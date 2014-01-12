@@ -1,7 +1,7 @@
 libopenworm
 ===========
 
-Unified data access library for the OpenWorm project
+Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
 
 Basic Usage
 ------------
