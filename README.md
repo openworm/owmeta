@@ -6,18 +6,19 @@ Unified data access library for data about the c. elegans anatomy and model for 
 Basic Usage
 ------------
 
-::
-
+```python
   import openworm
   
   # Grabs the representation of the neuronal network
   net = PyOpenWorm.network()
+```
   
 More examples
 -------------
   
 Returns information about individual neurons::
 
+```python
   >>>net.aneuron('AVAL').name()
   AVAL
   >>>net.aneuron('AVAL').aval_neuron.type()
@@ -26,4 +27,4 @@ Returns information about individual neurons::
   Motor
   >>>net.aneuron('PHAL').aval_neuron.type()
   Sensory
-  
+```

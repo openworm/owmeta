@@ -13,22 +13,8 @@ Basic Usage
   # Grabs the representation of the neuronal network
   net = PyOpenWorm.network()
   
-..  iter = net.motor
-  
 More examples
 -------------
-
-..Returns an iter with all motor neurons::
-
-..  net.sensory
-  
-..Returns an iter with all sensory neurons::
-
-..  nml = net.neuroml
-
-..Returns a NeuroML2 representation of the entire network::
-
-..  rdf = net.rdf
   
 Returns information about individual neurons::
 
@@ -41,6 +27,3 @@ Returns information about individual neurons::
   >>>net.aneuron('PHAL').aval_neuron.type()
   Sensory
   
-..Returns a neuron object by name::
-
-..  nx = network.networkx
