@@ -13,18 +13,11 @@ Contents:
 
    intro
 
-Classes
---------
-
-.. autoclass:: Network
-   :members:
-.. autoclass:: Neuron
-   :members:
-
 Modules
 --------
 
 .. automodule:: PyOpenWorm
+   :members:
 
 Issues
 ------
