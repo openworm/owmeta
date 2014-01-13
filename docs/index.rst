@@ -13,9 +13,23 @@ Contents:
 
    intro
 
+Classes
+--------
 
-.. Indices and tables
-.. ==================
+.. autoclass:: Network
+   :members:
+.. autoclass:: Neuron
+   :members:
 
-.. * :ref:`genindex`
 
+Issues
+------
+
+.. _github issue: https://github.com/slarson/PyOpenWorm/issues
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
