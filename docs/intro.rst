@@ -1,4 +1,4 @@
-libopenworm
+PyOpenWorm
 ===========
 
 Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
@@ -6,44 +6,32 @@ Unified data access library for data about the c. elegans anatomy and model for 
 Basic Usage
 ------------
 
-```python
   import openworm
   
   # Grabs the representation of the neuronal network
-  network = openworm.network
+  net = pyopenworm.network()
   
-  iter = network.motor
-```
+  iter = net.motor
   
 More examples
 -------------
 
-### Returns an iter with all motor neurons
+Returns an iter with all motor neurons::
 
-```python
-  network.sensory
-```  
+  net.sensory
   
-### Returns an iter with all sensory neurons
+Returns an iter with all sensory neurons::
 
-```python
-  nml = network.neuroml
-```
+  nml = net.neuroml
 
-### Returns a NeuroML2 representation of the entire network
+Returns a NeuroML2 representation of the entire network::
 
-```python
-  rdf = network.rdf
-```  
+  rdf = net.rdf
   
-### Returns an RDF graph representation of the entire network
+Returns an RDF graph representation of the entire network::
 
-```python
-  aval_neuron = network['AVAL']
-```
+  aval_neuron = net.aneuron('AVAL')
   
-### Returns a neuron object by name
+Returns a neuron object by name::
 
-```python
   nx = network.networkx
-```
