@@ -32,11 +32,14 @@ More examples
   
 Returns information about individual neurons::
 
-  >>>aval_neuron = net.aneuron('AVAL')
-  >>>aval_neuron.name()
+  >>>net.aneuron('AVAL').name()
   AVAL
-  >>>aval_neuron.type()
+  >>>net.aneuron('AVAL').aval_neuron.type()
   Interneuron
+  >>>net.aneuron('DD5').aval_neuron.type()
+  Motor
+  >>>net.aneuron('PHAL').aval_neuron.type()
+  Sensory
   
 ..Returns a neuron object by name::
 
