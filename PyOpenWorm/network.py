@@ -19,10 +19,17 @@ class Network:
 
 	#def __init__(self):
 	
-	def motor(self):
-		return motor
+#	def motor(self):
+#		return motor
 	
 	def aneuron(self, name):
+	"""
+	Get a neuron by name
+		
+	:param name: Name of a c. elegans neuron
+	:returns: Corresponding neuron to the name given
+	:rtype: Neuron
+	"""
 		conn = pymysql.connect(host='my01.winhost.com', port=3306, user='openworm', passwd='openworm', db='mysql_31129_celegans')
 	   
 		cur = conn.cursor()
