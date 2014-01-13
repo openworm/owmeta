@@ -30,9 +30,13 @@ More examples
 
 ..  rdf = net.rdf
   
-Returns an RDF graph representation of the entire network::
+Returns information about individual neurons::
 
-  aval_neuron = net.aneuron('AVAL')
+  >>>aval_neuron = net.aneuron('AVAL')
+  >>>aval_neuron.name()
+  AVAL
+  >>>aval_neuron.type()
+  Interneuron
   
 ..Returns a neuron object by name::
 
