@@ -1,10 +1,10 @@
 """
 .. class:: Neuron
 
-neuron client
-=============
+   neuron client
+   =============
 
-This module contains the class that defines the neuron
+   This module contains the class that defines the neuron
 
 """
 
@@ -100,7 +100,12 @@ class Neuron:
 		return 'AVAL'
 	
 	
-	#def neuroml(self):
+	# This method can start out life by reading in the nml files
+	# from GitHub
+	#def as_neuroml(self):
+	#   """Return this neuron as a NeuroML representation
+	#	:rtype: str
+	#   """
 	
 	#def rdf(self):
 	

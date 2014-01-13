@@ -2,7 +2,7 @@
 """
 .. class:: Network
 
-This module contains the class that defines the network
+   This module contains the class that defines the network
 
 """
 
