@@ -62,13 +62,15 @@ ion channels and neurotransmitter receptors.  A NeuroML representation is useful
 for answering questions about model morphology and simulation parameters.  Lastly,
 a Blender representation is a full 3D shape definition that can be used for 
 calculations in 3D space.  Further representations regarding activity patterns
-or simulated activity can be considered as well.
+such as Neo or simulated activity can be considered as well.
 
 Using these different representations separately leads to ad hoc scripting for
-for each representation and presents a challenge for data integration and 
+for each representation.  This presents a challenge for data integration and 
 consolidation of information in 'master' authoritative representations.  By
 creating a unified data access layer, different representations
-can become encapsulated into an abstract view that allows the user to work with
-objects related to the biological reality of the worm and forget about which
-representation is being used under the hood.  The worm itself has a unified sense of neurons, networks, muscles,
+can become encapsulated into an abstract view.  This allows the user to work with
+objects related to the biological reality of the worm.  This has the advantage that 
+the user can forget about which representation is being used under the hood.  
+
+The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
