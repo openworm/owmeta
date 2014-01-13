@@ -1,7 +1,7 @@
 """
-.. autoclass:: Neuron
+
 neuron client
-~~~~~~~~~~~~~~
+=============
 
 This module contains the class that defines the neuron
 
@@ -17,13 +17,14 @@ import urllib
 class Neuron:
 
 	def type(self):
+		return ''
 	
-	def neuroml(self):
+	#def neuroml(self):
 	
-	def rdf(self):
+	#def rdf(self):
 	
-	def channels(self):
+	#def channels(self):
 	
-	def peptides(self):
+	#def peptides(self):
 	
 	
