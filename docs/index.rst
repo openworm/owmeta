@@ -21,6 +21,10 @@ Classes
 .. autoclass:: Neuron
    :members:
 
+Modules
+--------
+
+.. automodule:: PyOpenWorm
 
 Issues
 ------
