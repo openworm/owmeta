@@ -22,6 +22,12 @@ class PyOpenWormTest(unittest.TestCase):
     def test_neuron_name(self):
     	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').name(),'AVAL')
     	self.assertEquals(PyOpenWorm.Network().aneuron('AVAR').name(),'AVAR')
+    	
+    def test_neuron_GJ_degree(self):
+    	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').GJ_degree(),60)
+    	
+    def test_neuron_Syn_degree(self):
+    	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').Syn_degree(),74)
         
 #    def test_bneuron(self):
 #        self.assertTrue(1)
