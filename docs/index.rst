@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to PyOpenWorm's documentation!
-====================================
+======================================
 
 Contents:
 
@@ -14,7 +14,7 @@ Contents:
    intro
 
 Modules
---------
+-------
 
 .. automodule:: PyOpenWorm
    :members:

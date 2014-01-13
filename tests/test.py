@@ -11,6 +11,9 @@ class PyOpenWormTest(unittest.TestCase):
     def test_network(self):
         self.assertTrue(isinstance(PyOpenWorm.Network(),PyOpenWorm.Network))
         
+    def test_network_aneuron(self):
+    	self.assertTrue(isinstance(PyOpenWorm.Network().aneuron('AVAL'),PyOpenWorm.Neuron))
+        
 #    def test_bneuron(self):
 #        self.assertTrue(1)
 

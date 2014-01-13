@@ -1,10 +1,8 @@
 """
-.. autoclass:: Network
 network client
-~~~~~~~~~~~~~~
+==============
 
 This module contains the class that defines the network
-
 
 """
 
@@ -14,6 +12,7 @@ from rdflib import Namespace
 from rdflib.namespace import RDF, RDFS
 from rdflib import URIRef, BNode, Literal
 import urllib
+import PyOpenWorm
 
 class Network:
 
@@ -28,7 +27,7 @@ class Network:
 			
 		:param name: Name of a c. elegans neuron
 		:returns: Corresponding neuron to the name given
-		:rtype: Neuron
+		:rtype: PyOpenWorm.Neuron
 		"""
 		conn = pymysql.connect(host='my01.winhost.com', port=3306, user='openworm', passwd='openworm', db='mysql_31129_celegans')
 	   
@@ -94,6 +93,7 @@ class Network:
 	
 		# when done!
 		g.close()
+		return PyOpenWorm.Neuron()
 
 		
 	#def sensory(self):
