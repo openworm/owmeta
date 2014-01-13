@@ -44,3 +44,27 @@ Returns the c. elegans connectome represented as a
   >>>net.as_networkx()
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
 
+Why is this necessary?
+----------------------
+
+There are many different useful ways to compute with data related to the worm.
+Different data structures have different strengths and answer different questions.
+For example, a NetworkX representation of the connectome as a complex graph enables
+questions to be asked about first and second nearest neighbors of a given neuron.
+In contrast, an RDF semantic graph representation is useful for reading and 
+writing annotations about multiple aspects of a neuron, such as what papers 
+have been written about it, multiple different properties it may have such as
+ion channels and neurotransmitter receptors.  A NeuroML representation is useful
+for answering questions about model morphology and simulation parameters.  Lastly,
+a Blender representation is a full 3D shape definition that can be used for 
+calculations in 3D space.  Further representations regarding activity patterns
+or simulated activity can be considered as well.
+
+Using these different representations separately leads to ad hoc scripting for
+for each representation and presents a challenge for data integration and 
+consolidation of information in 'master' authoritative representations.  By
+creating a unified data access layer, working with different representations
+can become integrated into an abstract view that allows the user to work with
+objects that are related to the full biological reality of the things getting
+worked with.  The worm itself has a unified sense of neurons, networks, muscles,
+ion channels, etc and so should our code.
