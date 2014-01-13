@@ -1,4 +1,4 @@
-libopenworm
+PyOpenWorm
 ===========
 
 Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
@@ -7,10 +7,10 @@ Basic Usage
 ------------
 
 ```python
-  import openworm
+  import pyopenworm
   
   # Grabs the representation of the neuronal network
-  network = openworm.network
+  network = pyopenworm.network()
   
   iter = network.motor
 ```
