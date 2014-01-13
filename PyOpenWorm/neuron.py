@@ -1,4 +1,5 @@
 """
+.. class:: Neuron
 
 neuron client
 =============
@@ -17,7 +18,21 @@ import urllib
 class Neuron:
 
 	def type(self):
-		return ''
+		"""Get type of this neuron (motor, interneuron, sensory)
+			
+		:returns: the type
+		:rtype: str
+		"""
+		return 'Interneuron'
+		
+	def name(self):
+		"""Get name of this neuron (e.g. AVAL)
+			
+		:returns: the name
+		:rtype: str
+		"""
+		return 'AVAL'
+	
 	
 	#def neuroml(self):
 	

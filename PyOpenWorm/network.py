@@ -1,4 +1,6 @@
 """
+.. class:: Network
+
 network client
 ==============
 
