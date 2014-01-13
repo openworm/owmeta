@@ -12,10 +12,15 @@ Basic Usage
 -----------
 
 ```python
-  import openworm
+  >>>import openworm
   
   # Grabs the representation of the neuronal network
-  net = PyOpenWorm.network()
+  >>>net = PyOpenWorm.Network()
+  >>>net.aneuron('AVAL').type()
+  Interneuron
+  #show how many gap junctions go in and out of AVAL
+  >>>net.aneuron('AVAL').GJ_degree()
+  60
 ```
   
   
@@ -27,16 +32,18 @@ Returns information about individual neurons::
 ```python
   >>>net.aneuron('AVAL').name()
   AVAL
-  >>>net.aneuron('AVAL').type()
-  Interneuron
   >>>net.aneuron('DD5').type()
   Motor
   >>>net.aneuron('PHAL').type()
   Sensory
-  #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').GJ_degree()
-  60
   #show how many chemical synapses go in and out of AVAL
   >>>net.aneuron('AVAL').Syn_degree()
   74
+```
+
+Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
+
+```python
+  >>>net.as_networkx()
+  <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
 ```

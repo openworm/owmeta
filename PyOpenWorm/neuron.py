@@ -54,7 +54,7 @@ class Neuron:
 	def GJ_degree(self):
 		"""Get the degree of this neuron for gap junction edges only
 		
-		:returns: total number of incoming and outgoing synapses
+		:returns: total number of incoming and outgoing gap junctions
 		:rtype: int
 		"""
 		count = 0
@@ -70,7 +70,7 @@ class Neuron:
 	def Syn_degree(self):
 		"""Get the degree of a this neuron for chemical synapse edges only
 		
-		:returns: total number of incoming and outgoing synapses
+		:returns: total number of incoming and outgoing chemical synapses
 		:rtype: int
 		"""
 		count = 0

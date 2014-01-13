@@ -3,6 +3,7 @@
 import unittest
 
 import PyOpenWorm
+import networkx
 
 
 class PyOpenWormTest(unittest.TestCase):
@@ -28,6 +29,9 @@ class PyOpenWormTest(unittest.TestCase):
     	
     def test_neuron_Syn_degree(self):
     	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').Syn_degree(),74)
+    	
+    def test_network_as_networkx(self):
+    	self.assertTrue(isinstance(PyOpenWorm.Network().as_networkx(),networkx.DiGraph))
         
 #    def test_bneuron(self):
 #        self.assertTrue(1)
