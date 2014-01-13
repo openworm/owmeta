@@ -13,7 +13,6 @@ setup(
     name = "PyOpenWorm",
     version = '0.0.1',
     packages = ['PyOpenWorm', 'tests'],
-    packages = ['PyOpenWorm'],
     #package_data = {'neuroml.test': ['*.nml']},
     author = "OpenWorm.org authors and contributors",
     author_email = "info@openworm.org",

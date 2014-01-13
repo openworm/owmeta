@@ -2,12 +2,12 @@
 
 """
 PyOpenWorm
-~~~~~~~
+==========
 
 OpenWorm Unified Data Abstract Layer.
 
 Classes
---------
+-------
 
 .. autoclass:: Network
    :members:

@@ -1,8 +1,6 @@
+# -*- coding: utf-8 -*-
 """
 .. class:: Network
-
-network client
-==============
 
 This module contains the class that defines the network
 
