@@ -67,8 +67,8 @@ or simulated activity can be considered as well.
 Using these different representations separately leads to ad hoc scripting for
 for each representation and presents a challenge for data integration and 
 consolidation of information in 'master' authoritative representations.  By
-creating a unified data access layer, working with different representations
-can become integrated into an abstract view that allows the user to work with
-objects that are related to the full biological reality of the things getting
-worked with.  The worm itself has a unified sense of neurons, networks, muscles,
+creating a unified data access layer, different representations
+can become encapsulated into an abstract view that allows the user to work with
+objects related to the biological reality of the worm and forget about which
+representation is being used under the hood.  The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
