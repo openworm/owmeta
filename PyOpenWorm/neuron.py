@@ -150,14 +150,12 @@ class Neuron:
 		"""
 		if (self.semantic_net == ''):
 			self._init_semantic_net()
-		
-		print("going to get results...")
 	
 		qres = self.semantic_net.query(
-		  """SELECT ?objLabel     #we want to get out the labels associated with the predicates and the objects
+		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
 		   WHERE {
-			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the 'AVALnode' that is the anchor of all information about the AVAL neuron
-			  ?node <http://openworm.org/entities/1515> ?object .# having identified that node, here we match any predicate and object associated with the AVALnode
+			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
+			  ?node <http://openworm.org/entities/1515> ?object .# having identified that node, here we match an object associated with the node via the 'is a' property (number 1515)
 			  ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
 			}""")       
 	
@@ -195,6 +193,29 @@ class Neuron:
 		"""
 		return self._name
 	
+	def receptors(self):
+		"""Get receptors associated with this neuron
+			
+		:returns: a list of all known receptors
+		:rtype: list
+		"""
+		if (self.semantic_net == ''):
+			self._init_semantic_net()
+	
+		qres = self.semantic_net.query(
+		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
+		   WHERE {
+			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
+			  ?node <http://openworm.org/entities/361> ?object .# having identified that node, here we match an object associated with the node via the 'receptor' property (number 361)
+			  ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
+			}""")       
+	
+		receptors = []
+		for r in qres.result:
+			receptors.append(str(r[0]))
+			
+		return receptors
+		
 	
 	# This method can start out life by reading in the nml files
 	# from GitHub
@@ -205,7 +226,7 @@ class Neuron:
 	
 	#def rdf(self):
 	
-	#def channels(self):
+	
 	
 	#def peptides(self):
 	

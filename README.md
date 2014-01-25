@@ -32,10 +32,13 @@ Returns information about individual neurons::
 ```python
   >>>net.aneuron('AVAL').name()
   AVAL
+  #list all known receptors
+  >>>net.aneuron('AVAL').receptors()
+  ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
   >>>net.aneuron('DD5').type()
-  Motor
+  motor
   >>>net.aneuron('PHAL').type()
-  Sensory
+  sensory
   #show how many chemical synapses go in and out of AVAL
   >>>net.aneuron('AVAL').Syn_degree()
   74
@@ -75,9 +78,16 @@ the user can forget about which representation is being used under the hood.
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
 
+Installation
+------------
+
+    git clone https://github.com/slarson/PyOpenWorm.git
+    cd PyOpenWorm
+    python setup.py install
+
 Running tests
 -------------
 
-After checking out the project, tests can be run on the command line with:
+After checking out the project, tests can be run on the command line with::
 
     python -m unittest discover -s tests

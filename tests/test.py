@@ -33,7 +33,8 @@ class PyOpenWormTest(unittest.TestCase):
     def test_network_as_networkx(self):
     	self.assertTrue(isinstance(PyOpenWorm.Network().as_networkx(),networkx.DiGraph))
         
-#    def test_bneuron(self):
-#        self.assertTrue(1)
+	def test_neuron_receptors(self):
+		self.assertTrue('GLR-2' in PyOpenWorm.Neuron('AVAL').receptors())
+		self.assertTrue('OSM-9' in PyOpenWorm.Neuron('PHAL').receptors())
 
         
