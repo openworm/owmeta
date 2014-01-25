@@ -85,7 +85,7 @@ class Neuron:
 			g.add( (n[first], RDFS.label, Literal(second)) )
 	
 	
-		#second stem, get the relationships between them and add them to the graph
+		#second step, get the relationships between them and add them to the graph
 		cur.execute("SELECT DISTINCT EnID1, Relation, EnID2 FROM tblrelationship")
 	
 		for r in cur.fetchall():
@@ -215,6 +215,38 @@ class Neuron:
 			
 		return receptors
 		
+	def get_reference(self, type, item=''):
+		"""Get a reference back that provides the evidence that this neuron is
+		   associated with the item requested as a digital object identifier URL.
+		   
+		   Example::
+		   
+		       >>>aval = PyOpenWorm.Neuron('AVAL')
+		       >>>aval.receptors()
+ 			   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
+ 			   #look up what reference says this neuron has a receptor GLR-1
+		       >>>aval.get_reference(0,'GLR-1')
+		       http://dx.doi.org/10.100.123/natneuro
+		       #look up what reference says this neuron has a neighbor DD5
+		       >>>aval.get_reference(1, 'DD5')
+		       http://dx.doi.org/20.140.521/ploscompbiol
+		   
+		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
+		   :param item: Name of the item requested, if appropriate
+		   :returns: a Digital Object Identifier (DOI) as a URL
+		   :rtype: URL
+		   """
+		   
+	def get_neighbors(self, type=0):
+		"""Get a list of neighboring neurons.  
+		
+		   :param type: What kind of junction to look for.  
+		                0=all, 1=gap junctions only, 2=all chemical synapses
+		                3=incoming chemical synapses, 4=outgoing chemical synapses
+		   :returns: a list of neuron names
+		   :rtype: List
+		   """
+	
 	
 	# This method can start out life by reading in the nml files
 	# from GitHub
