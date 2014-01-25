@@ -22,11 +22,11 @@ class Neuron:
 	def __init__(self, name):
 		
 		self._name = name
-		self.worm = ''
+		self.networkX = ''
 		self.semantic_net = ''
 			
 	def _init_networkX(self):
-		self.worm = nx.DiGraph()
+		self.networkX = nx.DiGraph()
 		
 		# Neuron table
 		csvfile = urllib2.urlopen('https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv')
@@ -45,16 +45,16 @@ class Neuron:
 				neurontype = "unknown"
 				
 			if len(row[0]) > 0: # Only saves valid neuron names
-				self.worm.add_node(row[0], ntype = neurontype)
+				self.networkX.add_node(row[0], ntype = neurontype)
 		
 		# Connectome table
 		csvfile = urllib2.urlopen('https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv')
 		
 		reader = csv.reader(csvfile, delimiter=';', quotechar='|')
 		for row in reader:
-			self.worm.add_edge(row[0], row[1], weight = row[3])
-			self.worm[row[0]][row[1]]['synapse'] = row[2]
-			self.worm[row[0]][row[1]]['neurotransmitter'] = row[4]
+			self.networkX.add_edge(row[0], row[1], weight = row[3])
+			self.networkX[row[0]][row[1]]['synapse'] = row[2]
+			self.networkX[row[0]][row[1]]['neurotransmitter'] = row[4]
 		
 	def _init_semantic_net(self):
 		conn = pymysql.connect(host='my01.winhost.com', port=3306, user='openworm', 
@@ -110,14 +110,14 @@ class Neuron:
 		:returns: total number of incoming and outgoing gap junctions
 		:rtype: int
 		"""
-		if (self.worm == ''):
+		if (self.networkX == ''):
 			self._init_networkX()
 		
 		count = 0
-		for item in self.worm.in_edges_iter(self.name(),data=True):
+		for item in self.networkX.in_edges_iter(self.name(),data=True):
 			if 'GapJunction' in item[2]['synapse']:
 				count = count + 1
-		for item in self.worm.out_edges_iter(self.name(),data=True):
+		for item in self.networkX.out_edges_iter(self.name(),data=True):
 			if 'GapJunction' in item[2]['synapse']:
 				count = count + 1
 		return count
@@ -129,13 +129,13 @@ class Neuron:
 		:returns: total number of incoming and outgoing chemical synapses
 		:rtype: int
 		"""
-		if (self.worm == ''):
+		if (self.networkX == ''):
 			self._init_networkX()
 		count = 0
-		for item in self.worm.in_edges_iter(self.name(),data=True):
+		for item in self.networkX.in_edges_iter(self.name(),data=True):
 			if 'Send' in item[2]['synapse']:
 				count = count + 1
-		for item in self.worm.out_edges_iter(self.name(),data=True):
+		for item in self.networkX.out_edges_iter(self.name(),data=True):
 			if 'Send' in item[2]['synapse']:
 				count = count + 1
 		return count
@@ -173,9 +173,9 @@ class Neuron:
 		:returns: the type
 		:rtype: str
 		"""
-		if (self.worm == ''):
+		if (self.networkX == ''):
 			self._init_networkX()
-		return self.worm.node[self.name()]['ntype']		
+		return self.networkX.node[self.name()]['ntype']		
 
 	def type(self):
 		"""Get type of this neuron (motor, interneuron, sensory)

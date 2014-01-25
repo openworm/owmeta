@@ -14,6 +14,11 @@ class PyOpenWormTest(unittest.TestCase):
         
     def test_network_aneuron(self):
     	self.assertTrue(isinstance(PyOpenWorm.Network().aneuron('AVAL'),PyOpenWorm.Neuron))
+   
+   	def test_network_neurons(self):
+   		self.assertTrue('AVAL' in PyOpenWorm.Network().neurons())
+   		self.assertTrue('DD5' in PyOpenWorm.Network().neurons())
+   		self.assertEquals(len(PyOpenWorm.Network().neurons()), 302)
     	
     def test_neuron_type(self):
     	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').type(),'interneuron')

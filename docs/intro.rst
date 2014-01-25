@@ -41,6 +41,10 @@ Returns information about individual neurons::
   >>>net.aneuron('AVAL').Syn_degree()
   74
 
+Returns the list of all neurons::
+
+  >>>len(net.neurons())
+  302
   
 Returns the c. elegans connectome represented as a 
 `NetworkX <http://networkx.github.io/documentation/latest/>`_ graph::
