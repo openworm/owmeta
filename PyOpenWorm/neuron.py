@@ -257,12 +257,12 @@ class Neuron:
 		   :rtype: List
 		   """
 	
-	# This method can start out life by reading in the nml files
-	# from GitHub
-	#def as_neuroml(self):
-	#   """Return this neuron as a NeuroML representation
-	#	:rtype: str
-	#   """
+
+	def _as_neuroml(self):
+	   """Return this neuron as a NeuroML representation
+	   
+		  :rtype: libNeuroML.Neuron
+	   """
 	
 	#def rdf(self):
 	
