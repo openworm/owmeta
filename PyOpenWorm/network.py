@@ -6,7 +6,7 @@
 
 """
 
-import pymysql
+import sqlite3
 from rdflib import Graph
 from rdflib import Namespace
 from rdflib.namespace import RDF, RDFS
@@ -123,8 +123,7 @@ class Network:
 		return self.worm
 		
 	def _init_semantic_net(self):
-		conn = pymysql.connect(host='my01.winhost.com', port=3306, user='openworm', 
-			   passwd='openworm', db='mysql_31129_celegans')
+		conn = sqlite3.connect('db/celegans.db')
 	   
 		cur = conn.cursor()
 	
@@ -150,7 +149,6 @@ class Network:
 			# In this case, we connect the common name of that entity to the 
 			# root URI via the RDFS label property.
 			g.add( (n[first], RDFS.label, Literal(second)) )
-	
 	
 		#second stem, get the relationships between them and add them to the graph
 		cur.execute("SELECT DISTINCT EnID1, Relation, EnID2 FROM tblrelationship")

@@ -8,7 +8,7 @@
 
 """
 
-import pymysql
+import sqlite3
 from rdflib import Graph
 from rdflib import Namespace
 from rdflib.namespace import RDF, RDFS
@@ -57,8 +57,7 @@ class Neuron:
 			self.networkX[row[0]][row[1]]['neurotransmitter'] = row[4]
 		
 	def _init_semantic_net(self):
-		conn = pymysql.connect(host='my01.winhost.com', port=3306, user='openworm', 
-			   passwd='openworm', db='mysql_31129_celegans')
+		conn = sqlite3.connect('db/celegans.db')
 	   
 		cur = conn.cursor()
 	
