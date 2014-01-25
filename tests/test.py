@@ -19,6 +19,10 @@ class PyOpenWormTest(unittest.TestCase):
    		self.assertTrue('AVAL' in PyOpenWorm.Network().neurons())
    		self.assertTrue('DD5' in PyOpenWorm.Network().neurons())
    		self.assertEquals(len(PyOpenWorm.Network().neurons()), 302)
+   		
+   	def test_network_muscles(self):
+   		self.assertTrue('MDL08' in PyOpenWorm.Network().muscles())
+   		self.assertTrue('MDL15' in PyOpenWorm.Network().muscles())
     	
     def test_neuron_type(self):
     	self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').type(),'interneuron')

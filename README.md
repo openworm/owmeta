@@ -51,6 +51,13 @@ Returns the list of all neurons::
   302
 ```
 
+Returns the list of all muscles::
+
+```python
+  >>>'MDL08' in net.muscles()
+  True
+```
+
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
