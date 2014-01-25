@@ -141,6 +141,13 @@ class Neuron:
 		return count
 		
 	def type_semantic(self):
+		"""Get type of this neuron (motor, interneuron, sensory)
+		
+		Use the semantic database as the source
+			
+		:returns: the type
+		:rtype: str
+		"""
 		if (self.semantic_net == ''):
 			self._init_semantic_net()
 		
@@ -161,6 +168,13 @@ class Neuron:
 		return type
 		
 	def type_networkX(self):
+		"""Get type of this neuron (motor, interneuron, sensory)
+		
+		Use the networkX representation as the source
+			
+		:returns: the type
+		:rtype: str
+		"""
 		if (self.worm == ''):
 			self._init_networkX()
 		return self.worm.node[self.name()]['ntype']		
