@@ -74,3 +74,10 @@ the user can forget about which representation is being used under the hood.
 
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
+
+Running tests
+-------------
+
+After checking out the project, tests can be run on the command line with:
+
+    python -m unittest discover -s tests
