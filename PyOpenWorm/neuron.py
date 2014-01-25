@@ -215,7 +215,7 @@ class Neuron:
 			
 		return receptors
 		
-	def get_reference(self, type, item=''):
+	def _get_reference(self, type, item=''):
 		"""Get a reference back that provides the evidence that this neuron is
 		   associated with the item requested as a digital object identifier URL.
 		   
@@ -237,7 +237,7 @@ class Neuron:
 		   :rtype: URL
 		   """
 		   
-	def get_neighbors(self, type=0):
+	def _get_neighbors(self, type=0):
 		"""Get a list of neighboring neurons.  
 		
 		   :param type: What kind of junction to look for.  
@@ -247,6 +247,15 @@ class Neuron:
 		   :rtype: List
 		   """
 	
+	def _get_connections(self, type=0):
+		"""Get a list of Connections between this neuron and other neurons.  
+		
+		   :param type: What kind of junction to look for.  
+		                0=all, 1=gap junctions only, 2=all chemical synapses
+		                3=incoming chemical synapses, 4=outgoing chemical synapses
+		   :returns: a list of PyOpenWorm.Connection objects
+		   :rtype: List
+		   """
 	
 	# This method can start out life by reading in the nml files
 	# from GitHub
@@ -256,8 +265,6 @@ class Neuron:
 	#   """
 	
 	#def rdf(self):
-	
-	
 	
 	#def peptides(self):
 	
