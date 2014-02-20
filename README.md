@@ -54,7 +54,7 @@ Returns the list of all neurons::
 Returns the list of all muscles::
 
 ```python
-  >>>'MDL08' in net.muscles()
+  >>>'MDL08' in PyOpenWorm.Worm().muscles()
   True
 ```
 

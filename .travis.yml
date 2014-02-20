@@ -1,0 +1,16 @@
+language: python
+
+python:
+  - "2.7"
+  - "3.2"
+
+# command to install dependencies
+install:
+  - "pip install discover"
+  - "pip install rdflib"
+  - "pip install networkx"  
+  - "pip install . --use-mirrors"
+
+
+script:  
+  - python -m unittest discover -s tests
