@@ -70,3 +70,6 @@ class PyOpenWormTest(unittest.TestCase):
         for r in qres.result:
             list.append(str(r[0]))
         self.assertTrue('MDL08' in list)
+   
+    def test_neuron_get_reference(self):
+        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'EXP-1'), 'test')
