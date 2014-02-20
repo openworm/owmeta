@@ -4,6 +4,7 @@ import unittest
 
 import PyOpenWorm
 import networkx
+import rdflib
 
 
 class PyOpenWormTest(unittest.TestCase):
@@ -48,4 +49,9 @@ class PyOpenWormTest(unittest.TestCase):
   
     def test_worm_get_network(self):
         self.assertTrue(isinstance(PyOpenWorm.Worm().get_neuron_network(), PyOpenWorm.Network))
+        
+    def test_worm_get_semantic_net(self):
+        g0 = PyOpenWorm.Worm().get_semantic_net()        
+        self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
+        
         
