@@ -72,5 +72,5 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertTrue('MDL08' in list)
    
     def test_neuron_get_reference(self):
-        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'EXP-1'), 'test')
+        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'EXP-1'), 'http://dx.doi.org/10.100.123/natneuro')
         self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'DOP-2'), None)

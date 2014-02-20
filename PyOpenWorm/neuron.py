@@ -15,7 +15,7 @@ from rdflib import URIRef, Literal
 import urllib2
 import networkx as nx
 import csv
-import os
+
 
 class Neuron:
 
@@ -24,6 +24,7 @@ class Neuron:
 		self._name = name
 		self.networkX = ''
 		self.semantic_net = ''
+		self.semantic_net_new = ''
 			
 	def _init_networkX(self):
 		self.networkX = nx.DiGraph()
@@ -165,7 +166,7 @@ class Neuron:
          cur.close()
          conn.close()
     
-         self.semantic_net = g0
+         self.semantic_net_new = g0
 		
 	def GJ_degree(self):
 		"""Get the degree of this neuron for gap junction edges only
@@ -312,24 +313,24 @@ class Neuron:
 		   
 		   Example::
 		   
-		       >>>aval = PyOpenWorm.Neuron('AVAL')
-		       >>>aval.receptors()
- 			   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
- 			   #look up what reference says this neuron has a receptor GLR-1
-		       >>>aval.get_reference(0,'GLR-1')
-		       http://dx.doi.org/10.100.123/natneuro
+		       >>>ader = PyOpenWorm.Neuron('ADER')
+		       >>>ader.receptors()
+ 			 ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
+ 			   #look up what reference says this neuron has a receptor EXP-1
+		       >>>ader.get_reference(0,'EXP-1')
+		       'http://dx.doi.org/10.100.123/natneuro'
 		       #look up what reference says this neuron has a neighbor DD5
-		       >>>aval.get_reference(1, 'DD5')
-		       http://dx.doi.org/20.140.521/ploscompbiol
+		       >>>ader.get_reference(1, 'DD5')
+		       'http://dx.doi.org/20.140.521/ploscompbiol'
 		   
 		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
 		   :param item: Name of the item requested, if appropriate
 		   :returns: a Digital Object Identifier (DOI) as a URL
 		   :rtype: URL
 		"""
-         if (self.semantic_net == ''):
+         if (self.semantic_net_new == ''):
 		  self._init_semantic_net_new()
-         qres = self.semantic_net.query(
+         qres = self.semantic_net_new.query(
             """
             SELECT ?prov    #we want to get out the labels associated with the objects
             WHERE {
