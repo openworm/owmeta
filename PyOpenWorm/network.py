@@ -2,16 +2,16 @@
 """
 .. class:: Network
 
-   This module contains the class that defines the network
+   This module contains the class that defines the neuronal network
 
 """
 
 import sqlite3
 from rdflib import Graph
 from rdflib import Namespace
-from rdflib.namespace import RDF, RDFS
-from rdflib import URIRef, BNode, Literal
-import urllib, urllib2
+from rdflib.namespace import RDFS
+from rdflib import Literal
+import urllib2
 import PyOpenWorm
 import networkx as nx
 import csv

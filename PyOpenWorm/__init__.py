@@ -21,3 +21,4 @@ __author__ = 'Stephen Larson'
 
 from .network import Network
 from .neuron import Neuron
+from .worm import Worm

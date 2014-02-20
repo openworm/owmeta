@@ -16,7 +16,7 @@ Basic Usage
   >>>import openworm
   
   # Grabs the representation of the neuronal network
-  >>>net = PyOpenWorm.Network()
+  >>>net = PyOpenWorm.Worm().get_neuron_network()
   >>>net.aneuron('AVAL').type()
   Interneuron
   #show how many gap junctions go in and out of AVAL
