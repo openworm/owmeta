@@ -15,6 +15,7 @@ from rdflib import URIRef, Literal
 import urllib2
 import networkx as nx
 import csv
+import os
 
 class Neuron:
 
@@ -55,6 +56,12 @@ class Neuron:
 			self.networkX[row[0]][row[1]]['synapse'] = row[2]
 			self.networkX[row[0]][row[1]]['neurotransmitter'] = row[4]
 		
+	def _write_out_db(self):
+          con = sqlite3.connect('db/celegans.db')
+          with open('db/celegans.sql', 'w') as f:
+              for line in con.iterdump():
+                  f.write('%s\n' % line)
+
 	def _init_semantic_net(self):
 		conn = sqlite3.connect('db/celegans.db')
 	   
@@ -305,15 +312,16 @@ class Neuron:
             """
             SELECT ?prov    #we want to get out the labels associated with the objects
             WHERE {
-              ?node rdfs:label '"""+self.name()+"""' .
-              ?node2 rdfs:label '"""+item+"""' .
+              ?node rdfs:label '"""+self.name()+"""' . #identify this neuron
+              ?node2 rdfs:label '"""+item+"""' . #identify the argument
               GRAPH ?g { #Each triple is in its own sub-graph to enable provenance
                 # find the triple that connects the neuron node to the receptor node
                 # via the 'receptor' (361) relation
                 ?node <http://openworm.org/entities/361> ?node2 .
                 }
               #Triples with prov information are in the main graph only
-              ?g <http://openworm.org/entities/text_reference> ?prov  #for the sub-graph, find the prov associated
+              #For the sub-graph, find the prov associated
+              ?g <http://openworm.org/entities/text_reference> ?prov  
             }
             """)       
     
