@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=master)](https://travis-ci.org/openworm/PyOpenWorm)
+
 PyOpenWorm
 ===========
 
