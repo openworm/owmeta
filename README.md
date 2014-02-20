@@ -60,6 +60,17 @@ Returns the list of all muscles::
   True
 ```
 
+Returns provenance information providing evidence about facts::
+
+```python
+  >>>ader = PyOpenWorm.Neuron('ADER')
+  >>>ader.receptors()
+  ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
+  #look up what reference says this neuron has a receptor EXP-1
+  >>>ader.get_reference(0,'EXP-1')
+  'http://dx.doi.org/10.100.123/natneuro'
+```
+
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
