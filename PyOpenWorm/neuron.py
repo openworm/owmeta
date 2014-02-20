@@ -285,6 +285,27 @@ class Neuron:
 			
 		return receptors
 		
+	def _add_reference(self, type, item, doi):
+         """Add a reference that provides evidence of the relationship between 
+            this neuron and one of its elements.
+            
+            Example::
+		   
+		       >>>aval = PyOpenWorm.Neuron('AVAL')
+		       >>>aval.receptors()
+ 			   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
+ 			   #look up what reference says this neuron has a receptor GLR-1
+		       >>>aval.get_reference(0,'GLR-3')
+		       None
+                   >>>aval.add_reference(0,'GLR-3', 'http://dx.doi.org/125.41.3/ploscompbiol')
+                   >>>aval.get_reference(0,'GLR-3')
+                   http://dx.doi.org/125.41.3/ploscompbiol
+                   
+		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
+		:param item: Name of the item
+            :param doi: A Digital Object Identifier (DOI) that provides evidence
+		"""
+         
 	def get_reference(self, type, item=''):
          """Get a reference back that provides the evidence that this neuron is
 		   associated with the item requested as a digital object identifier URL.
