@@ -346,11 +346,12 @@ class Neuron:
             }
             """)       
     
-         muscles = []
+         ref = []
          for r in qres.result:
-            print str(r[0])
-            muscles.append(str(r[0]))
-         return muscles[0]
+            ref.append(str(r[0]))
+         if ref[0] == '':
+             return None
+         return ref[0]
 		   
 	def _get_neighbors(self, type=0):
 		"""Get a list of neighboring neurons.  

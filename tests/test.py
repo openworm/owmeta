@@ -73,3 +73,4 @@ class PyOpenWormTest(unittest.TestCase):
    
     def test_neuron_get_reference(self):
         self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'EXP-1'), 'test')
+        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'DOP-2'), None)
