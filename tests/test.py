@@ -54,4 +54,19 @@ class PyOpenWormTest(unittest.TestCase):
         g0 = PyOpenWorm.Worm().get_semantic_net()        
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
         
-        
+        qres = g0.query(
+            """
+            SELECT ?subLabel     #we want to get out the labels associated with the objects
+            WHERE {
+              GRAPH ?g { #Each triple is in its own sub-graph to enable provenance
+                # match all subjects that have the 'is a' (1515) property pointing to 'muscle' (1519)
+                ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1519> .
+                }
+              #Triples that have the label are in the main graph only
+              ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
+            }
+            """)       
+        list = []
+        for r in qres.result:
+            list.append(str(r[0]))
+        self.assertTrue('MDL08' in list)
