@@ -13,6 +13,8 @@ Classes
    :members:
 .. autoclass:: Neuron
    :members:
+.. autoclass:: Worm
+   :members:
 
 """
 
