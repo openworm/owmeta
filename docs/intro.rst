@@ -51,7 +51,13 @@ Returns the list of all muscles::
   >>>'MDL08' in net.muscles()
   True
 
-  
+Returns all known receptors for individual muscles::
+
+  >>>muscle = PyOpenWorm.Muscle('MDL08')
+  >>>muscle.receptors()
+  ['ENC-68', 'EGL-19', 'SLO-2']
+
+
 Returns the c. elegans connectome represented as a 
 `NetworkX <http://networkx.github.io/documentation/latest/>`_ graph::
 
