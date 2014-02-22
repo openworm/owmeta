@@ -45,5 +45,11 @@ class PyOpenWormTest(unittest.TestCase):
 	def test_neuron_receptors(self):
 		self.assertTrue('GLR-2' in PyOpenWorm.Neuron('AVAL').receptors())
 		self.assertTrue('OSM-9' in PyOpenWorm.Neuron('PHAL').receptors())
+		
+    def test_muscle(self):
+        self.assertTrue(isinstance(PyOpenWorm.Muscle(),PyOpenWorm.Muscle))
+        
+        def test_muscle_receptors(self):
+		self.assertTrue('UNC-68' in PyOpenWorm.Muscle('MDL08').receptors())
 
         
