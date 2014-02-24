@@ -296,11 +296,11 @@ class Neuron:
 		       >>>aval.receptors()
  			   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
  			   #look up what reference says this neuron has a receptor GLR-1
-		       >>>aval.get_reference(0,'GLR-3')
+		       >>>aval.get_reference(0,'GLR-1')
 		       None
-                   >>>aval.add_reference(0,'GLR-3', doi='125.41.3/ploscompbiol',
+                   >>>aval.add_reference(0,'GLR-1', doi='125.41.3/ploscompbiol',
                                                     pmid = '57182010')
-                   >>>aval.get_reference(0,'GLR-3')
+                   >>>aval.get_reference(0,'GLR-1')
                    ['http://dx.doi.org/125.41.3/ploscompbiol', 'http://pubmedcentral.nih.gov/57182010']
 		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
 		:param item: Name of the item
@@ -309,8 +309,9 @@ class Neuron:
             :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
          """
          #Validate inputs using evidence object, throw errors if bad
+         evidence = PyOpenWorm.Evidence(pmid,doi,wormbaseid)
          
-         #run semantic query to find the id of the item requested, throw errors if can't find
+         #run semantic query to find the id of the items requested, throw errors if can't find
          neuronid = ''
          relationid = ''
          itemid = ''
@@ -341,8 +342,7 @@ class Neuron:
 		       >>>ader.get_reference(1, 'DD5')
 		       ['http://dx.doi.org/20.140.521/ploscompbiol']
 		   
-		   :param type: The kind of thing to search for.  Valid options are: 
-                            0=receptor, 1=neighbor 
+		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
 		   :param item: Name of the item requested, if appropriate
 		   :returns: a list of URLs that points to references
 		   :rtype: list
