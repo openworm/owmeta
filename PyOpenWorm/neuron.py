@@ -286,7 +286,7 @@ class Neuron:
 			
 		return receptors
 		
-	def _add_reference(self, type, item, pmid, doi, wormbaseid):
+	def _add_reference(self, type, item, pmid = '', doi = '', wormbaseid = ''):
          """Add a reference that provides evidence of the relationship between 
             this neuron and one of its elements.
             
@@ -304,10 +304,26 @@ class Neuron:
                    ['http://dx.doi.org/125.41.3/ploscompbiol', 'http://pubmedcentral.nih.gov/57182010']
 		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
 		:param item: Name of the item
-            :param doi: A Digital Object Identifier (DOI) that provides evidence
-            :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence
-            :param wormbaseid: An ID from WormBase that points to a record that provides evidence
-		"""
+            :param doi: A Digital Object Identifier (DOI) that provides evidence, optional
+            :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
+            :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
+         """
+         #Validate inputs using evidence object, throw errors if bad
+         
+         #run semantic query to find the id of the item requested, throw errors if can't find
+         neuronid = ''
+         relationid = ''
+         itemid = ''
+         
+         #update the sqlite database with the reference content
+         conn = sqlite3.connect('db/celegans.db')
+         cur = conn.cursor()
+         cur.execute("UPDATE EnID1, Relation, EnID2, Citations FROM " + 
+                     "tblrelationship WHERE EnID1 = " + neuronid + ", Relation = " + 
+                     + relationid + ", EndID2 = " + itemid)
+                     
+         #rebuild the semantic network
+         self._init_semantic_net_new()
          
 	def get_reference(self, type, item=''):
          """Get a reference back that provides the evidence that this neuron is
@@ -325,7 +341,8 @@ class Neuron:
 		       >>>ader.get_reference(1, 'DD5')
 		       ['http://dx.doi.org/20.140.521/ploscompbiol']
 		   
-		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
+		   :param type: The kind of thing to search for.  Valid options are: 
+                            0=receptor, 1=neighbor 
 		   :param item: Name of the item requested, if appropriate
 		   :returns: a list of URLs that points to references
 		   :rtype: list
@@ -334,7 +351,7 @@ class Neuron:
 		  self._init_semantic_net_new()
          qres = self.semantic_net_new.query(
             """
-            SELECT ?prov    #we want to get out the labels associated with the objects
+            SELECT ?prov #we want to get out the labels associated with the objects
             WHERE {
               ?node rdfs:label '"""+self.name()+"""' . #identify this neuron
               ?node2 rdfs:label '"""+item+"""' . #identify the argument
