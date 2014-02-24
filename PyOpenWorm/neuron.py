@@ -286,7 +286,7 @@ class Neuron:
 			
 		return receptors
 		
-	def _add_reference(self, type, item, doi):
+	def _add_reference(self, type, item, pmid, doi, wormbaseid):
          """Add a reference that provides evidence of the relationship between 
             this neuron and one of its elements.
             
@@ -300,16 +300,18 @@ class Neuron:
 		       None
                    >>>aval.add_reference(0,'GLR-3', 'http://dx.doi.org/125.41.3/ploscompbiol')
                    >>>aval.get_reference(0,'GLR-3')
-                   http://dx.doi.org/125.41.3/ploscompbiol
+                   ['http://dx.doi.org/125.41.3/ploscompbiol']
                    
 		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
 		:param item: Name of the item
             :param doi: A Digital Object Identifier (DOI) that provides evidence
+            :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence
+            :param wormbaseid: An ID from WormBase that points to a record that provides evidence
 		"""
          
 	def get_reference(self, type, item=''):
          """Get a reference back that provides the evidence that this neuron is
-		   associated with the item requested as a digital object identifier URL.
+		   associated with the item requested as a list of URLs.
 		   
 		   Example::
 		   
@@ -318,15 +320,15 @@ class Neuron:
  			 ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
  			   #look up what reference says this neuron has a receptor EXP-1
 		       >>>ader.get_reference(0,'EXP-1')
-		       'http://dx.doi.org/10.100.123/natneuro'
+		       ['http://dx.doi.org/10.100.123/natneuro']
 		       #look up what reference says this neuron has a neighbor DD5
 		       >>>ader.get_reference(1, 'DD5')
-		       'http://dx.doi.org/20.140.521/ploscompbiol'
+		       ['http://dx.doi.org/20.140.521/ploscompbiol']
 		   
 		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
 		   :param item: Name of the item requested, if appropriate
-		   :returns: a Digital Object Identifier (DOI) as a URL
-		   :rtype: URL
+		   :returns: a list of URLs that points to references
+		   :rtype: list
 		"""
          if (self.semantic_net_new == ''):
 		  self._init_semantic_net_new()
@@ -352,7 +354,7 @@ class Neuron:
             ref.append(str(r[0]))
          if ref[0] == '':
              return None
-         return ref[0]
+         return ref
 		   
 	def _get_neighbors(self, type=0):
 		"""Get a list of neighboring neurons.  
