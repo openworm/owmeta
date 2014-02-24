@@ -298,10 +298,10 @@ class Neuron:
  			   #look up what reference says this neuron has a receptor GLR-1
 		       >>>aval.get_reference(0,'GLR-3')
 		       None
-                   >>>aval.add_reference(0,'GLR-3', 'http://dx.doi.org/125.41.3/ploscompbiol')
+                   >>>aval.add_reference(0,'GLR-3', doi='125.41.3/ploscompbiol',
+                                                    pmid = '57182010')
                    >>>aval.get_reference(0,'GLR-3')
-                   ['http://dx.doi.org/125.41.3/ploscompbiol']
-                   
+                   ['http://dx.doi.org/125.41.3/ploscompbiol', 'http://pubmedcentral.nih.gov/57182010']
 		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
 		:param item: Name of the item
             :param doi: A Digital Object Identifier (DOI) that provides evidence
