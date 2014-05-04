@@ -33,8 +33,8 @@ class PyOpenWormTest(unittest.TestCase):
    	  self.assertEquals(len(self.net.neurons()), 302)
 
     def test_worm_muscles(self):
-   	  self.assertTrue('MDL08' in PyOpenWorm.Worm().muscles())
-   	  self.assertTrue('MDL15' in PyOpenWorm.Worm().muscles())
+   	  self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
+   	  self.assertTrue('MDL15' in PyOpenWorm.Worm(self.config).muscles())
 
     def test_neuron_type(self):
     	  self.assertEquals(self.net.aneuron('AVAL').type(),'interneuron')
@@ -59,10 +59,10 @@ class PyOpenWormTest(unittest.TestCase):
 	  self.assertTrue('OSM-9' in Neuron('PHAL',self.config).receptors())
 
     def test_worm_get_network(self):
-        self.assertTrue(isinstance(PyOpenWorm.Worm().get_neuron_network(), PyOpenWorm.Network))
+        self.assertTrue(isinstance(PyOpenWorm.Worm(self.config).get_neuron_network(), PyOpenWorm.Network))
 
     def test_worm_get_semantic_net(self):
-        g0 = PyOpenWorm.Worm().get_semantic_net()
+        g0 = PyOpenWorm.Worm(self.config).get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
 
         qres = g0.query(
@@ -114,4 +114,8 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertEquals(c['seven'], "sign")
         self.assertTrue(a['t'])
 
+    def test_muscle_neurons(self):
+        m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
+        for k in m:
+            print k
 

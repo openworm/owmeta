@@ -36,8 +36,8 @@ class Data(PyOpenWorm.Configure):
     def __init__(self, conf):
         PyOpenWorm.Configure.__init__(self,conf)
         self['nx'] = _B(self._init_networkX)
-        self['semantic_net'] = _B(self._init_semantic_net)
         self['semantic_net_new'] = _B(self._init_semantic_net_new)
+        self['semantic_net'] = self['semantic_net_new']
 
     def _init_networkX(self):
         g = nx.DiGraph()
@@ -69,52 +69,6 @@ class Data(PyOpenWorm.Configure):
             g.add_edge(row[0], row[1], weight = row[3])
             g[row[0]][row[1]]['synapse'] = row[2]
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
-        return g
-
-    def _init_semantic_net(self):
-        conn = sqlite3.connect(self['sqldb'])
-
-        cur = conn.cursor()
-
-        #first step, grab all entities and add them to the graph
-
-        cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
-
-        n = Namespace("http://openworm.org/entities/")
-
-        # print cur.description
-
-        g = Graph()
-
-        for r in cur.fetchall():
-            #first item is a number -- needs to be converted to a string
-            first = str(r[0])
-            #second item is text
-            second = str(r[1])
-
-            # This is the backbone of any RDF graph.  The unique
-            # ID for each entity is encoded as a URI and every other piece of
-            # knowledge about that entity is connected via triples to that URI
-            # In this case, we connect the common name of that entity to the
-            # root URI via the RDFS label property.
-            g.add( (n[first], RDFS.label, Literal(second)) )
-
-
-        #second step, get the relationships between them and add them to the graph
-        cur.execute("SELECT DISTINCT EnID1, Relation, EnID2 FROM tblrelationship")
-
-        for r in cur.fetchall():
-            #print r
-            #all items are numbers -- need to be converted to a string
-            first = str(r[0])
-            second = str(r[1])
-            third = str(r[2])
-
-            g.add( (n[first], n[second], n[third]) )
-
-        cur.close()
-        conn.close()
-
         return g
 
     def _init_semantic_net_new(self):

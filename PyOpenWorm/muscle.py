@@ -7,50 +7,59 @@
    This module contains the class that defines the muscle
 
 """
+import PyOpenWorm
+from PyOpenWorm import Configure
 
-import sqlite3
-from rdflib import Graph
-from rdflib import Namespace
-from rdflib.namespace import RDF, RDFS
-from rdflib import URIRef, BNode, Literal
-import urllib2
-import networkx as nx
-import csv
+class Muscle(Configure):
 
-class Muscle:
+    def __init__(self, name, conf=False):
+        Configure.__init__(self,conf)
+        self._name = name
 
-	def __init__(self, name):
-		self._name = name
+    def name(self):
+        """Get name of this muscle
 
-	def name(self):
-		"""Get name of this muscle
-			
-		:returns: the name
-		:rtype: str
-		"""
-		return self._name
+        :returns: the name
+        :rtype: str
+        """
+        return self._name
 
-	def _receptors(self):
-		"""Get receptors associated with this muscle
-			
-		:returns: a list of all known receptors
-		:rtype: list
-		"""
-		if (self.semantic_net == ''):
-			self._init_semantic_net()
+    def receptors(self):
+        """Get receptors associated with this muscle
 
-		qres = self.semantic_net.query(
-		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
-		   WHERE {
-			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified muscle
-			  ?node <http://openworm.org/entities/361> ?object .# having identified that node, here we match an object associated with the node via the 'receptor' property (number 361)
-			  ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
-			}""")       
+        :returns: a list of all known receptors
+        :rtype: list
+        """
 
-		receptors = []
-		for r in qres.result:
-			receptors.append(str(r[0]))
+        qres = self['semantic_net'].query(
+                """SELECT ?objLabel     #we want to get out the labels associated with the objects
+           WHERE {
+              ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified muscle
+              ?node <http://openworm.org/entities/361> ?object .# having identified that node, here we match an object associated with the node via the 'receptor' property (number 361)
+              ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
+            }""")
 
-		return receptors
+        receptors = []
+        for r in qres.result:
+            receptors.append(str(r[0]))
 
+        return receptors
 
+    def neurons(self):
+        """Get neurons synapsing with this muscle
+
+        :returns: a list of all known receptors
+        :rtype: list
+        """
+
+        qres = self['semantic_net'].query(
+                """SELECT ?objLabel
+           WHERE {
+              ?node rdfs:label '"""+self.name()+"""' .
+              ?node <http://openworm.org/entities/1516> ?object .
+              ?object rdfs:label ?objLabel
+            }""")
+
+        receptors = []
+        for r in qres.result:
+            yield str(r[0])

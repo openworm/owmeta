@@ -6,19 +6,11 @@
 
 """
 
-import sqlite3
-from rdflib import Graph
-from rdflib import Namespace
-from rdflib.namespace import RDFS
-from rdflib import Literal
-import urllib2
 import PyOpenWorm
-import networkx as nx
 
 class Network(PyOpenWorm.Configure):
 
     def __init__(self,conf=False):
-        self.semantic_net = ''
         PyOpenWorm.Configure.__init__(self,conf)
 
     def aneuron_nocheck(self, name):
