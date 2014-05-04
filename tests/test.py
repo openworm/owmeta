@@ -3,6 +3,7 @@
 import unittest
 
 import PyOpenWorm
+from PyOpenWorm import Configure,Network,Worm,Neuron,Data
 import networkx
 import rdflib
 
@@ -10,50 +11,60 @@ import rdflib
 class PyOpenWormTest(unittest.TestCase):
     """Test for PyOpenWorm."""
 
+    @classmethod
+    def setUpClass(cls):
+        c = Configure()
+        c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
+        c['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
+        c['sqldb'] = '/home/markw/work/openworm/PyOpenWorm/db/celegans.db'
+        c = Data(c)
+        cls.config = c
+        cls.net = Network(c)
+
     def test_network(self):
-        self.assertTrue(isinstance(PyOpenWorm.Network(),PyOpenWorm.Network))
-        
+        self.assertTrue(isinstance(self.net,Network))
+
     def test_network_aneuron(self):
-    	  self.assertTrue(isinstance(PyOpenWorm.Network().aneuron('AVAL'),PyOpenWorm.Neuron))
-   
+    	  self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
+
     def test_network_neurons(self):
-   	  self.assertTrue('AVAL' in PyOpenWorm.Network().neurons())
-   	  self.assertTrue('DD5' in PyOpenWorm.Network().neurons())
-   	  self.assertEquals(len(PyOpenWorm.Network().neurons()), 302)
-   		
+   	  self.assertTrue('AVAL' in self.net.neurons())
+   	  self.assertTrue('DD5' in self.net.neurons())
+   	  self.assertEquals(len(self.net.neurons()), 302)
+
     def test_worm_muscles(self):
    	  self.assertTrue('MDL08' in PyOpenWorm.Worm().muscles())
    	  self.assertTrue('MDL15' in PyOpenWorm.Worm().muscles())
-    	
+
     def test_neuron_type(self):
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').type(),'interneuron')
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('DD5').type(),'motor')
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('PHAL').type(),'sensory')
-    	
+    	  self.assertEquals(self.net.aneuron('AVAL').type(),'interneuron')
+    	  self.assertEquals(self.net.aneuron('DD5').type(),'motor')
+    	  self.assertEquals(self.net.aneuron('PHAL').type(),'sensory')
+
     def test_neuron_name(self):
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').name(),'AVAL')
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('AVAR').name(),'AVAR')
-    	
+    	  self.assertEquals(self.net.aneuron('AVAL').name(),'AVAL')
+    	  self.assertEquals(self.net.aneuron('AVAR').name(),'AVAR')
+
     def test_neuron_GJ_degree(self):
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').GJ_degree(),60)
-    	
+    	  self.assertEquals(self.net.aneuron('AVAL').GJ_degree(),60)
+
     def test_neuron_Syn_degree(self):
-    	  self.assertEquals(PyOpenWorm.Network().aneuron('AVAL').Syn_degree(),74)
-    	
+    	  self.assertEquals(self.net.aneuron('AVAL').Syn_degree(),74)
+
     def test_network_as_networkx(self):
-    	  self.assertTrue(isinstance(PyOpenWorm.Network().as_networkx(),networkx.DiGraph))
-        
+    	  self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
+
     def test_neuron_receptors(self):
-	  self.assertTrue('GLR-2' in PyOpenWorm.Neuron('AVAL').receptors())
-	  self.assertTrue('OSM-9' in PyOpenWorm.Neuron('PHAL').receptors())
-  
+	  self.assertTrue('GLR-2' in Neuron('AVAL',self.config).receptors())
+	  self.assertTrue('OSM-9' in Neuron('PHAL',self.config).receptors())
+
     def test_worm_get_network(self):
         self.assertTrue(isinstance(PyOpenWorm.Worm().get_neuron_network(), PyOpenWorm.Network))
-        
+
     def test_worm_get_semantic_net(self):
-        g0 = PyOpenWorm.Worm().get_semantic_net()        
+        g0 = PyOpenWorm.Worm().get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
-        
+
         qres = g0.query(
             """
             SELECT ?subLabel     #we want to get out the labels associated with the objects
@@ -65,17 +76,42 @@ class PyOpenWormTest(unittest.TestCase):
               #Triples that have the label are in the main graph only
               ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
             }
-            """)       
+            """)
         list = []
         for r in qres.result:
             list.append(str(r[0]))
         self.assertTrue('MDL08' in list)
-   
+
     def test_neuron_get_reference(self):
-        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'EXP-1'), ['http://dx.doi.org/10.100.123/natneuro'])
-        self.assertEquals(PyOpenWorm.Neuron('ADER').get_reference(0,'DOP-2'), None)
-		
+        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'), ['http://dx.doi.org/10.100.123/natneuro'])
+        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), None)
+
     def test_muscle(self):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))
+
+    def test_configure_literal(self):
+        c = Configure()
+        c['seven'] = "coke"
+        self.assertEquals(c['seven'], "coke")
+
+    def test_configure_getter(self):
+        c = Configure()
+        class pipe:
+            def get(self):
+                return "sign"
+        c['seven'] = pipe()
+        self.assertEquals(c['seven'], "sign")
+
+    def test_configure_late_get(self):
+        c = Configure()
+        a = {'t' : False}
+        class pipe:
+            def get(self):
+                a['t'] = True
+                return "sign"
+        c['seven'] = pipe()
+        self.assertFalse(a['t'])
+        self.assertEquals(c['seven'], "sign")
+        self.assertTrue(a['t'])
 
 
