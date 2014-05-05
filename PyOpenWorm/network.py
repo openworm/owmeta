@@ -56,6 +56,16 @@ class Network(PyOpenWorm.Configure):
 
         return neurons
 
+    def synapses(self):
+        """
+        Get all synapses by
+
+        :returns: A generator of (neuron1,neuron2,(synapse_type,neurotransmitter))
+        :rtype: generator
+        """
+        for n,nbrs in self['nx'].adjacency_iter():
+            for nbr,eattr in nbrs.items():
+                yield (n,nbr,(eattr['synapse'],eattr['neurotransmitter']))
     def as_networkx(self):
         return self['nx']
 
