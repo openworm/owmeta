@@ -9,9 +9,8 @@
 """
 
 import sqlite3
-from rdflib import Graph, Namespace, ConjunctiveGraph
+from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.namespace import RDFS
-from rdflib import URIRef, Literal
 import PyOpenWorm
 import csv
 
@@ -138,8 +137,8 @@ class Neuron(PyOpenWorm.Configure):
 
         return receptors
 
-    def _add_reference(self, type, item, pmid = '', doi = '', wormbaseid = ''):
-         """Add a reference that provides evidence of the relationship between
+    def add_reference(self, type, item, pmid = None, doi = None, wormbaseid = None):
+        """Add a reference that provides evidence of the relationship between
             this neuron and one of its elements.
 
             Example::
@@ -159,27 +158,42 @@ class Neuron(PyOpenWorm.Configure):
             :param doi: A Digital Object Identifier (DOI) that provides evidence, optional
             :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
             :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
-         """
-         #Validate inputs using evidence object, throw errors if bad
-         evidence = PyOpenWorm.Evidence(pmid,doi,wormbaseid)
+        """
+        types = {'send' : 'http://openworm.org/entities/356',
+                'gap' : 'http://openworm.org/entities/357',
+                'receptor' : 'http://openworm.org/entities/361'}
+        try:
+            t = types[type]
+        except KeyError:
+            # XXX: need logging
+            print 'not a valid type' + type
+            return
 
-         #run semantic query to find the id of the items requested, throw errors if can't find
-         neuronid = ''
-         relationid = ''
-         itemid = ''
+        n = Namespace("http://openworm.org/entities/")
+        qres = self['semantic_net'].query(
+          """SELECT ?this ?that
+           WHERE {
+              ?this rdfs:label '"""+self.name()+"""' .
+              ?that rdfs:label '"""+item +"""' .
+              ?this <"""+t+"""> ?that .
+            }""")
+        if len(qres) > 0:
+            for i in qres:
+                this = i['this']
+                that = i['that']
+                # XXX: need a way to generate new molecule identifiers...
+                # we'll use the internal identifiers
+                ui = BNode()
+                gi = Graph(self['semantic_net'].store, ui)
 
-         #update the sqlite database with the reference content
-         conn = sqlite3.connect('db/celegans.db')
-         cur = conn.cursor()
-         cur.execute("UPDATE EnID1, Relation, EnID2, Citations FROM " +
-                     "tblrelationship WHERE EnID1 = " + neuronid + ", Relation = " +
-                     + relationid + ", EndID2 = " + itemid)
+                gi.add( (URIRef(this), URIRef(t), URIRef(that)) )
 
-         #rebuild the semantic network
-         self._init_semantic_net_new()
+                self['semantic_net'].add([ui, RDFS.label, Literal('source')])
+                if (pmid is not None):
+                    self['semantic_net'].add([ui, n[u'text_reference'], Literal(pmid)])
 
     def check_exists(self):
-        """Assert the neuron already exists
+        """Ask if the neuron already exists
         """
         r = self['semantic_net_new'].query("ASK { ?node rdfs:label '"+self.name()+"'}")
         return r.askAnswer
@@ -224,10 +238,11 @@ class Neuron(PyOpenWorm.Configure):
             """)
 
          ref = []
-         for r in qres.result:
-            ref.append(str(r[0]))
-         if ref[0] == '':
-             return None
+         for f in qres:
+             s = str(f['prov'])
+             if s != '':
+                 ref.append(s)
+
          return ref
 
     # Directed graph. Getting accessible _from_ this node
@@ -240,9 +255,18 @@ class Neuron(PyOpenWorm.Configure):
            :returns: a list of neuron names
            :rtype: List
            """
-        for item in self['nx'].out_edges_iter(self.name(),data=True):
-            if 'GapJunction' in item[2]['synapse']:
-                yield item[0]
+        qres = self['semantic_net_new'].query(
+            """
+            SELECT ?n #we want to get out the labels associated with the objects
+            WHERE {
+                    ?node rdfs:label '"""+self.name()+"""' .
+                    ?node <http://openworm.org/entities/356> ?p .
+                    ?p rdfs:label ?n
+                  }
+            """)
+
+        for r in qres.result:
+            yield r[0]
 
     def get_incidents(self, type=0):
         for item in self['nx'].in_edges_iter(self.name(),data=True):

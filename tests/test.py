@@ -83,8 +83,13 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertTrue('MDL08' in list)
 
     def test_neuron_get_reference(self):
-        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'), ['http://dx.doi.org/10.100.123/natneuro'])
-        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), None)
+        self.assertTrue(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'), ['http://dx.doi.org/10.100.123/natneuro'])
+        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), [])
+
+    def test_neuron_add_reference(self):
+        PyOpenWorm.Neuron('ADER', self.config).add_reference('receptor', 'EXP-1', pmid='some_pmid')
+        self.assertTrue('some_pmid' in PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
+        self.config._properties['semantic_net'].invalidate()
 
     def test_muscle(self):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))

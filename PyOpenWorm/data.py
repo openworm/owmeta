@@ -14,7 +14,7 @@ import networkx as nx
 import PyOpenWorm
 import csv
 import urllib2
-from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
+from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
 from rdflib.namespace import RDFS
 
 # encapsulates some of the data all of the parts need...
@@ -33,11 +33,14 @@ class _B:
 
 
 class Data(PyOpenWorm.Configure):
-    def __init__(self, conf):
+    def __init__(self, conf=False):
         PyOpenWorm.Configure.__init__(self,conf)
         self['nx'] = _B(self._init_networkX)
-        self['semantic_net_new'] = _B(self._init_semantic_net_new)
-        self['semantic_net'] = self['semantic_net_new']
+        tmp = _B(self._init_semantic_net_new)
+        self['semantic_net_new'] = tmp
+        self['semantic_net'] = tmp
+        self['rdf.store'] = 'default'
+        self['rdf.store_conf'] = 'default'
 
     def _init_networkX(self):
         g = nx.DiGraph()
@@ -83,7 +86,9 @@ class Data(PyOpenWorm.Configure):
 
         # print cur.description
 
-        g0 = ConjunctiveGraph()
+        g0 = ConjunctiveGraph(self['rdf.store'])
+        #print self['rdf.store']
+        g0.open(self['rdf.store_conf'], create=True)
 
         for r in cur.fetchall():
             #first item is a number -- needs to be converted to a string
@@ -106,20 +111,20 @@ class Data(PyOpenWorm.Configure):
 
         i = 0
         for r in cur.fetchall():
-            #print r
            #all items are numbers -- need to be converted to a string
            first = str(r[0])
            second = str(r[1])
            third = str(r[2])
            prov = str(r[3])
 
-           ui = URIRef(u'http://openworm.org/rdfmolecules/' + str(i))
+           #ui = URIRef(u'http://openworm.org/rdfmolecules/' + str(i))
+           ui = BNode()
            gi = Graph(g0.store, ui)
 
            gi.add( (n[first], n[second], n[third]) )
 
            g0.add([ui, RDFS.label, Literal(str(i))])
-           if (prov is not None):
+           if (prov != ''):
                g0.add([ui, n[u'text_reference'], Literal(prov)])
 
            i = i + 1
