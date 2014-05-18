@@ -91,6 +91,27 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
         self.config._properties['semantic_net'].invalidate()
 
+    @unittest.skip("Long runner")
+    def test_neuron_persistance(self):
+        self.config._properties['semantic_net'].invalidate()
+        self.config['rdf.store'] = 'Sleepycat'
+        self.config['rdf.store_conf'] = 'tests/test.bdb'
+        PyOpenWorm.Neuron('ADER', self.config).add_reference('receptor', 'EXP-1', pmid='some_pmid')
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
+        self.config._properties['semantic_net'].invalidate()
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
+        self.config['rdf.store'] = 'default'
+        self.config['rdf.store_conf'] = ''
+        self.config._properties['semantic_net'].invalidate()
+
+        # make sure we've reverted back to normal
+        assert('some_pmid' not in PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
+
+    def test_fake_config(self):
+        with self.assertRaises(KeyError):
+            c = Configure()
+            k = c['not_a_valid_config']
+
     def test_muscle(self):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))
 
