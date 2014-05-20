@@ -91,9 +91,10 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), [])
 
     def test_neuron_add_reference(self):
-        PyOpenWorm.Neuron('ADER', self.config).add_reference('receptor', 'EXP-1', pmid='some_pmid')
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
-        self.config._properties['semantic_net'].invalidate()
+        d = Configure(self.config_no_data)
+        e = Data(d)
+        PyOpenWorm.Neuron('ADER', e).add_reference('receptor', 'EXP-1', pmid='some_pmid')
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
 
     @unittest.skip("Long runner")
     def test_neuron_persistence(self):

@@ -188,9 +188,9 @@ class Neuron(PyOpenWorm.Configure):
 
                 gi.add( (URIRef(this), URIRef(t), URIRef(that)) )
 
-                self['semantic_net'].add([ui, RDFS.label, Literal('source')])
+                self['semantic_net'].add([ui, RDFS.label, Literal('source'), None])
                 if (pmid is not None):
-                    self['semantic_net'].add([ui, n[u'text_reference'], Literal(pmid)])
+                    self['semantic_net'].add([ui, n[u'text_reference'], Literal(pmid), None])
 
     def check_exists(self):
         """Ask if the neuron already exists

@@ -17,6 +17,7 @@ import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
+from rdflib.plugins.stores.sparqlstore import SPARQLStore
 from rdflib.namespace import RDFS
 
 # encapsulates some of the data all of the parts need...
@@ -45,6 +46,7 @@ class SPARQLSource(Configure):
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
         g0.open(self['rdf.store_conf'])
         return g0
+
 class SQLiteSource(Configure):
     def get(self):
         conn = sqlite3.connect(self['sqldb'])
