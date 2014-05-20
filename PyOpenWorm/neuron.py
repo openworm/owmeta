@@ -183,7 +183,7 @@ class Neuron(PyOpenWorm.Configure):
                 that = i['that']
                 # XXX: need a way to generate new molecule identifiers...
                 # we'll use the internal identifiers
-                ui = BNode()
+                ui = self['molecule_name'](pmid)
                 gi = Graph(self['semantic_net'].store, ui)
 
                 gi.add( (URIRef(this), URIRef(t), URIRef(that)) )

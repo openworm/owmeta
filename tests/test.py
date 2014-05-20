@@ -3,6 +3,7 @@
 import unittest
 
 import PyOpenWorm
+import subprocess
 from PyOpenWorm import Configure,Network,Worm,Neuron,Data
 import networkx
 import rdflib
@@ -17,9 +18,12 @@ class PyOpenWormTest(unittest.TestCase):
         c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
         c['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
         c['sqldb'] = '/home/markw/work/openworm/PyOpenWorm/db/celegans.db'
-        c = Data(c)
-        cls.config = c
-        cls.net = Network(c)
+        #c['rdf.source'] = 'sqlite'
+        c['rdf.source'] = 'sparql_endpoint'
+        c['rdf.store_conf'] = ('http://localhost:8080/openrdf-sesame/repositories/test','http://localhost:8080/openrdf-sesame/repositories/test/statements')
+        cls.config = Data(c)
+        cls.config_no_data = c
+        cls.net = Network(cls.config)
 
     def test_network(self):
         self.assertTrue(isinstance(self.net,Network))
@@ -92,25 +96,32 @@ class PyOpenWormTest(unittest.TestCase):
         self.config._properties['semantic_net'].invalidate()
 
     @unittest.skip("Long runner")
-    def test_neuron_persistance(self):
-        self.config._properties['semantic_net'].invalidate()
-        self.config['rdf.store'] = 'Sleepycat'
-        self.config['rdf.store_conf'] = 'tests/test.bdb'
-        PyOpenWorm.Neuron('ADER', self.config).add_reference('receptor', 'EXP-1', pmid='some_pmid')
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
-        self.config._properties['semantic_net'].invalidate()
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
-        self.config['rdf.store'] = 'default'
-        self.config['rdf.store_conf'] = ''
-        self.config._properties['semantic_net'].invalidate()
+    def test_neuron_persistence(self):
+        d = Configure(self.config_no_data)
+        d['rdf.store'] = 'Sleepycat'
+        d['rdf.store_conf'] = 'tests/test.bdb'
+        e = Data(d)
 
-        # make sure we've reverted back to normal
+        PyOpenWorm.Neuron('ADER', e).add_reference('receptor', 'EXP-1', pmid='some_pmid')
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
+
+        e = Data(d)
+
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
+
         assert('some_pmid' not in PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
+        subprocess.call('rm -rf tests/test.bdb')
 
     def test_fake_config(self):
         with self.assertRaises(KeyError):
             c = Configure()
             k = c['not_a_valid_config']
+
+    def test_configure_double_set(self):
+        c = Configure()
+        c['conf'] = 'once'
+        with self.assertRaises(PyOpenWorm.DoubleSet):
+            c['conf'] = 'twice'
 
     def test_muscle(self):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))

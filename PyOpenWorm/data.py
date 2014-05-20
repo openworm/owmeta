@@ -12,6 +12,8 @@
 import sqlite3
 import networkx as nx
 import PyOpenWorm
+from PyOpenWorm import Configure
+import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
@@ -31,50 +33,20 @@ class _B:
     def invalidate(self):
         self.v = False
 
+class _Z:
+    def __init__(self, c, n):
+        self.n = n
+    def get(self):
+        return c[n]
 
-class Data(PyOpenWorm.Configure):
-    def __init__(self, conf=False):
-        PyOpenWorm.Configure.__init__(self,conf)
-        self['nx'] = _B(self._init_networkX)
-        tmp = _B(self._init_semantic_net_new)
-        self['semantic_net_new'] = tmp
-        self['semantic_net'] = tmp
-        self['rdf.store'] = 'default'
-        self['rdf.store_conf'] = 'default'
-
-    def _init_networkX(self):
-        g = nx.DiGraph()
-
-        # Neuron table
-        csvfile = urllib2.urlopen(self['neuronscsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            neurontype = ""
-            # Detects neuron function
-            if "sensory" in row[1].lower():
-                neurontype += "sensory"
-            if "motor" in row[1].lower():
-                neurontype += "motor"
-            if "interneuron" in row[1].lower():
-                neurontype += "interneuron"
-            if len(neurontype) == 0:
-                neurontype = "unknown"
-
-            if len(row[0]) > 0: # Only saves valid neuron names
-                g.add_node(row[0], ntype = neurontype)
-
-        # Connectome table
-        csvfile = urllib2.urlopen(self['connectomecsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            g.add_edge(row[0], row[1], weight = row[3])
-            g[row[0]][row[1]]['synapse'] = row[2]
-            g[row[0]][row[1]]['neurotransmitter'] = row[4]
-        return g
-
-    def _init_semantic_net_new(self):
+class SPARQLSource(Configure):
+    def get(self):
+        # XXX: If we have a source that's read only, should we need to set the store separately??
+        g0 = ConjunctiveGraph('SPARQLUpdateStore')
+        g0.open(self['rdf.store_conf'])
+        return g0
+class SQLiteSource(Configure):
+    def get(self):
         conn = sqlite3.connect(self['sqldb'])
         cur = conn.cursor()
 
@@ -117,8 +89,7 @@ class Data(PyOpenWorm.Configure):
            third = str(r[2])
            prov = str(r[3])
 
-           #ui = URIRef(u'http://openworm.org/rdfmolecules/' + str(i))
-           ui = BNode()
+           ui = self['molecule_name'](prov)
            gi = Graph(g0.store, ui)
 
            gi.add( (n[first], n[second], n[third]) )
@@ -133,3 +104,60 @@ class Data(PyOpenWorm.Configure):
         conn.close()
 
         return g0
+
+class Data(PyOpenWorm.Configure):
+    def __init__(self, conf=False):
+        PyOpenWorm.Configure.__init__(self,conf)
+        self['nx'] = _B(self._init_networkX)
+        try:
+            self['rdf.store'] = 'default'
+            self['rdf.store_conf'] = 'default'
+        except PyOpenWorm.DoubleSet:
+            pass
+        self._init_rdf_graph()
+
+    def _init_rdf_graph(self):
+        # check rdf.source
+        self['molecule_name'] = self._molecule_hash
+        d = {'sqlite' : SQLiteSource(self),
+                'sparql_endpoint' : SPARQLSource(self)}
+        i = d[self['rdf.source']]
+        self['rdf.graph'] = i
+        self['semantic_net_new'] = i
+        self['semantic_net'] = i
+
+    def _molecule_hash(self, data):
+        return URIRef(u'http://openworm.org/rdfmolecules/' + hashlib.sha224(data).hexdigest())
+
+    def _init_networkX(self):
+        g = nx.DiGraph()
+
+        # Neuron table
+        csvfile = urllib2.urlopen(self['neuronscsv'])
+
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        for row in reader:
+            neurontype = ""
+            # Detects neuron function
+            if "sensory" in row[1].lower():
+                neurontype += "sensory"
+            if "motor" in row[1].lower():
+                neurontype += "motor"
+            if "interneuron" in row[1].lower():
+                neurontype += "interneuron"
+            if len(neurontype) == 0:
+                neurontype = "unknown"
+
+            if len(row[0]) > 0: # Only saves valid neuron names
+                g.add_node(row[0], ntype = neurontype)
+
+        # Connectome table
+        csvfile = urllib2.urlopen(self['connectomecsv'])
+
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        for row in reader:
+            g.add_edge(row[0], row[1], weight = row[3])
+            g[row[0]][row[1]]['synapse'] = row[2]
+            g[row[0]][row[1]]['neurotransmitter'] = row[4]
+        return g
+
