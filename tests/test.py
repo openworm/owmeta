@@ -20,7 +20,7 @@ class PyOpenWormTest(unittest.TestCase):
         c['sqldb'] = '/home/markw/work/openworm/PyOpenWorm/db/celegans.db'
         #c['rdf.source'] = 'sqlite'
         c['rdf.source'] = 'sparql_endpoint'
-        c['rdf.store_conf'] = ('http://localhost:8080/openrdf-sesame/repositories/test','http://localhost:8080/openrdf-sesame/repositories/test/statements')
+        c['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm','http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm/statements')
         cls.config = Data(c)
         cls.config_no_data = c
         cls.net = Network(cls.config)
