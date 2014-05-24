@@ -1,6 +1,10 @@
 # a class for modules that need outside objects to parameterize their behavior (because what are generics?)
 # Modules inherit from this class and use their self['expected_configured_property']
-class _C:
+class ConfigValue(object):
+    def get(self):
+        raise NotImplementedError
+
+class _C(ConfigValue):
     def __init__(self, v):
         self.v = v
     def get(self):
@@ -18,14 +22,14 @@ class Configure:
     def __init__(self, conf=False, dependencies={}):
         if not conf:
             self._properties = {}
-        elif isinstance(conf, type(self)):
+        elif isinstance(conf, Configure):
             self._properties = dict(conf._properties)
         else:
             raise BadConf("Not a configuration object")
 
     def __setitem__(self, pname, value):
         if pname not in self._properties:
-            if not hasattr(value, "get"):
+            if not isinstance(value, ConfigValue):
                 value = _C(value)
             self._properties[pname] = value
         else:

@@ -4,7 +4,7 @@ import unittest
 
 import PyOpenWorm
 import subprocess
-from PyOpenWorm import Configure,Network,Worm,Neuron,Data
+from PyOpenWorm import Configure,ConfigValue,Network,Worm,Neuron,Data
 import networkx
 import rdflib
 
@@ -14,6 +14,9 @@ class PyOpenWormTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # XXX: clear the database and reload it from the schema and default data files
+        pass
+    def setUp(self):
         c = Configure()
         c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
         c['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
@@ -21,46 +24,46 @@ class PyOpenWormTest(unittest.TestCase):
         #c['rdf.source'] = 'sqlite'
         c['rdf.source'] = 'sparql_endpoint'
         c['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm','http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm/statements')
-        cls.config = Data(c)
-        cls.config_no_data = c
-        cls.net = Network(cls.config)
+        self.config = Data(c)
+        self.config_no_data = c
+        self.net = Network(self.config)
 
     def test_network(self):
         self.assertTrue(isinstance(self.net,Network))
 
     def test_network_aneuron(self):
-    	  self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
+        self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
 
     def test_network_neurons(self):
-   	  self.assertTrue('AVAL' in self.net.neurons())
-   	  self.assertTrue('DD5' in self.net.neurons())
-   	  self.assertEquals(len(self.net.neurons()), 302)
+        self.assertTrue('AVAL' in self.net.neurons())
+        self.assertTrue('DD5' in self.net.neurons())
+        self.assertEquals(len(self.net.neurons()), 302)
 
     def test_worm_muscles(self):
-   	  self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
-   	  self.assertTrue('MDL15' in PyOpenWorm.Worm(self.config).muscles())
+        self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
+        self.assertTrue('MDL15' in PyOpenWorm.Worm(self.config).muscles())
 
     def test_neuron_type(self):
-    	  self.assertEquals(self.net.aneuron('AVAL').type(),'interneuron')
-    	  self.assertEquals(self.net.aneuron('DD5').type(),'motor')
-    	  self.assertEquals(self.net.aneuron('PHAL').type(),'sensory')
+        self.assertEquals(self.net.aneuron('AVAL').type(),'interneuron')
+        self.assertEquals(self.net.aneuron('DD5').type(),'motor')
+        self.assertEquals(self.net.aneuron('PHAL').type(),'sensory')
 
     def test_neuron_name(self):
-    	  self.assertEquals(self.net.aneuron('AVAL').name(),'AVAL')
-    	  self.assertEquals(self.net.aneuron('AVAR').name(),'AVAR')
+        self.assertEquals(self.net.aneuron('AVAL').name(),'AVAL')
+        self.assertEquals(self.net.aneuron('AVAR').name(),'AVAR')
 
     def test_neuron_GJ_degree(self):
-    	  self.assertEquals(self.net.aneuron('AVAL').GJ_degree(),60)
+        self.assertEquals(self.net.aneuron('AVAL').GJ_degree(),60)
 
     def test_neuron_Syn_degree(self):
-    	  self.assertEquals(self.net.aneuron('AVAL').Syn_degree(),74)
+        self.assertEquals(self.net.aneuron('AVAL').Syn_degree(),74)
 
     def test_network_as_networkx(self):
-    	  self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
+        self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
 
     def test_neuron_receptors(self):
-	  self.assertTrue('GLR-2' in Neuron('AVAL',self.config).receptors())
-	  self.assertTrue('OSM-9' in Neuron('PHAL',self.config).receptors())
+        self.assertTrue('GLR-2' in Neuron('AVAL',self.config).receptors())
+        self.assertTrue('OSM-9' in Neuron('PHAL',self.config).receptors())
 
     def test_worm_get_network(self):
         self.assertTrue(isinstance(PyOpenWorm.Worm(self.config).get_neuron_network(), PyOpenWorm.Network))
@@ -91,8 +94,7 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), [])
 
     def test_neuron_add_reference(self):
-        d = Configure(self.config_no_data)
-        e = Data(d)
+        e = Data(self.config_no_data)
         PyOpenWorm.Neuron('ADER', e).add_reference('receptor', 'EXP-1', pmid='some_pmid')
         self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
 
@@ -134,7 +136,7 @@ class PyOpenWormTest(unittest.TestCase):
 
     def test_configure_getter(self):
         c = Configure()
-        class pipe:
+        class pipe(ConfigValue):
             def get(self):
                 return "sign"
         c['seven'] = pipe()
@@ -143,7 +145,7 @@ class PyOpenWormTest(unittest.TestCase):
     def test_configure_late_get(self):
         c = Configure()
         a = {'t' : False}
-        class pipe:
+        class pipe(ConfigValue):
             def get(self):
                 a['t'] = True
                 return "sign"

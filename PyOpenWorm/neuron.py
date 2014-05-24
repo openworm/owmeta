@@ -12,14 +12,15 @@ import sqlite3
 from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.namespace import RDFS
 import PyOpenWorm
+from PyOpenWorm import Data, Configure
 import csv
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
-class Neuron(PyOpenWorm.Configure):
+class Neuron(Data):
     def __init__(self, name, conf=False):
-        PyOpenWorm.Configure.__init__(self,conf)
+        Configure.__init__(self,conf)
         self._name = name
 
     def _write_out_db(self):
@@ -169,28 +170,18 @@ class Neuron(PyOpenWorm.Configure):
             print 'not a valid type' + type
             return
 
-        n = Namespace("http://openworm.org/entities/")
         qres = self['semantic_net'].query(
-          """SELECT ?this ?that
+          """SELECT ?this ?p ?that
            WHERE {
               ?this rdfs:label '"""+self.name()+"""' .
               ?that rdfs:label '"""+item +"""' .
               ?this <"""+t+"""> ?that .
+              bind (<"""+t+"""> as ?p)
             }""")
         if len(qres) > 0:
-            for i in qres:
-                this = i['this']
-                that = i['that']
-                # XXX: need a way to generate new molecule identifiers...
-                # we'll use the internal identifiers
-                ui = self['molecule_name'](pmid)
-                gi = Graph(self['semantic_net'].store, ui)
-
-                gi.add( (URIRef(this), URIRef(t), URIRef(that)) )
-
-                self['semantic_net'].add([ui, RDFS.label, Literal('source'), None])
-                if (pmid is not None):
-                    self['semantic_net'].add([ui, n[u'text_reference'], Literal(pmid), None])
+            #XXX: Should verify that we're given a valid uri
+            ui = self['molecule_name'](pmid)
+            Data.add_reference(self, qres, ui)
 
     def check_exists(self):
         """Ask if the neuron already exists
