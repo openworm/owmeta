@@ -3,7 +3,6 @@
 # includes:
 # NetworkX!
 # RDFlib!
-# CSV!
 # Other things!
 #
 # Works like Configure:
@@ -12,16 +11,16 @@
 import sqlite3
 import networkx as nx
 import PyOpenWorm
-from PyOpenWorm import Configure
+from PyOpenWorm import Configure, ConfigValue
 import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
-from rdflib.namespace import RDFS
+from rdflib.namespace import RDFS,RDF
 
 # encapsulates some of the data all of the parts need...
-class _B:
+class _B(ConfigValue):
     def __init__(self, f):
         self.v = False
         self.f = f
@@ -34,29 +33,29 @@ class _B:
     def invalidate(self):
         self.v = False
 
-class _Z:
+class _Z(ConfigValue):
     def __init__(self, c, n):
         self.n = n
     def get(self):
         return c[n]
 
-class SPARQLSource(Configure):
+class SPARQLSource(Configure,PyOpenWorm.ConfigValue):
     def get(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
         g0.open(self['rdf.store_conf'])
         return g0
 
-class SQLiteSource(Configure):
+class SQLiteSource(Configure,PyOpenWorm.ConfigValue):
     def get(self):
         conn = sqlite3.connect(self['sqldb'])
         cur = conn.cursor()
 
         #first step, grab all entities and add them to the graph
+        n = self['rdf.namespace']
 
         cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
 
-        n = Namespace("http://openworm.org/entities/")
 
         # print cur.description
 
@@ -107,16 +106,29 @@ class SQLiteSource(Configure):
 
         return g0
 
-class Data(PyOpenWorm.Configure):
+class Data(Configure):
     def __init__(self, conf=False):
-        PyOpenWorm.Configure.__init__(self,conf)
+        Configure.__init__(self,conf)
         self['nx'] = _B(self._init_networkX)
+        self['rdf.namespace'] = Namespace("http://openworm.org/entities/")
         try:
             self['rdf.store'] = 'default'
             self['rdf.store_conf'] = 'default'
         except PyOpenWorm.DoubleSet:
             pass
         self._init_rdf_graph()
+
+
+    def _add_to_named_graph(self, triples, graph_name):
+        ui = URIRef(graph_name)
+        g = Graph(self['rdf.graph'].store, ui)
+        for x in triples:
+            g.add(x)
+        return g
+
+    def add_reference(self, triples, reference_iri):
+        g = self._add_to_named_graph(triples, reference_iri)
+        self['rdf.graph'].add((g.identifier, RDF['type'], self['rdf.namespace']['misc_reference'], None))
 
     def _init_rdf_graph(self):
         # check rdf.source
