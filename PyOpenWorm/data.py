@@ -11,7 +11,7 @@
 import sqlite3
 import networkx as nx
 import PyOpenWorm
-from PyOpenWorm import Configure, ConfigValue
+from PyOpenWorm import Configureable, Configure, ConfigValue
 import hashlib
 import csv
 import urllib2
@@ -39,29 +39,108 @@ class _Z(ConfigValue):
     def get(self):
         return c[n]
 
-class SPARQLSource(Configure,PyOpenWorm.ConfigValue):
+propertyTypes = {"send" : 'http://openworm.org/entities/356',
+        "Neuropeptide" : 'http://openworm.org/entities/354',
+        "Receptor" : 'http://openworm.org/entities/361',
+        "is a" : 'http://openworm.org/entities/1515',
+        "neuromuscular junction" : 'http://openworm.org/entities/1516',
+        "Innexin" : 'http://openworm.org/entities/355',
+        "Neurotransmitter" : 'http://openworm.org/entities/313',
+        "gap junction" : 'http://openworm.org/entities/357'}
+
+class Data(Configure, Configureable):
+    def __init__(self, conf=False):
+        Configureable.__init__(self,conf)
+        Configure.__init__(self)
+        self['nx'] = _B(self._init_networkX)
+        self['rdf.namespace'] = Namespace("http://openworm.org/entities/")
+        self['molecule_name'] = self._molecule_hash
+        self._init_rdf_graph()
+
+
+    def _add_to_named_graph(self, triples, graph_name):
+        ui = URIRef(graph_name)
+        g = Graph(self['rdf.graph'].store, ui)
+        for x in triples:
+            g.add(x)
+        return g
+
+    def add_reference(self, triples, reference_iri):
+        g = self._add_to_named_graph(triples, reference_iri)
+        self['rdf.graph'].add((g.identifier, RDF['type'], self['rdf.namespace']['misc_reference'], None))
+
+    def _init_rdf_graph(self):
+        # check rdf.source
+        c = Configure()
+        c['rdf.store'] = self.conf.get('rdf.store', 'default')
+        c['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
+        c['connectomecsv'] = self.conf['connectomecsv']
+        c['neuronscsv'] = self.conf['neuronscsv']
+        d = {'sqlite' : SQLiteSource(c),
+                'sparql_endpoint' : SPARQLSource(c)}
+        i = d[self.conf['rdf.source']]
+        self['rdf.graph'] = i
+        self['semantic_net_new'] = i
+        self['semantic_net'] = i
+
+    def _molecule_hash(self, data):
+        return URIRef(u'http://openworm.org/rdfmolecules/' + hashlib.sha224(data).hexdigest())
+
+    def _init_networkX(self):
+        g = nx.DiGraph()
+
+        # Neuron table
+        csvfile = urllib2.urlopen(self.conf['neuronscsv'])
+
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        for row in reader:
+            neurontype = ""
+            # Detects neuron function
+            if "sensory" in row[1].lower():
+                neurontype += "sensory"
+            if "motor" in row[1].lower():
+                neurontype += "motor"
+            if "interneuron" in row[1].lower():
+                neurontype += "interneuron"
+            if len(neurontype) == 0:
+                neurontype = "unknown"
+
+            if len(row[0]) > 0: # Only saves valid neuron names
+                g.add_node(row[0], ntype = neurontype)
+
+        # Connectome table
+        csvfile = urllib2.urlopen(self.conf['connectomecsv'])
+
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        for row in reader:
+            g.add_edge(row[0], row[1], weight = row[3])
+            g[row[0]][row[1]]['synapse'] = row[2]
+            g[row[0]][row[1]]['neurotransmitter'] = row[4]
+        return g
+
+class SPARQLSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
-        g0.open(self['rdf.store_conf'])
+        g0.open(self.conf['rdf.store_conf'])
         return g0
 
-class SQLiteSource(Configure,PyOpenWorm.ConfigValue):
+class SQLiteSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
-        conn = sqlite3.connect(self['sqldb'])
+        conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
 
         #first step, grab all entities and add them to the graph
-        n = self['rdf.namespace']
+        n = self.conf['rdf.namespace']
 
         cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
 
 
         # print cur.description
 
-        g0 = ConjunctiveGraph(self['rdf.store'])
+        g0 = ConjunctiveGraph(self.conf['rdf.store'])
         #print self['rdf.store']
-        g0.open(self['rdf.store_conf'], create=True)
+        g0.open(self.conf['rdf.store_conf'], create=True)
 
         for r in cur.fetchall():
             #first item is a number -- needs to be converted to a string
@@ -90,7 +169,7 @@ class SQLiteSource(Configure,PyOpenWorm.ConfigValue):
            third = str(r[2])
            prov = str(r[3])
 
-           ui = self['molecule_name'](prov)
+           ui = self.conf['molecule_name'](prov)
            gi = Graph(g0.store, ui)
 
            gi.add( (n[first], n[second], n[third]) )
@@ -105,73 +184,4 @@ class SQLiteSource(Configure,PyOpenWorm.ConfigValue):
         conn.close()
 
         return g0
-
-class Data(Configure):
-    def __init__(self, conf=False):
-        Configure.__init__(self,conf)
-        self['nx'] = _B(self._init_networkX)
-        self['rdf.namespace'] = Namespace("http://openworm.org/entities/")
-        try:
-            self['rdf.store'] = 'default'
-            self['rdf.store_conf'] = 'default'
-        except PyOpenWorm.DoubleSet:
-            pass
-        self._init_rdf_graph()
-
-
-    def _add_to_named_graph(self, triples, graph_name):
-        ui = URIRef(graph_name)
-        g = Graph(self['rdf.graph'].store, ui)
-        for x in triples:
-            g.add(x)
-        return g
-
-    def add_reference(self, triples, reference_iri):
-        g = self._add_to_named_graph(triples, reference_iri)
-        self['rdf.graph'].add((g.identifier, RDF['type'], self['rdf.namespace']['misc_reference'], None))
-
-    def _init_rdf_graph(self):
-        # check rdf.source
-        self['molecule_name'] = self._molecule_hash
-        d = {'sqlite' : SQLiteSource(self),
-                'sparql_endpoint' : SPARQLSource(self)}
-        i = d[self['rdf.source']]
-        self['rdf.graph'] = i
-        self['semantic_net_new'] = i
-        self['semantic_net'] = i
-
-    def _molecule_hash(self, data):
-        return URIRef(u'http://openworm.org/rdfmolecules/' + hashlib.sha224(data).hexdigest())
-
-    def _init_networkX(self):
-        g = nx.DiGraph()
-
-        # Neuron table
-        csvfile = urllib2.urlopen(self['neuronscsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            neurontype = ""
-            # Detects neuron function
-            if "sensory" in row[1].lower():
-                neurontype += "sensory"
-            if "motor" in row[1].lower():
-                neurontype += "motor"
-            if "interneuron" in row[1].lower():
-                neurontype += "interneuron"
-            if len(neurontype) == 0:
-                neurontype = "unknown"
-
-            if len(row[0]) > 0: # Only saves valid neuron names
-                g.add_node(row[0], ntype = neurontype)
-
-        # Connectome table
-        csvfile = urllib2.urlopen(self['connectomecsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            g.add_edge(row[0], row[1], weight = row[3])
-            g[row[0]][row[1]]['synapse'] = row[2]
-            g[row[0]][row[1]]['neurotransmitter'] = row[4]
-        return g
 

@@ -12,15 +12,15 @@ import sqlite3
 from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.namespace import RDFS
 import PyOpenWorm
-from PyOpenWorm import Data, Configure
+from PyOpenWorm import Configureable, Configure, propertyTypes
 import csv
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
-class Neuron(Data):
+class Neuron(Configureable):
     def __init__(self, name, conf=False):
-        Configure.__init__(self,conf)
+        Configureable.__init__(self,conf)
         self._name = name
 
     def _write_out_db(self):
@@ -160,14 +160,11 @@ class Neuron(Data):
             :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
             :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
         """
-        types = {'send' : 'http://openworm.org/entities/356',
-                'gap' : 'http://openworm.org/entities/357',
-                'receptor' : 'http://openworm.org/entities/361'}
         try:
-            t = types[type]
+            t = propertyTypes[type]
         except KeyError:
             # XXX: need logging
-            print 'not a valid type' + type
+            print 'not a valid type ' + type
             return
 
         qres = self['semantic_net'].query(
@@ -181,17 +178,17 @@ class Neuron(Data):
         if len(qres) > 0:
             #XXX: Should verify that we're given a valid uri
             ui = self['molecule_name'](pmid)
-            Data.add_reference(self, qres, ui)
+            self.conf.add_reference(qres, ui)
 
     def check_exists(self):
         """Ask if the neuron already exists
         """
-        r = self['semantic_net_new'].query("ASK { ?node rdfs:label '"+self.name()+"'}")
+        r = self['semantic_net_new'].query("ASK { ?node <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . ?node rdfs:label '"+self.name()+"'}")
         return r.askAnswer
 
 
     def get_reference(self, type, item=''):
-         """Get a reference back that provides the evidence that this neuron is
+        """Get a reference back that provides the evidence that this neuron is
            associated with the item requested as a list of URLs.
 
            Example::
@@ -211,7 +208,14 @@ class Neuron(Data):
            :returns: a list of URLs that points to references
            :rtype: list
         """
-         qres = self['semantic_net_new'].query(
+        try:
+            t = propertyTypes[type]
+        except KeyError:
+            # XXX: need logging
+            print 'not a valid type ' + str(type)
+            return
+
+        qres = self['semantic_net_new'].query(
             """
             SELECT ?prov #we want to get out the labels associated with the objects
             WHERE {
@@ -220,21 +224,21 @@ class Neuron(Data):
                     GRAPH ?g { #Each triple is in its own sub-graph to enable provenance
                         # find the triple that connects the neuron node to the receptor node
                         # via the 'receptor' (361) relation
-                        ?node <http://openworm.org/entities/361> ?node2 .
-                        }
-                    #Triples with prov information are in the main graph only
-                    #For the sub-graph, find the prov associated
-                    ?g <http://openworm.org/entities/text_reference> ?prov
+                        ?node <""" + t + """>?node2 .
                     }
+                  #Triples with prov information are in the main graph only
+                  #For the sub-graph, find the prov associated
+                  ?g <http://openworm.org/entities/text_reference> ?prov
+            }
             """)
 
-         ref = []
-         for f in qres:
-             s = str(f['prov'])
-             if s != '':
-                 ref.append(s)
+        ref = []
+        for f in qres:
+            s = str(f['prov'])
+            if s != '':
+                ref.append(s)
 
-         return ref
+        return ref
 
     # Directed graph. Getting accessible _from_ this node
     def get_neighbors(self, type=0):
