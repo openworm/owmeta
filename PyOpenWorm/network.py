@@ -8,11 +8,7 @@
 
 import PyOpenWorm
 
-class Network(PyOpenWorm.Configure):
-
-    def __init__(self,conf=False):
-        PyOpenWorm.Configure.__init__(self,conf)
-
+class Network(PyOpenWorm.Configureable):
     def aneuron_nocheck(self, name):
         """
         Get a neuron by name
@@ -21,7 +17,7 @@ class Network(PyOpenWorm.Configure):
         :returns: Corresponding neuron to the name given
         :rtype: PyOpenWorm.Neuron
         """
-        return PyOpenWorm.Neuron(name,self)
+        return PyOpenWorm.Neuron(name,self.config)
 
     def aneuron(self, name):
         """
@@ -31,7 +27,7 @@ class Network(PyOpenWorm.Configure):
         :returns: Corresponding neuron to the name given
         :rtype: PyOpenWorm.Neuron
         """
-        n = PyOpenWorm.Neuron(name,self)
+        n = PyOpenWorm.Neuron(name,self.conf)
         assert(n.check_exists())
         return n
 
@@ -46,15 +42,12 @@ class Network(PyOpenWorm.Configure):
         qres = self['semantic_net'].query(
           """SELECT ?subLabel     #we want to get out the labels associated with the objects
            WHERE {
-              ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> .# match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1)
+              ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1)
               ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
             }""")
 
-        neurons = []
         for r in qres.result:
-            neurons.append(str(r[0]))
-
-        return neurons
+            yield str(r[0])
 
     def synapses(self):
         """
@@ -66,6 +59,7 @@ class Network(PyOpenWorm.Configure):
         for n,nbrs in self['nx'].adjacency_iter():
             for nbr,eattr in nbrs.items():
                 yield (n,nbr,(eattr['synapse'],eattr['neurotransmitter'],eattr['weight']))
+
     def as_networkx(self):
         return self['nx']
 

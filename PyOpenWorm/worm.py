@@ -7,12 +7,13 @@
 """
 
 import PyOpenWorm
+from PyOpenWorm import Configureable
 
 
-class Worm(PyOpenWorm.Configure):
+class Worm(Configureable):
 
     def __init__(self,conf=False):
-        PyOpenWorm.Configure.__init__(self,conf)
+        Configureable.__init__(self,conf)
 
     def get_neuron_network(self):
         """
@@ -21,7 +22,7 @@ class Worm(PyOpenWorm.Configure):
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
        """
-        return PyOpenWorm.Network(self)
+        return PyOpenWorm.Network(self.conf)
 
     def muscles(self):
         """

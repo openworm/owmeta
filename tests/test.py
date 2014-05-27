@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-7 -*-
 
 import unittest
 
@@ -37,7 +37,7 @@ class PyOpenWormTest(unittest.TestCase):
     def test_network_neurons(self):
         self.assertTrue('AVAL' in self.net.neurons())
         self.assertTrue('DD5' in self.net.neurons())
-        self.assertEquals(len(self.net.neurons()), 302)
+        self.assertEquals(len(list(self.net.neurons())), 302)
 
     def test_worm_muscles(self):
         self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
@@ -90,13 +90,13 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertTrue('MDL08' in list)
 
     def test_neuron_get_reference(self):
-        self.assertIn('http://dx.doi.org/10.100.123/natneuro', PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
-        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'DOP-2'), [])
+        self.assertIn('http://dx.doi.org/10.100.123/natneuro', PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','EXP-1'))
+        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','DOP-2'), [])
 
     def test_neuron_add_reference(self):
         e = Data(self.config_no_data)
-        PyOpenWorm.Neuron('ADER', e).add_reference('receptor', 'EXP-1', pmid='some_pmid')
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
+        PyOpenWorm.Neuron('ADER', e).add_reference('Receptor', 'EXP-1', pmid='some_pmid')
+        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference('Receptor','EXP-1'))
 
     @unittest.skip("Long runner")
     def test_neuron_persistence(self):
@@ -105,7 +105,7 @@ class PyOpenWormTest(unittest.TestCase):
         d['rdf.store_conf'] = 'tests/test.bdb'
         e = Data(d)
 
-        PyOpenWorm.Neuron('ADER', e).add_reference('receptor', 'EXP-1', pmid='some_pmid')
+        PyOpenWorm.Neuron('ADER', e).add_reference('Receptor', 'EXP-1', pmid='some_pmid')
         self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
 
         e = Data(d)
@@ -119,12 +119,6 @@ class PyOpenWormTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             c = Configure()
             k = c['not_a_valid_config']
-
-    def test_configure_double_set(self):
-        c = Configure()
-        c['conf'] = 'once'
-        with self.assertRaises(PyOpenWorm.DoubleSet):
-            c['conf'] = 'twice'
 
     def test_muscle(self):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))
