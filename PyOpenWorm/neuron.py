@@ -12,15 +12,15 @@ import sqlite3
 from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.namespace import RDFS
 import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, propertyTypes
+from PyOpenWorm import DataUser, Configure, propertyTypes
 import csv
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
-class Neuron(Configureable):
+class Neuron(DataUser):
     def __init__(self, name, conf=False):
-        Configureable.__init__(self,conf)
+        DataUser.__init__(self,conf)
         self._name = name
 
     def _write_out_db(self):

@@ -121,7 +121,7 @@ class PyOpenWormTest(unittest.TestCase):
             k = c['not_a_valid_config']
 
     def test_muscle(self):
-        self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08'),PyOpenWorm.Muscle))
+        self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08',self.config),PyOpenWorm.Muscle))
 
     def test_configure_literal(self):
         c = Configure()

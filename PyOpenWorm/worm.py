@@ -7,13 +7,13 @@
 """
 
 import PyOpenWorm
-from PyOpenWorm import Configureable
+from PyOpenWorm import DataUser
 
 
-class Worm(Configureable):
+class Worm(DataUser):
 
     def __init__(self,conf=False):
-        Configureable.__init__(self,conf)
+        DataUser.__init__(self,conf)
 
     def get_neuron_network(self):
         """

@@ -22,8 +22,8 @@ Classes
 __version__ = '0.0.1'
 __author__ = 'Stephen Larson'
 
-from .configure import *
-from .data import Data,propertyTypes
+from .configure import Configure,Configureable,ConfigValue
+from .data import Data,DataUser,propertyTypes
 from .network import Network
 from .neuron import Neuron
 from .worm import Worm
