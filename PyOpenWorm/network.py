@@ -8,7 +8,7 @@
 
 import PyOpenWorm
 
-class Network(PyOpenWorm.Configureable):
+class Network(PyOpenWorm.DataUser):
     def aneuron_nocheck(self, name):
         """
         Get a neuron by name
@@ -40,9 +40,15 @@ class Network(PyOpenWorm.Configureable):
         """
 
         qres = self['semantic_net'].query(
-          """SELECT ?subLabel     #we want to get out the labels associated with the objects
+          """SELECT DISTINCT ?subLabel     #we want to get out the labels associated with the objects
            WHERE {
-              ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1)
+              {
+                  ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1) or 'interneuron' (2)
+              }
+              UNION
+              {
+                  ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/2> .
+              }
               ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
             }""")
 
@@ -63,7 +69,23 @@ class Network(PyOpenWorm.Configureable):
     def as_networkx(self):
         return self['nx']
 
-    #def sensory(self):
+    def sensory(self):
+        """
+        Get all sensory neurons by name
+
+        :returns: A list of all sensory neuron names
+        :rtype: list
+        """
+
+        qres = self['semantic_net'].query(
+          """SELECT ?subLabel     #we want to get out the labels associated with the objects
+           WHERE {
+              ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1) or 'interneuron' (2)
+              ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
+            }""")
+
+        for r in qres.result:
+            yield str(r[0])
 
     #def inter(self):
 

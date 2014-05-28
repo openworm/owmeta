@@ -48,6 +48,13 @@ propertyTypes = {"send" : 'http://openworm.org/entities/356',
         "Neurotransmitter" : 'http://openworm.org/entities/313',
         "gap junction" : 'http://openworm.org/entities/357'}
 
+class DataUser(Configureable):
+    def __init__(self, conf = False):
+        if isinstance(conf, Data):
+            Configureable.__init__(self, conf)
+        else:
+            Configureable.__init__(self, Data(conf))
+
 class Data(Configure, Configureable):
     def __init__(self, conf=False):
         Configureable.__init__(self,conf)
@@ -56,7 +63,6 @@ class Data(Configure, Configureable):
         self['rdf.namespace'] = Namespace("http://openworm.org/entities/")
         self['molecule_name'] = self._molecule_hash
         self._init_rdf_graph()
-
 
     def _add_to_named_graph(self, triples, graph_name):
         ui = URIRef(graph_name)
