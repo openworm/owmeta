@@ -22,7 +22,7 @@ Classes
 __version__ = '0.0.1'
 __author__ = 'Stephen Larson'
 
-from .configure import Configure,Configureable,ConfigValue
+from .configure import Configure,Configureable,ConfigValue,DefaultConfig
 from .data import Data,DataUser,propertyTypes
 from .network import Network
 from .neuron import Neuron

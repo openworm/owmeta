@@ -47,6 +47,14 @@ class Configure:
 
     def __contains__(self, thing):
         return (thing in self._properties)
+
+    def copy(self,other):
+        if isinstance(other,Configure):
+            self._properties = dict(other._properties)
+        else:
+            raise BadConf()
+        return self
+
     def get(self, pname, default=False):
         if pname in self._properties:
             return self._properties[pname].get()
@@ -54,3 +62,13 @@ class Configure:
             return default
         else:
             raise KeyError(pname)
+
+DefaultConfig = Configure()
+DefaultConfig['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
+DefaultConfig['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
+DefaultConfig['rdf.source'] = 'sparql_endpoint'
+DefaultConfig['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm','http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm/statements')
+def _k (a, x, y):
+    raise NotImplementedError
+DefaultConfig.__setiem__ = _k
+

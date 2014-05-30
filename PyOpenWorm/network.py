@@ -64,7 +64,7 @@ class Network(PyOpenWorm.DataUser):
         """
         for n,nbrs in self['nx'].adjacency_iter():
             for nbr,eattr in nbrs.items():
-                yield (n,nbr,(eattr['synapse'],eattr['neurotransmitter'],eattr['weight']))
+                yield (n,nbr,(eattr['synapse'],eattr['neurotransmitter'],int(eattr['weight'])))
 
     def as_networkx(self):
         return self['nx']
