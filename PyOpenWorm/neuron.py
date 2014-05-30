@@ -160,6 +160,7 @@ class Neuron(DataUser):
             :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
             :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
         """
+
         try:
             t = propertyTypes[type]
         except KeyError:
@@ -178,7 +179,7 @@ class Neuron(DataUser):
         if len(qres) > 0:
             #XXX: Should verify that we're given a valid uri
             ui = self['molecule_name'](pmid)
-            self.conf.add_reference(qres, ui)
+            DataUser.add_reference(self, [qres], ui)
 
     def check_exists(self):
         """Ask if the neuron already exists

@@ -18,6 +18,9 @@ import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 from rdflib.namespace import RDFS,RDF
+from datetime import datetime as DT
+import pytz
+from rdflib.namespace import XSD
 
 # encapsulates some of the data all of the parts need...
 class _B(ConfigValue):
@@ -55,39 +58,63 @@ class DataUser(Configureable):
         else:
             Configureable.__init__(self, Data(conf))
 
+    def _add_to_store(self, g, graph_name=False):
+        if not graph_name:
+            graph_name = g.identifier
+        self.conf['rdf.graph'].update(" INSERT DATA { GRAPH "+graph_name.n3()+" { " + g.serialize(format="nt") + "} } ")
+        return g
+
+    def add_reference(self, triples, reference_iri):
+        """
+        Add a citation to a set of statements in the database
+        Annotates the addition with uploader name, etc
+        :param triples: A set of triples to annotate
+        """
+        g0 = ConjunctiveGraph()
+        g = Graph(g0.store, identifier=reference_iri)
+        ns = self.conf['rdf.namespace']
+        g0.add((reference_iri, RDF['type'], ns['misc_reference']))
+        self.add_statements(g0)
+
+    def add_statements(self, graph):
+        """
+        Add a set of statements the database.
+        Annotates the addition with uploader name, etc
+        :param triples_or_graph: A set of triples or a rdflib graph to add
+        """
+        uri = self.conf['molecule_name'](graph.identifier)
+        g = self._add_to_store(graph, uri)
+
+        #XXX: We should maybe check that this has the correct format
+        time_stamp = DT.now(pytz.utc).isoformat()
+        ns = self.conf['rdf.namespace']
+        gr = self.conf['rdf.graph']
+
+        gr.add((uri, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp']), None))
+        gr.add((uri, ns['uploader'], Literal(self.conf['user.email']), None))
+
 class Data(Configure, Configureable):
     def __init__(self, conf=False):
         Configureable.__init__(self,conf)
         Configure.__init__(self)
+        self.namespace = Namespace("http://openworm.org/entities/")
         self['nx'] = _B(self._init_networkX)
-        self['rdf.namespace'] = Namespace("http://openworm.org/entities/")
+        self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self._init_rdf_graph()
 
-    def _add_to_named_graph(self, triples, graph_name):
-        ui = URIRef(graph_name)
-        g = Graph(self['rdf.graph'].store, ui)
-        for x in triples:
-            g.add(x)
-        return g
-
-    def add_reference(self, triples, reference_iri):
-        g = self._add_to_named_graph(triples, reference_iri)
-        self['rdf.graph'].add((g.identifier, RDF['type'], self['rdf.namespace']['misc_reference'], None))
 
     def _init_rdf_graph(self):
         # check rdf.source
-        c = Configure()
-        c['rdf.store'] = self.conf.get('rdf.store', 'default')
-        c['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
-        c['connectomecsv'] = self.conf['connectomecsv']
-        c['neuronscsv'] = self.conf['neuronscsv']
-        d = {'sqlite' : SQLiteSource(c),
-                'sparql_endpoint' : SPARQLSource(c)}
+        self['rdf.store'] = self.conf.get('rdf.store', 'default')
+        self['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
+        d = {'sqlite' : SQLiteSource(self),
+                'sparql_endpoint' : SPARQLSource(self)}
         i = d[self.conf['rdf.source']]
         self['rdf.graph'] = i
         self['semantic_net_new'] = i
         self['semantic_net'] = i
+        return i
 
     def _molecule_hash(self, data):
         return URIRef(u'http://openworm.org/rdfmolecules/' + hashlib.sha224(data).hexdigest())

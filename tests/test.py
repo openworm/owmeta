@@ -23,8 +23,9 @@ class PyOpenWormTest(unittest.TestCase):
         c['sqldb'] = '/home/markw/work/openworm/PyOpenWorm/db/celegans.db'
         #c['rdf.source'] = 'sqlite'
         c['rdf.source'] = 'sparql_endpoint'
-        c['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm','http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm/statements')
+        c['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/test','http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements')
         self.config = Data(c)
+        self.config['user.email'] = 'jerry@cn.com'
         self.config_no_data = c
         self.net = Network(self.config)
 
@@ -37,26 +38,26 @@ class PyOpenWormTest(unittest.TestCase):
     def test_network_neurons(self):
         self.assertTrue('AVAL' in self.net.neurons())
         self.assertTrue('DD5' in self.net.neurons())
-        self.assertEquals(len(list(self.net.neurons())), 302)
+        self.assertEqual(len(list(self.net.neurons())), 302)
 
     def test_worm_muscles(self):
         self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
         self.assertTrue('MDL15' in PyOpenWorm.Worm(self.config).muscles())
 
     def test_neuron_type(self):
-        self.assertEquals(self.net.aneuron('AVAL').type(),'interneuron')
-        self.assertEquals(self.net.aneuron('DD5').type(),'motor')
-        self.assertEquals(self.net.aneuron('PHAL').type(),'sensory')
+        self.assertEqual(self.net.aneuron('AVAL').type(),'interneuron')
+        self.assertEqual(self.net.aneuron('DD5').type(),'motor')
+        self.assertEqual(self.net.aneuron('PHAL').type(),'sensory')
 
     def test_neuron_name(self):
-        self.assertEquals(self.net.aneuron('AVAL').name(),'AVAL')
-        self.assertEquals(self.net.aneuron('AVAR').name(),'AVAR')
+        self.assertEqual(self.net.aneuron('AVAL').name(),'AVAL')
+        self.assertEqual(self.net.aneuron('AVAR').name(),'AVAR')
 
     def test_neuron_GJ_degree(self):
-        self.assertEquals(self.net.aneuron('AVAL').GJ_degree(),60)
+        self.assertEqual(self.net.aneuron('AVAL').GJ_degree(),60)
 
     def test_neuron_Syn_degree(self):
-        self.assertEquals(self.net.aneuron('AVAL').Syn_degree(),74)
+        self.assertEqual(self.net.aneuron('AVAL').Syn_degree(),74)
 
     def test_network_as_networkx(self):
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
@@ -91,12 +92,22 @@ class PyOpenWormTest(unittest.TestCase):
 
     def test_neuron_get_reference(self):
         self.assertIn('http://dx.doi.org/10.100.123/natneuro', PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','EXP-1'))
-        self.assertEquals(PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','DOP-2'), [])
+        self.assertEqual(PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','DOP-2'), [])
 
     def test_neuron_add_reference(self):
-        e = Data(self.config_no_data)
+        e = self.config
         PyOpenWorm.Neuron('ADER', e).add_reference('Receptor', 'EXP-1', pmid='some_pmid')
         self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference('Receptor','EXP-1'))
+
+    def test_neuron_add_statements(self):
+        # generate random statements
+        g = rdflib.Graph()
+        for i in range(1000):
+            s = rdflib.URIRef("http://somehost.com/s%d" % i)
+            p = rdflib.URIRef("http://somehost.com/p%d" % i)
+            o = rdflib.URIRef("http://somehost.com/o%d" % i)
+            g.add((s,p,o))
+        PyOpenWorm.Neuron('ADER', self.config).add_statements(g)
 
     @unittest.skip("Long runner")
     def test_neuron_persistence(self):
@@ -126,7 +137,7 @@ class PyOpenWormTest(unittest.TestCase):
     def test_configure_literal(self):
         c = Configure()
         c['seven'] = "coke"
-        self.assertEquals(c['seven'], "coke")
+        self.assertEqual(c['seven'], "coke")
 
     def test_configure_getter(self):
         c = Configure()
@@ -134,7 +145,7 @@ class PyOpenWormTest(unittest.TestCase):
             def get(self):
                 return "sign"
         c['seven'] = pipe()
-        self.assertEquals(c['seven'], "sign")
+        self.assertEqual(c['seven'], "sign")
 
     def test_configure_late_get(self):
         c = Configure()
@@ -145,7 +156,7 @@ class PyOpenWormTest(unittest.TestCase):
                 return "sign"
         c['seven'] = pipe()
         self.assertFalse(a['t'])
-        self.assertEquals(c['seven'], "sign")
+        self.assertEqual(c['seven'], "sign")
         self.assertTrue(a['t'])
 
     def test_muscle_neurons(self):
@@ -153,3 +164,29 @@ class PyOpenWormTest(unittest.TestCase):
         for k in m:
             print k
 
+class RDFLibTest(unittest.TestCase):
+    """Test for RDFLib."""
+
+    @classmethod
+    def setUpClass(cls):
+        # XXX: clear the database and reload it from the schema and default data files
+        pass
+    def test_uriref_not_url(self):
+        uri = rdflib.URIRef("daniel@example.com")
+    def test_uriref_not_id(self):
+        uri = rdflib.URIRef("some random string")
+    def test_BNode_equality1(self):
+        a = rdflib.BNode("some random string")
+        b = rdflib.BNode("some random string")
+        self.assertEqual(a, b)
+    def test_BNode_equality2(self):
+        a = rdflib.BNode()
+        b = rdflib.BNode()
+        self.assertNotEqual(a, b)
+
+class TimeTest(unittest.TestCase):
+    def test_datetime_isoformat_has_timezone(self):
+        import pytz
+        from datetime import datetime as DT
+        time_stamp = DT.now(pytz.utc).isoformat()
+        self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
