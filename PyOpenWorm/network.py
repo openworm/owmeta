@@ -7,8 +7,16 @@
 """
 
 import PyOpenWorm
+import rdflib as R
+from PyOpenWorm import DataObject
 
-class Network(PyOpenWorm.DataUser):
+class Network(DataObject):
+    def __init__(self, conf=False):
+        DataObject.__init__(self,conf=conf)
+
+    def identifier(self):
+        return self.conf['rdf.namespace']['worm_net']
+
     def aneuron_nocheck(self, name):
         """
         Get a neuron by name
