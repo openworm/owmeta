@@ -2,7 +2,7 @@ import unittest
 
 import PyOpenWorm
 import subprocess
-from PyOpenWorm import Configure,ConfigValue,Network,Worm,Neuron,Data,DataUser
+from PyOpenWorm import *
 import networkx
 import rdflib
 import rdflib as R
@@ -18,6 +18,9 @@ def setup(self):
     self.config = Data(c)
     self.config['user.email'] = 'jerry@cn.com'
     self.config_no_data = c
+
+def clear_graph(graph):
+    graph.update("CLEAR ALL")
 
 class PyOpenWormTest(unittest.TestCase):
     """Test for PyOpenWorm."""
@@ -133,10 +136,10 @@ class CellTest(unittest.TestCase):
         setup(s)
 
     def test_DataUser(self):
-        do = Cell()
+        do = Cell('',self.config)
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
     def test_lineageName(self):
-        c = Cell(name="ADAL")
+        c = Cell("ADAL",self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
 
 class DataObjectTest(unittest.TestCase):
@@ -144,14 +147,15 @@ class DataObjectTest(unittest.TestCase):
         setup(s)
 
     def test_DataUser(self):
-        do = DataObject()
+        do = DataObject(conf=self.config)
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
+
     def test_identifier(self):
-        do = DataObject(ident="http://example.org")
+        do = DataObject(conf=self.config,ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
 
     def test_identifier(self):
-        do = DataObject(ident="http://example.org")
+        do = DataObject(conf=self.config,ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
 
 class NeuronTest(unittest.TestCase):
@@ -160,7 +164,7 @@ class NeuronTest(unittest.TestCase):
         s.neur = lambda x : Neuron(x,s.config)
 
     def test_Cell(self):
-        do = Neuron('BDUL')
+        do = self.neur('BDUL')
         self.assertTrue(isinstance(do,Cell))
 
     def test_identifier(self):
@@ -170,7 +174,6 @@ class NeuronTest(unittest.TestCase):
         for x in neurons:
             t = g.query('select ?x where { ?x rdfs:label "%s" }' % str(x))
             for m in t:
-                print "testing "+str(x)
                 ident = self.neur(x).identifier()
                 self.assertEqual(m, ident)
 
@@ -198,7 +201,7 @@ class NetworkTest(unittest.TestCase):
         setup(s)
         s.net = Network(s.config)
 
-    def test_identifier(s):
+    def test_identifier(self):
         ident = self.net.identifier()
         self.assertEqual(self.config['rdf.namespace']["worm_net"], ident)
 
@@ -243,14 +246,15 @@ class RDFLibTest(unittest.TestCase):
         b = rdflib.BNode()
         self.assertNotEqual(a, b)
     def test_reification(self):
-        graph = R.Graph(store="SPARQLUpdateStore")
+        graph = R.ConjunctiveGraph(store="SPARQLUpdateStore")
         graph.open(("http://localhost:8080/openrdf-sesame/repositories/test","http://localhost:8080/openrdf-sesame/repositories/test/statements"))
+        clear_graph(graph)
         update_stmt = "INSERT DATA { _:stmt ns1:subject ns1:a ; ns1:predicate ns1:b ; ns1:object ns1:c . _:someone ns1:says _:stmt }"
+
         for i in range(3):
             graph.update(update_stmt, initNs=self.ns)
-        r = graph.query("select ?z { ?p ns1:subject ?x . ?z ns1:says ?p }", initNs=self.ns)
-        for k in r:
-            print k
+        r = graph.query("select distinct ?z where { ?p ns1:subject ?x . ?z ns1:says ?p }", initNs=self.ns)
+        self.assertEqual(3,len(r))
 
 class TimeTest(unittest.TestCase):
     def test_datetime_isoformat_has_timezone(self):
