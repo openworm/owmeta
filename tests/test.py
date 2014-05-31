@@ -262,3 +262,5 @@ class TimeTest(unittest.TestCase):
         from datetime import datetime as DT
         time_stamp = DT.now(pytz.utc).isoformat()
         self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
+class RelationshipTest(unittest.TestCase):
+    pass
