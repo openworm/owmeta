@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8 :
 import unittest
 
 import PyOpenWorm
@@ -6,7 +7,7 @@ from PyOpenWorm import *
 import networkx
 import rdflib
 import rdflib as R
-
+namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 def setup(self):
     c = Configure()
     c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
@@ -56,25 +57,6 @@ class PyOpenWormTest(unittest.TestCase):
             list.append(str(r[0]))
         self.assertTrue('MDL08' in list)
 
-    def test_neuron_get_reference(self):
-        self.assertIn('http://dx.doi.org/10.100.123/natneuro', PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','EXP-1'))
-        self.assertEqual(PyOpenWorm.Neuron('ADER',self.config).get_reference('Receptor','DOP-2'), [])
-
-    def test_neuron_add_reference(self):
-        e = self.config
-        PyOpenWorm.Neuron('ADER', e).add_reference('Receptor', 'EXP-1', pmid='some_pmid')
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference('Receptor','EXP-1'))
-
-    def test_neuron_add_statements(self):
-        # generate random statements
-        g = rdflib.Graph()
-        for i in range(1000):
-            s = rdflib.URIRef("http://somehost.com/s%d" % i)
-            p = rdflib.URIRef("http://somehost.com/p%d" % i)
-            o = rdflib.URIRef("http://somehost.com/o%d" % i)
-            g.add((s,p,o))
-        PyOpenWorm.Neuron('ADER', self.config).add_statements(g)
-
     @unittest.skip("Long runner")
     def test_neuron_persistence(self):
         d = Configure(self.config_no_data)
@@ -96,9 +78,8 @@ class PyOpenWormTest(unittest.TestCase):
         self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08',self.config),PyOpenWorm.Muscle))
 
     def test_muscle_neurons(self):
+        self.fail("Need an actual test")
         m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
-        for k in m:
-            print k
 
 class ConfigureTest(unittest.TestCase):
     def test_fake_config(self):
@@ -142,6 +123,7 @@ class CellTest(unittest.TestCase):
         c = Cell("ADAL",self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
 
+
 class DataObjectTest(unittest.TestCase):
     def setUp(s):
         setup(s)
@@ -157,6 +139,47 @@ class DataObjectTest(unittest.TestCase):
     def test_identifier(self):
         do = DataObject(conf=self.config,ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
+
+class DataUserTest(unittest.TestCase):
+    def setUp(s):
+        setup(s)
+    def test_add_statements_has_uploader(self):
+        # assert that each statement has an uploader annotation
+        g = R.Graph()
+        s = rdflib.URIRef("http://somehost.com/s")
+        p = rdflib.URIRef("http://somehost.com/p")
+        o = rdflib.URIRef("http://somehost.com/o")
+        g.add((s,p,o))
+        du = DataUser(self.config)
+        du.add_statements(g)
+        g0 = du.conf['rdf.graph']
+        uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
+        uploader_email = self.conf['user.email']
+        q = """
+        Select ?u ?t where
+        { [] rdf:type rdf:Statement
+        ; rdf:subject <http://somehost.com/s>
+        ; rdf:predicate <http://somehost.com/p>
+        ; rdf:object <http://somehost.com/o>
+        ; """+uploader_n3_uri+""" '"""+uploader_email+"""'
+        }
+        """
+
+        g0.query(q)
+
+    @unittest.skip("Long runner")
+    def test_add_statements_completes(self):
+        g = rdflib.Graph()
+        for i in range(1000):
+            s = rdflib.URIRef("http://somehost.com/s%d" % i)
+            p = rdflib.URIRef("http://somehost.com/p%d" % i)
+            o = rdflib.URIRef("http://somehost.com/o%d" % i)
+            g.add((s,p,o))
+        du = DataUser(self.config)
+        du.add_statements(g)
+
+    def test_add_statements(self):
+        pass
 
 class NeuronTest(unittest.TestCase):
     def setUp(s):
@@ -226,6 +249,69 @@ class NetworkTest(unittest.TestCase):
 class EvidenceTest(unittest.TestCase):
     def setUp(s):
         setup(s)
+    def test_bibtex_init(self):
+        bibtex = u"""@ARTICLE{Cesar2013,
+          author = {Jean César},
+          title = {An amazing title},
+          year = {2013},
+          month = jan,
+          volume = {12},
+          pages = {12--23},
+          journal = {Nice Journal},
+          abstract = {This is an abstract. This line should be long enough to test
+             multilines...},
+          comments = {A comment},
+          keywords = {keyword1, keyword2},
+        }
+        """
+        self.assertEqual(u"Jean César", Evidence(bibtex).author())
+    def test_pubmed_init1(self):
+        """
+        A pubmed uri
+        """
+        uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
+        self.assertEqual(u"Frédéric MY", Evidence(pmid=uri).author()[0])
+
+    def test_pubmed_init1(self):
+        """
+        A pubmed id
+        """
+        pmid = "24098140"
+        self.assertEqual(u"Frédéric MY", Evidence(pmid=pmid).author()[0])
+
+    def test_pubmed_multiple_authors_list(self):
+        """
+        When multiple authors are on a paper, all of their names sohuld be returned in a list (preserving order from publication!)
+        """
+        pmid = "24098140"
+        alist = ["Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
+        self.assertEqual(alist,Evidence(pmid=pmid).author())
+
+    def test_doi_init1(self):
+        """
+        Full dx.doi.org uri
+        """
+        self.assertEqual(u"Elizabeth Chen", Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author())
+    def test_doi_init2(self):
+        """
+        Just the identifier, no URI
+        """
+        self.assertEqual(u"Elizabeth Chen", Evidence(doi='10.1007/s00454-010-9273-0').author())
+    def test_doi_init_fail_on_request_prefix(self):
+        """
+        Requesting only the prefix
+        """
+        with self.assertRaises(EvidenceError):
+            Evidence(doi='http://dx.doi.org/10.1126')
+    def test_doi_init_fail_on_request_suffix(self):
+        """
+        Requesting only the prefix
+        """
+        with self.assertRaises(EvidenceError):
+            Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
+
+    def test_wormbase_init(self):
+        EvidenceTest(wormbase="WBPaper00044287")
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
@@ -245,7 +331,8 @@ class RDFLibTest(unittest.TestCase):
         a = rdflib.BNode()
         b = rdflib.BNode()
         self.assertNotEqual(a, b)
-    def test_reification(self):
+
+    def test_reification1(self):
         graph = R.ConjunctiveGraph(store="SPARQLUpdateStore")
         graph.open(("http://localhost:8080/openrdf-sesame/repositories/test","http://localhost:8080/openrdf-sesame/repositories/test/statements"))
         clear_graph(graph)
@@ -262,5 +349,32 @@ class TimeTest(unittest.TestCase):
         from datetime import datetime as DT
         time_stamp = DT.now(pytz.utc).isoformat()
         self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
+
+class QuantityTest(unittest.TestCase):
+    def test_string_init_short(self):
+        q = Quantity.parse("23 mL")
+        self.assertEqual("milliliters", q.unit)
+        self.assertEqual("23", q.value)
+
+    def test_string_init_volume(self):
+        q = Quantity.parse("23 inches^3")
+        self.assertEqual("inches^3", q.unit)
+        self.assertEqual("23", q.value)
+
+    def test_string_init_compound(self):
+        q = Quantity.parse("23 inches/second")
+        self.assertEqual("inches*second^(-1)", q.unit)
+        self.assertEqual("23", q.value)
+
+    def test_atomic_short(self):
+        q = Quantity("23", "mL")
+        self.assertEqual("mL", q.unit)
+        self.assertEqual("23", q.value)
+
+    def test_atomic_long(self):
+        q = Quantity("23", "milliliters")
+        self.assertEqual("mL", q.unit)
+        self.assertEqual("23", q.value)
+
 class RelationshipTest(unittest.TestCase):
     pass
