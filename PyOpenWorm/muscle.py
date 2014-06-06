@@ -8,12 +8,12 @@
 
 """
 import PyOpenWorm
-from PyOpenWorm import DataUser
+from PyOpenWorm import DataObject
 
-class Muscle(DataUser):
+class Muscle(DataObject):
 
     def __init__(self, name, conf=False):
-        DataUser.__init__(self,conf)
+        DataObject.__init__(self,ident=name, conf=conf)
         self._name = name
 
     def name(self):

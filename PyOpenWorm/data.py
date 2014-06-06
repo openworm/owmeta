@@ -16,11 +16,11 @@ import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
-from rdflib.plugins.stores.sparqlstore import SPARQLStore
 from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
 import pytz
 from rdflib.namespace import XSD
+from itertools import izip_longest
 
 # encapsulates some of the data all of the parts need...
 class _B(ConfigValue):
@@ -51,6 +51,12 @@ propertyTypes = {"send" : 'http://openworm.org/entities/356',
         "Neurotransmitter" : 'http://openworm.org/entities/313',
         "gap junction" : 'http://openworm.org/entities/357'}
 
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+    args = [iter(iterable)] * n
+    return izip_longest(fillvalue=fillvalue, *args)
+
 class DataUser(Configureable):
     def __init__(self, conf = False):
         if isinstance(conf, Data):
@@ -61,46 +67,70 @@ class DataUser(Configureable):
     def _add_to_store(self, g, graph_name=False):
         if not graph_name:
             graph_name = g.identifier
-        self.conf['rdf.graph'].update(" INSERT DATA { GRAPH "+graph_name.n3()+" { " + g.serialize(format="nt") + "} } ")
+        for g in grouper(g, 1000):
+            temp_graph = Graph()
+            for x in g:
+                temp_graph.add(x)
+            s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
+            self.conf['rdf.graph'].update(s)
         return g
 
-    def add_reference(self, triples, reference_iri):
+
+    def add_reference(self, g, reference_iri):
         """
         Add a citation to a set of statements in the database
         Annotates the addition with uploader name, etc
         :param triples: A set of triples to annotate
         """
-        g0 = ConjunctiveGraph()
-        g = Graph(g0.store, identifier=reference_iri)
+        new_statements = Graph()
         ns = self.conf['rdf.namespace']
-        g0.add((reference_iri, RDF['type'], ns['misc_reference']))
-        self.add_statements(g0)
+        for statement in g:
+            statement_node = self._reify(new_statements,statement)
+            new_statements.add((URIRef(reference_iri), ns['asserts'], statement_node))
 
+        self.add_statements(g + new_statements)
+
+    #def _add_unannotatted_statements(self, graph):
     def add_statements(self, graph):
         """
-        Add a set of statements the database.
+        Add a set of statements to the database.
         Annotates the addition with uploader name, etc
         :param triples_or_graph: A set of triples or a rdflib graph to add
         """
-        uri = self.conf['molecule_name'](graph.identifier)
-        g = self._add_to_store(graph, uri)
+        #uri = self.conf['molecule_name'](graph.identifier)
 
-        #XXX: We should maybe check that this has the correct format
-        time_stamp = DT.now(pytz.utc).isoformat()
         ns = self.conf['rdf.namespace']
-        gr = self.conf['rdf.graph']
+        time_stamp = DT.now(pytz.utc).isoformat()
+        new_statements = Graph()
+        for statement in graph:
+            n = self._reify(new_statements,statement)
+            new_statements.add((n, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp'])))
+            new_statements.add((n, ns['uploader'], Literal(self.conf['user.email'])))
+            print(len(new_statements))
+        g = self._add_to_store(graph + new_statements)
 
-        gr.add((uri, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp']), None))
-        gr.add((uri, ns['uploader'], Literal(self.conf['user.email']), None))
+    def _reify(self,g,s):
+        """
+        Add a statement object to g that binds to s
+        """
+        n = self.conf['new_graph_uri'](s)
+        g.add((n, RDF['type'], RDF['Statement']))
+        g.add((n, RDF['subject'], s[0]))
+        g.add((n, RDF['predicate'], s[1]))
+        g.add((n, RDF['object'], s[2]))
+        return n
+
 
 class Data(Configure, Configureable):
     def __init__(self, conf=False):
         Configureable.__init__(self,conf)
         Configure.__init__(self)
         self.namespace = Namespace("http://openworm.org/entities/")
+        self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
+        self['new_graph_uri'] = self._molecule_hash
         self._init_rdf_graph()
 
 
@@ -117,7 +147,7 @@ class Data(Configure, Configureable):
         return i
 
     def _molecule_hash(self, data):
-        return URIRef(u'http://openworm.org/rdfmolecules/' + hashlib.sha224(data).hexdigest())
+        return URIRef(self.molecule_namespace[hashlib.sha224(str(data)).hexdigest()])
 
     def _init_networkX(self):
         g = nx.DiGraph()
