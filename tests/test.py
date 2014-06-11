@@ -112,6 +112,20 @@ class ConfigureTest(unittest.TestCase):
         self.assertEqual(c['seven'], "sign")
         self.assertTrue(a['t'])
 
+class ConfigureableTest(unittest.TestCase):
+    def test_DefaultConfig(self):
+        """Ensure Configureable gets init'd with a DefaultConfig if nothing's given"""
+        i = Configureable()
+        for x in DefaultConfig._properties:
+            self.assertEqual(DefaultConfig[x], i[x])
+
+    def test_DefaultConfig_False(self):
+        """Ensure Configureable gets init'd with a DefaultConfig if nothing's given"""
+        i = Configureable(conf=False)
+        for x in DefaultConfig._properties:
+            self.assertEqual(DefaultConfig[x], i[x])
+
+
 class CellTest(unittest.TestCase):
     def setUp(s):
         setup(s)

@@ -23,9 +23,9 @@ class Configureable:
     def get(self, pname, default=False):
         return self.conf.get(pname,default)
 
-    def __init__(self, conf = False):
+    def __init__(self, conf=False):
         if not conf:
-            self.conf = Configure()
+            self.conf = DefaultConfig
         elif isinstance(conf, Configure):
             self.conf = conf
         else:
