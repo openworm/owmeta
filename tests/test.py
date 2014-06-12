@@ -8,6 +8,7 @@ import networkx
 import rdflib
 import rdflib as R
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
+
 def setup(self):
     c = Configure()
     c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
@@ -74,13 +75,6 @@ class PyOpenWormTest(unittest.TestCase):
         assert('some_pmid' not in PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
         subprocess.call('rm -rf tests/test.bdb')
 
-    def test_muscle(self):
-        self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08',self.config),PyOpenWorm.Muscle))
-
-    def test_muscle_neurons(self):
-        self.fail("Need an actual test")
-        m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
-
 class ConfigureTest(unittest.TestCase):
     def test_fake_config(self):
         with self.assertRaises(KeyError):
@@ -120,7 +114,7 @@ class ConfigureableTest(unittest.TestCase):
             self.assertEqual(DefaultConfig[x], i[x])
 
     def test_DefaultConfig_False(self):
-        """Ensure Configureable gets init'd with a DefaultConfig if nothing's given"""
+        """Ensure Configureable gets init'd with a DefaultConfig if False is given"""
         i = Configureable(conf=False)
         for x in DefaultConfig._properties:
             self.assertEqual(DefaultConfig[x], i[x])
@@ -133,6 +127,7 @@ class CellTest(unittest.TestCase):
     def test_DataUser(self):
         do = Cell('',self.config)
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
+
     def test_lineageName(self):
         c = Cell("ADAL",self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
@@ -157,6 +152,10 @@ class DataObjectTest(unittest.TestCase):
 class DataUserTest(unittest.TestCase):
     def setUp(s):
         setup(s)
+
+    def test_init_no_config(self):
+        do = DataUser()
+
     def test_add_statements_has_uploader(self):
         # assert that each statement has an uploader annotation
         g = R.Graph()
@@ -392,3 +391,16 @@ class QuantityTest(unittest.TestCase):
 
 class RelationshipTest(unittest.TestCase):
     pass
+
+class MuscleTest(unittest.TestCase):
+    def setUp(self):
+        setup(self)
+
+    def test_muscle(self):
+        self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08',self.config),PyOpenWorm.Muscle))
+
+    def test_muscle_neurons(self):
+        self.fail("Need an actual test")
+        m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
+
+
