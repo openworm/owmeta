@@ -7,6 +7,8 @@ from PyOpenWorm import *
 import networkx
 import rdflib
 import rdflib as R
+import pint as Q
+
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
 def setup(self):
@@ -29,7 +31,6 @@ class PyOpenWormTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # XXX: clear the database and reload it from the schema and default data files
         pass
     def setUp(self):
         setup(self)
@@ -226,6 +227,10 @@ class NeuronTest(unittest.TestCase):
         self.assertEqual(self.neur('AVAL').name(),'AVAL')
         self.assertEqual(self.neur('AVAR').name(),'AVAR')
 
+    def test_init_from_lineage_name(self):
+        c = Neuron(lineageName="AB plapaaaap")
+        self.assertEqual(c.name(), 'ADAL')
+
     def test_GJ_degree(self):
         self.assertEqual(self.neur('AVAL').GJ_degree(),60)
 
@@ -363,31 +368,91 @@ class TimeTest(unittest.TestCase):
         time_stamp = DT.now(pytz.utc).isoformat()
         self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
 
+class PintTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.ur = Q.UnitRegistry()
+        self.Q = self.ur.Quantity
+    def test_atomic_short(self):
+        q = self.Q(23, "mL")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_atomic_long_singular(self):
+        q = self.Q(23, "milliliter")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_atomic_long_plural(self):
+        q = self.Q(23, "milliliters")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_atomic_long_plural_to_string(self):
+        #XXX: Maybe there's a way to have the unit name pluralized...
+        q = self.Q(23, "milliliters")
+        self.assertEqual("23 milliliter", str(q))
+
+    def test_string_init_long_plural_to_string(self):
+        #XXX: Maybe there's a way to have the unit name pluralized...
+        q = self.Q("23 milliliters")
+        self.assertEqual("23 milliliter", str(q))
+
+    def test_string_init_short(self):
+        q = self.Q("23 mL")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_string_init_short_no_space(self):
+        q = self.Q("23mL")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_string_init_long_singular(self):
+        q = self.Q("23 milliliter")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_string_init_long_plural(self):
+        q = self.Q("23 milliliters")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual(23, q.magnitude)
+
+    def test_init_magnitude_with_string(self):
+        """ Pint doesn't care if you don't give it a number """
+        q = self.Q("23", "milliliters")
+        self.assertEqual("milliliter", str(q.units))
+        self.assertEqual("23", q.magnitude)
+
+        q = self.Q("worm", "milliliters")
+        self.assertEqual("worm", q.magnitude)
+
+
 class QuantityTest(unittest.TestCase):
     def test_string_init_short(self):
         q = Quantity.parse("23 mL")
-        self.assertEqual("milliliters", q.unit)
-        self.assertEqual("23", q.value)
+        self.assertEqual("milliliter", q.unit)
+        self.assertEqual(23, q.value)
 
     def test_string_init_volume(self):
         q = Quantity.parse("23 inches^3")
-        self.assertEqual("inches^3", q.unit)
-        self.assertEqual("23", q.value)
+        self.assertEqual("inch ** 3", q.unit)
+        self.assertEqual(23, q.value)
 
     def test_string_init_compound(self):
         q = Quantity.parse("23 inches/second")
-        self.assertEqual("inches*second^(-1)", q.unit)
-        self.assertEqual("23", q.value)
+        self.assertEqual("inch / second", q.unit)
+        self.assertEqual(23, q.value)
 
     def test_atomic_short(self):
-        q = Quantity("23", "mL")
-        self.assertEqual("mL", q.unit)
-        self.assertEqual("23", q.value)
+        q = Quantity(23, "mL")
+        self.assertEqual("milliliter", q.unit)
+        self.assertEqual(23, q.value)
 
     def test_atomic_long(self):
-        q = Quantity("23", "milliliters")
-        self.assertEqual("mL", q.unit)
-        self.assertEqual("23", q.value)
+        q = Quantity(23, "milliliters")
+        self.assertEqual("milliliter", q.unit)
+        self.assertEqual(23, q.value)
 
 class RelationshipTest(unittest.TestCase):
     pass
@@ -402,5 +467,11 @@ class MuscleTest(unittest.TestCase):
     def test_muscle_neurons(self):
         self.fail("Need an actual test")
         m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
-
+class NeuroMLTest(unittest.TestCase):
+    def setUp(self):
+        setup(self)
+    def test_generate_validates(self):
+        """ Check that we can generate a cell's file and have it validate """
+        Neuron('ADAL')
+        PyOpenWorm.NeuroML.generate()
 
