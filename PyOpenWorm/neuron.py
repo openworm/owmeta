@@ -19,7 +19,7 @@ import csv
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class Neuron(Cell):
-    def __init__(self, name, conf=False):
+    def __init__(self, name=False, conf=False, lineageName=False):
         Cell.__init__(self,name,conf)
         self._name = name
 
@@ -62,7 +62,7 @@ class Neuron(Cell):
                 count = count + 1
         return count
 
-    def type_semantic(self):
+    def _type_semantic(self):
         """Get type of this neuron (motor, interneuron, sensory)
 
         Use the semantic database as the source
@@ -85,7 +85,7 @@ class Neuron(Cell):
 
         return type
 
-    def type_networkX(self):
+    def _type_networkX(self):
         """Get type of this neuron (motor, interneuron, sensory)
 
         Use the networkX representation as the source
@@ -101,7 +101,7 @@ class Neuron(Cell):
         :returns: the type
         :rtype: str
         """
-        return self.type_networkX().lower()
+        return self._type_networkX().lower()
 
     def name(self):
         """Get name of this neuron (e.g. AVAL)
