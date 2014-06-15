@@ -106,7 +106,6 @@ class DataUser(Configureable):
             n = self._reify(new_statements,statement)
             new_statements.add((n, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp'])))
             new_statements.add((n, ns['uploader'], Literal(self.conf['user.email'])))
-            print(len(new_statements))
         g = self._add_to_store(graph + new_statements)
 
     def _reify(self,g,s):
