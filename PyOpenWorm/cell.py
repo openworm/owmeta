@@ -74,6 +74,35 @@ class Cell(DataObject):
             loop = neuroml.Point3DWithDiam(*(r[x] for x in ['x','y','z','d']))
             s.distal = loop
             morph.segments.append(s)
+        # Query for segment groups
+        qres = self['semantic_net'].query(
+          """
+          SELECT ?gid ?member ?include
+           WHERE {
+              ?p ns1:id 'morphology_AFDL' .
+              ?p ns1:segmentGroup ?seg_group .
+              ?seg_group ns1:id ?gid .
+              OPTIONAL {
+                ?seg_group ns1:include ?inc .
+                ?inc ns1:segmentGroup ?include .
+              }
+              OPTIONAL {
+                ?seg_group ns1:member ?inc .
+                ?inc ns1:segment ?member .
+              }
+            }
+            """,initNs=ns)
+        for r in qres:
+            s = neuroml.SegmentGroup(id=r['gid'])
+            if r['member']:
+                m = neuroml.Member()
+                m.segments = str(r['member'])
+                s.members.append(m)
+            elif r['include']:
+                i = neuroml.Include()
+                i.segment_groups = str(r['include'])
+                s.includes.append(i)
+            morph.segment_groups.append(s)
         return morph
 
     def name(self):
