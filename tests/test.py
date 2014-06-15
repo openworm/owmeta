@@ -1,5 +1,7 @@
 # vim: set fileencoding=utf-8 :
 import unittest
+import neuroml
+import neuroml.writers as writers
 
 import PyOpenWorm
 import subprocess
@@ -10,6 +12,8 @@ import rdflib as R
 import pint as Q
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
+
+# Set up the database
 
 def setup(self):
     c = Configure()
@@ -133,6 +137,11 @@ class CellTest(unittest.TestCase):
         c = Cell("ADAL",self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
 
+    def test_morphology_is_NeuroML_morphology(self):
+        c = Cell("ADAR",self.config)
+        # get the morph
+        m = c.morphology()
+        self.assertIsInstance(m, neuroml.Morphology)
 
 class DataObjectTest(unittest.TestCase):
     def setUp(s):
@@ -427,7 +436,6 @@ class PintTest(unittest.TestCase):
         q = self.Q("worm", "milliliters")
         self.assertEqual("worm", q.magnitude)
 
-
 class QuantityTest(unittest.TestCase):
     def test_string_init_short(self):
         q = Quantity.parse("23 mL")
@@ -467,11 +475,16 @@ class MuscleTest(unittest.TestCase):
     def test_muscle_neurons(self):
         self.fail("Need an actual test")
         m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
+
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
+
     def test_generate_validates(self):
         """ Check that we can generate a cell's file and have it validate """
-        Neuron('ADAL')
-        PyOpenWorm.NeuroML.generate()
+        n = Neuron('ADAL',self.config)
+        doc = PyOpenWorm.NeuroML.generate(n,1)
+        writers.NeuroMLWriter.write(doc, "temp.nml")
+        from neuroml.utils import validate_neuroml2
+        validate_neuroml2("temp.nml")
 

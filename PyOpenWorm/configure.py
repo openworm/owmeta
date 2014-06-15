@@ -63,6 +63,7 @@ class Configure:
         else:
             raise KeyError(pname)
 
+# TODO: Read this from a file
 DefaultConfig = Configure()
 DefaultConfig['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
 DefaultConfig['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'

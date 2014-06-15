@@ -32,3 +32,4 @@ from .worm import Worm
 from .evidence import Evidence,EvidenceError
 from .muscle import Muscle
 from .quantity import Quantity
+from .my_neuroml import NeuroML
