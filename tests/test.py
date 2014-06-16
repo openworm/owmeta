@@ -30,8 +30,8 @@ def setup(self):
 def clear_graph(graph):
     graph.update("CLEAR ALL")
 
-class PyOpenWormTest(unittest.TestCase):
-    """Test for PyOpenWorm."""
+class WormTest(unittest.TestCase):
+    """Test for Worm."""
 
     @classmethod
     def setUpClass(cls):
@@ -39,11 +39,15 @@ class PyOpenWormTest(unittest.TestCase):
     def setUp(self):
         setup(self)
 
-    def test_worm_get_network(self):
-        self.assertTrue(isinstance(PyOpenWorm.Worm(self.config).get_neuron_network(), PyOpenWorm.Network))
+    def test_get_network(self):
+        self.assertTrue(isinstance(Worm(self.config).get_neuron_network(), Network))
 
-    def test_worm_get_semantic_net(self):
-        g0 = PyOpenWorm.Worm(self.config).get_semantic_net()
+    def test_muscles(self):
+        self.assertTrue('MDL08' in Worm(self.config).muscles())
+        self.assertTrue('MDL15' in Worm(self.config).muscles())
+
+    def test_get_semantic_net(self):
+        g0 = Worm(self.config).get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
 
         qres = g0.query(
@@ -110,6 +114,17 @@ class ConfigureTest(unittest.TestCase):
         self.assertFalse(a['t'])
         self.assertEqual(c['seven'], "sign")
         self.assertTrue(a['t'])
+    def test_read_from_file(self):
+        """ Read configuration from a JSON file """
+        try:
+            d = Data.open("tests/test.conf")
+            self.assertEqual("test_value", d["test_variable"])
+        except:
+            self.fail("test.conf should exist and be valid JSON")
+    def test_read_from_file_fail(self):
+        """ Fail on attempt to read configuration from a non-JSON file """
+        with self.assertRaises(BadConf):
+            d = Data.open("tests/bad_test.conf")
 
 class ConfigureableTest(unittest.TestCase):
     def test_DefaultConfig(self):
@@ -255,22 +270,22 @@ class NetworkTest(unittest.TestCase):
         ident = self.net.identifier()
         self.assertEqual(self.config['rdf.namespace']["worm_net"], ident)
 
-    def test_network(self):
+    def test(self):
         self.assertTrue(isinstance(self.net,Network))
 
-    def test_network_aneuron(self):
+    def test_aneuron(self):
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
 
-    def test_network_neurons(self):
+    def test_neurons(self):
         self.assertTrue('AVAL' in self.net.neurons())
         self.assertTrue('DD5' in self.net.neurons())
         self.assertEqual(len(list(self.net.neurons())), 302)
 
-    def test_worm_muscles(self):
-        self.assertTrue('MDL08' in PyOpenWorm.Worm(self.config).muscles())
-        self.assertTrue('MDL15' in PyOpenWorm.Worm(self.config).muscles())
+    def test_synapses(self):
+        for x in self.net.synapses():
+            self.assertIsInstance(x,Connection)
 
-    def test_network_as_networkx(self):
+    def test_as_networkx(self):
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
 
 class EvidenceTest(unittest.TestCase):
@@ -465,16 +480,43 @@ class QuantityTest(unittest.TestCase):
 class RelationshipTest(unittest.TestCase):
     pass
 
+class ConnectionTest(unittest.TestCase):
+    def test_init(self):
+        """Initialization with positional parameters"""
+        c = Connection(1,2,3,4,5)
+        self.assertEqual(1, c.pre_cell)
+        self.assertEqual(2, c.post_cell)
+        self.assertEqual(3, c.number)
+        self.assertEqual(4, c.syntype)
+        self.assertEqual(5, c.synclass)
+
+    def test_init_number_is_a_number(self):
+        with self.assertRaises(ValueError):
+            Connection(1,2,"gazillion",4,5)
+
 class MuscleTest(unittest.TestCase):
     def setUp(self):
         setup(self)
 
     def test_muscle(self):
-        self.assertTrue(isinstance(PyOpenWorm.Muscle('MDL08',self.config),PyOpenWorm.Muscle))
+        self.assertTrue(isinstance(Muscle('MDL08',self.config), Muscle))
 
     def test_muscle_neurons(self):
         self.fail("Need an actual test")
-        m = PyOpenWorm.Muscle('MDL08',self.config).neurons()
+        m = Muscle('MDL08',self.config).neurons()
+
+class DataTest(unittest.TestCase):
+    # Test store types
+    # Test source types
+    def setUp(self):
+        setup(self)
+
+    def test_sleepy_cat_source(self):
+        # open the database
+        # check we can add a triple
+        self.config['source'] = 'Sleepycat'
+        self.config['rdf.store_conf'] = 'Sleepycat'
+        self.config['semantic_net'].query
 
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
@@ -486,5 +528,8 @@ class NeuroMLTest(unittest.TestCase):
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
-        validate_neuroml2("temp.nml")
+        try:
+            validate_neuroml2("temp.nml")
+        except:
+            self.fail("Should validate")
 

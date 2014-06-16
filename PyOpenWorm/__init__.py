@@ -22,7 +22,7 @@ Classes
 __version__ = '0.0.1'
 __author__ = 'Stephen Larson'
 
-from .configure import Configure,Configureable,ConfigValue,DefaultConfig
+from .configure import Configure,Configureable,ConfigValue,DefaultConfig,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import DataObject
 from .cell import Cell
@@ -33,3 +33,5 @@ from .evidence import Evidence,EvidenceError
 from .muscle import Muscle
 from .quantity import Quantity
 from .my_neuroml import NeuroML
+from .relationship import Relationship
+from .connection import Connection
