@@ -25,7 +25,7 @@ class Configureable:
 
     def __init__(self, conf=False):
         if not conf:
-            self.conf = DefaultConfig
+            self.conf = Configure()
         elif isinstance(conf, Configure):
             self.conf = conf
         else:
@@ -54,15 +54,19 @@ class Configure:
 
     def __contains__(self, thing):
         return (thing in self._properties)
+
     def __str__(self):
         return "\n".join("%s = %s" %(k,self._properties[k]) for k in self._properties)
+
+    def __len__(self):
+        return len(self._properties)
 
     @classmethod
     def open(cls,file_name):
         import json
         try:
             f = open(file_name)
-            c = cls()
+            c = Configure()
             d = json.load(f)
             for k in d:
                 c[k] = _C(d[k])
@@ -86,13 +90,3 @@ class Configure:
         else:
             print _properties
             raise KeyError(pname)
-
-DefaultConfig = Configure()
-DefaultConfig['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
-DefaultConfig['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
-DefaultConfig['rdf.source'] = 'sparql_endpoint'
-DefaultConfig['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm','http://107.170.133.175:8080/openrdf-sesame/repositories/OpenWorm/statements')
-def _k (a, x, y):
-    raise NotImplementedError
-DefaultConfig.__setiem__ = _k
-

@@ -15,10 +15,10 @@ namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
 # Set up the database
 
-TestConfig = Data.open("tests/test.conf")
+TestConfig = Configure.open("tests/test.conf")
 def setup(self):
-    self.config = TestConfig
-    self.config_no_data = self.config.conf
+    self.config = Data(TestConfig)
+    self.config_no_data = TestConfig
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -117,17 +117,15 @@ class ConfigureTest(unittest.TestCase):
             d = Data.open("tests/bad_test.conf")
 
 class ConfigureableTest(unittest.TestCase):
-    def test_DefaultConfig(self):
-        """Ensure Configureable gets init'd with a DefaultConfig if nothing's given"""
+    def test_init_empty(self):
+        """Ensure Configureable gets init'd with an empty config if nothing's given"""
         i = Configureable()
-        for x in DefaultConfig._properties:
-            self.assertEqual(DefaultConfig[x], i[x])
+        self.assertEqual(0,len(i.conf))
 
-    def test_DefaultConfig_False(self):
-        """Ensure Configureable gets init'd with a DefaultConfig if False is given"""
+    def test_init_False(self):
+        """Ensure Configureable gets init'd with an empty config if False is given"""
         i = Configureable(conf=False)
-        for x in DefaultConfig._properties:
-            self.assertEqual(DefaultConfig[x], i[x])
+        self.assertEqual(0,len(i.conf))
 
 class CellTest(unittest.TestCase):
     def setUp(s):
@@ -168,17 +166,29 @@ class DataUserTest(unittest.TestCase):
         setup(s)
 
     def test_init_no_config(self):
-        do = DataUser()
+        """ Should fail to initialize since it's lacking basic configuration """
+        with self.assertRaises(Exception):
+            do = DataUser()
+
+    def test_init_config_no_Data(self):
+        """ Should succeed by wrapping a Data around the configuration it is given """
+        try:
+            do = DataUser(self.config_no_data)
+        except:
+            self.fail()
 
     def test_add_statements_has_uploader(self):
-        # assert that each statement has an uploader annotation
+        """ Assert that each statement has an uploader annotation """
         g = R.Graph()
         s = rdflib.URIRef("http://somehost.com/s")
         p = rdflib.URIRef("http://somehost.com/p")
         o = rdflib.URIRef("http://somehost.com/o")
         g.add((s,p,o))
         du = DataUser(self.config)
-        du.add_statements(g)
+        try:
+            du.add_statements(g)
+        except:
+            self.fail()
         g0 = du.conf['rdf.graph']
         uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
         uploader_email = self.conf['user.email']
@@ -241,7 +251,7 @@ class NeuronTest(unittest.TestCase):
         self.assertEqual(self.neur('AVAR').name(),'AVAR')
 
     def test_init_from_lineage_name(self):
-        c = Neuron(lineageName="AB plapaaaap")
+        c = Neuron(lineageName="AB plapaaaap",conf=self.config)
         self.assertEqual(c.name(), 'ADAL')
 
     def test_GJ_degree(self):
@@ -295,7 +305,7 @@ class EvidenceTest(unittest.TestCase):
           keywords = {keyword1, keyword2},
         }
         """
-        self.assertEqual(u"Jean César", Evidence(bibtex).author())
+        self.assertEqual(u"Jean César", Evidence(bibtex=bibtex).author())
     def test_pubmed_init1(self):
         """
         A pubmed uri
@@ -342,7 +352,7 @@ class EvidenceTest(unittest.TestCase):
             Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
 
     def test_wormbase_init(self):
-        EvidenceTest(wormbase="WBPaper00044287")
+        self.assertEqual(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287"))
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""

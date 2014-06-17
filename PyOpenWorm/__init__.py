@@ -22,7 +22,7 @@ Classes
 __version__ = '0.0.1'
 __author__ = 'Stephen Larson'
 
-from .configure import Configure,Configureable,ConfigValue,DefaultConfig,BadConf
+from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import DataObject
 from .cell import Cell

@@ -13,7 +13,7 @@ class EvidenceError(BaseException):
     pass
 
 class Evidence(DataUser):
-    def __init__(self,bibtex=None, **source):
+    def __init__(self, **source):
         # Get the type of the evidence (a paper, a lab, a uri)
         # We keep track of a set of fields for the evidence.
         # Some of the fields are pulled from provided URIs and
@@ -32,6 +32,9 @@ class Evidence(DataUser):
                 break
             if k in ('wormbase', 'wbid'):
                 self._fields['wormbase'] = source[k]
+                break
+            if k in ('bibtex'):
+                self._fields['bibtex'] = source[k]
                 break
 
     def add_data(self, k, v):
