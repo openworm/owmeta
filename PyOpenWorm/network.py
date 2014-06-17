@@ -17,17 +17,7 @@ class Network(DataObject):
     def identifier(self):
         return self.conf['rdf.namespace']['worm_net']
 
-    def aneuron_nocheck(self, name):
-        """
-        Get a neuron by name
-
-        :param name: Name of a c. elegans neuron
-        :returns: Corresponding neuron to the name given
-        :rtype: PyOpenWorm.Neuron
-        """
-        return PyOpenWorm.Neuron(name,self.config)
-
-    def aneuron(self, name):
+    def aneuron(self, name, check=False):
         """
         Get a neuron by name
 
@@ -36,7 +26,8 @@ class Network(DataObject):
         :rtype: PyOpenWorm.Neuron
         """
         n = PyOpenWorm.Neuron(name,self.conf)
-        assert(n.check_exists())
+        if check:
+            assert(n.check_exists())
         return n
 
     def neurons(self):
