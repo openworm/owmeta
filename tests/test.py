@@ -514,12 +514,13 @@ class NeuroMLTest(unittest.TestCase):
 
     def test_generate_validates(self):
         """ Check that we can generate a cell's file and have it validate """
-        n = Neuron('ADAL',self.config)
+        n = Neuron('ADAL', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
         try:
             validate_neuroml2("temp.nml")
-        except:
+        except Exception, e:
+            print e
             self.fail("Should validate")
 
