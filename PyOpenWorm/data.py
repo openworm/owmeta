@@ -124,6 +124,8 @@ class Data(Configure, Configureable):
     def __init__(self, conf=False):
         Configureable.__init__(self,conf)
         Configure.__init__(self)
+        # We copy over all of the configuration that we were given
+        self.copy(self.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
@@ -134,11 +136,14 @@ class Data(Configure, Configureable):
 
 
     def _init_rdf_graph(self):
-        # check rdf.source
+
+        # Set these in case they were left out
         self['rdf.store'] = self.conf.get('rdf.store', 'default')
-        self['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
+        self['rdf.store_conf'] = tuple(self.conf.get('rdf.store_conf', 'default'))
+
         d = {'sqlite' : SQLiteSource(self),
-                'sparql_endpoint' : SPARQLSource(self)}
+                'sparql_endpoint' : SPARQLSource(self),
+                'Sleepycat' : SleepyCatSource(self)}
         i = d[self.conf['rdf.source']]
         self['rdf.graph'] = i
         self['semantic_net_new'] = i
@@ -184,6 +189,13 @@ class SPARQLSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
+        g0.open(self.conf['rdf.store_conf'])
+        return g0
+
+class SleepyCatSource(Configureable,PyOpenWorm.ConfigValue):
+    def get(self):
+        # XXX: If we have a source that's read only, should we need to set the store separately??
+        g0 = ConjunctiveGraph('Sleepycat')
         g0.open(self.conf['rdf.store_conf'])
         return g0
 
