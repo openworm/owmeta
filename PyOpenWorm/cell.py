@@ -14,50 +14,51 @@ from rdflib.plugins.sparql import prepareQuery
 from rdflib.namespace import RDFS
 import PyOpenWorm
 from PyOpenWorm import DataObject
+from string import Template
 import neuroml
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 ns =  {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
-segment_query = """
-          SELECT ?seg_id ?seg_name ?x ?y ?z ?d ?par_id ?x_prox ?y_prox ?z_prox ?d_prox
-           WHERE {
-              ?p ns1:id ?morph_name .
-              ?p ns1:segment ?segment .
-              ?segment ns1:distal 	?loop
-                     ; ns1:id 	    ?seg_id
-                     ; ns1:name 	?seg_name .
+segment_query = Template("""
+SELECT ?seg_id ?seg_name ?x ?y ?z ?d ?par_id ?x_prox ?y_prox ?z_prox ?d_prox
+WHERE {
+  ?p ns1:id 'morphology_ADAL' .
+  ?p ns1:segment ?segment .
+  ?segment ns1:distal 	?loop
+         ; ns1:id 	    ?seg_id
+         ; ns1:name 	?seg_name .
 
-              OPTIONAL {
-                  ?segment ns1:proximal	?loop_prox .
-                  ?loop_prox ns1:x ?x_prox
-                    ; ns1:y ?y_prox
-                    ; ns1:z ?z_prox
-                    ; ns1:diameter ?d_prox .
-              }
-              OPTIONAL {?segment ns1:parent ?par . ?par ns1:segment ?par_id  }.
-              ?loop ns1:x ?x
-                ; ns1:y ?y
-                ; ns1:z ?z
-                ; ns1:diameter ?d .
-            }
-            """
-segment_group_query = """
-          SELECT ?gid ?member ?include
-           WHERE {
-              ?p ns1:id ?morph_name .
-              ?p ns1:segmentGroup ?seg_group .
-              ?seg_group ns1:id ?gid .
-              OPTIONAL {
-                ?seg_group ns1:include ?inc .
-                ?inc ns1:segmentGroup ?include .
-              }
-              OPTIONAL {
-                ?seg_group ns1:member ?inc .
-                ?inc ns1:segment ?member .
-              }
-            }
-            """
+  OPTIONAL {
+      ?segment ns1:proximal	?loop_prox .
+      ?loop_prox ns1:x ?x_prox
+        ; ns1:y ?y_prox
+        ; ns1:z ?z_prox
+        ; ns1:diameter ?d_prox .
+  }
+  OPTIONAL {?segment ns1:parent ?par . ?par ns1:segment ?par_id  }.
+  ?loop ns1:x ?x
+    ; ns1:y ?y
+    ; ns1:z ?z
+    ; ns1:diameter ?d .
+}
+            """)
+segment_group_query = Template("""
+SELECT ?gid ?member ?include
+WHERE {
+  ?p ns1:id 'morphology_ADAL' .
+  ?p ns1:segmentGroup ?seg_group .
+  ?seg_group ns1:id ?gid .
+  OPTIONAL {
+    ?seg_group ns1:include ?inc .
+    ?inc ns1:segmentGroup ?include .
+  }
+  OPTIONAL {
+    ?seg_group ns1:member ?inc .
+    ?inc ns1:segment ?member .
+  }
+}
+            """)
 class Cell(DataObject):
     def __init__(self, name, conf=False):
         DataObject.__init__(self,conf=conf)
@@ -68,11 +69,12 @@ class Cell(DataObject):
         return ""
 
     def morphology(self):
-        query_binds = { "morph_name" : Literal("morphology_" + str(self.name())) }
+        morph_name = "morphology_" + str(self.name())
 
         # Query for segments
-        qres = self['semantic_net'].query(segment_query,initBindings=query_binds,initNs=ns)
-        morph = neuroml.Morphology(id=query_binds['morph_name'])
+        query = segment_query.substitute(morph_name=morph_name)
+        qres = self['semantic_net'].query(query, initNs=ns)
+        morph = neuroml.Morphology(id=morph_name)
         for r in qres:
             par = False
 
@@ -90,7 +92,8 @@ class Cell(DataObject):
             s.distal = loop
             morph.segments.append(s)
         # Query for segment groups
-        qres = self['semantic_net'].query(segment_group_query,initBindings=query_binds,initNs=ns)
+        query = segment_group_query.substitute(morph_name=morph_name)
+        qres = self['semantic_net'].query(query,initNs=ns)
         for r in qres:
             s = neuroml.SegmentGroup(id=r['gid'])
             if r['member']:
