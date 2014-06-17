@@ -15,17 +15,10 @@ namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
 # Set up the database
 
+TestConfig = Data.open("tests/test.conf")
 def setup(self):
-    c = Configure()
-    c['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
-    c['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
-    c['sqldb'] = '/home/markw/work/openworm/PyOpenWorm/db/celegans.db'
-    #c['rdf.source'] = 'sqlite'
-    c['rdf.source'] = 'sparql_endpoint'
-    c['rdf.store_conf'] = ('http://107.170.133.175:8080/openrdf-sesame/repositories/test','http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements')
-    self.config = Data(c)
-    self.config['user.email'] = 'jerry@cn.com'
-    self.config_no_data = c
+    self.config = TestConfig
+    self.config_no_data = self.config.conf
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -67,43 +60,39 @@ class WormTest(unittest.TestCase):
             list.append(str(r[0]))
         self.assertTrue('MDL08' in list)
 
-    @unittest.skip("Long runner")
-    def test_neuron_persistence(self):
-        d = Configure(self.config_no_data)
-        d['rdf.store'] = 'Sleepycat'
-        d['rdf.store_conf'] = 'tests/test.bdb'
-        e = Data(d)
-
-        PyOpenWorm.Neuron('ADER', e).add_reference('Receptor', 'EXP-1', pmid='some_pmid')
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
-
-        e = Data(d)
-
-        self.assertIn('some_pmid', PyOpenWorm.Neuron('ADER',e).get_reference(0,'EXP-1'))
-
-        assert('some_pmid' not in PyOpenWorm.Neuron('ADER',self.config).get_reference(0,'EXP-1'))
-        subprocess.call('rm -rf tests/test.bdb')
-
 class ConfigureTest(unittest.TestCase):
     def test_fake_config(self):
+        """ Try to retrieve a config value that hasn't been set """
         with self.assertRaises(KeyError):
             c = Configure()
             k = c['not_a_valid_config']
 
-    def test_configure_literal(self):
+    def test_literal(self):
+        """ Assign a literal rather than a ConfigValue"""
         c = Configure()
         c['seven'] = "coke"
         self.assertEqual(c['seven'], "coke")
 
-    def test_configure_getter(self):
+    def test_ConfigValue(self):
+        """ Assign a ConfigValue"""
         c = Configure()
         class pipe(ConfigValue):
             def get(self):
                 return "sign"
         c['seven'] = pipe()
-        self.assertEqual(c['seven'], "sign")
+        self.assertEqual("sign",c['seven'])
 
-    def test_configure_late_get(self):
+    def test_getter_no_ConfigValue(self):
+        """ Assign a method with a "get". Should return a the object rather than calling its get method """
+        c = Configure()
+        class pipe:
+            def get(self):
+                return "sign"
+        c['seven'] = pipe()
+        self.assertIsInstance(c['seven'], pipe)
+
+    def test_late_get(self):
+        """ "get" shouldn't be called until the value is *dereferenced* """
         c = Configure()
         a = {'t' : False}
         class pipe(ConfigValue):
@@ -114,6 +103,7 @@ class ConfigureTest(unittest.TestCase):
         self.assertFalse(a['t'])
         self.assertEqual(c['seven'], "sign")
         self.assertTrue(a['t'])
+
     def test_read_from_file(self):
         """ Read configuration from a JSON file """
         try:
@@ -138,7 +128,6 @@ class ConfigureableTest(unittest.TestCase):
         i = Configureable(conf=False)
         for x in DefaultConfig._properties:
             self.assertEqual(DefaultConfig[x], i[x])
-
 
 class CellTest(unittest.TestCase):
     def setUp(s):
@@ -374,7 +363,8 @@ class RDFLibTest(unittest.TestCase):
         b = rdflib.BNode()
         self.assertNotEqual(a, b)
 
-    def test_reification1(self):
+    def test_OpenRDF_reification1(self):
+        """ WARNING: This test requires that you have OpenRDF installed on your machine with a repository named test and that you don't care what's in it """
         graph = R.ConjunctiveGraph(store="SPARQLUpdateStore")
         graph.open(("http://localhost:8080/openrdf-sesame/repositories/test","http://localhost:8080/openrdf-sesame/repositories/test/statements"))
         clear_graph(graph)
