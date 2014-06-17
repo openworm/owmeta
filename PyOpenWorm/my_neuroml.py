@@ -3,7 +3,7 @@ import neuroml as N
 
 class NeuroML(DataUser):
     @classmethod
-    def generate(cls, o, t):
+    def generate(cls, o, t=2):
         """
         Get a NeuroML object that represents the given object. The ``type`` determines what content is included in the NeuroML object:
 
@@ -18,7 +18,9 @@ class NeuroML(DataUser):
         if isinstance(o,Neuron):
             # read in the morphology data
             d = N.NeuroMLDocument(id=o.name())
-            d.morphology.append(o.morphology())
+            c = N.Cell(id=o.name())
+            c.morphology = o.morphology()
+            d.cells.append(c)
             return d
         else:
             raise "Not a valid object for conversion to neuroml"
