@@ -136,14 +136,28 @@ class CellTest(unittest.TestCase):
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_lineageName(self):
+        """ Test that we can retrieve the lineage name """
         c = Cell("ADAL",self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
 
     def test_morphology_is_NeuroML_morphology(self):
+        """ Check that the morphology is the kind made by neuroml """
         c = Cell("ADAR",self.config)
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
+    def test_morphology_validates(self):
+        """ Check that we can generate a cell's file and have it validate """
+        n = Neuron('ADAL', conf=self.config)
+        doc = PyOpenWorm.NeuroML.generate(n,1)
+        writers.NeuroMLWriter.write(doc, "temp.nml")
+        from neuroml.utils import validate_neuroml2
+        try:
+            validate_neuroml2("temp.nml")
+        except Exception, e:
+            print e
+            self.fail("Should validate")
+
 
 class DataObjectTest(unittest.TestCase):
     def setUp(s):
@@ -188,7 +202,7 @@ class DataUserTest(unittest.TestCase):
         try:
             du.add_statements(g)
         except:
-            self.fail()
+            self.fail("Should be able to add statements in the first place")
         g0 = du.conf['rdf.graph']
         uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
         uploader_email = self.conf['user.email']
@@ -521,16 +535,4 @@ class DataTest(unittest.TestCase):
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
-
-    def test_generate_validates(self):
-        """ Check that we can generate a cell's file and have it validate """
-        n = Neuron('ADAL', conf=self.config)
-        doc = PyOpenWorm.NeuroML.generate(n,1)
-        writers.NeuroMLWriter.write(doc, "temp.nml")
-        from neuroml.utils import validate_neuroml2
-        try:
-            validate_neuroml2("temp.nml")
-        except Exception, e:
-            print e
-            self.fail("Should validate")
 
