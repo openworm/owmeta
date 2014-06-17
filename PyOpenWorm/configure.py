@@ -11,17 +11,14 @@ class _C(ConfigValue):
         return self.v
     def __str__(self):
         return str(self.v)
+    def __repr__(self):
+        return str(self.v)
 
 
 class BadConf(BaseException):
     pass
 
 class Configureable:
-    def __getitem__(self, k):
-        return self.conf.get(k)
-
-    def __setitem__(self, k, v):
-        self.conf[k] = v
 
     def get(self, pname, default=False):
         return self.conf.get(pname,default)
@@ -33,6 +30,13 @@ class Configureable:
             self.conf = conf
         else:
             raise BadConf(self)
+        if not isinstance(self, Configure):
+            def __getitem__(k):
+                return self.conf.get(k)
+            def __setitem__(k, v):
+                self.conf[k] = v
+            self.__getitem__ = __getitem__
+            self.__setitem__ = __setitem__
 
 class Configure:
     # conf: is a configure instance to base this one on
@@ -51,7 +55,7 @@ class Configure:
     def __contains__(self, thing):
         return (thing in self._properties)
     def __str__(self):
-        return str(self._properties)
+        return "\n".join("%s = %s" %(k,self._properties[k]) for k in self._properties)
 
     @classmethod
     def open(cls,file_name):

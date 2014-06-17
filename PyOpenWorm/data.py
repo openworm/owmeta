@@ -122,8 +122,8 @@ class DataUser(Configureable):
 
 class Data(Configure, Configureable):
     def __init__(self, conf=False):
-        Configureable.__init__(self,conf)
         Configure.__init__(self)
+        Configureable.__init__(self,conf)
         # We copy over all of the configuration that we were given
         self.copy(self.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
@@ -136,14 +136,14 @@ class Data(Configure, Configureable):
 
 
     def _init_rdf_graph(self):
-
         # Set these in case they were left out
-        self['rdf.store'] = self.conf.get('rdf.store', 'default')
-        self['rdf.store_conf'] = tuple(self.conf.get('rdf.store_conf', 'default'))
+        c = self.conf
+        c['rdf.store'] = self.conf.get('rdf.store', 'default')
+        c['rdf.store_conf'] = tuple(self.conf.get('rdf.store_conf', 'default'))
 
-        d = {'sqlite' : SQLiteSource(self),
-                'sparql_endpoint' : SPARQLSource(self),
-                'Sleepycat' : SleepyCatSource(self)}
+        d = {'sqlite' : SQLiteSource(c),
+                'sparql_endpoint' : SPARQLSource(c),
+                'Sleepycat' : SleepyCatSource(c)}
         i = d[self.conf['rdf.source']]
         self['rdf.graph'] = i
         self['semantic_net_new'] = i
@@ -208,12 +208,7 @@ class SQLiteSource(Configureable,PyOpenWorm.ConfigValue):
         n = self.conf['rdf.namespace']
 
         cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
-
-
-        # print cur.description
-
         g0 = ConjunctiveGraph(self.conf['rdf.store'])
-        #print self['rdf.store']
         g0.open(self.conf['rdf.store_conf'], create=True)
 
         for r in cur.fetchall():
