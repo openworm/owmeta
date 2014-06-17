@@ -9,6 +9,9 @@ class _C(ConfigValue):
         self.v = v
     def get(self):
         return self.v
+    def __str__(self):
+        return str(self.v)
+
 
 class BadConf(BaseException):
     pass
@@ -47,6 +50,22 @@ class Configure:
 
     def __contains__(self, thing):
         return (thing in self._properties)
+    def __str__(self):
+        return str(self._properties)
+
+    @classmethod
+    def open(cls,file_name):
+        import json
+        try:
+            f = open(file_name)
+            c = Configure()
+            d = json.load(f)
+            for k in d:
+                c[k] = _C(d[k])
+            f.close()
+            return c
+        except Exception, e:
+            raise BadConf(e)
 
     def copy(self,other):
         if isinstance(other,Configure):
@@ -61,9 +80,9 @@ class Configure:
         elif default:
             return default
         else:
+            print _properties
             raise KeyError(pname)
 
-# TODO: Read this from a file
 DefaultConfig = Configure()
 DefaultConfig['connectomecsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv'
 DefaultConfig['neuronscsv'] = 'https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv'
