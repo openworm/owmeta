@@ -58,7 +58,7 @@ class Configure:
         import json
         try:
             f = open(file_name)
-            c = Configure()
+            c = cls()
             d = json.load(f)
             for k in d:
                 c[k] = _C(d[k])
