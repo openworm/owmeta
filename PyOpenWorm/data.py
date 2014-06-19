@@ -65,16 +65,18 @@ class DataUser(Configureable):
             Configureable.__init__(self, Data(conf))
 
     def _add_to_store(self, g, graph_name=False):
-        if not graph_name:
-            graph_name = g.identifier
-        for g in grouper(g, 1000):
+        for group in grouper(g, 1000):
             temp_graph = Graph()
-            for x in g:
-                temp_graph.add(x)
-            s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
+            for x in group:
+                if x:
+                    temp_graph.add(x)
+                else:
+                    break
+            if graph_name:
+                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
+            else:
+                s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
             self.conf['rdf.graph'].update(s)
-        return g
-
 
     def add_reference(self, g, reference_iri):
         """
@@ -90,7 +92,7 @@ class DataUser(Configureable):
 
         self.add_statements(g + new_statements)
 
-    #def _add_unannotatted_statements(self, graph):
+    #def _add_unannotated_statements(self, graph):
     def add_statements(self, graph):
         """
         Add a set of statements to the database.
@@ -101,12 +103,16 @@ class DataUser(Configureable):
 
         ns = self.conf['rdf.namespace']
         time_stamp = DT.now(pytz.utc).isoformat()
+
+        ts = Literal(time_stamp, datatype=XSD['dateTimeStamp'])
+        email = Literal(self.conf['user.email'])
+        m = self.conf['molecule_name']((ts,email))
+
         new_statements = Graph()
-        for statement in graph:
-            n = self._reify(new_statements,statement)
-            new_statements.add((n, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp'])))
-            new_statements.add((n, ns['uploader'], Literal(self.conf['user.email'])))
-        g = self._add_to_store(graph + new_statements)
+        new_statements.add((m, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp'])))
+        new_statements.add((m, ns['uploader'], Literal(self.conf['user.email'])))
+        self._add_to_store(graph, m)
+        self._add_to_store(new_statements)
 
     def _reify(self,g,s):
         """
