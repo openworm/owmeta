@@ -201,22 +201,28 @@ class DataUserTest(unittest.TestCase):
         du = DataUser(self.config)
         try:
             du.add_statements(g)
-        except:
-            self.fail("Should be able to add statements in the first place")
+        except Exception, e:
+            self.fail("Should be able to add statements in the first place: "+str(e))
         g0 = du.conf['rdf.graph']
         uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
-        uploader_email = self.conf['user.email']
+        upload_date_n3_uri = du.conf['rdf.namespace']['upload_date'].n3()
+        uploader_email = du.conf['user.email']
         q = """
         Select ?u ?t where
-        { [] rdf:type rdf:Statement
-        ; rdf:subject <http://somehost.com/s>
-        ; rdf:predicate <http://somehost.com/p>
-        ; rdf:object <http://somehost.com/o>
-        ; """+uploader_n3_uri+""" '"""+uploader_email+"""'
+        {
+        GRAPH ?g
+        {
+         <http://somehost.com/s>
+         <http://somehost.com/p>
+         <http://somehost.com/o> .
+        }
+
+        ?g """+uploader_n3_uri+""" ?u.
+        ?g """+upload_date_n3_uri+""" ?t.
         }
         """
-
-        g0.query(q)
+        for x in g0.query(q):
+            print x['u'], x['t']
 
     @unittest.skip("Long runner")
     def test_add_statements_completes(self):

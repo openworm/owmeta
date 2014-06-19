@@ -58,12 +58,47 @@ class Network(DataObject):
         """
         Get all synapses by
 
-        :returns: A generator of (neuron1,neuron2,(synapse_type,neurotransmitter,weight))
+        :returns: A generator of Connection objects
+        :rtype: generator
+        """
+        for x in self._synapses_csv():
+            yield x
+
+    def _synapses_csv(self):
+        """
+        Get all synapses by
+
+        :returns: A generator of Connection objects
         :rtype: generator
         """
         for n,nbrs in self['nx'].adjacency_iter():
             for nbr,eattr in nbrs.items():
                 yield PyOpenWorm.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'])
+
+    def _synapses_rdf(self):
+        """
+        Get all synapses by
+
+        :returns: A generator of Connection objects
+        :rtype: generator
+        """
+        qres = self['semantic_net'].query(
+            """
+            SELECT ?pre ?post ?type ?class #we want to get out the labels associated with the objects
+            WHERE {
+                    {
+                        ?node <http://openworm.org/entities/356> ?p .
+                    }
+                    UNION
+                    {
+                        ?node <http://openworm.org/entities/357> ?p .
+                    }
+                    ?node rdfs:label ?pre .
+                    ?p rdfs:label ?post .
+                  }
+            """)
+        for x in qres:
+            yield (str(x['pre']), str( x['post']))
 
     def as_networkx(self):
         return self['nx']
