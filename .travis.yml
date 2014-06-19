@@ -7,7 +7,9 @@ python:
 install:
   - "pip install discover"
   - "pip install rdflib"
-  - "pip install networkx"  
+  - "pip install networkx"
+  - "pip install libNeuroML"
+  - "pip install pint"
   - "pip install . --use-mirrors"
 
 
