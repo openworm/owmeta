@@ -8,9 +8,11 @@ install:
   - "pip install discover"
   - "pip install rdflib"
   - "pip install networkx"
-  - "pip install libNeuroML"
+  - "git clone git@github.com:NeuralEnsemble/libNeuroML.git"
+  - "cd libNeuroML"
+  - "python setup.py install"
+  - "cd .."
   - "pip install pint"
-  - "pip install tables"
   - "pip install . --use-mirrors"
 
 
