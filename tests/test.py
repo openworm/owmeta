@@ -572,6 +572,16 @@ class ConnectionTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             Connection(1,2,"gazillion",4,5)
 
+    def test_init_with_neuron_objects(self):
+        n1 = Neuron("AVAL",self.config)
+        n2 = Neuron("PVCR",self.config)
+        c = Connection(n1,n2,self.config)
+
+    def test_init_with_neuron_objects(self):
+        n1 = Neuron("AVAL",self.config)
+        n2 = Neuron("PVCR",self.config)
+        c = Connection(n1,n2,self.config)
+
 class MuscleTest(unittest.TestCase):
     def setUp(self):
         setup(self)
@@ -604,12 +614,13 @@ if __name__ == '__main__':
     """ Integration testing """
     # Reference a neuron
     Configure.default = TestConfig
-    n = Neuron(name='AVAL')
-    print n.name()
+    n1 = Neuron(name='AVAL')
+    n2 = Neuron(name='PVCR')
     # Look at all of its neighbors
+    Connection(n1,n2)
     print list(n.neighbor())
     # Get the relationship to neighbors as Connection objects
-    print Relationship.pull(n,neighbor)
+    print n.neighbor.rel()
     # print n.lineageName()
     #
     # reference a synaptic connection
