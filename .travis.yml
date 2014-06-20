@@ -7,7 +7,12 @@ python:
 install:
   - "pip install discover"
   - "pip install rdflib"
-  - "pip install networkx"  
+  - "pip install networkx"
+  - "git clone https://github.com/NeuralEnsemble/libNeuroML.git"
+  - "cd libNeuroML"
+  - "python setup.py install"
+  - "cd .."
+  - "pip install pint"
   - "pip install . --use-mirrors"
 
 
