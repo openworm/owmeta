@@ -2,7 +2,8 @@
 import unittest
 import neuroml
 import neuroml.writers as writers
-
+import sys
+sys.path.insert(0,".")
 import PyOpenWorm
 import subprocess
 from PyOpenWorm import *
@@ -22,6 +23,16 @@ def setup(self):
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
+
+def make_graph(size=100):
+    """ Make an rdflib graph """
+    g = R.Graph()
+    for i in range(size):
+        s = rdflib.URIRef("http://somehost.com/s"+str(i))
+        p = rdflib.URIRef("http://somehost.com/p"+str(i))
+        o = rdflib.URIRef("http://somehost.com/o"+str(i))
+        g.add((s,p,o))
+    return g
 
 class WormTest(unittest.TestCase):
     """Test for Worm."""
@@ -152,11 +163,14 @@ class CellTest(unittest.TestCase):
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
+        f = sys.stdout
+        sys.stdout = open("/dev/null")
         try:
             validate_neuroml2("temp.nml")
         except Exception, e:
             print e
             self.fail("Should validate")
+        sys.stdout = f
 
 
 class DataObjectTest(unittest.TestCase):
@@ -168,12 +182,26 @@ class DataObjectTest(unittest.TestCase):
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_identifier(self):
+        """ Test that we can set and return an identifier """
         do = DataObject(conf=self.config,ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
 
-    def test_identifier(self):
-        do = DataObject(conf=self.config,ident="http://example.org")
-        self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
+    def test_uploader(self):
+        """ Make sure that we're marking a statement with it's uploader """
+        g = make_graph(20)
+        r = DataObject(triples=g,conf=self.config)
+        r.save()
+        u = r.uploader()
+        self.assertEqual(self.config['user.email'], u)
+
+    def test_upload_date(self):
+        """ Make sure that we're marking a statement with it's upload date """
+        g = make_graph(20)
+        r = DataObject(triples=g,conf=self.config)
+        r.save()
+        u = r.upload_date()
+        self.assertIsNotNone(u)
+
 
 class DataUserTest(unittest.TestCase):
     def setUp(s):
@@ -194,19 +222,32 @@ class DataUserTest(unittest.TestCase):
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
         g = R.Graph()
+
+        # Make a statement (triple)
         s = rdflib.URIRef("http://somehost.com/s")
         p = rdflib.URIRef("http://somehost.com/p")
         o = rdflib.URIRef("http://somehost.com/o")
+
+        # Add it to an RDF graph
         g.add((s,p,o))
+
+        # Make a datauser
         du = DataUser(self.config)
+
         try:
+            # Add all of the statements in the graph
             du.add_statements(g)
         except Exception, e:
             self.fail("Should be able to add statements in the first place: "+str(e))
+
         g0 = du.conf['rdf.graph']
+
+        # These are the properties that we should find
         uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
         upload_date_n3_uri = du.conf['rdf.namespace']['upload_date'].n3()
         uploader_email = du.conf['user.email']
+
+        # This is the query to get uploader information
         q = """
         Select ?u ?t where
         {
@@ -219,10 +260,10 @@ class DataUserTest(unittest.TestCase):
 
         ?g """+uploader_n3_uri+""" ?u.
         ?g """+upload_date_n3_uri+""" ?t.
-        }
+        } LIMIT 1
         """
         for x in g0.query(q):
-            print x['u'], x['t']
+            self.assertEqual(du.conf['user.email'],str(x['u']))
 
     @unittest.skip("Long runner")
     def test_add_statements_completes(self):
@@ -498,7 +539,21 @@ class QuantityTest(unittest.TestCase):
         self.assertEqual(23, q.value)
 
 class RelationshipTest(unittest.TestCase):
-    pass
+    def setUp(self):
+        setup(self)
+
+    def test_init_graph(self):
+        """ Make sure that we're marking a statement with it's upload date """
+        g = make_graph()
+        r = Relationship(graph=g,conf=self.config)
+
+    def test_pull(self):
+        """ Get the relationship associated with a method """
+        g = make_graph(20)
+        r = DataObject(triples=g,conf=self.config)
+        #r.save()
+
+        s = Relationship.pull(r,'uploader')
 
 class ConnectionTest(unittest.TestCase):
     def test_init(self):
@@ -542,3 +597,22 @@ class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
 
+if __name__ == '__main__':
+    """ Integration testing """
+    # Reference a neuron
+    Configure.default = TestConfig
+    n = Neuron(name='AVAL')
+    print n.name()
+    # Look at all of its neighbors
+    print list(n.neighbor())
+    # Get the relationship to neighbors as Connection objects
+    print Relationship.pull(n,neighbor)
+    # print n.lineageName()
+    #
+    # reference a synaptic connection
+    # assert that some source affirms that connection
+    # look at other sources that affirm the connection
+    # look at who uploaded these sources and when
+    #
+    # look at who said something about a synaptic connection to some neuron
+    # look at what else one of these people said
