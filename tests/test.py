@@ -446,29 +446,29 @@ class RDFLibTest(unittest.TestCase):
         r = graph.query("select distinct ?z where { ?p ns1:subject ?x . ?z ns1:says ?p }", initNs=self.ns)
         self.assertEqual(3,len(r))
 
-class TimeTest(unittest.TestCase):
-    ZERO = timedelta(0)
-    HOUR = timedelta(hours=1)
+#from datetime import timedelta,now
+#ZERO = timedelta(0)
+#HOUR = timedelta(hours=1)
 
-    # A UTC class.
+## A UTC class.
 
-    class UTC(tzinfo):
-        """UTC"""
+#class UTC(tzinfo):
+    #"""UTC"""
 
-        def utcoffset(self, dt):
-            return ZERO
+    #def utcoffset(self, dt):
+        #return ZERO
 
-        def tzname(self, dt):
-            return "UTC"
+    #def tzname(self, dt):
+        #return "UTC"
 
-        def dst(self, dt):
-            return ZERO
+    #def dst(self, dt):
+        #return ZERO
+#utc = UTC()
+#class TimeTest(unittest.TestCase):
 
-    utc = UTC()
-    def test_datetime_isoformat_has_timezone(self):
-        from datetime import datetime as DT
-        time_stamp = DT.now(utc).isoformat()
-        self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
+    #def test_datetime_isoformat_has_timezone(self):
+        #time_stamp = now(utc).isoformat()
+        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
 
 class PintTest(unittest.TestCase):
     @classmethod

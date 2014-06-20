@@ -13,4 +13,23 @@ from PyOpenWorm import DataObject
 # Consequently, they can be reduced to or built up from a
 # set of triples.
 class Relationship(DataObject):
-    pass
+    def __init__(self,triples=[],graph=None,conf=None):
+        DataObject.__init__(self,conf=conf)
+        if graph:
+            self._triples = graph
+        else:
+            self._triples = triples
+
+    def triples(self):
+        for x in self._triples:
+            yield x
+
+    @classmethod
+    def pull(cls, do, name):
+        """
+        Returns a set of Relationship objects associated with the call ``class.method_name()``
+        :return: Iterable of relationship objects
+        """
+        attr = getattr(do,name)
+        # How to get the appropriate relationship?
+        #   need to get the a

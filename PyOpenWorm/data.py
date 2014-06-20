@@ -62,7 +62,7 @@ class DataUser(Configureable):
         if isinstance(conf, Data):
             Configureable.__init__(self, conf)
         else:
-            Configureable.__init__(self, Data(conf))
+            Configureable.__init__(self, conf=Data(conf))
 
     def _add_to_store(self, g, graph_name=False):
         for group in grouper(g, 1000):
@@ -97,7 +97,7 @@ class DataUser(Configureable):
         """
         Add a set of statements to the database.
         Annotates the addition with uploader name, etc
-        :param triples_or_graph: A set of triples or a rdflib graph to add
+        :param graph: An iterable of triples
         """
         #uri = self.conf['molecule_name'](graph.identifier)
 
