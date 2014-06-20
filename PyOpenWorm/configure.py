@@ -18,29 +18,10 @@ class _C(ConfigValue):
 class BadConf(BaseException):
     pass
 
-class Configureable:
-
-    def get(self, pname, default=False):
-        return self.conf.get(pname,default)
-
-    def __init__(self, conf=False):
-        if not conf:
-            self.conf = Configure()
-        elif isinstance(conf, Configure):
-            self.conf = conf
-        else:
-            raise BadConf(self)
-        if not isinstance(self, Configure):
-            def __getitem__(k):
-                return self.conf.get(k)
-            def __setitem__(k, v):
-                self.conf[k] = v
-            self.__getitem__ = __getitem__
-            self.__setitem__ = __setitem__
-
 class Configure:
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
+
     def __init__(self, dependencies={}):
         self._properties = {}
 
@@ -90,3 +71,24 @@ class Configure:
         else:
             print _properties
             raise KeyError(pname)
+
+class Configureable:
+    default = Configure()
+    def __init__(self, conf=False):
+        if not conf:
+            self.conf = Configureable.default
+        elif isinstance(conf, Configure):
+            self.conf = conf
+        else:
+            raise BadConf(self)
+
+        if not isinstance(self, Configure):
+            def __getitem__(k):
+                return self.conf.get(k)
+            def __setitem__(k, v):
+                self.conf[k] = v
+            self.__getitem__ = __getitem__
+            self.__setitem__ = __setitem__
+
+    def get(self, pname, default=False):
+        return self.conf.get(pname,default)

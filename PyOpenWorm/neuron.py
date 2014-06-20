@@ -19,15 +19,16 @@ from PyOpenWorm import Cell, DataUser, Configure, propertyTypes
 
 class Neuron(Cell):
     def __init__(self, name=False, conf=False, lineageName=False):
-        Cell.__init__(self,name,conf)
+        Cell.__init__(self,name,conf=conf)
         self._name = name
+        self.get_neighbors = self.neighbor
+
 
     def _write_out_db(self):
         con = sqlite3.connect(self['sqldb'])
         with open(self['sqldb'], 'w') as f:
             for line in con.iterdump():
                 f.write('%s\n' % line)
-
 
     def GJ_degree(self):
         """Get the degree of this neuron for gap junction edges only
@@ -241,7 +242,7 @@ class Neuron(Cell):
         return ref
 
     # Directed graph. Getting accessible _from_ this node
-    def get_neighbors(self, type=0):
+    def neighbor(self, type=0):
         """Get a list of neighboring neurons.
 
            :param type: What kind of junction to look for.
@@ -249,13 +250,19 @@ class Neuron(Cell):
                         3=incoming chemical synapses, 4=outgoing chemical synapses
            :returns: a list of neuron names
            :rtype: List
-           """
-        qres = self['semantic_net_new'].query(
+        """
+        qres = self.conf['semantic_net_new'].query(
             """
-            SELECT ?n #we want to get out the labels associated with the objects
+            SELECT distinct ?n #we want to get out the labels associated with the objects
             WHERE {
                     ?node rdfs:label '"""+self.name()+"""' .
-                    ?node <http://openworm.org/entities/356> ?p .
+                    {
+                        ?node <http://openworm.org/entities/356> ?p .
+                    }
+                    UNION
+                    {
+                        ?node <http://openworm.org/entities/357> ?p .
+                    }
                     ?p rdfs:label ?n
                   }
             """)
