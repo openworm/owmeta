@@ -11,6 +11,7 @@ import networkx
 import rdflib
 import rdflib as R
 import pint as Q
+import os
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
@@ -164,7 +165,11 @@ class CellTest(unittest.TestCase):
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
         f = sys.stdout
-        sys.stdout = open("/dev/null")
+        try:
+            sys.stdout = open(os.devnull, 'w')
+        except:
+            sys.stdout = f
+
         try:
             validate_neuroml2("temp.nml")
         except Exception, e:
@@ -446,26 +451,7 @@ class RDFLibTest(unittest.TestCase):
         r = graph.query("select distinct ?z where { ?p ns1:subject ?x . ?z ns1:says ?p }", initNs=self.ns)
         self.assertEqual(3,len(r))
 
-#from datetime import timedelta,now
-#ZERO = timedelta(0)
-#HOUR = timedelta(hours=1)
-
-## A UTC class.
-
-#class UTC(tzinfo):
-    #"""UTC"""
-
-    #def utcoffset(self, dt):
-        #return ZERO
-
-    #def tzname(self, dt):
-        #return "UTC"
-
-    #def dst(self, dt):
-        #return ZERO
-#utc = UTC()
 #class TimeTest(unittest.TestCase):
-
     #def test_datetime_isoformat_has_timezone(self):
         #time_stamp = now(utc).isoformat()
         #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
