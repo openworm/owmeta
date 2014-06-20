@@ -23,7 +23,6 @@ class Neuron(Cell):
         self._name = name
         self.get_neighbors = self.neighbor
 
-
     def _write_out_db(self):
         con = sqlite3.connect(self['sqldb'])
         with open(self['sqldb'], 'w') as f:
@@ -242,6 +241,7 @@ class Neuron(Cell):
         return ref
 
     # Directed graph. Getting accessible _from_ this node
+
     def neighbor(self, type=0):
         """Get a list of neighboring neurons.
 
