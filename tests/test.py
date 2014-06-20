@@ -447,10 +447,27 @@ class RDFLibTest(unittest.TestCase):
         self.assertEqual(3,len(r))
 
 class TimeTest(unittest.TestCase):
+    ZERO = timedelta(0)
+    HOUR = timedelta(hours=1)
+
+    # A UTC class.
+
+    class UTC(tzinfo):
+        """UTC"""
+
+        def utcoffset(self, dt):
+            return ZERO
+
+        def tzname(self, dt):
+            return "UTC"
+
+        def dst(self, dt):
+            return ZERO
+
+    utc = UTC()
     def test_datetime_isoformat_has_timezone(self):
-        import pytz
         from datetime import datetime as DT
-        time_stamp = DT.now(pytz.utc).isoformat()
+        time_stamp = DT.now(utc).isoformat()
         self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
 
 class PintTest(unittest.TestCase):
