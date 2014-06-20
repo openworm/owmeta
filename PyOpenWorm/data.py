@@ -18,7 +18,7 @@ import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
 from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
-import pytz
+import datetime
 from rdflib.namespace import XSD
 from itertools import izip_longest
 
@@ -35,6 +35,20 @@ class _B(ConfigValue):
         return self.v
     def invalidate(self):
         self.v = False
+
+ZERO = datetime.timedelta(0)
+class _UTC(datetime.tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return ZERO
+utc = _UTC()
 
 class _Z(ConfigValue):
     def __init__(self, c, n):
@@ -93,6 +107,8 @@ class DataUser(Configureable):
         self.add_statements(g + new_statements)
 
     #def _add_unannotated_statements(self, graph):
+    # A UTC class.
+
     def add_statements(self, graph):
         """
         Add a set of statements to the database.
@@ -102,7 +118,7 @@ class DataUser(Configureable):
         #uri = self.conf['molecule_name'](graph.identifier)
 
         ns = self.conf['rdf.namespace']
-        time_stamp = DT.now(pytz.utc).isoformat()
+        time_stamp = DT.now(utc).isoformat()
 
         ts = Literal(time_stamp, datatype=XSD['dateTimeStamp'])
         email = Literal(self.conf['user.email'])
