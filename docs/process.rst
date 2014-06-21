@@ -63,10 +63,26 @@ In line with current practices for communication through the source code managem
 
 Access control
 ~~~~~~~~~~~~~~~~~
-Write access to data in the project has been inconsistent between various data sources in the project. Going forward, write access to OpenWorm databases should be restricted to authenticated users to forestall the possibility of malicious tampering. 
+Write access to data in the project has been inconsistent between various data sources in the project. Going forward, 
+write access to OpenWorm databases should be restricted to authenticated users to forestall the possibility of malicious 
+tampering. 
+
+One way to accomplish this would be to leverage GitHub's fork and pull model with the data as well as the code.  This would
+require two things:
+
+1. Instead of remote hosting of data, data is local to each copy of the library within a local database
+2. A serialization method dumps a new copy of the data out to a flat file each time a database write occurs, 
+enabling all users of the library to contribute their modifications to the data back to the PyOpenWorm project via
+GitHub
+
+A follow on to #2 is that the serialization method would need to preserve the ordering of data elements and write in 
+some plain text format so that a simple diff on GitHub would be able to illuminate changes that were made.
 
 Storage options
 ~~~~~~~~~~~~~~~
+
+Evaluation of possible remote storage options was conducted.  However, the following would be problematic for the
+open source maintenance of the data, therefore exploring local storage options will be preferred going forward.
 
 Physical storage
 +++++++++++++++++++
@@ -93,7 +109,12 @@ A concern for OpenWorm as a project designed for wide dissemination of knowledge
 Store software
 ++++++++++++++++++
 
-For the time being, OpenRDF Sesame's memory store will serve as the storage for the project. Other store softwares are being evaluated.
+For the time being, OpenRDF Sesame's memory store will serve as the storage for the project. 
+
+While the OpenRDF Sesame memory store is a good choice for remote hosting, for local hosting a more native python
+library may be most appropriate for the purposes of ensuring open source contribution.
+
+Other store softwares are being evaluated.
 
 Testing:
 
@@ -124,4 +145,13 @@ Miscellaneous
 -------------
 Versioning
 ~~~~~~~~~~
-Experimental methods are constantly improving in biological research. These improvements may require updating the data we reference or store internally. However, in making updates we must not immediately expunge older content, breaking links created by internal and external agents. Ideally we would have a means of deprecating old data and specifying replacements. On the level of single resources, this is a trivial mapping which may be done transparently to all readers. For a more significant change, altering the schema, human intervention may be required to update external readers.
+Experimental methods are constantly improving in biological research. These improvements may require updating the 
+data we reference or store internally. However, in making updates we must not immediately expunge older content, 
+breaking links created by internal and external agents. Ideally we would have a means of deprecating old data and 
+specifying replacements. On the level of single resources, this is a trivial mapping which may be done transparently 
+to all readers. For a more significant change, altering the schema, human intervention may be required to update 
+external readers.
+
+The advantage of local storage of the database that goes along with each copy of the library is that the data 
+will have the version number of the library.  This means that data can be 'deprecated' along with a deprecated version
+of the library.  This also will prevent changes made to a volatile database that break downstream code that uses the library.
