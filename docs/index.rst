@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
 
    intro
+   process
+   api
 
 Modules
 -------
@@ -22,7 +24,7 @@ Modules
 Issues
 ------
 
-.. _github issue: https://github.com/slarson/PyOpenWorm/issues
+.. _github issue: https://github.com/openworm/PyOpenWorm/issues
 
 Indices and tables
 ==================
