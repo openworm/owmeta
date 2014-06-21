@@ -1,2 +1,4 @@
 *.pyc
 build/*
+PyOpenWorm.egg-info/*
+dist/*
