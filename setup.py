@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+from setuptools import setup
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
@@ -11,7 +11,7 @@ setup(
     #data_files=[("",['neuroml/test/Purk2M9s.nml'])],
     install_requires=required,
     name = "PyOpenWorm",
-    version = '0.0.1',
+    version = '0.5',
     packages = ['PyOpenWorm', 'tests'],
     #package_data = {'neuroml.test': ['*.nml']},
     author = "OpenWorm.org authors and contributors",
