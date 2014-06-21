@@ -1,4 +1,5 @@
 *.pyc
+*.nml
 build/*
 PyOpenWorm.egg-info/*
 dist/*
