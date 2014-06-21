@@ -70,8 +70,8 @@ tampering.
 One way to accomplish this would be to leverage GitHub's fork and pull model with the data as well as the code.  This would
 require two things:
 
-1. Instead of remote hosting of data, data is local to each copy of the library within a local database
-2. A serialization method dumps a new copy of the data out to a flat file each time a database write occurs, 
+- Instead of remote hosting of data, data is local to each copy of the library within a local database
+- A serialization method dumps a new copy of the data out to a flat file each time a database write occurs, 
 enabling all users of the library to contribute their modifications to the data back to the PyOpenWorm project via
 GitHub
 
