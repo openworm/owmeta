@@ -17,7 +17,7 @@ setup(
     description = "A Python library for working with OpenWorm data and models",
     long_description = long_description,
     license = "BSD",
-    url="http://github.com/openworm/pyopenworms",
+    url="http://github.com/openworm/pyopenworm",
     download_url = 'https://github.com/openworm/PyOpenWorm/tarball/0.0.1-alpha',
     classifiers = [
         'Intended Audience :: Science/Research',
