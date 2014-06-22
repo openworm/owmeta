@@ -18,6 +18,7 @@ setup(
     long_description = long_description,
     license = "BSD",
     url="http://github.com/openworm/pyopenworms",
+    download_url = 'https://github.com/openworm/PyOpenWorm/tarball/0.0.1-alpha',
     classifiers = [
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
