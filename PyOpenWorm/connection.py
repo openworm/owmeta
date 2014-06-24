@@ -14,7 +14,7 @@ class Connection(Relationship):
     def __init__(self,
                  pre_cell,
                  post_cell,
-                 number,
+                 number=0,
                  syntype=None,
                  synclass=None,
                  conf=False):
