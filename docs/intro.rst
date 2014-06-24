@@ -96,7 +96,7 @@ ion channels, etc and so should our code.
 Installation
 ------------
 
-    git clone https://github.com/slarson/PyOpenWorm.git
+    git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
 
