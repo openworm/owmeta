@@ -73,7 +73,7 @@ class Network(DataObject):
         """
         for n,nbrs in self['nx'].adjacency_iter():
             for nbr,eattr in nbrs.items():
-                yield PyOpenWorm.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'])
+                yield PyOpenWorm.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
 
     def _synapses_rdf(self):
         """
