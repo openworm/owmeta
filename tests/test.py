@@ -177,7 +177,6 @@ class CellTest(unittest.TestCase):
             self.fail("Should validate")
         sys.stdout = f
 
-
 class DataObjectTest(unittest.TestCase):
     def setUp(s):
         setup(s)
@@ -377,14 +376,14 @@ class EvidenceTest(unittest.TestCase):
         A pubmed uri
         """
         uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
-        self.assertEqual(u"Frédéric MY", Evidence(pmid=uri).author()[0])
+        self.assertIn(u"Frédéric MY", Evidence(pmid=uri).author())
 
     def test_pubmed_init1(self):
         """
         A pubmed id
         """
         pmid = "24098140"
-        self.assertEqual(u"Frédéric MY", Evidence(pmid=pmid).author()[0])
+        self.assertIn(u"Frédéric MY", Evidence(pmid=pmid).author())
 
     def test_pubmed_multiple_authors_list(self):
         """
@@ -418,7 +417,22 @@ class EvidenceTest(unittest.TestCase):
             Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
 
     def test_wormbase_init(self):
-        self.assertEqual(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287"))
+        self.assertIn(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287").author())
+
+    def test_wormbase_year(self):
+        for i in range(600,650):
+            wbid = 'WBPaper00044' + str(i)
+            e = Evidence(wormbase=wbid)
+            print e.year()
+    def test_asserts(self):
+        """
+        Asserting something should allow us to get it back.
+        """
+        e=Evidence(wormbase='WBPaper00044600')
+        g = make_graph(20)
+        r = Relationship(graph=g)
+        e.asserts(r)
+        self.assertIn(r,e.asserts())
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
@@ -606,27 +620,42 @@ class DataTest(unittest.TestCase):
         self.config['rdf.store_conf'] = 'Sleepycat'
         self.config['semantic_net'].query
 
+    def test_trix_source(self):
+        c = Configure().copy(self.config)
+        c['rdf.source'] = 'TriX'
+        c['trix_location'] = 'export.xml'
+        c['rdf.store_conf'] = 'test.db'
+        d = Data(conf=c)
+        b = d['rdf.graph'].query("ASK { ?S ?P ?O }")
+        print list(b)
+
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
 
 if __name__ == '__main__':
     """ Integration testing """
-    # Reference a neuron
-    Configure.default = TestConfig
+    Configureable.default = TestConfig
+
+    # Reference two neurons
     n1 = Neuron(name='AVAL')
     n2 = Neuron(name='PVCR')
-    # Look at all of its neighbors
-    Connection(n1,n2)
-    print list(n.neighbor())
-    # Get the relationship to neighbors as Connection objects
-    print n.neighbor.rel()
-    # print n.lineageName()
+
+    # Declare a connection between them
+    c = Connection(n1,n2,number=1)
+
+    # Attach some evidence for the connection
+    e = Evidence(person="Danny Glover")
+    e.asserts(c)
+    # look at what else this evidence has stated
+    r = e.asserts()
+    for x in r:
+        print "\t".join([str(y)[:60] for y in x])
+
     #
     # reference a synaptic connection
     # assert that some source affirms that connection
     # look at other sources that affirm the connection
     # look at who uploaded these sources and when
     #
-    # look at who said something about a synaptic connection to some neuron
     # look at what else one of these people said

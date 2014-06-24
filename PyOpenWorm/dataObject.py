@@ -12,6 +12,10 @@ class DataObject(DataUser):
         self._triples = triples
 
     def identifier(self):
+        """
+        The identifier for this object in the rdf graph
+        This identifier should be based on identifying characteristics of the object
+        """
         return R.URIRef(self._id)
 
     def triples(self):
@@ -23,6 +27,9 @@ class DataObject(DataUser):
 
     def _n3(self):
         return ".\n".join( " ".join(y.n3() for y in x) for x in self.triples())
+
+    def n3(self):
+        return self._n3()
 
     def save(self):
         """ Write in memory data to the database. Derived classes should call this to update the store. """
