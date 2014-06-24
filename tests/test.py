@@ -21,6 +21,7 @@ TestConfig = Configure.open("tests/test.conf")
 def setup(self):
     self.config = Data(TestConfig)
     self.config_no_data = TestConfig
+    Configureable.default = self.config
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -158,6 +159,7 @@ class CellTest(unittest.TestCase):
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
+
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         n = Neuron('ADAL', conf=self.config)
@@ -573,11 +575,14 @@ class RelationshipTest(unittest.TestCase):
         s = Relationship.pull(r,'uploader')
 
 class ConnectionTest(unittest.TestCase):
+    def setUp(self):
+        setup(self)
+
     def test_init(self):
         """Initialization with positional parameters"""
         c = Connection(1,2,3,4,5)
-        self.assertEqual(1, c.pre_cell)
-        self.assertEqual(2, c.post_cell)
+        self.assertIsInstance(c.pre_cell, Neuron)
+        self.assertIsInstance(c.post_cell, Neuron)
         self.assertEqual(3, c.number)
         self.assertEqual(4, c.syntype)
         self.assertEqual(5, c.synclass)
@@ -589,12 +594,12 @@ class ConnectionTest(unittest.TestCase):
     def test_init_with_neuron_objects(self):
         n1 = Neuron("AVAL",self.config)
         n2 = Neuron("PVCR",self.config)
-        c = Connection(n1,n2,self.config)
+        c = Connection(n1,n2)
 
     def test_init_with_neuron_objects(self):
         n1 = Neuron("AVAL",self.config)
         n2 = Neuron("PVCR",self.config)
-        c = Connection(n1,n2,self.config)
+        c = Connection(n1,n2)
 
 class MuscleTest(unittest.TestCase):
     def setUp(self):
