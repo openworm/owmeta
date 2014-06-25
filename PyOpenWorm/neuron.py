@@ -46,11 +46,10 @@ class Neuron(Cell):
         return count
 
     def identifier(self):
-        qres = self['semantic_net'].query("SELECT ?node WHERE { ?node rdfs:label '%s' }" % self.name())
+        qres = self['rdf.graph'].query("SELECT ?node WHERE { ?node rdfs:label '%s' }" % self.name())
         ident = None
         for r in qres:
             ident = r['node']
-        assert(ident is not None)
         return ident
 
     def Syn_degree(self):
@@ -77,7 +76,7 @@ class Neuron(Cell):
         :rtype: str
         """
 
-        qres = self['semantic_net'].query(
+        qres = self['rdf.graph'].query(
           """SELECT ?objLabel     #we want to get out the labels associated with the objects
            WHERE {
               ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
@@ -124,7 +123,7 @@ class Neuron(Cell):
         :rtype: list
         """
 
-        qres = self['semantic_net'].query(
+        qres = self['rdf.graph'].query(
           """SELECT ?objLabel     #we want to get out the labels associated with the objects
            WHERE {
                     #we are looking first for the node that is the anchor of
@@ -174,7 +173,7 @@ class Neuron(Cell):
             print 'not a valid type ' + type
             return
 
-        qres = self['semantic_net'].query(
+        qres = self['rdf.graph'].query(
           """SELECT ?this ?p ?that
            WHERE {
               ?this rdfs:label '"""+self.name()+"""' .
@@ -190,7 +189,7 @@ class Neuron(Cell):
     def check_exists(self):
         """Ask if the neuron already exists
         """
-        r = self['semantic_net_new'].query("ASK { ?node <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . ?node rdfs:label '"+self.name()+"'}")
+        r = self['rdf.graph'].query("ASK { ?node <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . ?node rdfs:label '"+self.name()+"'}")
         return r.askAnswer
 
 
@@ -222,7 +221,7 @@ class Neuron(Cell):
             print 'not a valid type ' + str(type)
             return
 
-        qres = self['semantic_net_new'].query(
+        qres = self['rdf.graph'].query(
             """
             SELECT ?prov #we want to get out the labels associated with the objects
             WHERE {
@@ -258,7 +257,7 @@ class Neuron(Cell):
            :returns: a list of neuron names
            :rtype: List
         """
-        qres = self.conf['semantic_net_new'].query(
+        qres = self.conf['rdf.graph'].query(
             """
             SELECT distinct ?n #we want to get out the labels associated with the objects
             WHERE {
@@ -298,7 +297,8 @@ class Neuron(Cell):
 
           :rtype: libNeuroML.Neuron
        """
-
+    def __repr__(self):
+        return "Neuron(name=%s)" % self.name()
     #def rdf(self):
 
     #def peptides(self):

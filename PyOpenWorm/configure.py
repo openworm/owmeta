@@ -18,6 +18,16 @@ class _C(ConfigValue):
 class BadConf(BaseException):
     pass
 
+class _link(ConfigValue):
+    def __init__(self,members,c):
+        self.members = members
+        self.conf = c
+    def set(self, v):
+        for x in self.members:
+            self.conf[x] = v
+    def get(self):
+        return self.conf[members[0]]
+
 class Configure:
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
@@ -28,10 +38,23 @@ class Configure:
     def __setitem__(self, pname, value):
         if not isinstance(value, ConfigValue):
             value = _C(value)
-        self._properties[pname] = value
+        if (pname in self._properties) and isinstance(self._properties[pname], _link):
+            self._properties[pname].set(value)
+        else:
+            self._properties[pname] = value
 
     def __getitem__(self, pname):
         return self._properties[pname].get()
+
+    def link(self,*names):
+        first = names[0]
+        if first in self._properties:
+            v = self._properties[first]
+        else:
+            v = _C(None)
+        l = _link(names,self)
+        for n in names:
+            self._properties[n] = l
 
     def __contains__(self, thing):
         return (thing in self._properties)

@@ -23,7 +23,7 @@ ns =  {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
 segment_query = Template("""
 SELECT ?seg_id ?seg_name ?x ?y ?z ?d ?par_id ?x_prox ?y_prox ?z_prox ?d_prox
 WHERE {
-  ?p ns1:id 'morphology_ADAL' .
+  ?p ns1:id $morph_name .
   ?p ns1:segment ?segment .
   ?segment ns1:distal 	?loop
          ; ns1:id 	    ?seg_id
@@ -46,7 +46,7 @@ WHERE {
 segment_group_query = Template("""
 SELECT ?gid ?member ?include
 WHERE {
-  ?p ns1:id 'morphology_ADAL' .
+  ?p ns1:id $morph_name .
   ?p ns1:segmentGroup ?seg_group .
   ?seg_group ns1:id ?gid .
   OPTIONAL {

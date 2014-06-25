@@ -579,6 +579,23 @@ class RelationshipTest(unittest.TestCase):
 class ConnectionTest(unittest.TestCase):
     def setUp(self):
         setup(self)
+        ns = self.config['rdf.namespace']
+        self.trips = [(ns['64'], ns['356'], ns['184']),
+                (ns['john'], R.RDF['type'], ns['Connection']),
+                (ns['john'], ns['Connection/pre'], ns['64']),
+                (ns['64'], R.RDFS['label'], R.Literal("PVCR")),
+                (ns['john'], ns['Connection/syntype'], ns['356']),
+                (ns['john'], ns['Connection/number'], R.Literal('1', datatype=R.XSD.integer)),
+                (ns['184'], R.RDFS['label'], R.Literal("AVAL")),
+                (ns['john'], ns['Connection/post'], ns['184']),
+                (ns['65'], ns['356'], ns['185']),
+                (ns['luke'], R.RDF['type'], ns['Connection']),
+                (ns['luke'], ns['Connection/pre'], ns['65']),
+                (ns['65'], R.RDFS['label'], R.Literal("PVCL")),
+                (ns['luke'], ns['Connection/syntype'], ns['356']),
+                (ns['luke'], ns['Connection/number'], R.Literal('1', datatype=R.XSD.integer)),
+                (ns['185'], R.RDFS['label'], R.Literal("AVAR")),
+                (ns['luke'], ns['Connection/post'], ns['185'])]
 
     def test_init(self):
         """Initialization with positional parameters"""
@@ -602,6 +619,27 @@ class ConnectionTest(unittest.TestCase):
         n1 = Neuron("AVAL",self.config)
         n2 = Neuron("PVCR",self.config)
         c = Connection(n1,n2)
+
+    def test_load1(self):
+        """ Put the appropriate triples in. Try to load them """
+        g = R.Graph()
+        self.config['rdf.graph'] = g
+        ns = self.config['rdf.namespace']
+        for t in self.trips:
+            g.add(t)
+        c = Connection(conf=self.config)
+        for x in c.load():
+            self.assertIsInstance(x,Connection)
+
+    def test_load_with_filter(self):
+        # Put the appropriate triples in. Try to load them
+        g = R.Graph()
+        self.config['rdf.graph'] = g
+        ns = self.config['rdf.namespace']
+        for t in self.trips:
+            g.add(t)
+        c = Connection(pre_cell="PVCR", conf=self.config)
+        r = c.load()
 
 class MuscleTest(unittest.TestCase):
     def setUp(self):
