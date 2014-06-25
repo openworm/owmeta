@@ -45,6 +45,13 @@ class Neuron(Cell):
                 count = count + 1
         return count
 
+    def identifier(self):
+        qres = self['semantic_net'].query("SELECT ?node WHERE { ?node rdfs:label '%s' }" % self.name())
+        ident = None
+        for r in qres:
+            ident = r['node']
+        assert(ident is not None)
+        return ident
 
     def Syn_degree(self):
         """Get the degree of a this neuron for chemical synapse edges only

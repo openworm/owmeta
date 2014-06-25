@@ -21,6 +21,7 @@ TestConfig = Configure.open("tests/test.conf")
 def setup(self):
     self.config = Data(TestConfig)
     self.config_no_data = TestConfig
+    Configureable.default = self.config
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -158,6 +159,7 @@ class CellTest(unittest.TestCase):
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
+
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         n = Neuron('ADAL', conf=self.config)
@@ -176,7 +178,6 @@ class CellTest(unittest.TestCase):
             print e
             self.fail("Should validate")
         sys.stdout = f
-
 
 class DataObjectTest(unittest.TestCase):
     def setUp(s):
@@ -377,33 +378,33 @@ class EvidenceTest(unittest.TestCase):
         A pubmed uri
         """
         uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
-        self.assertEqual(u"Frédéric MY", Evidence(pmid=uri).author()[0])
+        self.assertIn(u"Frédéric MY", Evidence(pmid=uri).author())
 
-    def test_pubmed_init1(self):
+    def test_pubmed_init2(self):
         """
         A pubmed id
         """
         pmid = "24098140"
-        self.assertEqual(u"Frédéric MY", Evidence(pmid=pmid).author()[0])
+        self.assertIn(u"Frédéric MY", Evidence(pmid=pmid).author())
 
     def test_pubmed_multiple_authors_list(self):
         """
         When multiple authors are on a paper, all of their names sohuld be returned in a list (preserving order from publication!)
         """
         pmid = "24098140"
-        alist = ["Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
+        alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
         self.assertEqual(alist,Evidence(pmid=pmid).author())
 
     def test_doi_init1(self):
         """
         Full dx.doi.org uri
         """
-        self.assertEqual(u"Elizabeth Chen", Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author())
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author())
     def test_doi_init2(self):
         """
         Just the identifier, no URI
         """
-        self.assertEqual(u"Elizabeth Chen", Evidence(doi='10.1007/s00454-010-9273-0').author())
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], Evidence(doi='10.1007/s00454-010-9273-0').author())
     def test_doi_init_fail_on_request_prefix(self):
         """
         Requesting only the prefix
@@ -418,7 +419,23 @@ class EvidenceTest(unittest.TestCase):
             Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
 
     def test_wormbase_init(self):
-        self.assertEqual(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287"))
+        self.assertIn(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287").author())
+
+    def test_wormbase_year(self):
+        """ Just make sure we can extract something without crashing """
+        for i in range(600,610):
+            wbid = 'WBPaper00044' + str(i)
+            e = Evidence(wormbase=wbid)
+            e.year()
+    def test_asserts(self):
+        """
+        Asserting something should allow us to get it back.
+        """
+        e=Evidence(wormbase='WBPaper00044600')
+        g = make_graph(20)
+        r = Relationship(graph=g)
+        e.asserts(r)
+        self.assertIn(r,e.asserts())
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
@@ -559,11 +576,14 @@ class RelationshipTest(unittest.TestCase):
         s = Relationship.pull(r,'uploader')
 
 class ConnectionTest(unittest.TestCase):
+    def setUp(self):
+        setup(self)
+
     def test_init(self):
         """Initialization with positional parameters"""
         c = Connection(1,2,3,4,5)
-        self.assertEqual(1, c.pre_cell)
-        self.assertEqual(2, c.post_cell)
+        self.assertIsInstance(c.pre_cell, Neuron)
+        self.assertIsInstance(c.post_cell, Neuron)
         self.assertEqual(3, c.number)
         self.assertEqual(4, c.syntype)
         self.assertEqual(5, c.synclass)
@@ -575,12 +595,12 @@ class ConnectionTest(unittest.TestCase):
     def test_init_with_neuron_objects(self):
         n1 = Neuron("AVAL",self.config)
         n2 = Neuron("PVCR",self.config)
-        c = Connection(n1,n2,self.config)
+        c = Connection(n1,n2)
 
     def test_init_with_neuron_objects(self):
         n1 = Neuron("AVAL",self.config)
         n2 = Neuron("PVCR",self.config)
-        c = Connection(n1,n2,self.config)
+        c = Connection(n1,n2)
 
 class MuscleTest(unittest.TestCase):
     def setUp(self):
@@ -606,27 +626,42 @@ class DataTest(unittest.TestCase):
         self.config['rdf.store_conf'] = 'Sleepycat'
         self.config['semantic_net'].query
 
+    def test_trix_source(self):
+        c = Configure().copy(self.config)
+        c['rdf.source'] = 'TriX'
+        c['trix_location'] = 'export.xml'
+        c['rdf.store_conf'] = 'test.db'
+        d = Data(conf=c)
+        b = d['rdf.graph'].query("ASK { ?S ?P ?O }")
+        print list(b)
+
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
 
 if __name__ == '__main__':
     """ Integration testing """
-    # Reference a neuron
-    Configure.default = TestConfig
+    Configureable.default = TestConfig
+
+    # Reference two neurons
     n1 = Neuron(name='AVAL')
     n2 = Neuron(name='PVCR')
-    # Look at all of its neighbors
-    Connection(n1,n2)
-    print list(n.neighbor())
-    # Get the relationship to neighbors as Connection objects
-    print n.neighbor.rel()
-    # print n.lineageName()
+
+    # Declare a connection between them
+    c = Connection(n1,n2,number=1)
+
+    # Attach some evidence for the connection
+    e = Evidence(person="Danny Glover")
+    e.asserts(c)
+    # look at what else this evidence has stated
+    r = e.asserts()
+    for x in r:
+        print "\t".join([str(y)[:60] for y in x])
+
     #
     # reference a synaptic connection
     # assert that some source affirms that connection
     # look at other sources that affirm the connection
     # look at who uploaded these sources and when
     #
-    # look at who said something about a synaptic connection to some neuron
     # look at what else one of these people said
