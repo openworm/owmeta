@@ -168,10 +168,8 @@ class Evidence(DataObject):
             s = U2.urlopen(r)
             return json.load(s)
         doi = self._fields['doi']
-        print 'before the change', doi
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
-        print 'after the change', doi
         r = crRequest(doi)
         #XXX: I don't think coins is meant to be used, but it has structured data...
         extra_data = r[0]['coins'].split('&amp;')

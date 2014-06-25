@@ -357,6 +357,7 @@ class NetworkTest(unittest.TestCase):
 class EvidenceTest(unittest.TestCase):
     def setUp(s):
         setup(s)
+    @unittest.skip("Post alpha")
     def test_bibtex_init(self):
         bibtex = u"""@ARTICLE{Cesar2013,
           author = {Jean César},
@@ -638,30 +639,3 @@ class DataTest(unittest.TestCase):
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
         setup(self)
-
-if __name__ == '__main__':
-    """ Integration testing """
-    Configureable.default = TestConfig
-
-    # Reference two neurons
-    n1 = Neuron(name='AVAL')
-    n2 = Neuron(name='PVCR')
-
-    # Declare a connection between them
-    c = Connection(n1,n2,number=1)
-
-    # Attach some evidence for the connection
-    e = Evidence(person="Danny Glover")
-    e.asserts(c)
-    # look at what else this evidence has stated
-    r = e.asserts()
-    for x in r:
-        print "\t".join([str(y)[:60] for y in x])
-
-    #
-    # reference a synaptic connection
-    # assert that some source affirms that connection
-    # look at other sources that affirm the connection
-    # look at who uploaded these sources and when
-    #
-    # look at what else one of these people said
