@@ -28,7 +28,6 @@ def _doi_uri_to_doi(uri):
     doi = unquote(doi)
     return doi
 
-
 class Evidence(DataObject):
     def __init__(self, conf=False, **source):
         # Get the type of the evidence (a paper, a lab, a uri)
@@ -106,6 +105,11 @@ class Evidence(DataObject):
         else:
             # Query for the evidence asserted by this
             query_stmt = "select ?s ?p ?o where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.namespace['asserts'].n3())
+            # This returns us a bunch of triples...how do we get the objects that they represent?
+            # Feed them back into a graph!
+            #
+            # Once we feed them into a graph, we can query on that (put this new graph in the configuration for the object)
+            #
             for x in self.conf['rdf.graph'].query(query_stmt):
                 yield x
 

@@ -32,8 +32,22 @@ class DataObject(DataUser):
         return self._n3()
 
     def save(self):
-        """ Write in memory data to the database. Derived classes should call this to update the store. """
+        """ Write in-memory data to the database. Derived classes should call this to update the store. """
         self.add_statements(self.triples())
+
+    def load(self):
+        """ Load in data from the database. Derived classes should override this for their own data structures.
+        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+        """
+        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
+        # graph and convert them into objects of the type of the querying object.
+        #
+        # Steps:
+        # - Do the query/queries
+        # - Create objects from the bound variables
+    def retract(self):
+        """ Remove this object from the data store. """
+        self.remove_statements(self._n3())
 
     def uploader(self):
         """ Get the uploader for this relationship """
