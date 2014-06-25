@@ -115,6 +115,20 @@ class Evidence(DataObject):
         j = wbRequest(wbid, 'publication_date')
         self._fields['publication_date'] = j['fields']['name']
 
+    def _crossref_doi_extract(self):
+        # Extract data from wormabase
+        def crRequest():
+            import urllib2 as U2
+            import urllib as U
+            import json
+            headers = {'Content-Type': 'application/json'}
+            data = {'q': doi}
+            data_encoded = U.urlencode(data)
+            r = U2.Request('http://search.labs.crossref.org/dois?%s' % data_encoded , headers=headers)
+            s = U2.urlopen(r)
+            return json.load(s)
+        return crRequest()
+
     def author(self,v=False):
         """
         Get/set the author for this evidence object
@@ -135,3 +149,8 @@ class Evidence(DataObject):
                 return self._fields['publication_date']
             else:
                 return ''
+    def __eq__(self, other):
+        for f in self._fields:
+            if (f not in other._fields) or (self._fields(f) != other._fields(f)):
+                return False
+        return True
