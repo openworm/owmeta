@@ -21,6 +21,7 @@ from datetime import datetime as DT
 import datetime
 from rdflib.namespace import XSD
 from itertools import izip_longest
+import os
 
 # encapsulates some of the data all of the parts need...
 class _B(ConfigValue):
@@ -74,9 +75,20 @@ def grouper(iterable, n, fillvalue=None):
 class DataUser(Configureable):
     def __init__(self, conf = False):
         if isinstance(conf, Data):
-            Configureable.__init__(self, conf)
+            Configureable.__init__(self, conf=conf)
         else:
             Configureable.__init__(self, conf=Data(conf))
+
+    def _remove_from_store(self, g):
+        for group in grouper(g, 1000):
+            temp_graph = Graph()
+            for x in group:
+                if x:
+                    temp_graph.add(x)
+                else:
+                    break
+            s = " DELETE DATA {" + temp_graph.serialize(format="nt") + " } "
+            self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
         for group in grouper(g, 1000):
@@ -161,11 +173,12 @@ class Data(Configure, Configureable):
         # Set these in case they were left out
         c = self.conf
         c['rdf.store'] = self.conf.get('rdf.store', 'default')
-        c['rdf.store_conf'] = tuple(self.conf.get('rdf.store_conf', 'default'))
+        c['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
 
         d = {'sqlite' : SQLiteSource(c),
                 'sparql_endpoint' : SPARQLSource(c),
-                'Sleepycat' : SleepyCatSource(c)}
+                'Sleepycat' : SleepyCatSource(c),
+                'TriX' : TrixSource(c)}
         i = d[self.conf['rdf.source']]
         self['rdf.graph'] = i
         self['semantic_net_new'] = i
@@ -207,11 +220,51 @@ class Data(Configure, Configureable):
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
         return g
 
+def modification_date(filename):
+    t = os.path.getmtime(filename)
+    return datetime.datetime.fromtimestamp(t)
+
+class TrixSource(Configureable,PyOpenWorm.ConfigValue):
+    """ Reads from a TriX file or if the store is more recent, from that. """
+    # XXX How to write back out to this?
+    def get(self):
+        import glob
+        # Check the ages of the files. Read the more recent one.
+        g0 = ConjunctiveGraph('Sleepycat')
+        database_store = self.conf['rdf.store_conf']
+        trix_file = self.conf['trix_location']
+
+        try:
+            store_time = modification_date(database_store)
+            # If the store is newer than the serialization
+            # get the newest file in the store
+            for x in glob.glob(database_store +"/*"):
+                mod = modification_date(x)
+                if store_time < mod:
+                    store_time = mod
+        except:
+            store_time = DT.min
+
+        trix_time = modification_date(trix_file)
+
+        g0.close()
+        g0.open(database_store,create=True)
+
+        if store_time > trix_time:
+            # just use the store
+            pass
+        else:
+            # delete the database and read in the new one
+            # read in the serialized format
+            g0.parse(trix_file,format="trix")
+
+        return g0
+
 class SPARQLSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
-        g0.open(self.conf['rdf.store_conf'])
+        g0.open(tuple(self.conf['rdf.store_conf']))
         return g0
 
 class SleepyCatSource(Configureable,PyOpenWorm.ConfigValue):
