@@ -380,7 +380,7 @@ class EvidenceTest(unittest.TestCase):
         uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
         self.assertIn(u"Frédéric MY", Evidence(pmid=uri).author())
 
-    def test_pubmed_init1(self):
+    def test_pubmed_init2(self):
         """
         A pubmed id
         """
@@ -392,19 +392,19 @@ class EvidenceTest(unittest.TestCase):
         When multiple authors are on a paper, all of their names sohuld be returned in a list (preserving order from publication!)
         """
         pmid = "24098140"
-        alist = ["Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
+        alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
         self.assertEqual(alist,Evidence(pmid=pmid).author())
 
     def test_doi_init1(self):
         """
         Full dx.doi.org uri
         """
-        self.assertEqual(u"Elizabeth Chen", Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author())
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author())
     def test_doi_init2(self):
         """
         Just the identifier, no URI
         """
-        self.assertEqual(u"Elizabeth Chen", Evidence(doi='10.1007/s00454-010-9273-0').author())
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], Evidence(doi='10.1007/s00454-010-9273-0').author())
     def test_doi_init_fail_on_request_prefix(self):
         """
         Requesting only the prefix
@@ -422,10 +422,11 @@ class EvidenceTest(unittest.TestCase):
         self.assertIn(u"Frederic, M. Y.", Evidence(wormbase="WBPaper00044287").author())
 
     def test_wormbase_year(self):
-        for i in range(600,650):
+        """ Just make sure we can extract something without crashing """
+        for i in range(600,610):
             wbid = 'WBPaper00044' + str(i)
             e = Evidence(wormbase=wbid)
-            print e.year()
+            e.year()
     def test_asserts(self):
         """
         Asserting something should allow us to get it back.

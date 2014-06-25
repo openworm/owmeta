@@ -13,6 +13,22 @@ import rdflib as R
 class EvidenceError(BaseException):
     pass
 
+def _pubmed_uri_to_pmid(uri):
+    from urlparse import urlparse
+    parsed = urlparse(uri)
+    pmid = int(parsed.path.split("/")[2])
+    return pmid
+
+def _doi_uri_to_doi(uri):
+    from urlparse import urlparse
+    from urllib2 import unquote
+    parsed = urlparse(uri)
+    doi = parsed.path.split("/")[1]
+    # the doi from a url needs to be decoded
+    doi = unquote(doi)
+    return doi
+
+
 class Evidence(DataObject):
     def __init__(self, conf=False, **source):
         # Get the type of the evidence (a paper, a lab, a uri)
@@ -31,10 +47,15 @@ class Evidence(DataObject):
         for k in source:
             if k in ('pubmed', 'pmid'):
                 self._fields['pmid'] = source[k]
+                self._pubmed_extract()
                 break
             if k in ('wormbase', 'wbid'):
                 self._fields['wormbase'] = source[k]
                 self._wormbase_extract()
+                break
+            if k in ('doi'):
+                self._fields['doi'] = source[k]
+                self._crossref_doi_extract()
                 break
             if k in ('bibtex'):
                 self._fields['bibtex'] = source[k]
@@ -84,7 +105,7 @@ class Evidence(DataObject):
             self.conf['rdf.graph'].update(update_stmt)
         else:
             # Query for the evidence asserted by this
-            query_stmt = "select  ?s ?p ?o  where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.namespace['asserts'].n3())
+            query_stmt = "select ?s ?p ?o where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.namespace['asserts'].n3())
             for x in self.conf['rdf.graph'].query(query_stmt):
                 yield x
 
@@ -97,27 +118,46 @@ class Evidence(DataObject):
         """
         return self.conf['molecule_name'](self._fields)
 
+    # Each 'extract' method should attempt to fill in additional fields given which ones
+    # are already set as well as correct fields that are wrong
+    # TODO: Provide a way to override modification of already set values.
     def _wormbase_extract(self):
+        #XXX: wormbase's REST API is pretty sparse in terms of data provided.
+        #     Would be better off using AQL or the perl interface
         # Extract data from wormabase
         def wbRequest(ident,field):
             import urllib2 as U
             import json
             headers = {'Content-Type': 'application/json'}
-            r = U.Request("http://api.wormbase.org/rest/widget/paper/"+wbid+"/"+field, headers=headers)
-            s = U.urlopen(r)
-            return json.load(s)
-
+            try:
+                r = U.Request("http://api.wormbase.org/rest/widget/paper/"+wbid+"/"+field, headers=headers)
+                s = U.urlopen(r)
+                return json.load(s)
+            except U.HTTPError, e:
+                return {}
+        # _Very_ few of these have these fields filled in
         wbid = self._fields['wormbase']
         # get the author
         j = wbRequest(wbid, 'authors')
-        self._fields['author'] = [x['label'] for x in j['fields']['data']]
+        if 'fields' in j:
+            f = j['fields']
+            if 'data' in f:
+                self._fields['author'] = [x['label'] for x in f['data']]
+            elif 'name' in f:
+                self._fields['author'] = f['name']['data']['label']
+
         # get the publication date
         j = wbRequest(wbid, 'publication_date')
-        self._fields['publication_date'] = j['fields']['name']
+        if 'fields' in j:
+            f = j['fields']
+            if 'data' in f:
+                self._fields['publication_date'] = f['data']['label']
+            elif 'name' in f:
+                self._fields['publication_date'] = f['name']['data']['label']
 
     def _crossref_doi_extract(self):
-        # Extract data from wormabase
-        def crRequest():
+        # Extract data from crossref
+        def crRequest(doi):
             import urllib2 as U2
             import urllib as U
             import json
@@ -127,7 +167,47 @@ class Evidence(DataObject):
             r = U2.Request('http://search.labs.crossref.org/dois?%s' % data_encoded , headers=headers)
             s = U2.urlopen(r)
             return json.load(s)
-        return crRequest()
+        doi = self._fields['doi']
+        print 'before the change', doi
+        if doi[:4] == 'http':
+            doi = _doi_uri_to_doi(doi)
+        print 'after the change', doi
+        r = crRequest(doi)
+        #XXX: I don't think coins is meant to be used, but it has structured data...
+        extra_data = r[0]['coins'].split('&amp;')
+        fields = (x.split("=") for x in extra_data)
+        fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
+        authors = [x[1] for x in fields if x[0] == 'rft.au']
+        self._fields['author'] = authors
+        # no error for bad ids, just an empty list
+        if len(r) > 0:
+            # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
+            r = r[0]
+            if 'title' in r:
+                self._fields['title'] = r['title']
+            if 'year' in r:
+                self._fields['publication_date'] = r['year']
+                self._fields['year'] = r['year']
+
+    def _pubmed_extract(self):
+        from lxml import etree as ET
+        def pmRequest(pmid):
+            import urllib2 as U2
+            base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+            # XXX: There's more data in esummary.fcgi?, but I don't know how to parse it
+            url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
+
+            r = U2.Request(url)
+            s = U2.urlopen(r)
+            return s
+
+        pmid = self._fields['pmid']
+        if pmid[:4] == 'http':
+            # Probably a uri, right?
+            pmid = _pubmed_uri_to_pmid(pmid)
+        pmid = int(pmid)
+        tree = ET.parse(pmRequest(pmid))
+        self._fields['author'] = [x.text for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item')]
 
     def author(self,v=False):
         """
