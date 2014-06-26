@@ -24,12 +24,13 @@ class Relationship(DataObject):
         for x in self._triples:
             yield x
 
-    def rel(self):
+    @classmethod
+    def rel(self, the_class, the_method):
         """
         Returns a set of Relationship objects associated with the call ``class.method_name()``
         :return: Iterable of relationship objects
         """
-        #
-        attr = getattr(do,name)
+        assert(issubclass(the_class, DataObject))
+        attr = getattr(the_class,the_method)
         # How to get the appropriate relationship?
         #   need to get the a
