@@ -131,14 +131,14 @@ class ConfigureTest(unittest.TestCase):
 
 class ConfigureableTest(unittest.TestCase):
     def test_init_empty(self):
-        """Ensure Configureable gets init'd with an empty config if nothing's given"""
+        """Ensure Configureable gets init'd with the defalut if nothing's given"""
         i = Configureable()
-        self.assertEqual(0,len(i.conf))
+        self.assertEqual(i.conf,Configureable.default)
 
     def test_init_False(self):
-        """Ensure Configureable gets init'd with an empty config if False is given"""
+        """Ensure Configureable gets init'd with the defalut if False is given"""
         i = Configureable(conf=False)
-        self.assertEqual(0,len(i.conf))
+        self.assertEqual(i.conf,Configureable.default)
 
 class CellTest(unittest.TestCase):
     def setUp(s):
@@ -215,7 +215,8 @@ class DataUserTest(unittest.TestCase):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
-        with self.assertRaises(Exception):
+        Configureable.default = None
+        with self.assertRaises(BadConf):
             do = DataUser()
 
     def test_init_config_no_Data(self):
@@ -568,13 +569,10 @@ class RelationshipTest(unittest.TestCase):
         g = make_graph()
         r = Relationship(graph=g,conf=self.config)
 
-    def test_pull(self):
+    def test_rel(self):
         """ Get the relationship associated with a method """
-        g = make_graph(20)
-        r = DataObject(triples=g,conf=self.config)
-        #r.save()
-
-        s = Relationship.pull(r,'uploader')
+        # XXX: Is there use case for this not covered by DataObject.load?
+        s = Relationship.rel(DataObject,'uploader')
 
 class ConnectionTest(unittest.TestCase):
     def setUp(self):
