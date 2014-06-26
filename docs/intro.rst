@@ -13,7 +13,7 @@ Basic Usage
 
 ::
 
-  >>>import openworm
+  >>>import PyOpenWorm
   
   # Grabs the representation of the neuronal network
   >>>net = PyOpenWorm.Worm().get_neuron_network()
