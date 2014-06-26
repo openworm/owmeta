@@ -303,7 +303,7 @@ class NeuronTest(unittest.TestCase):
             t = g.query('select ?x where { ?x rdfs:label "%s" }' % str(x))
             for m in t:
                 ident = self.neur(x).identifier()
-                self.assertEqual(m, ident)
+                self.assertEqual(m[0], ident)
 
     def test_receptors(self):
         self.assertTrue('GLR-2' in self.neur('AVAL').receptors())
