@@ -82,23 +82,9 @@ class Network(DataObject):
         :returns: A generator of Connection objects
         :rtype: generator
         """
-        qres = self['semantic_net'].query(
-            """
-            SELECT ?pre ?post ?type ?class #we want to get out the labels associated with the objects
-            WHERE {
-                    {
-                        ?node <http://openworm.org/entities/356> ?p .
-                    }
-                    UNION
-                    {
-                        ?node <http://openworm.org/entities/357> ?p .
-                    }
-                    ?node rdfs:label ?pre .
-                    ?p rdfs:label ?post .
-                  }
-            """)
-        for x in qres:
-            yield (str(x['pre']), str( x['post']))
+        # It only makes sense to talk about _all_ of the connections...so we should just get all of the connections
+        for x in PyOpenWorm.Connection().load():
+            yield x
 
     def as_networkx(self):
         return self['nx']

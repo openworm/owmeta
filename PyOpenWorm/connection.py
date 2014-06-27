@@ -11,6 +11,9 @@ from PyOpenWorm import Relationship,Neuron
 from string import Template
 import rdflib as R
 
+class SynapseType:
+    Chemical,GapJunction = range(2)
+
 class Connection(Relationship):
     def __init__(self,
                  pre_cell=None,
@@ -23,6 +26,7 @@ class Connection(Relationship):
         self.rdf_type = self.conf['rdf.namespace']['Connection']
         self.namespace = R.Namespace(self.rdf_type + '/')
 
+        print pre_cell,post_cell
         if isinstance(pre_cell,Neuron) or pre_cell is None:
             self.pre_cell = pre_cell
         elif pre_cell is not None:
@@ -34,7 +38,11 @@ class Connection(Relationship):
             self.post_cell = Neuron(name=post_cell, conf=self.conf)
 
         self.number = int(number)
-        self.syntype = syntype
+        if (syntype == 'send' or syntype == SynapseType.Chemical):
+            self.syntype = SynapseType.Chemical
+        elif (syntype.lower() == 'gapjunction' or syntype == SynapseType.GapJunction):
+            self.syntype = SynapseType.GapJunction
+
         self.synclass = synclass
 
     def identifier(self):
@@ -49,7 +57,19 @@ class Connection(Relationship):
         yield (pre_cell, self.conf['rdf.namespace']['356'], post_cell)
         yield (ident, R.RDF['type'], self.rdf_type)
         yield (ident, self.namespace['pre'], pre_cell)
-        yield (ident, self.namespace['syntype'], self.conf['rdf.namespace']['356'])
+
+        if self.syntype == SynapseType.Chemical:
+            yield (ident, self.namespace['syntype'], self.conf['rdf.namespace']['356'])
+        elif self.syntype == SynapseType.GapJunction:
+            yield (ident, self.namespace['syntype'], self.conf['rdf.namespace']['357'])
+        else:
+            yield (ident, self.namespace['syntype'], self.namespace['UnknownType'])
+
+        if self.synclass:
+            yield (ident, self.namespace['neurotransmitter'], R.Literal(synclass))
+        else:
+            yield (ident, self.namespace['neurotransmitter'], R.Literal("unknown class"))
+
         yield (ident, self.namespace['post'], post_cell)
 
     def load(self):
@@ -58,13 +78,16 @@ class Connection(Relationship):
         WHERE
         {
             ?id $pre_pred ?pre_n .
-            OPTIONAL { ?pre_n rdfs:label ?pre } .
+            ?pre_n rdfs:label ?pre  .
+
             ?id $post_pred ?post_n .
-            OPTIONAL { ?post_n rdfs:label ?post } .
+            ?post_n rdfs:label ?post  .
+
             ?id $syntype_pred ?syntype .
+            ?id $synclass_pred ?syntype .
             ?id $number_pred ?number .
             # Additional Bindings
-            $binds
+            $binds_add_to_store
         }
         """)
         binds = dict()
@@ -81,6 +104,7 @@ class Connection(Relationship):
                 syntype_pred=self.namespace['syntype'].n3(),
                 post_pred=self.namespace['post'].n3(),
                 number_pred=self.namespace['number'].n3(),
+                synclass_pred=self.namespace['neurotransmitter'].n3(),
                 binds=_dict_to_sparql_binds(binds))
         res = self['rdf.graph'].query(q)
         for r in res:
