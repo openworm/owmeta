@@ -22,9 +22,6 @@ class _link(ConfigValue):
     def __init__(self,members,c):
         self.members = members
         self.conf = c
-    def set(self, v):
-        for x in self.members:
-            self.conf[x] = v
     def get(self):
         return self.conf[members[0]]
 
@@ -39,7 +36,8 @@ class Configure:
         if not isinstance(value, ConfigValue):
             value = _C(value)
         if (pname in self._properties) and isinstance(self._properties[pname], _link):
-            self._properties[pname].set(value)
+            for x in self._properties[pname].members:
+                self._properties[x] = value
         else:
             self._properties[pname] = value
 

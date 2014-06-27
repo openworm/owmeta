@@ -348,9 +348,11 @@ class NetworkTest(unittest.TestCase):
         self.assertTrue('DD5' in self.net.neurons())
         self.assertEqual(len(list(self.net.neurons())), 302)
 
-    def test_synapses(self):
+    def test_synapses_rdf(self):
+        """ Check that synapses() returns connection objects """
         for x in self.net.synapses():
             self.assertIsInstance(x,Connection)
+            break
 
     def test_as_networkx(self):
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
@@ -660,17 +662,24 @@ class DataTest(unittest.TestCase):
         # open the database
         # check we can add a triple
         self.config['source'] = 'Sleepycat'
+        self.config['rdf.store'] = 'Sleepycat'
         self.config['rdf.store_conf'] = 'Sleepycat'
-        self.config['semantic_net'].query
+        b = self.config['rdf.graph'].query("ASK { ?S ?P ?O }")
+        for x in b:
+            self.assertTrue(x)
+        self.config['rdf.graph'].close()
 
     def test_trix_source(self):
         c = Configure().copy(self.config)
         c['rdf.source'] = 'TriX'
         c['trix_location'] = 'export.xml'
         c['rdf.store_conf'] = 'test.db'
+        c['rdf.store'] = 'Sleepycat'
         d = Data(conf=c)
         b = d['rdf.graph'].query("ASK { ?S ?P ?O }")
-        print list(b)
+        for x in b:
+            self.assertTrue(x)
+        d['rdf.graph'].close()
 
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):

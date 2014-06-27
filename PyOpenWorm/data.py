@@ -70,7 +70,16 @@ def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
+    while True:
+        l = []
+        try:
+            for x in args:
+                l.append(next(x))
+        except:
+            pass
+        yield l
+        if len(l) < n:
+            break
 
 class DataUser(Configureable):
     def __init__(self, conf = False):
@@ -83,7 +92,7 @@ class DataUser(Configureable):
         for group in grouper(g, 1000):
             temp_graph = Graph()
             for x in group:
-                if x:
+                if x is not None:
                     temp_graph.add(x)
                 else:
                     break
@@ -94,7 +103,7 @@ class DataUser(Configureable):
         for group in grouper(g, 1000):
             temp_graph = Graph()
             for x in group:
-                if x:
+                if x is not None:
                     temp_graph.add(x)
                 else:
                     break
@@ -120,6 +129,14 @@ class DataUser(Configureable):
 
     #def _add_unannotated_statements(self, graph):
     # A UTC class.
+
+    def retract_statements(self, graph):
+        """
+        Add a set of statements to the database.
+        Annotates the addition with uploader name, etc
+        :param graph: An iterable of triples
+        """
+        self._remove_from_store(graph)
 
     def add_statements(self, graph):
         """
@@ -180,9 +197,8 @@ class Data(Configure, Configureable):
                 'Sleepycat' : SleepyCatSource(c),
                 'TriX' : TrixSource(c)}
         i = d[self.conf['rdf.source']]
+        self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
-        self['semantic_net_new'] = i
-        self['semantic_net'] = i
         return i
 
     def _molecule_hash(self, data):
@@ -230,10 +246,11 @@ class TrixSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
         import glob
         # Check the ages of the files. Read the more recent one.
-        g0 = ConjunctiveGraph('Sleepycat')
+        g0 = ConjunctiveGraph(store=self.conf['rdf.store'])
         database_store = self.conf['rdf.store_conf']
         trix_file = self.conf['trix_location']
-
+        # store_time only works for stores that are on the local
+        # machine.
         try:
             store_time = modification_date(database_store)
             # If the store is newer than the serialization
@@ -247,8 +264,7 @@ class TrixSource(Configureable,PyOpenWorm.ConfigValue):
 
         trix_time = modification_date(trix_file)
 
-        g0.close()
-        g0.open(database_store,create=True)
+        g0.open(database_store, create=True)
 
         if store_time > trix_time:
             # just use the store

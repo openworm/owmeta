@@ -31,7 +31,6 @@ class IntegrationTest(unittest.TestCase):
         for x in r:
             print "\t".join([str(y)[:60] for y in x])
 
-
 # XXX: OTHER TESTS TO DO
 # reference a synaptic connection
 # assert that some source affirms that connection
