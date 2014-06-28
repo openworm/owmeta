@@ -603,7 +603,7 @@ class ConnectionTest(unittest.TestCase):
         self.assertIsInstance(c.pre_cell, Neuron)
         self.assertIsInstance(c.post_cell, Neuron)
         self.assertEqual(3, c.number)
-        self.assertEqual(4, c.syntype)
+        self.assertEqual(None, c.syntype)
         self.assertEqual(5, c.synclass)
 
     def test_init_number_is_a_number(self):

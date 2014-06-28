@@ -13,7 +13,7 @@ from PyOpenWorm import DataObject
 # Consequently, they can be reduced to or built up from a
 #  set of triples.
 class Relationship(DataObject):
-    def __init__(self,triples=[],graph=None,conf=None):
+    def __init__(self,triples=[],graph=None,conf=False):
         DataObject.__init__(self,conf=conf)
         if graph:
             self._triples = graph
