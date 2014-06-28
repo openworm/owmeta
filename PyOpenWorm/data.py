@@ -11,7 +11,7 @@
 import sqlite3
 import networkx as nx
 import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue
+from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 import hashlib
 import csv
 import urllib2
@@ -83,10 +83,9 @@ def grouper(iterable, n, fillvalue=None):
 
 class DataUser(Configureable):
     def __init__(self, conf = False):
-        if isinstance(conf, Data):
-            Configureable.__init__(self, conf=conf)
-        else:
-            Configureable.__init__(self, conf=Data(conf))
+        Configureable.__init__(self, conf=conf)
+        if not isinstance(self.conf,Data):
+            raise BadConf(self)
 
     def _remove_from_store(self, g):
         for group in grouper(g, 1000):
@@ -100,27 +99,22 @@ class DataUser(Configureable):
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
-        if not graph_name:
-            while True:
-                p = " INSERT DATA { "
-                for i,triple in enumerate(g):
-                    p += " ".join(t.n3() for t in triple) +" ."
-                    if i == 999:
-                        break
-                p += " }"
-        else:
-                p = " INSERT DATA { GRAPH "+graph_name.n3()+" { "
-                for i,triple in enumerate(g):
-                    p += " ".join(t.n3() for t in triple) +" ."
-                    if i == 999:
-                        break
-                p += " } } "
-        self.conf['rdf.graph'].update(p)
+        for group in grouper(g, 2000):
+            temp_graph = Graph()
+            for x in group:
+                if x is not None:
+                    temp_graph.add(x)
+                else:
+                    break
+            if graph_name:
+                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
+            else:
+                s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
+            self.conf['rdf.graph'].update(s)
 
     def add_reference(self, g, reference_iri):
         """
         Add a citation to a set of statements in the database
-        Annotates the addition with uploader name, etc
         :param triples: A set of triples to annotate
         """
         new_statements = Graph()
@@ -136,8 +130,7 @@ class DataUser(Configureable):
 
     def retract_statements(self, graph):
         """
-        Add a set of statements to the database.
-        Annotates the addition with uploader name, etc
+        Remove a set of statements from the database.
         :param graph: An iterable of triples
         """
         self._remove_from_store(graph)
@@ -151,17 +144,7 @@ class DataUser(Configureable):
         #uri = self.conf['molecule_name'](graph.identifier)
 
         ns = self.conf['rdf.namespace']
-        time_stamp = DT.now(utc).isoformat()
-
-        ts = Literal(time_stamp, datatype=XSD['dateTimeStamp'])
-        email = Literal(self.conf['user.email'])
-        m = self.conf['molecule_name']((ts,email))
-
-        new_statements = Graph()
-        new_statements.add((m, ns['upload_date'], Literal(time_stamp, datatype=XSD['dateTimeStamp'])))
-        new_statements.add((m, ns['uploader'], Literal(self.conf['user.email'])))
-        self._add_to_store(graph, m)
-        self._add_to_store(new_statements)
+        self._add_to_store(graph)
 
     def _reify(self,g,s):
         """
