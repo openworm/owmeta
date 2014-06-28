@@ -26,7 +26,6 @@ class Connection(Relationship):
         self.rdf_type = self.conf['rdf.namespace']['Connection']
         self.namespace = R.Namespace(self.rdf_type + '/')
 
-        print pre_cell,post_cell
         if isinstance(pre_cell,Neuron) or pre_cell is None:
             self.pre_cell = pre_cell
         elif pre_cell is not None:
@@ -38,10 +37,14 @@ class Connection(Relationship):
             self.post_cell = Neuron(name=post_cell, conf=self.conf)
 
         self.number = int(number)
-        if (syntype == 'send' or syntype == SynapseType.Chemical):
-            self.syntype = SynapseType.Chemical
-        elif (syntype.lower() == 'gapjunction' or syntype == SynapseType.GapJunction):
-            self.syntype = SynapseType.GapJunction
+        if isinstance(syntype,basestring):
+            syntype=syntype.lower()
+            if syntype in ('send', SynapseType.Chemical):
+                self.syntype = SynapseType.Chemical
+            elif syntype in ('gapjunction', SynapseType.GapJunction):
+                self.syntype = SynapseType.GapJunction
+        else:
+            self.syntype = None
 
         self.synclass = synclass
 
@@ -87,7 +90,7 @@ class Connection(Relationship):
             ?id $synclass_pred ?syntype .
             ?id $number_pred ?number .
             # Additional Bindings
-            $binds_add_to_store
+            $binds
         }
         """)
         binds = dict()

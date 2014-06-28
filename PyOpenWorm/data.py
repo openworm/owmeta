@@ -100,18 +100,22 @@ class DataUser(Configureable):
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
-        for group in grouper(g, 1000):
-            temp_graph = Graph()
-            for x in group:
-                if x is not None:
-                    temp_graph.add(x)
-                else:
-                    break
-            if graph_name:
-                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
-            else:
-                s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
-            self.conf['rdf.graph'].update(s)
+        if not graph_name:
+            while True:
+                p = " INSERT DATA { "
+                for i,triple in enumerate(g):
+                    p += " ".join(t.n3() for t in triple) +" ."
+                    if i == 999:
+                        break
+                p += " }"
+        else:
+                p = " INSERT DATA { GRAPH "+graph_name.n3()+" { "
+                for i,triple in enumerate(g):
+                    p += " ".join(t.n3() for t in triple) +" ."
+                    if i == 999:
+                        break
+                p += " } } "
+        self.conf['rdf.graph'].update(p)
 
     def add_reference(self, g, reference_iri):
         """
@@ -243,52 +247,72 @@ def modification_date(filename):
 class TrixSource(Configureable,PyOpenWorm.ConfigValue):
     """ Reads from a TriX file or if the store is more recent, from that. """
     # XXX How to write back out to this?
+    i = 0
+    def __init__(self, conf=False):
+        Configureable.__init__(self, conf=conf)
+        self.graph = False
+
     def get(self):
-        import glob
-        # Check the ages of the files. Read the more recent one.
-        g0 = ConjunctiveGraph(store=self.conf['rdf.store'])
-        database_store = self.conf['rdf.store_conf']
-        trix_file = self.conf['trix_location']
-        # store_time only works for stores that are on the local
-        # machine.
-        try:
-            store_time = modification_date(database_store)
-            # If the store is newer than the serialization
-            # get the newest file in the store
-            for x in glob.glob(database_store +"/*"):
-                mod = modification_date(x)
-                if store_time < mod:
-                    store_time = mod
-        except:
-            store_time = DT.min
+        if not self.graph:
+            self.graph = True
+            import glob
+            # Check the ages of the files. Read the more recent one.
+            g0 = ConjunctiveGraph(store=self.conf['rdf.store'])
+            database_store = self.conf['rdf.store_conf']
+            trix_file = self.conf['trix_location']
+            # store_time only works for stores that are on the local
+            # machine.
+            try:
+                store_time = modification_date(database_store)
+                # If the store is newer than the serialization
+                # get the newest file in the store
+                for x in glob.glob(database_store +"/*"):
+                    mod = modification_date(x)
+                    if store_time < mod:
+                        store_time = mod
+            except:
+                store_time = DT.min
 
-        trix_time = modification_date(trix_file)
+            trix_time = modification_date(trix_file)
 
-        g0.open(database_store, create=True)
+            g0.open(database_store, create=True)
 
-        if store_time > trix_time:
-            # just use the store
-            pass
-        else:
-            # delete the database and read in the new one
-            # read in the serialized format
-            g0.parse(trix_file,format="trix")
+            if store_time > trix_time:
+                # just use the store
+                pass
+            else:
+                # delete the database and read in the new one
+                # read in the serialized format
+                g0.parse(trix_file,format="trix")
 
-        return g0
+            self.graph = g0
+
+        return self.graph
 
 class SPARQLSource(Configureable,PyOpenWorm.ConfigValue):
+    def __init__(self,conf=False):
+        Configureable.__init__(self, conf=conf)
+        self.graph = False
+
     def get(self):
-        # XXX: If we have a source that's read only, should we need to set the store separately??
-        g0 = ConjunctiveGraph('SPARQLUpdateStore')
-        g0.open(tuple(self.conf['rdf.store_conf']))
-        return g0
+        if not self.graph:
+            # XXX: If we have a source that's read only, should we need to set the store separately??
+            g0 = ConjunctiveGraph('SPARQLUpdateStore')
+            g0.open(tuple(self.conf['rdf.store_conf']))
+            self.graph = g0
+        return self.graph
 
 class SleepyCatSource(Configureable,PyOpenWorm.ConfigValue):
+    def __init__(self,conf=False):
+        Configureable.__init__(self, conf=conf)
+        self.graph = False
     def get(self):
-        # XXX: If we have a source that's read only, should we need to set the store separately??
-        g0 = ConjunctiveGraph('Sleepycat')
-        g0.open(self.conf['rdf.store_conf'])
-        return g0
+        if not self.graph:
+            # XXX: If we have a source that's read only, should we need to set the store separately??
+            g0 = ConjunctiveGraph('Sleepycat')
+            g0.open(self.conf['rdf.store_conf'])
+            self.graph = g0
+        return self.graph
 
 class SQLiteSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
