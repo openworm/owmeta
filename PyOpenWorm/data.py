@@ -87,6 +87,10 @@ class DataUser(Configureable):
         if not isinstance(self.conf,Data):
             raise BadConf(self)
 
+    @property
+    def rdf(self):
+        return self.conf['rdf.graph']
+
     def _remove_from_store(self, g):
         for group in grouper(g, 1000):
             temp_graph = Graph()
@@ -99,7 +103,7 @@ class DataUser(Configureable):
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
-        for group in grouper(g, 2000):
+        for group in grouper(g, 1000):
             temp_graph = Graph()
             for x in group:
                 if x is not None:
@@ -172,6 +176,10 @@ class Data(Configure, Configureable):
         self['new_graph_uri'] = self._molecule_hash
         self._init_rdf_graph()
 
+    @classmethod
+    def open(cls,file_name):
+        c = Configure.open(file_name)
+        return cls(c)
 
     def _init_rdf_graph(self):
         # Set these in case they were left out
