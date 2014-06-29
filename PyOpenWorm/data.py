@@ -181,6 +181,12 @@ class Data(Configure, Configureable):
         c = Configure.open(file_name)
         return cls(c)
 
+    def openDatabase(self):
+        self.source.open()
+
+    def closeDatabase(self):
+        self.source.close()
+
     def _init_rdf_graph(self):
         # Set these in case they were left out
         c = self.conf
@@ -192,6 +198,7 @@ class Data(Configure, Configureable):
                 'Sleepycat' : SleepyCatSource(c),
                 'TriX' : TrixSource(c)}
         i = d[self.conf['rdf.source']]
+        self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
         return i
@@ -244,6 +251,12 @@ class TrixSource(Configureable,PyOpenWorm.ConfigValue):
         self.graph = False
 
     def get(self):
+        return self.graph
+
+    def close(self):
+        self.graph.close()
+
+    def open(self):
         if not self.graph:
             self.graph = True
             import glob
@@ -285,28 +298,38 @@ class SPARQLSource(Configureable,PyOpenWorm.ConfigValue):
         Configureable.__init__(self, conf=conf)
         self.graph = False
 
+    def open(self):
+        # XXX: If we have a source that's read only, should we need to set the store separately??
+        g0 = ConjunctiveGraph('SPARQLUpdateStore')
+        g0.open(tuple(self.conf['rdf.store_conf']))
+        self.graph = g0
+        return self.graph
+
+    def close(self):
+        self.graph.close()
+
     def get(self):
-        if not self.graph:
-            # XXX: If we have a source that's read only, should we need to set the store separately??
-            g0 = ConjunctiveGraph('SPARQLUpdateStore')
-            g0.open(tuple(self.conf['rdf.store_conf']))
-            self.graph = g0
         return self.graph
 
 class SleepyCatSource(Configureable,PyOpenWorm.ConfigValue):
     def __init__(self,conf=False):
         Configureable.__init__(self, conf=conf)
         self.graph = False
+
+    def open(self):
+        # XXX: If we have a source that's read only, should we need to set the store separately??
+        g0 = ConjunctiveGraph('Sleepycat')
+        g0.open(self.conf['rdf.store_conf'])
+        self.graph = g0
+    def close(self):
+        self.graph.close()
     def get(self):
-        if not self.graph:
-            # XXX: If we have a source that's read only, should we need to set the store separately??
-            g0 = ConjunctiveGraph('Sleepycat')
-            g0.open(self.conf['rdf.store_conf'])
-            self.graph = g0
         return self.graph
 
 class SQLiteSource(Configureable,PyOpenWorm.ConfigValue):
     def get(self):
+        return self.graph
+    def open(self):
         conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
 
@@ -357,6 +380,7 @@ class SQLiteSource(Configureable,PyOpenWorm.ConfigValue):
 
         cur.close()
         conn.close()
+        self.graph = g0
 
-        return g0
-
+    def close(self):
+        self.graph.close()
