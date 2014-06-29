@@ -18,10 +18,6 @@ namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 # Set up the database
 
 TestConfig = Configure.open("tests/test.conf")
-def setup(self):
-    self.config = Data(TestConfig)
-    self.config_no_data = TestConfig
-    Configureable.default = self.config
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -36,14 +32,17 @@ def make_graph(size=100):
         g.add((s,p,o))
     return g
 
-class WormTest(unittest.TestCase):
-    """Test for Worm."""
-
-    @classmethod
-    def setUpClass(cls):
-        pass
+class _DataTest(unittest.TestCase):
     def setUp(self):
-        setup(self)
+        self.config = Data(TestConfig)
+        self.config_no_data = TestConfig
+        Configureable.default = self.config
+        self.config.openDatabase()
+    def tearDown(self):
+        self.config.closeDatabase()
+
+class WormTest(_DataTest):
+    """Test for Worm."""
 
     def test_get_network(self):
         self.assertTrue(isinstance(Worm(self.config).get_neuron_network(), Network))
@@ -179,9 +178,7 @@ class CellTest(unittest.TestCase):
             self.fail("Should validate")
         sys.stdout = f
 
-class DataObjectTest(unittest.TestCase):
-    def setUp(s):
-        setup(s)
+class DataObjectTest(_DataTest):
 
     def test_DataUser(self):
         do = DataObject(conf=self.config)
@@ -209,9 +206,7 @@ class DataObjectTest(unittest.TestCase):
         self.assertIsNotNone(u)
 
 
-class DataUserTest(unittest.TestCase):
-    def setUp(s):
-        setup(s)
+class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
@@ -286,10 +281,10 @@ class DataUserTest(unittest.TestCase):
     def test_add_statements(self):
         pass
 
-class NeuronTest(unittest.TestCase):
-    def setUp(s):
-        setup(s)
-        s.neur = lambda x : Neuron(x,s.config)
+class NeuronTest(_DataTest):
+    def setUp(self):
+        _DataTest.setUp(self)
+        self.neur = lambda x : Neuron(x,self.config)
 
     def test_Cell(self):
         do = self.neur('BDUL')
@@ -328,9 +323,9 @@ class NeuronTest(unittest.TestCase):
     def test_Syn_degree(self):
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
 
-class NetworkTest(unittest.TestCase):
+class NetworkTest(_DataTest):
     def setUp(s):
-        setup(s)
+        _DataTest.setUp(s)
         s.net = Network(s.config)
 
     def test_identifier(self):
@@ -357,9 +352,7 @@ class NetworkTest(unittest.TestCase):
     def test_as_networkx(self):
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
 
-class EvidenceTest(unittest.TestCase):
-    def setUp(s):
-        setup(s)
+class EvidenceTest(_DataTest):
     @unittest.skip("Post alpha")
     def test_bibtex_init(self):
         bibtex = u"""@ARTICLE{Cesar2013,
@@ -562,9 +555,7 @@ class QuantityTest(unittest.TestCase):
         self.assertEqual("milliliter", q.unit)
         self.assertEqual(23, q.value)
 
-class RelationshipTest(unittest.TestCase):
-    def setUp(self):
-        setup(self)
+class RelationshipTest(_DataTest):
 
     def test_init_graph(self):
         """ Make sure that we're marking a statement with it's upload date """
@@ -576,9 +567,9 @@ class RelationshipTest(unittest.TestCase):
         # XXX: Is there use case for this not covered by DataObject.load?
         s = Relationship.rel(DataObject,'uploader')
 
-class ConnectionTest(unittest.TestCase):
+class ConnectionTest(_DataTest):
     def setUp(self):
-        setup(self)
+        _DataTest.setUp(self)
         ns = self.config['rdf.namespace']
         self.trips = [(ns['64'], ns['356'], ns['184']),
                 (ns['john'], R.RDF['type'], ns['Connection']),
@@ -641,9 +632,7 @@ class ConnectionTest(unittest.TestCase):
         c = Connection(pre_cell="PVCR", conf=self.config)
         r = c.load()
 
-class MuscleTest(unittest.TestCase):
-    def setUp(self):
-        setup(self)
+class MuscleTest(_DataTest):
 
     def test_muscle(self):
         self.assertTrue(isinstance(Muscle('MDL08',self.config), Muscle))
@@ -652,12 +641,7 @@ class MuscleTest(unittest.TestCase):
         self.fail("Need an actual test")
         m = Muscle('MDL08',self.config).neurons()
 
-class DataTest(unittest.TestCase):
-    # Test store types
-    # Test source types
-    def setUp(self):
-        setup(self)
-
+class DataTest(_DataTest):
     def test_sleepy_cat_source(self):
         # open the database
         # check we can add a triple
@@ -676,10 +660,11 @@ class DataTest(unittest.TestCase):
         c['rdf.store_conf'] = 'test.db'
         c['rdf.store'] = 'Sleepycat'
         d = Data(conf=c)
+        d.openDatabase()
         b = d['rdf.graph'].query("ASK { ?S ?P ?O }")
         for x in b:
             self.assertTrue(x)
-        d['rdf.graph'].close()
+        d.closeDatabase()
 
 class NeuroMLTest(unittest.TestCase):
     def setUp(self):
