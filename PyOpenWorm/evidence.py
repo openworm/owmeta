@@ -7,7 +7,7 @@ Created on Sun Feb 23 17:10:53 2014
 An Evidence object represents a single document
 
 """
-from PyOpenWorm import DataObject, Configure, Relationship
+from PyOpenWorm import DataObject, Configure, Relationship, Property, SimpleProperty
 import rdflib as R
 
 class EvidenceError(BaseException):
@@ -42,7 +42,13 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf)
         self._fields = dict()
-        self.namespace = R.Namespace(self.conf['rdf.namespace']['Evidence'] + '/')
+        self._statements = []
+        self.author = SimpleProperty(self,'author')
+        self.year = SimpleProperty(self,'year')
+        self.title = SimpleProperty(self,'title')
+
+        #XXX: I really don't like putting these in two places
+        self.properties = [self.author,self.title,self.year]
         for k in source:
             if k in ('pubmed', 'pmid'):
                 self._fields['pmid'] = source[k]
@@ -97,14 +103,10 @@ class Evidence(DataObject):
         """
         if stmt:
             assert(isinstance(stmt,Relationship))
-            trips = stmt.n3()
-            graph_uri = self.conf['molecule_name'](trips)
-            update_stmt = "insert data { graph %s { %s } . %s %s %s }" % (graph_uri.n3(), trips, self.identifier().n3(), self.namespace['asserts'].n3(), graph_uri.n3())
-            # insert the statement
-            self.conf['rdf.graph'].update(update_stmt)
+            self._statements.append(stmt)
         else:
             # Query for the evidence asserted by this
-            query_stmt = "select ?s ?p ?o where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.namespace['asserts'].n3())
+            query_stmt = "select ?s ?p ?o where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.rdf_namespace['asserts'].n3())
             # This returns us a bunch of triples...how do we get the objects that they represent?
             # Feed them back into a graph!
             #
@@ -113,6 +115,14 @@ class Evidence(DataObject):
             for x in self.conf['rdf.graph'].query(query_stmt):
                 yield x
 
+    def triples(self):
+        ident = self.identifier()
+        for x in self.properties:
+            for y in x.triples():
+                yield y
+        for x in self._statements:
+            yield (ident, self.rdf_namespace['asserts'], x.identifier())
+
     def identifier(self):
         """
         Note that this identifier changes with every change to the fields
@@ -120,7 +130,7 @@ class Evidence(DataObject):
         pubmed id. This is because manual addition of fields is allowed: an 'asserts' may
         be saying something in addition to the article which is referenced by the pmid.
         """
-        return self.conf['molecule_name'](self._fields)
+        return self.conf['molecule_name']("".join(x.identifier() for x in self.properties))
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
@@ -146,18 +156,18 @@ class Evidence(DataObject):
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
-                self._fields['author'] = [x['label'] for x in f['data']]
+                self.author([x['label'] for x in f['data']])
             elif 'name' in f:
-                self._fields['author'] = f['name']['data']['label']
+                self.author(f['name']['data']['label'])
 
         # get the publication date
         j = wbRequest(wbid, 'publication_date')
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
-                self._fields['publication_date'] = f['data']['label']
+                self.year(f['data']['label'])
             elif 'name' in f:
-                self._fields['publication_date'] = f['name']['data']['label']
+                self.year(f['name']['data']['label'])
 
     def _crossref_doi_extract(self):
         # Extract data from crossref
@@ -180,16 +190,15 @@ class Evidence(DataObject):
         fields = (x.split("=") for x in extra_data)
         fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
         authors = [x[1] for x in fields if x[0] == 'rft.au']
-        self._fields['author'] = authors
+        self.author(authors)
         # no error for bad ids, just an empty list
         if len(r) > 0:
             # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
             r = r[0]
             if 'title' in r:
-                self._fields['title'] = r['title']
+                self.title(r['title'])
             if 'year' in r:
-                self._fields['publication_date'] = r['year']
-                self._fields['year'] = r['year']
+                self.year(r['year'])
 
     def _pubmed_extract(self):
         from lxml import etree as ET
@@ -209,28 +218,8 @@ class Evidence(DataObject):
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
         tree = ET.parse(pmRequest(pmid))
-        self._fields['author'] = [x.text for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item')]
+        self.author([x.text for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item')])
 
-    def author(self,v=False):
-        """
-        Get/set the author for this evidence object
-        """
-        if v:
-            self._fields['author'] = v
-        else:
-            if 'author' in self._fields:
-                return self._fields['author']
-            else:
-                return []
-
-    def year(self, v=False):
-        if v:
-            self._fields['publication_date'] = v
-        else:
-            if 'publication_date' in self._fields:
-                return self._fields['publication_date']
-            else:
-                return ''
     def __eq__(self, other):
         for f in self._fields:
             if (f not in other._fields) or (self._fields(f) != other._fields(f)):

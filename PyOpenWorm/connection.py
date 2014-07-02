@@ -7,12 +7,13 @@
    Connection between neurons
 
 """
-from PyOpenWorm import Relationship,Neuron
+from PyOpenWorm import Relationship,Neuron,SimpleProperty
 from string import Template
 import rdflib as R
 
 class SynapseType:
-    Chemical,GapJunction = range(2)
+    Chemical = "send"
+    GapJunction = "gapJunction"
 
 class Connection(Relationship):
     def __init__(self,
@@ -23,8 +24,10 @@ class Connection(Relationship):
                  synclass=None,
                  conf=False):
         Relationship.__init__(self,conf=conf)
-        self.rdf_type = self.conf['rdf.namespace']['Connection']
-        self.namespace = R.Namespace(self.rdf_type + '/')
+
+        self.syntype = SimpleProperty(self,'syntype')
+        self.synclass = SimpleProperty(self,'neurotransmitter')
+        self.number = SimpleProperty(self,'number')
 
         if isinstance(pre_cell,Neuron) or pre_cell is None:
             self.pre_cell = pre_cell
@@ -36,20 +39,19 @@ class Connection(Relationship):
         elif post_cell is not None:
             self.post_cell = Neuron(name=post_cell, conf=self.conf)
 
-        self.number = int(number)
+        self.number(int(number))
+
         if isinstance(syntype,basestring):
             syntype=syntype.lower()
             if syntype in ('send', SynapseType.Chemical):
-                self.syntype = SynapseType.Chemical
+                self.syntype(SynapseType.Chemical)
             elif syntype in ('gapjunction', SynapseType.GapJunction):
-                self.syntype = SynapseType.GapJunction
-        else:
-            self.syntype = None
+                self.syntype(SynapseType.GapJunction)
 
-        self.synclass = synclass
+        self.synclass(synclass)
 
     def identifier(self):
-        data = (self.pre_cell, self.post_cell, self.number,self.syntype, self.synclass)
+        data = (self.pre_cell, self.post_cell, self.number, self.syntype.identifier(), self.synclass.identifier())
         return self.conf['molecule_name'](data)
 
     def triples(self):
@@ -59,21 +61,24 @@ class Connection(Relationship):
 
         yield (pre_cell, self.conf['rdf.namespace']['356'], post_cell)
         yield (ident, R.RDF['type'], self.rdf_type)
-        yield (ident, self.namespace['pre'], pre_cell)
+        yield (ident, self.rdf_namespace['pre'], pre_cell)
 
         if self.syntype == SynapseType.Chemical:
-            yield (ident, self.namespace['syntype'], self.conf['rdf.namespace']['356'])
+            yield (ident, self.rdf_namespace['syntype'], self.conf['rdf.namespace']['356'])
         elif self.syntype == SynapseType.GapJunction:
-            yield (ident, self.namespace['syntype'], self.conf['rdf.namespace']['357'])
+            yield (ident, self.rdf_namespace['syntype'], self.conf['rdf.namespace']['357'])
         else:
-            yield (ident, self.namespace['syntype'], self.namespace['UnknownType'])
+            yield (ident, self.rdf_namespace['syntype'], self.rdf_namespace['UnknownType'])
 
         if self.synclass:
-            yield (ident, self.namespace['neurotransmitter'], R.Literal(synclass))
+            yield (ident, self.rdf_namespace['neurotransmitter'], R.Literal(synclass))
         else:
-            yield (ident, self.namespace['neurotransmitter'], R.Literal("unknown class"))
+            yield (ident, self.rdf_namespace['neurotransmitter'], R.Literal("unknown class"))
 
-        yield (ident, self.namespace['post'], post_cell)
+        if self.number:
+            yield (ident, self.rdf_namespace['number'], R.Literal(self.number))
+
+        yield (ident, self.rdf_namespace['post'], post_cell)
 
     def load(self):
         t = Template("""
@@ -94,20 +99,22 @@ class Connection(Relationship):
         }
         """)
         binds = dict()
-        if self.number != 0:
-            binds['number'] = R.Literal(self.number,datatype=R.XSD.integer)
+        for x in self.number():
+            binds['number'] = R.Literal(x,datatype=R.XSD.integer)
         if self.pre_cell is not None:
             binds['pre_n'] = self.pre_cell.identifier().n3()
+
         if self.post_cell is not None:
             binds['post_n'] = self.post_cell.identifier().n3()
-        if self.syntype is not None:
-            binds['syntype'] = R.Literal(self.syntype)
 
-        q = t.substitute(pre_pred=self.namespace['pre'].n3(),
-                syntype_pred=self.namespace['syntype'].n3(),
-                post_pred=self.namespace['post'].n3(),
-                number_pred=self.namespace['number'].n3(),
-                synclass_pred=self.namespace['neurotransmitter'].n3(),
+        for x in self.syntype():
+            binds['syntype'] = R.Literal(x)
+
+        q = t.substitute(pre_pred=self.rdf_namespace['pre'].n3(),
+                syntype_pred=self.rdf_namespace['syntype'].n3(),
+                post_pred=self.rdf_namespace['post'].n3(),
+                number_pred=self.rdf_namespace['number'].n3(),
+                synclass_pred=self.rdf_namespace['neurotransmitter'].n3(),
                 binds=_dict_to_sparql_binds(binds))
         res = self['rdf.graph'].query(q)
         for r in res:
