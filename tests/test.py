@@ -139,22 +139,20 @@ class ConfigureableTest(unittest.TestCase):
         i = Configureable(conf=False)
         self.assertEqual(i.conf,Configureable.default)
 
-class CellTest(unittest.TestCase):
-    def setUp(s):
-        setup(s)
+class CellTest(_DataTest):
 
     def test_DataUser(self):
-        do = Cell('',self.config)
+        do = Cell('',conf=self.config)
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
-        c = Cell("ADAL",self.config)
+        c = Cell("ADAL",conf=self.config)
         self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
 
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
-        c = Cell("ADAR",self.config)
+        c = Cell("ADAR",conf=self.config)
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
@@ -214,12 +212,18 @@ class DataUserTest(_DataTest):
         with self.assertRaises(BadConf):
             do = DataUser()
 
+    def test_init_no_config_with_default(self):
+        """ Should suceed if the default configuration is a Data object """
+        DataUser()
+
+    def test_init_False_with_default(self):
+        """ Should suceed if the default configuration is a Data object """
+        DataUser(conf=False)
+
     def test_init_config_no_Data(self):
-        """ Should succeed by wrapping a Data around the configuration it is given """
-        try:
-            do = DataUser(self.config_no_data)
-        except:
-            self.fail()
+        """ Should fail if given a non-Data configuration """
+        with self.assertRaises(BadConf):
+            DataUser(self.config_no_data)
 
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
@@ -292,13 +296,14 @@ class NeuronTest(_DataTest):
 
     def test_identifier(self):
         g = self.config['rdf.graph']
-        q = "PREFIX ns1:<http://openworm.org/entities/> select ?x where { ?z rdfs:label ?x . ?z ns1:1515 ns1:1 }"
-        neurons = [r['x'] for r in g.query(q)]
-        for x in neurons:
-            t = g.query('select ?x where { ?x rdfs:label "%s" }' % str(x))
-            for m in t:
-                ident = self.neur(x).identifier()
-                self.assertEqual(m[0], ident)
+        self.assertEqual(self.neur('AVAL').identifier(), R.URIRef('http://openworm.org/entities/64'))
+        self.assertEqual(self.neur('AWBR').identifier(), R.URIRef('http://openworm.org/entities/86'))
+        self.assertEqual(self.neur('FLPR').identifier(), R.URIRef('http://openworm.org/entities/125'))
+        self.assertEqual(self.neur('I6').identifier(), R.URIRef('http://openworm.org/entities/135'))
+        self.assertEqual(self.neur('M5').identifier(), R.URIRef('http://openworm.org/entities/156'))
+        self.assertEqual(self.neur('AUAL').identifier(), R.URIRef('http://openworm.org/entities/62'))
+        self.assertEqual(self.neur('PVQL').identifier(), R.URIRef('http://openworm.org/entities/192'))
+        self.assertEqual(self.neur('OLQVR').identifier(), R.URIRef('http://openworm.org/entities/167'))
 
     def test_receptors(self):
         self.assertTrue('GLR-2' in self.neur('AVAL').receptors())
@@ -370,6 +375,16 @@ class EvidenceTest(_DataTest):
         }
         """
         self.assertEqual(u"Jean César", Evidence(bibtex=bibtex).author())
+    def test_triples(self):
+        e = Evidence()
+        e.author("Paul")
+        e.title("Galatians")
+        e.year("60")
+        t = set((x[1],str(x[2])) for x in e.triples())
+        self.assertIn((e.rdf_namespace["author"], "Paul"), t)
+        self.assertIn((e.rdf_namespace["year"], "60"), t)
+        self.assertIn((e.rdf_namespace["title"], "Galatians"), t)
+
     def test_pubmed_init1(self):
         """
         A pubmed uri
@@ -593,9 +608,9 @@ class ConnectionTest(_DataTest):
         c = Connection(1,2,3,4,5)
         self.assertIsInstance(c.pre_cell, Neuron)
         self.assertIsInstance(c.post_cell, Neuron)
-        self.assertEqual(3, c.number)
-        self.assertEqual(None, c.syntype)
-        self.assertEqual(5, c.synclass)
+        self.assertEqual([3], c.number())
+        self.assertEqual([], c.syntype())
+        self.assertEqual([5], c.synclass())
 
     def test_init_number_is_a_number(self):
         with self.assertRaises(ValueError):
@@ -666,6 +681,25 @@ class DataTest(_DataTest):
             self.assertTrue(x)
         d.closeDatabase()
 
-class NeuroMLTest(unittest.TestCase):
-    def setUp(self):
-        setup(self)
+class PropertyTest(_DataTest):
+    pass
+
+class SimplePropertyTest(_DataTest):
+    def test_triples_with_no_value(self):
+        """ Test that when there is no value set for a property, it doesn't yield any triples """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        sp = SimpleProperty(do,"test")
+        for x in sp.triples():
+            self.fail("Shouldn't have any triples")
+    def test_get_from_database(self):
+        g = R.Graph()
+        ident=R.URIRef("http://example.org")
+        self.config['rdf.graph'] = g
+        do = DataObject(ident=ident)
+        g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue1")))
+        g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue2")))
+        sp = SimpleProperty(do,"test")
+        v = set(sp())
+        self.assertEqual(set(["testvalue2","testvalue1"]), v)
+class NeuroMLTest(_DataTest):
+    pass
