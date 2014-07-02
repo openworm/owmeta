@@ -1,21 +1,37 @@
 import rdflib as R
 from PyOpenWorm import DataUser, Configure
 
+class X():
+   pass
+
+class IDError(BaseException):
+    def __init__(self, s):
+        BaseException.__init__(self,"No identifier for %s"%str(s))
+# in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
+# However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
+# connected by an actual node
+
 class DataObject(DataUser):
     """ An object backed by the database """
     # Must resolve, somehow, to a set of triples that we can manipulate
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
-    def __init__(self,ident="",triples=[],conf=False):
+    def __init__(self,ident=False,triples=[],conf=False):
         DataUser.__init__(self,conf=conf)
         self._id = ident
         self._triples = triples
+        self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
+        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
 
     def identifier(self):
         """
         The identifier for this object in the rdf graph
         This identifier should be based on identifying characteristics of the object
+        Only one identifier can be returned. If more than one could be returned based
+        on the object's characteristics, one in returned randomly!
         """
+        if not self._id:
+            raise IDError(self)
         return R.URIRef(self._id)
 
     def triples(self):
@@ -26,7 +42,7 @@ class DataObject(DataUser):
             yield x
 
     def _n3(self):
-        return ".\n".join( " ".join(y.n3() for y in x) for x in self.triples())
+        return u".\n".join( x[0].n3() + x[1].n3()  + x[2].n3() for x in self.triples())
 
     def n3(self):
         return self._n3()
@@ -89,3 +105,65 @@ class DataObject(DataUser):
             break
 
         return str(ud)
+
+# Define a property by writing the get
+class Property(DataObject):
+    def __init__(self, owner, conf=False):
+        """ Initialize with the owner of this property.
+        The owner has a distinct role in each subclass of Property
+        """
+        DataObject.__init__(self, owner, conf=conf)
+        self.owner = owner
+        # XXX: Default implementation is a box for a value
+        self._value = False
+
+    def get(self):
+        """ Get the things which are on the other side of this property """
+        # This should run a query or return a cached value
+        raise NotImplementedError()
+    def set(self,*args,**kwargs):
+        """ Set the value of this property """
+        # This should set some values and call DataObject.save()
+        raise NotImplementedError()
+    def __call__(self,*args,**kwargs):
+        if len(args) > 0 or len(kwargs) > 0:
+            self.set(*args,**kwargs)
+            return self
+        else:
+            return self.get()
+    # Get the property (a relationship) itself
+class SimpleProperty(Property):
+    """ A property that has just one link to a literal value """
+
+    def __init__(self,owner,linkName,conf=False):
+        if conf==False:
+            conf = owner.conf
+        Property.__init__(self,owner,conf=conf)
+        self.v = False
+        self.link = owner.rdf_namespace[linkName]
+
+    def get(self):
+        if self.v:
+            return self.v
+        else:
+            qres = self.rdf.query("Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3()))
+            return [str(x['x']) for x in qres]
+
+    def set(self,v):
+        if hasattr(v,'__iter__'):
+            self.v = v
+        else:
+            self.v = [v]
+
+    def identifier(self):
+        return self.conf['molecule_name'](self.v)
+
+    def triples(self):
+        owner_id = self.owner.identifier()
+        try:
+            for x in self.v:
+                yield (owner_id, self.link, R.Literal(x))
+        except:
+            if self.v:
+                yield (owner_id, self.link, R.Literal(self.v))
+
