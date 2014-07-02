@@ -43,6 +43,25 @@ class _DataTest(unittest.TestCase):
 
 class WormTest(_DataTest):
     """Test for Worm."""
+    def setUp(self):
+        _DataTest.setUp(self)
+        ns = self.config['rdf.namespace']
+        self.trips = [(ns['64'], ns['356'], ns['184']),
+                (ns['john'], R.RDF['type'], ns['Connection']),
+                (ns['john'], ns['Connection/pre'], ns['64']),
+                (ns['64'], R.RDFS['label'], R.Literal("PVCR")),
+                (ns['john'], ns['Connection/syntype'], ns['356']),
+                (ns['john'], ns['Connection/number'], R.Literal('1', datatype=R.XSD.integer)),
+                (ns['184'], R.RDFS['label'], R.Literal("AVAL")),
+                (ns['john'], ns['Connection/post'], ns['184']),
+                (ns['65'], ns['356'], ns['185']),
+                (ns['luke'], R.RDF['type'], ns['Connection']),
+                (ns['luke'], ns['Connection/pre'], ns['65']),
+                (ns['65'], R.RDFS['label'], R.Literal("PVCL")),
+                (ns['luke'], ns['Connection/syntype'], ns['356']),
+                (ns['luke'], ns['Connection/number'], R.Literal('1', datatype=R.XSD.integer)),
+                (ns['185'], R.RDFS['label'], R.Literal("AVAR")),
+                (ns['luke'], ns['Connection/post'], ns['185'])]
 
     def test_get_network(self):
         self.assertTrue(isinstance(Worm(self.config).get_neuron_network(), Network))
@@ -348,6 +367,8 @@ class NetworkTest(_DataTest):
         self.assertTrue('DD5' in self.net.neurons())
         self.assertEqual(len(list(self.net.neurons())), 302)
 
+    def test_synapses_rdf(self):
+        """ Check that synapses() returns connection objects """
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
         for x in self.net.synapses():

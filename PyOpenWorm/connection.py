@@ -62,23 +62,14 @@ class Connection(Relationship):
         yield (pre_cell, self.conf['rdf.namespace']['356'], post_cell)
         yield (ident, R.RDF['type'], self.rdf_type)
         yield (ident, self.rdf_namespace['pre'], pre_cell)
-
-        if self.syntype == SynapseType.Chemical:
-            yield (ident, self.rdf_namespace['syntype'], self.conf['rdf.namespace']['356'])
-        elif self.syntype == SynapseType.GapJunction:
-            yield (ident, self.rdf_namespace['syntype'], self.conf['rdf.namespace']['357'])
-        else:
-            yield (ident, self.rdf_namespace['syntype'], self.rdf_namespace['UnknownType'])
-
-        if self.synclass:
-            yield (ident, self.rdf_namespace['neurotransmitter'], R.Literal(synclass))
-        else:
-            yield (ident, self.rdf_namespace['neurotransmitter'], R.Literal("unknown class"))
-
-        if self.number:
-            yield (ident, self.rdf_namespace['number'], R.Literal(self.number))
-
         yield (ident, self.rdf_namespace['post'], post_cell)
+
+        for x in self.syntype.triples():
+            yield x
+        for x in self.synclass.triples():
+            yield x
+        for x in self.number.triples():
+            yield x
 
     def load(self):
         t = Template("""

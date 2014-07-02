@@ -1,4 +1,4 @@
-from PyOpenWorm import Data,DefaultConfig
+from PyOpenWorm import Data,Configureable
 from xlrd import open_workbook
 from rdflib import Literal, URIRef, Graph,Namespace,RDFS
 import re
@@ -132,8 +132,7 @@ def adult_dev_graph():
     def j():
         for x in triple_adult_dev_mapping():
             if re.match(goodname_regex,x[2]):
-                yield (f(x[2]), RDFS["label"], Literal(str(x[2])))
-                yield (f(x[2]), RDFS["label"], Literal(str(x[2])))
+                yield (f(x[2]), RDFS["label"], Literal(str(x[0])))
     for i in j():
         graph.add(i)
     return graph
@@ -145,12 +144,10 @@ def upload_adult_dev_mapping():
     put_in_sesame(adult_dev_graph())
 
 def print_serialization(g):
-    d = Data(DefaultConfig)
     print g.serialize(format="nt")
 
 if __name__ == "__main__":
     #print_serialization(adult_dev_graph())
-    for x in subject(triple_dev_tree()):
-        print x
+    upload_adult_dev_mapping()
     #for x in  dev_bad_names():
         #print x

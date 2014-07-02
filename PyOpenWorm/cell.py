@@ -60,13 +60,56 @@ WHERE {
 }
             """)
 class Cell(DataObject):
-    def __init__(self, name, conf=False):
+    def __init__(self, name, lineageName=False, conf=False):
         DataObject.__init__(self,conf=conf)
         self._name = name
+        self._lineageName = lineageName
 
-    def lineageName(self):
-        # run some query to get the name
-        return ""
+    def lineageName(self, lineageName=False):
+        if lineageName:
+            self._lineageName = lineageName
+        else:
+            if not self._lineageName:
+                q = """select ?label {
+                    # Get the lineage name, a string
+                    <%s> <%s> ?label
+                }
+                """ % (self.identifier(), self.rdf_namespace['lineageName'])
+
+                qres = self['rdf.graph'].query(q, initNs=ns)
+                for r in qres:
+                    return r['label']
+            else:
+                return self._lineageName
+
+    def identifier(self):
+        """ A cell can be identified by its name or lineage name """
+        if not self._id:
+            if self._lineageName:
+                q = """select ?x {
+                    # Get the lineage name, a string
+                    ?x <%s> '%s'
+                }
+                """ % (self.rdf_namespace['lineageName'], self._lineageName)
+
+                qres = self.rdf.query(q, initNs=ns)
+                for r in qres:
+                    self._id = r['x']
+                    break
+            elif self._name:
+                q = """select ?x {
+                    ?x <%s> '%s'
+                }
+                """ % (self.rdf_namespace['adultName'], self._name)
+
+                qres = self['rdf.graph'].query(q, initNs=ns)
+                for r in qres:
+                    self._id = r['x']
+                    break
+            if not self._id:
+                # What identifier should we return if there isn't a good one?
+                raise PyOpenWorm.IDError(self)
+        return self._id
 
     def morphology(self):
         morph_name = "morphology_" + str(self.name())
@@ -106,6 +149,13 @@ class Cell(DataObject):
                 s.includes.append(i)
             morph.segment_groups.append(s)
         return morph
+
+    def triples(self):
+        ident = self.identifier()
+        yield (ident, R.RDF['type'], self.rdf_type)
+        if self._lineageName:
+            yield (ident, self.rdf_namespace['lineageName'], R.Literal(self._lineageName))
+        yield (ident, self.rdf_namespace['name'], R.Literal(self._name))
 
     def name(self):
         return self._name

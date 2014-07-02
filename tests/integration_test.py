@@ -30,6 +30,20 @@ class IntegrationTest(unittest.TestCase):
         r = e.asserts()
         for x in r:
             print "\t".join([str(y)[:60] for y in x])
+    def test_get_evidence(self):
+        # Reference two neurons
+        n1 = Neuron(name='AVAL')
+        n2 = Neuron(name='PVCR')
+
+        # Declare a connection between them
+        c = Connection(n1,n2,number=1)
+        e = Evidence()
+        # Create an Evidence search-object
+        e.asserts(c)
+
+        # look for all of the evidence for the connection 'c'
+        for x in e.load():
+            print x.author()
 
 # XXX: OTHER TESTS TO DO
 # reference a synaptic connection

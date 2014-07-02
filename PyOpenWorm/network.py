@@ -10,9 +10,21 @@ import PyOpenWorm
 import rdflib as R
 from PyOpenWorm import DataObject
 
+class Synapses(PyOpenWorm.Property):
+    """
+    Get all synapses by
+
+    :returns: A generator of Connection objects
+    :rtype: generator
+    """
+    def get(self):
+        for x in PyOpenWorm.Connection().load():
+            yield x
+
 class Network(DataObject):
     def __init__(self, conf=False):
         DataObject.__init__(self,conf=conf)
+        self.synapses = Synapses(self)
 
     def identifier(self):
         return self.conf['rdf.namespace']['worm_net']
@@ -30,6 +42,8 @@ class Network(DataObject):
             assert(n.check_exists())
         return n
 
+    def triples(self):
+        """ Return all of the connections and neruons """
     def neurons(self):
         """
         Get all neurons by name
@@ -74,17 +88,6 @@ class Network(DataObject):
         for n,nbrs in self['nx'].adjacency_iter():
             for nbr,eattr in nbrs.items():
                 yield PyOpenWorm.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
-
-    def _synapses_rdf(self):
-        """
-        Get all synapses by
-
-        :returns: A generator of Connection objects
-        :rtype: generator
-        """
-        # It only makes sense to talk about _all_ of the connections...so we should just get all of the connections
-        for x in PyOpenWorm.Connection().load():
-            yield x
 
     def as_networkx(self):
         return self['nx']
