@@ -90,7 +90,7 @@ class Configure:
         elif default:
             return default
         else:
-            print _properties
+            print self._properties
             raise KeyError(pname)
 
 class Configureable:
