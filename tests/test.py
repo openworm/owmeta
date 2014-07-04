@@ -214,6 +214,12 @@ class DataObjectTest(_DataTest):
         u = r.uploader()
         self.assertEqual(self.config['user.email'], u)
 
+    def test_object_from_id(self):
+        g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
+        self.assertIsInstance(g,Neuron)
+        g = DataObject.object_from_id('http://openworm.org/entities/Connection')
+        self.assertIsInstance(g,Connection)
+
     def test_upload_date(self):
         """ Make sure that we're marking a statement with it's upload date """
         g = make_graph(20)
@@ -468,7 +474,12 @@ class EvidenceTest(_DataTest):
         g = make_graph(20)
         r = Relationship(graph=g)
         e.asserts(r)
-        self.assertIn(r,e.asserts())
+        r.identifier = lambda : r.make_identifier("test")
+        print list(e.triples())
+        e.save()
+        l = list(e.asserts())
+        print l
+        self.assertIn(r,l)
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
