@@ -1,16 +1,25 @@
 import rdflib as R
-from PyOpenWorm import DataUser, Configure
+from PyOpenWorm import DataUser
 import PyOpenWorm
 
 class X():
    pass
 
-class IDError(BaseException):
-    def __init__(self, s):
-        BaseException.__init__(self,"No identifier for %s"%str(s))
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
 # connected by an actual node
+def _bnode_to_var(x):
+    return "?" + x
+
+def _rdf_literal_to_n3(x):
+    if isinstance(x,R.BNode):
+        return _bnode_to_var(x)
+    else:
+        return x.n3()
+
+def _triples_to_bgp(trips):
+    g = "\n".join(" ".join(_rdf_literal_to_n3(x) for x in y) for y in trips)
+    return g
 
 class DataObject(DataUser):
     """ An object backed by the database """
@@ -20,7 +29,17 @@ class DataObject(DataUser):
 
     def __init__(self,ident=False,triples=[],conf=False):
         DataUser.__init__(self,conf=conf)
-        self._id = ident
+        if ident:
+            self._id = ident
+        else:
+            # Randomly generate an identifier if the derived class can't
+            # come up with one from the start. Ensures we always have something
+            # that functions as an identifier
+            import random
+            import struct
+            v = struct.pack("=f",random.random()).encode("hex")
+            self._id = BNode(self.__class__.__name__ + v)
+
         self._triples = triples
         self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
@@ -29,12 +48,10 @@ class DataObject(DataUser):
     def identifier(self):
         """
         The identifier for this object in the rdf graph
-        This identifier should be based on identifying characteristics of the object
+        This identifier should be based on identifying characteristics of the object.
         Only one identifier can be returned. If more than one could be returned based
-        on the object's characteristics, one in returned randomly!
+        on the object's characteristics, one is returned randomly!
         """
-        if not self._id:
-            raise IDError(self)
         return R.URIRef(self._id)
 
     def make_identifier(self, data):
@@ -45,8 +62,17 @@ class DataObject(DataUser):
         """ Should be overridden by derived classes to return appropriate triples
         :return: An iterable of triples
         """
+        # The default implementation, gives the object no representation or the one
+        # explicitly given in __init__
         for x in self._triples:
             yield x
+
+    def graph_pattern(self):
+        """ Get the graph pattern for this object.
+        It should be as simple as converting the result of triples() into a BGP
+        By default conversion from triples() will treat BNodes as variables
+        """
+        return _triples_to_bgp(self.triples())
 
     def _n3(self):
         return u".\n".join( x[0].n3() + x[1].n3()  + x[2].n3() for x in self.triples())
@@ -146,10 +172,22 @@ class Property(DataObject):
         """
         DataObject.__init__(self, owner, conf=conf)
         self.owner = owner
-        if hasattr(self.owner,'properties'):
-            self.owner.properties.append(self)
+        if not hasattr(self.owner,'properties'):
+            self.owner.properties = [self]
         else:
-            self.owner.properties=[self]
+            self.owner.properties.append(self)
+
+        # XXX: Assuming that nothing else will come in and reset
+        # triples() without preserving this one!
+        if not hasattr(self.owner,'triples'):
+            self.owner.triples = self.triples
+        else:
+            def more_triples():
+                for x in self.owner.triples():
+                    yield x
+                for x in self.triples():
+                    yield x
+            self.owner.triples = more_triples()
 
         # XXX: Default implementation is a box for a value
         self._value = False
@@ -174,7 +212,7 @@ class SimpleProperty(Property):
     """ A property that has just one link to a literal value """
 
     def __init__(self,owner,linkName,conf=False):
-        if conf==False:
+        if conf == False:
             conf = owner.conf
         Property.__init__(self,owner,conf=conf)
         self.v = False
