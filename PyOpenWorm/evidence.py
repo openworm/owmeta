@@ -193,6 +193,7 @@ class Evidence(DataObject):
     def _crossref_doi_extract(self):
         # Extract data from crossref
         def crRequest(doi):
+            import urllib as U
             data = {'q': doi}
             data_encoded = U.urlencode(data)
             return _json_request('http://search.labs.crossref.org/dois?%s' % data_encoded)
