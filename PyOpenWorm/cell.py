@@ -8,12 +8,9 @@
 
 """
 
-import sqlite3
-from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
-from rdflib.plugins.sparql import prepareQuery
-from rdflib.namespace import RDFS
+import rdflib as R
 import PyOpenWorm
-from PyOpenWorm import DataObject,SimpleProperty
+from PyOpenWorm import DataObject, SimpleProperty
 from string import Template
 import neuroml
 
@@ -76,6 +73,7 @@ class Cell(DataObject):
 
     def identifier(self):
         """ A cell can be identified by its name or lineage name """
+
         if self._name:
             # What identifier should we return if there isn't a good one?
             self._id = self.make_identifier(self._name)
@@ -130,12 +128,8 @@ class Cell(DataObject):
         return g
 
     def triples(self):
-        try:
-            ident = self.identifier()
-        except PyOpenWorm.IDError:
-            ident = R.BNode()
-        if self._lineageName:
-            yield (ident, self.rdf_namespace['lineageName'], R.Literal(self._lineageName))
+        ident = self.identifier()
+        yield (ident, R.RDF['type'], self.rdf_type)
         yield (ident, self.rdf_namespace['name'], R.Literal(self._name))
 
     def name(self):
