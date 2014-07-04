@@ -73,10 +73,8 @@ class DataObject(DataUser):
     def _extract_class_name(self,uri):
         from urlparse import urlparse
         u = urlparse(uri)
-        print u
         x = u.path.split('/')
         if x[1] == 'entities':
-            print x
             return x[2]
 
     def load(self):
@@ -89,6 +87,12 @@ class DataObject(DataUser):
         # Steps:
         # - Do the query/queries
         # - Create objects from the bound variables
+    def query_pattern(self):
+        """ Return the pattern, variables to extract, and bindings for other variables in order to load this object from the graph
+        :return (pattern_string, variables, bindings):
+        """
+        raise NotImplementedError()
+
     def retract(self):
         """ Remove this object from the data store. """
         self.remove_statements(self._n3())
@@ -161,6 +165,7 @@ class Property(DataObject):
     def __call__(self,*args,**kwargs):
         if len(args) > 0 or len(kwargs) > 0:
             self.set(*args,**kwargs)
+            self.save()
             return self
         else:
             return self.get()
@@ -189,15 +194,25 @@ class SimpleProperty(Property):
             self.v = v
         else:
             self.v = [v]
+    def query_pattern(self):
+        q = """{ ?p %s ?v
+                 ; %s ?l }
+            """ % (self.rdf_namespace['value'], self.rdf_namespace['type'])
+        variables = ("v",)
+        bindings = {"l":self.linkname}
+        return (q,variables,bindings)
 
     def identifier(self):
         return self.make_identifier((self.linkname,self.v))
 
     def triples(self):
         owner_id = self.owner.identifier()
+        ident = self.identifier()
         try:
             for x in self.v:
-                yield (owner_id, self.link, R.Literal(x))
+                yield (ident, self.rdf_namespace['owner'], owner_id)
+                yield (owner_id, self.rdf_namespace['value'], R.Literal(x))
+                yield (owner_id, R.RDF['type'], self.linkName)
         except:
             if self.v:
                 yield (owner_id, self.link, R.Literal(self.v))
