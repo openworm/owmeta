@@ -8,12 +8,9 @@
 
 """
 
-import sqlite3
-from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
-from rdflib.plugins.sparql import prepareQuery
-from rdflib.namespace import RDFS
+import rdflib as R
 import PyOpenWorm
-from PyOpenWorm import DataObject
+from PyOpenWorm import DataObject, SimpleProperty
 from string import Template
 import neuroml
 
@@ -63,6 +60,8 @@ class Cell(DataObject):
     def __init__(self, name, lineageName=False, conf=False):
         DataObject.__init__(self,conf=conf)
         self._name = name
+        self.lineageName = SimpleProperty(self, "lineageName")
+        self.name = SimpleProperty(self, "name")
         self._lineageName = lineageName
 
     def lineageName(self, lineageName=False):
@@ -153,7 +152,7 @@ class Cell(DataObject):
     def triples(self):
         ident = self.identifier()
         yield (ident, R.RDF['type'], self.rdf_type)
-        if self._lineageName:
+        if self.lineageName.triples():
             yield (ident, self.rdf_namespace['lineageName'], R.Literal(self._lineageName))
         yield (ident, self.rdf_namespace['name'], R.Literal(self._name))
 

@@ -1,5 +1,5 @@
 import rdflib as R
-from PyOpenWorm import DataUser, Configure
+from PyOpenWorm import DataUser
 
 class X():
    pass
@@ -10,6 +10,18 @@ class IDError(BaseException):
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
 # connected by an actual node
+def _bnode_to_var(x):
+    return "?" + x
+
+def _rdf_literal_to_n3(x):
+    if isinstance(x,R.BNode):
+        return _bnode_to_var(x)
+    else:
+        return x.n3()
+
+def _triples_to_bgp(trips):
+    g = "\n".join(" ".join(_rdf_literal_to_n3(x) for x in y) for y in trips)
+    return g
 
 class DataObject(DataUser):
     """ An object backed by the database """
@@ -38,8 +50,16 @@ class DataObject(DataUser):
         """ Should be overridden by derived classes to return appropriate triples
         :return: An iterable of triples
         """
+        # The default implementation, gives the object no representation or the one
+        # explicitly given in __init__
         for x in self._triples:
             yield x
+
+    def graph_pattern(self):
+        """ Get the graph pattern for this object.
+        It should be as simple as converting the result of triples into a BGP
+        """
+        return _triples_to_bgp(self.triples())
 
     def _n3(self):
         return u".\n".join( x[0].n3() + x[1].n3()  + x[2].n3() for x in self.triples())
@@ -114,6 +134,23 @@ class Property(DataObject):
         """
         DataObject.__init__(self, owner, conf=conf)
         self.owner = owner
+        if not hasattr(self.owner,'properties'):
+            self.owner.properties = [self]
+        else:
+            self.owner.properties.append(self)
+
+        # XXX: Assuming that nothing else will come in and reset
+        # triples() without preserving this one!
+        if not hasattr(self.owner,'triples'):
+            self.owner.triples = self.triples
+        else:
+            def more_triples():
+                for x in self.owner.triples():
+                    yield x
+                for x in self.triples():
+                    yield x
+            self.owner.triples = more_triples()
+
         # XXX: Default implementation is a box for a value
         self._value = False
 
@@ -136,7 +173,7 @@ class SimpleProperty(Property):
     """ A property that has just one link to a literal value """
 
     def __init__(self,owner,linkName,conf=False):
-        if conf==False:
+        if conf == False:
             conf = owner.conf
         Property.__init__(self,owner,conf=conf)
         self.v = False
@@ -146,7 +183,8 @@ class SimpleProperty(Property):
         if self.v:
             return self.v
         else:
-            qres = self.rdf.query("Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3()))
+            print "self.rdf = ", self.rdf
+            qres = self.conf['rdf.graph'].query("Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3()))
             return [str(x['x']) for x in qres]
 
     def set(self,v):
