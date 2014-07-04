@@ -13,7 +13,7 @@ from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.plugins.sparql import prepareQuery
 from rdflib.namespace import RDFS
 import PyOpenWorm
-from PyOpenWorm import DataObject
+from PyOpenWorm import DataObject,SimpleProperty
 from string import Template
 import neuroml
 
@@ -59,56 +59,26 @@ WHERE {
   }
 }
             """)
+def _dict_merge(d1,d2):
+    from itertools import chain
+    dict(chain(d1.items(), d2.items()))
+
 class Cell(DataObject):
-    def __init__(self, name, lineageName=False, conf=False):
+    def __init__(self, name=False, lineageName=False, conf=False):
         DataObject.__init__(self,conf=conf)
         self._name = name
-        self._lineageName = lineageName
-
-    def lineageName(self, lineageName=False):
+        self.lineageName = SimpleProperty(self,'lineageName')
+        self.name = SimpleProperty(self,'name')
+        if name:
+            self.name(name)
         if lineageName:
-            self._lineageName = lineageName
-        else:
-            if not self._lineageName:
-                q = """select ?label {
-                    # Get the lineage name, a string
-                    <%s> <%s> ?label
-                }
-                """ % (self.identifier(), self.rdf_namespace['lineageName'])
-
-                qres = self['rdf.graph'].query(q, initNs=ns)
-                for r in qres:
-                    return r['label']
-            else:
-                return self._lineageName
+            self.lineageName(lineageName)
 
     def identifier(self):
         """ A cell can be identified by its name or lineage name """
-        if not self._id:
-            if self._lineageName:
-                q = """select ?x {
-                    # Get the lineage name, a string
-                    ?x <%s> '%s'
-                }
-                """ % (self.rdf_namespace['lineageName'], self._lineageName)
-
-                qres = self.rdf.query(q, initNs=ns)
-                for r in qres:
-                    self._id = r['x']
-                    break
-            elif self._name:
-                q = """select ?x {
-                    ?x <%s> '%s'
-                }
-                """ % (self.rdf_namespace['adultName'], self._name)
-
-                qres = self['rdf.graph'].query(q, initNs=ns)
-                for r in qres:
-                    self._id = r['x']
-                    break
-            if not self._id:
-                # What identifier should we return if there isn't a good one?
-                raise PyOpenWorm.IDError(self)
+        if self._name:
+            # What identifier should we return if there isn't a good one?
+            self._id = self.make_identifier(self._name)
         return self._id
 
     def morphology(self):
@@ -150,9 +120,20 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
+    def query_pattern(self):
+        lineage_query, name_query = (self.lineageName.query_pattern(), self.name.query_pattern())
+        print lineage_query, name_query
+        q="{ OPTIONAL { %s } %s }" % (lineage_query[0],name_query[0])
+        variables = list(lineage_query[1])+list(name_query[1])
+        bindings = _dict_merge(lineage_query[2],name_query[2])
+        g = (q,variables,bindings)
+        return g
+
     def triples(self):
-        ident = self.identifier()
-        yield (ident, R.RDF['type'], self.rdf_type)
+        try:
+            ident = self.identifier()
+        except PyOpenWorm.IDError:
+            ident = R.BNode()
         if self._lineageName:
             yield (ident, self.rdf_namespace['lineageName'], R.Literal(self._lineageName))
         yield (ident, self.rdf_namespace['name'], R.Literal(self._name))
