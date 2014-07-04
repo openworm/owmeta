@@ -1,5 +1,6 @@
 import rdflib as R
 from PyOpenWorm import DataUser, Configure
+import PyOpenWorm
 
 class X():
    pass
@@ -16,13 +17,15 @@ class DataObject(DataUser):
     # Must resolve, somehow, to a set of triples that we can manipulate
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
+
     def __init__(self,ident=False,triples=[],conf=False):
         DataUser.__init__(self,conf=conf)
         self._id = ident
         self._triples = triples
         self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
-
+    def __eq__(self,other):
+        return (self.identifier() == other.identifier())
     def identifier(self):
         """
         The identifier for this object in the rdf graph
@@ -33,6 +36,10 @@ class DataObject(DataUser):
         if not self._id:
             raise IDError(self)
         return R.URIRef(self._id)
+
+    def make_identifier(self, data):
+        import hashlib
+        return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
     def triples(self):
         """ Should be overridden by derived classes to return appropriate triples
@@ -50,6 +57,27 @@ class DataObject(DataUser):
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
         self.add_statements(self.triples())
+
+    @classmethod
+    def object_from_id(self,identifier,rdf_type=False):
+        """ Load an object from the database using its type tag """
+        # We should be able to extract the type from the identifier
+        cn = self._extract_class_name(identifier)
+        if cn is not None:
+            cls = getattr(PyOpenWorm,cn)
+            b = cls()
+            b.identifier = lambda : identifier
+            return b
+
+    @classmethod
+    def _extract_class_name(self,uri):
+        from urlparse import urlparse
+        u = urlparse(uri)
+        print u
+        x = u.path.split('/')
+        if x[1] == 'entities':
+            print x
+            return x[2]
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -114,6 +142,11 @@ class Property(DataObject):
         """
         DataObject.__init__(self, owner, conf=conf)
         self.owner = owner
+        if hasattr(self.owner,'properties'):
+            self.owner.properties.append(self)
+        else:
+            self.owner.properties=[self]
+
         # XXX: Default implementation is a box for a value
         self._value = False
 
@@ -141,12 +174,14 @@ class SimpleProperty(Property):
         Property.__init__(self,owner,conf=conf)
         self.v = False
         self.link = owner.rdf_namespace[linkName]
+        self.linkname = linkName
 
     def get(self):
         if self.v:
             return self.v
         else:
-            qres = self.rdf.query("Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3()))
+            query = "Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3())
+            qres = self.rdf.query(query)
             return [str(x['x']) for x in qres]
 
     def set(self,v):
@@ -156,7 +191,7 @@ class SimpleProperty(Property):
             self.v = [v]
 
     def identifier(self):
-        return self.conf['molecule_name'](self.v)
+        return self.make_identifier((self.linkname,self.v))
 
     def triples(self):
         owner_id = self.owner.identifier()

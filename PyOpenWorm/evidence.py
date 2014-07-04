@@ -27,6 +27,77 @@ def _doi_uri_to_doi(uri):
     # the doi from a url needs to be decoded
     doi = unquote(doi)
     return doi
+class Asserts(Property):
+    """
+    State that this Evidence asserts that the relationship is true.
+
+    Example::
+
+        import bibtex
+        bt = bibtex.parse("my.bib")
+        n1 = Neuron("AVAL")
+        n2 = Neuron("DA3")
+        c = Connection(pre=n1,post=n2,class="synapse")
+        e = Evidence(bibtex=bt['white86'])
+        e.asserts(c)
+
+    Other methods return objects which asserts accepts.
+
+    Example::
+
+        n1 = Neuron("AVAL")
+        r = n1.neighbor("DA3")
+        e = Evidence(bibtex=bt['white86'])
+        e.asserts(r)
+    """
+    def __init__(self,owner):
+        Property.__init__(self,owner)
+        self._statements = []
+
+    def get(self):
+        # Query for the evidence asserted by this
+        query_stmt = "select ?g where { %s %s ?g }" % (self.owner.identifier().n3(), self.owner.rdf_namespace['asserts'].n3())
+        # This returns us a bunch of triples...how do we get the objects that they represent?
+        # Feed them back into a graph!
+        #
+        # Once we feed them into a graph, we can query on that (put this new graph in the configuration for the object)
+        #
+        for x in self.conf['rdf.graph'].query(query_stmt):
+            g = self.object_from_id(x[0])
+            if g is not None:
+                yield g
+
+    def set(self,stmt):
+        assert(isinstance(stmt,Relationship))
+        self._statements.append(stmt)
+
+    def identifier(self):
+        return self.rdf_type
+
+    def triples(self):
+        ident = self.owner.identifier()
+        for x in self._statements:
+            t = (ident, self.owner.rdf_namespace['asserts'], x.identifier())
+            yield t
+
+def _url_request(url,headers={}):
+    import urllib2 as U
+    try:
+        r = U.Request(url, headers=headers)
+        s = U.urlopen(r)
+        return s
+    except U.HTTPError, e:
+        return ""
+    except U.URLError, e:
+        return ""
+
+def _json_request(url):
+    import json
+    headers = {'Content-Type': 'application/json'}
+    try:
+        return json.load(_url_request(url,headers))
+    except BaseException, e:
+        return {}
 
 class Evidence(DataObject):
     def __init__(self, conf=False, **source):
@@ -42,13 +113,12 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf)
         self._fields = dict()
-        self._statements = []
         self.author = SimpleProperty(self,'author')
         self.year = SimpleProperty(self,'year')
         self.title = SimpleProperty(self,'title')
+        self.asserts = Asserts(self)
 
         #XXX: I really don't like putting these in two places
-        self.properties = [self.author,self.title,self.year]
         for k in source:
             if k in ('pubmed', 'pmid'):
                 self._fields['pmid'] = source[k]
@@ -78,50 +148,10 @@ class Evidence(DataObject):
         # Confirm that pmid contains a valid pubmed id
         self._fields[k] = v
 
-    def asserts(self,stmt=False):
-        """
-        State that this Evidence asserts that the relationship is true.
-
-        Example::
-
-            import bibtex
-            bt = bibtex.parse("my.bib")
-            n1 = Neuron("AVAL")
-            n2 = Neuron("DA3")
-            c = Connection(pre=n1,post=n2,class="synapse")
-            e = Evidence(bibtex=bt['white86'])
-            e.asserts(c)
-
-        Other methods return objects which asserts accepts.
-
-        Example::
-
-            n1 = Neuron("AVAL")
-            r = n1.neighbor("DA3")
-            e = Evidence(bibtex=bt['white86'])
-            e.asserts(r)
-        """
-        if stmt:
-            assert(isinstance(stmt,Relationship))
-            self._statements.append(stmt)
-        else:
-            # Query for the evidence asserted by this
-            query_stmt = "select ?s ?p ?o where { graph ?g { ?s ?p ?o } . %s %s ?g }" % (self.identifier().n3(), self.rdf_namespace['asserts'].n3())
-            # This returns us a bunch of triples...how do we get the objects that they represent?
-            # Feed them back into a graph!
-            #
-            # Once we feed them into a graph, we can query on that (put this new graph in the configuration for the object)
-            #
-            for x in self.conf['rdf.graph'].query(query_stmt):
-                yield x
-
     def triples(self):
-        ident = self.identifier()
         for x in self.properties:
             for y in x.triples():
                 yield y
-        for x in self._statements:
-            yield (ident, self.rdf_namespace['asserts'], x.identifier())
 
     def identifier(self):
         """
@@ -130,27 +160,18 @@ class Evidence(DataObject):
         pubmed id. This is because manual addition of fields is allowed: an 'asserts' may
         be saying something in addition to the article which is referenced by the pmid.
         """
-        return self.conf['molecule_name']("".join(x.identifier() for x in self.properties))
-
+        evidence_name = self.make_identifier("".join(x.identifier() for x in self.properties))
+        return evidence_name
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
     # TODO: Provide a way to override modification of already set values.
     def _wormbase_extract(self):
         #XXX: wormbase's REST API is pretty sparse in terms of data provided.
         #     Would be better off using AQL or the perl interface
-        # Extract data from wormabase
-        def wbRequest(ident,field):
-            import urllib2 as U
-            import json
-            headers = {'Content-Type': 'application/json'}
-            try:
-                r = U.Request("http://api.wormbase.org/rest/widget/paper/"+wbid+"/"+field, headers=headers)
-                s = U.urlopen(r)
-                return json.load(s)
-            except U.HTTPError, e:
-                return {}
         # _Very_ few of these have these fields filled in
         wbid = self._fields['wormbase']
+        def wbRequest(ident,field):
+            return _json_request("http://api.wormbase.org/rest/widget/paper/"+wbid+"/"+field)
         # get the author
         j = wbRequest(wbid, 'authors')
         if 'fields' in j:
@@ -172,15 +193,10 @@ class Evidence(DataObject):
     def _crossref_doi_extract(self):
         # Extract data from crossref
         def crRequest(doi):
-            import urllib2 as U2
-            import urllib as U
-            import json
-            headers = {'Content-Type': 'application/json'}
             data = {'q': doi}
             data_encoded = U.urlencode(data)
-            r = U2.Request('http://search.labs.crossref.org/dois?%s' % data_encoded , headers=headers)
-            s = U2.urlopen(r)
-            return json.load(s)
+            return _json_request('http://search.labs.crossref.org/dois?%s' % data_encoded)
+
         doi = self._fields['doi']
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
@@ -201,23 +217,19 @@ class Evidence(DataObject):
                 self.year(r['year'])
 
     def _pubmed_extract(self):
-        from lxml import etree as ET
         def pmRequest(pmid):
-            import urllib2 as U2
+            from lxml import etree as ET
             base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
             # XXX: There's more data in esummary.fcgi?, but I don't know how to parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
-
-            r = U2.Request(url)
-            s = U2.urlopen(r)
-            return s
+            return ET.parse(_url_request(url))
 
         pmid = self._fields['pmid']
         if pmid[:4] == 'http':
             # Probably a uri, right?
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
-        tree = ET.parse(pmRequest(pmid))
+        tree = pmRequest(pmid)
         self.author([x.text for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item')])
 
     def __eq__(self, other):
