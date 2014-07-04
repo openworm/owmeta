@@ -167,7 +167,15 @@ class CellTest(_DataTest):
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
         c = Cell("ADAL",conf=self.config)
-        self.assertEqual(c.lineageName(), ["AB plapaaaapp"])
+        c.lineageName("AB plapaaaapp")
+        self.assertEqual(["AB plapaaaapp"], c.lineageName())
+
+    def test_lineageName_database(self):
+        """ Test that we can retrieve the lineage name """
+        c = Cell("ADAL",conf=self.config)
+        c.lineageName("AB plapaaaapp")
+        print str(c.query_pattern()[0])
+        self.assertEqual(["AB plapaaaapp"], c.lineageName())
 
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
@@ -475,10 +483,8 @@ class EvidenceTest(_DataTest):
         r = Relationship(graph=g)
         e.asserts(r)
         r.identifier = lambda : r.make_identifier("test")
-        print list(e.triples())
         e.save()
         l = list(e.asserts())
-        print l
         self.assertIn(r,l)
 
 class RDFLibTest(unittest.TestCase):
