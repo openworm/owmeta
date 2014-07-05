@@ -18,9 +18,8 @@ from PyOpenWorm import Cell, DataUser, Configure, propertyTypes
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class Neuron(Cell):
-    def __init__(self, name=False, conf=False, lineageName=False):
-        Cell.__init__(self,name,conf=conf)
-        self._name = name
+    def __init__(self, **kwargs):
+        Cell.__init__(self,**kwargs)
         self.get_neighbors = self.neighbor
 
     def _write_out_db(self):
@@ -44,13 +43,6 @@ class Neuron(Cell):
             if 'GapJunction' in item[2]['synapse']:
                 count = count + 1
         return count
-
-    def identifier(self):
-        qres = self['rdf.graph'].query("SELECT ?node WHERE { ?node rdfs:label '%s' }" % self.name())
-        ident = None
-        for r in qres:
-            ident = r['node']
-        return ident
 
     def Syn_degree(self):
         """Get the degree of a this neuron for chemical synapse edges only
@@ -107,14 +99,6 @@ class Neuron(Cell):
         :rtype: str
         """
         return self._type_networkX().lower()
-
-    def name(self):
-        """Get name of this neuron (e.g. AVAL)
-
-        :returns: the name
-        :rtype: str
-        """
-        return self._name
 
     def receptors(self):
         """Get receptors associated with this neuron

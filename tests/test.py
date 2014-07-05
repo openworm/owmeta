@@ -39,6 +39,7 @@ class _DataTest(unittest.TestCase):
         Configureable.default = self.config
         self.config.openDatabase()
     def tearDown(self):
+        print 'closing the database'
         self.config.closeDatabase()
 
 class WormTest(_DataTest):
@@ -166,27 +167,20 @@ class CellTest(_DataTest):
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
-        c = Cell("ADAL",conf=self.config)
+        c = Cell(name="ADAL",conf=self.config)
         c.lineageName("AB plapaaaapp")
-        self.assertEqual(["AB plapaaaapp"], c.lineageName())
-
-    def test_lineageName_database(self):
-        """ Test that we can retrieve the lineage name """
-        c = Cell("ADAL",conf=self.config)
-        c.lineageName("AB plapaaaapp")
-        print str(c.query_pattern()[0])
         self.assertEqual(["AB plapaaaapp"], c.lineageName())
 
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
-        c = Cell("ADAR",conf=self.config)
+        c = Cell(name="ADAR",conf=self.config)
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
 
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
-        n = Neuron('ADAL', conf=self.config)
+        n = Neuron(name='ADAL', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
@@ -206,12 +200,12 @@ class CellTest(_DataTest):
 class DataObjectTest(_DataTest):
 
     def test_DataUser(self):
-        do = DataObject(conf=self.config)
+        do = DataObject()
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_identifier(self):
         """ Test that we can set and return an identifier """
-        do = DataObject(conf=self.config,ident="http://example.org")
+        do = DataObject(ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
 
     def test_uploader(self):
@@ -231,7 +225,7 @@ class DataObjectTest(_DataTest):
     def test_upload_date(self):
         """ Make sure that we're marking a statement with it's upload date """
         g = make_graph(20)
-        r = DataObject(triples=g,conf=self.config)
+        r = DataObject(triples=g)
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
@@ -256,7 +250,7 @@ class DataUserTest(_DataTest):
     def test_init_config_no_Data(self):
         """ Should fail if given a non-Data configuration """
         with self.assertRaises(BadConf):
-            DataUser(self.config_no_data)
+            DataUser(conf=self.config_no_data)
 
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
@@ -321,7 +315,7 @@ class DataUserTest(_DataTest):
 class NeuronTest(_DataTest):
     def setUp(self):
         _DataTest.setUp(self)
-        self.neur = lambda x : Neuron(x,self.config)
+        self.neur = lambda x : Neuron(name=x,conf=self.config)
 
     def test_Cell(self):
         do = self.neur('BDUL')
@@ -364,7 +358,7 @@ class NeuronTest(_DataTest):
 class NetworkTest(_DataTest):
     def setUp(s):
         _DataTest.setUp(s)
-        s.net = Network(s.config)
+        s.net = Network(conf=s.config)
 
     def test_identifier(self):
         ident = self.net.identifier()
@@ -643,9 +637,10 @@ class ConnectionTest(_DataTest):
 
     def test_init(self):
         """Initialization with positional parameters"""
-        c = Connection(1,2,3,4,5)
-        self.assertIsInstance(c.pre_cell, Neuron)
-        self.assertIsInstance(c.post_cell, Neuron)
+        c = Connection('AVAL','ADAR',3,'send','Serotonin')
+        c.save()
+        self.assertIsInstance(c.pre_cell()[0], Neuron)
+        self.assertIsInstance(c.post_cell()[0], Neuron)
         self.assertEqual([3], c.number())
         self.assertEqual([], c.syntype())
         self.assertEqual([5], c.synclass())
@@ -655,13 +650,13 @@ class ConnectionTest(_DataTest):
             Connection(1,2,"gazillion",4,5)
 
     def test_init_with_neuron_objects(self):
-        n1 = Neuron("AVAL",self.config)
-        n2 = Neuron("PVCR",self.config)
+        n1 = Neuron(name="AVAL")
+        n2 = Neuron(name="PVCR")
         c = Connection(n1,n2)
 
     def test_init_with_neuron_objects(self):
-        n1 = Neuron("AVAL",self.config)
-        n2 = Neuron("PVCR",self.config)
+        n1 = Neuron(name="AVAL")
+        n2 = Neuron(name="PVCR")
         c = Connection(n1,n2)
 
     def test_load1(self):
