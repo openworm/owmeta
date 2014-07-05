@@ -61,8 +61,8 @@ def _dict_merge(d1,d2):
     dict(chain(d1.items(), d2.items()))
 
 class Cell(DataObject):
-    def __init__(self, name=False, lineageName=False, conf=False):
-        DataObject.__init__(self,conf=conf)
+    def __init__(self, name=False, lineageName=False, **kwargs):
+        DataObject.__init__(self,**kwargs)
         self._name = name
         self.lineageName = SimpleProperty(self,'lineageName')
         self.name = SimpleProperty(self,'name')
@@ -76,8 +76,9 @@ class Cell(DataObject):
 
         if self._name:
             # What identifier should we return if there isn't a good one?
-            self._id = self.make_identifier(self._name)
-        return self._id
+            return self.make_identifier(self._name)
+        else:
+            return DataObject.identifier(self)
 
     def morphology(self):
         morph_name = "morphology_" + str(self.name())
@@ -118,22 +119,12 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
-    def query_pattern(self):
-        lineage_query, name_query = (self.lineageName.query_pattern(), self.name.query_pattern())
-        print lineage_query, name_query
-        q="{ OPTIONAL { %s } %s }" % (lineage_query[0],name_query[0])
-        variables = list(lineage_query[1])+list(name_query[1])
-        bindings = _dict_merge(lineage_query[2],name_query[2])
-        g = (q,variables,bindings)
-        return g
-
     def triples(self):
         ident = self.identifier()
         yield (ident, R.RDF['type'], self.rdf_type)
-        yield (ident, self.rdf_namespace['name'], R.Literal(self._name))
+        for x in DataObject.triples(self):
+            yield x
 
-    def name(self):
-        return self._name
     #def rdf(self):
 
     #def peptides(self):
