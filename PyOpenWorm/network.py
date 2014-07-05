@@ -37,7 +37,7 @@ class Network(DataObject):
         :returns: Corresponding neuron to the name given
         :rtype: PyOpenWorm.Neuron
         """
-        n = PyOpenWorm.Neuron(name,self.conf)
+        n = PyOpenWorm.Neuron(name=name,conf=self.conf)
         if check:
             assert(n.check_exists())
         return n

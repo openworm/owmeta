@@ -11,14 +11,14 @@ class X():
 def _bnode_to_var(x):
     return "?" + x
 
-def _rdf_literal_to_n3(x):
+def _rdf_literal_to_gp(x):
     if isinstance(x,R.BNode):
         return _bnode_to_var(x)
     else:
         return x.n3()
 
 def _triples_to_bgp(trips):
-    g = "\n".join(" ".join(_rdf_literal_to_n3(x) for x in y) for y in trips)
+    g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
     return g
 
 class DataObject(DataUser):
@@ -27,8 +27,8 @@ class DataObject(DataUser):
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
 
-    def __init__(self,ident=False,triples=[],conf=False):
-        DataUser.__init__(self,conf=conf)
+    def __init__(self,ident=False,triples=[],**kwargs):
+        DataUser.__init__(self,**kwargs)
         if ident:
             self._id = ident
         else:
@@ -38,9 +38,10 @@ class DataObject(DataUser):
             import random
             import struct
             v = struct.pack("=f",random.random()).encode("hex")
-            self._id = BNode(self.__class__.__name__ + v)
+            self._id = R.BNode(self.__class__.__name__ + v)
 
         self._triples = triples
+        self.properties = []
         self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
     def __eq__(self,other):
@@ -52,7 +53,7 @@ class DataObject(DataUser):
         Only one identifier can be returned. If more than one could be returned based
         on the object's characteristics, one is returned randomly!
         """
-        return R.URIRef(self._id)
+        return self._id
 
     def make_identifier(self, data):
         import hashlib
@@ -64,8 +65,12 @@ class DataObject(DataUser):
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
+        yield (self.identifier(), R.RDF['type'], self.rdf_type)
         for x in self._triples:
             yield x
+        for x in self.properties:
+            for y in x.triples():
+                yield y
 
     def graph_pattern(self):
         """ Get the graph pattern for this object.
@@ -113,11 +118,8 @@ class DataObject(DataUser):
         # Steps:
         # - Do the query/queries
         # - Create objects from the bound variables
-    def query_pattern(self):
-        """ Return the pattern, variables to extract, and bindings for other variables in order to load this object from the graph
-        :return (pattern_string, variables, bindings):
-        """
-        raise NotImplementedError()
+        gp = self.graph_pattern()
+        return self.conf['rdf.graph'].query("Select distinct * where { "+ gp +" }")
 
     def retract(self):
         """ Remove this object from the data store. """
@@ -170,24 +172,9 @@ class Property(DataObject):
         """ Initialize with the owner of this property.
         The owner has a distinct role in each subclass of Property
         """
-        DataObject.__init__(self, owner, conf=conf)
+        DataObject.__init__(self, conf=conf)
         self.owner = owner
-        if not hasattr(self.owner,'properties'):
-            self.owner.properties = [self]
-        else:
-            self.owner.properties.append(self)
-
-        # XXX: Assuming that nothing else will come in and reset
-        # triples() without preserving this one!
-        if not hasattr(self.owner,'triples'):
-            self.owner.triples = self.triples
-        else:
-            def more_triples():
-                for x in self.owner.triples():
-                    yield x
-                for x in self.triples():
-                    yield x
-            self.owner.triples = more_triples()
+        self.owner.properties.append(self)
 
         # XXX: Default implementation is a box for a value
         self._value = False
@@ -203,55 +190,53 @@ class Property(DataObject):
     def __call__(self,*args,**kwargs):
         if len(args) > 0 or len(kwargs) > 0:
             self.set(*args,**kwargs)
-            self.save()
             return self
         else:
             return self.get()
     # Get the property (a relationship) itself
 class SimpleProperty(Property):
-    """ A property that has just one link to a literal value """
+    """ A property that has just one link to a literal or DataObject """
 
     def __init__(self,owner,linkName,conf=False):
         if conf == False:
             conf = owner.conf
         Property.__init__(self,owner,conf=conf)
-        self.v = False
+        self.v = []
         self.link = owner.rdf_namespace[linkName]
-        self.linkname = linkName
+        self.linkName = linkName
 
     def get(self):
         if self.v:
             return self.v
         else:
-            query = "Select ?x where { %s %s ?x } " % (self.owner.identifier().n3(), self.link.n3())
-            qres = self.rdf.query(query)
-            return [str(x['x']) for x in qres]
+            gp = self.owner.graph_pattern()
+            var = "?"+self.linkName
+            qres = self.rdf.query("select distinct " +  var + " where { " + gp + " }")
+            r = [x[0] for x in qres if not isinstance(x[0],R.BNode)]
+            return r
 
     def set(self,v):
         if hasattr(v,'__iter__'):
             self.v = v
         else:
             self.v = [v]
-    def query_pattern(self):
-        q = """{ ?p %s ?v
-                 ; %s ?l }
-            """ % (self.rdf_namespace['value'], self.rdf_namespace['type'])
-        variables = ("v",)
-        bindings = {"l":self.linkname}
-        return (q,variables,bindings)
-
-    def identifier(self):
-        return self.make_identifier((self.linkname,self.v))
 
     def triples(self):
         owner_id = self.owner.identifier()
         ident = self.identifier()
-        try:
+        yield (ident, self.rdf_namespace['owner'], owner_id)
+        yield (ident, R.RDF['type'], self.link)
+        if len(self.v) > 0:
             for x in self.v:
-                yield (ident, self.rdf_namespace['owner'], owner_id)
-                yield (owner_id, self.rdf_namespace['value'], R.Literal(x))
-                yield (owner_id, R.RDF['type'], self.linkName)
-        except:
-            if self.v:
-                yield (owner_id, self.link, R.Literal(self.v))
+                if isinstance(x, DataObject):
+                    yield (ident, self.rdf_namespace['value'], x.identifier())
+                    for z in x.triples():
+                        yield z
+                else:
+                    yield (ident, self.rdf_namespace['value'], R.Literal(x))
+        else:
+            yield (ident, self.rdf_namespace['value'], R.BNode(self.linkName))
+
+    def __str__(self):
+        return str(self.linkName + "=" + str(self.v))
 
