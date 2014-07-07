@@ -1,7 +1,7 @@
 import unittest
 from PyOpenWorm import *
 
-TestConfig = Configure.open("tests/test.conf")
+TestConfig = Data.open("tests/test.conf")
 Configureable.default = TestConfig
 
 class IntegrationTest(unittest.TestCase):
@@ -44,6 +44,10 @@ class IntegrationTest(unittest.TestCase):
         # look for all of the evidence for the connection 'c'
         for x in e.load():
             print x.author()
+    def test_get_synclasses(self):
+        c = Connection()
+        for x in c.synclass():
+            print x
 
 # XXX: OTHER TESTS TO DO
 # reference a synaptic connection

@@ -15,7 +15,7 @@ class _C(ConfigValue):
         return str(self.v)
 
 
-class BadConf(BaseException):
+class BadConf(Exception):
     pass
 
 class _link(ConfigValue):

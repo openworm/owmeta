@@ -112,6 +112,7 @@ class DataUser(Configureable):
                     break
             if graph_name:
                 s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
+                print "saving ", s
             else:
                 s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
             self.conf['rdf.graph'].update(s)
