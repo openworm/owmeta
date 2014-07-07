@@ -59,6 +59,3 @@ class Connection(Relationship):
 
     def __str__(self):
         return "Connection from %s to %s (%s times, type: %s, neurotransmitter: %s)"%(self.pre_cell, self.post_cell, self.number, self.syntype, self.synclass)
-
-def _dict_to_sparql_binds(d):
-    return "\n".join('filter(' + d[x] + ' = ?' + x + ')' for x in d)

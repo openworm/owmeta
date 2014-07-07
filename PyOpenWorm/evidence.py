@@ -27,58 +27,6 @@ def _doi_uri_to_doi(uri):
     # the doi from a url needs to be decoded
     doi = unquote(doi)
     return doi
-class Asserts(Property):
-    """
-    State that this Evidence asserts that the relationship is true.
-
-    Example::
-
-        import bibtex
-        bt = bibtex.parse("my.bib")
-        n1 = Neuron("AVAL")
-        n2 = Neuron("DA3")
-        c = Connection(pre=n1,post=n2,class="synapse")
-        e = Evidence(bibtex=bt['white86'])
-        e.asserts(c)
-
-    Other methods return objects which asserts accepts.
-
-    Example::
-
-        n1 = Neuron("AVAL")
-        r = n1.neighbor("DA3")
-        e = Evidence(bibtex=bt['white86'])
-        e.asserts(r)
-    """
-    def __init__(self,owner):
-        Property.__init__(self,owner)
-        self._statements = []
-
-    def get(self):
-        # Query for the evidence asserted by this
-        query_stmt = "select ?g where { %s %s ?g }" % (self.owner.identifier().n3(), self.owner.rdf_namespace['asserts'].n3())
-        # This returns us a bunch of triples...how do we get the objects that they represent?
-        # Feed them back into a graph!
-        #
-        # Once we feed them into a graph, we can query on that (put this new graph in the configuration for the object)
-        #
-        for x in self.conf['rdf.graph'].query(query_stmt):
-            g = self.object_from_id(x[0])
-            if g is not None:
-                yield g
-
-    def set(self,stmt):
-        assert(isinstance(stmt,Relationship))
-        self._statements.append(stmt)
-
-    def identifier(self):
-        return self.rdf_type
-
-    def triples(self):
-        ident = self.owner.identifier()
-        for x in self._statements:
-            t = (ident, self.owner.rdf_namespace['asserts'], x.identifier())
-            yield t
 
 def _url_request(url,headers={}):
     import urllib2 as U
@@ -116,7 +64,7 @@ class Evidence(DataObject):
         DatatypeProperty('author',owner=self)
         DatatypeProperty('year',owner=self)
         DatatypeProperty('title',owner=self)
-        self.asserts = Asserts(self)
+        ObjectProperty('asserts',owner=self)
 
         #XXX: I really don't like putting these in two places
         for k in source:
