@@ -346,10 +346,9 @@ class NeuronTest(_DataTest):
 
     def test_neighbor(self):
         n = self.neur('AVAL')
-        n.neighbor(self.neur('PVCR'))
+        n.neighbor(self.neur('PVCL'))
         n.save()
-        for x in self.neur('AVAL').neighbor():
-            print x
+        self.assertIn(self.neur('PVCL'),[x[0] for x in self.neur('AVAL').neighbor()])
 
     def test_init_from_lineage_name(self):
         c = Neuron(lineageName="AB plapaaaap",name="ADAL")
