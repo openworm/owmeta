@@ -24,7 +24,7 @@ __author__ = 'Stephen Larson'
 
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
-from .dataObject import DataObject, Property, SimpleProperty
+from .dataObject import *
 from .cell import Cell
 from .network import Network
 from .neuron import Neuron
