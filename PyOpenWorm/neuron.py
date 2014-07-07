@@ -11,15 +11,44 @@
 import sqlite3
 from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
 from rdflib.namespace import RDFS
-import PyOpenWorm
+import PyOpenWorm as P
 from PyOpenWorm import Cell, DataUser, Configure, propertyTypes
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
+class Neighbor(P.Property):
+    """Get a list of neighboring neurons.
+
+       :param type: What kind of junction to look for.
+                    0=all, 1=gap junctions only, 2=all chemical synapses
+                    3=incoming chemical synapses, 4=outgoing chemical synapses
+       :returns: a list of neuron names
+       :rtype: List
+    """
+    def __init__(self,**kwargs):
+        P.Property.__init__(self,**kwargs)
+        self._conns = []
+
+    def get(self,**kwargs):
+        c = P.Connection(pre_cell=self.owner,**kwargs)
+        for r in c.load():
+            yield r.post_cell()
+
+    def set(self, other, **kwargs):
+        c = P.Connection(pre_cell=self,post_cell=other,**kwargs)
+        self._conns.append(c)
+        # should just save the triples for saving later...
+
+    def triples(self):
+        for c in self._conns:
+            for x in c.triples():
+                yield x
+
 class Neuron(Cell):
     def __init__(self, **kwargs):
         Cell.__init__(self,**kwargs)
+        self.neighbor = Neighbor(owner=self)
         self.get_neighbors = self.neighbor
 
     def _write_out_db(self):
@@ -106,20 +135,21 @@ class Neuron(Cell):
         :returns: a list of all known receptors
         :rtype: list
         """
-
-        qres = self['rdf.graph'].query(
-          """SELECT ?objLabel     #we want to get out the labels associated with the objects
+        q = """SELECT ?objLabel     #we want to get out the labels associated with the objects
            WHERE {
                     #we are looking first for the node that is the anchor of
                     # all information about the specified neuron
-              ?node ?p '"""+self.name()+"""' .
+              ?node ?p ?name .
                     # having identified that node, here we match an object
                     #  associated with the node via the 'receptor' property
                     #  (number 361)
               ?node <http://openworm.org/entities/361> ?object .
                     #for the object, look up their plain text label.
-              ?object rdfs:label ?objLabel
-            }""")
+              ?object rdfs:label ?objLabel .
+              FILTER( ?name in ("""+ ", ".join("'%s'" % x for x in self.name()) + """) )
+            }"""
+        print q
+        qres = self['rdf.graph'].query(q)
 
         receptors = []
         for r in qres.result:
@@ -231,34 +261,6 @@ class Neuron(Cell):
         return ref
 
     # Directed graph. Getting accessible _from_ this node
-
-    def neighbor(self, type=0):
-        """Get a list of neighboring neurons.
-
-           :param type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
-           :returns: a list of neuron names
-           :rtype: List
-        """
-        qres = self.conf['rdf.graph'].query(
-            """
-            SELECT distinct ?n #we want to get out the labels associated with the objects
-            WHERE {
-                    ?node rdfs:label '"""+self.name()+"""' .
-                    {
-                        ?node <http://openworm.org/entities/356> ?p .
-                    }
-                    UNION
-                    {
-                        ?node <http://openworm.org/entities/357> ?p .
-                    }
-                    ?p rdfs:label ?n
-                  }
-            """)
-
-        for r in qres.result:
-            yield r[0]
 
     def get_incidents(self, type=0):
         for item in self['nx'].in_edges_iter(self.name(),data=True):

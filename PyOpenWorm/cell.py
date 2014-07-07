@@ -10,7 +10,7 @@
 
 import rdflib as R
 import PyOpenWorm
-from PyOpenWorm import DataObject, SimpleProperty
+from PyOpenWorm import *
 from string import Template
 import neuroml
 
@@ -64,8 +64,8 @@ class Cell(DataObject):
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
         self._name = name
-        self.lineageName = SimpleProperty(self,'lineageName')
-        self.name = SimpleProperty(self,'name')
+        DatatypeProperty('lineageName',owner=self)
+        DatatypeProperty('name',owner=self)
         if name:
             self.name(name)
         if lineageName:
