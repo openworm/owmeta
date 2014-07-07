@@ -36,9 +36,9 @@ class Neighbor(P.Property):
             yield r.post_cell()
 
     def set(self, other, **kwargs):
-        c = P.Connection(pre_cell=self,post_cell=other,**kwargs)
+        print other
+        c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
         self._conns.append(c)
-        # should just save the triples for saving later...
 
     def triples(self):
         for c in self._conns:
