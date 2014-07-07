@@ -142,12 +142,15 @@ class DataObject(DataUser):
                     # get the linkName
                     link_name = prop.linkName
                     # Check if the name is in the result
-                    if link_name in g:
+                    if link_name in g.labels:
                         new_object_prop = getattr(new_object, link_name)
-                        if isinstance(new_object_prop, DatatypeProperty):
-                            new_object_prop(qres[link_name])
-                        elif isinstance(new_object_prop, DatatypeProperty):
-                            new_object_prop(DataObject.object_from_id(ident=qres[link_name]))
+                        result_value = g[link_name]
+                        if result_value is not None:
+                            # XXX: Maybe should verify that it's an rdflib term?
+                            if isinstance(new_object_prop, DatatypeProperty):
+                                new_object_prop(result_value)
+                            elif isinstance(new_object_prop, ObjectProperty):
+                                new_object_prop(DataObject.object_from_id(result_value))
                     else:
                         our_value = getattr(self, link_name)
                         setattr(new_object, link_name, our_value)
