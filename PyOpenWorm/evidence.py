@@ -7,10 +7,10 @@ Created on Sun Feb 23 17:10:53 2014
 An Evidence object represents a single document
 
 """
-from PyOpenWorm import DataObject, Configure, Relationship, Property, SimpleProperty
+from PyOpenWorm import *
 import rdflib as R
 
-class EvidenceError(BaseException):
+class EvidenceError(Exception):
     pass
 
 def _pubmed_uri_to_pmid(uri):
@@ -113,9 +113,9 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf)
         self._fields = dict()
-        self.author = SimpleProperty(self,'author')
-        self.year = SimpleProperty(self,'year')
-        self.title = SimpleProperty(self,'title')
+        DatatypeProperty('author',owner=self)
+        DatatypeProperty('year',owner=self)
+        DatatypeProperty('title',owner=self)
         self.asserts = Asserts(self)
 
         #XXX: I really don't like putting these in two places

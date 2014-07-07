@@ -39,7 +39,6 @@ class _DataTest(unittest.TestCase):
         Configureable.default = self.config
         self.config.openDatabase()
     def tearDown(self):
-        print 'closing the database'
         self.config.closeDatabase()
 
 class WormTest(_DataTest):
@@ -342,12 +341,21 @@ class NeuronTest(_DataTest):
         self.assertEqual(self.neur('PHAL').type(),'sensory')
 
     def test_name(self):
-        self.assertEqual(self.neur('AVAL').name(),'AVAL')
-        self.assertEqual(self.neur('AVAR').name(),'AVAR')
+        self.assertEqual(self.neur('AVAL').name(), ['AVAL'])
+        self.assertEqual(self.neur('AVAR').name(), ['AVAR'])
+
+    def test_neighbor(self):
+        n = self.neur('AVAL')
+        n.neighbor(self.neur('PVCR'))
+        n.save()
+        for x in self.neur('AVAL').neighbor():
+            print x
 
     def test_init_from_lineage_name(self):
-        c = Neuron(lineageName="AB plapaaaap",conf=self.config)
-        self.assertEqual(c.name(), 'ADAL')
+        c = Neuron(lineageName="AB plapaaaap",name="ADAL")
+        c.save()
+        c = Neuron(lineageName="AB plapaaaap")
+        self.assertEqual(c.name(), ['ADAL'])
 
     def test_GJ_degree(self):
         self.assertEqual(self.neur('AVAL').GJ_degree(),60)
@@ -642,11 +650,11 @@ class ConnectionTest(_DataTest):
         self.assertIsInstance(c.pre_cell()[0], Neuron)
         self.assertIsInstance(c.post_cell()[0], Neuron)
         self.assertEqual([3], c.number())
-        self.assertEqual([], c.syntype())
-        self.assertEqual([5], c.synclass())
+        self.assertEqual(['send'], c.syntype())
+        self.assertEqual(['Serotonin'], c.synclass())
 
     def test_init_number_is_a_number(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             Connection(1,2,"gazillion",4,5)
 
     def test_init_with_neuron_objects(self):
