@@ -6,7 +6,7 @@
 # Other things!
 #
 # Works like Configure:
-# Inherit from the Data class to access data of all kinds (listed above)
+# Inherit from the DataUser class to access data of all kinds (listed above)
 
 import sqlite3
 import networkx as nx
@@ -15,15 +15,12 @@ from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 import hashlib
 import csv
 import urllib2
-from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, BNode
+from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
 import datetime
-from rdflib.namespace import XSD
-from itertools import izip_longest
 import os
 
-# encapsulates some of the data all of the parts need...
 class _B(ConfigValue):
     def __init__(self, f):
         self.v = False
@@ -50,12 +47,6 @@ class _UTC(datetime.tzinfo):
     def dst(self, dt):
         return ZERO
 utc = _UTC()
-
-class _Z(ConfigValue):
-    def __init__(self, c, n):
-        self.n = n
-    def get(self):
-        return c[n]
 
 propertyTypes = {"send" : 'http://openworm.org/entities/356',
         "Neuropeptide" : 'http://openworm.org/entities/354',
@@ -145,9 +136,6 @@ class DataUser(Configureable):
         Annotates the addition with uploader name, etc
         :param graph: An iterable of triples
         """
-        #uri = self.conf['molecule_name'](graph.identifier)
-
-        ns = self.conf['rdf.namespace']
         self._add_to_store(graph)
 
     def _reify(self,g,s):
