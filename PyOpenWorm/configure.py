@@ -23,7 +23,7 @@ class _link(ConfigValue):
         self.members = members
         self.conf = c
     def get(self):
-        return self.conf[members[0]]
+        return self.conf[self.members[0]]
 
 class Configure:
     # conf: is a configure instance to base this one on
@@ -45,11 +45,9 @@ class Configure:
         return self._properties[pname].get()
 
     def link(self,*names):
-        first = names[0]
-        if first in self._properties:
-            v = self._properties[first]
-        else:
-            v = _C(None)
+        """ Call link() with the names of configuration values that should
+        always be the same to link them together
+        """
         l = _link(names,self)
         for n in names:
             self._properties[n] = l
