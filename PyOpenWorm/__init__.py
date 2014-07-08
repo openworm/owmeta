@@ -53,3 +53,11 @@ def useTestConfig():
 def loadConfig(f):
     """ Load configuration for the module """
     Configureable.default = Data.open(f)
+
+def connect(configFile=False,testConfig=False):
+    """ Load desired configuration and open the database """
+    if configFile:
+        loadConfig(configFile)
+    elif testConfig:
+        useTestConfig()
+    Configureable.default.openDatabase()
