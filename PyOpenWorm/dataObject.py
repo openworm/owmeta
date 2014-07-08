@@ -10,12 +10,15 @@ class X():
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
 # connected by an actual node
+
 def _bnode_to_var(x):
     return "?" + x
 
 def _rdf_literal_to_gp(x):
     if isinstance(x,R.BNode):
         return _bnode_to_var(x)
+    elif isinstance(x,R.URIRef) and DataObject._is_variable(x):
+        return DataObject._graph_variable_to_var(x)
     else:
         return x.n3()
 
@@ -32,6 +35,13 @@ class DataObject(DataUser):
 
     def __init__(self,ident=False,triples=[],**kwargs):
         DataUser.__init__(self,**kwargs)
+
+        self._triples = triples
+        self._is_releasing_triples = False
+        self.properties = []
+        self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
+        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
+
         if ident:
             self._id = ident
         else:
@@ -43,19 +53,44 @@ class DataObject(DataUser):
             v = struct.pack("=f",random.random()).encode("hex")
             self._id = R.BNode(self.__class__.__name__ + v)
 
-        self._triples = triples
-        self._is_releasing_triples = False
-        self.properties = []
-        self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
-        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
     def __eq__(self,other):
         return (self.identifier() == other.identifier())
+
+    def __str__(self,_level=0):
+        s = (" " * _level) + self.__class__.__name__
+        s += '\n'
+        s +=  "\n".join((" " * (_level + 1))+str(x) for x in self.properties)
+        return s
+
+    def _graph_variable(self,var_name):
+        """ Make a variable for storage the graph """
+        return self.conf['rdf.namespace']["variable#"+var_name]
+
+    @classmethod
+    def _is_variable(self,uri):
+        """ Is the uriref a graph variable? """
+        # We should be able to extract the type from the identifier
+        if not isinstance(uri,R.URIRef):
+            return False
+        cn = self._extract_class_name(uri)
+        #print 'cn = ', cn
+        return (cn == 'variable')
+
+    @classmethod
+    def _graph_variable_to_var(self,uri):
+        from urlparse import urlparse
+        u = urlparse(uri)
+        x = u.path.split('/')
+        #print uri
+        if x[2] == 'variable':
+            #print 'fragment = ', u.fragment
+            return "?"+u.fragment
+
     def identifier(self):
         """
         The identifier for this object in the rdf graph
-        This identifier should be based on identifying characteristics of the object.
-        Only one identifier can be returned. If more than one could be returned based
-        on the object's characteristics, one is returned randomly!
+        This identifier is usually randomly generated, but an identifier returned from the
+        graph can be used to retrieve the object.
         """
         return self._id
 
@@ -71,7 +106,7 @@ class DataObject(DataUser):
         # explicitly given in __init__
         if not self._is_releasing_triples:
             # Note: We are _definitely_ assuming synchronous operation here.
-            #       Anyway, this codes idempotent. There's no need to lock it...
+            #       Anyway, this code's idempotent. There's no need to lock it...
             self._is_releasing_triples = True
             yield (self.identifier(), R.RDF['type'], self.rdf_type)
             for x in self._triples:
@@ -96,7 +131,18 @@ class DataObject(DataUser):
 
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
-        self.add_statements(self.triples())
+
+        self.add_statements(self._skolemize_triples(self.triples()))
+
+    def _skolemize_triples(self, trips):
+        # Turn all of the BNodes into concrete_identifiers
+        for t in trips:
+            new_t = []
+            for z in t:
+                if isinstance(z,R.BNode):
+                    z = self.make_identifier(z)
+                new_t.append(z)
+            yield new_t
 
     @classmethod
     def object_from_id(self,identifier,rdf_type=False):
@@ -114,6 +160,7 @@ class DataObject(DataUser):
         from urlparse import urlparse
         u = urlparse(uri)
         x = u.path.split('/')
+        #print 'ecn, uri =', uri
         if x[1] == 'entities':
             return x[2]
 
@@ -124,30 +171,57 @@ class DataObject(DataUser):
         # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
         # graph and convert them into objects of the type of the querying object.
         #
-        # Steps:
-        # - Do the query/queries
-        # - Create objects from the bound variables
         gp = self.graph_pattern()
+
+        # Append some extra patterns to get all values for the properties
+        for prop in self.properties:
+            # hack, hack, hack
+            if isinstance(prop, SimpleProperty):
+                z = prop.v
+                prop.v = []
+                prop_gp = prop.graph_pattern()
+                gp += " .\n"+prop_gp
+                prop.v = z
+        ident = self.identifier()
         varlist = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
-        qres = self.conf['rdf.graph'].query("Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +" }")
+        if isinstance(ident,R.BNode):
+            varlist.append(ident)
+        # Do the query/queries
+        q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +" }"
+        qres = self.conf['rdf.graph'].query(q)
         for g in qres:
             # attempt to get a value for each of the properties this object has
             # if there isn't a value for this property
 
             # XXX: Should distinguish datatype and object properties to set them up accordingly.
-            # Assuming any uri is an identifier :(
-            new_object = self.__class__()
+
+            # If our own identifier is a BNode, then the binding we get will be for a distinct object
+            # otherwise, the object we get is really the same as this object
+
+            if isinstance(ident,R.BNode):
+                new_ident = g[str(ident)]
+            else:
+                new_ident = ident
+
+            if isinstance(new_ident,R.BNode):
+                new_object = self.__class__()
+            else:
+                new_object = DataObject.object_from_id(new_ident)
+
             for prop in self.properties:
                 if isinstance(prop, SimpleProperty):
                     # get the linkName
                     link_name = prop.linkName
                     # Check if the name is in the result
-                    if link_name in g.labels:
+                    if g[link_name] is not None:
                         new_object_prop = getattr(new_object, link_name)
                         result_value = g[link_name]
-                        if result_value is not None:
+                        if result_value is not None \
+                                and not isinstance(result_value, R.BNode) \
+                                and not DataObject._is_variable(result_value):
                             # XXX: Maybe should verify that it's an rdflib term?
-                            if isinstance(new_object_prop, DatatypeProperty):
+                            # Create objects from the bound variables
+                            if isinstance(result_value, R.Literal) and isinstance(new_object_prop, DatatypeProperty):
                                 new_object_prop(result_value)
                             elif isinstance(new_object_prop, ObjectProperty):
                                 new_object_prop(DataObject.object_from_id(result_value))
@@ -259,8 +333,8 @@ class SimpleProperty(Property):
     def triples(self):
         owner_id = self.owner.identifier()
         ident = self.identifier()
-        yield (ident, self.rdf_namespace['owner'], owner_id)
         yield (ident, R.RDF['type'], self.link)
+        yield (owner_id, self.link, ident)
         if len(self.v) > 0:
             for x in self.v:
                 if isinstance(self, DatatypeProperty):
@@ -270,7 +344,7 @@ class SimpleProperty(Property):
                     for z in x.triples():
                         yield z
         else:
-            yield (ident, self.rdf_namespace['value'], R.BNode(self.linkName))
+            yield (ident, self.rdf_namespace['value'], self._graph_variable(self.linkName))
 
     def __str__(self):
         return str(self.linkName + "=" + str(self.v))

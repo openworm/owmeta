@@ -6,12 +6,19 @@ Configureable.default = TestConfig
 
 class IntegrationTest(unittest.TestCase):
     """ Integration testing """
+    def setUp(self):
+        self.config = TestConfig
+        self.config.openDatabase()
+
+    def tearDown(self):
+        self.config.closeDatabase()
+
     def test_1(self):
         import bibtex
         bt = bibtex.parse("my.bib")
         n1 = Neuron("AVAL")
         n2 = Neuron("DA3")
-        c = Connection(pre=n1,post=n2,synclass="synapse")
+        c = Connection(pre_cell=n1,post_cell=n2,synclass="synapse")
         e = Evidence(bibtex=bt['white86'])
         e.asserts(c)
 
@@ -24,12 +31,15 @@ class IntegrationTest(unittest.TestCase):
         c = Connection(n1,n2,number=1)
 
         # Attach some evidence for the connection
-        e = Evidence(person="Danny Glover")
+        e = Evidence(author="Danny Glover")
         e.asserts(c)
         # look at what else this evidence has stated
+        e.save()
+        e = Evidence(author="Danny Glover")
         r = e.asserts()
         for x in r:
-            print "\t".join([str(y)[:60] for y in x])
+            print x
+            #print "\t".join([str(y)[:60] for y in x])
     def test_get_evidence(self):
         # Reference two neurons
         n1 = Neuron(name='AVAL')

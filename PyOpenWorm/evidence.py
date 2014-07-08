@@ -83,8 +83,9 @@ class Evidence(DataObject):
             if k in ('bibtex'):
                 self._fields['bibtex'] = source[k]
                 break
-            if k in ('person'):
-                self._fields['person'] = source[k]
+            if k in (x.linkName for x in self.properties):
+                print 'setting ',k,'to',source[k]
+                getattr(self,k)(source[k])
                 break
 
     def add_data(self, k, v):
@@ -96,20 +97,6 @@ class Evidence(DataObject):
         # Confirm that pmid contains a valid pubmed id
         self._fields[k] = v
 
-    def triples(self):
-        for x in self.properties:
-            for y in x.triples():
-                yield y
-
-    def identifier(self):
-        """
-        Note that this identifier changes with every change to the fields
-        For example, the identifiers may be distinct for two evidence objects with the same
-        pubmed id. This is because manual addition of fields is allowed: an 'asserts' may
-        be saying something in addition to the article which is referenced by the pmid.
-        """
-        evidence_name = self.make_identifier("".join(x.identifier() for x in self.properties))
-        return evidence_name
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
     # TODO: Provide a way to override modification of already set values.
