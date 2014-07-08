@@ -243,12 +243,16 @@ def modification_date(filename):
     return datetime.datetime.fromtimestamp(t)
 
 class RDFSource(Configureable,PyOpenWorm.ConfigValue):
+    i = 0
     def __init__(self, conf=False):
+        if self.i == 1:
+            raise Exception(self.i)
+        self.i+=1
         Configureable.__init__(self, conf=conf)
         self.graph = False
 
     def get(self):
-        if not self.graph:
+        if self.graph == False:
             raise Exception("Must call openDatabase on Data object before using the database")
         return self.graph
 
