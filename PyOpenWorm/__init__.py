@@ -35,3 +35,21 @@ from .muscle import Muscle
 from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
+
+def useTestConfig():
+    cfg = {
+        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
+        "rdf.source" : "sparql_endpoint",
+        "rdf.store_conf" : ["http://107.170.133.175:8080/openrdf-sesame/repositories/test","http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements"],
+        "user.email" : "jerry@cn.com",
+        "test_variable" : "test_value"
+    }
+    for x in cfg:
+        Configureable.default[x] = cfg[x]
+    Configureable.default = Data(Configureable.default)
+
+def loadConfig(f):
+    """ Load configuration for the module """
+    Configureable.default = Data.open(f)
