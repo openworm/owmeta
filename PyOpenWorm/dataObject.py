@@ -2,7 +2,7 @@ import rdflib as R
 from PyOpenWorm import DataUser
 import PyOpenWorm
 
-__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property"]
+__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty"]
 
 class X():
    pass
