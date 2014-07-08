@@ -119,12 +119,6 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
-    def triples(self):
-        ident = self.identifier()
-        yield (ident, R.RDF['type'], self.rdf_type)
-        for x in DataObject.triples(self):
-            yield x
-
     #def rdf(self):
 
     #def peptides(self):

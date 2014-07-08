@@ -36,7 +36,6 @@ class Neighbor(P.Property):
             yield r.post_cell()
 
     def set(self, other, **kwargs):
-        print other
         c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
         self._conns.append(c)
 

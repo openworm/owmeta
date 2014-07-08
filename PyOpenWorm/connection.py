@@ -57,5 +57,5 @@ class Connection(Relationship):
         if isinstance(synclass,basestring):
             self.synclass(synclass)
 
-    def __str__(self):
-        return "Connection from %s to %s (%s times, type: %s, neurotransmitter: %s)"%(self.pre_cell, self.post_cell, self.number, self.syntype, self.synclass)
+    #def __str__(self):
+        #return "Connection from %s to %s (%s times, type: %s, neurotransmitter: %s)"%(self.pre_cell, self.post_cell, self.number, self.syntype, self.synclass)
