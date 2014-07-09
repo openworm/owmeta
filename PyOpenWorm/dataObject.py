@@ -148,7 +148,10 @@ class DataObject(DataUser):
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type tag """
         # We should be able to extract the type from the identifier
-        cn = self._extract_class_name(identifier)
+        if rdf_type:
+            cn = self._extract_class_name(rdf_type)
+        else:
+            cn = self._extract_class_name(identifier)
         if cn is not None:
             cls = getattr(PyOpenWorm,cn)
             b = cls()
@@ -187,7 +190,7 @@ class DataObject(DataUser):
         if isinstance(ident,R.BNode):
             varlist.append(ident)
         # Do the query/queries
-        q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +" }"
+        q = "Select distinct "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +"\n"+ " .\n".join("OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " }" for x in varlist) + " }"
         qres = self.conf['rdf.graph'].query(q)
         for g in qres:
             # attempt to get a value for each of the properties this object has
@@ -216,6 +219,10 @@ class DataObject(DataUser):
                     if g[link_name] is not None:
                         new_object_prop = getattr(new_object, link_name)
                         result_value = g[link_name]
+                        result_type = False
+                        if g['typeof_'+link_name] is not None:
+                            result_type = g['typeof_'+link_name]
+
                         if result_value is not None \
                                 and not isinstance(result_value, R.BNode) \
                                 and not DataObject._is_variable(result_value):
@@ -224,7 +231,7 @@ class DataObject(DataUser):
                             if isinstance(result_value, R.Literal) and isinstance(new_object_prop, DatatypeProperty):
                                 new_object_prop(result_value)
                             elif isinstance(new_object_prop, ObjectProperty):
-                                new_object_prop(DataObject.object_from_id(result_value))
+                                new_object_prop(DataObject.object_from_id(result_value, result_type))
                     else:
                         our_value = getattr(self, link_name)
                         setattr(new_object, link_name, our_value)
@@ -325,10 +332,7 @@ class SimpleProperty(Property):
             return r
 
     def set(self,v):
-        if hasattr(v,'__iter__'):
-            self.v = v
-        else:
-            self.v = [v]
+        self.v.append(v)
 
     def triples(self):
         owner_id = self.owner.identifier()
