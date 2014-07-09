@@ -43,7 +43,7 @@ class DataObject(DataUser):
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
 
         if ident:
-            self._id = ident
+            self._id = R.URIRef(ident)
         else:
             # Randomly generate an identifier if the derived class can't
             # come up with one from the start. Ensures we always have something
