@@ -142,7 +142,8 @@ class Evidence(DataObject):
         fields = (x.split("=") for x in extra_data)
         fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
         authors = [x[1] for x in fields if x[0] == 'rft.au']
-        self.author(authors)
+        for a in authors:
+            self.author(a)
         # no error for bad ids, just an empty list
         if len(r) > 0:
             # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
@@ -166,7 +167,8 @@ class Evidence(DataObject):
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
         tree = pmRequest(pmid)
-        self.author([x.text for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item')])
+        for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item'):
+            self.author(x.text)
 
     def __eq__(self, other):
         for f in self._fields:
