@@ -5,7 +5,6 @@ import neuroml.writers as writers
 import sys
 sys.path.insert(0,".")
 import PyOpenWorm
-import subprocess
 from PyOpenWorm import *
 import networkx
 import rdflib
@@ -96,7 +95,7 @@ class ConfigureTest(unittest.TestCase):
         """ Try to retrieve a config value that hasn't been set """
         with self.assertRaises(KeyError):
             c = Configure()
-            k = c['not_a_valid_config']
+            c['not_a_valid_config']
 
     def test_literal(self):
         """ Assign a literal rather than a ConfigValue"""
@@ -145,7 +144,7 @@ class ConfigureTest(unittest.TestCase):
     def test_read_from_file_fail(self):
         """ Fail on attempt to read configuration from a non-JSON file """
         with self.assertRaises(BadConf):
-            d = Data.open("tests/bad_test.conf")
+            Data.open("tests/bad_test.conf")
 
 class ConfigureableTest(unittest.TestCase):
     def test_init_empty(self):
@@ -207,6 +206,7 @@ class DataObjectTest(_DataTest):
         do = DataObject(ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
 
+    @unittest.skip("Should be tracked by version control")
     def test_uploader(self):
         """ Make sure that we're marking a statement with it's uploader """
         g = make_graph(20)
@@ -229,14 +229,13 @@ class DataObjectTest(_DataTest):
         u = r.upload_date()
         self.assertIsNotNone(u)
 
-
 class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
         Configureable.default = None
         with self.assertRaises(BadConf):
-            do = DataUser()
+            DataUser()
 
     def test_init_no_config_with_default(self):
         """ Should suceed if the default configuration is a Data object """
@@ -250,7 +249,7 @@ class DataUserTest(_DataTest):
         """ Should fail if given a non-Data configuration """
         with self.assertRaises(BadConf):
             DataUser(conf=self.config_no_data)
-
+    @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
         g = R.Graph()
@@ -320,17 +319,6 @@ class NeuronTest(_DataTest):
         do = self.neur('BDUL')
         self.assertTrue(isinstance(do,Cell))
 
-    def test_identifier(self):
-        g = self.config['rdf.graph']
-        self.assertEqual(self.neur('AVAL').identifier(), R.URIRef('http://openworm.org/entities/64'))
-        self.assertEqual(self.neur('AWBR').identifier(), R.URIRef('http://openworm.org/entities/86'))
-        self.assertEqual(self.neur('FLPR').identifier(), R.URIRef('http://openworm.org/entities/125'))
-        self.assertEqual(self.neur('I6').identifier(), R.URIRef('http://openworm.org/entities/135'))
-        self.assertEqual(self.neur('M5').identifier(), R.URIRef('http://openworm.org/entities/156'))
-        self.assertEqual(self.neur('AUAL').identifier(), R.URIRef('http://openworm.org/entities/62'))
-        self.assertEqual(self.neur('PVQL').identifier(), R.URIRef('http://openworm.org/entities/192'))
-        self.assertEqual(self.neur('OLQVR').identifier(), R.URIRef('http://openworm.org/entities/167'))
-
     def test_receptors(self):
         self.assertTrue('GLR-2' in self.neur('AVAL').receptors())
         self.assertTrue('OSM-9' in self.neur('PHAL').receptors())
@@ -382,8 +370,6 @@ class NetworkTest(_DataTest):
         self.assertTrue('DD5' in self.net.neurons())
         self.assertEqual(len(list(self.net.neurons())), 302)
 
-    def test_synapses_rdf(self):
-        """ Check that synapses() returns connection objects """
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
         for x in self.net.synapses():
@@ -495,9 +481,15 @@ class RDFLibTest(unittest.TestCase):
     def setUpClass(cls):
         cls.ns = {"ns1" : "http://example.org/"}
     def test_uriref_not_url(self):
-        uri = rdflib.URIRef("daniel@example.com")
+        try:
+            rdflib.URIRef("daniel@example.com")
+        except:
+            self.fail("Doesn't actually fail...which is weird")
     def test_uriref_not_id(self):
-        uri = rdflib.URIRef("some random string")
+        try:
+            rdflib.URIRef("some random string")
+        except:
+            self.fail("Doesn't actually fail...which is weird")
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
@@ -609,18 +601,6 @@ class QuantityTest(unittest.TestCase):
         self.assertEqual("milliliter", q.unit)
         self.assertEqual(23, q.value)
 
-class RelationshipTest(_DataTest):
-
-    def test_init_graph(self):
-        """ Make sure that we're marking a statement with it's upload date """
-        g = make_graph()
-        r = Relationship(graph=g,conf=self.config)
-
-    def test_rel(self):
-        """ Get the relationship associated with a method """
-        # XXX: Is there use case for this not covered by DataObject.load?
-        s = Relationship.rel(DataObject,'uploader')
-
 class ConnectionTest(_DataTest):
     def setUp(self):
         _DataTest.setUp(self)
@@ -659,18 +639,15 @@ class ConnectionTest(_DataTest):
     def test_init_with_neuron_objects(self):
         n1 = Neuron(name="AVAL")
         n2 = Neuron(name="PVCR")
-        c = Connection(n1,n2)
-
-    def test_init_with_neuron_objects(self):
-        n1 = Neuron(name="AVAL")
-        n2 = Neuron(name="PVCR")
-        c = Connection(n1,n2)
+        try:
+            Connection(n1,n2)
+        except:
+            self.fail("Shouldn't fail on Connection init")
 
     def test_load1(self):
         """ Put the appropriate triples in. Try to load them """
         g = R.Graph()
         self.config['rdf.graph'] = g
-        ns = self.config['rdf.namespace']
         for t in self.trips:
             g.add(t)
         c = Connection(conf=self.config)
@@ -681,11 +658,12 @@ class ConnectionTest(_DataTest):
         # Put the appropriate triples in. Try to load them
         g = R.Graph()
         self.config['rdf.graph'] = g
-        ns = self.config['rdf.namespace']
         for t in self.trips:
             g.add(t)
         c = Connection(pre_cell="PVCR", conf=self.config)
         r = c.load()
+        for x in r:
+            self.assertIsInstance(x,Connection)
 
 class MuscleTest(_DataTest):
 
@@ -694,7 +672,12 @@ class MuscleTest(_DataTest):
 
     def test_muscle_neurons(self):
         self.fail("Need an actual test")
-        m = Muscle('MDL08',self.config).neurons()
+        m = Muscle('MDL08')
+        neu = Neuron(name="tnnetenba")
+        m.neurons(neu)
+        m.save()
+        m = Muscle('MDL08')
+        self.assertIn(neu, m.neurons)
 
 class DataTest(_DataTest):
     def test_sleepy_cat_source(self):
@@ -726,20 +709,23 @@ class PropertyTest(_DataTest):
 
 class SimplePropertyTest(_DataTest):
     def test_triples_with_no_value(self):
-        """ Test that when there is no value set for a property, it doesn't yield any triples """
+        """ Test that when there is no value set for a property, it still yields a triple """
         do = DataObject(ident=R.URIRef("http://example.org"))
-        sp = SimpleProperty(do,"test")
+        sp = SimpleProperty("test",owner=do)
         for x in sp.triples():
             self.fail("Shouldn't have any triples")
+
     def test_get_from_database(self):
+        """ Test that we can get a property in from the database """
         g = R.Graph()
         ident=R.URIRef("http://example.org")
         self.config['rdf.graph'] = g
         do = DataObject(ident=ident)
         g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue1")))
         g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue2")))
-        sp = SimpleProperty(do,"test")
+        sp = SimpleProperty("test",owner=do)
         v = set(sp())
         self.assertEqual(set(["testvalue2","testvalue1"]), v)
+
 class NeuroMLTest(_DataTest):
     pass
