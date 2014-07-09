@@ -7,22 +7,20 @@
    This module contains the class that defines the muscle
 
 """
-import PyOpenWorm
+import PyOpenWorm as P
 from PyOpenWorm import Cell
 
 class Muscle(Cell):
 
-    def __init__(self, name, conf=False):
-        Cell.__init__(self, name=name, conf=conf)
-        self._name = name
+    def __init__(self, **kwargs):
+        Cell.__init__(self, **kwargs)
+        """Get neurons synapsing with this muscle
 
-    def name(self):
-        """Get name of this muscle
-
-        :returns: the name
-        :rtype: str
+        :returns: a list of all known receptors
+        :rtype: list
         """
-        return self._name
+        P.ObjectProperty("neurons",owner=self)
+        P.DatatypeProperty("receptors",owner=self)
 
     def receptors(self):
         """Get receptors associated with this muscle
@@ -45,21 +43,3 @@ class Muscle(Cell):
 
         return receptors
 
-    def neurons(self):
-        """Get neurons synapsing with this muscle
-
-        :returns: a list of all known receptors
-        :rtype: list
-        """
-
-        qres = self['semantic_net'].query(
-                """SELECT ?objLabel
-           WHERE {
-              ?node rdfs:label '"""+self.name()+"""' .
-              ?node <http://openworm.org/entities/1516> ?object .
-              ?object rdfs:label ?objLabel
-            }""")
-
-        receptors = []
-        for r in qres.result:
-            yield str(r[0])
