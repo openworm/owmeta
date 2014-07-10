@@ -81,7 +81,7 @@ class Cell(DataObject):
             return DataObject.identifier(self)
 
     def morphology(self):
-        morph_name = "morphology_" + str(self.name())
+        morph_name = "morphology_" + str(self.name()[0])
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)
