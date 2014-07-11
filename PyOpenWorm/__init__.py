@@ -36,7 +36,10 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 
-def useTestConfig():
+def useTestConfig(do_logging):
+    import logging
+    if do_logging:
+        logging.basicConfig(level=logging.DEBUG)
     cfg = {
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
         "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
@@ -61,5 +64,5 @@ def connect(conf=False,configFile=False,testConfig=False):
     elif configFile:
         loadConfig(configFile)
     elif testConfig:
-        useTestConfig()
+        useTestConfig(do_logging=True)
     Configureable.default.openDatabase()
