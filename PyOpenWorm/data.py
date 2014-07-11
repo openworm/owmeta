@@ -83,6 +83,9 @@ class DataUser(Configureable):
         return self.conf['rdf.graph']
 
     def _remove_from_store(self, g):
+        # Note the assymetry with _add_to_store. You must add actual elements, but deletes
+        # can be performed as a query
+        import logging as L
         for group in grouper(g, 1000):
             temp_graph = Graph()
             for x in group:
@@ -91,6 +94,7 @@ class DataUser(Configureable):
                 else:
                     break
             s = " DELETE DATA {" + temp_graph.serialize(format="nt") + " } "
+            L.debug("deleting. s = " + s)
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
@@ -128,7 +132,12 @@ class DataUser(Configureable):
         Remove a set of statements from the database.
         :param graph: An iterable of triples
         """
-        self._remove_from_store(graph)
+        self._remove_from_store_by_query(graph)
+    def _remove_from_store_by_query(self, q):
+        import logging as L
+        s = " DELETE WHERE {" + q + " } "
+        L.debug("deleting. s = " + s)
+        self.conf['rdf.graph'].update(s)
 
     def add_statements(self, graph):
         """
