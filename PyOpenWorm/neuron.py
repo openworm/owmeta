@@ -44,10 +44,41 @@ class Neighbor(P.Property):
             for x in c.triples():
                 yield x
 
+class Connection(P.Property):
+    """Get a list of neighboring neurons.
+
+       :param type: What kind of junction to look for.
+                    0=all, 1=gap junctions only, 2=all chemical synapses
+                    3=incoming chemical synapses, 4=outgoing chemical synapses
+       :returns: a list of neuron names
+       :rtype: List
+    """
+    def __init__(self,**kwargs):
+        P.Property.__init__(self,**kwargs)
+        self._conns = []
+
+    def get(self,pre_or_post='pre',**kwargs):
+        if pre_or_post == 'pre':
+            c = P.Connection(pre_cell=self.owner,**kwargs)
+        else:
+            c = P.Connection(post_cell=self.owner,**kwargs)
+        for r in c.load():
+            yield r
+
+    def set(self, conn, **kwargs):
+        assert(isinstance(conn, P.Connection))
+        self._conns.append(conn)
+
+    def triples(self):
+        for c in self._conns:
+            for x in c.triples():
+                yield x
+
 class Neuron(Cell):
     def __init__(self, **kwargs):
         Cell.__init__(self,**kwargs)
         self.neighbor = Neighbor(owner=self)
+        self.connection = Connection(owner=self)
         self.get_neighbors = self.neighbor
 
     def _write_out_db(self):
