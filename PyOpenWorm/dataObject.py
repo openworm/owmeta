@@ -174,8 +174,9 @@ class DataObject(DataUser):
         # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
         # graph and convert them into objects of the type of the querying object.
         #
+        import logging as L
         gp = self.graph_pattern()
-
+        L.debug('loading...')
         # Append some extra patterns to get all values for the properties
         for prop in self.properties:
             # hack, hack, hack
@@ -191,8 +192,11 @@ class DataObject(DataUser):
             varlist.append(ident)
         # Do the query/queries
         q = "Select distinct "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +"\n"+ " .\n".join("OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " }" for x in varlist) + " }"
+        L.debug('load query = ' + q)
         qres = self.conf['rdf.graph'].query(q)
+        L.debug('returned from query')
         for g in qres:
+            L.debug('got result = ' + str(g))
             # attempt to get a value for each of the properties this object has
             # if there isn't a value for this property
 
@@ -206,10 +210,7 @@ class DataObject(DataUser):
             else:
                 new_ident = ident
 
-            if isinstance(new_ident,R.BNode):
-                new_object = self.__class__()
-            else:
-                new_object = DataObject.object_from_id(new_ident)
+            new_object = self.__class__()
 
             for prop in self.properties:
                 if isinstance(prop, SimpleProperty):
@@ -239,7 +240,12 @@ class DataObject(DataUser):
 
     def retract(self):
         """ Remove this object from the data store. """
-        self.remove_statements(self._n3())
+        import logging as L
+        for x in self.triples():
+            ll = L.getLogger().getEffectiveLevel()
+            if ll == L.DEBUG:
+                L.debug("got a bnode in retract = " + str(x))
+        self.retract_statements(_triples_to_bgp(self.triples()))
 
     def uploader(self):
         """ Get the uploader for this relationship """
@@ -345,8 +351,6 @@ class SimpleProperty(Property):
                     yield (ident, self.rdf_namespace['value'], R.Literal(x))
                 elif isinstance(self, ObjectProperty):
                     yield (ident, self.rdf_namespace['value'], x.identifier())
-                    for z in x.triples():
-                        yield z
         else:
             yield (ident, self.rdf_namespace['value'], self._graph_variable(self.linkName))
 
