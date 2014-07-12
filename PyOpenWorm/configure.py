@@ -25,7 +25,7 @@ class _link(ConfigValue):
     def get(self):
         return self.conf[self.members[0]]
 
-class Configure:
+class Configure(object):
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
@@ -91,7 +91,7 @@ class Configure:
             print self._properties
             raise KeyError(pname)
 
-class Configureable:
+class Configureable(object):
     default = Configure()
     def __init__(self, conf=False):
         if not conf:
@@ -101,13 +101,17 @@ class Configureable:
         else:
             raise BadConf(self)
 
+    def __getitem__(self,k):
         if not isinstance(self, Configure):
-            def __getitem__(k):
-                return self.conf.get(k)
-            def __setitem__(k, v):
-                self.conf[k] = v
-            self.__getitem__ = __getitem__
-            self.__setitem__ = __setitem__
+            return self.conf.get(k)
+        else:
+            return Configure.__getitem__(self,k)
+
+    def __setitem__(self,k,v):
+        if not isinstance(self, Configure):
+            self.conf[k] = v
+        else:
+            return Configure.__setitem__(self,k,v)
 
     def get(self, pname, default=False):
         return self.conf.get(pname,default)

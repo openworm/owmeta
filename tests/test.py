@@ -372,7 +372,7 @@ class NetworkTest(_DataTest):
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
-        for x in self.net.synapses():
+        for x in self.net.synapse():
             self.assertIsInstance(x,Connection)
             break
 
@@ -668,7 +668,7 @@ class ConnectionTest(_DataTest):
 class MuscleTest(_DataTest):
 
     def test_muscle(self):
-        self.assertTrue(isinstance(Muscle('MDL08',self.config), Muscle))
+        self.assertTrue(isinstance(Muscle(name='MDL08'), Muscle))
 
     def test_muscle_neurons(self):
         self.fail("Need an actual test")
@@ -676,7 +676,7 @@ class MuscleTest(_DataTest):
         neu = Neuron(name="tnnetenba")
         m.neurons(neu)
         m.save()
-        m = Muscle('MDL08')
+        m = Muscle(name='MDL08')
         self.assertIn(neu, m.neurons)
 
 class DataTest(_DataTest):
@@ -711,7 +711,7 @@ class SimplePropertyTest(_DataTest):
     def test_triples_with_no_value(self):
         """ Test that when there is no value set for a property, it still yields a triple """
         do = DataObject(ident=R.URIRef("http://example.org"))
-        sp = SimpleProperty("test",owner=do)
+        sp = SimpleProperty("test",'DatatypeProperty',owner=do)
         for x in sp.triples():
             self.fail("Shouldn't have any triples")
 
@@ -723,7 +723,7 @@ class SimplePropertyTest(_DataTest):
         do = DataObject(ident=ident)
         g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue1")))
         g.add((ident, do.rdf_namespace['test'], R.Literal("testvalue2")))
-        sp = SimpleProperty("test",owner=do)
+        sp = SimpleProperty("test",'DatatypeProperty',owner=do)
         v = set(sp())
         self.assertEqual(set(["testvalue2","testvalue1"]), v)
 
