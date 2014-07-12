@@ -149,23 +149,36 @@ class DataObject(DataUser):
         """ Load an object from the database using its type tag """
         # We should be able to extract the type from the identifier
         if rdf_type:
-            cn = self._extract_class_name(rdf_type)
+            uri = rdf_type
         else:
-            cn = self._extract_class_name(identifier)
-        if cn is not None:
-            cls = getattr(PyOpenWorm,cn)
-            b = cls()
-            b.identifier = lambda : identifier
-            return b
+            uri = identifier
+
+        cn = self._extract_class_name(uri)
+        # if its our class name, then make our own object
+        # if there's a part after that, that's the property name
+        # get the
+        prop = self._extract_property_name(uri)
+        o = getattr(PyOpenWorm,cn)(ident=identifier)
+        if prop is not None and hasattr(o,prop):
+            o = getattr(o,prop).__class__()
+        return o
 
     @classmethod
     def _extract_class_name(self,uri):
         from urlparse import urlparse
         u = urlparse(uri)
         x = u.path.split('/')
-        #print 'ecn, uri =', uri
-        if x[1] == 'entities':
+        if len(x) >= 3 and x[1] == 'entities':
             return x[2]
+
+    @classmethod
+    def _extract_property_name(self,uri):
+        from urlparse import urlparse
+        u = urlparse(uri)
+        x = u.path.split('/')
+        if len(x) >= 4 and x[1] == 'entities':
+            return x[3]
+
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -187,56 +200,58 @@ class DataObject(DataUser):
                 gp += " .\n"+prop_gp
                 prop.v = z
         ident = self.identifier()
-        varlist = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
-        if isinstance(ident,R.BNode):
-            varlist.append(ident)
         # Do the query/queries
-        q = "Select distinct "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +"\n"+ " .\n".join("OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " }" for x in varlist) + " }"
+        #q = "Select distinct "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +"\n"+ " .\n".join("OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " }" for x in varlist) + " }"
+        q = "CONSTRUCT WHERE { "+ gp + " }"
         L.debug('load query = ' + q)
         qres = self.conf['rdf.graph'].query(q)
         L.debug('returned from query')
+        property_names = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
+        objects = dict()
+        properties = dict()
+        rdf_type = R.RDF['type']
         for g in qres:
             L.debug('got result = ' + str(g))
-            # attempt to get a value for each of the properties this object has
-            # if there isn't a value for this property
+            if g[1] == rdf_type and g[0] not in objects:
+                objects[g[0]] = self.object_from_id(g[0], g[2])
+            else :
+                properties[g[0]] = (g[1], g[2])
+                objects[g[0]] = self.object_from_id(g[0])
+        for x in objects:
+            yield objects[x]
 
-            # XXX: Should distinguish datatype and object properties to set them up accordingly.
+            ## XXX: Should distinguish datatype and object properties to set them up accordingly.
 
-            # If our own identifier is a BNode, then the binding we get will be for a distinct object
-            # otherwise, the object we get is really the same as this object
+            ## If our own identifier is a BNode, then the binding we get will be for a distinct object
+            ## otherwise, the object we get is really the same as this object
 
-            if isinstance(ident,R.BNode):
-                new_ident = g[str(ident)]
-            else:
-                new_ident = ident
+            #new_object = self.__class__()
 
-            new_object = self.__class__()
+            #for prop in self.properties:
+                #if isinstance(prop, SimpleProperty):
+                    ## get the linkName
+                    #link_name = prop.linkName
+                    ## Check if the name is in the result
+                    #if g[link_name] is not None:
+                        #new_object_prop = getattr(new_object, link_name)
+                        #result_value = g[link_name]
+                        #result_type = False
+                        #if g['typeof_'+link_name] is not None:
+                            #result_type = g['typeof_'+link_name]
 
-            for prop in self.properties:
-                if isinstance(prop, SimpleProperty):
-                    # get the linkName
-                    link_name = prop.linkName
-                    # Check if the name is in the result
-                    if g[link_name] is not None:
-                        new_object_prop = getattr(new_object, link_name)
-                        result_value = g[link_name]
-                        result_type = False
-                        if g['typeof_'+link_name] is not None:
-                            result_type = g['typeof_'+link_name]
-
-                        if result_value is not None \
-                                and not isinstance(result_value, R.BNode) \
-                                and not DataObject._is_variable(result_value):
-                            # XXX: Maybe should verify that it's an rdflib term?
-                            # Create objects from the bound variables
-                            if isinstance(result_value, R.Literal) and isinstance(new_object_prop, DatatypeProperty):
-                                new_object_prop(result_value)
-                            elif isinstance(new_object_prop, ObjectProperty):
-                                new_object_prop(DataObject.object_from_id(result_value, result_type))
-                    else:
-                        our_value = getattr(self, link_name)
-                        setattr(new_object, link_name, our_value)
-            yield new_object
+                        #if result_value is not None \
+                                #and not isinstance(result_value, R.BNode) \
+                                #and not DataObject._is_variable(result_value):
+                            ## XXX: Maybe should verify that it's an rdflib term?
+                            ## Create objects from the bound variables
+                            #if isinstance(result_value, R.Literal) and isinstance(new_object_prop, DatatypeProperty):
+                                #new_object_prop(result_value)
+                            #elif isinstance(new_object_prop, ObjectProperty):
+                                #new_object_prop(DataObject.object_from_id(result_value, result_type))
+                    #else:
+                        #our_value = getattr(self, link_name)
+                        #setattr(new_object, link_name, our_value)
+            #yield new_object
 
     def retract(self):
         """ Remove this object from the data store. """
@@ -320,11 +335,13 @@ class Property(DataObject):
 class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
-    def __init__(self,linkName,**kwargs):
+    def __init__(self,linkName,property_type,**kwargs):
         Property.__init__(self,**kwargs)
         self.v = []
         self.link = self.owner.rdf_namespace[linkName]
+        self.rdf_type = self.owner.rdf_namespace[linkName]
         self.linkName = linkName
+        self.property_type = property_type
         setattr(self.owner,linkName, self)
 
     def get(self):
@@ -347,9 +364,9 @@ class SimpleProperty(Property):
         yield (owner_id, self.link, ident)
         if len(self.v) > 0:
             for x in self.v:
-                if isinstance(self, DatatypeProperty):
+                if self.property_type == 'DatatypeProperty':
                     yield (ident, self.rdf_namespace['value'], R.Literal(x))
-                elif isinstance(self, ObjectProperty):
+                elif self.property_type == 'ObjectProperty':
                     yield (ident, self.rdf_namespace['value'], x.identifier())
         else:
             yield (ident, self.rdf_namespace['value'], self._graph_variable(self.linkName))
@@ -357,8 +374,25 @@ class SimpleProperty(Property):
     def __str__(self):
         return str(self.linkName + "=" + str(self.v))
 
-class ObjectProperty(SimpleProperty):
-    pass
+# We keep a little tree of properties in here
+_ObjectProperties = dict()
+def DatatypeProperty(link,owner):
+    return _create_property(link,owner,'DatatypeProperty')
+def ObjectProperty(link,owner):
+    return _create_property(link,owner,'ObjectProperty')
 
-class DatatypeProperty(SimpleProperty):
-    pass
+def _create_property(linkName, owner, property_type):
+    owner_class = owner.__class__.__name__
+    if not owner_class in _ObjectProperties:
+        _ObjectProperties[owner_class] = dict()
+
+    c = None
+
+    if linkName in _ObjectProperties[owner_class]:
+        c = _ObjectProperties[owner_class][linkName]
+    else:
+        c = type(linkName,(SimpleProperty,),dict())
+        _ObjectProperties[owner_class][linkName] = c
+
+    return c(linkName, property_type, owner=owner)
+
