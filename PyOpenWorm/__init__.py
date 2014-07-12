@@ -64,5 +64,5 @@ def connect(conf=False,configFile=False,testConfig=False):
     elif configFile:
         loadConfig(configFile)
     elif testConfig:
-        useTestConfig(do_logging=True)
+        useTestConfig(do_logging=False)
     Configureable.default.openDatabase()
