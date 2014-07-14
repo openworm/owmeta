@@ -78,8 +78,9 @@ class Configure(object):
     def copy(self,other):
         if isinstance(other,Configure):
             self._properties = dict(other._properties)
-        else:
-            raise BadConf()
+        elif isinstance(other,dict):
+            for x in other:
+                self[x] = other[x]
         return self
 
     def get(self, pname, default=False):
@@ -96,10 +97,8 @@ class Configureable(object):
     def __init__(self, conf=False):
         if not conf:
             self.conf = Configureable.default
-        elif isinstance(conf, Configure):
-            self.conf = conf
         else:
-            raise BadConf(self)
+            self.conf = conf
 
     def __getitem__(self,k):
         if not isinstance(self, Configure):
