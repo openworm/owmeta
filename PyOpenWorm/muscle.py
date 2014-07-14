@@ -19,7 +19,7 @@ class Muscle(Cell):
         :returns: a list of all known receptors
         :rtype: list
         """
-        P.ObjectProperty("neurons",owner=self)
+        P.ObjectProperty("neurons",owner=self,value_type=P.Neuron)
         P.DatatypeProperty("receptors",owner=self)
 
     def receptors(self):

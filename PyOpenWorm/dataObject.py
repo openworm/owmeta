@@ -3,7 +3,7 @@ from PyOpenWorm import DataUser
 import PyOpenWorm
 import logging as L
 
-__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty"]
+__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty", "_DataObjectsParents"]
 
 class X():
    pass
@@ -28,15 +28,27 @@ def _triples_to_bgp(trips):
     g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
     return g
 
+_DataObjects = dict()
+_DataObjectsParents = dict()
+
+# We keep a little tree of properties in here
 class DataObject(DataUser):
     """ An object backed by the database """
     # Must resolve, somehow, to a set of triples that we can manipulate
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
 
+
+    @classmethod
+    def register(cls):
+        assert(issubclass(cls, DataObject))
+        _DataObjects[cls.__name__] = cls
+        base = None
+        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
+        cls.parents = _DataObjectsParents[cls.__name__]
+
     def __init__(self,ident=False,triples=[],**kwargs):
         DataUser.__init__(self,**kwargs)
-
         self._triples = triples
         self._is_releasing_triples = False
         self.properties = []
@@ -116,7 +128,19 @@ class DataObject(DataUser):
             # Note: We are _definitely_ assuming synchronous operation here.
             #       Anyway, this code's idempotent. There's no need to lock it...
             self._is_releasing_triples = True
-            yield (self.identifier(query=query), R.RDF['type'], self.rdf_type)
+            ident = self.identifier(query=query)
+
+            bases = self.parents
+            while len(bases) > 0:
+                next_bases = set([])
+                for x in bases:
+                    t = x(conf=self.conf).rdf_type
+                    yield (ident, R.RDF['type'], t)
+                    next_bases = next_bases | set(x.parents)
+                bases = next_bases
+
+            yield (ident, R.RDF['type'], self.rdf_type)
+
             for x in self._triples:
                 yield x
             for x in self.properties:
@@ -146,9 +170,9 @@ class DataObject(DataUser):
                 new_t.append(z)
             yield new_t
 
-    @classmethod
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type tag """
+        # XXX: This is a class method because we need to get the conf
         # We should be able to extract the type from the identifier
         if rdf_type:
             uri = rdf_type
@@ -159,15 +183,7 @@ class DataObject(DataUser):
         # if its our class name, then make our own object
         # if there's a part after that, that's the property name
         prop = self._extract_property_name(uri)
-        print
-        print
-        print
-        print 'uri = ', uri
-        o = getattr(PyOpenWorm,cn)(ident=identifier)
-        #if prop is not None and hasattr(o,prop):
-            #print "the property = ", prop
-            #o = getattr(o,prop).__class__()
-            #print "made property = ", prop
+        o = _DataObjects[cn](ident=identifier, conf=self.conf)
         return o
 
     @classmethod
@@ -210,13 +226,12 @@ class DataObject(DataUser):
         if not self._id_is_set:
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
-        q = "Select "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +". \n"+ " .\n".join(" OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " } " for x in varlist) + " }"
-        #q = "construct where { "+ gp +". \n"+ " .\n".join(" ?" + x + " rdf:type ?typeof_" + x + " " for x in varlist) + " }"
+        q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
         L.debug('load query = ' + q)
         qres = self.conf['rdf.graph'].query(q)
         L.debug('returned from query')
         for g in qres:
-            L.debug('got result = ' + str(g))
+            L.debug('got result = ' + "  ".join(str(x) for x in g))
             # attempt to get a value for each of the properties this object has
             # if there isn't a value for this property
 
@@ -242,9 +257,6 @@ class DataObject(DataUser):
                         new_object_prop = getattr(new_object, link_name)
                         L.debug("new_object_prop = " + str(new_object_prop))
                         result_value = g[link_name]
-                        result_type = False
-                        if g['typeof_'+link_name] is not None:
-                            result_type = g['typeof_'+link_name]
 
                         if result_value is not None \
                                 and not isinstance(result_value, R.BNode) \
@@ -255,7 +267,7 @@ class DataObject(DataUser):
                             and new_object_prop.property_type == 'DatatypeProperty':
                                 new_object_prop(result_value)
                             elif new_object_prop.property_type == 'ObjectProperty':
-                                new_object_prop(DataObject.object_from_id(result_value, result_type))
+                                new_object_prop(self.object_from_id(result_value, new_object_prop.value_rdf_type))
                     else:
                         our_value = getattr(self, link_name)
                         setattr(new_object, link_name, our_value)
@@ -267,17 +279,24 @@ class DataObject(DataUser):
 
 # Define a property by writing the get
 class Property(DataObject):
-    def __init__(self, owner, **kwargs):
+    def __init__(self, owner=False, **kwargs):
         """ Initialize with the owner of this property.
         The owner has a distinct role in each subclass of Property
         """
         DataObject.__init__(self, **kwargs)
         self.owner = owner
-        self.owner.properties.append(self)
-        self.conf = self.owner.conf
+        if self.owner:
+            self.owner.properties.append(self)
+            self.conf = self.owner.conf
 
         # XXX: Default implementation is a box for a value
         self._value = False
+
+    def owner(self,v=False):
+        if v:
+            self.owner = v
+            self.owner.properties.append(self)
+
 
     def get(self,*args):
         """ Get the things which are on the other side of this property """
@@ -297,14 +316,12 @@ class Property(DataObject):
 class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
-    def __init__(self,linkName,property_type,**kwargs):
+    def __init__(self,**kwargs):
         Property.__init__(self,**kwargs)
         self.v = []
-        self.link = self.owner.rdf_namespace[linkName]
-        self.rdf_type = self.owner.rdf_namespace[linkName]
-        self.linkName = linkName
-        self.property_type = property_type
-        setattr(self.owner,linkName, self)
+        if self.owner:
+            self.link = self.owner.rdf_namespace[self.linkName]
+            setattr(self.owner, self.linkName, self)
 
     def get(self):
         L.debug('getting value of %s' % (self,))
@@ -314,29 +331,31 @@ class SimpleProperty(Property):
         else:
             gp = self.graph_pattern(query=True)
             var = "?"+self.linkName
-            q = "select distinct " +  var + " " + var + "_type " + " where { " + gp + " OPTIONAL { " + var + " rdf:type " + var + "_type . } }"
-            print q
+            q = "select distinct " +  var + " where { " + gp + " }"
             qres = self.rdf.query(q)
             for x in qres:
-                if self.property_type == 'DatatypeProperty':
+
+                if self.property_type == 'DatatypeProperty' \
+                        and not DataObject._is_variable(x[0]):
                     L.debug("returning " + repr(x[0]))
                     yield str(x[0])
                 elif self.property_type == 'ObjectProperty':
                     L.debug("object property...")
-                    if x[1] is not None:
-                        L.debug("returning " + repr(x[0]) + " with type " + repr(x[1]))
-                        yield self.object_from_id(x[0], x[1])
+                    yield self.object_from_id(x[0], self.value_rdf_type)
 
     def set(self,v):
         L.debug('setting %s to %s' % (self, v))
         self.v.append(v)
 
     def triples(self,query=False):
+        for x in Property.triples(self,query=query):
+            yield x
         owner_id = self.owner.identifier(query=query)
         ident = self.identifier(query=query)
         value_property = self.conf['rdf.namespace']['SimpleProperty/value']
-        yield (ident, R.RDF['type'], self.link)
+
         yield (owner_id, self.link, ident)
+
         if len(self.v) > 0:
             for x in self.v:
                 try:
@@ -348,32 +367,38 @@ class SimpleProperty(Property):
                             yield t
                 except Exception, e:
                     print e
-        else:
-            yield (ident, value_property, self._graph_variable(self.linkName))
+        gv = self._graph_variable(self.linkName)
+        yield (ident, value_property, gv)
+        if self.property_type == 'ObjectProperty':
+            # The value
+            if not hasattr(self,'value_rdf_type'):
+                yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
+            else:
+                yield (gv, R.RDF['type'], self.value_rdf_type)
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
 
-# We keep a little tree of properties in here
-_ObjectProperties = dict()
-def DatatypeProperty(link,owner):
-    return _create_property(link,owner,'DatatypeProperty')
-def ObjectProperty(link,owner):
-    return _create_property(link,owner,'ObjectProperty')
+def DatatypeProperty(*args,**kwargs):
+    return _create_property(*args,property_type='DatatypeProperty',**kwargs)
 
-def _create_property(linkName, owner, property_type):
+def ObjectProperty(*args,**kwargs):
+    return _create_property(*args,property_type='ObjectProperty',**kwargs)
+
+def _create_property(linkName, owner, property_type, value_type=DataObject):
     L.debug("creating property "+str(linkName)+" on " + str(owner))
     owner_class = owner.__class__.__name__
-    if not owner_class in _ObjectProperties:
-        _ObjectProperties[owner_class] = dict()
+    property_class_name = owner_class + "_" + linkName
 
     c = None
 
-    if linkName in _ObjectProperties[owner_class]:
-        c = _ObjectProperties[owner_class][linkName]
+    if property_class_name in _DataObjects:
+        c = _DataObjects[property_class_name]
     else:
-        c = type(owner_class + "_" + linkName,(SimpleProperty,),dict())
-        _ObjectProperties[owner_class][linkName] = c
+        value_rdf_type = value_type(conf=owner.conf).rdf_type
+        c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type))
+        _DataObjects[property_class_name] = c
+        c.register()
 
-    return c(linkName, property_type, owner=owner)
+    return c(owner=owner, conf=owner.conf)
 

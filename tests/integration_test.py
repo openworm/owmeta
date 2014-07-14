@@ -1,4 +1,5 @@
 import unittest
+import rdflib as R
 from PyOpenWorm import *
 
 TestConfig = Data.open("tests/test.conf")
