@@ -36,6 +36,19 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 
+DataObject.register()
+Cell.register()
+Network.register()
+Neuron.register()
+Worm.register()
+Evidence.register()
+Muscle.register()
+Connection.register()
+SimpleProperty.register()
+Property.register()
+Relationship.register()
+
+
 def useTestConfig():
     cfg = {
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
