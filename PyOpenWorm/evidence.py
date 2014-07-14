@@ -64,7 +64,7 @@ class Evidence(DataObject):
         DatatypeProperty('author',owner=self)
         DatatypeProperty('year',owner=self)
         DatatypeProperty('title',owner=self)
-        ObjectProperty('asserts',owner=self)
+        ObjectProperty('asserts', owner=self)
 
         #XXX: I really don't like putting these in two places
         for k in source:

@@ -35,7 +35,8 @@ class _DataTest(unittest.TestCase):
     def setUp(self):
         self.config = Data(TestConfig)
         self.config_no_data = TestConfig
-        PyOpenWorm.connect(conf=self.config, do_logging=True)
+        # Set do_logging to True if you like walls of text
+        PyOpenWorm.connect(conf=self.config, do_logging=False)
         self.config.openDatabase()
     def tearDown(self):
         self.config.closeDatabase()
@@ -160,6 +161,7 @@ class CellTest(_DataTest):
         c.save()
         self.assertEqual(["AB plapaaaapp"], list(Cell(name="ADAL").lineageName()))
 
+    @unittest.skip('Long runner')
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
         c = Cell(name="ADAR",conf=self.config)
@@ -167,9 +169,12 @@ class CellTest(_DataTest):
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
 
+    @unittest.skip('Long runner')
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
-        n = Neuron(name='ADAL', conf=self.config)
+        # Load in raw morphology for ADAL
+        self.config['rdf.graph'].parse("PVDR.nml.rdf.xml",format='trig')
+        n = Neuron(name='PVDR', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
         from neuroml.utils import validate_neuroml2
@@ -207,9 +212,10 @@ class DataObjectTest(_DataTest):
         self.assertEqual(self.config['user.email'], u)
 
     def test_object_from_id(self):
-        g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
+        do = DataObject(ident="http://example.org")
+        g = do.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g,Neuron)
-        g = DataObject.object_from_id('http://openworm.org/entities/Connection')
+        g = do.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g,Connection)
 
     @unittest.skip("Should be tracked by version control")
@@ -442,7 +448,9 @@ class EvidenceTest(_DataTest):
             Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
 
     def test_wormbase_init(self):
-        self.assertIn(u"Frederic, M. Y.", list(Evidence(wormbase="WBPaper00044287").author()))
+        """ Initialize with wormbase source """
+        # Wormbase lacks anything beyond the author,date format for a lot of papers
+        self.assertIn(u'Frederic et al., 2013', list(Evidence(wormbase="WBPaper00044287").author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
@@ -458,7 +466,7 @@ class EvidenceTest(_DataTest):
         g = make_graph(20)
         r = Relationship(graph=g)
         e.asserts(r)
-        r.identifier = lambda : r.make_identifier("test")
+        r.identifier = lambda **args : r.make_identifier("test")
         e.save()
         l = list(e.asserts())
         self.assertIn(r,l)
@@ -659,13 +667,12 @@ class MuscleTest(_DataTest):
         self.assertTrue(isinstance(Muscle(name='MDL08'), Muscle))
 
     def test_muscle_neurons(self):
-        self.fail("Need an actual test")
-        m = Muscle('MDL08')
+        m = Muscle(name='MDL08')
         neu = Neuron(name="tnnetenba")
         m.neurons(neu)
         m.save()
         m = Muscle(name='MDL08')
-        self.assertIn(neu, m.neurons)
+        self.assertIn(neu, list(m.neurons()))
 
 class DataTest(_DataTest):
     def test_sleepy_cat_source(self):
@@ -673,8 +680,12 @@ class DataTest(_DataTest):
         # check we can add a triple
         self.config['source'] = 'Sleepycat'
         self.config['rdf.store'] = 'Sleepycat'
-        self.config['rdf.store_conf'] = 'Sleepycat'
-        b = self.config['rdf.graph'].query("ASK { ?S ?P ?O }")
+        self.config['rdf.store_conf'] = 'test.db'
+
+        g = self.config['rdf.graph']
+        ns = self.config['rdf.namespace']
+        g.add((ns['64'], ns['356'], ns['184']))
+        b = g.query("ASK { ?S ?P ?O }")
         for x in b:
             self.assertTrue(x)
         self.config['rdf.graph'].close()
@@ -699,7 +710,11 @@ class SimplePropertyTest(_DataTest):
     def test_triples_with_no_value(self):
         """ Test that when there is no value set for a property, it still yields a triple """
         do = DataObject(ident=R.URIRef("http://example.org"))
-        sp = SimpleProperty("test",'DatatypeProperty',owner=do)
+        class T(SimpleProperty):
+            property_type = 'DatatypeProperty'
+            linkName = 'test'
+
+        sp = T(owner=do)
         self.assertNotEqual(len(list(sp.triples())), 0)
 
 class NeuroMLTest(_DataTest):
