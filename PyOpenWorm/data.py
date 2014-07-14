@@ -20,6 +20,7 @@ from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
 import datetime
 import os
+import logging as L
 
 class _B(ConfigValue):
     def __init__(self, f):
@@ -98,7 +99,7 @@ class DataUser(Configureable):
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
-        for group in grouper(g, 1000):
+        for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
             temp_graph = Graph()
             for x in group:
                 if x is not None:
@@ -109,6 +110,7 @@ class DataUser(Configureable):
                 s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
             else:
                 s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
+            L.debug("update query = " + s)
             self.conf['rdf.graph'].update(s)
 
     def add_reference(self, g, reference_iri):
@@ -180,6 +182,8 @@ class Data(Configure, Configureable):
 
     def openDatabase(self):
         self.source.open()
+        L.debug("opening " + str(self.source))
+
 
     def closeDatabase(self):
         self.source.close()
@@ -187,14 +191,16 @@ class Data(Configure, Configureable):
     def _init_rdf_graph(self):
         # Set these in case they were left out
         c = self.conf
-        c['rdf.store'] = self.conf.get('rdf.store', 'default')
-        c['rdf.store_conf'] = self.conf.get('rdf.store_conf', 'default')
+        c['rdf.source'] = c.get('rdf.source', 'default')
+        c['rdf.store'] = c.get('rdf.store', 'default')
+        c['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
 
-        d = {'sqlite' : SQLiteSource(c),
+        self.sources = {'sqlite' : SQLiteSource(c),
                 'sparql_endpoint' : SPARQLSource(c),
                 'Sleepycat' : SleepyCatSource(c),
+                'default' : DefaultSource(c),
                 'TriX' : TrixSource(c)}
-        i = d[self.conf['rdf.source']]
+        i = self.sources[c['rdf.source']]
         self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
@@ -308,10 +314,13 @@ class SPARQLSource(RDFSource):
 
 class SleepyCatSource(RDFSource):
     def open(self):
+        import logging
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('Sleepycat')
-        g0.open(self.conf['rdf.store_conf'])
+        g0.open(self.conf['rdf.store_conf'],create=True)
         self.graph = g0
+        logging.debug("Opened SleepyCatSource")
+
 
 class SQLiteSource(RDFSource):
     def open(self):
@@ -366,3 +375,8 @@ class SQLiteSource(RDFSource):
         cur.close()
         conn.close()
         self.graph = g0
+
+class DefaultSource(RDFSource,ConfigValue):
+    def open(self):
+        self.graph = ConjunctiveGraph(self.conf['rdf.store'])
+        self.graph.open(self.conf['rdf.store_conf'],create=True)

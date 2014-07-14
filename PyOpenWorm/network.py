@@ -10,24 +10,11 @@ import PyOpenWorm as P
 import rdflib as R
 from PyOpenWorm import DataObject
 
-class Synapses(P.Property):
-    """
-    Get all synapses by
-
-    :returns: A generator of Connection objects
-    :rtype: generator
-    """
-    def get(self):
-        for x in P.Connection().load():
-            yield x
-
 class Network(DataObject):
-    def __init__(self, conf=False):
-        DataObject.__init__(self,conf=conf)
-        P.ObjectProperty('synapse',owner=self)
-
-    def identifier(self):
-        return self.conf['rdf.namespace']['worm_net']
+    def __init__(self, **kwargs):
+        DataObject.__init__(self,**kwargs)
+        self.synapses = P.ObjectProperty('synapse',owner=self)
+        self.neurons = P.ObjectProperty('neuron',owner=self)
 
     def aneuron(self, name, check=False):
         """
@@ -41,30 +28,6 @@ class Network(DataObject):
         if check:
             assert(n.check_exists())
         return n
-
-    def neurons(self):
-        """
-        Get all neurons by name
-
-        :returns: A list of all neuron names
-        :rtype: list
-        """
-
-        qres = self['semantic_net'].query(
-          """SELECT DISTINCT ?subLabel     #we want to get out the labels associated with the objects
-           WHERE {
-              {
-                  ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1) or 'interneuron' (2)
-              }
-              UNION
-              {
-                  ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/2> .
-              }
-              ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
-            }""")
-
-        for r in qres.result:
-            yield str(r[0])
 
     def _synapses_csv(self):
         """

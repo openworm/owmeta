@@ -31,17 +31,24 @@ class Neighbor(P.Property):
         self._conns = []
 
     def get(self,**kwargs):
-        c = P.Connection(pre_cell=self.owner,**kwargs)
-        for r in c.load():
-            yield r.post_cell()
+        if len(self._conns) > 0:
+            for c in self._conns:
+                for x in c.post_cell():
+                    yield x
+        else:
+            c = P.Connection(pre_cell=self.owner,**kwargs)
+            for r in c.load():
+                for x in r.post_cell():
+                    yield x
 
     def set(self, other, **kwargs):
         c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
         self._conns.append(c)
+        return c
 
-    def triples(self):
+    def triples(self,**kwargs):
         for c in self._conns:
-            for x in c.triples():
+            for x in c.triples(**kwargs):
                 yield x
 
 class Connection(P.Property):
@@ -69,17 +76,23 @@ class Connection(P.Property):
         assert(isinstance(conn, P.Connection))
         self._conns.append(conn)
 
-    def triples(self):
+    def triples(self,**kwargs):
         for c in self._conns:
-            for x in c.triples():
+            for x in c.triples(**kwargs):
                 yield x
 
 class Neuron(Cell):
     def __init__(self, **kwargs):
         Cell.__init__(self,**kwargs)
+        # Get neurons connected to this neuron
         self.neighbor = Neighbor(owner=self)
+        # Get connections from this neuron
         self.connection = Connection(owner=self)
+        P.DatatypeProperty("type",self)
+        P.DatatypeProperty("receptor",self)
+        ### Aliases ###
         self.get_neighbors = self.neighbor
+        self.receptors = self.receptor
 
     def _write_out_db(self):
         con = sqlite3.connect(self['sqldb'])
@@ -150,42 +163,6 @@ class Neuron(Cell):
         :rtype: str
         """
         return self['nx'].node[self.name()]['ntype']
-
-    def type(self):
-        """Get type of this neuron (motor, interneuron, sensory)
-
-        :returns: the type
-        :rtype: str
-        """
-        return self._type_networkX().lower()
-
-    def receptors(self):
-        """Get receptors associated with this neuron
-
-        :returns: a list of all known receptors
-        :rtype: list
-        """
-        q = """SELECT ?objLabel     #we want to get out the labels associated with the objects
-           WHERE {
-                    #we are looking first for the node that is the anchor of
-                    # all information about the specified neuron
-              ?node ?p ?name .
-                    # having identified that node, here we match an object
-                    #  associated with the node via the 'receptor' property
-                    #  (number 361)
-              ?node <http://openworm.org/entities/361> ?object .
-                    #for the object, look up their plain text label.
-              ?object rdfs:label ?objLabel .
-              FILTER( ?name in ("""+ ", ".join("'%s'" % x for x in self.name()) + """) )
-            }"""
-        print q
-        qres = self['rdf.graph'].query(q)
-
-        receptors = []
-        for r in qres.result:
-            receptors.append(str(r[0]))
-
-        return receptors
 
     def add_reference(self, type, item, pmid = None, doi = None, wormbaseid = None):
         """Add a reference that provides evidence of the relationship between
@@ -313,8 +290,6 @@ class Neuron(Cell):
 
           :rtype: libNeuroML.Neuron
        """
-    def __repr__(self):
-        return "Neuron(name=%s)" % self.name()
     #def rdf(self):
 
     #def peptides(self):
