@@ -30,8 +30,8 @@ class Connection(Relationship):
         DatatypeProperty('syntype',owner=self)
         DatatypeProperty('synclass',owner=self)
         DatatypeProperty('number',owner=self)
-        ObjectProperty('pre_cell',owner=self)
-        ObjectProperty('post_cell',owner=self)
+        ObjectProperty('pre_cell',owner=self, value_type=Neuron)
+        ObjectProperty('post_cell',owner=self, value_type=Neuron)
 
         if isinstance(pre_cell,P.Neuron):
             self.pre_cell(pre_cell)
