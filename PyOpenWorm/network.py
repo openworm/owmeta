@@ -13,9 +13,13 @@ from PyOpenWorm import DataObject
 class Network(DataObject):
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
-        self.synapses = P.ObjectProperty('synapse',owner=self)
-        self.neurons = P.ObjectProperty('neuron',owner=self)
+        self.synapses = P.ObjectProperty('synapse',owner=self,value_type=P.Connection)
+        P.ObjectProperty('neuron',owner=self,value_type=P.Neuron)
 
+    def neurons(self):
+        for x in self.neuron():
+            for n in x.name():
+                yield n
     def aneuron(self, name, check=False):
         """
         Get a neuron by name

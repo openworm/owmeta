@@ -14,8 +14,8 @@ class Worm(DataObject):
 
     def __init__(self,**kwargs):
         DataObject.__init__(self,**kwargs)
-        P.ObjectProperty("neuron_network", owner=self)
-        P.ObjectProperty("muscle", owner=self)
+        P.ObjectProperty("neuron_network", owner=self, value_type=P.Network)
+        P.ObjectProperty("muscle", owner=self, value_type=P.Muscle)
 
     def get_neuron_network(self):
         """
