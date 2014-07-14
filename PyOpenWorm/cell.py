@@ -71,17 +71,8 @@ class Cell(DataObject):
         if lineageName:
             self.lineageName(lineageName)
 
-    def identifier(self):
-        """ A cell can be identified by its name or lineage name """
-
-        if self._name:
-            # What identifier should we return if there isn't a good one?
-            return self.make_identifier(self._name)
-        else:
-            return DataObject.identifier(self)
-
     def morphology(self):
-        morph_name = "morphology_" + str(self.name()[0])
+        morph_name = "morphology_" + str(next(self.name()))
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)
@@ -118,7 +109,8 @@ class Cell(DataObject):
                 s.includes.append(i)
             morph.segment_groups.append(s)
         return morph
-
+    def __eq__(self,other):
+        return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
     #def rdf(self):
 
     #def peptides(self):
