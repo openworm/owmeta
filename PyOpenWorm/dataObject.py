@@ -1,6 +1,7 @@
 import rdflib as R
 from PyOpenWorm import DataUser
 import PyOpenWorm
+import logging as L
 
 __all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty"]
 
@@ -42,24 +43,28 @@ class DataObject(DataUser):
         self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
 
+        self._id_is_set = False
+
         if ident:
             self._id = R.URIRef(ident)
+            self._id_is_set = True
         else:
             # Randomly generate an identifier if the derived class can't
             # come up with one from the start. Ensures we always have something
             # that functions as an identifier
             import random
             import struct
-            v = struct.pack("=f",random.random()).encode("hex")
-            self._id = R.BNode(self.__class__.__name__ + v)
+            v = struct.pack("=2f",random.random(),random.random())
+            self._id_variable = self._graph_variable(self.__class__.__name__ + v.encode('hex'))
+            self._id = self.make_identifier(v)
 
     def __eq__(self,other):
-        return (self.identifier() == other.identifier())
+        return isinstance(other,DataObject) and (self.identifier() == other.identifier())
 
-    def __str__(self,_level=0):
-        s = (" " * _level) + self.__class__.__name__
-        s += '\n'
-        s +=  "\n".join((" " * (_level + 1))+str(x) for x in self.properties)
+    def __str__(self):
+        s = self.__class__.__name__ + "("
+        s +=  ", ".join(str(x) for x in self.properties)
+        s += ")"
         return s
 
     def _graph_variable(self,var_name):
@@ -86,19 +91,22 @@ class DataObject(DataUser):
             #print 'fragment = ', u.fragment
             return "?"+u.fragment
 
-    def identifier(self):
+    def identifier(self,query=False):
         """
         The identifier for this object in the rdf graph
         This identifier is usually randomly generated, but an identifier returned from the
         graph can be used to retrieve the object.
         """
-        return self._id
+        if query and not self._id_is_set:
+            return self._id_variable
+        else:
+            return self._id
 
     def make_identifier(self, data):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self):
+    def triples(self, query=False):
         """ Should be overridden by derived classes to return appropriate triples
         :return: An iterable of triples
         """
@@ -108,26 +116,20 @@ class DataObject(DataUser):
             # Note: We are _definitely_ assuming synchronous operation here.
             #       Anyway, this code's idempotent. There's no need to lock it...
             self._is_releasing_triples = True
-            yield (self.identifier(), R.RDF['type'], self.rdf_type)
+            yield (self.identifier(query=query), R.RDF['type'], self.rdf_type)
             for x in self._triples:
                 yield x
             for x in self.properties:
-                for y in x.triples():
+                for y in x.triples(query=query):
                     yield y
             self._is_releasing_triples = False
 
-    def graph_pattern(self):
+    def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
         It should be as simple as converting the result of triples() into a BGP
         By default conversion from triples() will treat BNodes as variables
         """
-        return _triples_to_bgp(self.triples())
-
-    def _n3(self):
-        return u".\n".join( x[0].n3() + x[1].n3()  + x[2].n3() for x in self.triples())
-
-    def n3(self):
-        return self._n3()
+        return _triples_to_bgp(self.triples(query=query))
 
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
@@ -156,11 +158,16 @@ class DataObject(DataUser):
         cn = self._extract_class_name(uri)
         # if its our class name, then make our own object
         # if there's a part after that, that's the property name
-        # get the
         prop = self._extract_property_name(uri)
+        print
+        print
+        print
+        print 'uri = ', uri
         o = getattr(PyOpenWorm,cn)(ident=identifier)
-        if prop is not None and hasattr(o,prop):
-            o = getattr(o,prop).__class__()
+        #if prop is not None and hasattr(o,prop):
+            #print "the property = ", prop
+            #o = getattr(o,prop).__class__()
+            #print "made property = ", prop
         return o
 
     @classmethod
@@ -187,24 +194,24 @@ class DataObject(DataUser):
         # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
         # graph and convert them into objects of the type of the querying object.
         #
-        import logging as L
-        gp = self.graph_pattern()
+        gp = self.graph_pattern(query=True)
         L.debug('loading...')
-        # Append some extra patterns to get all values for the properties
-        for prop in self.properties:
-            # hack, hack, hack
-            if isinstance(prop, SimpleProperty):
-                z = prop.v
-                prop.v = []
-                prop_gp = prop.graph_pattern()
-                gp += " .\n"+prop_gp
-                prop.v = z
-        ident = self.identifier()
+        # Append some extra patterns to get *all* values for *all* the properties
+        #for prop in self.properties:
+            ## hack, hack, hack
+            #if isinstance(prop, SimpleProperty):
+                #z = prop.v
+                #prop.v = []
+                #prop_gp = prop.graph_pattern(query=True)
+                #gp += " .\n"+prop_gp
+                #prop.v = z
+        ident = self.identifier(query=True)
         varlist = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
-        if isinstance(ident,R.BNode):
-            varlist.append(ident)
+        if not self._id_is_set:
+            varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
-        q = "Select distinct "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +"\n"+ " .\n".join("OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " }" for x in varlist) + " }"
+        q = "Select "+ " ".join("?" + x + " ?typeof_" + x for x in varlist)+"  where { "+ gp +". \n"+ " .\n".join(" OPTIONAL { ?" + x + " rdf:type ?typeof_" + x + " } " for x in varlist) + " }"
+        #q = "construct where { "+ gp +". \n"+ " .\n".join(" ?" + x + " rdf:type ?typeof_" + x + " " for x in varlist) + " }"
         L.debug('load query = ' + q)
         qres = self.conf['rdf.graph'].query(q)
         L.debug('returned from query')
@@ -218,20 +225,22 @@ class DataObject(DataUser):
             # If our own identifier is a BNode, then the binding we get will be for a distinct object
             # otherwise, the object we get is really the same as this object
 
-            if isinstance(ident,R.BNode):
-                new_ident = g[str(ident)]
+            if not self._id_is_set:
+                new_ident = g[self._graph_variable_to_var(ident)[1:]]
             else:
                 new_ident = ident
 
-            new_object = self.__class__()
+            new_object = self.__class__(ident=new_ident)
 
             for prop in self.properties:
                 if isinstance(prop, SimpleProperty):
                     # get the linkName
                     link_name = prop.linkName
+                    L.debug("load() link_name = " + link_name)
                     # Check if the name is in the result
                     if g[link_name] is not None:
                         new_object_prop = getattr(new_object, link_name)
+                        L.debug("new_object_prop = " + str(new_object_prop))
                         result_value = g[link_name]
                         result_type = False
                         if g['typeof_'+link_name] is not None:
@@ -242,9 +251,10 @@ class DataObject(DataUser):
                                 and not DataObject._is_variable(result_value):
                             # XXX: Maybe should verify that it's an rdflib term?
                             # Create objects from the bound variables
-                            if isinstance(result_value, R.Literal) and isinstance(new_object_prop, DatatypeProperty):
+                            if isinstance(result_value, R.Literal) \
+                            and new_object_prop.property_type == 'DatatypeProperty':
                                 new_object_prop(result_value)
-                            elif isinstance(new_object_prop, ObjectProperty):
+                            elif new_object_prop.property_type == 'ObjectProperty':
                                 new_object_prop(DataObject.object_from_id(result_value, result_type))
                     else:
                         our_value = getattr(self, link_name)
@@ -253,53 +263,7 @@ class DataObject(DataUser):
 
     def retract(self):
         """ Remove this object from the data store. """
-        import logging as L
-        for x in self.triples():
-            ll = L.getLogger().getEffectiveLevel()
-            if ll == L.DEBUG:
-                L.debug("got a bnode in retract = " + str(x))
-        self.retract_statements(_triples_to_bgp(self.triples()))
-
-    def uploader(self):
-        """ Get the uploader for this relationship """
-        uploader_n3_uri = self.conf['rdf.namespace']['uploader'].n3()
-        q = """
-        Select ?u where
-        {
-        GRAPH ?g {
-        """+self._n3()+"""}
-
-        ?g """+uploader_n3_uri+""" ?u.
-        } LIMIT 1
-        """
-        qres = self.conf['rdf.graph'].query(q)
-        uploader = None
-        for x in qres:
-            uploader = x['u']
-            break
-        return str(uploader)
-
-    def upload_date(self):
-        """ Get the date of upload for this relationship
-        :return: the date(s) of upload for this object
-        """
-        upload_date_n3_uri = self.conf['rdf.namespace']['upload_date'].n3()
-        q = """
-        Select ?u where
-        {
-        GRAPH ?g {
-        """+self._n3()+"""}
-
-        ?g """+upload_date_n3_uri+""" ?u.
-        } LIMIT 1
-        """
-        qres = self.conf['rdf.graph'].query(q)
-        ud = None
-        for x in qres:
-            ud = x['u']
-            break
-
-        return str(ud)
+        self.retract_statements(self.graph_pattern(query=True))
 
 # Define a property by writing the get
 class Property(DataObject):
@@ -343,34 +307,52 @@ class SimpleProperty(Property):
         setattr(self.owner,linkName, self)
 
     def get(self):
-        if self.v:
-            return self.v
+        L.debug('getting value of %s' % (self,))
+        if len(self.v) > 0:
+            for x in self.v:
+                yield x
         else:
-            gp = self.owner.graph_pattern()
+            gp = self.graph_pattern(query=True)
             var = "?"+self.linkName
-            qres = self.rdf.query("select distinct " +  var + " where { " + gp + " }")
-            r = [str(x[0]) for x in qres if not isinstance(x[0],R.BNode)]
-            return r
+            q = "select distinct " +  var + " " + var + "_type " + " where { " + gp + " OPTIONAL { " + var + " rdf:type " + var + "_type . } }"
+            print q
+            qres = self.rdf.query(q)
+            for x in qres:
+                if self.property_type == 'DatatypeProperty':
+                    L.debug("returning " + repr(x[0]))
+                    yield str(x[0])
+                elif self.property_type == 'ObjectProperty':
+                    L.debug("object property...")
+                    if x[1] is not None:
+                        L.debug("returning " + repr(x[0]) + " with type " + repr(x[1]))
+                        yield self.object_from_id(x[0], x[1])
 
     def set(self,v):
+        L.debug('setting %s to %s' % (self, v))
         self.v.append(v)
 
-    def triples(self):
-        owner_id = self.owner.identifier()
-        ident = self.identifier()
+    def triples(self,query=False):
+        owner_id = self.owner.identifier(query=query)
+        ident = self.identifier(query=query)
+        value_property = self.conf['rdf.namespace']['SimpleProperty/value']
         yield (ident, R.RDF['type'], self.link)
         yield (owner_id, self.link, ident)
         if len(self.v) > 0:
             for x in self.v:
-                if self.property_type == 'DatatypeProperty':
-                    yield (ident, self.rdf_namespace['value'], R.Literal(x))
-                elif self.property_type == 'ObjectProperty':
-                    yield (ident, self.rdf_namespace['value'], x.identifier())
+                try:
+                    if self.property_type == 'DatatypeProperty':
+                        yield (ident, value_property, R.Literal(x))
+                    elif self.property_type == 'ObjectProperty':
+                        yield (ident, value_property, x.identifier(query=query))
+                        for t in x.triples(query=query):
+                            yield t
+                except Exception, e:
+                    print e
         else:
-            yield (ident, self.rdf_namespace['value'], self._graph_variable(self.linkName))
+            yield (ident, value_property, self._graph_variable(self.linkName))
 
     def __str__(self):
-        return str(self.linkName + "=" + str(self.v))
+        return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
 
 # We keep a little tree of properties in here
 _ObjectProperties = dict()
@@ -380,6 +362,7 @@ def ObjectProperty(link,owner):
     return _create_property(link,owner,'ObjectProperty')
 
 def _create_property(linkName, owner, property_type):
+    L.debug("creating property "+str(linkName)+" on " + str(owner))
     owner_class = owner.__class__.__name__
     if not owner_class in _ObjectProperties:
         _ObjectProperties[owner_class] = dict()
@@ -389,7 +372,7 @@ def _create_property(linkName, owner, property_type):
     if linkName in _ObjectProperties[owner_class]:
         c = _ObjectProperties[owner_class][linkName]
     else:
-        c = type(linkName,(SimpleProperty,),dict())
+        c = type(owner_class + "_" + linkName,(SimpleProperty,),dict())
         _ObjectProperties[owner_class][linkName] = c
 
     return c(linkName, property_type, owner=owner)
