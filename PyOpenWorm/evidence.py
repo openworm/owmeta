@@ -155,7 +155,13 @@ class Evidence(DataObject):
 
     def _pubmed_extract(self):
         def pmRequest(pmid):
-            from lxml import etree as ET
+            try: import elementtree.ElementTree as ET
+            except ImportError:
+                try: import cElementTree as ET
+                except ImportError:
+                    try: import lxml.etree as ET
+                    except ImportError:
+                        import xml.etree.ElementTree as ET # Python 2.5 and up
             base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
             # XXX: There's more data in esummary.fcgi?, but I don't know how to parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
