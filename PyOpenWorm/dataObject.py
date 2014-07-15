@@ -130,14 +130,15 @@ class DataObject(DataUser):
             self._is_releasing_triples = True
             ident = self.identifier(query=query)
 
-            bases = self.parents
-            while len(bases) > 0:
-                next_bases = set([])
-                for x in bases:
-                    t = x(conf=self.conf).rdf_type
-                    yield (ident, R.RDF['type'], t)
-                    next_bases = next_bases | set(x.parents)
-                bases = next_bases
+            if not query:
+                bases = self.parents
+                while len(bases) > 0:
+                    next_bases = set([])
+                    for x in bases:
+                        t = x(conf=self.conf).rdf_type
+                        yield (ident, R.RDF['type'], t)
+                        next_bases = next_bases | set(x.parents)
+                    bases = next_bases
 
             yield (ident, R.RDF['type'], self.rdf_type)
 
@@ -211,7 +212,6 @@ class DataObject(DataUser):
         # graph and convert them into objects of the type of the querying object.
         #
         gp = self.graph_pattern(query=True)
-        L.debug('loading...')
         # Append some extra patterns to get *all* values for *all* the properties
         #for prop in self.properties:
             ## hack, hack, hack
@@ -227,11 +227,8 @@ class DataObject(DataUser):
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
         q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
-        L.debug('load query = ' + q)
         qres = self.conf['rdf.graph'].query(q)
-        L.debug('returned from query')
         for g in qres:
-            L.debug('got result = ' + "  ".join(str(x) for x in g))
             # attempt to get a value for each of the properties this object has
             # if there isn't a value for this property
 
@@ -251,11 +248,9 @@ class DataObject(DataUser):
                 if isinstance(prop, SimpleProperty):
                     # get the linkName
                     link_name = prop.linkName
-                    L.debug("load() link_name = " + link_name)
                     # Check if the name is in the result
                     if g[link_name] is not None:
                         new_object_prop = getattr(new_object, link_name)
-                        L.debug("new_object_prop = " + str(new_object_prop))
                         result_value = g[link_name]
 
                         if result_value is not None \
@@ -324,12 +319,11 @@ class SimpleProperty(Property):
             setattr(self.owner, self.linkName, self)
 
     def get(self):
-        L.debug('getting value of %s' % (self,))
         if len(self.v) > 0:
             for x in self.v:
                 yield x
         else:
-            gp = self.graph_pattern(query=True)
+            gp = self.owner.graph_pattern(query=True)
             var = "?"+self.linkName
             q = "select distinct " +  var + " where { " + gp + " }"
             qres = self.rdf.query(q)
@@ -337,14 +331,11 @@ class SimpleProperty(Property):
 
                 if self.property_type == 'DatatypeProperty' \
                         and not DataObject._is_variable(x[0]):
-                    L.debug("returning " + repr(x[0]))
                     yield str(x[0])
                 elif self.property_type == 'ObjectProperty':
-                    L.debug("object property...")
                     yield self.object_from_id(x[0], self.value_rdf_type)
 
     def set(self,v):
-        L.debug('setting %s to %s' % (self, v))
         self.v.append(v)
 
     def triples(self,query=False):
@@ -386,7 +377,6 @@ def ObjectProperty(*args,**kwargs):
     return _create_property(*args,property_type='ObjectProperty',**kwargs)
 
 def _create_property(linkName, owner, property_type, value_type=DataObject):
-    L.debug("creating property "+str(linkName)+" on " + str(owner))
     owner_class = owner.__class__.__name__
     property_class_name = owner_class + "_" + linkName
 
