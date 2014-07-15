@@ -63,11 +63,12 @@ def _dict_merge(d1,d2):
 class Cell(DataObject):
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
-        self._name = name
         DatatypeProperty('lineageName',owner=self)
         DatatypeProperty('name',owner=self)
+
         if name:
             self.name(name)
+
         if lineageName:
             self.lineageName(lineageName)
 
@@ -111,6 +112,18 @@ class Cell(DataObject):
         return morph
     def __eq__(self,other):
         return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
+
+    def identifier(self, *args, **kwargs):
+        n = False
+        for x in self.name():
+            if x is not None:
+                n = x
+
+        if n != False:
+            return self.make_identifier(n)
+        else:
+            return DataObject.identifier(self, *args, **kwargs)
+
     #def rdf(self):
 
     #def peptides(self):

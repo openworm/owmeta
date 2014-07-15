@@ -328,9 +328,9 @@ class SimpleProperty(Property):
             q = "select distinct " +  var + " where { " + gp + " }"
             qres = self.rdf.query(q)
             for x in qres:
-
                 if self.property_type == 'DatatypeProperty' \
-                        and not DataObject._is_variable(x[0]):
+                        and not DataObject._is_variable(x[0]) \
+                        and x[0] is not None:
                     yield str(x[0])
                 elif self.property_type == 'ObjectProperty':
                     yield self.object_from_id(x[0], self.value_rdf_type)
