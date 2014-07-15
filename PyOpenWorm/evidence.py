@@ -155,11 +155,11 @@ class Evidence(DataObject):
 
     def _pubmed_extract(self):
         def pmRequest(pmid):
-            try: import elementtree.ElementTree as ET
+            try: import lxml.etree as ET
             except ImportError:
                 try: import cElementTree as ET
                 except ImportError:
-                    try: import lxml.etree as ET
+                    try: import elementtree.ElementTree as ET
                     except ImportError:
                         import xml.etree.ElementTree as ET # Python 2.5 and up
             base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
