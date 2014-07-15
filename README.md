@@ -18,10 +18,10 @@ Basic Usage
   
   # Grabs the representation of the neuronal network
   >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>net.aneuron('AVAL').type()
-  Interneuron
+  >>>list(net.aneuron('AVAL').type())
+  ['Interneuron']
   #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').GJ_degree()
+  >>>len(net.aneuron('AVAL').connection(syntype='gapjunction'))
   60
 ```
   
@@ -32,10 +32,10 @@ More examples
 Returns information about individual neurons::
 
 ```python
-  >>>net.aneuron('AVAL').name()
-  AVAL
+  >>>list(net.aneuron('AVAL').name())
+  ['AVAL']
   #list all known receptors
-  >>>net.aneuron('AVAL').receptors()
+  >>>list(net.aneuron('AVAL').receptors())
   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
   >>>net.aneuron('DD5').type()
   motor
