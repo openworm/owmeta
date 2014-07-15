@@ -42,7 +42,7 @@ class _DataTest(unittest.TestCase):
         self.config = Data(TestConfig)
         self.config_no_data = TestConfig
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=self.config, do_logging=False)
+        PyOpenWorm.connect(conf=self.config, do_logging=True)
         self.config.openDatabase()
     def tearDown(self):
         self.config.closeDatabase()
@@ -167,6 +167,14 @@ class CellTest(_DataTest):
         c.save()
         self.assertEqual(["AB plapaaaapp"], list(Cell(name="ADAL").lineageName()))
 
+    def test_same_name_same_id(self):
+        """
+        Test that two Cell objects with the same name have the same identifier()
+        Saves us from having too many inserts of the same object.
+        """
+        c = Cell(name="boots")
+        c1 = Cell(name="boots")
+        self.assertEqual(c.identifier(),c1.identifier())
     @unittest.skip('Long runner')
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
