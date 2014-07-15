@@ -496,18 +496,6 @@ class RDFLibTest(unittest.TestCase):
         b = rdflib.BNode()
         self.assertNotEqual(a, b)
 
-    def test_OpenRDF_reification1(self):
-        """ WARNING: This test requires that you have OpenRDF installed on your machine with a repository named test and that you don't care what's in it """
-        graph = R.ConjunctiveGraph(store="SPARQLUpdateStore")
-        graph.open(("http://localhost:8080/openrdf-sesame/repositories/test","http://localhost:8080/openrdf-sesame/repositories/test/statements"))
-        clear_graph(graph)
-        update_stmt = "INSERT DATA { _:stmt ns1:subject ns1:a ; ns1:predicate ns1:b ; ns1:object ns1:c . _:someone ns1:says _:stmt }"
-
-        for i in range(3):
-            graph.update(update_stmt, initNs=self.ns)
-        r = graph.query("select distinct ?z where { ?p ns1:subject ?x . ?z ns1:says ?p }", initNs=self.ns)
-        self.assertEqual(3,len(r))
-
 #class TimeTest(unittest.TestCase):
     #def test_datetime_isoformat_has_timezone(self):
         #time_stamp = now(utc).isoformat()

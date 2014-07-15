@@ -3,3 +3,4 @@ rdflib
 networkx
 requirements
 pint
+bsddb
