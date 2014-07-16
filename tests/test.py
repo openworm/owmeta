@@ -337,6 +337,15 @@ class NeuronTest(_DataTest):
         n.save()
         self.assertIn('GLR-2', list(self.neur('AVAL').receptors()))
 
+    def test_same_name_same_id(self):
+        """
+        Test that two Neuron objects with the same name have the same identifier()
+        Saves us from having too many inserts of the same object.
+        """
+        c = Neuron(name="boots")
+        c1 = Neuron(name="boots")
+        self.assertEqual(c.identifier(),c1.identifier())
+
     def test_type(self):
         n = self.neur('AVAL')
         n.type('interneuron')
@@ -430,11 +439,11 @@ class EvidenceTest(_DataTest):
 
     def test_pubmed_multiple_authors_list(self):
         """
-        When multiple authors are on a paper, all of their names sohuld be returned in a list (preserving order from publication!)
+        When multiple authors are on a paper, all of their names sohuld be returned in an iterator. Publication order not necessarily preserved
         """
         pmid = "24098140"
         alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
-        self.assertEqual(alist, list(Evidence(pmid=pmid).author()))
+        self.assertEqual(set(alist), set(Evidence(pmid=pmid).author()))
 
     def test_doi_init1(self):
         """
@@ -716,6 +725,79 @@ class PropertyTest(_DataTest):
     pass
 
 class SimplePropertyTest(_DataTest):
+    def test_same_value_same_id_empty(self):
+        """
+        Test that two SimpleProperty objects with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do1)
+        self.assertEqual(c.identifier(),c1.identifier())
+
+    def test_same_value_same_id_not_empty(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do1)
+        do.boots('partition')
+        do1.boots('partition')
+        self.assertEqual(c.identifier(),c1.identifier())
+
+    def test_diff_value_diff_id_not_empty(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do1)
+        do.boots('join')
+        do1.boots('partition')
+        self.assertNotEqual(c.identifier(),c1.identifier())
+
+    def test_diff_prop_same_name_same_object_same_value_same_id(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        # why would you ever do this?
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do)
+        c('join')
+        c1('join')
+        self.assertEqual(c.identifier(),c1.identifier())
+    def test_diff_prop_same_name_same_object_diff_value_same_id(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        # why would you ever do this?
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do)
+        c('partition')
+        c1('join')
+        self.assertNotEqual(c.identifier(),c1.identifier())
+
+    def test_diff_value_insert_order_same_id(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        c = DatatypeProperty("boots", do)
+        c1 = DatatypeProperty("boots", do1)
+        do.boots('join')
+        do.boots('simile')
+        do.boots('partition')
+        do1.boots('partition')
+        do1.boots('join')
+        do1.boots('simile')
+        self.assertEqual(c.identifier(),c1.identifier())
+
     def test_triples_with_no_value(self):
         """ Test that when there is no value set for a property, it still yields a triple """
         do = DataObject(ident=R.URIRef("http://example.org"))
