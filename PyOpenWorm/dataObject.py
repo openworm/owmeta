@@ -227,6 +227,7 @@ class DataObject(DataUser):
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
         q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
+        print q
         qres = self.conf['rdf.graph'].query(q)
         for g in qres:
             # attempt to get a value for each of the properties this object has
@@ -336,7 +337,8 @@ class SimpleProperty(Property):
                     yield self.object_from_id(x[0], self.value_rdf_type)
 
     def set(self,v):
-        self.v.append(v)
+        import bisect
+        bisect.insort(self.v,v)
 
     def triples(self,query=False):
         for x in Property.triples(self,query=query):
@@ -358,14 +360,32 @@ class SimpleProperty(Property):
                             yield t
                 except Exception, e:
                     print e
-        gv = self._graph_variable(self.linkName)
-        yield (ident, value_property, gv)
-        if self.property_type == 'ObjectProperty':
-            # The value
-            if not hasattr(self,'value_rdf_type'):
-                yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
-            else:
-                yield (gv, R.RDF['type'], self.value_rdf_type)
+        else:
+            gv = self._graph_variable(self.linkName)
+            yield (ident, value_property, gv)
+            if self.property_type == 'ObjectProperty':
+                # The value
+                if not hasattr(self,'value_rdf_type'):
+                    yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
+                else:
+                    yield (gv, R.RDF['type'], self.value_rdf_type)
+
+    def identifier(self,query=False):
+        ident = DataObject.identifier(self,query=query)
+        if self._id_is_set:
+            return ident
+
+        if query:
+            # If we're querying then our identifier should be a variable if either our value is empty
+            # or our owner's identifier is a variable
+            owner_id = self.owner.identifier(query=query)
+            vlen = len(self.v)
+            #print vlen
+            #print owner_id
+            if vlen == 0 or DataObject._is_variable(owner_id):
+                return ident
+        # Intentional fall through from if statement ...
+        return self.make_identifier((self.owner.identifier(query), self.link, self.v))
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
