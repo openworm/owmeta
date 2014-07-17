@@ -26,6 +26,9 @@ def upload_synapses():
     try:
         conn = sqlite3.connect('db/celegans.db')
         cur = conn.cursor()
+        w = P.Worm()
+        n = P.Network()
+        w.neuron_network(n)
         #second step, get the relationships between them and add them to the graph
         cur.execute("SELECT DISTINCT a.Entity, b.Entity, Weight, Relation FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and (Relation = '356' OR Relation = '357')")
 
@@ -77,28 +80,28 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
-        upload_neurons()
+        upload_synapses()
     except:
         pass
-    try:
-        for x in P.Neuron().load():
-            print x
-        #q = """
-            #prefix openworm: <http://openworm.org/entities/>
-            #prefix neuron: <http://openworm.org/entities/Neuron/>
-            #prefix sp: <http://openworm.org/entities/SimpleProperty/>
-            #select distinct ?Neuron where
-            #{
-                #?Neuron_name sp:value "AVAL" .
-                #?Neuron neuron:name ?Neuron_name .
-                #?Neuron_name rdf:type openworm:Neuron_name .
-
-                #?Neuron rdf:type openworm:Neuron .
-            #}
-            #"""
-        #for x in P.Configureable.default['rdf.graph'].query(q):
+    #try:
+        #for x in P.Neuron().load():
             #print x
-    except:
-        traceback.print_exc()
+        ##q = """
+            ##prefix openworm: <http://openworm.org/entities/>
+            ##prefix neuron: <http://openworm.org/entities/Neuron/>
+            ##prefix sp: <http://openworm.org/entities/SimpleProperty/>
+            ##select distinct ?Neuron where
+            ##{
+                ##?Neuron_name sp:value "AVAL" .
+                ##?Neuron neuron:name ?Neuron_name .
+                ##?Neuron_name rdf:type openworm:Neuron_name .
+
+                ##?Neuron rdf:type openworm:Neuron .
+            ##}
+            ##"""
+        ##for x in P.Configureable.default['rdf.graph'].query(q):
+            ##print x
+    #except:
+        #traceback.print_exc()
     P.disconnect()
 
