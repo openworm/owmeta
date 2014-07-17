@@ -114,15 +114,30 @@ class Cell(DataObject):
         return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
 
     def identifier(self, *args, **kwargs):
-        n = False
-        for x in self.name():
-            if x is not None:
-                n = x
+        # If the DataObject identifier isn't variable, then self is a specific
+        # object and this identifier should be returned. Otherwise, if our name
+        # attribute is _already_ set, then we can get the identifier from it and
+        # return that. Otherwise, there's no telling from here what our identifier
+        # should be, so the variable identifier (from DataObject.identifier() must
+        # be returned
+        ident = DataObject.identifier(self, *args, **kwargs)
+        if 'query' in kwargs and kwargs['query'] == True:
+            if not DataObject._is_variable(ident):
+                return ident
 
-        if n != False:
-            return self.make_identifier(n)
+            if len(self.name.v) > 0:
+                # name is already set, so we can make an identifier from it
+                n = next(self.name())
+                return self.make_identifier(n)
+            else:
+                return ident
         else:
-            return DataObject.identifier(self, *args, **kwargs)
+            if len(self.name.v) > 0:
+                # name is already set, so we can make an identifier from it
+                n = next(self.name())
+                return self.make_identifier(n)
+            else:
+                return ident
 
     #def rdf(self):
 
