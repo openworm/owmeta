@@ -223,11 +223,10 @@ class DataObject(DataUser):
                 #prop.v = z
         ident = self.identifier(query=True)
         varlist = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
-        if not self._id_is_set:
+        if DataObject._is_variable(ident):
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
         q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
-        print q
         qres = self.conf['rdf.graph'].query(q)
         for g in qres:
             # attempt to get a value for each of the properties this object has
@@ -238,7 +237,7 @@ class DataObject(DataUser):
             # If our own identifier is a BNode, then the binding we get will be for a distinct object
             # otherwise, the object we get is really the same as this object
 
-            if not self._id_is_set:
+            if DataObject._is_variable(ident):
                 new_ident = g[self._graph_variable_to_var(ident)[1:]]
             else:
                 new_ident = ident
