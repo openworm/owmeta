@@ -344,7 +344,7 @@ class NeuronTest(_DataTest):
         """
         c = Neuron(name="boots")
         c1 = Neuron(name="boots")
-        self.assertEqual(c.identifier(),c1.identifier())
+        self.assertEqual(c.identifier(query=True),c1.identifier(query=True))
 
     def test_type(self):
         n = self.neur('AVAL')
