@@ -84,7 +84,6 @@ class Evidence(DataObject):
                 self._fields['bibtex'] = source[k]
                 break
             if k in (x.linkName for x in self.properties):
-                print 'setting ',k,'to',source[k]
                 getattr(self,k)(source[k])
                 break
 
