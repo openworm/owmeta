@@ -323,9 +323,15 @@ class SimpleProperty(Property):
             for x in self.v:
                 yield x
         else:
-            gp = self.owner.graph_pattern(query=True)
+            owner_id = self.owner.identifier(query=True)
+            if DataObject._is_variable(owner_id):
+                gp = self.owner.graph_pattern(query=True)
+            else:
+                gp = self.graph_pattern(query=True)
+
             var = "?"+self.linkName
             q = "select distinct " +  var + " where { " + gp + " }"
+            L.debug("get query = " + q)
             qres = self.rdf.query(q)
             for x in qres:
                 if self.property_type == 'DatatypeProperty' \
@@ -384,7 +390,7 @@ class SimpleProperty(Property):
             if vlen == 0 or DataObject._is_variable(owner_id):
                 return ident
         # Intentional fall through from if statement ...
-        return self.make_identifier((self.owner.identifier(query), self.link, self.v))
+        return self.make_identifier((self.owner.identifier(query=query), self.link, self.v))
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
