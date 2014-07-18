@@ -506,10 +506,10 @@ class RDFLibTest(unittest.TestCase):
         except:
             self.fail("Doesn't actually fail...which is weird")
     def test_uriref_not_id(self):
-        try:
-            rdflib.URIRef("some random string")
-        except:
-            self.fail("Doesn't actually fail but prints a warning.")
+        import cStringIO
+        out = cStringIO.StringIO()
+        #XXX: capture the logged warning
+        rdflib.URIRef("some random string")
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
