@@ -42,7 +42,7 @@ class _DataTest(unittest.TestCase):
         self.config = Data(TestConfig)
         self.config_no_data = TestConfig
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=self.config, do_logging=True)
+        PyOpenWorm.connect(conf=self.config, do_logging=False)
         self.config.openDatabase()
     def tearDown(self):
         self.config.closeDatabase()
@@ -509,7 +509,7 @@ class RDFLibTest(unittest.TestCase):
         try:
             rdflib.URIRef("some random string")
         except:
-            self.fail("Doesn't actually fail...which is weird")
+            self.fail("Doesn't actually fail but prints a warning.")
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
@@ -723,8 +723,12 @@ class DataTest(_DataTest):
 
 class PropertyTest(_DataTest):
     pass
-
 class SimplePropertyTest(_DataTest):
+    def __init__(self,*args,**kwargs):
+        _DataTest.__init__(self,*args,**kwargs)
+        id_tests = []
+
+    # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
         """
         Test that two SimpleProperty objects with the same name have the same identifier()
@@ -745,6 +749,20 @@ class SimplePropertyTest(_DataTest):
         c1 = DatatypeProperty("boots", do1)
         do.boots('partition')
         do1.boots('partition')
+        self.assertEqual(c.identifier(),c1.identifier())
+
+    def test_same_value_same_id_not_empty_object_property(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        dz = DataObject(ident=R.URIRef("http://example.org/vip"))
+        dz1 = DataObject(ident=R.URIRef("http://example.org/vip"))
+        c = ObjectProperty("boots", do)
+        c1 = ObjectProperty("boots", do1)
+        do.boots(dz)
+        do1.boots(dz1)
         self.assertEqual(c.identifier(),c1.identifier())
 
     def test_diff_value_diff_id_not_empty(self):
@@ -770,6 +788,7 @@ class SimplePropertyTest(_DataTest):
         c('join')
         c1('join')
         self.assertEqual(c.identifier(),c1.identifier())
+
     def test_diff_prop_same_name_same_object_diff_value_same_id(self):
         """
         Test that two SimpleProperty with the same name have the same identifier()
@@ -796,6 +815,27 @@ class SimplePropertyTest(_DataTest):
         do1.boots('partition')
         do1.boots('join')
         do1.boots('simile')
+        self.assertEqual(c.identifier(),c1.identifier())
+
+    def test_diff_value_insert_order_same_id_object_property(self):
+        """
+        Test that two SimpleProperty with the same name have the same identifier()
+        """
+        do = DataObject(ident=R.URIRef("http://example.org"))
+        do1 = DataObject(ident=R.URIRef("http://example.org"))
+        oa = DataObject(ident=R.URIRef("http://example.org/a"))
+        ob = DataObject(ident=R.URIRef("http://example.org/b"))
+        oc = DataObject(ident=R.URIRef("http://example.org/c"))
+
+        c = ObjectProperty("boots", do)
+        c1 = ObjectProperty("boots", do1)
+
+        do.boots(oa)
+        do.boots(ob)
+        do.boots(oc)
+        do1.boots(oc)
+        do1.boots(oa)
+        do1.boots(ob)
         self.assertEqual(c.identifier(),c1.identifier())
 
     def test_triples_with_no_value(self):
