@@ -3,7 +3,7 @@ from PyOpenWorm import DataUser
 import PyOpenWorm
 import logging as L
 
-__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty", "_DataObjectsParents"]
+__all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
 
 class X():
    pass
@@ -390,7 +390,13 @@ class SimpleProperty(Property):
             if vlen == 0 or DataObject._is_variable(owner_id):
                 return ident
         # Intentional fall through from if statement ...
-        return self.make_identifier((self.owner.identifier(query=query), self.link, self.v))
+        value_data = ""
+        if self.property_type == 'DatatypeProperty':
+            value_data = "".join(str(x) for x in self.v)
+        elif self.property_type == 'ObjectProperty':
+            value_data = "".join(str(x.identifier()) for x in self.v)
+
+        return self.make_identifier((self.owner.identifier(query=query), self.link, value_data))
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
@@ -417,3 +423,12 @@ def _create_property(linkName, owner, property_type, value_type=DataObject):
 
     return c(owner=owner, conf=owner.conf)
 
+class values(DataObject):
+    """ A convenience class for getting the triples from a collection of objects
+    Provide the name of the value you want and the object that should return it.
+    """
+    def __init__(self,**kwargs):
+        DataObject.__init__(self,**kwargs)
+        ObjectProperty('_o', owner=self)
+    def add(self,v):
+        self._o(v)
