@@ -112,6 +112,11 @@ Installation
     git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
+    
+Uninstall
+----------
+
+    pip uninstall PyOpenWorm
 
 Running tests
 -------------
