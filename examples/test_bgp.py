@@ -1,6 +1,9 @@
+import sys
+sys.path.insert(0,'..')
+
 import PyOpenWorm as P
-P.Configureable.default = P.Data.open("tests/test.conf")
-P.Configureable.default.openDatabase()
+
+P.connect(configFile="../tests/test.conf", do_logging=False)
 try:
     #tests = [P.Neuron(),P.Neuron(lineageName="AB"),P.Neuron(name="ADAL"),P.Connection(),P.Connection(pre_cell="ADAL",post_cell="PVCR",syntype='send',synclass='Acetycholine')]
     #tests[len(tests)-1].save()
@@ -13,7 +16,7 @@ try:
     query_object = P.Connection(pre_cell='AVAL')
     print 'STARTING WITH AVAL'
     for x in query_object.load():
-        cc = x
+        print x
     print
     print 'STARTING WITH PVCL'
     query_object = P.Connection(pre_cell='PVCL')
@@ -24,16 +27,16 @@ try:
     print 'NEURONS'
     query_object = P.Neuron()
     for x in query_object.load():
-        print x
+        print next(x.name())
     print
     print 'NEIGHBORS of PVCL'
     query_object = P.Neuron(name='PVCL')
     for x in query_object.neighbor():
-        print x
+        print next(x.name())
     print
     print 'NEIGHBORS of AVAL with number=30 connections'
     query_object = P.Neuron(name='AVAL')
     for x in query_object.neighbor():
-        print x
+        print next(x.name())
 finally:
     P.Configureable.default.closeDatabase()
