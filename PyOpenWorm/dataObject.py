@@ -1,6 +1,6 @@
 import rdflib as R
 from PyOpenWorm import DataUser
-import PyOpenWorm
+import traceback
 import logging as L
 
 __all__ = [ "DataObject", "DatatypeProperty", "ObjectProperty", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
@@ -43,7 +43,6 @@ class DataObject(DataUser):
     def register(cls):
         assert(issubclass(cls, DataObject))
         _DataObjects[cls.__name__] = cls
-        base = None
         _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
         cls.parents = _DataObjectsParents[cls.__name__]
 
@@ -183,7 +182,6 @@ class DataObject(DataUser):
         cn = self._extract_class_name(uri)
         # if its our class name, then make our own object
         # if there's a part after that, that's the property name
-        prop = self._extract_property_name(uri)
         o = _DataObjects[cn](ident=identifier, conf=self.conf)
         return o
 
@@ -227,6 +225,7 @@ class DataObject(DataUser):
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
         q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
+        L.debug('load_query='+q)
         qres = self.conf['rdf.graph'].query(q)
         for g in qres:
             # attempt to get a value for each of the properties this object has
@@ -242,7 +241,7 @@ class DataObject(DataUser):
             else:
                 new_ident = ident
 
-            new_object = self.__class__(ident=new_ident)
+            new_object = self.object_from_id(new_ident)
 
             for prop in self.properties:
                 if isinstance(prop, SimpleProperty):
@@ -287,12 +286,6 @@ class Property(DataObject):
         # XXX: Default implementation is a box for a value
         self._value = False
 
-    def owner(self,v=False):
-        if v:
-            self.owner = v
-            self.owner.properties.append(self)
-
-
     def get(self,*args):
         """ Get the things which are on the other side of this property """
         # This should run a query or return a cached value
@@ -314,7 +307,10 @@ class SimpleProperty(Property):
     def __init__(self,**kwargs):
         Property.__init__(self,**kwargs)
         self.v = []
-        if self.owner:
+        if (self.owner==False) and hasattr(self,'owner_type'):
+            self.owner = self.owner_type(conf=self.conf)
+
+        if self.owner!=False:
             self.link = self.owner.rdf_namespace[self.linkName]
             setattr(self.owner, self.linkName, self)
 
@@ -363,8 +359,8 @@ class SimpleProperty(Property):
                         yield (ident, value_property, x.identifier(query=query))
                         for t in x.triples(query=query):
                             yield t
-                except Exception, e:
-                    print e
+                except Exception:
+                    traceback.print_exn()
         else:
             gv = self._graph_variable(self.linkName)
             yield (ident, value_property, gv)
@@ -374,6 +370,29 @@ class SimpleProperty(Property):
                     yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
                 else:
                     yield (gv, R.RDF['type'], self.value_rdf_type)
+    def load(self):
+        """ Load in data from the database. Derived classes should override this for their own data structures.
+        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+
+        """
+        # This load is way simpler since we just need the values for this property
+        gp = self.graph_pattern(query=True)
+
+        q = "Select distinct ?"+self.linkName+"  where { "+ gp +" . }"
+        L.debug('load_query='+q)
+        qres = self.conf['rdf.graph'].query(q)
+        for k in qres:
+            k = k[0]
+            value = False
+            if not self._is_variable(k):
+                if self.property_type == 'ObjectProperty':
+                    value = self.object_from_id(k)
+                elif self.property_type == 'DatatypeProperty':
+                    value = str(k)
+
+                if value:
+                    self.v.append(value)
+        yield self
 
     def identifier(self,query=False):
         ident = DataObject.identifier(self,query=query)
@@ -408,16 +427,20 @@ def ObjectProperty(*args,**kwargs):
     return _create_property(*args,property_type='ObjectProperty',**kwargs)
 
 def _create_property(linkName, owner, property_type, value_type=DataObject):
-    owner_class = owner.__class__.__name__
-    property_class_name = owner_class + "_" + linkName
+    owner_class = owner.__class__
+    owner_class_name = owner_class.__name__
+    property_class_name = owner_class_name + "_" + linkName
 
     c = None
-
     if property_class_name in _DataObjects:
         c = _DataObjects[property_class_name]
     else:
-        value_rdf_type = value_type(conf=owner.conf).rdf_type
-        c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type))
+        if property_type == 'ObjectProperty':
+            value_rdf_type = value_type(conf=owner.conf).rdf_type
+        else:
+            value_rdf_type = False
+
+        c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
         _DataObjects[property_class_name] = c
         c.register()
 

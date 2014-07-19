@@ -48,6 +48,7 @@ SimpleProperty.register()
 Property.register()
 Relationship.register()
 
+config = Configureable.default
 
 def useTestConfig():
     cfg = {
@@ -83,5 +84,6 @@ def connect(conf=False,configFile=False,testConfig=False,do_logging=False):
 
     Configureable.default.openDatabase()
     logging.info("Connected to database")
+
 def disconnect():
     Configureable.default.closeDatabase()
