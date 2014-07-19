@@ -1,23 +1,31 @@
-import PyOpenWorm
+import sys
+sys.path.insert(0,'..')
 
-TestConfig = PyOpenWorm.Configure.open("../tests/test.conf")
-config = PyOpenWorm.Data(TestConfig)
+import PyOpenWorm as P
 
-worm = PyOpenWorm.Worm(config)
+P.connect(configFile="readme.conf")
+
+g = P.Configureable.default['rdf.graph']
+t = P.Neuron().rdf_type
+
+
+worm = P.Worm()
+for x in worm.load():
+    print x
 
 net = worm.get_neuron_network()
 
 types = {}
-for neuron in net.neurons():
+for neuron in net.neuron():
     try:
-        type = net.aneuron(neuron).type()
+        type = next(neuron.type())
     except KeyError:
         type = "Unknown"
 
     if not types.has_key(type):
         types[type] = []
-    types[type].append(neuron)
-        
+    types[type].append(next(neuron.name()))
+
 
 for type in types.keys():
     print("Neurons of type %s:\n  %s\n"%(type, types[type]))
