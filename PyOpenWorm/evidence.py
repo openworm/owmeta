@@ -59,7 +59,7 @@ class Evidence(DataObject):
         # Evidence field1 value1
         #        ; field2 value2
         #        ; field3 value3 .
-        DataObject.__init__(self, conf)
+        DataObject.__init__(self, conf=conf)
         self._fields = dict()
         DatatypeProperty('author',owner=self)
         DatatypeProperty('year',owner=self)
@@ -174,9 +174,3 @@ class Evidence(DataObject):
         tree = pmRequest(pmid)
         for x in tree.xpath('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item'):
             self.author(x.text)
-
-    def __eq__(self, other):
-        for f in self._fields:
-            if (f not in other._fields) or (self._fields(f) != other._fields(f)):
-                return False
-        return True
