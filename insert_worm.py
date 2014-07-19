@@ -22,6 +22,55 @@ def upload_neurons():
     finally:
         conn.close()
 
+def upload_receptors_and_innexins():
+    try:
+        conn = sqlite3.connect('db/celegans.db')
+        cur = conn.cursor()
+        w = P.Worm()
+        n = P.Network()
+        w.neuron_network(n)
+        # insert neurons.
+        # save
+        # get the receptor (354) and innexin (355)
+        cur.execute("""
+        SELECT DISTINCT a.Entity, b.Entity
+        FROM
+        tblrelationship q,
+        tblrelationship r,
+        tblentity a,
+        tblentity b
+        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
+        and   r.EnID1=a.id and r.Relation = '354'  and r.EnID2=b.id
+        """)
+        for r in cur.fetchall():
+            neuron_name = str(r[0])
+            receptor = str(r[1])
+            neur = P.Neuron(name=neuron_name)
+            neur.receptor(receptor)
+            n.neuron(neur)
+        cur.execute("""
+        SELECT DISTINCT a.Entity, b.Entity
+        FROM
+        tblrelationship q,
+        tblrelationship r,
+        tblentity a,
+        tblentity b
+        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
+        and   r.EnID1=a.id and r.Relation = '355'  and r.EnID2=b.id
+        """)
+        for r in cur.fetchall():
+            neuron_name = str(r[0])
+            innexin = str(r[1])
+            neur = P.Neuron(name=neuron_name)
+            neur.innexin(innexin)
+            n.neuron(neur)
+        n.save()
+        #second step, get the relationships between them and add them to the graph
+    except Exception:
+        traceback.print_exc()
+    finally:
+        conn.close()
+
 def upload_synapses():
     try:
         conn = sqlite3.connect('db/celegans.db')
@@ -62,6 +111,7 @@ def upload_synapses():
         traceback.print_exc()
     finally:
         conn.close()
+
 if __name__ == '__main__':
     d = P.Data({
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
@@ -80,7 +130,7 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
-        upload_synapses()
+        upload_receptors_and_innexins()
     except:
         pass
     #try:
