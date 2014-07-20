@@ -342,15 +342,15 @@ class SimpleProperty(Property):
         bisect.insort(self.v,v)
 
     def triples(self,query=False):
-        for x in Property.triples(self,query=query):
-            yield x
         owner_id = self.owner.identifier(query=query)
         ident = self.identifier(query=query)
         value_property = self.conf['rdf.namespace']['SimpleProperty/value']
 
-        yield (owner_id, self.link, ident)
 
         if len(self.v) > 0:
+            for x in Property.triples(self,query=query):
+                yield x
+            yield (owner_id, self.link, ident)
             for x in self.v:
                 try:
                     if self.property_type == 'DatatypeProperty':
@@ -360,16 +360,24 @@ class SimpleProperty(Property):
                         for t in x.triples(query=query):
                             yield t
                 except Exception:
-                    traceback.print_exn()
+                    traceback.print_exc()
         else:
+            # XXX : Note: we insert 'variables' into the graph so that we don't
+            # have to do OPTIONAL patterns in load.
+            # We could instead use Triple objects to which we attach 'optional' tags
+            # to indicate that the triple should be in an optional pattern when
+            # queried.
             gv = self._graph_variable(self.linkName)
+            yield (owner_id, self.link, ident)
             yield (ident, value_property, gv)
-            if self.property_type == 'ObjectProperty':
-                # The value
-                if not hasattr(self,'value_rdf_type'):
-                    yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
-                else:
-                    yield (gv, R.RDF['type'], self.value_rdf_type)
+
+            # Removing
+            #if self.property_type == 'ObjectProperty':
+                ## The value
+                #if not hasattr(self,'value_rdf_type'):
+                    #yield (gv, R.RDF['type'], DataObject(conf=self.conf).rdf_type)
+                #else:
+                    #yield (gv, R.RDF['type'], self.value_rdf_type)
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
         :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
@@ -377,7 +385,6 @@ class SimpleProperty(Property):
         """
         # This load is way simpler since we just need the values for this property
         gp = self.graph_pattern(query=True)
-
         q = "Select distinct ?"+self.linkName+"  where { "+ gp +" . }"
         L.debug('load_query='+q)
         qres = self.conf['rdf.graph'].query(q)

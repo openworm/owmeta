@@ -14,10 +14,12 @@ try:
     #P.Connection(pre_cell='AVAL', post_cell='PVCR', number=10).save()
     #P.Connection(pre_cell='AVAL', post_cell='LOLR', number=30).save()
     query_object = P.Connection(pre_cell='AVAL')
+    #sys.exit()
     print 'STARTING WITH AVAL'
     for x in query_object.load():
         print x
     print
+    #sys.exit()
     print 'STARTING WITH PVCL'
     query_object = P.Connection(pre_cell='PVCL')
     for x in query_object.load():
@@ -36,11 +38,12 @@ try:
     print
     print 'NEIGHBORS of AVAL with number=30 connections'
     query_object = P.Neuron(name='AVAL')
-    for x in query_object.neighbor(number=30):
+    for x in query_object.neighbor.get(number=30):
         print next(x.name())
     print
     print 'NEURONS and their RECEPTORS'
     query_object = P.Neuron()
+    print query_object.graph_pattern(query=True)
     for x in query_object.load():
         # Wrap in a try-block in case there are no receptors listed
         try:
