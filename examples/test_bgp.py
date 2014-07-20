@@ -13,6 +13,7 @@ try:
     #P.Connection(pre_cell='AVAL', post_cell='PVCR', number=30).save()
     #P.Connection(pre_cell='AVAL', post_cell='PVCR', number=10).save()
     #P.Connection(pre_cell='AVAL', post_cell='LOLR', number=30).save()
+
     query_object = P.Connection(pre_cell='AVAL')
     #sys.exit()
     print 'STARTING WITH AVAL'
@@ -28,32 +29,37 @@ try:
     print
     print 'NEURONS'
     query_object = P.Neuron()
+    # sometimes a neuron object with the same name is returned more than once
+    names = dict()
     for x in query_object.load():
-        print next(x.name())
+         n = next(x.name())
+         if n not in names:
+             names[n] = dict()
+             print n
     print
     print 'NEIGHBORS of PVCL'
     query_object = P.Neuron(name='PVCL')
     for x in query_object.neighbor():
         print next(x.name())
     print
-    print 'NEIGHBORS of AVAL with number=30 connections'
+    print 'NEIGHBORS of AVAL with number=3 connections'
     query_object = P.Neuron(name='AVAL')
-    for x in query_object.neighbor.get(number=30):
+    for x in query_object.neighbor.get(number=3):
         print next(x.name())
     print
     print 'NEURONS and their RECEPTORS'
-    query_object = P.Neuron()
-    print query_object.graph_pattern(query=True)
-    for x in query_object.load():
+    for x in names:
         # Wrap in a try-block in case there are no receptors listed
+        print x,
         try:
-            print next(x.receptor())
-        except:
+            for r in P.Neuron(name=x).receptor():
+                print ' ', r,
+        except StopIteration:
             pass
+        print
     print
-    print 'EVERYTHING'
-    for x in P.DataObject().load():
-        for y in x.load():
-            print y
+    print 'FIRST 100 OBJECTS'
+    for x in zip(P.DataObject().load(), range(100)):
+        print x[0]
 finally:
     P.Configureable.default.closeDatabase()
