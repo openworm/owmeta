@@ -65,27 +65,28 @@ class Evidence(DataObject):
         DatatypeProperty('year',owner=self)
         DatatypeProperty('title',owner=self)
         ObjectProperty('asserts', owner=self)
+        DatatypeProperty('doi',owner=self)
+        DatatypeProperty('wbid',owner=self)
+        DatatypeProperty('pmid',owner=self)
 
         #XXX: I really don't like putting these in two places
         for k in source:
             if k in ('pubmed', 'pmid'):
                 self._fields['pmid'] = source[k]
                 self._pubmed_extract()
-                break
+                self.pmid(source[k])
             if k in ('wormbase', 'wbid'):
                 self._fields['wormbase'] = source[k]
                 self._wormbase_extract()
-                break
+                self.wbid(source[k])
             if k in ('doi'):
                 self._fields['doi'] = source[k]
                 self._crossref_doi_extract()
-                break
+                self.doi(source[k])
             if k in ('bibtex'):
                 self._fields['bibtex'] = source[k]
-                break
             if k in (x.linkName for x in self.properties):
                 getattr(self,k)(source[k])
-                break
 
     def add_data(self, k, v):
         """ Add a field
