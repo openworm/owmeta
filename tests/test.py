@@ -42,7 +42,7 @@ class _DataTest(unittest.TestCase):
         self.config = Data(TestConfig)
         self.config_no_data = TestConfig
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=self.config, do_logging=False)
+        PyOpenWorm.connect(conf=self.config, do_logging=True)
         self.config.openDatabase()
     def tearDown(self):
         self.config.closeDatabase()
@@ -839,7 +839,7 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(),c1.identifier())
 
     def test_triples_with_no_value(self):
-        """ Test that when there is no value set for a property, it still yields a triple """
+        """ Test that when there is no value set for a property, it still yields triples """
         do = DataObject(ident=R.URIRef("http://example.org"))
         class T(SimpleProperty):
             property_type = 'DatatypeProperty'
@@ -847,6 +847,7 @@ class SimplePropertyTest(_DataTest):
 
         sp = T(owner=do)
         self.assertNotEqual(len(list(sp.triples())), 0)
+        self.assertNotEqual(len(list(sp.triples(query=True))), 0)
 
 class NeuroMLTest(_DataTest):
     pass
