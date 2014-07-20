@@ -130,6 +130,7 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
+        upload_synapses()
         upload_receptors_and_innexins()
     except:
         pass
