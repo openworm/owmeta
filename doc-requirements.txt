@@ -4,4 +4,4 @@ requirements
 pint
 lxml
 numpydoc
-neuroml
+libneuroml
