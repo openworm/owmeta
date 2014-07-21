@@ -723,6 +723,7 @@ class DataTest(_DataTest):
 
 class PropertyTest(_DataTest):
     pass
+
 class SimplePropertyTest(_DataTest):
     def __init__(self,*args,**kwargs):
         _DataTest.__init__(self,*args,**kwargs)
