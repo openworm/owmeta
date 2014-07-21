@@ -11,6 +11,14 @@ import rdflib as R
 from PyOpenWorm import DataObject
 
 class Network(DataObject):
+    """
+    Attributes
+    ----------
+    neuron : ObjectProperty
+        Representation of neurons in the network
+    synapse : ObjectProperty
+        Representation of synapses in the network
+    """
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
         self.synapses = P.ObjectProperty('synapse',owner=self,value_type=P.Connection)
@@ -20,17 +28,15 @@ class Network(DataObject):
         for x in self.neuron():
             for n in x.name():
                 yield n
-    def aneuron(self, name, check=False):
+    def aneuron(self, name):
         """
         Get a neuron by name
 
         :param name: Name of a c. elegans neuron
-        :returns: Corresponding neuron to the name given
+        :returns: Neuron corresponding to the name given
         :rtype: PyOpenWorm.Neuron
         """
         n = P.Neuron(name=name,conf=self.conf)
-        if check:
-            assert(n.check_exists())
         return n
 
     def _synapses_csv(self):
@@ -51,21 +57,30 @@ class Network(DataObject):
         """
         Get all sensory neurons by name
 
-        :returns: A list of all sensory neuron names
-        :rtype: list
+        :returns: A iterable of all sensory neurons
+        :rtype: iter(Neuron)
         """
 
-        qres = self['semantic_net'].query(
-          """SELECT ?subLabel     #we want to get out the labels associated with the objects
-           WHERE {
-              ?subject <http://openworm.org/entities/1515> <http://openworm.org/entities/1> . # match all subjects that have the 'is a' (1515) property pointing to 'neuron' (1) or 'interneuron' (2)
-              ?subject rdfs:label ?subLabel  #for the subject, look up their plain text label.
-            }""")
+        # TODO: make sure these belong to *this* Network
+        n = P.Neuron()
+        n.type('sensory')
 
-        for r in qres.result:
-            yield str(r[0])
+        for x in n.load():
+            yield x
+    def interneurons(self):
+        """
+        Get all interneurons neurons
 
-    #def inter(self):
+        :returns: A iterable of all interneurons
+        :rtype: iter(Neuron)
+        """
+
+        # TODO: make sure these belong to *this* Network
+        n = P.Neuron()
+        n.type('interneuron')
+
+        for x in n.load():
+            yield x
 
     #def neuroml(self):
 

@@ -17,6 +17,12 @@ Classes
    :members:
 .. autoclass:: Muscle
    :members:
+.. autoclass:: Cell
+   :members:
+.. autoclass:: Evidence
+   :members:
+.. autoclass:: Connection
+   :members:
 """
 
 __version__ = '0.0.1-alpha'
