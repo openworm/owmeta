@@ -48,8 +48,30 @@ def _json_request(url):
         return {}
 
 class Evidence(DataObject):
+    """
+    A class for storing metadata, like scholarly references, for
+    other objects
+    """
     def __init__(self, conf=False, **source):
-        # Get the type of the evidence (a paper, a lab, a uri)
+        """
+            Parameters
+            ----------
+            doi:
+                A Digital Object Identifier (DOI) that provides evidence, optional
+            pmid:
+                A PubMed ID (PMID) that point to a paper that provides evidence, optional
+            wormbaseid:
+                An ID from WormBase that points to a record that provides evidence, optional
+            author:
+                The author of the evidence
+            title:
+                The title of the evidence
+            year:
+                The date (e.g., publication date) of the evidence
+
+        """
+        # The type of the evidence (a paper, a lab, a uri) is
+        # determined by the `source` key
         # We keep track of a set of fields for the evidence.
         # Some of the fields are pulled from provided URIs and
         # some is provided by the user.
@@ -75,7 +97,7 @@ class Evidence(DataObject):
                 self._fields['pmid'] = source[k]
                 self._pubmed_extract()
                 self.pmid(source[k])
-            if k in ('wormbase', 'wbid'):
+            if k in ('wormbaseid','wormbase', 'wbid'):
                 self._fields['wormbase'] = source[k]
                 self._wormbase_extract()
                 self.wbid(source[k])
