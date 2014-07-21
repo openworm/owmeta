@@ -1,7 +1,7 @@
 """
 .. class:: Cell
 
-   neuron client
+   cell client
    =============
 
    This module contains the class that defines the cell
@@ -61,6 +61,14 @@ def _dict_merge(d1,d2):
     dict(chain(d1.items(), d2.items()))
 
 class Cell(DataObject):
+    """
+    Attributes
+    ----------
+    name : DatatypeProperty
+        The name of the cell
+    lineageName : DatatypeProperty
+        The lineageName of the cell
+    """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
         DatatypeProperty('lineageName',owner=self)
