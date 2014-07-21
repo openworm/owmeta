@@ -2,6 +2,36 @@ import PyOpenWorm as P
 import traceback
 from PyOpenWorm import Data, Configureable, Configure
 import sqlite3
+def print_evidence():
+    try:
+        conn = sqlite3.connect('db/celegans.db')
+        cur = conn.cursor()
+        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
+        for r in cur.fetchall():
+            print r
+    except Exception, e:
+        traceback.print_exc()
+    finally:
+        conn.close()
+
+def upload_muscles():
+    try:
+        conn = sqlite3.connect('db/celegans.db')
+        cur = conn.cursor()
+        w = P.Worm()
+        # insert neurons.
+        # save
+        cur.execute("SELECT DISTINCT b.Entity FROM tblrelationship, tblentity b where Relation = '1516' and EnID2=b.id")
+        for r in cur.fetchall():
+            muscle_name = str(r[0])
+            w.muscle(P.Muscle(muscle_name))
+        w.save()
+        #second step, get the relationships between them and add them to the graph
+    except Exception, e:
+        traceback.print_exc()
+    finally:
+        conn.close()
+
 def upload_neurons():
     try:
         conn = sqlite3.connect('db/celegans.db')
@@ -130,8 +160,10 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
-        upload_synapses()
-        upload_receptors_and_innexins()
+        #print_evidence()
+        upload_muscles()
+        #upload_synapses()
+        #upload_receptors_and_innexins()
     except:
         pass
     #try:

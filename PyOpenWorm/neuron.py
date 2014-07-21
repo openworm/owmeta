@@ -27,7 +27,7 @@ class Neighbor(P.Property):
        :rtype: List
     """
     def __init__(self,**kwargs):
-        P.Property.__init__(self,**kwargs)
+        P.Property.__init__(self,'neighbor',**kwargs)
         self._conns = []
 
     def get(self,**kwargs):
@@ -61,16 +61,24 @@ class Connection(P.Property):
        :rtype: List
     """
     def __init__(self,**kwargs):
-        P.Property.__init__(self,**kwargs)
+        P.Property.__init__(self,'connection',**kwargs)
         self._conns = []
 
-    def get(self,pre_or_post='pre',**kwargs):
-        if pre_or_post == 'pre':
-            c = P.Connection(pre_cell=self.owner,**kwargs)
-        else:
-            c = P.Connection(post_cell=self.owner,**kwargs)
-        for r in c.load():
-            yield r
+    def get(self,pre_post_or_either='pre',**kwargs):
+        c = []
+        if pre_post_or_either == 'pre':
+            c.append(P.Connection(pre_cell=self.owner,**kwargs))
+        elif pre_post_or_either == 'post':
+            c.append(P.Connection(post_cell=self.owner,**kwargs))
+        elif pre_post_or_either == 'either':
+            c.append(P.Connection(pre_cell=self.owner,**kwargs))
+            c.append(P.Connection(post_cell=self.owner,**kwargs))
+        for x in c:
+            for r in x.load():
+                yield r
+    def count(self,*args,**kwargs):
+        # XXX: Turn this into a count query
+        return len(list(self.get(*args,**kwargs)))
 
     def set(self, conn, **kwargs):
         assert(isinstance(conn, P.Connection))
@@ -82,12 +90,12 @@ class Connection(P.Property):
                 yield x
 
 class Neuron(Cell):
-    def __init__(self, **kwargs):
-        Cell.__init__(self,**kwargs)
+    def __init__(self, name=False, **kwargs):
+        Cell.__init__(self,name=name,**kwargs)
         # Get neurons connected to this neuron
-        self.neighbor = Neighbor(owner=self)
+        Neighbor(owner=self)
         # Get connections from this neuron
-        self.connection = Connection(owner=self)
+        Connection(owner=self)
         P.DatatypeProperty("type",self)
         P.DatatypeProperty("receptor",self)
         P.DatatypeProperty("innexin",self)
@@ -101,7 +109,7 @@ class Neuron(Cell):
             for line in con.iterdump():
                 f.write('%s\n' % line)
 
-    def GJ_degree(self):
+    def GJ_degree_nx(self):
         """Get the degree of this neuron for gap junction edges only
 
         :returns: total number of incoming and outgoing gap junctions
