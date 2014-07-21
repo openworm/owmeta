@@ -9,62 +9,75 @@ What does it do?
 Allows asking various questions about the c. elegans nervous system.
 
 Basic Usage
-------------
+-----------
 
-::
-
+```python
   >>>import PyOpenWorm
   
   # Grabs the representation of the neuronal network
   >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>net.aneuron('AVAL').type()
-  Interneuron
+  >>>list(net.aneuron('AVAL').type())
+  ['Interneuron']
   #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').GJ_degree()
-  60
+  >>>net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
+  80
+```
+  
   
 More examples
 -------------
   
 Returns information about individual neurons::
 
-  >>>net.aneuron('AVAL').name()
-  AVAL
+```python
+  >>>list(net.aneuron('AVAL').name())
+  ['AVAL']
   #list all known receptors
-  >>>net.aneuron('AVAL').receptors()
+  >>>list(net.aneuron('AVAL').receptors())
   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-  >>>net.aneuron('DD5').type()
-  motor
+  >>>list(net.aneuron('DD5').type())
+  ['motor']
   >>>net.aneuron('PHAL').type()
-  sensory
+  ['sensory']
   #show how many chemical synapses go in and out of AVAL
   >>>net.aneuron('AVAL').Syn_degree()
   74
+```
 
 Returns the list of all neurons::
 
-  >>>len(net.neurons())
+```python
+  >>>  len(set(net.neurons()))
   302
-  
+```
+
 Returns the list of all muscles::
 
+```python
   >>>'MDL08' in PyOpenWorm.Worm().muscles()
   True
+```
+
 
 Returns provenance information providing evidence about facts::
 
+```python
   >>>ader = PyOpenWorm.Neuron('ADER')
-  >>>ader.receptors()
+  >>>list(ader.receptors())
   ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
   #look up what reference says this neuron has a receptor EXP-1
-  >>>ader.get_reference(0,'EXP-1')
-  ['http://dx.doi.org/10.100.123/natneuro']
+  >>>e = Evidence()
+  >>>e.asserts(PyOpenWorm.Neuron('ADER').receptor('EXP-1')) 
+  >>>list(e.doi())
+  ['10.100.123/natneuro']
+```
 
-Returns the c. elegans connectome represented as a 
-`NetworkX <http://networkx.github.io/documentation/latest/>`_ graph::
+Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
+```python
   >>>net.as_networkx()
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
+```
 
 Why is this necessary?
 ----------------------
@@ -99,6 +112,11 @@ Installation
     git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
+    
+Uninstall
+----------
+
+    pip uninstall PyOpenWorm
 
 Running tests
 -------------
