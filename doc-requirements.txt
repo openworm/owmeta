@@ -1,6 +1,7 @@
-neuroml
 rdflib
 networkx
 requirements
 pint
 lxml
+numpydoc
+neuroml
