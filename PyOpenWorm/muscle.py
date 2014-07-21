@@ -12,8 +12,8 @@ from PyOpenWorm import Cell
 
 class Muscle(Cell):
 
-    def __init__(self, **kwargs):
-        Cell.__init__(self, **kwargs)
+    def __init__(self, name=False, **kwargs):
+        Cell.__init__(self, name=name, **kwargs)
         """Get neurons synapsing with this muscle
 
         :returns: a list of all known receptors
