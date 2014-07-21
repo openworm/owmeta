@@ -109,7 +109,7 @@ class Neuron(Cell):
             for line in con.iterdump():
                 f.write('%s\n' % line)
 
-    def GJ_degree_nx(self):
+    def GJ_degree(self):
         """Get the degree of this neuron for gap junction edges only
 
         :returns: total number of incoming and outgoing gap junctions
