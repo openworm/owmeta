@@ -496,6 +496,53 @@ class EvidenceTest(_DataTest):
         l = list(e.asserts())
         self.assertIn(r,l)
 
+    def test_asserts_query(self):
+        """ Show that we can store the evidence on an object and later retrieve it """
+        e = Evidence(author='tom@cn.com')
+        r = Relationship(make_graph(10))
+        e.asserts(r)
+        e.save()
+        e0 = Evidence()
+        e0.asserts(r)
+        s = list(e0.load())
+        author = next(s[0].author())
+        self.assertIn('tom@cn.com', author)
+
+    def test_asserts_query_multiple(self):
+        """ Show that setting the evidence with distinct objects yields distinct results """
+        e = Evidence(author='tom@cn.com')
+        r = Relationship(make_graph(10))
+        e.asserts(r)
+        e.save()
+
+        e1 = Evidence(year=1999)
+        e1.asserts(r)
+        e1.save()
+
+        e0 = Evidence()
+        e0.asserts(r)
+        for x in e0.load():
+            a = list(x.author())
+            y = list(x.year())
+            # Testing that either a has a result tom@cn.com and y has nothing or
+            # y has a result 1999 and a has nothing
+            self.assertTrue((len(a) > 0 and str(a[0]) == 'tom@cn.com' and len(y) == 0) \
+                    or len(a) == 0 and int(y[0]) == 1999)
+    def test_asserts_query_multiple_author_matches(self):
+        """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
+        e = Evidence(author='tom@cn.com')
+        r = Relationship(make_graph(10))
+        e.asserts(r)
+        e.save()
+
+        e1 = Evidence(author='tom@cn.com')
+        e1.asserts(r)
+        e1.save()
+
+        e0 = Evidence()
+        e0.asserts(r)
+        self.assertTrue(len(list(e0.load())) == 2)
+
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
 
