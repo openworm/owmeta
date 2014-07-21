@@ -42,7 +42,7 @@ class _DataTest(unittest.TestCase):
         self.config = Data(TestConfig)
         self.config_no_data = TestConfig
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=self.config, do_logging=True)
+        PyOpenWorm.connect(conf=self.config, do_logging=False)
         self.config.openDatabase()
     def tearDown(self):
         self.config.closeDatabase()
@@ -373,9 +373,11 @@ class NeuronTest(_DataTest):
         self.assertEqual(next(c.name()), 'ADAL')
 
     def test_GJ_degree(self):
+        """ Get the number of gap junctions from a networkx representation """
         self.assertEqual(self.neur('AVAL').GJ_degree(),60)
 
     def test_Syn_degree(self):
+        """ Get the number of chemical synapses from a networkx representation """
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
 
 class NetworkTest(_DataTest):
