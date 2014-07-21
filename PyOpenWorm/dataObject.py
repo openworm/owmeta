@@ -125,7 +125,7 @@ class DataObject(DataUser):
         # explicitly given in __init__
         if not self._is_releasing_triples:
             # Note: We are _definitely_ assuming synchronous operation here.
-            #       Anyway, this code's idempotent. There's no need to lock it...
+            #       Anyway, this code should be idempotent, so that there's no need to lock it...
             self._is_releasing_triples = True
             ident = self.identifier(query=query)
 
@@ -141,11 +141,23 @@ class DataObject(DataUser):
 
             yield (ident, R.RDF['type'], self.rdf_type)
 
+            # For objects that are defined by triples, we can just release these.
+            # However, they are still data objects, so they must have the above
+            # triples released as well.
             for x in self._triples:
                 yield x
-            for x in self.properties:
-                for y in x.triples(query=query):
-                    yield y
+
+            # Properties (of type Property) can be attached to an object
+            # However, we won't require that there even is a property list in this
+            # case.
+            try:
+                for x in self.properties:
+                    for y in x.triples(query=query):
+                        yield y
+            except AttributeError:
+                # XXX Is there a way to check what the failed attribute reference was?
+                pass
+
             self._is_releasing_triples = False
 
     def graph_pattern(self,query=False):
