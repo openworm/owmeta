@@ -1,4 +1,4 @@
-neuroml
+libneuroml
 rdflib
 networkx
 requirements
