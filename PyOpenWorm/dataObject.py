@@ -273,7 +273,7 @@ class DataObject(DataUser):
 
 # Define a property by writing the get
 class Property(DataObject):
-    def __init__(self, owner=False, **kwargs):
+    def __init__(self, name=False, owner=False, **kwargs):
         """ Initialize with the owner of this property.
         The owner has a distinct role in each subclass of Property
         """
@@ -281,6 +281,8 @@ class Property(DataObject):
         self.owner = owner
         if self.owner:
             self.owner.properties.append(self)
+            if name:
+                setattr(self.owner, name, self)
             self.conf = self.owner.conf
 
         # XXX: Default implementation is a box for a value
@@ -305,14 +307,15 @@ class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
     def __init__(self,**kwargs):
-        Property.__init__(self,**kwargs)
+        if not hasattr(self,'linkName'):
+            self.__class__.linkName=self.__class__.__name__ + "property"
+        Property.__init__(self, name=self.linkName, **kwargs)
         self.v = []
         if (self.owner==False) and hasattr(self,'owner_type'):
             self.owner = self.owner_type(conf=self.conf)
 
         if self.owner!=False:
             self.link = self.owner.rdf_namespace[self.linkName]
-            setattr(self.owner, self.linkName, self)
 
     def get(self):
         if len(self.v) > 0:

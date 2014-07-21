@@ -21,8 +21,8 @@ Basic Usage
   >>>list(net.aneuron('AVAL').type())
   ['Interneuron']
   #show how many gap junctions go in and out of AVAL
-  >>>len(net.aneuron('AVAL').connection(syntype='gapjunction'))
-  60
+  >>>net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
+  80
 ```
   
   
@@ -37,10 +37,10 @@ Returns information about individual neurons::
   #list all known receptors
   >>>list(net.aneuron('AVAL').receptors())
   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-  >>>net.aneuron('DD5').type()
-  motor
+  >>>list(net.aneuron('DD5').type())
+  ['motor']
   >>>net.aneuron('PHAL').type()
-  sensory
+  ['sensory']
   #show how many chemical synapses go in and out of AVAL
   >>>net.aneuron('AVAL').Syn_degree()
   74
@@ -49,7 +49,7 @@ Returns information about individual neurons::
 Returns the list of all neurons::
 
 ```python
-  >>>len(net.neurons())
+  >>>  len(set(net.neurons()))
   302
 ```
 
@@ -65,11 +65,13 @@ Returns provenance information providing evidence about facts::
 
 ```python
   >>>ader = PyOpenWorm.Neuron('ADER')
-  >>>ader.receptors()
+  >>>list(ader.receptors())
   ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
   #look up what reference says this neuron has a receptor EXP-1
-  >>>ader.get_reference(0,'EXP-1')
-  ['http://dx.doi.org/10.100.123/natneuro']
+  >>>e = Evidence()
+  >>>e.asserts(PyOpenWorm.Neuron('ADER').receptor('EXP-1')) 
+  >>>list(e.doi())
+  ['10.100.123/natneuro']
 ```
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
