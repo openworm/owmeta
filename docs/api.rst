@@ -21,7 +21,7 @@ Worm()
 A representation of the whole worm
 
 Worm.neuron_network() : Network
-+++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++
 
 Return the neuron Network of the worm
 
