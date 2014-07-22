@@ -9,8 +9,6 @@
 """
 import PyOpenWorm as P
 from PyOpenWorm import *
-from string import Template
-import rdflib as R
 
 __all__ = ['Connection']
 
@@ -18,6 +16,22 @@ class SynapseType:
     Chemical = "send"
     GapJunction = "gapJunction"
 class Connection(Relationship):
+    """Connection between neurons
+
+    Parameters
+    ----------
+    pre_cell : string or Neuron, optional
+        The pre-synaptic cell
+    post_cell : string or Neuron, optional
+        The post-synaptic cell
+    number : int, optional
+        The weight of the connection
+    syntype : {'gapJunction', 'send'}, optional
+        The kind of synaptic connection. 'gapJunction' indicates
+        a gap junction and 'send' a chemical synapse
+    synclass : string, optional
+        The kind of Neurotransmitter (if any) sent between `pre_cell` and `post_cell`
+    """
     def __init__(self,
                  pre_cell=None,
                  post_cell=None,
@@ -56,6 +70,3 @@ class Connection(Relationship):
                 self.syntype(SynapseType.GapJunction)
         if isinstance(synclass,basestring):
             self.synclass(synclass)
-
-    #def __str__(self):
-        #return "Connection from %s to %s (%s times, type: %s, neurotransmitter: %s)"%(self.pre_cell, self.post_cell, self.number, self.syntype, self.synclass)

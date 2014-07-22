@@ -130,7 +130,10 @@ class DataObject(DataUser):
 
     def triples(self, query=False):
         """ Should be overridden by derived classes to return appropriate triples
-        :return: An iterable of triples
+
+        Returns
+        --------
+        An iterable of triples
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
@@ -173,7 +176,9 @@ class DataObject(DataUser):
 
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
+
         It should be as simple as converting the result of triples() into a BGP
+
         By default conversion from triples() will treat BNodes as variables
         """
         return _triples_to_bgp(self.triples(query=query))
@@ -227,6 +232,7 @@ class DataObject(DataUser):
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
+
         :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
         """
         # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
@@ -406,6 +412,7 @@ class SimpleProperty(Property):
                     #yield (gv, R.RDF['type'], self.value_rdf_type)
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
+
         :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
 
         """
