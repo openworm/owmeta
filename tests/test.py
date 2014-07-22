@@ -457,6 +457,7 @@ class EvidenceTest(_DataTest):
         Just the identifier, no URI
         """
         self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='10.1007/s00454-010-9273-0').author()))
+
     @unittest.skip("Fix later")
     def test_doi_init_fail_on_request_prefix(self):
         """
@@ -464,6 +465,7 @@ class EvidenceTest(_DataTest):
         """
         with self.assertRaises(EvidenceError):
             Evidence(doi='http://dx.doi.org/10.1126')
+
     @unittest.skip("Fix later")
     def test_doi_init_fail_on_request_suffix(self):
         """
