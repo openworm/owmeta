@@ -33,7 +33,18 @@ _DataObjectsParents = dict()
 
 # We keep a little tree of properties in here
 class DataObject(DataUser):
-    """ An object backed by the database """
+    """ An object backed by the database
+
+    Attributes
+    -----------
+    rdf_type : rdflib.term.URIRef
+        The RDF type URI for objects of this type
+    rdf_namespace : rdflib.namespace.Namespace
+        The rdflib namespace (prefix for URIs) for objects from this class
+    properties : list of Property
+        Properties
+
+    """
     # Must resolve, somehow, to a set of triples that we can manipulate
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
