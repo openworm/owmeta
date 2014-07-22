@@ -75,6 +75,10 @@ def grouper(iterable, n, fillvalue=None):
 
 class DataUser(Configureable):
     def __init__(self, conf = False):
+        """ An convenience wrapper for users of the database
+
+        Classes which use the database should inherit from DataUser.
+        """
         Configureable.__init__(self, conf=conf)
         if not isinstance(self.conf,Data):
             raise BadConf(self)
@@ -86,7 +90,6 @@ class DataUser(Configureable):
     def _remove_from_store(self, g):
         # Note the assymetry with _add_to_store. You must add actual elements, but deletes
         # can be performed as a query
-        import logging as L
         for group in grouper(g, 1000):
             temp_graph = Graph()
             for x in group:
