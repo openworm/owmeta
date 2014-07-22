@@ -9,28 +9,28 @@
 """
 
 import sqlite3
-from rdflib import Graph, Namespace, ConjunctiveGraph, BNode, URIRef, Literal
-from rdflib.namespace import RDFS
 import PyOpenWorm as P
-from PyOpenWorm import Cell, DataUser, Configure, propertyTypes
+from PyOpenWorm import Cell
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class Neighbor(P.Property):
-    """Get a list of neighboring neurons.
-
-       :param type: What kind of junction to look for.
-                    0=all, 1=gap junctions only, 2=all chemical synapses
-                    3=incoming chemical synapses, 4=outgoing chemical synapses
-       :returns: a list of neuron names
-       :rtype: List
-    """
     def __init__(self,**kwargs):
         P.Property.__init__(self,'neighbor',**kwargs)
         self._conns = []
 
     def get(self,**kwargs):
+        """Get a list of neighboring neurons.
+
+           Parameters
+           ----------
+           See parameters for PyOpenWorm.connection.Connection
+
+           Returns
+           -------
+           list of Neuron
+        """
         if len(self._conns) > 0:
             for c in self._conns:
                 for x in c.post_cell():
@@ -52,19 +52,22 @@ class Neighbor(P.Property):
                 yield x
 
 class Connection(P.Property):
-    """Get a list of connections associated with the owning neuron.
-
-       :param type: What kind of junction to look for.
-                    0=all, 1=gap junctions only, 2=all chemical synapses
-                    3=incoming chemical synapses, 4=outgoing chemical synapses
-       :returns: a list of neuron names
-       :rtype: List
-    """
     def __init__(self,**kwargs):
         P.Property.__init__(self,'connection',**kwargs)
         self._conns = []
 
     def get(self,pre_post_or_either='pre',**kwargs):
+        """Get a list of connections associated with the owning neuron.
+
+           Parameters
+           ----------
+           type: What kind of junction to look for.
+                        0=all, 1=gap junctions only, 2=all chemical synapses
+                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           Returns
+           -------
+           list of Connection
+        """
         c = []
         if pre_post_or_either == 'pre':
             c.append(P.Connection(pre_cell=self.owner,**kwargs))
@@ -77,10 +80,33 @@ class Connection(P.Property):
             for r in x.load():
                 yield r
     def count(self,*args,**kwargs):
+        """Get a list of connections associated with the owning neuron.
+
+           Parameters
+           ----------
+           See parameters for PyOpenWorm.connection.Connection
+
+           Returns
+           -------
+           int
+               The number of connections matching the paramters given
+        """
         # XXX: Turn this into a COUNT query
         return len(list(self.get(*args,**kwargs)))
 
     def set(self, conn, **kwargs):
+        """Add a connection associated with the owner Neuron
+
+           Parameters
+           ----------
+           type: What kind of junction to look for.
+                        0=all, 1=gap junctions only, 2=all chemical synapses
+                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           Returns
+           -------
+           list of Connection
+        """
+        #XXX: Should this create a Connection here instead?
         assert(isinstance(conn, P.Connection))
         self._conns.append(conn)
 
@@ -91,6 +117,13 @@ class Connection(P.Property):
 
 class Neuron(Cell):
     """
+    A neuron
+
+    Parameters
+    ----------
+    name : string
+        The name of the neuron
+
     Attributes
     ----------
     type : DatatypeProperty
@@ -110,6 +143,7 @@ class Neuron(Cell):
         Neighbor(owner=self)
         # Get connections from this neuron
         Connection(owner=self)
+
         P.DatatypeProperty("type",self)
         P.DatatypeProperty("receptor",self)
         P.DatatypeProperty("innexin",self)
@@ -286,6 +320,7 @@ class Neuron(Cell):
     # Directed graph. Getting accessible _from_ this node
 
     def get_incidents(self, type=0):
+        """ Get neurons which synapse at this neuron """
         for item in self['nx'].in_edges_iter(self.name(),data=True):
             if 'GapJunction' in item[2]['synapse']:
                 yield item[0]
