@@ -7,12 +7,10 @@ P.connect(configFile="readme.conf", do_logging=False)
 try:
 
     query_object = P.Connection(pre_cell='AVAL')
-    #sys.exit()
     print 'STARTING WITH AVAL'
     for x in query_object.load():
         print x
     print
-    #sys.exit()
     print 'STARTING WITH PVCL'
     query_object = P.Connection(pre_cell='PVCL')
     for x in query_object.load():
