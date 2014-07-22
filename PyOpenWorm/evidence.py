@@ -11,7 +11,6 @@ Created on Sun Feb 23 17:10:53 2014
 
 """
 from PyOpenWorm import *
-import rdflib as R
 
 class EvidenceError(Exception):
     pass
@@ -37,9 +36,9 @@ def _url_request(url,headers={}):
         r = U.Request(url, headers=headers)
         s = U.urlopen(r)
         return s
-    except U.HTTPError, e:
+    except U.HTTPError:
         return ""
-    except U.URLError, e:
+    except U.URLError:
         return ""
 
 def _json_request(url):
@@ -47,32 +46,31 @@ def _json_request(url):
     headers = {'Content-Type': 'application/json'}
     try:
         return json.load(_url_request(url,headers))
-    except BaseException, e:
+    except BaseException:
         return {}
 
 class Evidence(DataObject):
     """
     A class for storing metadata, like scholarly references, for
     other objects
+
+    Parameters
+    ----------
+    doi : string
+        A Digital Object Identifier (DOI) that provides evidence, optional
+
+    pmid : string
+        A PubMed ID (PMID) that point to a paper that provides evidence, optional
+    wormbaseid : string
+        An ID from WormBase that points to a record that provides evidence, optional
+    author : string
+        The author of the evidence
+    title : string
+        The title of the evidence
+    year : string or int
+        The date (e.g., publication date) of the evidence
     """
     def __init__(self, conf=False, **source):
-        """
-            Parameters
-            ----------
-            doi:
-                A Digital Object Identifier (DOI) that provides evidence, optional
-            pmid:
-                A PubMed ID (PMID) that point to a paper that provides evidence, optional
-            wormbaseid:
-                An ID from WormBase that points to a record that provides evidence, optional
-            author:
-                The author of the evidence
-            title:
-                The title of the evidence
-            year:
-                The date (e.g., publication date) of the evidence
-
-        """
         # The type of the evidence (a paper, a lab, a uri) is
         # determined by the `source` key
         # We keep track of a set of fields for the evidence.
@@ -116,11 +114,16 @@ class Evidence(DataObject):
     def add_data(self, k, v):
         """ Add a field
 
-            :param k: Field name
-            :param v: Field value
+        Parameters
+        ----------
+        k : string
+            Field name
+        v : string
+            Field value
         """
-        # Confirm that pmid contains a valid pubmed id
         self._fields[k] = v
+        dp = DatatypeProperty(k,owner=self)
+        dp(v)
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
