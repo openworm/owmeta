@@ -302,10 +302,19 @@ class DataObject(DataUser):
 
 # Define a property by writing the get
 class Property(DataObject):
+    """ A value associated with a DataObject
+
+    Parameters
+    ----------
+    owner : PyOpenWorm.dataObject.DataObject
+        The owner of this property
+    name : string
+        The name of this property. Can be accessed as an attribute like::
+
+            owner.name
+
+    """
     def __init__(self, name=False, owner=False, **kwargs):
-        """ Initialize with the owner of this property.
-        The owner has a distinct role in each subclass of Property
-        """
         DataObject.__init__(self, **kwargs)
         self.owner = owner
         if self.owner:
@@ -318,11 +327,17 @@ class Property(DataObject):
         self._value = False
 
     def get(self,*args):
-        """ Get the things which are on the other side of this property """
+        """ Get the things which are on the other side of this property
+
+        Derived classes must override.
+        """
         # This should run a query or return a cached value
         raise NotImplementedError()
     def set(self,*args,**kwargs):
-        """ Set the value of this property """
+        """ Set the value of this property
+
+        Derived classes must override.
+        """
         # This should set some values and call DataObject.save()
         raise NotImplementedError()
     def __call__(self,*args,**kwargs):
@@ -435,6 +450,13 @@ class SimpleProperty(Property):
         yield self
 
     def identifier(self,query=False):
+        """ Return the URI for this object
+
+        Parameters
+        ----------
+        query: bool
+            Indicates whether the identifier is to be used in a query or not
+        """
         ident = DataObject.identifier(self,query=query)
         if self._id_is_set:
             return ident
@@ -461,9 +483,29 @@ class SimpleProperty(Property):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
 
 def DatatypeProperty(*args,**kwargs):
+    """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
+
+    Parameters
+    ----------
+    linkName : string
+        The name of this Property.
+    owner : PyOpenWorm.dataObject.DataObject
+        The name of this Property.
+    """
     return _create_property(*args,property_type='DatatypeProperty',**kwargs)
 
 def ObjectProperty(*args,**kwargs):
+    """ Create a SimpleProperty that has a complex DataObject as its value
+
+    Parameters
+    ----------
+    linkName : string
+        The name of this Property.
+    owner : PyOpenWorm.dataObject.DataObject
+        The name of this Property.
+    value_type : type
+        The type of DataObject fro values of this property
+    """
     return _create_property(*args,property_type='ObjectProperty',**kwargs)
 
 def _create_property(linkName, owner, property_type, value_type=DataObject):
@@ -487,7 +529,8 @@ def _create_property(linkName, owner, property_type, value_type=DataObject):
     return c(owner=owner, conf=owner.conf)
 
 class values(DataObject):
-    """ A convenience class for getting the triples from a collection of objects
+    """
+    A convenience class for getting the triples from a collection of objects
     Provide the name of the value you want and the object that should return it.
     """
     def __init__(self,**kwargs):
