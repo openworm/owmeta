@@ -47,8 +47,9 @@ Classes
 .. autoclass:: Evidence
 .. autoclass:: Connection
 .. autoclass:: Relationship
-.. autoclass:: DataObject
+.. automodule:: PyOpenWorm.dataObject
 .. autoclass:: DataUser
+.. autoclass:: Property
 """
 
 __version__ = '0.0.1-alpha'
