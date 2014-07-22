@@ -11,18 +11,25 @@ Classes
 
 .. autoclass:: Network
    :members:
+   :show-inheritance:
 .. autoclass:: Neuron
    :members:
+   :show-inheritance:
 .. autoclass:: Worm
    :members:
+   :show-inheritance:
 .. autoclass:: Muscle
    :members:
+   :show-inheritance:
 .. autoclass:: Cell
    :members:
+   :show-inheritance:
 .. autoclass:: Evidence
    :members:
+   :show-inheritance:
 .. autoclass:: Connection
    :members:
+   :show-inheritance:
 """
 
 __version__ = '0.0.1-alpha'

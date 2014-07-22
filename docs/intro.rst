@@ -11,17 +11,30 @@ Allows asking various questions about the c. elegans nervous system.
 Basic Usage
 -----------
 
-```python
-  >>>import PyOpenWorm
-  
+To get started::
+
+  >>> import PyOpenWorm
+
+  >>> PyOpenWorm.connect(configFile='default.conf')
   # Grabs the representation of the neuronal network
-  >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>list(net.aneuron('AVAL').type())
-  ['Interneuron']
+  >>> net = PyOpenWorm.Worm().get_neuron_network()
+  >>> list(net.aneuron('AVAL').type())
   #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
-  80
-```
+  >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
+
+default.conf::
+
+    {
+        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
+        "rdf.source" : "default",
+        "rdf.store" : "Sleepycat",
+        "rdf.store_conf" : "worm.db",
+        "user.email" : "jerry@cn.com",
+        "rdf.upload_block_statement_count" : 50,
+        "test_variable" : "test_value"
+    }
   
   
 More examples
@@ -29,55 +42,46 @@ More examples
   
 Returns information about individual neurons::
 
-```python
-  >>>list(net.aneuron('AVAL').name())
+  >>> list(net.aneuron('AVAL').name())
   ['AVAL']
   #list all known receptors
-  >>>list(net.aneuron('AVAL').receptors())
+  >>> list(net.aneuron('AVAL').receptors())
   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-  >>>list(net.aneuron('DD5').type())
+  >>> list(net.aneuron('DD5').type())
   ['motor']
-  >>>net.aneuron('PHAL').type()
+  >>> net.aneuron('PHAL').type()
   ['sensory']
   #show how many chemical synapses go in and out of AVAL
-  >>>net.aneuron('AVAL').Syn_degree()
+  >>> net.aneuron('AVAL').Syn_degree()
   74
-```
+
 
 Returns the list of all neurons::
 
-```python
   >>>  len(set(net.neurons()))
   302
-```
 
 Returns the list of all muscles::
 
-```python
-  >>>'MDL08' in PyOpenWorm.Worm().muscles()
+  >>> 'MDL08' in PyOpenWorm.Worm().muscles()
   True
-```
 
 
 Returns provenance information providing evidence about facts::
 
-```python
-  >>>ader = PyOpenWorm.Neuron('ADER')
-  >>>list(ader.receptors())
+  >>> ader = PyOpenWorm.Neuron('ADER')
+  >>> list(ader.receptors())
   ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
   #look up what reference says this neuron has a receptor EXP-1
-  >>>e = Evidence()
-  >>>e.asserts(PyOpenWorm.Neuron('ADER').receptor('EXP-1')) 
-  >>>list(e.doi())
+  >>> e = Evidence()
+  >>> e.asserts(PyOpenWorm.Neuron('ADER').receptor('EXP-1')) 
+  >>> list(e.doi())
   ['10.100.123/natneuro']
-```
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
-```python
-  >>>net.as_networkx()
+  >>> net.as_networkx()
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
-```
 
 Why is this necessary?
 ----------------------
