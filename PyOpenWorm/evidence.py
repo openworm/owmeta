@@ -1,10 +1,13 @@
 """
+.. class:: Evidence
+
+    An Evidence object represents a single document
+
 Created on Sun Feb 23 17:10:53 2014
 
 @author: slarson
 @author: mwatts15
 
-An Evidence object represents a single document
 
 """
 from PyOpenWorm import *
