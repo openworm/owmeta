@@ -8,8 +8,6 @@
 
 """
 
-import rdflib as R
-import PyOpenWorm
 from PyOpenWorm import *
 from string import Template
 import neuroml
@@ -62,6 +60,15 @@ def _dict_merge(d1,d2):
 
 class Cell(DataObject):
     """
+    A biological cell
+
+    Parameters
+    -----------
+    name : string
+        The name of the cell
+    lineageName : string
+        The lineageName of the cell
+
     Attributes
     ----------
     name : DatatypeProperty
