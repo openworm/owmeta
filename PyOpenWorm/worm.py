@@ -11,6 +11,15 @@ from PyOpenWorm import DataObject
 
 
 class Worm(DataObject):
+    """
+    Attributes
+    ----------
+    neuron_network : ObjectProperty
+        The neuron network of the worm
+    muscle : ObjectProperty
+        Muscles of the worm
+
+    """
 
     def __init__(self,**kwargs):
         DataObject.__init__(self,**kwargs)

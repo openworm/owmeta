@@ -101,11 +101,11 @@ class Evidence(DataObject):
                 self._fields['wormbase'] = source[k]
                 self._wormbase_extract()
                 self.wbid(source[k])
-            if k in ('doi'):
+            if k in ('doi',):
                 self._fields['doi'] = source[k]
                 self._crossref_doi_extract()
                 self.doi(source[k])
-            if k in ('bibtex'):
+            if k in ('bibtex',):
                 self._fields['bibtex'] = source[k]
             if k in (x.linkName for x in self.properties):
                 getattr(self,k)(source[k])
