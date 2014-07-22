@@ -13,10 +13,10 @@ from PyOpenWorm import DataObject
 class Network(DataObject):
     """
     Attributes
-    ----------
-    neuron : ObjectProperty
+    -----------
+    neuron
         Representation of neurons in the network
-    synapse : ObjectProperty
+    synapse
         Representation of synapses in the network
     """
     def __init__(self, **kwargs):
@@ -28,6 +28,7 @@ class Network(DataObject):
         for x in self.neuron():
             for n in x.name():
                 yield n
+
     def aneuron(self, name):
         """
         Get a neuron by name
@@ -55,7 +56,7 @@ class Network(DataObject):
 
     def sensory(self):
         """
-        Get all sensory neurons by name
+        Get all sensory neurons
 
         :returns: A iterable of all sensory neurons
         :rtype: iter(Neuron)
@@ -69,7 +70,7 @@ class Network(DataObject):
             yield x
     def interneurons(self):
         """
-        Get all interneurons neurons
+        Get all interneurons
 
         :returns: A iterable of all interneurons
         :rtype: iter(Neuron)
