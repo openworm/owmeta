@@ -756,7 +756,11 @@ class DataTest(_DataTest):
         except ImportError:
             pass
     def test_trix_source(self):
-        """ May fail if bsddb is not available. Ignore if it is not """
+        """ Test that we can load the datbase up from an XML file.
+
+        Takes a while to run the first time.
+        May fail if bsddb is not available. Ignore if it is not
+        """
         try:
             c = Configure().copy(self.config)
             c['rdf.source'] = 'TriX'
