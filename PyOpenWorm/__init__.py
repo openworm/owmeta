@@ -101,7 +101,7 @@ def loadConfig(f):
     """ Load configuration for the module """
     Configureable.default = Data.open(f)
 
-def connect(conf=False,configFile=False,testConfig=False,do_logging=False):
+def connect(configFile=False,conf=False,testConfig=False,do_logging=False):
     """ Load desired configuration and open the database """
 
     import logging
