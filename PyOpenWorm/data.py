@@ -22,7 +22,7 @@ import datetime
 import os
 import logging as L
 
-__all__ = ["Data", "DataUser", "TrixSource", "SPARQLSource", "SleepyCatSource", "SQLiteSource", "DefaultSource"]
+__all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource"]
 
 class _B(ConfigValue):
     def __init__(self, f):
@@ -167,6 +167,11 @@ class DataUser(Configureable):
 
 
 class Data(Configure, Configureable):
+    """
+    Provides configuration for access to the database.
+
+    Usally doesn't need to be accessed directly
+    """
     def __init__(self, conf=False):
         Configure.__init__(self)
         Configureable.__init__(self,conf)
@@ -182,15 +187,18 @@ class Data(Configure, Configureable):
 
     @classmethod
     def open(cls,file_name):
+        """ Open a file storing configuration in a JSON format """
         c = Configure.open(file_name)
         return cls(c)
 
     def openDatabase(self):
+        """ Open a the configured database """
         self.source.open()
         L.debug("opening " + str(self.source))
 
 
     def closeDatabase(self):
+        """ Close a the configured database """
         self.source.close()
 
     def _init_rdf_graph(self):
@@ -342,9 +350,13 @@ class SPARQLSource(RDFSource):
         return self.graph
 
 class SleepyCatSource(RDFSource):
-    """ Reads from and queries against a local sleepy cat database
+    """ Reads from and queries against a local Sleepycat database
 
-        configure with  "rdf.source" = "sparql_endpoint"
+        .. note:: configure with  "rdf.source" = "SQLiteSource"
+
+        The database location can be configured like::
+
+            "rdf.store_conf" = <your database location here>
     """
     def open(self):
         import logging
@@ -410,6 +422,20 @@ class SQLiteSource(RDFSource):
         self.graph = g0
 
 class DefaultSource(RDFSource,ConfigValue):
+    """ Reads from and queries against a configured database.
+
+    .. note::
+
+        The default configuration.
+
+        Can also configure with "rdf.source" = "default"
+
+        The database store is configured with::
+
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+    """
     def open(self):
         self.graph = ConjunctiveGraph(self.conf['rdf.store'])
         self.graph.open(self.conf['rdf.store_conf'],create=True)
