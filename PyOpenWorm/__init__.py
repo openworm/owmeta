@@ -48,8 +48,8 @@ Classes
 .. autoclass:: Connection
 .. autoclass:: Relationship
 .. automodule:: PyOpenWorm.dataObject
-.. autoclass:: DataUser
 .. autoclass:: Property
+.. automodule:: PyOpenWorm.data
 """
 
 __version__ = '0.0.1-alpha'
@@ -101,10 +101,15 @@ def loadConfig(f):
     """ Load configuration for the module """
     Configureable.default = Data.open(f)
 
+def disconnect():
+    """ Close the database """
+    Configureable.default.closeDatabase()
+
 def connect(conf=False,configFile=False,testConfig=False,do_logging=False):
     """ Load desired configuration and open the database """
 
     import logging
+    import atexit
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -117,6 +122,4 @@ def connect(conf=False,configFile=False,testConfig=False,do_logging=False):
 
     Configureable.default.openDatabase()
     logging.info("Connected to database")
-
-def disconnect():
-    Configureable.default.closeDatabase()
+    atexit.register(disconnect)
