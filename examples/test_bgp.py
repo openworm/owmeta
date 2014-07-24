@@ -52,4 +52,4 @@ try:
     for x in zip(P.DataObject().load(), range(100)):
         print x[0]
 finally:
-    P.Configureable.default.closeDatabase()
+    P.disconnect()
