@@ -13,16 +13,37 @@ Allows asking various questions about the c. elegans nervous system.
 Basic Usage
 -----------
 
+To get started::
+
 ```python
-  >>>import PyOpenWorm
-  
+  >>> import PyOpenWorm
+
+  # Set up
+  >>> PyOpenWorm.connect('default.conf')
   # Grabs the representation of the neuronal network
-  >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>list(net.aneuron('AVAL').type())
-  ['Interneuron']
+  >>> net = PyOpenWorm.Worm().get_neuron_network()
+  >>> list(net.aneuron('AVAL').type())
   #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
+  >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
   80
+  # Tear down
+  >>> PyOpenWorm.disconnect()
+```
+
+default.conf::
+
+```python
+    {
+        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
+        "rdf.source" : "default",
+        "rdf.store" : "Sleepycat",
+        "rdf.store_conf" : "worm.db",
+        "user.email" : "jerry@cn.com",
+        "rdf.upload_block_statement_count" : 50,
+        "test_variable" : "test_value"
+    }
 ```
   
   
