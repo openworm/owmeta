@@ -74,6 +74,56 @@ Returns provenance information providing evidence about facts::
   ['10.100.123/natneuro']
 ```
 
+Add provenance information::
+
+```python
+  >>> e = Evidence(author='Sulston et al.', date='1983')
+  >>> e.asserts(Neuron(name="AVDL").lineageName("AB alaaapalr"))
+  <PyOpenWorm.dataObject.Evidence_asserts at 0x27f3d50>
+  >>> e.save()
+```
+
+See what some evidence stated::
+```python
+  >>> e0 = Evidence(author='Sulston et al.', date='1983')
+  >>> list(e0.asserts())
+  [Neuron(name=AVDL,lineageName=AB alaaapalr)]
+```
+
+See what neurons express some receptor::
+```python
+  >>>n = Neuron()
+  >>>n.receptor("TH")
+  >>>list(n.load())
+  [Neuron(lineageName=, name=CEPVL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPVR, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=PDEL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=PDER, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPDL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPDR, Neighbor(), Connection(), type=, receptor=, innexin=)]
+```
+
+To get any object's possible values, use load()::
+```python
+  >>>list(P.Neuron().load())
+  [
+   ...
+   Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=IL1DR, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=IL1R, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
+   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=, innexin=),
+   ...
+  ]
+  # Properties are a little different
+  >>>next(Neuron().receptor.load())
+  receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
+
+```
+
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
