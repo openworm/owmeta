@@ -11,7 +11,7 @@
 from PyOpenWorm import *
 from string import Template
 import neuroml
-
+__all__ = [ "Cell" ]
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 ns =  {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
