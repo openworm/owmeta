@@ -1,4 +1,8 @@
-# Get the shortest path between any two neurons
+# Get the length of the shortest path between any two neurons.
+# Takes connection strength into account by taking the inverse of the number as the weight between edges
+import sys
+sys.path.insert(0,'..')
+
 import apsp
 import PyOpenWorm as P
 import numpy as np
@@ -8,7 +12,7 @@ try:
     # make the matrix
     try:
         # Try to load from a previous run -- the worm isn't changing
-        mat = load("celegans.npy")
+        mat = np.load("celegans.npy")
     except:
         # Get a dictionary of cell names to generated indices used to index into the matrix below
         cell_names = { x[1] : x[0] for x in enumerate(set(str(next(x.name())) for x in P.Neuron().load())) }
@@ -24,8 +28,9 @@ try:
             post_cell = next(x.post_cell())
             pre_name = next(pre_cell.name())
             post_name = next(post_cell.name())
-            mat[cell_names[pre_name], cell_names[post_name]] = 1
-            mat[cell_names[post_name], cell_names[pre_name]] = 1
+            num = int(next(x.number()))
+            mat[cell_names[pre_name], cell_names[post_name]] = 1.0 / num
+            mat[cell_names[post_name], cell_names[pre_name]] = 1.0 / num
 
         for c in cell_names:
             mat[cell_names[c], cell_names[c]] = 0
@@ -44,6 +49,6 @@ try:
     np.save("celegans_apsp.npy", mat)
 
 finally:
-    # Be sure to disconnect from PyOpenWorm to prevent resources leaks!
+    # Be sure to disconnect from PyOpenWorm to prevent resource leaks!
     P.disconnect()
 
