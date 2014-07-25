@@ -141,6 +141,41 @@ To get any object's possible values, use load()::
   receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
 
 
+Get direct access to the RDFLib graph::
+
+ # we get it from Worm, but any object will do
+ >>> Worm().rdf.query(...)
+
+
+Use pre-made objects with custom SPARQL queries::
+
+ >>> n = Neuron()
+ # Get a Neuron graph pattern suitable for use in a SPARQL query
+ >>> gp = n.graph_pattern(query=True)
+ >>> print gp
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/lineageName> ?Neuron_lineageName6836ce3c9c85873e .
+ ?Neuron_lineageName6836ce3c9c85873e <http://openworm.org/entities/SimpleProperty/value> ?lineageName .
+ <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron_name> .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/name> <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> .
+ <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://openworm.org/entities/SimpleProperty/value> "PVCR" .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/type> ?Neuron_type7b9bf83eb590323f .
+ ?Neuron_type7b9bf83eb590323f <http://openworm.org/entities/SimpleProperty/value> ?type .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/receptor> ?Neuron_receptor986e983db972bd3e .
+ ?Neuron_receptor986e983db972bd3e <http://openworm.org/entities/SimpleProperty/value> ?receptor .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/innexin> ?Neuron_innexind9223b3f5feebd3d .
+ ?Neuron_innexind9223b3f5feebd3d <http://openworm.org/entities/SimpleProperty/value> ?innexin
+
+ # Run a query to get bare values
+ >>> n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
+ ...    print x
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-1'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-19'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'UNC-9'))
+ ...
+
+
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 

@@ -435,6 +435,7 @@ class DefaultSource(RDFSource,ConfigValue):
             "rdf.store" = <your rdflib store name here>
             "rdf.store_conf" = <your rdflib store configuration here>
 
+        Leaving unconfigured simply gives an in-memory data store.
     """
     def open(self):
         self.graph = ConjunctiveGraph(self.conf['rdf.store'])
