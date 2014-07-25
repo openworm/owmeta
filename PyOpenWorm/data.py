@@ -22,6 +22,8 @@ import datetime
 import os
 import logging as L
 
+__all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource"]
+
 class _B(ConfigValue):
     def __init__(self, f):
         self.v = False
@@ -165,6 +167,11 @@ class DataUser(Configureable):
 
 
 class Data(Configure, Configureable):
+    """
+    Provides configuration for access to the database.
+
+    Usally doesn't need to be accessed directly
+    """
     def __init__(self, conf=False):
         Configure.__init__(self)
         Configureable.__init__(self,conf)
@@ -180,15 +187,18 @@ class Data(Configure, Configureable):
 
     @classmethod
     def open(cls,file_name):
+        """ Open a file storing configuration in a JSON format """
         c = Configure.open(file_name)
         return cls(c)
 
     def openDatabase(self):
+        """ Open a the configured database """
         self.source.open()
         L.debug("opening " + str(self.source))
 
 
     def closeDatabase(self):
+        """ Close a the configured database """
         self.source.close()
 
     def _init_rdf_graph(self):
@@ -249,6 +259,10 @@ def modification_date(filename):
     return datetime.datetime.fromtimestamp(t)
 
 class RDFSource(Configureable,PyOpenWorm.ConfigValue):
+    """ Base class for data sources.
+
+    Alternative sources should dervie from this class
+    """
     i = 0
     def __init__(self, conf=False):
         if self.i == 1:
@@ -263,10 +277,24 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
         return self.graph
 
     def close(self):
+        if self.graph == False:
+            return
         self.graph.close()
+        self.graph = False
 
 class TrixSource(RDFSource):
-    """ Reads from a TriX file or if the store is more recent, from that. """
+    """ Reads from a TriX file or the configured store is more recent, from that.
+
+    .. note::
+
+        configure with  "rdf.source" = "TriX"
+
+        The database store is configured with::
+
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+    """
     # XXX How to write back out to this?
     i = 0
 
@@ -308,6 +336,12 @@ class TrixSource(RDFSource):
         return self.graph
 
 class SPARQLSource(RDFSource):
+    """ Reads from and queries against a remote data store
+
+        .. note::
+
+            configure with  "rdf.source" = "sparql_endpoint"
+    """
     def open(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
@@ -316,6 +350,14 @@ class SPARQLSource(RDFSource):
         return self.graph
 
 class SleepyCatSource(RDFSource):
+    """ Reads from and queries against a local Sleepycat database
+
+        .. note:: configure with  "rdf.source" = "SQLiteSource"
+
+        The database location can be configured like::
+
+            "rdf.store_conf" = <your database location here>
+    """
     def open(self):
         import logging
         # XXX: If we have a source that's read only, should we need to set the store separately??
@@ -380,6 +422,21 @@ class SQLiteSource(RDFSource):
         self.graph = g0
 
 class DefaultSource(RDFSource,ConfigValue):
+    """ Reads from and queries against a configured database.
+
+    .. note::
+
+        The default configuration.
+
+        Can also configure with "rdf.source" = "default"
+
+        The database store is configured with::
+
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+        Leaving unconfigured simply gives an in-memory data store.
+    """
     def open(self):
         self.graph = ConjunctiveGraph(self.conf['rdf.store'])
         self.graph.open(self.conf['rdf.store_conf'],create=True)

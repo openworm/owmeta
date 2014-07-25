@@ -29,6 +29,7 @@ def _triples_to_bgp(trips):
     return g
 
 _DataObjects = dict()
+# TODO: Put the subclass relationships in the database
 _DataObjectsParents = dict()
 
 # We keep a little tree of properties in here
@@ -88,6 +89,8 @@ class DataObject(DataUser):
         s +=  ", ".join(str(x) for x in self.properties)
         s += ")"
         return s
+    def __repr__(self):
+        return self.__str__()
 
     def _graph_variable(self,var_name):
         """ Make a variable for storage the graph """
@@ -302,7 +305,14 @@ class DataObject(DataUser):
 
 # Define a property by writing the get
 class Property(DataObject):
-    """ A value associated with a DataObject
+    """ Store a value associated with a DataObject
+
+    Properties can be be accessed like methods. A method call like::
+
+        a.P()
+
+    for a property ``P`` will return values appropriate to that property for ``a``,
+    the `owner` of the property.
 
     Parameters
     ----------
@@ -382,6 +392,8 @@ class SimpleProperty(Property):
                         and x[0] is not None:
                     yield str(x[0])
                 elif self.property_type == 'ObjectProperty':
+                    # XXX: We can pull the type from the graph. Just be sure
+                    #   to get the most specific type
                     yield self.object_from_id(x[0], self.value_rdf_type)
 
     def set(self,v):
@@ -509,6 +521,8 @@ def ObjectProperty(*args,**kwargs):
     return _create_property(*args,property_type='ObjectProperty',**kwargs)
 
 def _create_property(linkName, owner, property_type, value_type=DataObject):
+    #XXX This should actually get called for all of the properties on library load.
+    #    The initialization, however, must happen with the owner object's creation
     owner_class = owner.__class__
     owner_class_name = owner_class.__name__
     property_class_name = owner_class_name + "_" + linkName
