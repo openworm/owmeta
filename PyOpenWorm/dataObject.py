@@ -50,7 +50,6 @@ class DataObject(DataUser):
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
 
-
     @classmethod
     def register(cls):
         assert(issubclass(cls, DataObject))
@@ -521,7 +520,8 @@ def ObjectProperty(*args,**kwargs):
     return _create_property(*args,property_type='ObjectProperty',**kwargs)
 
 def _create_property(linkName, owner, property_type, value_type=DataObject):
-    #XXX This should actually get called for all of the properties on library load.
+    #XXX This should actually get called for all of the properties when their owner
+    #    classes are defined.
     #    The initialization, however, must happen with the owner object's creation
     owner_class = owner.__class__
     owner_class_name = owner_class.__name__
@@ -544,11 +544,44 @@ def _create_property(linkName, owner, property_type, value_type=DataObject):
 
 class values(DataObject):
     """
-    A convenience class for getting the triples from a collection of objects
-    Provide the name of the value you want and the object that should return it.
+    A convenience class for working with a collection of objects
+
+    Example::
+
+        v = values('unc-13 neurons and muscles')
+        n = P.Neuron()
+        m = P.Muscle()
+        n.receptor('UNC-13')
+        m.receptor('UNC-13')
+        for x in n.load():
+            v.value(x)
+        for x in m.load():
+            v.value(x)
+        # Save the group for later use
+        v.save()
+        ...
+        # get the list back
+        u = values('unc=-13 neurons and muscles')
+        nm = list(u.value())
+
+
+    Parameters
+    ----------
+    group_name : string
+        A name of the group of objects
+
+    Attributes
+    ----------
+    name : DatatypeProperty
+        The name of the group of objects
+    value : ObjectProperty
+        An object in the group
+    add : ObjectProperty
+        an alias for ``value``
+
     """
-    def __init__(self,**kwargs):
+    def __init__(self,group_name,**kwargs):
         DataObject.__init__(self,**kwargs)
-        ObjectProperty('_o', owner=self)
-    def add(self,v):
-        self._o(v)
+        self.add = ObjectProperty('value', owner=self)
+        DatatypeProperty('name', owner=self)
+        self.name(group_name)

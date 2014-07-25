@@ -1,6 +1,5 @@
 import PyOpenWorm as P
 import traceback
-from PyOpenWorm import Data, Configureable, Configure
 import sqlite3
 def print_evidence():
     try:
@@ -9,7 +8,7 @@ def print_evidence():
         cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
         for r in cur.fetchall():
             print r
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
     finally:
         conn.close()
@@ -27,7 +26,7 @@ def upload_muscles():
             w.muscle(P.Muscle(muscle_name))
         w.save()
         #second step, get the relationships between them and add them to the graph
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
     finally:
         conn.close()
@@ -47,7 +46,7 @@ def upload_neurons():
             n.neuron(P.Neuron(name=neuron_name))
         n.save()
         #second step, get the relationships between them and add them to the graph
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
     finally:
         conn.close()
