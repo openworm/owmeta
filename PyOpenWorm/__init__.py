@@ -43,13 +43,13 @@ Classes
 .. autoclass:: Neuron
 .. autoclass:: Worm
 .. autoclass:: Muscle
-.. autoclass:: Cell
 .. autoclass:: Evidence
 .. autoclass:: Connection
 .. autoclass:: Relationship
 .. automodule:: PyOpenWorm.dataObject
 .. autoclass:: Property
 .. automodule:: PyOpenWorm.data
+.. automodule:: PyOpenWorm.cell
 """
 
 __version__ = '0.0.1-alpha'

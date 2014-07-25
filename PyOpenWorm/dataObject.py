@@ -305,7 +305,14 @@ class DataObject(DataUser):
 
 # Define a property by writing the get
 class Property(DataObject):
-    """ A value associated with a DataObject
+    """ Store a value associated with a DataObject
+
+    Properties can be be accessed like methods. A method call like::
+
+        a.P()
+
+    for a property ``P`` will return values appropriate to that property for ``a``,
+    the `owner` of the property.
 
     Parameters
     ----------
