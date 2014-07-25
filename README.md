@@ -13,16 +13,37 @@ Allows asking various questions about the c. elegans nervous system.
 Basic Usage
 -----------
 
+To get started::
+
 ```python
-  >>>import PyOpenWorm
-  
+  >>> import PyOpenWorm
+
+  # Set up
+  >>> PyOpenWorm.connect('default.conf')
   # Grabs the representation of the neuronal network
-  >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>list(net.aneuron('AVAL').type())
-  ['Interneuron']
+  >>> net = PyOpenWorm.Worm().get_neuron_network()
+  >>> list(net.aneuron('AVAL').type())
   #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
+  >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
   80
+  # Tear down
+  >>> PyOpenWorm.disconnect()
+```
+
+default.conf::
+
+```python
+    {
+        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
+        "rdf.source" : "default",
+        "rdf.store" : "Sleepycat",
+        "rdf.store_conf" : "worm.db",
+        "user.email" : "jerry@cn.com",
+        "rdf.upload_block_statement_count" : 50,
+        "test_variable" : "test_value"
+    }
 ```
   
   
@@ -73,6 +94,92 @@ Returns provenance information providing evidence about facts::
   >>>list(e.doi())
   ['10.100.123/natneuro']
 ```
+
+Add provenance information::
+
+```python
+  >>> e = Evidence(author='Sulston et al.', date='1983')
+  >>> e.asserts(Neuron(name="AVDL").lineageName("AB alaaapalr"))
+  <PyOpenWorm.dataObject.Evidence_asserts at 0x27f3d50>
+  >>> e.save()
+```
+
+See what some evidence stated::
+```python
+  >>> e0 = Evidence(author='Sulston et al.', date='1983')
+  >>> list(e0.asserts())
+  [Neuron(name=AVDL,lineageName=AB alaaapalr)]
+```
+
+See what neurons express some receptor::
+```python
+  >>>n = Neuron()
+  >>>n.receptor("TH")
+  >>>list(n.load())
+  [Neuron(lineageName=, name=CEPVL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPVR, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=PDEL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=PDER, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPDL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=CEPDR, Neighbor(), Connection(), type=, receptor=, innexin=)]
+```
+
+To get any object's possible values, use load()::
+```python
+  >>>list(P.Neuron().load())
+  [
+   ...
+   Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
+   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=IL1DR, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=IL1R, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
+   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=, innexin=),
+   ...
+  ]
+  # Properties are a little different
+  >>>next(Neuron().receptor.load())
+  receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
+
+```
+
+Get direct access to the RDFLib graph::
+```python
+ # we get it from Worm, but any object will do
+ >>> Worm().rdf.query(...)
+ ```
+
+Use pre-made objects with custom SPARQL queries::
+```python
+ >>> n = Neuron()
+ # Get a Neuron graph pattern suitable for use in a SPARQL query
+ >>> gp = n.graph_pattern(query=True)
+ >>> print gp
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/lineageName> ?Neuron_lineageName6836ce3c9c85873e .
+ ?Neuron_lineageName6836ce3c9c85873e <http://openworm.org/entities/SimpleProperty/value> ?lineageName .
+ <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron_name> .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/name> <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> .
+ <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://openworm.org/entities/SimpleProperty/value> "PVCR" .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/type> ?Neuron_type7b9bf83eb590323f .
+ ?Neuron_type7b9bf83eb590323f <http://openworm.org/entities/SimpleProperty/value> ?type .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/receptor> ?Neuron_receptor986e983db972bd3e .
+ ?Neuron_receptor986e983db972bd3e <http://openworm.org/entities/SimpleProperty/value> ?receptor .
+ <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/innexin> ?Neuron_innexind9223b3f5feebd3d .
+ ?Neuron_innexind9223b3f5feebd3d <http://openworm.org/entities/SimpleProperty/value> ?innexin
+
+ # Run a query to get bare values
+ >>> n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
+ ...    print x
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-1'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-19'))
+ (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'UNC-9'))
+ ...
+ ```
+
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
