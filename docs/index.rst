@@ -15,6 +15,7 @@ Contents:
    process
    api
    evidence
+   making_dataObjects
 
 Modules
 -------
