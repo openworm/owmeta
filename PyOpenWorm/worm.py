@@ -21,11 +21,17 @@ class Worm(DataObject):
 
     """
 
-    def __init__(self,**kwargs):
+    def __init__(self,scientific_name=False,**kwargs):
         DataObject.__init__(self,**kwargs)
+        P.DatatypeProperty("scientific_name", owner=self)
         P.ObjectProperty("neuron_network", owner=self, value_type=P.Network)
         P.ObjectProperty("muscle", owner=self, value_type=P.Muscle)
         P.ObjectProperty("cell", owner=self, value_type=P.Cell)
+
+        if scientific_name:
+            self.scientific_name(scientific_name)
+        else:
+            self.scientific_name("C. elegans")
 
     def get_neuron_network(self):
         """
