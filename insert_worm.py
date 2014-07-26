@@ -32,6 +32,33 @@ def upload_muscles():
     finally:
         conn.close()
 
+def upload_lineage():
+    try:
+        w = P.Worm()
+        ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
+        # insert neurons.
+        # save
+        f = open("C. elegans Cell List - WormAtlas.tsv", "r")
+        names = dict()
+        for x in f:
+             j = [x.strip() for x in x.split("\t")]
+             name=j[0]
+             if name in names:
+                 while (name in names):
+                     names[name] += 1
+                     name = name + "("+ str(names[name]) +")"
+             else:
+                 names[name] = 0
+             c = P.Cell(name,j[1])
+             w.cell(c)
+        ev.asserts(w)
+        for x,_ in zip(ev.triples(),range(1000)):
+            print x
+        ev.save()
+    except Exception, e:
+        traceback.print_exc()
+
+
 def upload_neurons():
     try:
         conn = sqlite3.connect('db/celegans.db')
@@ -158,10 +185,12 @@ if __name__ == '__main__':
     logging = False
     if len(sys.argv) > 1 and sys.argv[1] == '-l':
         logging = True
-    P.connect(configFile='readme.conf',do_logging=logging)
+    #P.connect(configFile='readme.conf',do_logging=logging)
+    P.connect()
     try:
         #print_evidence()
-        upload_muscles()
+        #upload_muscles()
+        upload_lineage()
         #upload_synapses()
         #upload_receptors_and_innexins()
     except:

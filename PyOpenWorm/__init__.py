@@ -119,6 +119,8 @@ def connect(configFile=False,conf=False,testConfig=False,do_logging=False):
         loadConfig(configFile)
     elif testConfig:
         useTestConfig()
+    else:
+        Configureable.default = Data()
 
     Configureable.default.openDatabase()
     logging.info("Connected to database")
