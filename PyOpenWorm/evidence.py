@@ -53,12 +53,15 @@ class Evidence(DataObject):
     """
     A class for storing metadata, like scholarly references, for
     other objects
+    Attributes
+    ----------
+    asserts : ObjectProperty (value_type=DataObject)
+       Something asserted by this evidence
 
     Parameters
     ----------
     doi : string
         A Digital Object Identifier (DOI) that provides evidence, optional
-
     pmid : string
         A PubMed ID (PMID) that point to a paper that provides evidence, optional
     wormbaseid : string
@@ -84,13 +87,14 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf=conf)
         self._fields = dict()
+        ObjectProperty('asserts', owner=self)
         DatatypeProperty('author',owner=self)
         DatatypeProperty('year',owner=self)
         DatatypeProperty('title',owner=self)
-        ObjectProperty('asserts', owner=self)
         DatatypeProperty('doi',owner=self)
         DatatypeProperty('wbid',owner=self)
         DatatypeProperty('pmid',owner=self)
+        DatatypeProperty('uri',owner=self)
 
         #XXX: I really don't like putting these in two places
         for k in source:
