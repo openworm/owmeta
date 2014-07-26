@@ -561,7 +561,7 @@ class values(DataObject):
         v.save()
         ...
         # get the list back
-        u = values('unc=-13 neurons and muscles')
+        u = values('unc-13 neurons and muscles')
         nm = list(u.value())
 
 
