@@ -50,7 +50,6 @@ class DataObject(DataUser):
     # For instance, one or more construct query could represent the object or
     # the triples might be stored in memory.
 
-
     @classmethod
     def register(cls):
         assert(issubclass(cls, DataObject))
@@ -544,11 +543,32 @@ def _create_property(linkName, owner, property_type, value_type=DataObject):
 
 class values(DataObject):
     """
-    A convenience class for getting the triples from a collection of objects
-    Provide the name of the value you want and the object that should return it.
+    A convenience class for working with a collection of objects
+
+    Example::
+
+        v = values('unc-13 neurons and muscles')
+        n = P.Neuron()
+        m = P.Muscle()
+        n.receptor('UNC-19')
+        m.receptor('UNC-19')
+        for x in n.load():
+            v.value(x)
+        for x in m.load():
+            v.value(x)
+        # Save the group for later use
+        v.save()
+        ...
+        # get the list back
+        u = values('unc=-13 neurons and muscles')
+        nm = list(u.value())
+
     """
-    def __init__(self,**kwargs):
+    def __init__(self,group_name,**kwargs):
         DataObject.__init__(self,**kwargs)
-        ObjectProperty('_o', owner=self)
+        ObjectProperty('value', owner=self)
+        DatatypeProperty('name', owner=self)
+        self.name(group_name)
+
     def add(self,v):
-        self._o(v)
+        self.value(v)
