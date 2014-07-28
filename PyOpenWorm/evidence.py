@@ -53,6 +53,7 @@ class Evidence(DataObject):
     """
     A class for storing metadata, like scholarly references, for
     other objects
+
     Attributes
     ----------
     asserts : ObjectProperty (value_type=DataObject)

@@ -3,12 +3,12 @@
 PyOpenWorm
 ===========
 
-Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
+Unified data access library for data about the C. elegans anatomy and model for the OpenWorm project
 
 What does it do?
 ----------------
 
-Allows asking various questions about the c. elegans nervous system.
+Allows asking various questions about the C. elegans nervous system.
 
 Basic Usage
 -----------
@@ -171,7 +171,7 @@ Use pre-made objects with custom SPARQL queries::
  ?Neuron_innexind9223b3f5feebd3d <http://openworm.org/entities/SimpleProperty/value> ?innexin
 
  # Run a query to get bare values
- >>> n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
+ >>> for x in n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
  ...    print x
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-1'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
