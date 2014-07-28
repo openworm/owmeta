@@ -1,8 +1,8 @@
 Making data objects
 ====================
-To make new objects like Neuron or Worm, for the most part, you just need to make a Python class.
+To make new objects like ``Neuron`` or ``Worm``, for the most part, you just need to make a Python class.
 Say, for example, that I want to record some information about drug reactions in C. elegans. I make
-a ``Drug`` and ``Experiment`` classes to describe C. Elegans reactions::
+``Drug`` and ``Experiment`` classes to describe C. Elegans reactions::
 
     class Drug(DataObject):
         # We set up properties in __init__
