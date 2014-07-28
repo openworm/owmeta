@@ -1,13 +1,3 @@
-"""
-.. class:: Cell
-
-   cell client
-   =============
-
-   This module contains the class that defines the cell
-
-"""
-
 from PyOpenWorm import *
 from string import Template
 import neuroml
