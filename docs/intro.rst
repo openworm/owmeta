@@ -1,12 +1,12 @@
 PyOpenWorm
 ===========
 
-Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
+Unified data access library for data about the C. elegans anatomy and model for the OpenWorm project
 
 What does it do?
 ----------------
 
-Allows asking various questions about the c. elegans nervous system.
+Allows asking various questions about the C. elegans nervous system.
 
 Basic Usage
 -----------
@@ -143,8 +143,10 @@ To get any object's possible values, use load()::
 
 Get direct access to the RDFLib graph::
 
- # we get it from Worm, but any object will do
- >>> Worm().rdf.query(...)
+ >>> Worm().rdf.query("SELECT * WHERE { ?x rdf:type <http://openworm.org/entities/Neuron/lineageName> . } ")
+ # The choice of object is arbitrary.
+ # This also works:
+ >>> Neuron().rdf.query("SELECT * WHERE { ?x rdf:type <http://openworm.org/entities/Neuron/lineageName> . } ")
 
 
 Use pre-made objects with custom SPARQL queries::
@@ -167,17 +169,17 @@ Use pre-made objects with custom SPARQL queries::
  ?Neuron_innexind9223b3f5feebd3d <http://openworm.org/entities/SimpleProperty/value> ?innexin
 
  # Run a query to get bare values
- >>> n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
+ >>> for x in n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
  ...    print x
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-1'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-19'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'UNC-9'))
- ...
+ # ...
 
 
 
-Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
+Returns the c. elegans connectome represented as a `NetworkX <http://networkx.github.io/documentation/latest/>`_ graph::
 
 
   >>> net.as_networkx()
@@ -214,12 +216,16 @@ ion channels, etc and so should our code.
 Installation
 ------------
 
+::
+
     git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
     
 Uninstall
 ----------
+
+::
 
     pip uninstall PyOpenWorm
 
