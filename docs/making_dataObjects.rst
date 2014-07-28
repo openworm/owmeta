@@ -2,14 +2,23 @@ Making data objects
 ====================
 To make new objects like ``Neuron`` or ``Worm``, for the most part, you just need to make a Python class.
 Say, for example, that I want to record some information about drug reactions in C. elegans. I make
-``Drug`` and ``Experiment`` classes to describe C. Elegans reactions::
+``Drug`` and ``Experiment`` classes to describe C. elegans reactions::
+
+    from PyOpenWorm import (DataObject,
+                            DatatypeProperty,
+                            ObjectProperty,
+                            Worm,
+                            Evidence,
+                            connect)
 
     class Drug(DataObject):
         # We set up properties in __init__
-        def __init__(self,drug_name,*args,**kwargs):
+        def __init__(self,drug_name=False,*args,**kwargs):
             # pass arguments to DataObject
             DataObject.__init__(self,*args,**kwargs)
             DatatypeProperty('name', owner=self)
+            if drug_name:
+                self.name(drug_name)
 
     class Experiment(DataObject):
         def __init__(self,*args,**kwargs):
@@ -20,6 +29,7 @@ Say, for example, that I want to record some information about drug reactions in
             DatatypeProperty('route_of_entry', owner=self)
             DatatypeProperty('reaction', owner=self)
 
+    connect()
     # Set up with the RDF translation machinery
     Experiment.register()
     Drug.register()
