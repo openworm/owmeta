@@ -3,5 +3,4 @@ networkx
 requirements
 pint
 lxml
-numpydoc
 libneuroml
