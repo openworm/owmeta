@@ -70,10 +70,10 @@ class Cell(DataObject):
         DataObject.__init__(self,**kwargs)
         DatatypeProperty('lineageName',owner=self)
         DatatypeProperty('name',owner=self)
+        DatatypeProperty('description',owner=self)
 
         if name:
             self.name(name)
-
         if lineageName:
             self.lineageName(lineageName)
 
