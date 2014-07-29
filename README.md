@@ -177,9 +177,8 @@ Use pre-made objects with custom SPARQL queries::
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-19'))
  (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'UNC-9'))
- ...
+ # ...
  ```
-
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
@@ -187,6 +186,8 @@ Returns the c. elegans connectome represented as a [NetworkX](http://networkx.gi
   >>>net.as_networkx()
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
 ```
+
+More examples can be found [here](http://pyopenworm-markw.readthedocs.org/en/latest/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
 
 Why is this necessary?
 ----------------------
