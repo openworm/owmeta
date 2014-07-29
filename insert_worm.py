@@ -190,7 +190,6 @@ if __name__ == '__main__':
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
         print P.config()
-        raise Exception('done')
         #print_evidence()
         upload_muscles()
         print ("uploaded muscles")
