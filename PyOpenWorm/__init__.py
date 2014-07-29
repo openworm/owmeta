@@ -81,7 +81,8 @@ SimpleProperty.register()
 Property.register()
 Relationship.register()
 
-config = Configureable.default
+def config():
+    return Configureable.default
 
 def useTestConfig():
     cfg = {
