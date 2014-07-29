@@ -3,4 +3,5 @@ rdflib
 networkx
 requirements
 pint
+numpydoc
 lxml
