@@ -31,16 +31,29 @@ def upload_muscles():
     finally:
         conn.close()
 
-def upload_lineage():
+def upload_lineage_and_descriptions():
+    # XXX: This wants a way to insert cells, then later, to insert neurons from the same set
+    # and have the later recoginzed as the former. Identifier matching limits us here. It would
+    # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
+    # at the sub-class insert and have a reasoner relate
+    # the two sets of inserts.
     try:
         w = P.Worm()
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
         # insert neurons.
         # save
         f = open("C. elegans Cell List - WormAtlas.tsv", "r")
+        h = open("C. elegans Cell List - WormBase.tsv", "r")
+        # Join f onto h by lineage name
+
+        # Skip headers
+        next(h)
+        next(h)
+        next(h)
+        next(f)
         names = dict()
         for x in f:
-             j = [x.strip() for x in x.split("\t")]
+             j = [x.strip().strip("\"") for x in x.split("\t")]
              name=j[0]
              if name in names:
                  while (name in names):
@@ -49,10 +62,11 @@ def upload_lineage():
              else:
                  names[name] = 0
              c = P.Cell(name,j[1])
+             c.description(j[2])
              w.cell(c)
         ev.asserts(w)
-        for x,_ in zip(ev.triples(),range(1000)):
-            print x
+        #for x,_ in zip(ev.triples(),range(1000)):
+            #print x
         ev.save()
     except Exception, e:
         traceback.print_exc()
@@ -169,30 +183,24 @@ def upload_synapses():
         conn.close()
 
 if __name__ == '__main__':
-    d = P.Data({
-        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
-        "rdf.source"  : "sparql_endpoint",
-        "rdf.store"  : "SPARQLUpdateStore",
-        "rdf.store_conf"  : ["http://107.170.133.175:8080/openrdf-sesame/repositories/test","http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements"],
-        "rdf.upload_block_statement_count" : 1000,
-        "user.email" : "jerry@cn.com",
-        "test_variable" : "test_value"
-    })
     import sys
     logging = False
     if len(sys.argv) > 1 and sys.argv[1] == '-l':
         logging = True
-    #P.connect(configFile='readme.conf',do_logging=logging)
-    P.connect()
+    P.connect(configFile='readme.conf',do_logging=logging)
     try:
+        print P.config()
+        raise Exception('done')
         #print_evidence()
-        #upload_muscles()
-        upload_lineage()
-        #upload_synapses()
-        #upload_receptors_and_innexins()
+        upload_muscles()
+        print ("uploaded muscles")
+        #upload_lineage_and_descriptions()
+        upload_synapses()
+        print ("uploaded synapses")
+        upload_receptors_and_innexins()
+        print ("uploaded receptors and innexins")
     except:
+        print "here"
         pass
     #try:
         #for x in P.Neuron().load():
