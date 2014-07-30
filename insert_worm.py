@@ -199,8 +199,7 @@ if __name__ == '__main__':
         upload_receptors_and_innexins()
         print ("uploaded receptors and innexins")
     except:
-        print "here"
-        pass
+        traceback.print_exc()
     #try:
         #for x in P.Neuron().load():
             #print x
