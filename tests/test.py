@@ -175,6 +175,63 @@ class CellTest(_DataTest):
         c = Cell(name="boots")
         c1 = Cell(name="boots")
         self.assertEqual(c.identifier(),c1.identifier())
+
+    def test_blast_space(self):
+        """
+        Test that setting the lineage name gives the blast cell.
+        """
+        c = Cell(name="carrots")
+        c.lineageName("a tahsuetoahusenoatu")
+        self.assertEqual(c.blast(), "a")
+
+    def test_blast_dot(self):
+        """
+        Test that setting the lineage name gives the blast cell.
+        """
+        c = Cell(name="peas")
+        c.lineageName("ab.tahsuetoahusenoatu")
+        self.assertEqual(c.blast(), "ab")
+
+    def test_parentOf(self):
+        """
+        Test that we can get the children of a cell
+        Tests for anterior, posterior, left, right, ventral, dorsal divisions
+        """
+        p = Cell(name="peas")
+        p.lineageName("ab.tahsuetoahusenoat")
+        p.save()
+
+        c = ["carrots",
+             "jam",
+             "peanuts",
+             "celery",
+             "tuna",
+             "chicken"]
+
+        division_directions = "alvpdr"
+
+        for x,l in zip(c, division_directions):
+            base = 'ab.tahsuetoahusenoat'
+            ln = base + l
+            Cell(name=x,lineageName=ln).save()
+
+        names = set(str(next(x.name())) for x in p.parentOf())
+        self.assertEqual(set(c), names)
+
+    def test_daughterOf(self):
+        """
+        Test that we can get the parent of a cell
+        """
+        p = Cell(name="peas")
+        p.lineageName("ab.tahsuetoahusenoat")
+        p.save()
+
+        c = Cell(name="carrots")
+        c.lineageName("ab.tahsuetoahusenoatu")
+        c.save()
+        parent_p = next(c.daughterOf().name())
+        self.assertEqual("peas", parent_p)
+
     @unittest.skip('Long runner')
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
