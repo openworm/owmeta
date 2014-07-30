@@ -89,6 +89,10 @@ class DataUser(Configureable):
     def rdf(self):
         return self.conf['rdf.graph']
 
+    @rdf.setter
+    def rdf(self, value):
+        self.conf['rdf.graph'] = value
+
     def _remove_from_store(self, g):
         # Note the assymetry with _add_to_store. You must add actual elements, but deletes
         # can be performed as a query
