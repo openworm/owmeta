@@ -70,6 +70,7 @@ class Cell(DataObject):
         DataObject.__init__(self,**kwargs)
         DatatypeProperty('lineageName',owner=self)
         DatatypeProperty('name',owner=self)
+        DatatypeProperty('divisionVolume',owner=self)
         DatatypeProperty('description',owner=self)
 
         if name:
@@ -117,6 +118,39 @@ class Cell(DataObject):
         return morph
     def __eq__(self,other):
         return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
+
+    def blast(self):
+        """
+        Note that this isn't a Property. It returns the blast extracted from the ''first''
+        lineageName saved.
+        """
+        import re
+        try:
+            ln = next(self.lineageName())
+            x = re.split("[. ]", ln)
+            return x[0]
+        except:
+            return ""
+
+    def daughterOf(self):
+        """ Get the parent of this cell """
+        ln = next(self.lineageName())
+        parent_ln = ln[:-1]
+        return Cell(lineageName=parent_ln)
+
+    def parentOf(self):
+        """ Get the daughters of this cell """
+        # XXX: This is pretty icky. We sorely need a convenient way to plug-in
+        # custom patterns to the load query.
+
+        # hackish. just query for the possible children lineage names...
+        ln = next(self.lineageName())
+        possible_child_lns = [ln + "a", ln + "v",
+                              ln + "p", ln + "r",
+                              ln + "l", ln + "d"]
+        for x in possible_child_lns:
+            for z in Cell(lineageName=x).load():
+                yield z
 
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific
