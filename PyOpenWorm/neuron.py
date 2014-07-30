@@ -61,12 +61,13 @@ class Connection(P.Property):
 
            Parameters
            ----------
-           type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           pre_post_or_either: {'pre','post','either'}, default='pre'
+               Says whether the query is for having the owning Neuron in the pre-synaptic,
+               post-synaptic, or in either position.
+
            Returns
            -------
-           list of Connection
+           generator of Connection objects
         """
         c = []
         if pre_post_or_either == 'pre':
