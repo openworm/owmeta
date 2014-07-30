@@ -335,6 +335,12 @@ class Property(DataObject):
         # XXX: Default implementation is a box for a value
         self._value = False
 
+    def __getattr__(self, f):
+        """ Executes the get() query for this object and creates a new generator
+        pulling values from each result
+        """
+        return _PropertyLink(self.get(), f)
+
     def get(self,*args):
         """ Get the things which are on the other side of this property
 
@@ -356,6 +362,18 @@ class Property(DataObject):
         else:
             return self.get(*args,**kwargs)
     # Get the property (a relationship) itself
+class _PropertyLink(Property):
+    def __init__(self, gen, link):
+        self._last = gen
+        self._link = link
+    def get(self):
+        for i in self._last:
+            for x in getattr(i, self._link).get():
+                yield x
+
+    def __getattr__(self, n):
+        return self.__class__(self.get(), n)
+
 class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
@@ -394,6 +412,7 @@ class SimpleProperty(Property):
                     # XXX: We can pull the type from the graph. Just be sure
                     #   to get the most specific type
                     yield self.object_from_id(x[0], self.value_rdf_type)
+
 
     def set(self,v):
         import bisect
