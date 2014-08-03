@@ -55,6 +55,8 @@ class DataObject(DataUser):
         assert(issubclass(cls, DataObject))
         _DataObjects[cls.__name__] = cls
         _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
+        self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
+        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
         cls.parents = _DataObjectsParents[cls.__name__]
 
     def __init__(self,ident=False,triples=[],**kwargs):
@@ -62,8 +64,6 @@ class DataObject(DataUser):
         self._triples = triples
         self._is_releasing_triples = False
         self.properties = []
-        self.rdf_type = self.conf['rdf.namespace'][self.__class__.__name__]
-        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
 
         self._id_is_set = False
 
