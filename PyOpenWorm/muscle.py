@@ -21,5 +21,5 @@ class Muscle(Cell):
 
     def __init__(self, name=False, **kwargs):
         Cell.__init__(self, name=name, **kwargs)
-        P.ObjectProperty("neurons",owner=self,value_type=P.Neuron)
+        self.innervatedBy = P.ObjectProperty("neurons",owner=self,value_type=P.Neuron)
         P.DatatypeProperty("receptors",owner=self)
