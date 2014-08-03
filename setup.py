@@ -10,7 +10,7 @@ long_description = open("README.md").read()
 setup(
     install_requires=required,
     name = "PyOpenWorm",
-    version = '0.0.1-alpha',
+    version = '0.5.0-alpha',
     packages = ['PyOpenWorm', 'tests'],
     author = "OpenWorm.org authors and contributors",
     author_email = "info@openworm.org",
