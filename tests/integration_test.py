@@ -62,6 +62,34 @@ class IntegrationTest(unittest.TestCase):
         c = Connection()
         for x in c.synclass():
             print x
+    def test_evidence_asserts_all_about(self):
+        """ Test that we can assert_all_about a containing object and
+        then get evidence for contained objects.
+        """
+        import random
+        random.seed()
+        v = values('all')
+        def make_syn():
+            import struct
+            u = struct.pack("=2f",random.random(),random.random())
+            z = struct.pack("=2f",random.random(),random.random())
+            a = Neuron(u.encode('hex'))
+            b = Neuron(z.encode('hex'))
+            v.value(a.neighbor(b))
+            return (a,b)
+        for x in range(200):
+            make_syn()
+
+        # the one we'll check for
+        z = make_syn()
+        ev = Evidence(author="Homer")
+        ev.asserts_all_about(ev)
+        ev.save()
+        eve = Evidence()
+        eve.asserts(a.neighbor(b))
+        for x in eve.load():
+            print x
+
     def testl(self):
         """
         Test that a property can be loaded when the owning
@@ -81,7 +109,8 @@ class IntegrationTest(unittest.TestCase):
                 DatatypeProperty('flexo',owner=self)
                 if x:
                     self.flexo(x)
-        nums = [10, 1e2, 1e3, 1e4, 1e5]
+        # feel free to add more if you have the time
+        nums = [10, 1e2, 1e3]
 
         Configureable.default = Data.open("tests/test_testl.conf")
         Configureable.default.openDatabase()
@@ -89,7 +118,7 @@ class IntegrationTest(unittest.TestCase):
             #for 1000, takes about 10 seconds...
             for x in nums:
                 print 'running ',x,'sized test on a ',Configureable.default['rdf.graph'].store,'store'
-                v = values()
+                v = values('zim')
                 for z in range(int(x)):
                     v.add(_to(random()))
                 t0 = time()
