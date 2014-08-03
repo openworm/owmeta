@@ -298,62 +298,6 @@ class DataObjectTest(_DataTest):
         u = r.upload_date()
         self.assertIsNotNone(u)
 
-    def test_asserts_same_props(self):
-        """ Show that setting the same properties with distinct values returns a single
-            object.
-
-        Copied from the Evidence tests since the semantics apply to all data objects.
-        """
-        class T(DataObject):
-            def __init__(self, **args):
-                DataObject.__init__(self,**args)
-                DatatypeProperty("boots", owner=self)
-                DatatypeProperty("sandals", owner=self)
-        T.register()
-
-        do = T()
-        do.boots('somalia')
-
-        doa = T()
-        doa.boots('chile')
-
-        do.save()
-        doa.save()
-
-        dq = T()
-        l = list(dq.load())
-        qt = set(("somalia", "chile"))
-        q = set(map(str,list(next(l[0].boots()))))
-
-        self.assertEqual(1,len(l))
-        self.assertEqual(qt, q)
-
-    def test_asserts_diff_props(self):
-        """ Show that setting the same properties with distinct values returns a single
-            object.
-
-        Copied from the Evidence tests since the semantics apply to all data objects.
-        """
-        class T(DataObject):
-            def __init__(self, **args):
-                DataObject.__init__(self,**args)
-                DatatypeProperty("boots", owner=self)
-                DatatypeProperty("sandals", owner=self)
-        T.register()
-        do = T()
-        do.boots('somalia')
-
-        doa = T()
-        doa.sandals('chile')
-        do.save()
-        doa.save()
-
-        dq = T()
-        l = list(dq.load())
-        self.assertEqual(1,len(l))
-        self.assertEqual("somalia", str(next(l[0].boots())))
-        self.assertEqual("chile", str(next(l[0].sandals())))
-
 class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
@@ -624,8 +568,7 @@ class EvidenceTest(_DataTest):
         self.assertIn('tom@cn.com', author)
 
     def test_asserts_query_multiple(self):
-        """ Show that setting the evidence with distinct objects yields merged results.
-        """
+        """ Show that setting the evidence with distinct objects yields distinct results """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)
@@ -637,40 +580,16 @@ class EvidenceTest(_DataTest):
 
         e0 = Evidence()
         e0.asserts(r)
-        l = list(e0.load())
-        self.assertEqual(1,len(l))
-        self.assertEqual("tom@cn.com", str(next(l[0].author())))
-        self.assertEqual(1999, int(next(l[0].author())))
-
-    def test_asserts_query_multiple_overlapping(self):
-        """ Show that setting the evidence with distinct objects and overlapping set
-        values yields merged results.
-
-        If this seems confusing, consider that there's nothing that requires any of the
-        values set to be the unique value for the property.
-        """
-        e = Evidence(author='tom@cn.com', year="2000")
-        r = Relationship(make_graph(10))
-        e.asserts(r)
-        e.save()
-
-        e1 = Evidence(year=1999,author="jerry@cn.com")
-        e1.asserts(r)
-        e1.save()
-
-        e0 = Evidence()
-        e0.asserts(r)
-        l = list(e0.load())
-        authors = set(("jerry@cn.com", "tom@cn.com"))
-        queried_authors = set(map(str,list(next(l[0].author()))))
-        self.assertEqual(1,len(l))
-        self.assertEqual(authors, queried_authors)
-        self.assertEqual(1999, int(next(l[0].author())))
+        for x in e0.load():
+            a = list(x.author())
+            y = list(x.year())
+            # Testing that either a has a result tom@cn.com and y has nothing or
+            # y has a result 1999 and a has nothing
+            self.assertTrue((len(a) > 0 and str(a[0]) == 'tom@cn.com' and len(y) == 0) \
+                    or len(a) == 0 and int(y[0]) == 1999)
 
     def test_asserts_query_multiple_author_matches(self):
-        """ Show that setting the evidence with distinct objects yields one
-            result if there are matching values
-        """
+        """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)
@@ -682,7 +601,7 @@ class EvidenceTest(_DataTest):
 
         e0 = Evidence()
         e0.asserts(r)
-        self.assertEqual(1, len(list(e0.load())))
+        self.assertTrue(len(list(e0.load())) == 2)
 
 class RDFLibTest(unittest.TestCase):
     """Test for RDFLib."""
