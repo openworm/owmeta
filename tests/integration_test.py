@@ -3,17 +3,13 @@ import traceback
 import rdflib as R
 from PyOpenWorm import *
 
-TestConfig = Data.open("tests/test.conf")
-Configureable.default = TestConfig
-
 class IntegrationTest(unittest.TestCase):
     """ Integration testing """
     def setUp(self):
-        self.config = TestConfig
-        self.config.openDatabase()
+        connect("tests/test.conf")
 
     def tearDown(self):
-        self.config.closeDatabase()
+        disconnect()
 
     @unittest.skip("No bibtex module")
     def test_1(self):
@@ -38,6 +34,7 @@ class IntegrationTest(unittest.TestCase):
         e = Evidence(author="Danny Glover")
         e.asserts(c)
         # look at what else this evidence has stated
+        print e.conf
         e.save()
         e = Evidence(author="Danny Glover")
         r = e.asserts()
@@ -77,11 +74,12 @@ class IntegrationTest(unittest.TestCase):
             b = Neuron(z.encode('hex'))
             v.value(a.neighbor(b))
             return (a,b)
+
         for x in range(200):
             make_syn()
 
         # the one we'll check for
-        z = make_syn()
+        a,b = make_syn()
         ev = Evidence(author="Homer")
         ev.asserts_all_about(ev)
         ev.save()
