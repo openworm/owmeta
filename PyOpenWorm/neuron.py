@@ -144,9 +144,9 @@ class Neuron(Cell):
         # Get connections from this neuron
         Connection(owner=self)
 
-        P.DatatypeProperty("type",self)
-        P.DatatypeProperty("receptor",self)
-        P.DatatypeProperty("innexin",self)
+        Neuron.DatatypeProperty("type",self)
+        Neuron.DatatypeProperty("receptor",self)
+        Neuron.DatatypeProperty("innexin",self)
         ### Aliases ###
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
