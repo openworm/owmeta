@@ -421,7 +421,7 @@ class SimpleProperty(Property):
 
         if self.owner != False:
             # XXX: Shouldn't be recreating this here...
-            self.link = self.owner.rdf_namespace[self.linkName]
+            self.link = self.owner_type.rdf_namespace[self.linkName]
 
     def get(self):
         if len(self.v) > 0:
