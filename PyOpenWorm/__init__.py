@@ -50,6 +50,7 @@ Classes
 .. autoclass:: Property
 .. automodule:: PyOpenWorm.data
 .. automodule:: PyOpenWorm.cell
+.. automodule:: PyOpenWorm.configure
 """
 
 __version__ = '0.0.1-alpha'
@@ -69,20 +70,10 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 
-DataObject.register()
-Cell.register()
-Network.register()
-Neuron.register()
-Worm.register()
-Evidence.register()
-Muscle.register()
-Connection.register()
-SimpleProperty.register()
-Property.register()
-Relationship.register()
+__import__('__main__').connected = False
 
 def config():
-    return Configureable.default
+    return Configureable.conf
 
 def useTestConfig():
     cfg = {
@@ -95,34 +86,69 @@ def useTestConfig():
         "test_variable" : "test_value"
     }
     for x in cfg:
-        Configureable.default[x] = cfg[x]
-    Configureable.default = Data(Configureable.default)
+        Configureable.conf[x] = cfg[x]
+    Configureable.conf = Data(Configureable.conf)
 
 def loadConfig(f):
     """ Load configuration for the module """
-    Configureable.default = Data.open(f)
+    Configureable.conf = Data.open(f)
 
-def disconnect():
+def disconnect(c=False):
     """ Close the database """
-    Configureable.default.closeDatabase()
+    m = __import__('__main__')
+    if not m.connected:
+        return
+    if c == False:
+        c = Configureable.conf
 
-def connect(configFile=False,conf=False,testConfig=False,do_logging=False):
+    if c != False:
+        c.closeDatabase()
+    m.connected = False
+
+def connect(configFile=False,
+        conf=False,
+        testConfig=False,
+        do_logging=False):
     """ Load desired configuration and open the database """
-
     import logging
     import atexit
+    m = __import__('__main__')
+    if m.connected == True:
+        print "PyOpenWorm already connected"
+        return
+
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
 
     if conf:
-        Configureable.default = conf
+        Configureable.conf = conf
+        if not isinstance(conf, Data):
+            d = Data()
+            Configureable.conf = d
     elif configFile:
         loadConfig(configFile)
     elif testConfig:
         useTestConfig()
     else:
-        Configureable.default = Data()
+        Configureable.conf = Data()
 
-    Configureable.default.openDatabase()
+    Configureable.conf.openDatabase()
     logging.info("Connected to database")
+
+    # have to register the right one to disconnect...
+    c = Configureable.conf
     atexit.register(disconnect)
+    Configureable._lh = hash(Configureable.conf)
+
+    DataObject.register()
+    Cell.register()
+    Network.register()
+    Neuron.register()
+    Worm.register()
+    Evidence.register()
+    Muscle.register()
+    Connection.register()
+    SimpleProperty.register()
+    Property.register()
+    Relationship.register()
+

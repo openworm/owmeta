@@ -39,13 +39,13 @@ def make_graph(size=100):
 
 class _DataTest(unittest.TestCase):
     def setUp(self):
-        self.config = Data(TestConfig)
-        self.config_no_data = TestConfig
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=self.config, do_logging=False)
-        self.config.openDatabase()
+        PyOpenWorm.connect(conf=TestConfig, do_logging=False)
     def tearDown(self):
-        self.config.closeDatabase()
+        PyOpenWorm.disconnect()
+    @property
+    def config(self):
+        return PyOpenWorm.config()
 
 class WormTest(_DataTest):
     """Test for Worm."""
@@ -138,6 +138,7 @@ class ConfigureTest(unittest.TestCase):
             self.assertEqual("test_value", d["test_variable"])
         except:
             self.fail("test.conf should exist and be valid JSON")
+
     def test_read_from_file_fail(self):
         """ Fail on attempt to read configuration from a non-JSON file """
         with self.assertRaises(BadConf):
@@ -147,12 +148,12 @@ class ConfigureableTest(unittest.TestCase):
     def test_init_empty(self):
         """Ensure Configureable gets init'd with the defalut if nothing's given"""
         i = Configureable()
-        self.assertEqual(i.conf,Configureable.default)
+        self.assertEqual(Configureable.conf,i.conf)
 
     def test_init_False(self):
         """Ensure Configureable gets init'd with the defalut if False is given"""
         i = Configureable(conf=False)
-        self.assertEqual(i.conf,Configureable.default)
+        self.assertEqual(Configureable.conf, i.conf)
 
 class CellTest(_DataTest):
 
@@ -302,7 +303,7 @@ class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
-        Configureable.default = None
+        Configureable.conf = False
         with self.assertRaises(BadConf):
             DataUser()
 
@@ -316,8 +317,13 @@ class DataUserTest(_DataTest):
 
     def test_init_config_no_Data(self):
         """ Should fail if given a non-Data configuration """
+        # XXX: This test touches some machinery in
+        # PyOpenWorm/__init__.py. Feel like it's a bad test
+        tmp = Configureable.conf
+        Configureable.conf = Configure()
         with self.assertRaises(BadConf):
-            DataUser(conf=self.config_no_data)
+            DataUser()
+        Configureable.conf = tmp
     @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
@@ -810,40 +816,48 @@ class DataTest(_DataTest):
         """ May fail if bsddb is not available. Ignore if it is not """
         # open the database
         # check we can add a triple
+        disconnect()
+        c = Configure()
+        c['source'] = 'Sleepycat'
+        c['rdf.store'] = 'Sleepycat'
+        c['rdf.store_conf'] = 'test.db'
         try:
-            self.config['source'] = 'Sleepycat'
-            self.config['rdf.store'] = 'Sleepycat'
-            self.config['rdf.store_conf'] = 'test.db'
+            connect(conf=c)
+            c = config()
+            g = c['rdf.graph']
+            ns = c['rdf.namespace']
 
-            g = self.config['rdf.graph']
-            ns = self.config['rdf.namespace']
             g.add((ns['64'], ns['356'], ns['184']))
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
-            self.config['rdf.graph'].close()
         except ImportError:
             pass
+        finally:
+            disconnect()
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
 
         Takes a while to run the first time.
         May fail if bsddb is not available. Ignore if it is not
         """
+        disconnect()
+        c = Configure()
+        c['rdf.source'] = 'TriX'
+        c['trix_location'] = 'trix.xml'
+        c['rdf.store_conf'] = 'trix_test.db'
+        c['rdf.store'] = 'Sleepycat'
         try:
-            c = Configure().copy(self.config)
-            c['rdf.source'] = 'TriX'
-            c['trix_location'] = 'export.xml'
-            c['rdf.store_conf'] = 'test.db'
-            c['rdf.store'] = 'Sleepycat'
-            d = Data(conf=c)
-            d.openDatabase()
-            b = d['rdf.graph'].query("ASK { ?S ?P ?O }")
+            connect(conf=c)
+            d = self.config
+            g = d['rdf.graph']
+            b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
-            d.closeDatabase()
         except ImportError:
             pass
+        finally:
+            disconnect()
 
 class PropertyTest(_DataTest):
     pass
@@ -860,8 +874,8 @@ class SimplePropertyTest(_DataTest):
         """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do1)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do1)
         self.assertEqual(c.identifier(),c1.identifier())
 
     def test_same_value_same_id_not_empty(self):
@@ -870,8 +884,8 @@ class SimplePropertyTest(_DataTest):
         """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do1)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('partition')
         do1.boots('partition')
         self.assertEqual(c.identifier(),c1.identifier())
@@ -884,8 +898,8 @@ class SimplePropertyTest(_DataTest):
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         dz = DataObject(ident=R.URIRef("http://example.org/vip"))
         dz1 = DataObject(ident=R.URIRef("http://example.org/vip"))
-        c = ObjectProperty("boots", do)
-        c1 = ObjectProperty("boots", do1)
+        c = DataObject.ObjectProperty("boots", do)
+        c1 = DataObject.ObjectProperty("boots", do1)
         do.boots(dz)
         do1.boots(dz1)
         self.assertEqual(c.identifier(),c1.identifier())
@@ -896,8 +910,8 @@ class SimplePropertyTest(_DataTest):
         """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do1)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('join')
         do1.boots('partition')
         self.assertNotEqual(c.identifier(),c1.identifier())
@@ -908,8 +922,8 @@ class SimplePropertyTest(_DataTest):
         """
         # why would you ever do this?
         do = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do)
         c('join')
         c1('join')
         self.assertEqual(c.identifier(),c1.identifier())
@@ -920,8 +934,8 @@ class SimplePropertyTest(_DataTest):
         """
         # why would you ever do this?
         do = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do)
         c('partition')
         c1('join')
         self.assertNotEqual(c.identifier(),c1.identifier())
@@ -932,8 +946,8 @@ class SimplePropertyTest(_DataTest):
         """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DatatypeProperty("boots", do)
-        c1 = DatatypeProperty("boots", do1)
+        c = DataObject.DatatypeProperty("boots", do)
+        c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('join')
         do.boots('simile')
         do.boots('partition')
@@ -952,8 +966,8 @@ class SimplePropertyTest(_DataTest):
         ob = DataObject(ident=R.URIRef("http://example.org/b"))
         oc = DataObject(ident=R.URIRef("http://example.org/c"))
 
-        c = ObjectProperty("boots", do)
-        c1 = ObjectProperty("boots", do1)
+        c = DataObject.ObjectProperty("boots", do)
+        c1 = DataObject.ObjectProperty("boots", do1)
 
         do.boots(oa)
         do.boots(ob)

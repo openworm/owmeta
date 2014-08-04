@@ -41,11 +41,11 @@ class Connection(Relationship):
                  **kwargs):
         Relationship.__init__(self,**kwargs)
 
-        DatatypeProperty('syntype',owner=self)
-        DatatypeProperty('synclass',owner=self)
-        DatatypeProperty('number',owner=self)
-        ObjectProperty('pre_cell',owner=self, value_type=Neuron)
-        ObjectProperty('post_cell',owner=self, value_type=Neuron)
+        Connection.DatatypeProperty('syntype',owner=self)
+        Connection.DatatypeProperty('synclass',owner=self)
+        Connection.DatatypeProperty('number',owner=self)
+        Connection.ObjectProperty('pre_cell',owner=self, value_type=Neuron)
+        Connection.ObjectProperty('post_cell',owner=self, value_type=Neuron)
 
         if isinstance(pre_cell,P.Neuron):
             self.pre_cell(pre_cell)
