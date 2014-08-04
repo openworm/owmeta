@@ -26,6 +26,7 @@ class _link(ConfigValue):
         return self.conf[self.members[0]]
 
 class Configure(object):
+    """ Configuration """
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
@@ -93,24 +94,17 @@ class Configure(object):
             raise KeyError(pname)
 
 class Configureable(object):
-    default = Configure()
+    """ An object which can accept configuration """
+    conf = Configure()
+    default = conf
     def __init__(self, conf=False):
-        if not conf:
-            self.conf = Configureable.default
-        else:
-            self.conf = conf
+        pass
 
     def __getitem__(self,k):
-        if not isinstance(self, Configure):
-            return self.conf.get(k)
-        else:
-            return Configure.__getitem__(self,k)
+        return self.conf.get(k)
 
     def __setitem__(self,k,v):
-        if not isinstance(self, Configure):
-            self.conf[k] = v
-        else:
-            return Configure.__setitem__(self,k,v)
+        self.conf[k] = v
 
     def get(self, pname, default=False):
         return self.conf.get(pname,default)
