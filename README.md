@@ -218,10 +218,19 @@ ion channels, etc and so should our code.
 
 Installation
 ------------
+Typically the steps below should be sufficient for a successful install
 
     git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
+
+However, some users have experienced difficulty installing on Mac OSX. If the install
+fails when attempting to instal lxml, you might try installing it separately before
+attempting to install PyOpenWorm. At least one user has found this [Stack Overflow](http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9)
+post to be helpful.
+
+You may also experience difficulty with a mismatch between your bsddb version and the one used to create the database.
+
     
 Uninstall
 ----------

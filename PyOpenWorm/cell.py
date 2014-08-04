@@ -68,10 +68,10 @@ class Cell(DataObject):
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
-        DatatypeProperty('lineageName',owner=self)
-        DatatypeProperty('name',owner=self)
-        DatatypeProperty('divisionVolume',owner=self)
-        DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('lineageName',owner=self)
+        Cell.DatatypeProperty('name',owner=self)
+        Cell.DatatypeProperty('divisionVolume',owner=self)
+        Cell.DatatypeProperty('description',owner=self)
 
         if name:
             self.name(name)
