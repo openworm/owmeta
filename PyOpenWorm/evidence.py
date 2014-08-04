@@ -130,7 +130,7 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf=conf)
         self._fields = dict()
-        ObjectProperty('asserts', owner=self)
+        Evidence.ObjectProperty('asserts', owner=self)
         AssertsAllAbout(owner=self)
         fields = ('author',
                 'year',
@@ -140,7 +140,7 @@ class Evidence(DataObject):
                 'pmid',
                 'uri')
         for x in fields:
-            DatatypeProperty(x, owner=self)
+            Evidence.DatatypeProperty(x, owner=self)
 
         #XXX: I really don't like putting these in two places
         for k in source:

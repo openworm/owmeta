@@ -200,14 +200,13 @@ class Data(Configure, Configureable):
     @classmethod
     def open(cls,file_name):
         """ Open a file storing configuration in a JSON format """
-        c = Configure.open(file_name)
-        return cls(c)
+        Configureable.conf = Configure.open(file_name)
+        return cls()
 
     def openDatabase(self):
         """ Open a the configured database """
-        self.source.open()
         L.debug("opening " + str(self.source))
-
+        self.source.open()
 
     def closeDatabase(self):
         """ Close a the configured database """
@@ -216,16 +215,16 @@ class Data(Configure, Configureable):
     def _init_rdf_graph(self):
         # Set these in case they were left out
         c = self.conf
-        c['rdf.source'] = c.get('rdf.source', 'default')
-        c['rdf.store'] = c.get('rdf.store', 'default')
-        c['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
+        self['rdf.source'] = c.get('rdf.source', 'default')
+        self['rdf.store'] = c.get('rdf.store', 'default')
+        self['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
 
-        self.sources = {'sqlite' : SQLiteSource(c),
-                'sparql_endpoint' : SPARQLSource(c),
-                'Sleepycat' : SleepyCatSource(c),
-                'default' : DefaultSource(c),
-                'TriX' : TrixSource(c)}
-        i = self.sources[c['rdf.source']]
+        self.sources = {'sqlite' : SQLiteSource(self),
+                'sparql_endpoint' : SPARQLSource(self),
+                'Sleepycat' : SleepyCatSource(self),
+                'default' : DefaultSource(self),
+                'TriX' : TrixSource(self)}
+        i = self.sources[self['rdf.source']]
         self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
