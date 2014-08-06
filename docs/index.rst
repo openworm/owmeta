@@ -16,6 +16,7 @@ Contents:
    api
    evidence
    making_dataObjects
+   adding_data
 
 Modules
 -------
