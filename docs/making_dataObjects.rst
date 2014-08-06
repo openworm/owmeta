@@ -1,3 +1,4 @@
+.. _mkdobj:
 Making data objects
 ====================
 To make new objects like ``Neuron`` or ``Worm``, for the most part, you just need to make a Python class.
@@ -16,7 +17,7 @@ Say, for example, that I want to record some information about drug reactions in
         def __init__(self,drug_name=False,*args,**kwargs):
             # pass arguments to DataObject
             DataObject.__init__(self,*args,**kwargs)
-            DatatypeProperty('name', owner=self)
+            Drug.DatatypeProperty('name', owner=self)
             if drug_name:
                 self.name(drug_name)
 
@@ -24,10 +25,10 @@ Say, for example, that I want to record some information about drug reactions in
         def __init__(self,*args,**kwargs):
             # pass arguments to DataObject
             DataObject.__init__(self,*args,**kwargs)
-            ObjectProperty('drug', value_type=Drug, owner=self)
-            ObjectProperty('subject', value_type=Worm, owner=self)
-            DatatypeProperty('route_of_entry', owner=self)
-            DatatypeProperty('reaction', owner=self)
+            Experiment.ObjectProperty('drug', value_type=Drug, owner=self)
+            Experiment.ObjectProperty('subject', value_type=Worm, owner=self)
+            Experiment.DatatypeProperty('route_of_entry', owner=self)
+            Experiment.DatatypeProperty('reaction', owner=self)
 
     connect()
     # Set up with the RDF translation machinery
@@ -51,3 +52,11 @@ and save it::
     ev.save()
 
 For simple objects, this is all we have to do.
+
+You can also add properties to an object after it has been created by calling either ObjectProperty or DatatypeProperty on the object as is done in ``__init__``::
+
+    d = Drug('moon rocks')
+    Drug.DatatypeProperty('granularity', owner=self)
+    d.granularity('ground up')
+
+Properties added in this fashion will not propagate to any other objects, but they will be saved along with the object they are attached to.
