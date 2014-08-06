@@ -32,11 +32,16 @@ def upload_muscles():
         conn.close()
 
 def upload_lineage_and_descriptions():
+    """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
+
+    Assumes that Neurons and Muscles have already been added
+    """
     # XXX: This wants a way to insert cells, then later, to insert neurons from the same set
     # and have the later recoginzed as the former. Identifier matching limits us here. It would
     # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
     # at the sub-class insert and have a reasoner relate
     # the two sets of inserts.
+    cells = dict()
     try:
         w = P.Worm()
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
@@ -44,7 +49,6 @@ def upload_lineage_and_descriptions():
         # save
         f = open("C. elegans Cell List - WormAtlas.tsv", "r")
         h = open("C. elegans Cell List - WormBase.tsv", "r")
-        # Join f onto h by lineage name
 
         # Skip headers
         next(h)
@@ -61,16 +65,49 @@ def upload_lineage_and_descriptions():
                      name = name + "("+ str(names[name]) +")"
              else:
                  names[name] = 0
+
              c = P.Cell(name,j[1])
              c.description(j[2])
              w.cell(c)
+             cells[name] = (j[1],j[2])
+        # We bring in the neurons and muscles through their shared name
+        # -- the name is the only thing that relates these sets of
+        # objects
+
         ev.asserts(w)
-        #for x,_ in zip(ev.triples(),range(1000)):
-            #print x
         ev.save()
     except Exception, e:
         traceback.print_exc()
+    return cells
 
+def norn(x):
+    """ return the next or None of an iterator """
+    try:
+        return next(x)
+    except StopIteration:
+        return None
+
+def update_neurons_and_muscles_with_lineage_and_descriptions():
+    v = P.values('neurons and muscles')
+    #XXX: This could be expensive...the lineage name and description should be loaded with the cell though.
+    cells = {next(x.name()) : (norn(x.lineageName()), norn(x.description())) for x in P.Cell().load() }
+    def dtt(x):
+        """ Do the thing """
+        try:
+            name = next(x.name())
+            if cells[name][0] is not None:
+                x.lineageName(cells[name][0])
+            if cells[name][1] is not None:
+                x.description(cells[name][1])
+            v.value(x)
+        except:
+            traceback.print_exc()
+    for x in P.Neuron().load():
+        dtt(x)
+    for x in P.Muscle().load():
+        dtt(x)
+
+    v.save()
 
 def upload_neurons():
     try:
@@ -189,15 +226,17 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
-        print P.config()
         #print_evidence()
-        upload_muscles()
-        print ("uploaded muscles")
+        #upload_muscles()
+        #print ("uploaded muscles")
         #upload_lineage_and_descriptions()
-        upload_synapses()
-        print ("uploaded synapses")
-        upload_receptors_and_innexins()
-        print ("uploaded receptors and innexins")
+        #print ("uploaded lineage and descriptions")
+        #upload_synapses()
+        #print ("uploaded synapses")
+        #upload_receptors_and_innexins()
+        #print ("uploaded receptors and innexins")
+        update_neurons_and_muscles_with_lineage_and_descriptions()
+        print ("updated muscles and neurons with cell data")
     except:
         traceback.print_exc()
     #try:

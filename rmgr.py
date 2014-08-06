@@ -81,6 +81,7 @@ d = [(ask, 'gj', rmg),
      (ash, 'sn', rmg),
      (ash, 'gj', rmg),
      (rmg, 'sn', ash)]
+
 for p,x,o in d:
     if x == 'gj':
         x='GapJunction'
