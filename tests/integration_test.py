@@ -85,15 +85,18 @@ class IntegrationTest(unittest.TestCase):
         ev.save()
         eve = Evidence()
         eve.asserts(a.neighbor(b))
+        print "This is the pattern:"
+        print eve.graph_pattern(True)
         for x in eve.load():
             print x
 
-    def testl(self):
+    def test_l(self):
         """
         Test that a property can be loaded when the owning
         object doesn't have any other values set
         This test is for many objects of the same kind
         """
+        disconnect()
         from random import random
         from time import time
         from subprocess import call
@@ -110,8 +113,7 @@ class IntegrationTest(unittest.TestCase):
         # feel free to add more if you have the time
         nums = [10, 1e2, 1e3]
 
-        Configureable.default = Data.open("tests/test_testl.conf")
-        Configureable.default.openDatabase()
+        connect("tests/test_testl.conf")
         try:
             #for 1000, takes about 10 seconds...
             for x in nums:
@@ -128,7 +130,7 @@ class IntegrationTest(unittest.TestCase):
                 Configureable.default['rdf.graph'].remove((None,None,None))
         except:
             traceback.print_exc()
-        Configureable.default.closeDatabase()
+        disconnect()
 
 # XXX: OTHER TESTS TO DO
 # reference a synaptic connection
