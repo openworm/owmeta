@@ -32,7 +32,7 @@ Return the Population of all cells in the worm
 
 .. _evidence:
 
-Evidence(`key`=`value`)
+Evidence(key = value)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A representation of some document which provides evidence for something. Possible keys include::
