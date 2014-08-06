@@ -582,3 +582,5 @@ class values(DataObject):
         self.add = values.ObjectProperty('value', owner=self)
         values.DatatypeProperty('name', owner=self)
         self.name(group_name)
+    def identifier(self, query=False):
+        return self.make_identifier(self.group_name)

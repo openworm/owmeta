@@ -27,7 +27,7 @@ WHERE {
     ; ns1:z ?z
     ; ns1:diameter ?d .
 }
-            """)
+""")
 segment_group_query = Template("""
 SELECT ?gid ?member ?include
 WHERE {
@@ -43,7 +43,7 @@ WHERE {
     ?inc ns1:segment ?member .
   }
 }
-            """)
+""")
 def _dict_merge(d1,d2):
     from itertools import chain
     dict(chain(d1.items(), d2.items()))

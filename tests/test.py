@@ -983,6 +983,7 @@ class SimplePropertyTest(_DataTest):
         class T(SimpleProperty):
             property_type = 'DatatypeProperty'
             linkName = 'test'
+            owner_type = DataObject
 
         sp = T(owner=do)
         self.assertNotEqual(len(list(sp.triples())), 0)
