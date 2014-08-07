@@ -29,12 +29,10 @@ class NC_neighbor(P.Property):
                     this_neuron.neighbor(x,**kwargs)
 
     def triples(self,*args,**kwargs):
-        print 'start with',args, kwargs
         for x in self.real_neighbor.triples(*args,**kwargs):
             yield x
         for x in self.owner.member.triples(*args,**kwargs):
             yield x
-        print 'finish'
 
 
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
