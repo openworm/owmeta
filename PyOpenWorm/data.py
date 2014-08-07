@@ -116,19 +116,36 @@ class DataUser(Configureable):
             self.conf['rdf.graph'].update(s)
 
     def _add_to_store(self, g, graph_name=False):
-        for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
-            temp_graph = Graph()
-            for x in group:
-                if x is not None:
-                    temp_graph.add(x)
-                else:
-                    break
+        if self.conf['rdf.store'] == 'SPARQLUpdateStore':
+            # XXX With Sesame, for instance, it is probably faster to do a PUT with over
+            #     the endpoint's rest interface. Just need to do it for some common endpoints
+
+            try:
+                gs = graph.serialize(format="nt")
+            except:
+                gs = _triples_to_bgp(g)
+
             if graph_name:
-                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
+                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + gs + " } } "
             else:
-                s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
-            L.debug("update query = " + s)
-            self.conf['rdf.graph'].update(s)
+                s = " INSERT DATA { " + gs + " } "
+        else:
+            gr = self.conf['rdf.graph']
+            for x in g:
+                gr.add(x)
+        #for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
+            #temp_graph = Graph()
+            #for x in group:
+                #if x is not None:
+                    #temp_graph.add(x)
+                #else:
+                    #break
+            #if graph_name:
+                #s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
+            #else:
+                #s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
+            #L.debug("update query = " + s)
+            #self.conf['rdf.graph'].update(s)
 
     def add_reference(self, g, reference_iri):
         """
@@ -345,6 +362,14 @@ class TrixSource(RDFSource):
             self.graph = g0
 
         return self.graph
+
+def _rdf_literal_to_gp(x):
+    return x.n3()
+
+def _triples_to_bgp(trips):
+    # XXX: Collisions could result between the variable names of different objects
+    g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
+    return g
 
 class SPARQLSource(RDFSource):
     """ Reads from and queries against a remote data store
