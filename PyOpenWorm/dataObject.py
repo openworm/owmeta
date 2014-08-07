@@ -117,8 +117,6 @@ class DataObject(DataUser):
         self._triples = triples
         self._is_releasing_triples = False
         self.properties = []
-        # Used in by save() for triples
-        self._saved = False
         # Used in triples()
         self._id_is_set = False
 
@@ -185,7 +183,7 @@ class DataObject(DataUser):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self, query=False, check_saved=False):
+    def triples(self, query=False, check_saved=set()):
         """ Should be overridden by derived classes to return appropriate triples
 
         Returns
@@ -194,11 +192,10 @@ class DataObject(DataUser):
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
-        if check_saved:
-            if self._saved:
-                return
+        if self in check_saved:
+            return
         else:
-            self._saved = False
+            check_saved.add(self)
 
         if not self._is_releasing_triples:
             # Note: We are _definitely_ assuming synchronous operation here.
@@ -236,8 +233,6 @@ class DataObject(DataUser):
                 pass
 
             self._is_releasing_triples = False
-            if check_saved:
-                self._saved = True
 
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
@@ -251,7 +246,8 @@ class DataObject(DataUser):
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
-        self.add_statements(self._skolemize_triples(self.triples(check_saved=True)))
+        ss = set()
+        self.add_statements(self._skolemize_triples(self.triples(check_saved=ss)))
 
     def _skolemize_triples(self, trips):
         # Turn all of the BNodes into concrete_identifiers
@@ -463,7 +459,7 @@ class SimpleProperty(Property):
         bisect.insort(self.v,v)
 
     def triples(self,*args,**kwargs):
-        query=kwargs['query']
+        query=kwargs.get('query',False)
         owner_id = self.owner.identifier(query=query)
         ident = self.identifier(query=query)
         value_property = self.conf['rdf.namespace']['SimpleProperty/value']
