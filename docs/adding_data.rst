@@ -14,7 +14,7 @@ If these entities already cover your use-case, then all you need to do is add va
     n = Neuron()
     n.receptor('UNC-13')
     for x in n.load():
-        # do something with a UNC-13 Neuron
+        do_something_with_unc13_neuron(n)
 
 If you need additional entities it's easy to create them. Documentation for this is provided :ref:`here <mkdobj>`.
 
