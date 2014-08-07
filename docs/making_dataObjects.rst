@@ -1,4 +1,5 @@
 .. _mkdobj:
+
 Making data objects
 ====================
 To make new objects like ``Neuron`` or ``Worm``, for the most part, you just need to make a Python class.
