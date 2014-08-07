@@ -117,7 +117,9 @@ class DataObject(DataUser):
         self._triples = triples
         self._is_releasing_triples = False
         self.properties = []
-
+        # Used in by save() for triples
+        self._saved = False
+        # Used in triples()
         self._id_is_set = False
 
         if ident:
@@ -183,7 +185,7 @@ class DataObject(DataUser):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self, query=False):
+    def triples(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
 
         Returns
@@ -192,6 +194,12 @@ class DataObject(DataUser):
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
+        if check_saved:
+            if self._saved:
+                return
+        else:
+            self._saved = False
+
         if not self._is_releasing_triples:
             # Note: We are _definitely_ assuming synchronous operation here.
             #       Anyway, this code should be idempotent, so that there's no need to lock it...
@@ -221,13 +229,15 @@ class DataObject(DataUser):
             # case.
             try:
                 for x in self.properties:
-                    for y in x.triples(query=query):
+                    for y in x.triples(query=query, check_saved=check_saved):
                         yield y
             except AttributeError:
                 # XXX Is there a way to check what the failed attribute reference was?
                 pass
 
             self._is_releasing_triples = False
+            if check_saved:
+                self._saved = True
 
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
@@ -241,7 +251,7 @@ class DataObject(DataUser):
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
-        self.add_statements(self._skolemize_triples(self.triples()))
+        self.add_statements(self._skolemize_triples(self.triples(check_saved=True)))
 
     def _skolemize_triples(self, trips):
         # Turn all of the BNodes into concrete_identifiers
@@ -452,14 +462,15 @@ class SimpleProperty(Property):
         import bisect
         bisect.insort(self.v,v)
 
-    def triples(self,query=False):
+    def triples(self,*args,**kwargs):
+        query=kwargs['query']
         owner_id = self.owner.identifier(query=query)
         ident = self.identifier(query=query)
         value_property = self.conf['rdf.namespace']['SimpleProperty/value']
 
 
         if len(self.v) > 0:
-            for x in Property.triples(self,query=query):
+            for x in Property.triples(self,*args,**kwargs):
                 yield x
             yield (owner_id, self.link, ident)
             for x in self.v:
@@ -468,7 +479,7 @@ class SimpleProperty(Property):
                         yield (ident, value_property, R.Literal(x))
                     elif self.property_type == 'ObjectProperty':
                         yield (ident, value_property, x.identifier(query=query))
-                        for t in x.triples(query=query):
+                        for t in x.triples(*args,**kwargs):
                             yield t
                 except Exception:
                     traceback.print_exc()
