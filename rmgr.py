@@ -3,17 +3,21 @@ import PyOpenWorm as P
 P.connect(conf={"rdf.upload_block_statement_count" : 80 })
 
 class NC_neighbor(P.Property):
+    def __init__(self, *args, **kwargs):
+        P.Property.__init__(self, '_nb', *args, **kwargs)
+        self.real_neighbor = self.owner.neighbor
+        self.owner.neighbor = self
+
     def get(self,**kwargs):
         # get the members of the class
         for x in self.owner.neighbor():
             yield x
 
     def set(self,ob, **kwargs):
+        self.real_neighbor(ob)
         if isinstance(ob, NeuronClass):
             ob_name = next(ob.name())
             this_name = next(self.owner.name())
-            print 'on',ob_name
-            print 'tn',this_name
             for x in ob.member():
                 # Get the name for the neighbor
                 n = next(x.name())
@@ -24,12 +28,21 @@ class NC_neighbor(P.Property):
                     self.owner.member(this_neuron)
                     this_neuron.neighbor(x,**kwargs)
 
+    def triples(self,*args,**kwargs):
+        print 'start with',args, kwargs
+        for x in self.real_neighbor.triples(*args,**kwargs):
+            yield x
+        for x in self.owner.member.triples(*args,**kwargs):
+            yield x
+        print 'finish'
+
+
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
 class NeuronClass(P.Neuron):
     def __init__(self, name=False, **kwargs):
         P.Neuron.__init__(self,**kwargs)
         NeuronClass.ObjectProperty('member', owner=self)
-        NC_neighbor('neighbor', owner=self)
+        NC_neighbor(owner=self)
         if name:
             self.name(name)
 NeuronClass.register()
