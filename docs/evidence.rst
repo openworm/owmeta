@@ -39,7 +39,7 @@ intention can be expressed as (TODO)::
 properties of values set on the AVDL Neuron. If, for instance, the Neuron had a *complex object* as the value for its receptor types with
 information about the receptor's name primary agonist, etc., `asserts_all_about` would say nothing about these. However, `asserts_all`::
 
-      e.asserts_all(Neuron(name="AVDL",receptor=<complex receptor object>))
+      e.asserts_all(Neuron(name="AVDL",receptor=complex_receptor_object))
 
 would make the aforementioned recursive statement. 
 
