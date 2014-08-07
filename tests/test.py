@@ -371,19 +371,19 @@ class DataUserTest(_DataTest):
         for x in g0.query(q):
             self.assertEqual(du.conf['user.email'],str(x['u']))
 
-    @unittest.skip("Long runner")
     def test_add_statements_completes(self):
+        """ Test that we can upload lots of triples.
+
+        This is to address the problem from issue #31 on https://github.com/openworm/PyOpenWorm/issues
+        """
         g = rdflib.Graph()
-        for i in range(1000):
+        for i in range(9000):
             s = rdflib.URIRef("http://somehost.com/s%d" % i)
             p = rdflib.URIRef("http://somehost.com/p%d" % i)
             o = rdflib.URIRef("http://somehost.com/o%d" % i)
             g.add((s,p,o))
         du = DataUser(self.config)
         du.add_statements(g)
-
-    def test_add_statements(self):
-        pass
 
 class NeuronTest(_DataTest):
     def setUp(self):
