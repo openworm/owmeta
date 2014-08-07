@@ -1,14 +1,38 @@
 import PyOpenWorm as P
 
-P.connect(conf=P.Data({"rdf.upload_block_statement_count" : 50 }))
+P.connect(conf={"rdf.upload_block_statement_count" : 80 })
+
+class NC_neighbor(P.Property):
+    def get(self,**kwargs):
+        # get the members of the class
+        for x in self.owner.neighbor():
+            yield x
+
+    def set(self,ob, **kwargs):
+        if isinstance(ob, NeuronClass):
+            ob_name = next(ob.name())
+            this_name = next(self.owner.name())
+            print 'on',ob_name
+            print 'tn',this_name
+            for x in ob.member():
+                # Get the name for the neighbor
+                n = next(x.name())
+                side = n[-1]
+                if side in ('L','R'):
+                    name_here = this_name + side
+                    this_neuron = P.Neuron(name_here)
+                    self.owner.member(this_neuron)
+                    this_neuron.neighbor(x,**kwargs)
 
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
 class NeuronClass(P.Neuron):
     def __init__(self, name=False, **kwargs):
         P.Neuron.__init__(self,**kwargs)
-        P.ObjectProperty('member', owner=self)
+        NeuronClass.ObjectProperty('member', owner=self)
+        NC_neighbor('neighbor', owner=self)
         if name:
             self.name(name)
+NeuronClass.register()
 
 # A neuron class should be a way for saying what all neurons of a class have in common
 # (The notation below is a bit of a mish-mash. basically it's PyOpenWorm without
@@ -40,7 +64,6 @@ class NeuronClass(P.Neuron):
 #               # last in n's name) in the neighbor
 # n.name()[:-1] == nc.name()
 
-NeuronClass.register()
 
 #
 # Setting up the data
@@ -52,6 +75,7 @@ ev = P.Evidence(title="A Hub-and-Spoke Circuit Drives Pheromone Attraction and S
 w = P.Worm("C. elegans")
 net = P.Network()
 w.neuron_network(net)
+
 ev.asserts(w)
 def setup(name,type):
     n = NeuronClass(name)
@@ -88,7 +112,14 @@ for p,x,o in d:
     else:
         x='Send'
     p.neighbor(o,syntype=x)
-for x in ev.triples():
-    print "\t".join(str(z) for z in x)
 ev.save()
+
+nc = NeuronClass()
+nc.type('sensory')
+
+print 'Sensory neuron classes in the circuit'
+# XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
+for x in nc.load():
+    print next(x.name())
+
 P.disconnect()
