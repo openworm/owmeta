@@ -590,7 +590,8 @@ class values(DataObject):
     def __init__(self,group_name,**kwargs):
         DataObject.__init__(self,**kwargs)
         self.add = values.ObjectProperty('value', owner=self)
-        values.DatatypeProperty('name', owner=self)
+        self.group_name = values.DatatypeProperty('name', owner=self)
         self.name(group_name)
+
     def identifier(self, query=False):
         return self.make_identifier(self.group_name)
