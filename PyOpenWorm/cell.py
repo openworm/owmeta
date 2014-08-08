@@ -50,7 +50,9 @@ def _dict_merge(d1,d2):
 
 class Cell(DataObject):
     """
-    A biological cell
+    A biological cell.
+
+    All cells with the same name are considered to be the same object.
 
     Parameters
     -----------

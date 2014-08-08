@@ -14,16 +14,20 @@ def print_evidence():
         conn.close()
 
 def upload_muscles():
+    """ Upload muscles and the neurons that connect to them
+    """
     try:
         conn = sqlite3.connect('db/celegans.db')
         cur = conn.cursor()
         w = P.Worm()
-        # insert neurons.
-        # save
-        cur.execute("SELECT DISTINCT b.Entity FROM tblrelationship, tblentity b where Relation = '1516' and EnID2=b.id")
+        cur.execute("SELECT DISTINCT a.Entity, b.Entity FROM tblrelationship, tblentity b, tblentity a where Relation = '1516' and EnID2=b.id and EnID1=a.id")
         for r in cur.fetchall():
-            muscle_name = str(r[0])
-            w.muscle(P.Muscle(muscle_name))
+            muscle_name = str(r[1])
+            m = P.Muscle(muscle_name)
+            w.muscle(m)
+            n = P.Neuron(str(r[0]))
+            m.innervatedBy(n)
+
         w.save()
         #second step, get the relationships between them and add them to the graph
     except Exception:
