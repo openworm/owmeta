@@ -117,12 +117,12 @@ class Connection(P.Property):
 
 class Neuron(Cell):
     """
-    A neuron
+    A neuron.
 
     Parameters
     ----------
     name : string
-        The name of the neuron
+        The name of the neuron.
 
     Attributes
     ----------
