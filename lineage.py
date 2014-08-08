@@ -1,4 +1,3 @@
-from PyOpenWorm import Data,Configureable
 from xlrd import open_workbook
 from rdflib import Literal, URIRef, Graph,Namespace,RDFS
 import re
@@ -108,9 +107,9 @@ def dev_bad_names():
         collector.add(p)
     return collector
 
-def put_in_sesame(graph):
+def put_in_sesame(graph, host, port=8080):
     s = graph.serialize(format="n3")
-    con = H.HTTPConnection("107.170.133.175:8080")
+    con = H.HTTPConnection(host + ":" + str(port))
     con.request("POST", "/openrdf-sesame/repositories/OpenWorm2/statements", s, {"Content-Type": "application/x-turtle;charset=UTF-8"})
     r = con.getresponse()
     print "sesame response is %d " % r.status
