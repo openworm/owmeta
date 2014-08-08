@@ -34,15 +34,12 @@ class NC_neighbor(P.Property):
                     # XXX: could default to all-to-all semantics
                     print 'Do not recoginze the membership of this neuron/neuron class', ob
         elif isinstance(ob, Neuron):
-            #XXX : Could do all-to-one here, but being conservative
-            pass
+            for x in self.owner.member:
+                x.neighbor(ob)
 
     def triples(self,*args,**kwargs):
-        for x in self.real_neighbor.triples(*args,**kwargs):
-            yield x
-        for x in self.owner.member.triples(*args,**kwargs):
-            yield x
-
+        """ Stub. All of the actual relationships are encoded in Neuron.neighbor and NeuronClass.member """
+        return []
 
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
 class NeuronClass(P.Neuron):
