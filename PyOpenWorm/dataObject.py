@@ -407,6 +407,9 @@ class Property(DataObject):
         """
         # This should set some values and call DataObject.save()
         raise NotImplementedError()
+    def one(self):
+        return next(self.get())
+
     def __call__(self,*args,**kwargs):
         if len(args) > 0 or len(kwargs) > 0:
             self.set(*args,**kwargs)
