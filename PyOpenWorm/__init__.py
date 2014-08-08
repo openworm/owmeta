@@ -77,14 +77,17 @@ def config():
 
 def useTestConfig():
     cfg = {
-        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
-        "rdf.source" : "sparql_endpoint",
-        "rdf.store_conf" : ["http://107.170.133.175:8080/openrdf-sesame/repositories/test","http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements"],
-        "user.email" : "jerry@cn.com",
-        "test_variable" : "test_value"
-    }
+    "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+    "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+    "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
+    "rdf.source" : "default",
+    "rdf.store" : "Sleepycat",
+    "rdf.store_conf" : "worm.db",
+    "user.email" : "jerry@cn.com",
+    "rdf.upload_block_statement_count" : 50,
+    "test_variable" : "test_value"
+}
+
     for x in cfg:
         Configureable.conf[x] = cfg[x]
     Configureable.conf = Data(Configureable.conf)

@@ -116,6 +116,7 @@ class Cell(DataObject):
                 s.includes.append(i)
             morph.segment_groups.append(s)
         return morph
+
     def __eq__(self,other):
         return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
 
