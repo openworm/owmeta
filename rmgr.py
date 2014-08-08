@@ -6,6 +6,8 @@ class NC_neighbor(P.Property):
     def __init__(self, *args, **kwargs):
         P.Property.__init__(self, '_nb', *args, **kwargs)
         self.real_neighbor = self.owner.neighbor
+
+        # Re-assigning neighbor Property
         self.owner.neighbor = self
 
     def get(self,**kwargs):
@@ -136,7 +138,7 @@ nc.type('sensory')
 
 print 'Sensory neuron classes in the circuit'
 # XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
-for x in nc.load():
-    print next(x.name())
+for x in set(y.name.one() for y in nc.load()):
+    print x
 
 P.disconnect()
