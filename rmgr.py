@@ -20,13 +20,22 @@ class NC_neighbor(P.Property):
             this_name = next(self.owner.name())
             for x in ob.member():
                 # Get the name for the neighbor
-                n = next(x.name())
-                side = n[-1]
-                if side in ('L','R'):
+                # XXX:
+
+                try:
+                    n = next(x.name())
+                    side = n[n.find(ob_name)+len(ob_name):]
+
                     name_here = this_name + side
                     this_neuron = P.Neuron(name_here)
                     self.owner.member(this_neuron)
                     this_neuron.neighbor(x,**kwargs)
+                except ValueError:
+                    # XXX: could default to all-to-all semantics
+                    print 'Do not recoginze the membership of this neuron/neuron class', ob
+        elif isinstance(ob, Neuron):
+            #XXX : Could do all-to-one here, but being conservative
+            pass
 
     def triples(self,*args,**kwargs):
         for x in self.real_neighbor.triples(*args,**kwargs):
