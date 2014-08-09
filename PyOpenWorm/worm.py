@@ -24,13 +24,12 @@ class Worm(DataObject):
         Muscles of the worm
 
     """
-
+    objectProperties = [('neuron_network','Network'),
+                        ('muscle','Muscle'),
+                        ('cell', 'Cell')]
+    datatypeProperties = ['scientific_name']
     def __init__(self,scientific_name=False,**kwargs):
         DataObject.__init__(self,**kwargs)
-        self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty("neuron_network", owner=self, value_type=P.Network)
-        Worm.ObjectProperty("muscle", owner=self, value_type=P.Muscle)
-        Worm.ObjectProperty("cell", owner=self, value_type=P.Cell)
 
         if scientific_name:
             self.scientific_name(scientific_name)

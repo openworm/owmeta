@@ -58,17 +58,8 @@ __author__ = 'Stephen Larson'
 
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
-from .dataObject import *
-from .cell import Cell
-from .network import Network
-from .neuron import Neuron
-from .worm import Worm
-from .relationship import Relationship
-from .evidence import Evidence,EvidenceError
-from .muscle import Muscle
+from .mapper import DataObjectMapper
 from .quantity import Quantity
-from .my_neuroml import NeuroML
-from .connection import Connection
 
 __import__('__main__').connected = False
 
@@ -86,7 +77,7 @@ def useTestConfig():
     "user.email" : "jerry@cn.com",
     "rdf.upload_block_statement_count" : 50,
     "test_variable" : "test_value"
-}
+    }
 
     for x in cfg:
         Configureable.conf[x] = cfg[x]
@@ -115,6 +106,7 @@ def connect(configFile=False,
     """ Load desired configuration and open the database """
     import logging
     import atexit
+    import sys
     m = __import__('__main__')
     if m.connected == True:
         print "PyOpenWorm already connected"
@@ -142,16 +134,16 @@ def connect(configFile=False,
     c = Configureable.conf
     atexit.register(disconnect)
     Configureable._lh = hash(Configureable.conf)
+    from .dataObject import DataObject, Property, SimpleProperty
+    from .cell import Cell
+    from .network import Network
+    from .neuron import Neuron
+    from .worm import Worm
+    from .relationship import Relationship
+    from .evidence import Evidence,EvidenceError
+    from .muscle import Muscle
+    from .connection import Connection
 
-    DataObject.register()
-    Cell.register()
-    Network.register()
-    Neuron.register()
-    Worm.register()
-    Evidence.register()
-    Muscle.register()
-    Connection.register()
-    SimpleProperty.register()
-    Property.register()
-    Relationship.register()
-
+    # Not a dataobject, but depends on some of them
+    from .my_neuroml import NeuroML
+    DataObjectMapper.setUpDB()

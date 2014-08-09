@@ -95,10 +95,14 @@ class Configure(object):
 
 class Configureable(object):
     """ An object which can accept configuration """
-    conf = Configure()
-    default = conf
+    conf = False
     def __init__(self, conf=False):
-        pass
+        if conf:
+            self.conf = conf
+        elif Configureable.conf:
+            self.conf = Configureable.conf
+        else:
+            self.conf = Configure()
 
     def __getitem__(self,k):
         return self.conf.get(k)

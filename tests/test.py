@@ -20,7 +20,10 @@ except ImportError:
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
-# Set up the database
+# XXX: Should have some of the tests run multiple for subclasses
+# would like to do it without copy/pasting. something like, make a list of clasess,
+# make a general test case, run the test case for each. Can use actually autogenerate
+# the tests: attach them to some class for easy discoverability.
 
 TestConfig = Configure.open("tests/test.conf")
 
@@ -70,10 +73,10 @@ class WormTest(_DataTest):
                 (ns['luke'], ns['Connection/post'], ns['185'])]
 
     def test_get_network(self):
-        w = Worm()
-        w.neuron_network(Network())
+        w = PyOpenWorm.Worm()
+        w.neuron_network(PyOpenWorm.Network())
         w.save()
-        self.assertIsInstance(Worm().get_neuron_network(), Network)
+        self.assertIsInstance(PyOpenWorm.Worm().get_neuron_network(), PyOpenWorm.Network)
 
     def test_muscles1(self):
         w = Worm()
@@ -273,6 +276,12 @@ class DataObjectTest(_DataTest):
         """ Test that we can set and return an identifier """
         do = DataObject(ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
+
+    def test_call_graph_pattern_twice(self):
+        """ Be sure that we can call graph pattern on the same object multiple times and not have it die on us """
+        d = DataObject(triples=g)
+        assertNotEqual(0,len(d.graph_pattern(True)))
+        assertNotEqual(0,len(d.graph_pattern(True)))
 
     @unittest.skip("Should be tracked by version control")
     def test_uploader(self):

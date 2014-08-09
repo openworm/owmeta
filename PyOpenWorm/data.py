@@ -8,19 +8,15 @@
 # Works like Configure:
 # Inherit from the DataUser class to access data of all kinds (listed above)
 
-import sqlite3
-import networkx as nx
-import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
+
 import hashlib
-import csv
-import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
 import datetime
 import os
 import logging as L
+from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 
 __all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource"]
 
@@ -208,7 +204,7 @@ class Data(Configure, Configureable):
         self.copy(self.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
-        self['nx'] = _B(self._init_networkX)
+        #self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
@@ -251,6 +247,9 @@ class Data(Configure, Configureable):
         return URIRef(self.molecule_namespace[hashlib.sha224(str(data)).hexdigest()])
 
     def _init_networkX(self):
+        import networkx as nx
+        import csv
+        import urllib2
         g = nx.DiGraph()
 
         # Neuron table
@@ -286,7 +285,7 @@ def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
-class RDFSource(Configureable,PyOpenWorm.ConfigValue):
+class RDFSource(Configureable,ConfigValue):
     """ Base class for data sources.
 
     Alternative sources should dervie from this class
@@ -405,6 +404,7 @@ class SleepyCatSource(RDFSource):
 
 class SQLiteSource(RDFSource):
     def open(self):
+        import sqlite3
         conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
 
