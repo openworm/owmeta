@@ -18,8 +18,8 @@ class Muscle(Cell):
     neurons : ObjectProperty
         Neurons synapsing with this muscle
     """
-
+    objectProperties = [("neurons", P.Neuron)]
+    datatypeProperties = ["receptors"]
     def __init__(self, name=False, **kwargs):
         Cell.__init__(self, name=name, **kwargs)
-        self.innervatedBy = Muscle.ObjectProperty("neurons",owner=self,value_type=P.Neuron)
-        Muscle.DatatypeProperty("receptors",owner=self)
+        self.innervatedBy = self.neurons

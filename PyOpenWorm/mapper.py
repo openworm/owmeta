@@ -9,33 +9,86 @@ _DataObjects = dict()
 # TODO: Put the subclass relationships in the database
 _DataObjectsParents = dict()
 
-class DataObjectMapper(type,DataUser):
-    def __init__(cls, name, bases, dct):
+def DatatypeProperty(*args,**kwargs):
+    """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
+
+    Parameters
+    ----------
+    linkName : string
+        The name of this Property.
+    """
+    return _create_property(*args,property_type='DatatypeProperty',**kwargs)
+
+def ObjectProperty(*args,**kwargs):
+    """ Create a SimpleProperty that has a complex DataObject as its value
+
+    Parameters
+    ----------
+    linkName : string
+        The name of this Property.
+    value_type : type
+        The type of DataObject fro values of this property
+    """
+    return _create_property(*args,property_type='ObjectProperty',**kwargs)
+
+def _create_property(owner_class, linkName, property_type, value_type=False):
+    #XXX This should actually get called for all of the properties when their owner
+    #    classes are defined.
+    #    The initialization, however, must happen with the owner object's creation
+    owner_class_name = owner_class.__name__
+    property_class_name = owner_class_name + "_" + linkName
+    if value_type == False:
+        value_type = P.DataObject
+
+    c = None
+    if property_class_name in _DataObjects:
+        c = _DataObjects[property_class_name]
+    else:
+        if property_type == 'ObjectProperty':
+            value_rdf_type = value_type.rdf_type
+        else:
+            value_rdf_type = False
+
+        c = type(property_class_name,(P.SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
+
+    owner_class.bones.append(c)
+
+    return c
+
+class DataObjectMapper(type):
+    def __init__(cls, name, bases, dct, conf=False):
         bs = list(bases)
-        bs.append(DataUser)
+        cls.du = DataUser(conf)
         type.__init__(cls,name,tuple(bs),dct)
-        DataUser.__init__(cls, conf=False)
         cls.bones = []
-        DataObjectMapper.register(cls)
+        #print 'doing init for', cls
+        for x in bs:
+            try:
+                cls.bones += x.bones
+            except AttributeError:
+                pass
+        cls.register()
 
     @classmethod
     def setUpDB(self):
-        for x in _DataObjectsParents:
-            for y in _DataObjectsParents[x]:
-                 (_DataObjects[x].rdf_type, R.RDFS['subClassOf'], y.rdf_type)
+        pass
 
-    @classmethod
-    def register(self,cls):
+    def register(cls):
         _DataObjects[cls.__name__] = cls
-        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if isinstance(x, self)]
+        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if isinstance(x, DataObjectMapper)]
+
         cls.parents = _DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
 
+        deets = []
+        for y in cls.parents:
+            deets.append((cls.rdf_type, R.RDFS['subClassOf'], y.rdf_type))
+        cls.du.add_statements(deets)
         # Also get all of the properites
         try:
             for x in cls.datatypeProperties:
-                print 'dp',self.DatatypeProperty(cls,x)
+                DatatypeProperty(cls,x)
         except AttributeError:
             pass
         except:
@@ -44,61 +97,27 @@ class DataObjectMapper(type,DataUser):
         try:
             for x in cls.objectProperties:
                 if isinstance(x,tuple):
-                    print 'dp',self.ObjectProperty(cls,x[0], value_type=x[1])
+                    ObjectProperty(cls,x[0], value_type=x[1])
                 else:
-                    print 'dp',self.ObjectProperty(cls,x)
-        except:
+                    ObjectProperty(cls,x)
+        except AttributeError:
             pass
-
+        except:
+            traceback.print_exc()
         setattr(P, cls.__name__, cls)
 
-    @classmethod
-    def DatatypeProperty(cls,*args,**kwargs):
-        """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        """
-        return cls._create_property(*args,property_type='DatatypeProperty',**kwargs)
-
-    @classmethod
-    def ObjectProperty(cls, *args,**kwargs):
-        """ Create a SimpleProperty that has a complex DataObject as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        value_type : type
-            The type of DataObject fro values of this property
-        """
-        return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
-
-    @classmethod
-    def _create_property(cls, owner_class, linkName, property_type, value_type=False):
-        #XXX This should actually get called for all of the properties when their owner
-        #    classes are defined.
-        #    The initialization, however, must happen with the owner object's creation
-        owner_class_name = owner_class.__name__
-        property_class_name = owner_class_name + "_" + linkName
-        if value_type == False:
-            value_type = P.DataObject
-
-        c = None
-        if property_class_name in _DataObjects:
-            c = _DataObjects[property_class_name]
+    def oid(self,identifier,rdf_type=False):
+        """ Load an object from the database using its type tag """
+        # XXX: This is a class method because we need to get the conf
+        # We should be able to extract the type from the identifier
+        if rdf_type:
+            uri = rdf_type
         else:
-            if property_type == 'ObjectProperty':
-                value_rdf_type = value_type.rdf_type
-            else:
-                value_rdf_type = False
+            uri = identifier
 
-            c = type(property_class_name,(P.SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
-
-        print 'putting some bones on %s' % owner_class
-        owner_class.bones.append(c)
-
-        return c
+        cn = self._extract_class_name(uri)
+        # if its our class name, then make our own object
+        # if there's a part after that, that's the property name
+        o = _DataObjects[cn](ident=identifier)
+        return o
 

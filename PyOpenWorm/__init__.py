@@ -136,12 +136,12 @@ def connect(configFile=False,
     Configureable._lh = hash(Configureable.conf)
     from .dataObject import DataObject, Property, SimpleProperty
     from .cell import Cell
-    from .network import Network
     from .neuron import Neuron
+    from .muscle import Muscle
+    from .network import Network
     from .worm import Worm
     from .relationship import Relationship
     from .evidence import Evidence,EvidenceError
-    from .muscle import Muscle
     from .connection import Connection
 
     # Not a dataobject, but depends on some of them

@@ -204,7 +204,7 @@ class Data(Configure, Configureable):
         self.copy(self.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
-        #self['nx'] = _B(self._init_networkX)
+        self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash

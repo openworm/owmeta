@@ -26,7 +26,7 @@ def _triples_to_bgp(trips):
 
 # We keep a little tree of properties in here
 
-class DataObject:
+class DataObject(DataUser):
     """ An object backed by the database
 
     Attributes
@@ -65,9 +65,6 @@ class DataObject:
             self._id_variable = self._graph_variable(self.__class__.__name__ + v.encode('hex'))
             self._id = self.make_identifier(v)
 
-        for x in self.__dict__.keys():
-            print x
-
     def __eq__(self,other):
         return isinstance(other,DataObject) and (self.identifier() == other.identifier())
 
@@ -82,6 +79,9 @@ class DataObject:
     def _graph_variable(self,var_name):
         """ Make a variable for storage the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
+
+    def object_from_id(self,*args,**kwargs):
+        return self.__class__.oid(*args,**kwargs)
 
     @classmethod
     def _is_variable(self,uri):
@@ -118,7 +118,7 @@ class DataObject:
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self, query=False, check_saved=set()):
+    def triples(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
 
         Returns
@@ -127,6 +127,9 @@ class DataObject:
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
+        if check_saved == False:
+            check_saved = set()
+
         if self in check_saved:
             return
         else:
@@ -168,7 +171,7 @@ class DataObject:
                 pass
 
             self._is_releasing_triples = False
-
+    tcalled = 0
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
 
@@ -182,32 +185,7 @@ class DataObject:
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
         ss = set()
-        self.add_statements(self._skolemize_triples(self.triples(check_saved=ss)))
-
-    def _skolemize_triples(self, trips):
-        # Turn all of the BNodes into concrete_identifiers
-        for t in trips:
-            new_t = []
-            for z in t:
-                if isinstance(z,R.BNode):
-                    z = self.make_identifier(z)
-                new_t.append(z)
-            yield new_t
-
-    def object_from_id(self,identifier,rdf_type=False):
-        """ Load an object from the database using its type tag """
-        # XXX: This is a class method because we need to get the conf
-        # We should be able to extract the type from the identifier
-        if rdf_type:
-            uri = rdf_type
-        else:
-            uri = identifier
-
-        cn = self._extract_class_name(uri)
-        # if its our class name, then make our own object
-        # if there's a part after that, that's the property name
-        o = _DataObjects[cn](ident=identifier)
-        return o
+        self.add_statements(self.triples(check_saved=ss))
 
     @classmethod
     def _extract_class_name(self,uri):

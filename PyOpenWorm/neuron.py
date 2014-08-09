@@ -137,6 +137,9 @@ class Neuron(Cell):
     connection : Property
         Get connections associated with this neuron
     """
+    datatypeProperties = ["type",
+                          "receptor",
+                          "innexin",]
     def __init__(self, name=False, **kwargs):
         Cell.__init__(self,name=name,**kwargs)
         # Get neurons connected to this neuron
@@ -144,9 +147,6 @@ class Neuron(Cell):
         # Get connections from this neuron
         Connection(owner=self)
 
-        Neuron.DatatypeProperty("type",self)
-        Neuron.DatatypeProperty("receptor",self)
-        Neuron.DatatypeProperty("innexin",self)
         ### Aliases ###
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
