@@ -230,38 +230,19 @@ if __name__ == '__main__':
         logging = True
     P.connect(configFile='readme.conf',do_logging=logging)
     try:
-        #print_evidence()
-        #upload_muscles()
-        #print ("uploaded muscles")
-        #upload_lineage_and_descriptions()
-        #print ("uploaded lineage and descriptions")
-        #upload_synapses()
-        #print ("uploaded synapses")
-        #upload_receptors_and_innexins()
-        #print ("uploaded receptors and innexins")
+        print_evidence()
+        upload_muscles()
+        print ("uploaded muscles")
+        upload_lineage_and_descriptions()
+        print ("uploaded lineage and descriptions")
+        upload_synapses()
+        print ("uploaded synapses")
+        upload_receptors_and_innexins()
+        print ("uploaded receptors and innexins")
         update_neurons_and_muscles_with_lineage_and_descriptions()
         print ("updated muscles and neurons with cell data")
     except:
         traceback.print_exc()
-    #try:
-        #for x in P.Neuron().load():
-            #print x
-        ##q = """
-            ##prefix openworm: <http://openworm.org/entities/>
-            ##prefix neuron: <http://openworm.org/entities/Neuron/>
-            ##prefix sp: <http://openworm.org/entities/SimpleProperty/>
-            ##select distinct ?Neuron where
-            ##{
-                ##?Neuron_name sp:value "AVAL" .
-                ##?Neuron neuron:name ?Neuron_name .
-                ##?Neuron_name rdf:type openworm:Neuron_name .
-
-                ##?Neuron rdf:type openworm:Neuron .
-            ##}
-            ##"""
-        ##for x in P.Configureable.default['rdf.graph'].query(q):
-            ##print x
-    #except:
-        #traceback.print_exc()
-    P.disconnect()
+    finally:
+        P.disconnect()
 
