@@ -1,9 +1,10 @@
 import PyOpenWorm as P
 import traceback
 import sqlite3
+
 def print_evidence():
     try:
-        conn = sqlite3.connect('db/celegans.db')
+        conn = sqlite3.connect('celegans.db')
         cur = conn.cursor()
         cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
         for r in cur.fetchall():
@@ -17,7 +18,7 @@ def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
-        conn = sqlite3.connect('db/celegans.db')
+        conn = sqlite3.connect('celegans.db')
         cur = conn.cursor()
         w = P.Worm()
         cur.execute("SELECT DISTINCT a.Entity, b.Entity FROM tblrelationship, tblentity b, tblentity a where Relation = '1516' and EnID2=b.id and EnID1=a.id")
@@ -115,7 +116,7 @@ def update_neurons_and_muscles_with_lineage_and_descriptions():
 
 def upload_neurons():
     try:
-        conn = sqlite3.connect('db/celegans.db')
+        conn = sqlite3.connect('celegans.db')
         cur = conn.cursor()
         w = P.Worm()
         n = P.Network()
@@ -135,7 +136,7 @@ def upload_neurons():
 
 def upload_receptors_and_innexins():
     try:
-        conn = sqlite3.connect('db/celegans.db')
+        conn = sqlite3.connect('celegans.db')
         cur = conn.cursor()
         w = P.Worm()
         n = P.Network()
@@ -184,7 +185,7 @@ def upload_receptors_and_innexins():
 
 def upload_synapses():
     try:
-        conn = sqlite3.connect('db/celegans.db')
+        conn = sqlite3.connect('celegans.db')
         cur = conn.cursor()
         w = P.Worm()
         n = P.Network()
@@ -223,14 +224,13 @@ def upload_synapses():
     finally:
         conn.close()
 
-if __name__ == '__main__':
+def do_insert():
     import sys
     logging = False
     if len(sys.argv) > 1 and sys.argv[1] == '-l':
         logging = True
-    P.connect(configFile='readme.conf',do_logging=logging)
+    P.connect(configFile='default.conf',do_logging=logging)
     try:
-        print_evidence()
         upload_muscles()
         print ("uploaded muscles")
         upload_lineage_and_descriptions()
@@ -246,3 +246,5 @@ if __name__ == '__main__':
     finally:
         P.disconnect()
 
+if __name__ == '__main__':
+    do_insert()
