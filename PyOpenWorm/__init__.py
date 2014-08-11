@@ -56,6 +56,7 @@ Classes
 __version__ = '0.0.1-alpha'
 __author__ = 'Stephen Larson'
 
+import traceback
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import *
@@ -95,6 +96,7 @@ def useTestConfig():
 def loadConfig(f):
     """ Load configuration for the module """
     Configureable.conf = Data.open(f)
+    return Configureable.conf
 
 def disconnect(c=False):
     """ Close the database """
@@ -121,18 +123,39 @@ def connect(configFile=False,
         return
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
     if conf:
         Configureable.conf = conf
         if not isinstance(conf, Data):
-            d = Data()
-            Configureable.conf = d
+            # Initializes a Data object with
+            # the Configureable.conf
+            Configureable.conf = Data()
     elif configFile:
         loadConfig(configFile)
     elif testConfig:
         useTestConfig()
     else:
-        Configureable.conf = Data()
+        from pkg_resources import Requirement, resource_filename
+        try:
+            filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
+            c = Configure.open(filename)
+            for x in c:
+                value = c[x]
+                # Now we have to rewrite all of the paths to point to their
+                # locations in the package directory
+                if isinstance(value,basestring):
+                    if value.startswith("BASE/"):
+                        value = value[5:]
+                        value = resource_filename(Requirement.parse("PyOpenWorm"), value)
+                        c[x] = value
+                Configureable.conf = c
+                Configureable.conf = Data()
+        except:
+            logging.info("Couldn't load default configuration")
+            traceback.print_exc()
+            Configureable.conf = Data()
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")

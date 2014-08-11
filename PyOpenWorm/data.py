@@ -84,7 +84,6 @@ class DataUser(Configureable):
         Configureable.__init__(self, conf=conf)
         if not isinstance(self.conf,Data):
             raise BadConf(self)
-
     @property
     def base_namespace(self):
         return self.conf['rdf.namespace']
