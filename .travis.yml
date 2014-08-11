@@ -13,6 +13,7 @@ install:
   - "python setup.py install"
   - "cd .."
   - "pip install pint"
+  - "python setup.py develop"
 
 
 script:  
