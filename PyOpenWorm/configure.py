@@ -45,6 +45,9 @@ class Configure(object):
     def __getitem__(self, pname):
         return self._properties[pname].get()
 
+    def __iter__(self):
+        return iter(self._properties)
+
     def link(self,*names):
         """ Call link() with the names of configuration values that should
         always be the same to link them together
@@ -72,6 +75,7 @@ class Configure(object):
             for k in d:
                 c[k] = _C(d[k])
             f.close()
+            c['configure.file_location'] = file_name
             return c
         except Exception, e:
             raise BadConf(e)
