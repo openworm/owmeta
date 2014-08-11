@@ -541,7 +541,7 @@ class SimpleProperty(Property):
         if self.property_type == 'DatatypeProperty':
             value_data = "".join(str(x) for x in self.v)
         elif self.property_type == 'ObjectProperty':
-            value_data = "".join(str(x.identifier()) for x in self.v)
+            value_data = "".join(str(x.identifier()) for x in self.v if self is not x)
 
         return self.make_identifier((self.owner.identifier(query=query), self.link, value_data))
 

@@ -504,22 +504,11 @@ class EvidenceTest(_DataTest):
 
     def test_pubmed_multiple_authors_list(self):
         """
-        When multiple authors are on a paper, all of their names sohuld be returned in an iterator. Publication order not necessarily preserved
+        When multiple authors are on a paper, all of their names should be returned in an iterator. Publication order not necessarily preserved
         """
         pmid = "24098140"
         alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
         self.assertEqual(set(alist), set(Evidence(pmid=pmid).author()))
-
-    def test_doi_init1(self):
-        """
-        Full dx.doi.org uri
-        """
-        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author()))
-    def test_doi_init2(self):
-        """
-        Just the identifier, no URI
-        """
-        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='10.1007/s00454-010-9273-0').author()))
 
     @unittest.skip("Fix later")
     def test_doi_init_fail_on_request_prefix(self):
