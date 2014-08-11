@@ -119,7 +119,7 @@ def connect(configFile=False,
     if m.connected == True:
         print "PyOpenWorm already connected"
         return
-
+    m.connected = True
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
 
