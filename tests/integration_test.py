@@ -85,10 +85,21 @@ class IntegrationTest(unittest.TestCase):
         ev.save()
         eve = Evidence()
         eve.asserts(a.neighbor(b))
-        print "This is the pattern:"
-        print eve.graph_pattern(True)
-        for x in eve.load():
-            print x
+        #print "This is the pattern:"
+        #print eve.graph_pattern(True)
+        #for x in eve.load():
+            #print x
+
+    def test_doi_init1(self):
+        """
+        Full dx.doi.org uri
+        """
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author()))
+    def test_doi_init2(self):
+        """
+        Just the identifier, no URI
+        """
+        self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='10.1007/s00454-010-9273-0').author()))
 
     def test_l(self):
         """
