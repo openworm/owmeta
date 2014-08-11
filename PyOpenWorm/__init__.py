@@ -119,7 +119,6 @@ def connect(configFile=False,
     if m.connected == True:
         print "PyOpenWorm already connected"
         return
-    m.connected = True
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -139,7 +138,6 @@ def connect(configFile=False,
     logging.info("Connected to database")
 
     # have to register the right one to disconnect...
-    c = Configureable.conf
     atexit.register(disconnect)
     Configureable._lh = hash(Configureable.conf)
 
@@ -155,3 +153,4 @@ def connect(configFile=False,
     Property.register()
     Relationship.register()
 
+    #m.connected = True
