@@ -212,20 +212,21 @@ class Evidence(DataObject):
             doi = _doi_uri_to_doi(doi)
         r = crRequest(doi)
         #XXX: I don't think coins is meant to be used, but it has structured data...
-        extra_data = r[0]['coins'].split('&amp;')
-        fields = (x.split("=") for x in extra_data)
-        fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
-        authors = [x[1] for x in fields if x[0] == 'rft.au']
-        for a in authors:
-            self.author(a)
-        # no error for bad ids, just an empty list
-        if len(r) > 0:
-            # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
-            r = r[0]
-            if 'title' in r:
-                self.title(r['title'])
-            if 'year' in r:
-                self.year(r['year'])
+        if len(r)>0:
+            extra_data = r[0]['coins'].split('&amp;')
+            fields = (x.split("=") for x in extra_data)
+            fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
+            authors = [x[1] for x in fields if x[0] == 'rft.au']
+            for a in authors:
+                self.author(a)
+            # no error for bad ids, just an empty list
+            if len(r) > 0:
+                # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
+                r = r[0]
+                if 'title' in r:
+                    self.title(r['title'])
+                if 'year' in r:
+                    self.year(r['year'])
 
     def _pubmed_extract(self):
         def pmRequest(pmid):
