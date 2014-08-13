@@ -5,3 +5,4 @@ requirements
 pint
 numpydoc
 lxml
+bsddb3
