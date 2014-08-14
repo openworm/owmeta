@@ -137,21 +137,10 @@ def connect(configFile=False,
     elif testConfig:
         useTestConfig()
     else:
-        from pkg_resources import Requirement, resource_filename
         try:
+            from pkg_resources import Requirement, resource_filename
             filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
-            c = Configure.open(filename)
-            for x in c:
-                value = c[x]
-                # Now we have to rewrite all of the paths to point to their
-                # locations in the package directory
-                if isinstance(value,basestring):
-                    if value.startswith("BASE/"):
-                        value = value[5:]
-                        value = resource_filename(Requirement.parse("PyOpenWorm"), value)
-                        c[x] = value
-                Configureable.conf = c
-                Configureable.conf = Data()
+            Configureable.conf = Data.open(filename)
         except:
             logging.info("Couldn't load default configuration")
             traceback.print_exc()
