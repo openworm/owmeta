@@ -124,7 +124,7 @@ class IntegrationTest(unittest.TestCase):
         # feel free to add more if you have the time
         nums = [10, 1e2, 1e3]
 
-        connect("tests/test_testl.conf")
+        connect("tests/testl.conf")
         try:
             #for 1000, takes about 10 seconds...
             for x in nums:
