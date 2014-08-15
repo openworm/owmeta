@@ -1,3 +1,5 @@
+ZODB
+rdflib-zodb
 libneuroml
 rdflib
 networkx
