@@ -11,17 +11,22 @@ if [ $1 ] ; then
     fi
 else
     test_result=0
+    bad_files=
     for x in tests/test_*.conf ; do
+        log=${x/.conf}.log
         cp $x tests/_test.conf
         echo Testing with $x
-        python -m unittest tests.test 2> ${x/.conf}.log
-        if [ $test_result -ne 0 ] ; then
+        python -m unittest tests.test 2> $log
+        if [ $? -ne 0 ] ; then
             test_result=1
+            bad_files="$bad_files $log"
         fi
-        tail -n 3 ${x/.conf}.log
+        tail -n 3 $log
+        echo '-------------[END OF TEST]-----------' >> $log
         echo -----------------------------------------------------------------
     done
     echo $test_result
+    cat $bad_files
     exit $test_result
     #python -m unittest tests.integration_test
 fi
