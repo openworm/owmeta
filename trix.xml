@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<TriX xmlns='http://www.w3.org/2004/03/trix/trix-1/'>
+	<graph>
+		<triple>
+			<uri>http://openworm.org/entities/molecules/e007d3a4e911b503d8bdf439019f8fbc0e1ab2f09b3214852e2898db</uri>
+			<uri>http://openworm.org/entities/uploader</uri>
+			<plainLiteral>jerry@cn.com</plainLiteral>
+		</triple>
+		<triple>
+			<uri>http://openworm.org/entities/molecules/e007d3a4e911b503d8bdf439019f8fbc0e1ab2f09b3214852e2898db</uri>
+			<uri>http://openworm.org/entities/upload_date</uri>
+			<typedLiteral datatype='http://www.w3.org/2001/XMLSchema#dateTimeStamp'>2014-06-20T17:37:07.575314+00:00</typedLiteral>
+		</triple>
+	</graph>
+	<graph>
+		<uri>http://openworm.org/entities/molecules/6de7e55334036bbe7ca2e364ad00372db26ddfe3b43fed5acab1987c</uri>
+		<triple>
+			<uri>http://somehost.com/s</uri>
+			<uri>http://somehost.com/p</uri>
+			<uri>http://somehost.com/o</uri>
+		</triple>
+	</graph>
+</TriX>
