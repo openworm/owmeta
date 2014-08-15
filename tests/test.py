@@ -11,6 +11,7 @@ import rdflib
 import rdflib as R
 import pint as Q
 import os
+import subprocess
 
 try:
     import bsddb
@@ -38,11 +39,23 @@ def make_graph(size=100):
     return g
 
 class _DataTest(unittest.TestCase):
+    path = TestConfig['rdf.store_conf']
     def setUp(self):
         # Set do_logging to True if you like walls of text
+        try:
+            subprocess.call("rm -rf "+self.path, shell=True)
+        except OSError, e:
+            if e.errno == 2:
+                # The file may not exist and that's fine
+                pass
+            else:
+                raise e
         PyOpenWorm.connect(conf=TestConfig, do_logging=False)
+
     def tearDown(self):
         PyOpenWorm.disconnect()
+        if PyOpenWorm.config()['rdf.store'] == "Sleepycat":
+            subprocess.call("rm -rf "+self.path)
     @property
     def config(self):
         return PyOpenWorm.config()
@@ -421,7 +434,6 @@ class NeuronTest(_DataTest):
         self.assertEqual(next(self.neur('AVAR').name()), 'AVAR')
 
     def test_neighbor(self):
-        n0 = self.neur('AVAR')
         n = self.neur('AVAL')
         n.neighbor(self.neur('PVCL'))
         neighbors = list(n.neighbor())
@@ -610,10 +622,11 @@ class RDFLibTest(unittest.TestCase):
         except:
             self.fail("Doesn't actually fail...which is weird")
     def test_uriref_not_id(self):
-        import cStringIO
-        out = cStringIO.StringIO()
         #XXX: capture the logged warning
+        # import cStringIO
+        # out = cStringIO.StringIO()
         rdflib.URIRef("some random string")
+
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
@@ -824,6 +837,7 @@ class DataTest(_DataTest):
             pass
         finally:
             disconnect()
+
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
 
@@ -840,6 +854,28 @@ class DataTest(_DataTest):
             connect(conf=c)
             d = self.config
             g = d['rdf.graph']
+            b = g.query("ASK { ?S ?P ?O }")
+            for x in b:
+                self.assertTrue(x)
+        except ImportError:
+            pass
+        finally:
+            disconnect()
+    def test_ZODBSource(self):
+        """ Test that we can load the datbase up from an XML file.
+
+        Takes a while to run the first time.
+        May fail if bsddb is not available. Ignore if it is not
+        """
+        disconnect()
+        c = Configure()
+        c['rdf.source'] = 'ZODB'
+        c['rdf.store_conf'] = 'zodb_test.fs'
+        try:
+            connect(conf=c)
+            d = self.config
+            g = d['rdf.graph']
+            g.add((ns['64'], ns['356'], ns['184']))
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
