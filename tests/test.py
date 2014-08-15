@@ -23,7 +23,6 @@ namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
 # Set up the database
 
-TestConfig = Configure.open("tests/test.conf")
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -39,12 +38,13 @@ def make_graph(size=100):
     return g
 
 class _DataTest(unittest.TestCase):
-    path = TestConfig['rdf.store_conf']
+    TestConfig = Configure.open("tests/_test.conf")
     def delete_dir(self):
+        self.path = self.TestConfig['rdf.store_conf']
         try:
-            if TestConfig['rdf.source'] == "Sleepycat":
+            if self.TestConfig['rdf.source'] == "Sleepycat":
                 subprocess.call("rm -rf "+self.path, shell=True)
-            elif TestConfig['rdf.source'] == "ZODB":
+            elif self.TestConfig['rdf.source'] == "ZODB":
                 os.unlink(self.path)
                 os.unlink(self.path + '.index')
                 os.unlink(self.path + '.tmp')
@@ -58,7 +58,7 @@ class _DataTest(unittest.TestCase):
     def setUp(self):
         # Set do_logging to True if you like walls of text
         self.delete_dir()
-        PyOpenWorm.connect(conf=TestConfig, do_logging=False)
+        PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
 
     def tearDown(self):
         PyOpenWorm.disconnect()
