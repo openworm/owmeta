@@ -498,6 +498,7 @@ class ZODBSource(RDFSource):
     """
     def __init__(self,*args,**kwargs):
         RDFSource.__init__(self,*args,**kwargs)
+        self.conf['rdf.store'] = "ZODB"
 
     def open(self):
         import ZODB
@@ -513,12 +514,25 @@ class ZODBSource(RDFSource):
         if 'rdflib' not in root:
             root['rdflib'] = ConjunctiveGraph('ZODB')
         self.graph = self.g = root['rdflib']
-        transaction.commit()
+        try:
+            transaction.commit()
+        except Exception as e:
+            # catch commit exception and close db.
+            # otherwise db would stay open and follow up tests
+            # will detect the db in error state
+            transaction.abort()
+        transaction.begin()
         self.graph.open(self.path)
 
     def close(self):
         import transaction
         self.graph.close()
-        transaction.commit()
+        try:
+            transaction.commit()
+        except Exception as e:
+            # catch commit exception and close db.
+            # otherwise db would stay open and follow up tests
+            # will detect the db in error state
+            transaction.abort()
         self.conn.close()
         self.zdb.close()
