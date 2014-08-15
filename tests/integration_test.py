@@ -29,18 +29,17 @@ class IntegrationTest(unittest.TestCase):
 
         # Declare a connection between them
         c = Connection(n1,n2,number=1)
-
+        c_id = c.identifier()
         # Attach some evidence for the connection
         e = Evidence(author="Danny Glover")
         e.asserts(c)
         # look at what else this evidence has stated
-        print e.conf
         e.save()
         e = Evidence(author="Danny Glover")
         r = e.asserts()
-        for x in r:
-            print x
-            #print "\t".join([str(y)[:60] for y in x])
+        ids = set(x.identifier() for x in r)
+        self.assertIn(c_id, ids)
+
     def test_get_evidence(self):
         # Reference two neurons
         n1 = Neuron(name='AVAL')
@@ -55,10 +54,16 @@ class IntegrationTest(unittest.TestCase):
         # look for all of the evidence for the connection 'c'
         for x in e.load():
             print x.author()
+
     def test_get_synclasses(self):
+        import random
+        scs = ("FMRFamide", "Acetylcholine", "Glutamate")
+        for x in range(200):
+            sc = random.choice(scs)
+            Connection(synclass=sc).save()
         c = Connection()
-        for x in c.synclass():
-            print x
+        self.assertEqual(set(scs), set(c.synclass()))
+
     def test_evidence_asserts_all_about(self):
         """ Test that we can assert_all_about a containing object and
         then get evidence for contained objects.
@@ -95,6 +100,7 @@ class IntegrationTest(unittest.TestCase):
         Full dx.doi.org uri
         """
         self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='http://dx.doi.org/10.1007%2Fs00454-010-9273-0').author()))
+
     def test_doi_init2(self):
         """
         Just the identifier, no URI
