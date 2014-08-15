@@ -123,8 +123,6 @@ def connect(configFile=False,
         return
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
 
     if conf:
         Configureable.conf = conf
