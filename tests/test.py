@@ -40,22 +40,30 @@ def make_graph(size=100):
 
 class _DataTest(unittest.TestCase):
     path = TestConfig['rdf.store_conf']
-    def setUp(self):
-        # Set do_logging to True if you like walls of text
+    def delete_dir(self):
         try:
-            subprocess.call("rm -rf "+self.path, shell=True)
+            if TestConfig['rdf.source'] == "Sleepycat":
+                subprocess.call("rm -rf "+self.path, shell=True)
+            elif TestConfig['rdf.source'] == "ZODB":
+                os.unlink(self.path)
+                os.unlink(self.path + '.index')
+                os.unlink(self.path + '.tmp')
+                os.unlink(self.path + '.lock')
         except OSError, e:
             if e.errno == 2:
                 # The file may not exist and that's fine
                 pass
             else:
                 raise e
+    def setUp(self):
+        # Set do_logging to True if you like walls of text
+        self.delete_dir()
         PyOpenWorm.connect(conf=TestConfig, do_logging=False)
 
     def tearDown(self):
         PyOpenWorm.disconnect()
-        if PyOpenWorm.config()['rdf.store'] == "Sleepycat":
-            subprocess.call("rm -rf "+self.path)
+        self.delete_dir()
+
     @property
     def config(self):
         return PyOpenWorm.config()
@@ -316,9 +324,11 @@ class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
+        c = Configureable.conf
         Configureable.conf = False
         with self.assertRaises(BadConf):
             DataUser()
+        Configureable.conf = c
 
     def test_init_no_config_with_default(self):
         """ Should suceed if the default configuration is a Data object """
@@ -814,30 +824,6 @@ class MuscleTest(_DataTest):
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
 
 class DataTest(_DataTest):
-    def test_sleepy_cat_source(self):
-        """ May fail if bsddb is not available. Ignore if it is not """
-        # open the database
-        # check we can add a triple
-        disconnect()
-        c = Configure()
-        c['source'] = 'Sleepycat'
-        c['rdf.store'] = 'Sleepycat'
-        c['rdf.store_conf'] = 'test.db'
-        try:
-            connect(conf=c)
-            c = config()
-            g = c['rdf.graph']
-            ns = c['rdf.namespace']
-
-            g.add((ns['64'], ns['356'], ns['184']))
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
-
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
 
@@ -854,28 +840,6 @@ class DataTest(_DataTest):
             connect(conf=c)
             d = self.config
             g = d['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
-    def test_ZODBSource(self):
-        """ Test that we can load the datbase up from an XML file.
-
-        Takes a while to run the first time.
-        May fail if bsddb is not available. Ignore if it is not
-        """
-        disconnect()
-        c = Configure()
-        c['rdf.source'] = 'ZODB'
-        c['rdf.store_conf'] = 'zodb_test.fs'
-        try:
-            connect(conf=c)
-            d = self.config
-            g = d['rdf.graph']
-            g.add((ns['64'], ns['356'], ns['184']))
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
