@@ -22,7 +22,7 @@ import datetime
 import os
 import logging as L
 
-__all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource"]
+__all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
 
 class _B(ConfigValue):
     def __init__(self, f):
@@ -89,7 +89,7 @@ class DataUser(Configureable):
         return self.conf['rdf.namespace']
 
     @base_namespace.setter
-    def base_namespace(self, value):
+    def base_namespace_set(self, value):
         self.conf['rdf.namespace'] = value
 
     @property
@@ -97,7 +97,7 @@ class DataUser(Configureable):
         return self.conf['rdf.graph']
 
     @rdf.setter
-    def rdf(self, value):
+    def rdf_set(self, value):
         self.conf['rdf.graph'] = value
 
     def _remove_from_store(self, g):
@@ -120,7 +120,7 @@ class DataUser(Configureable):
             #     the endpoint's rest interface. Just need to do it for some common endpoints
 
             try:
-                gs = graph.serialize(format="nt")
+                gs = g.serialize(format="nt")
             except:
                 gs = _triples_to_bgp(g)
 
@@ -128,6 +128,8 @@ class DataUser(Configureable):
                 s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + gs + " } } "
             else:
                 s = " INSERT DATA { " + gs + " } "
+                L.debug("update query = " + s)
+                self.conf['rdf.graph'].update(s)
         else:
             gr = self.conf['rdf.graph']
             for x in g:
@@ -237,10 +239,11 @@ class Data(Configure, Configureable):
 
         self.sources = {'sqlite' : SQLiteSource(self),
                 'sparql_endpoint' : SPARQLSource(self),
-                'Sleepycat' : SleepyCatSource(self),
+                'sleepycat' : SleepyCatSource(self),
                 'default' : DefaultSource(self),
-                'TriX' : TrixSource(self)}
-        i = self.sources[self['rdf.source']]
+                'trix' : TrixSource(self),
+                'zodb' : ZODBSource(self)}
+        i = self.sources[self['rdf.source'].lower()]
         self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
@@ -397,6 +400,7 @@ class SleepyCatSource(RDFSource):
         import logging
         # XXX: If we have a source that's read only, should we need to set the store separately??
         g0 = ConjunctiveGraph('Sleepycat')
+        self.conf['rdf.store'] = 'Sleepycat'
         g0.open(self.conf['rdf.store_conf'],create=True)
         self.graph = g0
         logging.debug("Opened SleepyCatSource")
@@ -456,7 +460,7 @@ class SQLiteSource(RDFSource):
         conn.close()
         self.graph = g0
 
-class DefaultSource(RDFSource,ConfigValue):
+class DefaultSource(RDFSource):
     """ Reads from and queries against a configured database.
 
     .. note::
@@ -475,3 +479,46 @@ class DefaultSource(RDFSource,ConfigValue):
     def open(self):
         self.graph = ConjunctiveGraph(self.conf['rdf.store'])
         self.graph.open(self.conf['rdf.store_conf'],create=True)
+
+class ZODBSource(RDFSource):
+    """ Reads from and queries against a configured database.
+
+    .. note::
+
+        The default configuration.
+
+        Can also configure with "rdf.source" = "default"
+
+        The database store is configured with::
+
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+        Leaving unconfigured simply gives an in-memory data store.
+    """
+    def __init__(self,*args,**kwargs):
+        RDFSource.__init__(self,*args,**kwargs)
+
+    def open(self):
+        import ZODB
+        import transaction
+        from ZODB.FileStorage import FileStorage
+        self.path = self.conf['rdf.store_conf']
+        openstr = os.path.abspath(self.path)
+
+        fs=FileStorage(openstr)
+        self.zdb=ZODB.DB(fs)
+        self.conn=self.zdb.open()
+        root=self.conn.root()
+        if 'rdflib' not in root:
+            root['rdflib'] = ConjunctiveGraph('ZODB')
+        self.graph = self.g = root['rdflib']
+        transaction.commit()
+        self.graph.open(self.path)
+
+    def close(self):
+        import transaction
+        self.graph.close()
+        transaction.commit()
+        self.conn.close()
+        self.zdb.close()
