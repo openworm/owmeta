@@ -20,8 +20,6 @@ except ImportError:
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
-# Set up the database
-
 TestConfig = Configure.open("tests/test.conf")
 
 def clear_graph(graph):
@@ -40,7 +38,7 @@ def make_graph(size=100):
 class _DataTest(unittest.TestCase):
     def setUp(self):
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect(conf=TestConfig, do_logging=False)
+        PyOpenWorm.connect("tests/test.conf", do_logging=False)
     def tearDown(self):
         PyOpenWorm.disconnect()
     @property
