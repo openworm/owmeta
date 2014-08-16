@@ -8,13 +8,13 @@ install:
   - "pip install discover"
   - "pip install rdflib"
   - "pip install networkx"
-  - "sudo apt-get install python-bsddb3"
   - "git clone https://github.com/NeuralEnsemble/libNeuroML.git"
   - "cd libNeuroML"
   - "python setup.py install"
   - "cd .."
   - "pip install pint"
   - "python setup.py develop"
+  - "rm tests/test_Sleepycat.conf"
      
 
 script:  
