@@ -26,15 +26,13 @@ To get started::
   # Tear down
   >>> PyOpenWorm.disconnect()
 
-default.conf::
+In a file, ``default.conf``::
 
     {
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
         "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
-        "rdf.source" : "default",
-        "rdf.store" : "Sleepycat",
-        "rdf.store_conf" : "worm.db",
+        "rdf.source" : "ZODB",
+        "rdf.store_conf" : "BASE/db/worm.db",
         "user.email" : "jerry@cn.com",
         "rdf.upload_block_statement_count" : 50,
         "test_variable" : "test_value"
