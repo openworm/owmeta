@@ -5,3 +5,4 @@ PyOpenWorm.egg-info/*
 dist/*
 tests/*.log
 tests/_test.conf
+db/worm.*
