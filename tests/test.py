@@ -266,7 +266,7 @@ class CellTest(_DataTest):
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         # Load in raw morphology for ADAL
-        self.config['rdf.graph'].parse("PVDR.nml.rdf.xml",format='trig')
+        self.config['rdf.graph'].parse("tests/PVDR.nml.rdf.xml",format='trig')
         n = Neuron(name='PVDR', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
@@ -823,6 +823,18 @@ class MuscleTest(_DataTest):
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
 
+TriX_data = """<?xml version='1.0' encoding='UTF-8'?>
+<TriX xmlns='http://www.w3.org/2004/03/trix/trix-1/'>
+	<graph>
+		<uri>http://openworm.org/entities/molecules/6de7e55334036bbe7ca2e364ad00372db26ddfe3b43fed5acab1987c</uri>
+		<triple>
+			<uri>http://somehost.com/s</uri>
+			<uri>http://somehost.com/p</uri>
+			<uri>http://somehost.com/o</uri>
+		</triple>
+	</graph>
+</TriX>
+"""
 class DataTest(_DataTest):
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
@@ -830,14 +842,22 @@ class DataTest(_DataTest):
         Takes a while to run the first time.
         May fail if bsddb is not available. Ignore if it is not
         """
+        import tempfile
+        t = tempfile.mkdtemp()
+        f = tempfile.mkstemp()
         disconnect()
+
         c = Configure()
-        c['rdf.source'] = 'TriX'
-        c['trix_location'] = 'trix.xml'
-        c['rdf.store_conf'] = 'trix_test.db'
+        c['rdf.source'] = 'trix'
+        c['trix_location'] = f[1]
+        c['rdf.store_conf'] = t
         c['rdf.store'] = 'Sleepycat'
         try:
+            with open(f[1],'w') as fo:
+                fo.write(TriX_data)
+
             connect(conf=c)
+
             d = self.config
             g = d['rdf.graph']
             b = g.query("ASK { ?S ?P ?O }")
