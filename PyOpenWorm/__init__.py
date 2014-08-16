@@ -80,10 +80,9 @@ def useTestConfig():
     cfg = {
     "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
     "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-    "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
     "rdf.source" : "default",
     "rdf.store" : "Sleepycat",
-    "rdf.store_conf" : "worm.db",
+    "rdf.store_conf" : "db/worm.db",
     "user.email" : "jerry@cn.com",
     "rdf.upload_block_statement_count" : 50,
     "test_variable" : "test_value"
@@ -112,7 +111,6 @@ def disconnect(c=False):
 
 def connect(configFile=False,
         conf=False,
-        testConfig=False,
         do_logging=False):
     """ Load desired configuration and open the database """
     import logging
@@ -132,8 +130,6 @@ def connect(configFile=False,
             Configureable.conf = Data()
     elif configFile:
         loadConfig(configFile)
-    elif testConfig:
-        useTestConfig()
     else:
         try:
             from pkg_resources import Requirement, resource_filename

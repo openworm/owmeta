@@ -407,6 +407,19 @@ class SleepyCatSource(RDFSource):
 
 
 class SQLiteSource(RDFSource):
+    """ Reads from and queries against a SQLITE database
+
+    See db/celegans.db for the format
+    .. note::
+
+        The database store is configured with::
+
+            "sqldb" = "/home/USER/openworm/PyOpenWorm/db/celegans.db",
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+        Leaving unconfigured simply gives an in-memory data store.
+    """
     def open(self):
         conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
