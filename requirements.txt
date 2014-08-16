@@ -1,4 +1,3 @@
-tables
 discover
 ZODB
 rdflib-zodb
