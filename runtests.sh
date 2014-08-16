@@ -25,7 +25,6 @@ else
         echo '-------------[END OF TEST]-----------' >> $log
         echo -----------------------------------------------------------------
     done
-    echo $test_result
     echo | cat $bad_files
     exit $test_result
     #python -m unittest tests.integration_test
