@@ -1,3 +1,6 @@
+numpy>=1.8.2
+numexpr>=2.4
+tables
 ZODB
 rdflib-zodb
 libneuroml
