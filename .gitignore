@@ -3,3 +3,4 @@
 build/*
 PyOpenWorm.egg-info/*
 dist/*
+tests/*.log
