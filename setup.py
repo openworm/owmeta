@@ -11,7 +11,6 @@ import os
 long_description = open("README.md").read()
 
 setup(
-    install_requires=required,
     name = "PyOpenWorm",
     version = '0.5.0-alpha',
     packages = ['PyOpenWorm', 'tests', 'db'],
