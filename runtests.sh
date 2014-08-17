@@ -16,7 +16,7 @@ else
         log=${x/.conf}.log
         cp $x tests/_test.conf
         echo Testing with $x
-        python -m unittest tests.test 2> $log
+        nosetests tests/test.py 2> $log
         if [ $? -ne 0 ] ; then
             test_result=1
             bad_files="$bad_files $log"
