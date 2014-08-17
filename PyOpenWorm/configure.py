@@ -67,26 +67,23 @@ class Configure(object):
 
     @classmethod
     def open(cls,file_name):
-        import json
-        try:
-            f = open(file_name)
-            c = Configure()
-            d = json.load(f)
-            for k in d:
-                value = d[k]
-                if isinstance(value,basestring):
-                    if value.startswith("BASE/"):
-                        from pkg_resources import Requirement, resource_filename
-                        value = value[5:]
-                        value = resource_filename(Requirement.parse("PyOpenWorm"), value)
-                        print 'the value =', value
-                        d[k] = value
-                c[k] = _C(d[k])
-            f.close()
-            c['configure.file_location'] = file_name
-            return c
-        except Exception, e:
-            raise BadConf(e)
+    	import json
+    	f = open(file_name)
+    	c = Configure()
+    	d = json.load(f)
+    	for k in d:
+			value = d[k]
+			if isinstance(value,basestring):
+				if value.startswith("BASE/"):
+					from pkg_resources import Requirement, resource_filename
+					value = value[5:]
+					value = resource_filename(Requirement.parse("PyOpenWorm"), value)
+					print 'the value =', value
+					d[k] = value
+			c[k] = _C(d[k])
+        f.close()
+        c['configure.file_location'] = file_name
+        return c
 
     def copy(self,other):
         if isinstance(other,Configure):
