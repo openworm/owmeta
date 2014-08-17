@@ -27,6 +27,6 @@ else
     done
     echo | cat $bad_files
     exit $test_result
-    #python -m unittest tests.integration_test
+    python -m unittest tests.integration_test
 fi
 

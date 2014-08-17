@@ -22,7 +22,7 @@ import datetime
 import os
 import logging as L
 
-__all__ = ["Data", "DataUser", "RDFSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
+__all__ = ["Data", "DataUser", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
 
 class _B(ConfigValue):
     def __init__(self, f):
@@ -213,7 +213,6 @@ class Data(Configure, Configureable):
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
-        self._init_rdf_graph()
 
     @classmethod
     def open(cls,file_name):
@@ -223,6 +222,7 @@ class Data(Configure, Configureable):
 
     def openDatabase(self):
         """ Open a the configured database """
+        self._init_rdf_graph()
         L.debug("opening " + str(self.source))
         self.source.open()
 
@@ -237,13 +237,16 @@ class Data(Configure, Configureable):
         self['rdf.store'] = c.get('rdf.store', 'default')
         self['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
 
-        self.sources = {'sqlite' : SQLiteSource(self),
-                'sparql_endpoint' : SPARQLSource(self),
-                'sleepycat' : SleepyCatSource(self),
-                'default' : DefaultSource(self),
-                'trix' : TrixSource(self),
-                'zodb' : ZODBSource(self)}
-        i = self.sources[self['rdf.source'].lower()]
+        # XXX:The conf=self can probably be removed
+        self.sources = {'sqlite' : SQLiteSource,
+                'sparql_endpoint' : SPARQLSource,
+                'sleepycat' : SleepyCatSource,
+                'default' : DefaultSource,
+                'trix' : TrixSource,
+                'serialization' : SerializationSource,
+                'zodb' : ZODBSource
+                }
+        i = self.sources[self['rdf.source'].lower()]()
         self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = i
@@ -294,11 +297,11 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
     Alternative sources should dervie from this class
     """
     i = 0
-    def __init__(self, conf=False):
+    def __init__(self, **kwargs):
         if self.i == 1:
             raise Exception(self.i)
         self.i+=1
-        Configureable.__init__(self, conf=conf)
+        Configureable.__init__(self, **kwargs)
         self.graph = False
 
     def get(self):
@@ -312,21 +315,21 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
         self.graph.close()
         self.graph = False
 
-class TrixSource(RDFSource):
-    """ Reads from a TriX file or the configured store is more recent, from that.
+class SerializationSource(RDFSource):
+    """ Reads from an RDF serialization or, if the configured database is more recent, then from that.
 
     .. note::
 
-        configure with  "rdf.source" = "TriX"
+        configure with "rdf.source" = "serialization"
 
         The database store is configured with::
 
             "rdf.store" = <your rdflib store name here>
+            "rdf.serialization" = <your RDF serialization>
+            "rdf.serialization_format" = <your rdflib serialization format used>
             "rdf.store_conf" = <your rdflib store configuration here>
 
     """
-    # XXX How to write back out to this?
-    i = 0
 
     def open(self):
         if not self.graph:
@@ -335,7 +338,8 @@ class TrixSource(RDFSource):
             # Check the ages of the files. Read the more recent one.
             g0 = ConjunctiveGraph(store=self.conf['rdf.store'])
             database_store = self.conf['rdf.store_conf']
-            trix_file = self.conf['trix_location']
+            source_file = self.conf['rdf.serialization']
+            file_format = self.conf['rdf.serialization_format']
             # store_time only works for stores that are on the local
             # machine.
             try:
@@ -349,7 +353,7 @@ class TrixSource(RDFSource):
             except:
                 store_time = DT.min
 
-            trix_time = modification_date(trix_file)
+            trix_time = modification_date(source_file)
 
             g0.open(database_store, create=True)
 
@@ -359,11 +363,19 @@ class TrixSource(RDFSource):
             else:
                 # delete the database and read in the new one
                 # read in the serialized format
-                g0.parse(trix_file,format="trix")
+                g0.parse(source_file,format=file_format)
 
             self.graph = g0
 
         return self.graph
+
+class TrixSource(SerializationSource):
+    def __init__(self,**kwargs):
+        SerializationSource.__init__(self,**kwargs)
+        h = self.conf.get('trix_location','UNSET')
+        self.conf.link('rdf.serialization','trix_location')
+        self.conf['rdf.serialization'] = h
+        self.conf['rdf.serialization_format'] = 'trix'
 
 def _rdf_literal_to_gp(x):
     return x.n3()
@@ -500,7 +512,7 @@ class ZODBSource(RDFSource):
 
         The default configuration.
 
-        Can also configure with "rdf.source" = "default"
+        Can also configure with "rdf.source" = "ZODB"
 
         The database store is configured with::
 

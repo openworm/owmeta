@@ -6,12 +6,14 @@ import sys
 sys.path.insert(0,".")
 import PyOpenWorm
 from PyOpenWorm import *
+import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
 import pint as Q
 import os
 import subprocess
+import tempfile
 
 try:
     import bsddb
@@ -37,6 +39,7 @@ def make_graph(size=100):
         g.add((s,p,o))
     return g
 
+@unittest.skipIf(has_bsddb==False, "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
     TestConfig = Configure.open("tests/_test.conf")
     def delete_dir(self):
@@ -823,43 +826,54 @@ class MuscleTest(_DataTest):
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
 
-TriX_data = """<?xml version='1.0' encoding='UTF-8'?>
-<TriX xmlns='http://www.w3.org/2004/03/trix/trix-1/'>
-	<graph>
-		<uri>http://openworm.org/entities/molecules/6de7e55334036bbe7ca2e364ad00372db26ddfe3b43fed5acab1987c</uri>
-		<triple>
-			<uri>http://somehost.com/s</uri>
-			<uri>http://somehost.com/p</uri>
-			<uri>http://somehost.com/o</uri>
-		</triple>
-	</graph>
-</TriX>
-"""
-class DataTest(_DataTest):
+class DataTest(unittest.TestCase):
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
-
-        Takes a while to run the first time.
-        May fail if bsddb is not available. Ignore if it is not
         """
-        import tempfile
         t = tempfile.mkdtemp()
         f = tempfile.mkstemp()
-        disconnect()
 
         c = Configure()
         c['rdf.source'] = 'trix'
+        c['rdf.store'] = 'default'
         c['trix_location'] = f[1]
-        c['rdf.store_conf'] = t
-        c['rdf.store'] = 'Sleepycat'
+
+        with open(f[1],'w') as fo:
+            fo.write(TD.TriX_data)
+
+        connect(conf=c)
+        c = config()
+
         try:
-            with open(f[1],'w') as fo:
-                fo.write(TriX_data)
+            g = c['rdf.graph']
+            b = g.query("ASK { ?S ?P ?O }")
+            for x in b:
+                self.assertTrue(x)
+        except ImportError:
+            pass
+        finally:
+            disconnect()
+        os.unlink(f[1])
 
-            connect(conf=c)
+    def test_trig_source(self):
+        """ Test that we can load the datbase up from a trig file.
+        """
+        t = tempfile.mkdtemp()
+        f = tempfile.mkstemp()
 
-            d = self.config
-            g = d['rdf.graph']
+        c = Configure()
+        c['rdf.source'] = 'serialization'
+        c['rdf.serialization'] = f[1]
+        c['rdf.serialization_format'] = 'trig'
+        c['rdf.store'] = 'ZODB'
+        with open(f[1],'w') as fo:
+            fo.write(TD.Trig_data)
+
+        connect(conf=c)
+        c = config()
+
+        try:
+            g = c['rdf.graph']
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
