@@ -1,5 +1,6 @@
 # a class for modules that need outside objects to parameterize their behavior (because what are generics?)
 # Modules inherit from this class and use their self['expected_configured_property']
+import traceback
 class ConfigValue(object):
     def get(self):
         raise NotImplementedError
@@ -77,15 +78,15 @@ class Configure(object):
                 if isinstance(value,basestring):
                     if value.startswith("BASE/"):
                         from pkg_resources import Requirement, resource_filename
-                        value = value[5:]
-                        value = resource_filename(Requirement.parse("PyOpenWorm"), value)
-                        print 'the value =', value
+                        value = value[4:]
+                        value = resource_filename(Requirement.parse('PyOpenWorm'), value)
                         d[k] = value
                 c[k] = _C(d[k])
             f.close()
             c['configure.file_location'] = file_name
             return c
         except Exception, e:
+            traceback.print_exc()
             raise BadConf(e)
 
     def copy(self,other):
