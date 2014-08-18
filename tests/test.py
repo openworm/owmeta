@@ -38,10 +38,10 @@ def make_graph(size=100):
         o = rdflib.URIRef("http://somehost.com/o"+str(i))
         g.add((s,p,o))
     return g
-
-@unittest.skipIf(has_bsddb==False, "Sleepycat store will not work without bsddb")
+TEST_CONFIG = Configure.open("tests/_test.conf")
+@unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
-    TestConfig = Configure.open("tests/_test.conf")
+    TestConfig = TEST_CONFIG
     def delete_dir(self):
         self.path = self.TestConfig['rdf.store_conf']
         try:
