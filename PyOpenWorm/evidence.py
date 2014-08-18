@@ -86,7 +86,7 @@ class Evidence(DataObject):
        Something asserted by this evidence
     doi : DatatypeProperty
         A Digital Object Identifier (DOI) that provides evidence, optional
-    pmid :DatatypeProperty
+    pmid : DatatypeProperty
         A PubMed ID (PMID) that point to a paper that provides evidence, optional
     wormbaseid : DatatypeProperty
         An ID from WormBase that points to a record that provides evidence, optional
