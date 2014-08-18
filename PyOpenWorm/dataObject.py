@@ -183,7 +183,7 @@ class DataObject(DataUser):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self, query=False, check_saved=set()):
+    def triples(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
 
         Returns
@@ -192,6 +192,9 @@ class DataObject(DataUser):
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
+        if check_saved == False:
+            check_saved = set()
+
         if self in check_saved:
             return
         else:
