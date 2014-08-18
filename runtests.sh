@@ -6,10 +6,17 @@ if [ $1 ] ; then
         else
             python -m unittest tests.integration_test.IntegrationTest
         fi
+    elif [ "$1" = conf ] ; then
+        if [ -f "$2" ] ; then
+            # use nose to run with the given config file
+            cp "$2" tests/_test.conf
+            nosetests tests/test.py
+        fi
     else
         python -m unittest tests.test.$1
     fi
 else
+    # Run with all detected configuration files in tests/
     test_result=0
     bad_files=
     for x in tests/test_*.conf ; do
