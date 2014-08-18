@@ -13,10 +13,8 @@ long_description = open("README.md").read()
 setup(
     name = "PyOpenWorm",
     version = '0.5.0-alpha',
-    packages = ['PyOpenWorm', 'tests', 'db'],
-    package_data = dict(
-        db=['default.conf', 'worm.db/*']
-        ),
+    packages = ['PyOpenWorm', 'db'],
+    package_data = dict(db=['default.conf']),
     author = "OpenWorm.org authors and contributors",
     author_email = "info@openworm.org",
     description = "A Python library for working with OpenWorm data and models",
