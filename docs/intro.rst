@@ -32,7 +32,7 @@ In a file, ``default.conf``::
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
         "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
         "rdf.source" : "ZODB",
-        "rdf.store_conf" : "BASE/db/worm.db",
+        "rdf.store_conf" : "worm.db",
         "user.email" : "jerry@cn.com",
         "rdf.upload_block_statement_count" : 50,
         "test_variable" : "test_value"
