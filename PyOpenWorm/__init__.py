@@ -39,15 +39,14 @@ Notes:
 Classes
 -------
 
-.. autoclass:: Network
-.. autoclass:: Neuron
-.. autoclass:: Worm
-.. autoclass:: Muscle
-.. autoclass:: Evidence
-.. autoclass:: Connection
-.. autoclass:: Relationship
+.. automodule:: PyOpenWorm.evidence
+.. automodule:: PyOpenWorm.network
+.. automodule:: PyOpenWorm.neuron
+.. automodule:: PyOpenWorm.worm
+.. automodule:: PyOpenWorm.muscle
+.. automodule:: PyOpenWorm.connection
+.. automodule:: PyOpenWorm.relationship
 .. automodule:: PyOpenWorm.dataObject
-.. autoclass:: Property
 .. automodule:: PyOpenWorm.data
 .. automodule:: PyOpenWorm.cell
 .. automodule:: PyOpenWorm.configure

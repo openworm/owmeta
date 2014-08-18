@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-.. class:: Network
-
-   This module contains the class that defines the neuronal network
-
-"""
-
 import PyOpenWorm as P
 import rdflib as R
 from PyOpenWorm import DataObject
 
 class Network(DataObject):
-    """
+    """A neuronal network.
+
     Attributes
     -----------
     neuron
