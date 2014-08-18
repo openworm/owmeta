@@ -14,7 +14,7 @@ Basic Usage
 -----------
 
 ```python
-  >>>import openworm
+  >>>import PyOpenWorm
   
   # Grabs the representation of the neuronal network
   >>>net = PyOpenWorm.Worm().get_neuron_network()
@@ -109,9 +109,14 @@ ion channels, etc and so should our code.
 Installation
 ------------
 
-    git clone https://github.com/slarson/PyOpenWorm.git
+    git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
+    
+Uninstall
+----------
+
+    pip uninstall PyOpenWorm
 
 Running tests
 -------------
