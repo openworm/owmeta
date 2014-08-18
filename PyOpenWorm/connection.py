@@ -1,12 +1,3 @@
-"""
-.. class:: Connection
-
-   connection
-   =============
-
-   Connection between neurons
-
-"""
 import PyOpenWorm as P
 from PyOpenWorm import *
 

@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.abspath('../'))
 #needs_sphinx = '1.0'
 numpydoc_show_class_members = False
 autodoc_default_flags = ['members','show-inheritance']
+autodoc_member_order = 'groupwise'
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.todo', 'sphinx.ext.autosummary', 'sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc']
