@@ -315,7 +315,7 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
         self.graph.close()
         self.graph = False
     def open(self):
-        """ Called on ``|pow|.connect()`` to set up and return the rdflib graph.
+        """ Called on ``PyOpenWorm.connect()`` to set up and return the rdflib graph.
         Must be overridden by sub-classes.
         """
         raise NotImplementedError()
