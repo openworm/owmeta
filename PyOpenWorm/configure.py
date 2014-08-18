@@ -31,7 +31,7 @@ class Configure(object):
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
-    def __init__(self, dependencies={}):
+    def __init__(self):
         self._properties = {}
 
     def __setitem__(self, pname, value):
