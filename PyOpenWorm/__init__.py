@@ -78,15 +78,15 @@ def config():
 
 def useTestConfig():
     cfg = {
-    "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-    "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-    "rdf.source" : "default",
-    "rdf.store" : "Sleepycat",
-    "rdf.store_conf" : "db/worm.db",
-    "user.email" : "jerry@cn.com",
-    "rdf.upload_block_statement_count" : 50,
-    "test_variable" : "test_value"
-}
+            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+            "rdf.source" : "default",
+            "rdf.store" : "Sleepycat",
+            "rdf.store_conf" : "db/worm.db",
+            "user.email" : "jerry@cn.com",
+            "rdf.upload_block_statement_count" : 50,
+            "test_variable" : "test_value"
+          }
 
     for x in cfg:
         Configureable.conf[x] = cfg[x]
