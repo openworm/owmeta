@@ -314,16 +314,18 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
             return
         self.graph.close()
         self.graph = False
+    def open(self):
+        """ Called on ``|pow|.connect()`` to set up and return the rdflib graph.
+        Must be overridden by sub-classes.
+        """
+        raise NotImplementedError()
 
 class SerializationSource(RDFSource):
     """ Reads from an RDF serialization or, if the configured database is more recent, then from that.
 
-    .. note::
-
-        configure with "rdf.source" = "serialization"
-
         The database store is configured with::
 
+            "rdf.source" = "serialization"
             "rdf.store" = <your rdflib store name here>
             "rdf.serialization" = <your RDF serialization>
             "rdf.serialization_format" = <your rdflib serialization format used>
@@ -370,6 +372,16 @@ class SerializationSource(RDFSource):
         return self.graph
 
 class TrixSource(SerializationSource):
+    """ A SerializationSource specialized for TriX
+
+        The database store is configured with::
+
+            "rdf.source" = "trix"
+            "rdf.trix_location" = <location of the TriX file>
+            "rdf.store" = <your rdflib store name here>
+            "rdf.store_conf" = <your rdflib store configuration here>
+
+    """
     def __init__(self,**kwargs):
         SerializationSource.__init__(self,**kwargs)
         h = self.conf.get('trix_location','UNSET')
@@ -388,9 +400,9 @@ def _triples_to_bgp(trips):
 class SPARQLSource(RDFSource):
     """ Reads from and queries against a remote data store
 
-        .. note::
+        ::
 
-            configure with  "rdf.source" = "sparql_endpoint"
+            "rdf.source" = "sparql_endpoint"
     """
     def open(self):
         # XXX: If we have a source that's read only, should we need to set the store separately??
@@ -402,10 +414,9 @@ class SPARQLSource(RDFSource):
 class SleepyCatSource(RDFSource):
     """ Reads from and queries against a local Sleepycat database
 
-        .. note:: configure with  "rdf.source" = "SQLiteSource"
+        The database can be configured like::
 
-        The database location can be configured like::
-
+            "rdf.source" = "Sleepycat"
             "rdf.store_conf" = <your database location here>
     """
     def open(self):
@@ -419,18 +430,18 @@ class SleepyCatSource(RDFSource):
 
 
 class SQLiteSource(RDFSource):
-    """ Reads from and queries against a SQLITE database
+    """ Reads from and queries against a SQLite database
 
-    See db/celegans.db for the format
-    .. note::
+    See see the SQLite database :file:`db/celegans.db` for the format
 
-        The database store is configured with::
+    The database store is configured with::
 
-            "sqldb" = "/home/USER/openworm/PyOpenWorm/db/celegans.db",
-            "rdf.store" = <your rdflib store name here>
-            "rdf.store_conf" = <your rdflib store configuration here>
+        "rdf.source" = "Sleepycat"
+        "sqldb" = "/home/USER/openworm/PyOpenWorm/db/celegans.db",
+        "rdf.store" = <your rdflib store name here>
+        "rdf.store_conf" = <your rdflib store configuration here>
 
-        Leaving unconfigured simply gives an in-memory data store.
+    Leaving ``rdf.store`` unconfigured simply gives an in-memory data store.
     """
     def open(self):
         conn = sqlite3.connect(self.conf['sqldb'])
@@ -488,14 +499,11 @@ class SQLiteSource(RDFSource):
 class DefaultSource(RDFSource):
     """ Reads from and queries against a configured database.
 
-    .. note::
-
         The default configuration.
-
-        Can also configure with "rdf.source" = "default"
 
         The database store is configured with::
 
+            "rdf.source" = "default"
             "rdf.store" = <your rdflib store name here>
             "rdf.store_conf" = <your rdflib store configuration here>
 
@@ -506,18 +514,14 @@ class DefaultSource(RDFSource):
         self.graph.open(self.conf['rdf.store_conf'],create=True)
 
 class ZODBSource(RDFSource):
-    """ Reads from and queries against a configured database.
+    """ Reads from and queries against a configured Zope Object Database.
 
-    .. note::
-
-        The default configuration.
-
-        Can also configure with "rdf.source" = "ZODB"
+        If the configured database does not exist, it is created.
 
         The database store is configured with::
 
-            "rdf.store" = <your rdflib store name here>
-            "rdf.store_conf" = <your rdflib store configuration here>
+            "rdf.source" = "ZODB"
+            "rdf.store_conf" = <location of your ZODB database>
 
         Leaving unconfigured simply gives an in-memory data store.
     """
