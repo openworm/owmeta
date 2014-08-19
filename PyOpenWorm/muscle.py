@@ -1,18 +1,9 @@
-"""
-.. class:: Muscle
-
-   muscle client
-   =============
-
-   This module contains the class that defines the muscle
-
-"""
 import PyOpenWorm as P
 from PyOpenWorm import Cell
 
 class Muscle(Cell):
+    """A single muscle cell
 
-    """
     Attributes
     ----------
     neurons : ObjectProperty

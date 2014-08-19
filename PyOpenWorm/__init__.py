@@ -39,15 +39,14 @@ Notes:
 Classes
 -------
 
-.. autoclass:: Network
-.. autoclass:: Neuron
-.. autoclass:: Worm
-.. autoclass:: Muscle
-.. autoclass:: Evidence
-.. autoclass:: Connection
-.. autoclass:: Relationship
+.. automodule:: PyOpenWorm.evidence
+.. automodule:: PyOpenWorm.network
+.. automodule:: PyOpenWorm.neuron
+.. automodule:: PyOpenWorm.worm
+.. automodule:: PyOpenWorm.muscle
+.. automodule:: PyOpenWorm.connection
+.. automodule:: PyOpenWorm.relationship
 .. automodule:: PyOpenWorm.dataObject
-.. autoclass:: Property
 .. automodule:: PyOpenWorm.data
 .. automodule:: PyOpenWorm.cell
 .. automodule:: PyOpenWorm.configure
@@ -78,16 +77,15 @@ def config():
 
 def useTestConfig():
     cfg = {
-    "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-    "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-    "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
-    "rdf.source" : "default",
-    "rdf.store" : "Sleepycat",
-    "rdf.store_conf" : "worm.db",
-    "user.email" : "jerry@cn.com",
-    "rdf.upload_block_statement_count" : 50,
-    "test_variable" : "test_value"
-}
+            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+            "rdf.source" : "default",
+            "rdf.store" : "Sleepycat",
+            "rdf.store_conf" : "db/worm.db",
+            "user.email" : "jerry@cn.com",
+            "rdf.upload_block_statement_count" : 50,
+            "test_variable" : "test_value"
+          }
 
     for x in cfg:
         Configureable.conf[x] = cfg[x]
@@ -112,7 +110,6 @@ def disconnect(c=False):
 
 def connect(configFile=False,
         conf=False,
-        testConfig=False,
         do_logging=False):
     """ Load desired configuration and open the database """
     import logging
@@ -123,8 +120,6 @@ def connect(configFile=False,
         return
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
 
     if conf:
         Configureable.conf = conf
@@ -134,8 +129,6 @@ def connect(configFile=False,
             Configureable.conf = Data()
     elif configFile:
         loadConfig(configFile)
-    elif testConfig:
-        useTestConfig()
     else:
         try:
             from pkg_resources import Requirement, resource_filename

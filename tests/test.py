@@ -6,11 +6,14 @@ import sys
 sys.path.insert(0,".")
 import PyOpenWorm
 from PyOpenWorm import *
+import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
 import pint as Q
 import os
+import subprocess
+import tempfile
 
 try:
     import bsddb
@@ -19,8 +22,6 @@ except ImportError:
     has_bsddb = False
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
-
-TestConfig = Configure.open("tests/test.conf")
 
 def clear_graph(graph):
     graph.update("CLEAR ALL")
@@ -34,13 +35,35 @@ def make_graph(size=100):
         o = rdflib.URIRef("http://somehost.com/o"+str(i))
         g.add((s,p,o))
     return g
-
+TEST_CONFIG = Configure.open("tests/_test.conf")
+@unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
+    TestConfig = TEST_CONFIG
+    def delete_dir(self):
+        self.path = self.TestConfig['rdf.store_conf']
+        try:
+            if self.TestConfig['rdf.source'] == "Sleepycat":
+                subprocess.call("rm -rf "+self.path, shell=True)
+            elif self.TestConfig['rdf.source'] == "ZODB":
+                os.unlink(self.path)
+                os.unlink(self.path + '.index')
+                os.unlink(self.path + '.tmp')
+                os.unlink(self.path + '.lock')
+        except OSError, e:
+            if e.errno == 2:
+                # The file may not exist and that's fine
+                pass
+            else:
+                raise e
     def setUp(self):
         # Set do_logging to True if you like walls of text
-        PyOpenWorm.connect("tests/test.conf", do_logging=False)
+        self.delete_dir()
+        PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
+
     def tearDown(self):
         PyOpenWorm.disconnect()
+        self.delete_dir()
+
     @property
     def config(self):
         return PyOpenWorm.config()
@@ -139,7 +162,7 @@ class ConfigureTest(unittest.TestCase):
 
     def test_read_from_file_fail(self):
         """ Fail on attempt to read configuration from a non-JSON file """
-        with self.assertRaises(BadConf):
+        with self.assertRaises(ValueError):
             Data.open("tests/bad_test.conf")
 
 class ConfigureableTest(unittest.TestCase):
@@ -243,7 +266,7 @@ class CellTest(_DataTest):
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         # Load in raw morphology for ADAL
-        self.config['rdf.graph'].parse("PVDR.nml.rdf.xml",format='trig')
+        self.config['rdf.graph'].parse("tests/PVDR.nml.rdf.xml",format='trig')
         n = Neuron(name='PVDR', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
@@ -301,9 +324,11 @@ class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
+        c = Configureable.conf
         Configureable.conf = False
         with self.assertRaises(BadConf):
             DataUser()
+        Configureable.conf = c
 
     def test_init_no_config_with_default(self):
         """ Should suceed if the default configuration is a Data object """
@@ -419,7 +444,6 @@ class NeuronTest(_DataTest):
         self.assertEqual(next(self.neur('AVAR').name()), 'AVAR')
 
     def test_neighbor(self):
-        n0 = self.neur('AVAR')
         n = self.neur('AVAL')
         n.neighbor(self.neur('PVCL'))
         neighbors = list(n.neighbor())
@@ -608,10 +632,11 @@ class RDFLibTest(unittest.TestCase):
         except:
             self.fail("Doesn't actually fail...which is weird")
     def test_uriref_not_id(self):
-        import cStringIO
-        out = cStringIO.StringIO()
         #XXX: capture the logged warning
+        # import cStringIO
+        # out = cStringIO.StringIO()
         rdflib.URIRef("some random string")
+
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
@@ -798,23 +823,26 @@ class MuscleTest(_DataTest):
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
 
-class DataTest(_DataTest):
-    def test_sleepy_cat_source(self):
-        """ May fail if bsddb is not available. Ignore if it is not """
-        # open the database
-        # check we can add a triple
-        disconnect()
-        c = Configure()
-        c['source'] = 'Sleepycat'
-        c['rdf.store'] = 'Sleepycat'
-        c['rdf.store_conf'] = 'test.db'
-        try:
-            connect(conf=c)
-            c = config()
-            g = c['rdf.graph']
-            ns = c['rdf.namespace']
+class DataTest(unittest.TestCase):
+    def test_trix_source(self):
+        """ Test that we can load the datbase up from an XML file.
+        """
+        t = tempfile.mkdtemp()
+        f = tempfile.mkstemp()
 
-            g.add((ns['64'], ns['356'], ns['184']))
+        c = Configure()
+        c['rdf.source'] = 'trix'
+        c['rdf.store'] = 'default'
+        c['trix_location'] = f[1]
+
+        with open(f[1],'w') as fo:
+            fo.write(TD.TriX_data)
+
+        connect(conf=c)
+        c = config()
+
+        try:
+            g = c['rdf.graph']
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
@@ -822,22 +850,27 @@ class DataTest(_DataTest):
             pass
         finally:
             disconnect()
-    def test_trix_source(self):
-        """ Test that we can load the datbase up from an XML file.
+        os.unlink(f[1])
 
-        Takes a while to run the first time.
-        May fail if bsddb is not available. Ignore if it is not
+    def test_trig_source(self):
+        """ Test that we can load the datbase up from a trig file.
         """
-        disconnect()
+        t = tempfile.mkdtemp()
+        f = tempfile.mkstemp()
+
         c = Configure()
-        c['rdf.source'] = 'TriX'
-        c['trix_location'] = 'trix.xml'
-        c['rdf.store_conf'] = 'trix_test.db'
-        c['rdf.store'] = 'Sleepycat'
+        c['rdf.source'] = 'serialization'
+        c['rdf.serialization'] = f[1]
+        c['rdf.serialization_format'] = 'trig'
+        c['rdf.store'] = 'ZODB'
+        with open(f[1],'w') as fo:
+            fo.write(TD.Trig_data)
+
+        connect(conf=c)
+        c = config()
+
         try:
-            connect(conf=c)
-            d = self.config
-            g = d['rdf.graph']
+            g = c['rdf.graph']
             b = g.query("ASK { ?S ?P ?O }")
             for x in b:
                 self.assertTrue(x)
