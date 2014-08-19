@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-.. class:: Worm
-
-   This module contains the class that defines the worm as a whole
-
-"""
-
 import PyOpenWorm as P
 from PyOpenWorm import DataObject
 
 
 class Worm(DataObject):
     """
-    A worm
+    A worm.
 
     All worms with the same name are considered to be the same object.
 

@@ -17,6 +17,8 @@ Contents:
    evidence
    making_dataObjects
    adding_data
+   sharing
+   docs
 
 Modules
 -------
