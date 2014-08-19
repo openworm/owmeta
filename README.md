@@ -8,12 +8,20 @@ Unified data access library for data about the C. elegans anatomy and model for 
 What does it do?
 ----------------
 
-Allows asking various questions about the C. elegans nervous system.
+Allows asking various questions about the C. elegans nervous system and sharing data about C. elegans.
 
 Basic Usage
 -----------
 
-To get started::
+To get started, you'll probably want to load in the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
+by doing 
+
+```python
+  import PyOpenWorm as P
+  P.connect('PyOpenWorm/default.conf')
+  P.config()['rdf.graph'].parse('OpenWormData/out.n3', format='n3')
+  P.disconnect()
+```
 
 ```python
   >>> import PyOpenWorm
