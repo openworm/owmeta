@@ -23,6 +23,8 @@ by doing
   P.disconnect()
 ```
 
+Assuming everything goes as planned, you can try out a few things:
+
 ```python
   >>> import PyOpenWorm
 
@@ -133,7 +135,7 @@ See what neurons express some receptor::
 
 To get any object's possible values, use load()::
 ```python
-  >>>list(P.Neuron().load())
+  >>>list(PyOpenWorm.Neuron().load())
   [
    ...
    Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
@@ -147,7 +149,7 @@ To get any object's possible values, use load()::
    ...
   ]
   # Properties are a little different
-  >>>next(Neuron().receptor.load())
+  >>>next(PyOpenWorm.Neuron().receptor.load())
   receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
 
 ```
@@ -155,12 +157,12 @@ To get any object's possible values, use load()::
 Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
- >>> Worm().rdf.query(...)
+ >>> PyOpenWorm.Worm().rdf.query(...)
  ```
 
 Use pre-made objects with custom SPARQL queries::
 ```python
- >>> n = Neuron()
+ >>> n = PyOpenWorm.Neuron()
  # Get a Neuron graph pattern suitable for use in a SPARQL query
  >>> gp = n.graph_pattern(query=True)
  >>> print gp
