@@ -19,7 +19,9 @@ from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS,RDF
 from datetime import datetime as DT
 import datetime
+import transaction
 import os
+import traceback
 import logging as L
 
 __all__ = ["Data", "DataUser", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
@@ -314,6 +316,7 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
             return
         self.graph.close()
         self.graph = False
+
     def open(self):
         """ Called on ``PyOpenWorm.connect()`` to set up and return the rdflib graph.
         Must be overridden by sub-classes.
@@ -531,7 +534,6 @@ class ZODBSource(RDFSource):
 
     def open(self):
         import ZODB
-        import transaction
         from ZODB.FileStorage import FileStorage
         self.path = self.conf['rdf.store_conf']
         openstr = os.path.abspath(self.path)
@@ -542,26 +544,40 @@ class ZODBSource(RDFSource):
         root=self.conn.root()
         if 'rdflib' not in root:
             root['rdflib'] = ConjunctiveGraph('ZODB')
-        self.graph = self.g = root['rdflib']
+        self.graph = root['rdflib']
         try:
             transaction.commit()
         except Exception as e:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
+            L.warning('Forced to abort transaction on ZODB store opening')
+            traceback.print_exc()
             transaction.abort()
         transaction.begin()
         self.graph.open(self.path)
+        self.graph._add = self.graph.add
+        def graph_add(*args,**kwargs):
+            self.graph._add(*args,**kwargs)
+            transaction.commit()
+        self.graph.add = graph_add
+
 
     def close(self):
-        import transaction
+        if self.graph == False:
+            return
+
         self.graph.close()
+
         try:
             transaction.commit()
         except Exception as e:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
+            traceback.print_exc()
+            L.warning('Forced to abort transaction on ZODB store closing')
             transaction.abort()
         self.conn.close()
         self.zdb.close()
+        self.graph = False

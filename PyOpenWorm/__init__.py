@@ -101,9 +101,9 @@ def disconnect(c=False):
     m = __import__('__main__')
     if not m.connected:
         return
+
     if c == False:
         c = Configureable.conf
-
     if c != False:
         c.closeDatabase()
     m.connected = False
@@ -158,4 +158,4 @@ def connect(configFile=False,
     Property.register()
     Relationship.register()
 
-    #m.connected = True
+    m.connected = True
