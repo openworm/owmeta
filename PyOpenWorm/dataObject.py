@@ -112,9 +112,13 @@ class DataObject(DataUser):
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
 
-    def __init__(self,ident=False,triples=[],**kwargs):
+    def __init__(self,ident=False,triples=False,**kwargs):
         DataUser.__init__(self,**kwargs)
-        self._triples = triples
+        if not triples:
+            self._triples = []
+        else:
+            self._triples = triples
+
         self._is_releasing_triples = False
         self.properties = []
         # Used in triples()
@@ -170,9 +174,10 @@ class DataObject(DataUser):
 
     def identifier(self,query=False):
         """
-        The identifier for this object in the rdf graph
-        This identifier is usually randomly generated, but an identifier returned from the
-        graph can be used to retrieve the object.
+        The identifier for this object in the rdf graph.
+
+        This identifier may be randomly generated, but an identifier returned from the
+        graph can be used to retrieve the specific object that it refers to.
         """
         if query and not self._id_is_set:
             return self._id_variable
@@ -183,7 +188,7 @@ class DataObject(DataUser):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
 
-    def triples(self, query=False, check_saved=set()):
+    def triples(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
 
         Returns
@@ -192,6 +197,9 @@ class DataObject(DataUser):
         """
         # The default implementation, gives the object no representation or the one
         # explicitly given in __init__
+        if check_saved == False:
+            check_saved = set()
+
         if self in check_saved:
             return
         else:
@@ -238,8 +246,6 @@ class DataObject(DataUser):
         """ Get the graph pattern for this object.
 
         It should be as simple as converting the result of triples() into a BGP
-
-        By default conversion from triples() will treat BNodes as variables
         """
         return _triples_to_bgp(self.triples(query=query))
 
@@ -260,7 +266,15 @@ class DataObject(DataUser):
             yield new_t
 
     def object_from_id(self,identifier,rdf_type=False):
-        """ Load an object from the database using its type tag """
+        """ Load an object from the database using its type and id
+
+        Parameters
+        ----------
+        identifier : rdflib.term.URIRef
+            the object's id
+        rdf_type : rdflib.term.URIRef
+            the object's type. Optional.
+        """
         # XXX: This is a class method because we need to get the conf
         # We should be able to extract the type from the identifier
         if rdf_type:
@@ -294,6 +308,7 @@ class DataObject(DataUser):
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
+        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have, for the Properties set, the same values
         :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
         """
         # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current

@@ -3,12 +3,12 @@
 Adding Data to *YOUR* OpenWorm Database
 ----------------------------------------
 
-So, you've got some biological data about the worm and you'd like to save it in PyOpenWorm,
+So, you've got some biological data about the worm and you'd like to save it in |pow|,
 but you don't know how it's done?
 
 You've come to the right place!
 
-A few biological entities (e.g., Cell, Neuron, Muscle, Worm) are pre-coded into PyOpenWorm. The full list is available in the :ref:`API <api>`.
+A few biological entities (e.g., Cell, Neuron, Muscle, Worm) are pre-coded into |pow|. The full list is available in the :ref:`API <api>`.
 If these entities already cover your use-case, then all you need to do is add values for the appropriate fields and save them. If you have data already loaded into your database, then you can load objects from it::
 
     n = Neuron()
@@ -28,7 +28,7 @@ Typically, you'll want to attach the data that you insert to entities already in
     nn.neuron(n)            # attach to the neuron network
     w.save()                # save all of the data attached to the worm
 
-It is possible to create objects without attaching them to anything and they can still be referenced by calling load on an instance of the object's class as in ``n.load()`` above. This also points out another fact: you don't have to set up the hierarchy for each insert in order for the objects to be linked to existing entities. If you have previously set up connections to an entity (e.g., ``Worm('C. briggsae')``), assuming you *only* have one such entity, you can refer to things attached to it without respecifying the hierarchy for each script. The database packaged with PyOpenWorm should have only one Worm and one Network.
+It is possible to create objects without attaching them to anything and they can still be referenced by calling load on an instance of the object's class as in ``n.load()`` above. This also points out another fact: you don't have to set up the hierarchy for each insert in order for the objects to be linked to existing entities. If you have previously set up connections to an entity (e.g., ``Worm('C. briggsae')``), assuming you *only* have one such entity, you can refer to things attached to it without respecifying the hierarchy for each script. The database packaged with |pow| should have only one Worm and one Network.
 
 Remember that once you've set up all of the data, you must save the objects. For now, this requires keeping track of top-level objects -- objects which aren't values of some other property -- and calling ``save()`` on each of them individually. This isn't too difficult to acheive
 
