@@ -1,13 +1,3 @@
-"""
-.. class:: Neuron
-
-   neuron client
-   =============
-
-   This module contains the class that defines the neuron
-
-"""
-
 import sqlite3
 import PyOpenWorm as P
 from PyOpenWorm import Cell
