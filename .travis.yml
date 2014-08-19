@@ -4,17 +4,14 @@ python:
   - "2.7"
 
 # command to install dependencies
+# had to split requirements.txt into
+#  TWO files because they install all or none
+#  and dependencies installed later don't know 
+#  about dependencies installed earlier in the process
 install:
-  - "pip install discover"
-  - "pip install rdflib"
-  - "pip install networkx"
-  - "git clone https://github.com/NeuralEnsemble/libNeuroML.git"
-  - "cd libNeuroML"
-  - "python setup.py install"
-  - "cd .."
-  - "pip install pint"
+  - "pip install -r requirements.txt"
   - "python setup.py develop"
-
+     
 
 script:  
-  - python -m unittest discover -s tests
+  - ./runtests.sh
