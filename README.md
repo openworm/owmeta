@@ -36,7 +36,6 @@ default.conf::
     {
         "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
         "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-        "sqldb" : "/home/markw/work/openworm/PyOpenWorm/db/celegans.db",
         "rdf.source" : "default",
         "rdf.store" : "Sleepycat",
         "rdf.store_conf" : "worm.db",
@@ -187,7 +186,7 @@ Returns the c. elegans connectome represented as a [NetworkX](http://networkx.gi
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
 ```
 
-More examples can be found [here](http://pyopenworm-markw.readthedocs.org/en/latest/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
+More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
 
 Why is this necessary?
 ----------------------
