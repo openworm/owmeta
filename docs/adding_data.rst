@@ -1,7 +1,7 @@
-.. _add_data:
+.. _adding_data:
 
 Adding Data to *YOUR* OpenWorm Database
-----------------------------------------
+========================================
 
 So, you've got some biological data about the worm and you'd like to save it in |pow|,
 but you don't know how it's done?
@@ -16,7 +16,7 @@ If these entities already cover your use-case, then all you need to do is add va
     for x in n.load():
         do_something_with_unc13_neuron(n)
 
-If you need additional entities it's easy to create them. Documentation for this is provided :ref:`here <mkdobj>`.
+If you need additional entities it's easy to create them. Documentation for this is provided :ref:`here <making_dataObjects>`.
 
 Typically, you'll want to attach the data that you insert to entities already in the database. This allows you to recover objects in a hierarchical fashion from the database later. ``Worm``, for instance has a property, ``neuron_network`` which points to the ``Network`` which should contain all neural cells and synaptic connections. To initialize the hiearchy you would do something like::
 

@@ -1,7 +1,7 @@
 .. _api:
 
 Draft Updates and Modifications to the PyOpenWorm API
-------------------------------------------------------
+======================================================
 
 This API will augment the existing API of `PyOpenWorm <https://github.com/openworm/PyOpenWorm/>`_, which is centered around a simple means of accessing data about the C. elegans using an object model that is based on its anatomy.  In particular it is for making statements about biological entities in the worm or querying previously made statements. In addition, statements concerning the evidence for statements (called relationships below).
 
