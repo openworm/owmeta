@@ -1,7 +1,7 @@
 .. _docs:
 
 Adding documentation
----------------------
+=====================
 Documentation for |pow| is housed in two locations: 
 
     #. In the top-level project directory as :file:`INSTALL.md` and :file:`README.md`. 
