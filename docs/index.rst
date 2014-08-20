@@ -20,6 +20,7 @@ Contents:
    sharing
    docs
    rdf_format
+   rdf_semantics
 
 Modules
 -------
