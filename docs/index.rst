@@ -19,6 +19,7 @@ Contents:
    adding_data
    sharing
    docs
+   rdf_format
 
 Modules
 -------
