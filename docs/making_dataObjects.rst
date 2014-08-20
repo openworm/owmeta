@@ -1,4 +1,4 @@
-.. _mkdobj:
+.. _making_dataObjects:
 
 Making data objects
 ====================
