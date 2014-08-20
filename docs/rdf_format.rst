@@ -1,7 +1,7 @@
 .. _rdf_format:
 
 RDF structure for |pow|
------------------------
+=======================
 
 For most use cases, it is (hopefully) not necessary to write custom queries over the RDF graph in order to work with |pow|. However, if it does become necessary it will be helpful to have an understanding of the structure of the RDF graph. Thus, a summary is given below.
 

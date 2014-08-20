@@ -1,3 +1,5 @@
+.. _evidence:
+
 Metadata in PyOpenWorm
 ======================
 
