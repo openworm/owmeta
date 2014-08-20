@@ -862,7 +862,7 @@ class DataTest(unittest.TestCase):
         c['rdf.source'] = 'serialization'
         c['rdf.serialization'] = f[1]
         c['rdf.serialization_format'] = 'trig'
-        c['rdf.store'] = 'ZODB'
+        c['rdf.store'] = 'default'
         with open(f[1],'w') as fo:
             fo.write(TD.Trig_data)
 
