@@ -24,7 +24,7 @@ and::
 
 The get() method also allows for parameterizing the query in ways specific to the Property.
 
-Relationship objects are key to the `Evidence class <#PyOpenWorm.Evidence>`_ for sourcing statements.
+Relationship objects are key to the :class:`Evidence class <.Evidence>` for sourcing statements.
 Relationships can themselves be members in a relationship, allowing for fairly complex hierarchical statements to
 be made about entities.
 
