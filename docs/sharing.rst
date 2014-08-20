@@ -1,7 +1,7 @@
 .. _sharing:
 
 Sharing Data with other users 
-------------------------------
+==============================
 
 Sharing is key to |pow|. This document covers the appropriate way to share changes with other |pow| users.
 
