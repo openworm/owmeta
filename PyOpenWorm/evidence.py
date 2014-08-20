@@ -1,11 +1,3 @@
-"""
-Created on Sun Feb 23 17:10:53 2014
-
-@author: slarson
-@author: mwatts15
-
-
-"""
 from PyOpenWorm import *
 
 class EvidenceError(Exception):
