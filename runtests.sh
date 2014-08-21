@@ -12,7 +12,7 @@ if [ $1 ] ; then
         if [ -f "$2" ] ; then
             # use nose to run with the given config file
             cp "$2" tests/_test.conf
-            nosetests tests/test.py
+            python -m unittest tests.test
         fi
     else
         python -m unittest tests.test.$1
@@ -25,7 +25,7 @@ else
         log=${x/.conf}.log
         cp $x tests/_test.conf
         echo Testing with $x
-        nosetests tests/test.py 2> $log
+        python -m unittest tests.test 2> $log
         if [ $? -ne 0 ] ; then
             test_result=1
             bad_files="$bad_files $log"
