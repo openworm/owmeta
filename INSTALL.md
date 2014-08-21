@@ -35,10 +35,6 @@ After checking out the project, tests can be run on the command line with::
 
     python -m unittest discover -s tests
 
-or if you have [ nose ](https://nose.readthedocs.org/en/latest/):
-
-    nosetests tests tests
-
 or 
 
     ./runtests.sh (mac / linux only)
