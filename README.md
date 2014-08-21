@@ -107,7 +107,7 @@ Add provenance information::
 ```python
   >>> e = P.Evidence(author='Sulston et al.', date='1983')
   >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
-  <PyOpenWorm.dataObject.Evidence_asserts at 0x27f3d50>
+  asserts=lineageName=AB alaaapalr
   >>> e.save()
 ```
 
