@@ -3,7 +3,7 @@ from PyOpenWorm import DataUser
 import traceback
 import logging as L
 
-__all__ = [ "DataObject", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
+__all__ = ["DataObject", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
 
 class X():
    pass
@@ -46,71 +46,6 @@ class DataObject(DataUser):
         Properties
 
     """
-    # Must resolve, somehow, to a set of triples that we can manipulate
-    # For instance, one or more construct query could represent the object or
-    # the triples might be stored in memory.
-    @classmethod
-    def DatatypeProperty(cls,*args,**kwargs):
-        """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
-        """
-        return cls._create_property(*args,property_type='DatatypeProperty',**kwargs)
-
-    @classmethod
-    def ObjectProperty(cls, *args,**kwargs):
-        """ Create a SimpleProperty that has a complex DataObject as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
-        value_type : type
-            The type of DataObject fro values of this property
-        """
-        return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
-
-    @classmethod
-    def _create_property(cls, linkName, owner, property_type, value_type=False):
-        #XXX This should actually get called for all of the properties when their owner
-        #    classes are defined.
-        #    The initialization, however, must happen with the owner object's creation
-        owner_class = cls
-        owner_class_name = owner_class.__name__
-        property_class_name = owner_class_name + "_" + linkName
-        if value_type == False:
-            value_type = DataObject
-
-        c = None
-        if property_class_name in _DataObjects:
-            c = _DataObjects[property_class_name]
-        else:
-            if property_type == 'ObjectProperty':
-                value_rdf_type = value_type().rdf_type
-            else:
-                value_rdf_type = False
-
-            c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
-            _DataObjects[property_class_name] = c
-            c.register()
-
-        return c(owner=owner)
-
-    @classmethod
-    def register(cls):
-        assert(issubclass(cls, DataObject))
-        _DataObjects[cls.__name__] = cls
-        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
-        cls.parents = _DataObjectsParents[cls.__name__]
-        cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
-        cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
 
     def __init__(self,ident=False,triples=False,**kwargs):
         DataUser.__init__(self,**kwargs)
@@ -304,6 +239,72 @@ class DataObject(DataUser):
         if len(x) >= 4 and x[1] == 'entities':
             return x[3]
 
+    # Must resolve, somehow, to a set of triples that we can manipulate
+    # For instance, one or more construct query could represent the object or
+    # the triples might be stored in memory.
+    @classmethod
+    def DatatypeProperty(cls,*args,**kwargs):
+        """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
+
+        Parameters
+        ----------
+        linkName : string
+            The name of this Property.
+        owner : PyOpenWorm.dataObject.DataObject
+            The name of this Property.
+        """
+        return cls._create_property(*args,property_type='DatatypeProperty',**kwargs)
+
+    @classmethod
+    def ObjectProperty(cls, *args,**kwargs):
+        """ Create a SimpleProperty that has a complex DataObject as its value
+
+        Parameters
+        ----------
+        linkName : string
+            The name of this Property.
+        owner : PyOpenWorm.dataObject.DataObject
+            The name of this Property.
+        value_type : type
+            The type of DataObject fro values of this property
+        """
+        return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
+
+    @classmethod
+    def _create_property(cls, linkName, owner, property_type, value_type=False):
+        #XXX This should actually get called for all of the properties when their owner
+        #    classes are defined.
+        #    The initialization, however, must happen with the owner object's creation
+        owner_class = cls
+        owner_class_name = owner_class.__name__
+        property_class_name = owner_class_name + "_" + linkName
+        if value_type == False:
+            value_type = DataObject
+
+        c = None
+        if property_class_name in _DataObjects:
+            c = _DataObjects[property_class_name]
+        else:
+            if property_type == 'ObjectProperty':
+                value_rdf_type = value_type().rdf_type
+            else:
+                value_rdf_type = False
+
+            c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
+            _DataObjects[property_class_name] = c
+            c.register()
+
+        return c(owner=owner)
+
+    @classmethod
+    def register(cls):
+        # NOTE: This expects that configuration has been read in and that the database is available
+        assert(issubclass(cls, DataObject))
+        _DataObjects[cls.__name__] = cls
+        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
+        cls.parents = _DataObjectsParents[cls.__name__]
+        cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
+        cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -439,6 +440,7 @@ class SimpleProperty(Property):
         if not hasattr(self,'linkName'):
             self.__class__.linkName = self.__class__.__name__ + "property"
         Property.__init__(self, name=self.linkName, **kwargs)
+        self.value_property = SimpleProperty.rdf_namespace['value']
         self.v = []
         if (self.owner==False) and hasattr(self,'owner_type'):
             self.owner = self.owner_type()
@@ -480,7 +482,6 @@ class SimpleProperty(Property):
         query=kwargs.get('query',False)
         owner_id = self.owner.identifier(query=query)
         ident = self.identifier(query=query)
-        value_property = self.conf['rdf.namespace']['SimpleProperty/value']
 
 
         if len(self.v) > 0:
@@ -490,9 +491,9 @@ class SimpleProperty(Property):
             for x in self.v:
                 try:
                     if self.property_type == 'DatatypeProperty':
-                        yield (ident, value_property, R.Literal(x))
+                        yield (ident, self.value_property, R.Literal(x))
                     elif self.property_type == 'ObjectProperty':
-                        yield (ident, value_property, x.identifier(query=query))
+                        yield (ident, self.value_property, x.identifier(query=query))
                         for t in x.triples(*args,**kwargs):
                             yield t
                 except Exception:
@@ -505,7 +506,7 @@ class SimpleProperty(Property):
             # queried.
             gv = self._graph_variable(self.linkName)
             yield (owner_id, self.link, ident)
-            yield (ident, value_property, gv)
+            yield (ident, self.value_property, gv)
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
