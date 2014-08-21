@@ -60,7 +60,6 @@ class DataObject(DataUser):
             self._triples = []
         else:
             self._triples = triples
-
         self._is_releasing_triples = False
         self.properties = []
         # Used in triples()

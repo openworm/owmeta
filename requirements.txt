@@ -3,7 +3,7 @@ BTrees==4.0.8
 Pint==0.5.2
 SPARQLWrapper==1.6.2
 ZConfig==3.0.4
-ZODB==4.0.1
+-e git://github.com/zopefoundation/ZODB#egg=ZODB
 decorator==3.4.0
 discover==0.4.0
 html5lib==0.999
