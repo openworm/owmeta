@@ -12,13 +12,9 @@ fails when attempting to instal lxml, you might try installing it separately bef
 attempting to install PyOpenWorm. At least one user has found this [Stack Overflow](http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9)
 post to be helpful.
 
-You may also experience difficulty with a mismatch between your bsddb version and the one used to create the default Sleepycat database.
+You may also experience difficulty with a mismatch between your bsddb version and the one used to create the database.
 
-If your system does not come with bsddb, you will need to install it. On MacOSX, you can follow 
-[these instructions](http://stackoverflow.com/questions/16003224/installing-bsddb-package-python) for how to install 
-the python library.
-
-If you don't have the Berkeley DB (necessary for using bsddb) you can get it from the [Oracle website](http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index-085366.html).
+If your system does not come with bsddb, you will need to install it.  On MacOSX, follow [these instructions](http://stackoverflow.com/questions/16003224/installing-bsddb-package-python)
 
     
 Uninstall
