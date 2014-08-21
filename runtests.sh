@@ -1,4 +1,6 @@
 #!/bin/bash
+
+cp tests/test_default.conf tests/_test.conf
 if [ $1 ] ; then 
     if [ "$1" = itest ] ; then 
         if [ "$2" ] ; then 
