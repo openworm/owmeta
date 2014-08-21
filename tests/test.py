@@ -844,6 +844,57 @@ class DataTest(unittest.TestCase):
         except:
             self.fail("Bad state")
 
+    def test_ZODB_persistence(self):
+        """ Should be able to init without these values """
+        c = Configure()
+        fname ='ZODB.fs'
+        c['rdf.source'] = 'ZODB'
+        c['rdf.store_conf'] = fname
+        Configureable.conf = c
+        d = Data()
+        try:
+            d.openDatabase()
+            g = make_graph(20)
+            for x in g:
+                d['rdf.graph'].add(x)
+            d.closeDatabase()
+
+            d.openDatabase()
+            self.assertEqual(20, len(list(d['rdf.graph'])))
+            d.closeDatabase()
+        except:
+            traceback.print_exc()
+            self.fail("Bad state")
+        os.unlink(fname)
+        os.unlink(fname + '.index')
+        os.unlink(fname + '.tmp')
+        os.unlink(fname + '.lock')
+
+    @unittest.skipIf((has_bsddb==False), "Sleepycat requires working bsddb")
+    def test_Sleepycat_persistence(self):
+        """ Should be able to init without these values """
+        c = Configure()
+        fname='Sleepycat_store'
+        c['rdf.source'] = 'Sleepycat'
+        c['rdf.store_conf'] = fname
+        Configureable.conf = c
+        d = Data()
+        try:
+            d.openDatabase()
+            g = make_graph(20)
+            for x in g:
+                d['rdf.graph'].add(x)
+            d.closeDatabase()
+
+            d.openDatabase()
+            self.assertEqual(20, len(list(d['rdf.graph'])))
+            d.closeDatabase()
+        except:
+            traceback.print_exc()
+            self.fail("Bad state")
+
+        subprocess.call("rm -rf "+fname, shell=True)
+
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
         """
