@@ -16,7 +16,7 @@ import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
-from rdflib.namespace import RDFS,RDF
+from rdflib.namespace import RDFS,RDF, NamespaceManager
 from datetime import datetime as DT
 import datetime
 import transaction
@@ -78,12 +78,12 @@ def grouper(iterable, n, fillvalue=None):
             break
 
 class DataUser(Configureable):
-    def __init__(self, conf = False):
-        """ An convenience wrapper for users of the database
+    """ A convenience wrapper for users of the database
 
-        Classes which use the database should inherit from DataUser.
-        """
-        Configureable.__init__(self, conf=conf)
+    Classes which use the database should inherit from DataUser.
+    """
+    def __init__(self, **kwargs):
+        Configureable.__init__(self, **kwargs)
         if not isinstance(self.conf,Data):
             raise BadConf(self)
     @property
@@ -227,6 +227,9 @@ class Data(Configure, Configureable):
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
         self.source.open()
+        nm = NamespaceManager(self['rdf.graph'])
+        self['rdf.namespace_manager'] = nm
+        self['rdf.graph'].namespace_manager = nm
 
     def closeDatabase(self):
         """ Close a the configured database """
@@ -235,9 +238,9 @@ class Data(Configure, Configureable):
     def _init_rdf_graph(self):
         # Set these in case they were left out
         c = self.conf
-        self['rdf.source'] = c.get('rdf.source', 'default')
-        self['rdf.store'] = c.get('rdf.store', 'default')
-        self['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
+        self['rdf.source'] = c['rdf.source'] = c.get('rdf.source', 'default')
+        self['rdf.store'] = c['rdf.store'] = c.get('rdf.store', 'default')
+        self['rdf.store_conf'] = c['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
 
         # XXX:The conf=self can probably be removed
         self.sources = {'sqlite' : SQLiteSource,
