@@ -47,6 +47,7 @@ class DataObject(DataUser):
 
     """
     _openSet = set()
+    _closedSet = set()
     i = 0
 
     @classmethod
@@ -60,8 +61,6 @@ class DataObject(DataUser):
         else:
             self._triples = triples
 
-        if self.__class__.__name__ == 'DataObject':
-            raise Exception()
         self._is_releasing_triples = False
         self.properties = []
         # Used in triples()
@@ -100,11 +99,13 @@ class DataObject(DataUser):
 
     @classmethod
     def addToOpenSet(cls,o):
-       cls._openSet.add(o)
+        cls._openSet.add(o)
 
     @classmethod
     def removeFromOpenSet(cls,o):
-       cls._openSet.remove(o)
+        if o not in cls._closedSet:
+            cls._openSet.remove(o)
+            cls._closedSet.add(o)
 
     @classmethod
     def _is_variable(self,uri):
@@ -170,7 +171,7 @@ class DataObject(DataUser):
                 while len(bases) > 0:
                     next_bases = set([])
                     for x in bases:
-                        t = x().rdf_type
+                        t = x.rdf_type
                         yield (ident, R.RDF['type'], t)
                         next_bases = next_bases | set(x.parents)
                     bases = next_bases
@@ -444,6 +445,9 @@ class Property(DataObject):
         raise NotImplementedError()
     def one(self):
         return next(self.get())
+
+    def hasValue(self):
+        return True
 
     def __call__(self,*args,**kwargs):
         if len(args) > 0 or len(kwargs) > 0:
