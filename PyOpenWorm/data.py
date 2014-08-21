@@ -1,4 +1,3 @@
-
 # A consolidation of the data sources for the project
 # includes:
 # NetworkX!
@@ -16,7 +15,7 @@ import hashlib
 import csv
 import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
-from rdflib.namespace import RDFS,RDF, NamespaceManager
+from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
 import datetime
 import transaction
@@ -136,6 +135,13 @@ class DataUser(Configureable):
             gr = self.conf['rdf.graph']
             for x in g:
                 gr.add(x)
+
+        if self.conf['rdf.source'] == 'ZODB':
+            # Commit the current commit
+            transaction.commit()
+            # Fire off a new one
+            transaction.begin()
+
         #for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
             #temp_graph = Graph()
             #for x in group:
@@ -559,11 +565,7 @@ class ZODBSource(RDFSource):
             transaction.abort()
         transaction.begin()
         self.graph.open(self.path)
-        self.graph._add = self.graph.add
-        def graph_add(*args,**kwargs):
-            self.graph._add(*args,**kwargs)
-            transaction.commit()
-        self.graph.add = graph_add
+        self.graph.add
 
 
     def close(self):
