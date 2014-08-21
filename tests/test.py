@@ -405,7 +405,7 @@ class DataUserTest(_DataTest):
             p = rdflib.URIRef("http://somehost.com/p%d" % i)
             o = rdflib.URIRef("http://somehost.com/o%d" % i)
             g.add((s,p,o))
-        du = DataUser(self.config)
+        du = DataUser(conf=self.config)
         du.add_statements(g)
 
 class NeuronTest(_DataTest):
@@ -824,6 +824,26 @@ class MuscleTest(_DataTest):
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
 
 class DataTest(unittest.TestCase):
+    def test_namespace_manager(self):
+        c = Configure()
+        c['rdf.source'] = 'default'
+        c['rdf.store'] = 'default'
+        Configureable.conf = c
+        d = Data()
+        d.openDatabase()
+
+        self.assertIsInstance(d['rdf.namespace_manager'], R.namespace.NamespaceManager)
+
+    def test_init_no_rdf_store(self):
+        """ Should be able to init without these values """
+        c = Configure()
+        Configureable.conf = c
+        d = Data()
+        try:
+            d.openDatabase()
+        except:
+            self.fail("Bad state")
+
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
         """

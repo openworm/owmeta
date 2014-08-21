@@ -144,7 +144,6 @@ def connect(configFile=False,
 
     # have to register the right one to disconnect...
     atexit.register(disconnect)
-    Configureable._lh = hash(Configureable.conf)
 
     DataObject.register()
     Cell.register()
