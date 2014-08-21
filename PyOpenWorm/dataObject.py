@@ -46,6 +46,12 @@ class DataObject(DataUser):
         Properties
 
     """
+    _openSet = set()
+    i = 0
+
+    @classmethod
+    def openSet(self):
+        return self._openSet
 
     def __init__(self,ident=False,triples=False,**kwargs):
         DataUser.__init__(self,**kwargs)
@@ -54,6 +60,8 @@ class DataObject(DataUser):
         else:
             self._triples = triples
 
+        if self.__class__.__name__ == 'DataObject':
+            raise Exception()
         self._is_releasing_triples = False
         self.properties = []
         # Used in triples()
@@ -69,8 +77,10 @@ class DataObject(DataUser):
             import random
             import struct
             v = struct.pack("=2f",random.random(),random.random())
-            self._id_variable = self._graph_variable(self.__class__.__name__ + v.encode('hex'))
+            cname = self.__class__.__name__
+            self._id_variable = self._graph_variable(cname + v.encode('hex'))
             self._id = self.make_identifier(v)
+        DataObject.addToOpenSet(self)
 
     def __eq__(self,other):
         return isinstance(other,DataObject) and (self.identifier() == other.identifier())
@@ -80,12 +90,21 @@ class DataObject(DataUser):
         s +=  ", ".join(str(x) for x in self.properties)
         s += ")"
         return s
+
     def __repr__(self):
         return self.__str__()
 
     def _graph_variable(self,var_name):
         """ Make a variable for storage the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
+
+    @classmethod
+    def addToOpenSet(cls,o):
+       cls._openSet.add(o)
+
+    @classmethod
+    def removeFromOpenSet(cls,o):
+       cls._openSet.remove(o)
 
     @classmethod
     def _is_variable(self,uri):
@@ -286,7 +305,7 @@ class DataObject(DataUser):
             c = _DataObjects[property_class_name]
         else:
             if property_type == 'ObjectProperty':
-                value_rdf_type = value_type().rdf_type
+                value_rdf_type = value_type.rdf_type
             else:
                 value_rdf_type = False
 
@@ -405,7 +424,7 @@ class Property(DataObject):
             self.owner.properties.append(self)
             if name:
                 setattr(self.owner, name, self)
-
+            DataObject.removeFromOpenSet(self)
         # XXX: Default implementation is a box for a value
         self._value = False
 
@@ -477,6 +496,8 @@ class SimpleProperty(Property):
     def set(self,v):
         import bisect
         bisect.insort(self.v,v)
+        if isinstance(v,DataObject):
+            DataObject.removeFromOpenSet(v)
 
     def triples(self,*args,**kwargs):
         query=kwargs.get('query',False)
