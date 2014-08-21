@@ -207,7 +207,7 @@ class DataObject(DataUser):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
         ss = set()
-        self.add_statements(self._skolemize_triples(self.triples(check_saved=ss)))
+        self.add_statements(self.triples(check_saved=ss))
 
     def _skolemize_triples(self, trips):
         # Turn all of the BNodes into concrete_identifiers
