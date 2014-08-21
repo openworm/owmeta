@@ -3,12 +3,39 @@
 PyOpenWorm
 ===========
 
-Unified data access library for data about the C. elegans anatomy and model for the OpenWorm project
+A unified, simple data access library for data & facts about c. elegans anatomy
 
 What does it do?
 ----------------
 
-Allows asking various questions about the C. elegans nervous system and sharing data about C. elegans.
+Enables a simple API for asking various questions about the cells of the C. elegans, enabling the sharing of data about C. elegans for the purpose of building a data-to-model pipeline for the OpenWorm project.
+
+Why is this necessary?
+----------------------
+
+There are many different useful ways to compute with data related to the worm.
+Different data structures have different strengths and answer different questions.
+For example, a NetworkX representation of the connectome as a complex graph enables
+questions to be asked about first and second nearest neighbors of a given neuron.
+In contrast, an RDF semantic graph representation is useful for reading and 
+writing annotations about multiple aspects of a neuron, such as what papers 
+have been written about it, multiple different properties it may have such as
+ion channels and neurotransmitter receptors.  A NeuroML representation is useful
+for answering questions about model morphology and simulation parameters.  Lastly,
+a Blender representation is a full 3D shape definition that can be used for 
+calculations in 3D space.  Further representations regarding activity patterns
+such as Neo or simulated activity can be considered as well.
+
+Using these different representations separately leads to ad hoc scripting for
+for each representation.  This presents a challenge for data integration and 
+consolidation of information in 'master' authoritative representations.  By
+creating a unified data access layer, different representations
+can become encapsulated into an abstract view.  This allows the user to work with
+objects related to the biological reality of the worm.  This has the advantage that 
+the user can forget about which representation is being used under the hood.  
+
+The worm itself has a unified sense of neurons, networks, muscles,
+ion channels, etc and so should our code.
 
 Basic Usage
 -----------
@@ -35,21 +62,6 @@ Then you can try out a few things:
   80
   # Tear down
   >>> P.disconnect()
-```
-
-default.conf::
-
-```python
-    {
-        "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-        "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-        "rdf.source" : "default",
-        "rdf.store" : "Sleepycat",
-        "rdf.store_conf" : "worm.db",
-        "user.email" : "jerry@cn.com",
-        "rdf.upload_block_statement_count" : 50,
-        "test_variable" : "test_value"
-    }
 ```
   
   
@@ -120,7 +132,7 @@ See what some evidence stated::
 
 See what neurons express some receptor::
 ```python
-  >>>n = Neuron()
+  >>>n = P.Neuron()
   >>>n.receptor("TH")
   >>>list(n.load())
   [Neuron(lineageName=, name=CEPVL, Neighbor(), Connection(), type=, receptor=, innexin=),
@@ -155,36 +167,7 @@ To get any object's possible values, use load()::
 Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
- >>> P.Worm().rdf.query(...)
- ```
-
-Use pre-made objects with custom SPARQL queries::
-```python
- >>> n = P.Neuron()
- # Get a Neuron graph pattern suitable for use in a SPARQL query
- >>> gp = n.graph_pattern(query=True)
- >>> print gp
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/lineageName> ?Neuron_lineageName6836ce3c9c85873e .
- ?Neuron_lineageName6836ce3c9c85873e <http://openworm.org/entities/SimpleProperty/value> ?lineageName .
- <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron_name> .
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/name> <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> .
- <http://openworm.org/entities/Neuron_name/8268f38298d4ce45fdaac56cada0724575774a472a6055ac40233665> <http://openworm.org/entities/SimpleProperty/value> "PVCR" .
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/type> ?Neuron_type7b9bf83eb590323f .
- ?Neuron_type7b9bf83eb590323f <http://openworm.org/entities/SimpleProperty/value> ?type .
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/receptor> ?Neuron_receptor986e983db972bd3e .
- ?Neuron_receptor986e983db972bd3e <http://openworm.org/entities/SimpleProperty/value> ?receptor .
- <http://openworm.org/entities/Neuron/cc3414e079869baf6c9ef3105545632fb8c1e3eddc2f3300311dc160> <http://openworm.org/entities/Neuron/innexin> ?Neuron_innexind9223b3f5feebd3d .
- ?Neuron_innexind9223b3f5feebd3d <http://openworm.org/entities/SimpleProperty/value> ?innexin
-
- # Run a query to get bare values
- >>> for x in n.rdf.query("SELECT DISTINCT ?name ?innexin WHERE { "+ n.graph_pattern(True) +" filter(?innexin != <http://openworm.org/entities/variable#innexin>) }"):
- ...    print x
- (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-1'))
- (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-7'))
- (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'INX-19'))
- (rdflib.term.Literal(u'AIYR'), rdflib.term.Literal(u'UNC-9'))
- # ...
+ >>> Worm().rdf.query(...)
  ```
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
@@ -196,32 +179,13 @@ Returns the c. elegans connectome represented as a [NetworkX](http://networkx.gi
 
 More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
 
-Why is this necessary?
-----------------------
 
-There are many different useful ways to compute with data related to the worm.
-Different data structures have different strengths and answer different questions.
-For example, a NetworkX representation of the connectome as a complex graph enables
-questions to be asked about first and second nearest neighbors of a given neuron.
-In contrast, an RDF semantic graph representation is useful for reading and 
-writing annotations about multiple aspects of a neuron, such as what papers 
-have been written about it, multiple different properties it may have such as
-ion channels and neurotransmitter receptors.  A NeuroML representation is useful
-for answering questions about model morphology and simulation parameters.  Lastly,
-a Blender representation is a full 3D shape definition that can be used for 
-calculations in 3D space.  Further representations regarding activity patterns
-such as Neo or simulated activity can be considered as well.
+Ease of use
+-----------
 
-Using these different representations separately leads to ad hoc scripting for
-for each representation.  This presents a challenge for data integration and 
-consolidation of information in 'master' authoritative representations.  By
-creating a unified data access layer, different representations
-can become encapsulated into an abstract view.  This allows the user to work with
-objects related to the biological reality of the worm.  This has the advantage that 
-the user can forget about which representation is being used under the hood.  
-
-The worm itself has a unified sense of neurons, networks, muscles,
-ion channels, etc and so should our code.
+This library should be easy to use and easy to install, to make it most accessible.  Python beginners should be able to get information out about c. elegans from this library.  Sytactical constructs in this library should be intuitive and easy to understand what they will return within the knowledge domain of c. elegans, 
+rather than in the programming domain of its underlying technologies.  Values that are returned should be easily interpretable and easy to read.
+Wherever possible, pure-python libraries or those with few compilation requirements, rather than those that create extra dependencies on external native libraries are used.
 
 Installation
 ------------
