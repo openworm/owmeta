@@ -107,6 +107,12 @@ class IntegrationTest(unittest.TestCase):
         """
         self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='10.1007/s00454-010-9273-0').author()))
 
+    def test_open_set(self):
+        print DataObject.openSet()
+        values('exo-skeleton')
+        values(', ex=')
+        print DataObject.openSet()
+
     def test_l(self):
         """
         Test that a property can be loaded when the owning
