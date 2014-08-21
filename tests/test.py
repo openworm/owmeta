@@ -35,7 +35,11 @@ def make_graph(size=100):
         o = rdflib.URIRef("http://somehost.com/o"+str(i))
         g.add((s,p,o))
     return g
-TEST_CONFIG = Configure.open("tests/_test.conf")
+try:
+    TEST_CONFIG = Configure.open("tests/_test.conf")
+except:
+    TEST_CONFIG = Configure.open("tests/test_default.conf")
+
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
     TestConfig = TEST_CONFIG
