@@ -565,7 +565,6 @@ class ZODBSource(RDFSource):
             transaction.abort()
         transaction.begin()
         self.graph.open(self.path)
-        self.graph.add
 
 
     def close(self):
