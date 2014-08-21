@@ -23,21 +23,19 @@ by doing
   P.disconnect()
 ```
 
-Assuming everything goes as planned, you can try out a few things:
-
 ```python
-  >>> import PyOpenWorm
+  >>> import PyOpenWorm as P
 
   # Set up
-  >>> PyOpenWorm.connect('default.conf')
+  >>> P.connect('default.conf')
   # Grabs the representation of the neuronal network
-  >>> net = PyOpenWorm.Worm().get_neuron_network()
+  >>> net = P.Worm().get_neuron_network()
   >>> list(net.aneuron('AVAL').type())
   #show how many gap junctions go in and out of AVAL
   >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
   80
   # Tear down
-  >>> PyOpenWorm.disconnect()
+  >>> P.disconnect()
 ```
 
 default.conf::
@@ -135,7 +133,7 @@ See what neurons express some receptor::
 
 To get any object's possible values, use load()::
 ```python
-  >>>list(PyOpenWorm.Neuron().load())
+  >>>list(P.Neuron().load())
   [
    ...
    Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
@@ -149,7 +147,7 @@ To get any object's possible values, use load()::
    ...
   ]
   # Properties are a little different
-  >>>next(PyOpenWorm.Neuron().receptor.load())
+  >>>next(Neuron().receptor.load())
   receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
 
 ```
@@ -157,12 +155,12 @@ To get any object's possible values, use load()::
 Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
- >>> PyOpenWorm.Worm().rdf.query(...)
+ >>> Worm().rdf.query(...)
  ```
 
 Use pre-made objects with custom SPARQL queries::
 ```python
- >>> n = PyOpenWorm.Neuron()
+ >>> n = Neuron()
  # Get a Neuron graph pattern suitable for use in a SPARQL query
  >>> gp = n.graph_pattern(query=True)
  >>> print gp
