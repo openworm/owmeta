@@ -87,7 +87,7 @@ class DataObject(DataUser):
 
     def __str__(self):
         s = self.__class__.__name__ + "("
-        s +=  ", ".join(str(x) for x in self.properties)
+        s +=  ", ".join(str(x) for x in self.properties if x.hasValue())
         s += ")"
         return s
 
@@ -467,6 +467,9 @@ class SimpleProperty(Property):
         if self.owner != False:
             # XXX: Shouldn't be recreating this here...
             self.link = self.owner_type.rdf_namespace[self.linkName]
+
+    def hasValue(self):
+        return len(self.v) > 0
 
     def get(self):
         if len(self.v) > 0:
