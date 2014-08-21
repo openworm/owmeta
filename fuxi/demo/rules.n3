@@ -2,3 +2,11 @@
 @prefix worm: <http://openworm.org/entities/>.
 
 { ?x rdf:type worm:Neuron } => { ?x rdf:type worm:Cell } .
+
+{ ?x rdf:type worm:Muscle } => { ?x rdf:type worm:Cell } .
+
+{ ?x rdf:type worm:Cell } => { ?x rdf:type worm:DataObject } .
+
+{ ?x rdf:type worm:Network } => { ?x rdf:type worm:DataObject } .
+
+{ ?x rdf:type worm:Worm } => { ?x rdf:type worm:DataObject } .
