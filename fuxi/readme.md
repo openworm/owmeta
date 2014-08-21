@@ -1,6 +1,6 @@
 #FuXi integration
 
-FuXi is implemented as a semantic reasoning layer in PyOpenWorm. Its purpose here is to reduce the number of triples explicitly stored in the PyOpenWorm database by generating new connections in the graph. This should decrease loading time and reduce the size of the database file.
+FuXi is implemented as a semantic reasoning layer in PyOpenWorm. Its purpose here is to automate the setting of various properties (ex: class-subclass relationships), rather than programming them by hand.
 
 <br>
 ## How it works
@@ -29,6 +29,6 @@ Navigate to the directory you want to install FuXi in, then do:
 <br>
 ##Files
 <br>
-* `Demo` folder contains `facts.n3` for a single Neuron object, and `rules.n3` which implements the p[seudocode described above.   
-* `test_fuxi.py` is a test script adapted from the FuXi docs that shows the rule being applied, and prints out the inferred fact.
+* `Demo` folder contains `facts.n3` for a single Neuron object, and `rules.n3` which implements the pseudocode described above.   
+* `test_fuxi.py` is a test script adapted from the FuXi docs that shows the rule being applied, and prints the inferred fact(s) to a new file.
 <br>
