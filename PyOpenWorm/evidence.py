@@ -36,6 +36,7 @@ def _json_request(url):
         return json.load(_url_request(url,headers))
     except BaseException:
         return {}
+
 class AssertsAllAbout(Property):
     def __init__(self, **kwargs):
         Property.__init__(self, 'asserts_all_about', **kwargs)
@@ -66,6 +67,10 @@ class AssertsAllAbout(Property):
         # general property pattern
         }
         """
+
+    def triples(self, **kwargs):
+        #XXX: All triples here are from ``asserts``
+        return []
 
 class Evidence(DataObject):
     """

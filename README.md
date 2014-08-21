@@ -17,27 +17,24 @@ To get started, you'll probably want to load in the database. If you cloned the 
 by doing 
 
 ```python
-  import PyOpenWorm as P
-  P.connect('PyOpenWorm/default.conf')
-  P.config()['rdf.graph'].parse('OpenWormData/out.n3', format='n3')
-  P.disconnect()
+  >>> import PyOpenWorm as P
+  >>> P.connect('PyOpenWorm/default.conf', data='OpenWormData/out.n3', dataFormat='n3')
+  >>> P.disconnect()
 ```
 
-Assuming everything goes as planned, you can try out a few things:
+Then you can try out a few things:
 
 ```python
-  >>> import PyOpenWorm
-
   # Set up
-  >>> PyOpenWorm.connect('default.conf')
+  >>> P.connect('default.conf')
   # Grabs the representation of the neuronal network
-  >>> net = PyOpenWorm.Worm().get_neuron_network()
+  >>> net = P.Worm().get_neuron_network()
   >>> list(net.aneuron('AVAL').type())
   #show how many gap junctions go in and out of AVAL
   >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
   80
   # Tear down
-  >>> PyOpenWorm.disconnect()
+  >>> P.disconnect()
 ```
 
 default.conf::
@@ -86,7 +83,7 @@ Returns the list of all neurons::
 Returns the list of all muscles::
 
 ```python
-  >>>'MDL08' in PyOpenWorm.Worm().muscles()
+  >>>'MDL08' in (x.name.one() for x in P.Worm().muscles())
   True
 ```
 
@@ -94,12 +91,13 @@ Returns the list of all muscles::
 Returns provenance information providing evidence about facts::
 
 ```python
-  >>>ader = PyOpenWorm.Neuron('ADER')
+  >>>ader = P.Neuron('ADER')
   >>>list(ader.receptors())
   ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
   #look up what reference says this neuron has a receptor EXP-1
   >>>e = Evidence()
-  >>>e.asserts(PyOpenWorm.Neuron('ADER').receptor('EXP-1')) 
+  >>>e.asserts(P.Neuron('ADER').receptor('EXP-1')) 
+  asserts=receptor=EXP-1
   >>>list(e.doi())
   ['10.100.123/natneuro']
 ```
@@ -107,15 +105,15 @@ Returns provenance information providing evidence about facts::
 Add provenance information::
 
 ```python
-  >>> e = Evidence(author='Sulston et al.', date='1983')
-  >>> e.asserts(Neuron(name="AVDL").lineageName("AB alaaapalr"))
+  >>> e = P.Evidence(author='Sulston et al.', date='1983')
+  >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
   <PyOpenWorm.dataObject.Evidence_asserts at 0x27f3d50>
   >>> e.save()
 ```
 
 See what some evidence stated::
 ```python
-  >>> e0 = Evidence(author='Sulston et al.', date='1983')
+  >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
   >>> list(e0.asserts())
   [Neuron(name=AVDL,lineageName=AB alaaapalr)]
 ```
@@ -135,7 +133,7 @@ See what neurons express some receptor::
 
 To get any object's possible values, use load()::
 ```python
-  >>>list(PyOpenWorm.Neuron().load())
+  >>>list(P.Neuron().load())
   [
    ...
    Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
@@ -149,7 +147,7 @@ To get any object's possible values, use load()::
    ...
   ]
   # Properties are a little different
-  >>>next(PyOpenWorm.Neuron().receptor.load())
+  >>>next(P.Neuron().receptor.load())
   receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
 
 ```
@@ -157,12 +155,12 @@ To get any object's possible values, use load()::
 Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
- >>> PyOpenWorm.Worm().rdf.query(...)
+ >>> P.Worm().rdf.query(...)
  ```
 
 Use pre-made objects with custom SPARQL queries::
 ```python
- >>> n = PyOpenWorm.Neuron()
+ >>> n = P.Neuron()
  # Get a Neuron graph pattern suitable for use in a SPARQL query
  >>> gp = n.graph_pattern(query=True)
  >>> print gp
