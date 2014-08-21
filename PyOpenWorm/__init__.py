@@ -108,9 +108,15 @@ def disconnect(c=False):
         c.closeDatabase()
     m.connected = False
 
+def loadData(data, dataFormat):
+    if data:
+        config()['rdf.graph'].parse(data, format=dataFormat)
+
 def connect(configFile=False,
-        conf=False,
-        do_logging=False):
+            conf=False,
+            do_logging=False,
+            data=False,
+            dataFormat='n3'):
     """ Load desired configuration and open the database """
     import logging
     import atexit
@@ -118,6 +124,7 @@ def connect(configFile=False,
     if m.connected == True:
         print "PyOpenWorm already connected"
         return
+
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -158,3 +165,5 @@ def connect(configFile=False,
     Relationship.register()
 
     m.connected = True
+    if data:
+        loadData(data, dataFormat)
