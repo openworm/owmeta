@@ -31,4 +31,4 @@ Running tests
 
 After checking out the project, tests can be run on the command line with::
 
-    python -m unittest discover -s tests
+    ./runtests.sh (mac / linux only)
