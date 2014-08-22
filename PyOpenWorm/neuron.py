@@ -1,4 +1,5 @@
 import sqlite3
+import sys
 import PyOpenWorm as P
 from PyOpenWorm import Cell
 
@@ -69,7 +70,7 @@ class Connection(P.Property):
         for x in c:
             for r in x.load():
                 yield r
-    def count(self,*args,**kwargs):
+    def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
@@ -82,7 +83,39 @@ class Connection(P.Property):
                The number of connections matching the paramters given
         """
         # XXX: Turn this into a COUNT query
-        return len(list(self.get(*args,**kwargs)))
+        options = dict()
+        options["pre"] = """
+                     ?x c:pre_cell ?z .
+                     ?z sp:value <%s> .
+                     """ % self.owner.identifier()
+        options["post"] = """
+                      ?x c:post_cell ?z .
+                      ?z sp:value <%s> .
+                      """ % self.owner.identifier()
+        options["either"] = " { %s } UNION { %s } . " % (options['post'], options['pre'])
+
+        if syntype is not None:
+            if syntype.lower() == 'gapjunction':
+                syntype='gapJunction'
+            syntype_pattern = "FILTER( EXISTS { ?x c:syntype ?v . ?v sp:value \"%s\" . }) ." % syntype
+        else:
+            syntype_pattern = ''
+
+        q = """
+        prefix ow: <http://openworm.org/entities/>
+        prefix c: <http://openworm.org/entities/Connection/>
+        prefix sp: <http://openworm.org/entities/SimpleProperty/>
+        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        SELECT (COUNT(?x) as ?count) WHERE {
+         %s
+         %s
+        }
+        """ % (options[pre_post_or_either], syntype_pattern)
+
+        res = 0
+        for x in self.conf['rdf.graph'].query(q):
+            res = x['count']
+        return int(res)
 
     def set(self, conn, **kwargs):
         """Add a connection associated with the owner Neuron
