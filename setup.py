@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from distutils.core import setup
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
@@ -8,17 +8,18 @@ with open('requirements.txt') as f:
 long_description = open("README.md").read()
 
 setup(
+    #data_files=[("",['neuroml/test/Purk2M9s.nml'])],
     install_requires=required,
     name = "PyOpenWorm",
-    version = '0.0.1-alpha',
+    version = '0.0.1',
     packages = ['PyOpenWorm', 'tests'],
+    #package_data = {'neuroml.test': ['*.nml']},
     author = "OpenWorm.org authors and contributors",
     author_email = "info@openworm.org",
     description = "A Python library for working with OpenWorm data and models",
     long_description = long_description,
     license = "BSD",
-    url="http://github.com/openworm/pyopenworm",
-    download_url = 'https://github.com/openworm/PyOpenWorm/tarball/0.0.1-alpha',
+    url="http://PyOpenWorm.readthedocs.org/en/latest/",
     classifiers = [
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
