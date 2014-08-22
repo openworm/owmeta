@@ -1,28 +1,3 @@
-#worm facts
-
+#example fact
 
 <http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Worm> .
-
-<http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/SimpleProperty> .
-
-<http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Property> .
-
-<http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/DataObject> .
-
-<http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Worm_scientific_name> .
-
-<http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://openworm.org/entities/Worm/scientific_name> <http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> .
-
-<http://openworm.org/entities/Worm_scientific_name/e69f7816b38bc49acc0c660b347c7fa13c23c3c9f05a71c447176359> <http://openworm.org/entities/SimpleProperty/value> "C. elegans" .
-
-<http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://openworm.org/entities/Worm/neuron_network> <http://openworm.org/entities/Worm_neuron_network/88b299e47e3c0506ba5a84902e8d2c27eee5c2789f7f9eca100a14f1> .
-
-<http://openworm.org/entities/Worm_neuron_network/88b299e47e3c0506ba5a84902e8d2c27eee5c2789f7f9eca100a14f1> <http://openworm.org/entities/SimpleProperty/value> ?neuron_network .
-
-<http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://openworm.org/entities/Worm/muscle> <http://openworm.org/entities/Worm_muscle/f2a7695bd74b4d91eb1eb9e5f80f2e369dbe30da1cd416b7a00407df> .
-
-<http://openworm.org/entities/Worm_muscle/f2a7695bd74b4d91eb1eb9e5f80f2e369dbe30da1cd416b7a00407df> <http://openworm.org/entities/SimpleProperty/value> ?muscle .
-
-<http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://openworm.org/entities/Worm/cell> <http://openworm.org/entities/Worm_cell/6853f69888ca6482bc94d1007ba3a389cc5a62468b233f8ec241e212> .
-
-<http://openworm.org/entities/Worm_cell/6853f69888ca6482bc94d1007ba3a389cc5a62468b233f8ec241e212> <http://openworm.org/entities/SimpleProperty/value> ?cell .

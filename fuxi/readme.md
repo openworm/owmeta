@@ -29,6 +29,8 @@ Navigate to the directory you want to install FuXi in, then do:
 <br>
 ##Files
 <br>
-* `Demo` folder contains `facts.n3` for a single Neuron object, and `rules.n3` which implements the pseudocode described above.   
-* `test_fuxi.py` is a test script adapted from the FuXi docs that shows the rule being applied, and prints the inferred fact(s) to a new file.
+`Demo` folder contains `facts.n3` with a single fact, and `rules.n3` which contains a single rule.     
 <br>
+`test_fuxi.py` is a test script adapted from the FuXi docs that shows the rule being applied, and prints the inferred fact(s) to a new file.  
+<br>
+`testrules.n3` contains the rule(s) to be applied when insert_worm is run. In this version, each muscle object is given type worm:TestClass.
