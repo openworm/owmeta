@@ -45,23 +45,26 @@ by doing
 
 ```python
   >>> import PyOpenWorm as P
-  >>> P.connect('PyOpenWorm/default.conf', data='OpenWormData/out.n3', dataFormat='n3')
+  >>> P.connect('PyOpenWorm/default.conf')
   >>> P.disconnect()
+
 ```
 
 Then you can try out a few things:
 
 ```python
   # Set up
-  >>> P.connect('default.conf')
+  >>> P.connect('PyOpenWorm/default.conf')
+
   # Grabs the representation of the neuronal network
   >>> net = P.Worm().get_neuron_network()
   >>> list(net.aneuron('AVAL').type())
-  #show how many gap junctions go in and out of AVAL
-  >>> net.aneuron('AVAL').connection.count('either',syntype='gapjunction')
-  80
-  # Tear down
-  >>> P.disconnect()
+  ['interneuron']
+
+  #show how many connections go out of AVAL
+  >>> net.aneuron('AVAL').connection.count('pre')
+  77
+
 ```
   
   
@@ -71,47 +74,57 @@ More examples
 Returns information about individual neurons::
 
 ```python
-  >>>list(net.aneuron('AVAL').name())
+  >>> list(net.aneuron('AVAL').name())
   ['AVAL']
+
   #list all known receptors
-  >>>list(net.aneuron('AVAL').receptors())
-  ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-  >>>list(net.aneuron('DD5').type())
+  >>> s = set(net.aneuron('AVAL').receptors())
+  >>> s == set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
+  True
+
+  >>> list(net.aneuron('DD5').type())
   ['motor']
-  >>>net.aneuron('PHAL').type()
+  >>> list(net.aneuron('PHAL').type())
   ['sensory']
+
   #show how many chemical synapses go in and out of AVAL
-  >>>net.aneuron('AVAL').Syn_degree()
+  >>> net.aneuron('AVAL').Syn_degree()
   74
+
 ```
 
 Returns the list of all neurons::
 
 ```python
-  >>>  len(set(net.neurons()))
+  >>> len(set(P.Neuron().load()))
   302
+
 ```
 
 Returns the list of all muscles::
 
 ```python
-  >>>'MDL08' in (x.name.one() for x in P.Worm().muscles())
+  >>> 'MDL08' in (x.name.one() for x in P.Worm().muscles())
   True
+
 ```
 
 
 Returns provenance information providing evidence about facts::
 
 ```python
-  >>>ader = P.Neuron('ADER')
-  >>>list(ader.receptors())
-  ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
+  >>> ader = P.Neuron('ADER')
+  >>> s = set(ader.receptors())
+  >>> s == set(['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1'])
+  True
+
   #look up what reference says this neuron has a receptor EXP-1
-  >>>e = Evidence()
-  >>>e.asserts(P.Neuron('ADER').receptor('EXP-1')) 
+  >>> e = P.Evidence()
+  >>> e.asserts(P.Neuron('ADER').receptor('EXP-1')) 
   asserts=receptor=EXP-1
-  >>>list(e.doi())
+  >>> list(e.doi())
   ['10.100.123/natneuro']
+
 ```
 
 Add provenance information::
@@ -121,6 +134,7 @@ Add provenance information::
   >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
   asserts=lineageName=AB alaaapalr
   >>> e.save()
+
 ```
 
 See what some evidence stated::
@@ -128,38 +142,47 @@ See what some evidence stated::
   >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
   >>> list(e0.asserts())
   [Neuron(name=AVDL,lineageName=AB alaaapalr)]
+
 ```
 
 See what neurons express some receptor::
 ```python
-  >>>n = P.Neuron()
-  >>>n.receptor("TH")
-  >>>list(n.load())
-  [Neuron(lineageName=, name=CEPVL, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=CEPVR, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=PDEL, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=PDER, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=CEPDL, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=CEPDR, Neighbor(), Connection(), type=, receptor=, innexin=)]
+  >>> n = P.Neuron()
+  >>> n.receptor("TH")
+  receptor=TH
+
+  >>> s = set(x.name.one() for x in n.load()) 
+  >>> s == set([CEPVL,CEPVR,PDEL,PDER,CEPDR])
+  True
+
 ```
 
 To get any object's possible values, use load()::
 ```python
-  >>>list(P.Neuron().load())
+  >>> list(P.Neuron().load())
+  >>>
+    set([IL1DL,
+    OLQDL,
+    OLQDL,
+    OLQDL,
+    IL1DR,
+    IL1R, 
+    AVER, 
+    AVER])
   [
    ...
-   Neuron(lineageName=, name=IL1DL, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
-   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
-   Neuron(lineageName=, name=OLQDL, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=IL1DR, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=IL1R, Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
-   Neuron(lineageName=, name=AVER, Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
+   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
+   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
+   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
+   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
    ...
   ]
   # Properties are a little different
-  >>>next(P.Neuron().receptor.load())
+  >>> next(P.Neuron().receptor.load())
   receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
 
 ```
@@ -168,13 +191,15 @@ Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
  >>> Worm().rdf.query(...)
- ```
+
+```
 
 Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
-  >>>net.as_networkx()
+  >>> net.as_networkx()
   <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
+
 ```
 
 More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
