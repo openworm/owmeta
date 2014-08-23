@@ -1,31 +1,3 @@
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/DataObject> .
+#example fact
 
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Cell/lineageName> <http://openworm.org/entities/Cell_lineageName/528a16794a542cd8721a2e81990d44b4778872fcb94dff19357dc4c2> .
-
-<http://openworm.org/entities/Cell_lineageName/528a16794a542cd8721a2e81990d44b4778872fcb94dff19357dc4c2> <http://openworm.org/entities/SimpleProperty/value> ?lineageName .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Cell/name> <http://openworm.org/entities/Cell_name/0b3f5b27b910affd3153120af30920713566795f78b07a2fc55f53f6> .
-
-<http://openworm.org/entities/Cell_name/0b3f5b27b910affd3153120af30920713566795f78b07a2fc55f53f6> <http://openworm.org/entities/SimpleProperty/value> ?name .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Cell/divisionVolume> <http://openworm.org/entities/Cell_divisionVolume/47661a5ac630b032bd673029410c90c3cdc6a6e91c76199ba60f61b6> .
-
-<http://openworm.org/entities/Cell_divisionVolume/47661a5ac630b032bd673029410c90c3cdc6a6e91c76199ba60f61b6> <http://openworm.org/entities/SimpleProperty/value> ?divisionVolume .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Cell/description> <http://openworm.org/entities/Cell_description/f2f59c1cf8f1066a9dec0678ab9c167bcb32b6df9138983c83ea739c> .
-
-<http://openworm.org/entities/Cell_description/f2f59c1cf8f1066a9dec0678ab9c167bcb32b6df9138983c83ea739c> <http://openworm.org/entities/SimpleProperty/value> ?description .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Neuron/type> <http://openworm.org/entities/Neuron_type/540bca95d6b80ace7d3f6f266f27ae72b9ccf56e99226bd743f66b88> .
-
-<http://openworm.org/entities/Neuron_type/540bca95d6b80ace7d3f6f266f27ae72b9ccf56e99226bd743f66b88> <http://openworm.org/entities/SimpleProperty/value> ?type .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Neuron/receptor> <http://openworm.org/entities/Neuron_receptor/15fdd914f7fd33484180bd01e02e4f9353594a988b57b9059e3d12fb> .
-
-<http://openworm.org/entities/Neuron_receptor/15fdd914f7fd33484180bd01e02e4f9353594a988b57b9059e3d12fb> <http://openworm.org/entities/SimpleProperty/value> ?receptor .
-
-<http://openworm.org/entities/Neuron/cb0aaa67a63878c3aece2edc772ead4236815b17dba641682048a9b3> <http://openworm.org/entities/Neuron/innexin> <http://openworm.org/entities/Neuron_innexin/0c3fc0f9fdc0e4bb3580da61ea093dc9ac8aad260dcd8152def47c40> .
-
-<http://openworm.org/entities/Neuron_innexin/0c3fc0f9fdc0e4bb3580da61ea093dc9ac8aad260dcd8152def47c40> <http://openworm.org/entities/SimpleProperty/value> ?innexin.
+<http://openworm.org/entities/Worm/ca57c2c6f9cbe28a29dc83b485068cf2daf78ffcfb5ec972f0d88303> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Worm> .
