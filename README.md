@@ -109,6 +109,12 @@ ion channels, etc and so should our code.
 Installation
 ------------
 
+From PyPi using [pip](http://pip.readthedocs.org/en/latest/installing.html):
+
+    pip install pyopenworm --pre
+    
+From source:
+
     git clone https://github.com/slarson/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
