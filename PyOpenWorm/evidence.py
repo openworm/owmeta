@@ -239,5 +239,6 @@ class Evidence(DataObject):
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
         tree = pmRequest(pmid)
-        for x in tree.findall('/eSummaryResult/DocSum/Item[@Name="AuthorList"]/Item'):
+
+        for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
             self.author(x.text)
