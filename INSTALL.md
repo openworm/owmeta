@@ -4,7 +4,6 @@ Typically the steps below should be sufficient for a successful install
 
     git clone https://github.com/openworm/PyOpenWorm.git --recursive
     cd PyOpenWorm
-    pip install -r requirements.txt
     python setup.py install
 
 However, some users have experienced difficulty installing on Mac OSX. If the install
