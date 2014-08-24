@@ -98,7 +98,7 @@ class DataUser(Configureable):
         return self.conf['rdf.graph']
 
     @rdf.setter
-    def rdf_set(self, value):
+    def rdf(self, value):
         self.conf['rdf.graph'] = value
 
     def _remove_from_store(self, g):
