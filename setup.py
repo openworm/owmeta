@@ -15,7 +15,7 @@ setup(
     install_requires=required,
     dependency_links=[
         "git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML",
-        "git://github.com/zopefoundation/ZODB.git#egg=ZODB"
+        "git://github.com/zopefoundation/ZODB.git#egg=ZODB",
         ],
     setup_requires="six==1.7.3",
     version = '0.5.0-alpha',
