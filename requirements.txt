@@ -1,7 +1,8 @@
 libneuroml
 ZODB
+Pint
+rdflib
 BTrees==4.0.8
-Pint==0.5.2
 SPARQLWrapper==1.6.2
 ZConfig==3.0.4
 decorator==3.4.0
@@ -12,7 +13,6 @@ networkx==1.9
 numpydoc==0.5
 persistent==4.0.8
 pyparsing==2.0.2
-rdflib==4.1.2
 rdflib-zodb==1.0
 requirements==0.1
 transaction==1.4.3
