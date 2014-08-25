@@ -3,12 +3,12 @@
 PyOpenWorm
 ===========
 
-Unified data access library for data about the c. elegans anatomy and model for the OpenWorm project
+Unified data access library for data about the *C. elegans* anatomy and model for the OpenWorm project.
 
 What does it do?
 ----------------
 
-Allows asking various questions about the c. elegans nervous system.
+Allows asking various questions about the *C. elegans* nervous system.
 
 Basic Usage
 -----------
