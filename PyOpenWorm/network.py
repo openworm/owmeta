@@ -18,7 +18,16 @@ class Network(DataObject):
         self.synapses = Network.ObjectProperty('synapse',owner=self,value_type=P.Connection)
         Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron)
 
-    def neurons(self):
+	def neurons(self):
+		"""
+		Get all neurons by name
+			
+		:returns: A list of all neuron names
+		:rtype: list
+		"""
+		return list(_neurons_helper())
+
+    def _neurons_helper(self):
         for x in self.neuron():
             for n in x.name():
                 yield n
