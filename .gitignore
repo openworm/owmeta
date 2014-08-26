@@ -7,4 +7,3 @@ tests/*.log
 tests/_test.conf
 db/worm.*
 worm.fs*
-six-1.7.3*
