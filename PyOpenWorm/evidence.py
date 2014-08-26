@@ -38,6 +38,7 @@ def _json_request(url):
         return {}
 
 class AssertsAllAbout(Property):
+    # TODO: Needs tests!
     def __init__(self, **kwargs):
         Property.__init__(self, 'asserts_all_about', **kwargs)
 
