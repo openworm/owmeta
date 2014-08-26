@@ -122,12 +122,12 @@ class Connection(P.Property):
 
            Parameters
            ----------
-           type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           conn : PyOpenWorm.connection.Connection
+               connection associated with the owner neuron
+
            Returns
            -------
-           list of Connection
+           A PyOpenWorm.neuron.Connection
         """
         #XXX: Should this create a Connection here instead?
         assert(isinstance(conn, P.Connection))
@@ -173,12 +173,6 @@ class Neuron(Cell):
         ### Aliases ###
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
-
-    def _write_out_db(self):
-        con = sqlite3.connect(self['sqldb'])
-        with open(self['sqldb'], 'w') as f:
-            for line in con.iterdump():
-                f.write('%s\n' % line)
 
     def GJ_degree(self):
         """Get the degree of this neuron for gap junction edges only
@@ -242,108 +236,12 @@ class Neuron(Cell):
         :returns: the type
         :rtype: str
         """
-        return self['nx'].node[self.name()]['ntype']
+        return self['nx'].node[self.name.one()]['ntype']
 
-    #def add_reference(self, type, item, pmid = None, doi = None, wormbaseid = None):
-        #"""Add a reference that provides evidence of the relationship between
-            #this neuron and one of its elements.
-
-            #Example::
-
-                #>>>aval = PyOpenWorm.Neuron('AVAL')
-               #>>>aval.receptors()
-               #['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-               ##look up what reference says this neuron has a receptor GLR-1
-               #>>>aval.get_reference(0,'GLR-1')
-               #None
-                   #>>>aval.add_reference(0,'GLR-1', doi='125.41.3/ploscompbiol',
-                           #pmid = '57182010')
-                   #>>>aval.get_reference(0,'GLR-1')
-                   #['http://dx.doi.org/125.41.3/ploscompbiol', 'http://pubmedcentral.nih.gov/57182010']
-        #:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor
-        #:param item: Name of the item
-            #:param doi: A Digital Object Identifier (DOI) that provides evidence, optional
-            #:param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
-            #:param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
-        #"""
-
-        #try:
-            #t = propertyTypes[type]
-        #except KeyError:
-            ## XXX: need logging
-            #print 'not a valid type ' + type
-            #return
-
-        #qres = self['rdf.graph'].query(
-          #"""SELECT ?this ?p ?that
-           #WHERE {
-              #?this rdfs:label '"""+self.name()+"""' .
-              #?that rdfs:label '"""+item +"""' .
-              #?this <"""+t+"""> ?that .
-              #bind (<"""+t+"""> as ?p)
-            #}""")
-        #if len(qres) > 0:
-            ##XXX: Should verify that we're given a valid uri
-            #ui = self['molecule_name'](pmid)
-            #DataUser.add_reference(self, [qres], ui)
-
-    #def get_reference(self, type, item=''):
-        #"""Get a reference back that provides the evidence that this neuron is
-           #associated with the item requested as a list of URLs.
-
-           #Example::
-
-               #>>>ader = PyOpenWorm.Neuron('ADER')
-               #>>>ader.receptors()
-             #['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
-               ##look up what reference says this neuron has a receptor EXP-1
-               #>>>ader.get_reference(0,'EXP-1')
-               #['http://dx.doi.org/10.100.123/natneuro']
-               ##look up what reference says this neuron has a neighbor DD5
-               #>>>ader.get_reference(1, 'DD5')
-               #['http://dx.doi.org/20.140.521/ploscompbiol']
-
-           #:param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor
-           #:param item: Name of the item requested, if appropriate
-           #:returns: a list of URLs that points to references
-           #:rtype: list
-        #"""
-        #try:
-            #t = propertyTypes[type]
-        #except KeyError:
-            ## XXX: need logging
-            #print 'not a valid type ' + str(type)
-            #return
-
-        #qres = self['rdf.graph'].query(
-            #"""
-            #SELECT ?prov #we want to get out the labels associated with the objects
-            #WHERE {
-                    #?node rdfs:label '"""+self.name()+"""' . #identify this neuron
-                    #?node2 rdfs:label '"""+item+"""' . #identify the argument
-                    #GRAPH ?g { #Each triple is in its own sub-graph to enable provenance
-                        ## find the triple that connects the neuron node to the receptor node
-                        ## via the 'receptor' (361) relation
-                        #?node <""" + t + """>?node2 .
-                    #}
-                  ##Triples with prov information are in the main graph only
-                  ##For the sub-graph, find the prov associated
-                  #?g <http://openworm.org/entities/text_reference> ?prov
-            #}
-            #""")
-
-        #ref = []
-        #for f in qres:
-            #s = str(f['prov'])
-            #if s != '':
-                #ref.append(s)
-
-        #return ref
-
-    # Directed graph. Getting accessible _from_ this node
 
     def get_incidents(self, type=0):
         """ Get neurons which synapse at this neuron """
+        # Directed graph. Getting accessible _from_ this node
         for item in self['nx'].in_edges_iter(self.name(),data=True):
             if 'GapJunction' in item[2]['synapse']:
                 yield item[0]
@@ -353,8 +251,5 @@ class Neuron(Cell):
 
           :rtype: libNeuroML.Neuron
        """
-    #def rdf(self):
-
-    #def peptides(self):
 
 

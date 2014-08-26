@@ -1,11 +1,15 @@
 Installation
 ============
-Typically the steps below should be sufficient for a successful install
+Typically the steps below should be sufficient for a successful install:
 
     git clone https://github.com/openworm/PyOpenWorm.git --recursive
     cd PyOpenWorm
     python setup.py install
 
+Alternatively, you can use [pip](http://pip.readthedocs.org/en/latest/installing.html):
+
+    pip install pyopenworm --pre
+    
 However, some users have experienced difficulty installing on Mac OSX. If the install
 fails when attempting to install lxml, you might try installing it separately before
 attempting to install PyOpenWorm. At least one user has found this [Stack Overflow](http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9)
