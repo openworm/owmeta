@@ -1,5 +1,6 @@
+# Makes a graph of lineage relationships from the included excel spreadsheet
 from xlrd import open_workbook
-from rdflib import Literal, URIRef, Graph,Namespace,RDFS
+from rdflib import Literal, URIRef, Graph, Namespace,RDFS
 import re
 import httplib as H
 from itertools import chain
@@ -17,10 +18,11 @@ def read(n,sheet_number,cols,start=1):
         yield l
 
 # Replace spaces with dots
-postembryonic_regex = re.compile(r"^([A-Z0-9]+)\.([a-z]+)$")
-embryonic_regex = re.compile(r"^([A-Z0-9]+) ([a-z]+)$")
-goodname_regex = re.compile(r"^([A-Z0-9]+)(:?[. ]([a-z]+))?$")
-nospace_regex = re.compile(r"^([A-Z0-9]+)([a-z]+)$")
+blast_regex = r"^([A-Z0-9_]+)"
+postembryonic_regex = re.compile(blast_regex +"\.([a-z]+)$")
+embryonic_regex = re.compile(blast_regex + " ([a-z]+)$")
+goodname_regex = re.compile(blast_regex + "(:?[. ]([a-z]+))?$")
+nospace_regex = re.compile(blast_regex + "([a-z]+)$")
 # expression for
 def normalize_lineage_name(name):
     n = str(name)
@@ -114,24 +116,47 @@ def put_in_sesame(graph, host, port=8080):
     r = con.getresponse()
     print "sesame response is %d " % r.status
 
-class D:
-    namespace = Namespace("http://openworm.org/entities/")
-d = D()
+ns = Namespace("http://openworm.org/entities/")
+
 def f(i):
-    return urlize(normalize_lineage_name(i),d.namespace)
+    return urlize(normalize_lineage_name(i),ns)
 
 def tree_graph():
     graph = Graph()
-    for i in ((f(x[0]), d.namespace[x[1]], f(x[2])) for x in triple_dev_tree()):
+    for i in ((f(x[0]), ns[x[1]], f(x[2])) for x in triple_dev_tree()):
         graph.add(i)
     return graph
 
+def tree_pygraph():
+    def f(i):
+        return normalize_lineage_name(i)
+    graph = G()
+    for i in ((f(x[2]), f(x[0])) for x in triple_dev_tree()):
+        try:
+            graph.add_nodes(i[:1])
+        except Exception, e:
+            pass
+
+        try:
+            graph.add_nodes(i[1:])
+        except Exception, e:
+            pass
+
+        try:
+            graph.add_edge(i)
+        except Exception, e:
+            pass
+
+    return graph
+
+# Shew a mapping between developmental cells and named adult cells or cell types
 def adult_dev_graph():
     graph = Graph()
     def j():
         for x in triple_adult_dev_mapping():
             if re.match(goodname_regex,x[2]):
-                yield (f(x[2]), RDFS["label"], Literal(str(x[0])))
+                yield (f(x[2]), RDFS["label"], Literal(str(x[2])))
+                yield (f(x[2]), ns["origin"], ns[str(x[0])])
     for i in j():
         graph.add(i)
     return graph
@@ -146,7 +171,14 @@ def print_serialization(g):
     print g.serialize(format="nt")
 
 if __name__ == "__main__":
-    #print_serialization(adult_dev_graph())
-    upload_adult_dev_mapping()
-    #for x in  dev_bad_names():
-        #print x
+    #g = tree_pygraph()
+    #k = 0
+    #j = 0
+    #for x in g.nodes():
+        #j +=1
+        #if len(g.incidents(x)) == 0:
+            #print x
+            #k += 1
+
+    #print k,j
+    print_serialization(adult_dev_graph())
