@@ -76,14 +76,14 @@ class Worm(DataObject):
 
             if len(self.name.v) > 0:
                 # name is already set, so we can make an identifier from it
-                n = next(self.name())
+                n = self.name.one()
                 return self.make_identifier(n)
             else:
                 return ident
         else:
             if len(self.name.v) > 0:
                 # name is already set, so we can make an identifier from it
-                n = next(self.name())
+                n = self.name.one()
                 return self.make_identifier(n)
             else:
                 return ident

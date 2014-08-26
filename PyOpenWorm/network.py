@@ -78,9 +78,3 @@ class Network(DataObject):
             yield x
 
     #def neuroml(self):
-
-    #def rdf(self):
-
-    #def networkx(self):
-
-
