@@ -45,16 +45,19 @@ by doing
 
 ```python
   >>> import PyOpenWorm as P
-  >>> P.connect()
+  >>> P.connect('PyOpenWorm/default.conf')
 
-  >>> P.loadData()
-  #...this will take a minute or two to load...
+  >>> P.loadData('OpenWormData/out.n3', 'n3')
+
+  >>> P.disconnect()
 
 ```
 
 Then you can try out a few things:
 
 ```python
+  # Set up
+  >>> P.connect('PyOpenWorm/default.conf')
 
   # Grabs the representation of the neuronal network
   >>> net = P.Worm().get_neuron_network()
@@ -64,9 +67,6 @@ Then you can try out a few things:
   #show how many connections go out of AVAL
   >>> net.aneuron('AVAL').connection.count('pre')
   77
-    
-  >>> P.disconnect() #Please use at the end of your sessions.
-
 
 ```
   
