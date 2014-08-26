@@ -18,16 +18,7 @@ class Network(DataObject):
         self.synapses = Network.ObjectProperty('synapse',owner=self,value_type=P.Connection)
         Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron)
 
-	def neurons(self):
-		"""
-		Get all neurons by name
-			
-		:returns: A list of all neuron names
-		:rtype: list
-		"""
-		return list(_neurons_helper())
-
-    def _neurons_helper(self):
+    def neurons(self):
         for x in self.neuron():
             for n in x.name():
                 yield n
@@ -82,21 +73,6 @@ class Network(DataObject):
         # TODO: make sure these belong to *this* Network
         n = P.Neuron()
         n.type('interneuron')
-
-        for x in n.load():
-            yield x
-            
-    def motor(self):
-        """
-        Get all motor neurons
-
-        :returns: A iterable of all motor neurons
-        :rtype: iter(Neuron)
-        """
-
-        # TODO: make sure these belong to *this* Network
-        n = P.Neuron()
-        n.type('motor')
 
         for x in n.load():
             yield x
