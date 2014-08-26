@@ -443,7 +443,10 @@ class Property(DataObject):
         # This should set some values and call DataObject.save()
         raise NotImplementedError()
     def one(self):
-        return next(self.get())
+        try:
+            return next(self.get())
+        except StopIteration:
+            return None
 
     def hasValue(self):
         return True
