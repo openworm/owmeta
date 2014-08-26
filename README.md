@@ -3,12 +3,12 @@
 PyOpenWorm
 ===========
 
-A unified, simple data access library for data & facts about c. elegans anatomy
+A unified, simple data access library for data & facts about *C. elegans* biology
 
 What does it do?
 ----------------
 
-Enables a simple API for asking various questions about the cells of the C. elegans, enabling the sharing of data about C. elegans for the purpose of building a data-to-model pipeline for the OpenWorm project.
+Enables a simple API for asking various questions about the cells of the *C. elegans*, enabling the sharing of data about *C. elegans* for the purpose of building a data-to-model pipeline for the OpenWorm project.
 
 Why is this necessary?
 ----------------------
