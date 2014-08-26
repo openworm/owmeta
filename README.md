@@ -18,10 +18,6 @@ See INSTALL.md
 Basic Usage
 -----------
 
-You may need to install some dependencies in order to use PyOpenWorm. These can be installed with:
-
-    python setup.py develop --user
-
 To get started, you'll probably want to load in the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
 by doing 
 
