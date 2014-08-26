@@ -76,5 +76,20 @@ class Network(DataObject):
 
         for x in n.load():
             yield x
+            
+    def motor(self):
+        """
+        Get all motor neurons
+
+        :returns: A iterable of all motor neurons
+        :rtype: iter(Neuron)
+        """
+
+        # TODO: make sure these belong to *this* Network
+        n = P.Neuron()
+        n.type('motor')
+
+        for x in n.load():
+            yield x
 
     #def neuroml(self):
