@@ -45,9 +45,9 @@ by doing
 
 ```python
   >>> import PyOpenWorm as P
-  >>> P.connect('PyOpenWorm/default.conf')
+  >>> P.connect()
 
-  >>> P.loadData('OpenWormData/out.n3', 'n3')
+  >>> P.loadData()
   #...this will take a minute or two to load...
 
 ```

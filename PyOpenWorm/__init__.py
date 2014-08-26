@@ -108,11 +108,11 @@ def disconnect(c=False):
         c.closeDatabase()
     m.connected = False
 
-def loadData(data, dataFormat):
+def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
     if data:
         config()['rdf.graph'].parse(data, format=dataFormat)
 
-def connect(configFile=False,
+def connect(configFile='PyOpenWorm/default.conf',
             conf=False,
             do_logging=False,
             data=False,
