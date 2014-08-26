@@ -31,7 +31,7 @@ Now a more ambiguous example::
 What might this mean? There's no clear relationship being discussed as in the previous examples. There are two reasonable semantics for
 these statements. They could indicate that Sulston et al. assert everything about the AVDL (in this case, only its name). Or they could
 indicate that Sulston et al. state the existence of AVDL. We will assume the semantics of the latter for *most* objects. The second
-intention can be expressed as (TODO)::
+intention can be expressed as::
 
       e = Evidence(author='Sulston et al.', date='1983')
       e.asserts_all_about(Neuron(name="AVDL"))
@@ -39,7 +39,7 @@ intention can be expressed as (TODO)::
 
 `asserts_all_about` individually asserts each of the properties of the Neuron including its existence. It does not recursively assert
 properties of values set on the AVDL Neuron. If, for instance, the Neuron had a *complex object* as the value for its receptor types with
-information about the receptor's name primary agonist, etc., `asserts_all_about` would say nothing about these. However, `asserts_all`::
+information about the receptor's name primary agonist, etc., `asserts_all_about` would say nothing about these. However, `asserts_all` (TODO)::
 
       e.asserts_all(Neuron(name="AVDL",receptor=complex_receptor_object))
 
