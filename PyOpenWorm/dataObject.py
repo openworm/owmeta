@@ -480,7 +480,7 @@ class SimpleProperty(Property):
     def get(self):
         if len(self.v) > 0:
             for x in self.v:
-                yield x
+                yield str(x)
         else:
             owner_id = self.owner.identifier(query=True)
             if DataObject._is_variable(owner_id):
