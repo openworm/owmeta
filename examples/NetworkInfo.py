@@ -1,24 +1,23 @@
-import PyOpenWorm
+import PyOpenWorm as P
 
-TestConfig = PyOpenWorm.Configure.open("../tests/test.conf")
-config = PyOpenWorm.Data(TestConfig)
+P.connect("default.conf")
 
-worm = PyOpenWorm.Worm(config)
+worm = P.Worm()
 
 net = worm.get_neuron_network()
 
 some_neuron_names = ["ADAL", "AIBL", "I1L", "I1R", "PVCR", "DB5"]
-some_neurons = [net.aneuron(name) for name in some_neuron_names]
+some_neurons = [P.Neuron(name) for name in some_neuron_names]
 
 for neuron in some_neurons:
-    print("Checking connectivity of %s"%neuron.name())
-    
+    print("Checking connectivity of %s"%neuron.name.one())
+
     for s in net.synapses():
-        type = 'G' if (s.syntype == "GapJunction") else ('I' if s.synclass in ['GABA'] else 'E') 
-        
-        if s.pre_cell == neuron.name():
+        type = 'G' if (s.syntype.one() == "GapJunction") else ('I' if s.synclass.one() in ['GABA'] else 'E')
+
+        if s.pre_cell.one() == neuron.name.one():
             print("o-> %s %s"%(type, s))
-        elif s.post_cell == neuron.name():
+        elif s.post_cell.one() == neuron.name.one():
             print("->o %s %s"%(type, s))
 
 
