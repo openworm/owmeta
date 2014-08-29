@@ -1,12 +1,8 @@
 import rdflib as R
-from PyOpenWorm import DataUser
+from PyOpenWorm import DataUser,DataObjectMapper
+import PyOpenWorm as P
 import traceback
 import logging as L
-
-__all__ = ["DataObject", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
-
-class X():
-   pass
 
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
@@ -28,11 +24,8 @@ def _triples_to_bgp(trips):
     g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
     return g
 
-_DataObjects = dict()
-# TODO: Put the subclass relationships in the database
-_DataObjectsParents = dict()
-
 # We keep a little tree of properties in here
+
 class DataObject(DataUser):
     """ An object backed by the database
 
@@ -54,14 +47,20 @@ class DataObject(DataUser):
     def openSet(self):
         return self._openSet
 
+    __metaclass__ = DataObjectMapper
+    # Must resolve, somehow, to a set of triples that we can manipulate
+    # For instance, one or more construct query could represent the object or
+    # the triples might be stored in memory.
     def __init__(self,ident=False,triples=False,**kwargs):
-        DataUser.__init__(self,**kwargs)
         if not triples:
             self._triples = []
         else:
             self._triples = triples
+
         self._is_releasing_triples = False
         self.properties = []
+        for x in self.__class__.dataObjectProperties:
+            x(owner=self)
         # Used in triples()
         self._id_is_set = False
 
@@ -95,6 +94,9 @@ class DataObject(DataUser):
     def _graph_variable(self,var_name):
         """ Make a variable for storage the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
+
+    def object_from_id(self,*args,**kwargs):
+        return self.__class__.oid(*args,**kwargs)
 
     @classmethod
     def addToOpenSet(cls,o):
@@ -165,16 +167,6 @@ class DataObject(DataUser):
             self._is_releasing_triples = True
             ident = self.identifier(query=query)
 
-            if not query:
-                bases = self.parents
-                while len(bases) > 0:
-                    next_bases = set([])
-                    for x in bases:
-                        t = x.rdf_type
-                        yield (ident, R.RDF['type'], t)
-                        next_bases = next_bases | set(x.parents)
-                    bases = next_bases
-
             yield (ident, R.RDF['type'], self.rdf_type)
 
             # For objects that are defined by triples, we can just release these.
@@ -195,7 +187,7 @@ class DataObject(DataUser):
                 pass
 
             self._is_releasing_triples = False
-
+    tcalled = 0
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
 
@@ -208,39 +200,6 @@ class DataObject(DataUser):
 
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
-
-    def _skolemize_triples(self, trips):
-        # Turn all of the BNodes into concrete_identifiers
-        for t in trips:
-            new_t = []
-            for z in t:
-                if isinstance(z,R.BNode):
-                    z = self.make_identifier(z)
-                new_t.append(z)
-            yield new_t
-
-    def object_from_id(self,identifier,rdf_type=False):
-        """ Load an object from the database using its type and id
-
-        Parameters
-        ----------
-        identifier : rdflib.term.URIRef
-            the object's id
-        rdf_type : rdflib.term.URIRef
-            the object's type. Optional.
-        """
-        # XXX: This is a class method because we need to get the conf
-        # We should be able to extract the type from the identifier
-        if rdf_type:
-            uri = rdf_type
-        else:
-            uri = identifier
-
-        cn = self._extract_class_name(uri)
-        # if its our class name, then make our own object
-        # if there's a part after that, that's the property name
-        o = _DataObjects[cn](ident=identifier)
-        return o
 
     @classmethod
     def _extract_class_name(self,uri):
@@ -257,74 +216,6 @@ class DataObject(DataUser):
         x = u.path.split('/')
         if len(x) >= 4 and x[1] == 'entities':
             return x[3]
-
-    # Must resolve, somehow, to a set of triples that we can manipulate
-    # For instance, one or more construct query could represent the object or
-    # the triples might be stored in memory.
-    @classmethod
-    def DatatypeProperty(cls,*args,**kwargs):
-        """ Create a SimpleProperty that has a simple type (string,number,etc) as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
-        """
-        return cls._create_property(*args,property_type='DatatypeProperty',**kwargs)
-
-    @classmethod
-    def ObjectProperty(cls, *args,**kwargs):
-        """ Create a SimpleProperty that has a complex DataObject as its value
-
-        Parameters
-        ----------
-        linkName : string
-            The name of this Property.
-        owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
-        value_type : type
-            The type of DataObject fro values of this property
-        """
-        return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
-
-    @classmethod
-    def _create_property(cls, linkName, owner, property_type, value_type=False):
-        #XXX This should actually get called for all of the properties when their owner
-        #    classes are defined.
-        #    The initialization, however, must happen with the owner object's creation
-        owner_class = cls
-        owner_class_name = owner_class.__name__
-        property_class_name = owner_class_name + "_" + linkName
-        if value_type == False:
-            value_type = DataObject
-
-        c = None
-        if property_class_name in _DataObjects:
-            c = _DataObjects[property_class_name]
-        else:
-            if property_type == 'ObjectProperty':
-                value_rdf_type = value_type.rdf_type
-            else:
-                value_rdf_type = False
-
-            c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
-            _DataObjects[property_class_name] = c
-            c.register()
-
-        return c(owner=owner)
-
-    @classmethod
-    def register(cls):
-        # NOTE: This expects that configuration has been read in and that the database is available
-        assert(issubclass(cls, DataObject))
-        _DataObjects[cls.__name__] = cls
-        _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
-        cls.parents = _DataObjectsParents[cls.__name__]
-        cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
-        cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
-
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
@@ -458,6 +349,7 @@ class Property(DataObject):
         else:
             return self.get(*args,**kwargs)
     # Get the property (a relationship) itself
+
 class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
@@ -480,7 +372,11 @@ class SimpleProperty(Property):
     def get(self):
         if len(self.v) > 0:
             for x in self.v:
-                yield str(x)
+                if isinstance(x, R.Literal):
+                    x = x.toPython()
+                    if isinstance(x, R.Literal):
+                        x = str(x)
+                yield x
         else:
             owner_id = self.owner.identifier(query=True)
             if DataObject._is_variable(owner_id):
@@ -515,9 +411,12 @@ class SimpleProperty(Property):
 
 
         if len(self.v) > 0:
+
             for x in Property.triples(self,*args,**kwargs):
                 yield x
+
             yield (owner_id, self.link, ident)
+
             for x in self.v:
                 try:
                     if self.property_type == 'DatatypeProperty':
@@ -593,6 +492,12 @@ class SimpleProperty(Property):
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self.v)))
+
+class DatatypeProperty(SimpleProperty):
+    pass
+
+class ObjectProperty(SimpleProperty):
+    pass
 
 
 class values(DataObject):

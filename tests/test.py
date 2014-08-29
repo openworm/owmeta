@@ -6,6 +6,7 @@ import neuroml.writers as writers
 import sys
 sys.path.insert(0,".")
 import PyOpenWorm
+import PyOpenWorm as P
 from PyOpenWorm import *
 import test_data as TD
 import networkx
@@ -96,21 +97,21 @@ class WormTest(_DataTest):
                 (ns['luke'], ns['Connection/post'], ns['185'])]
 
     def test_get_network(self):
-        w = Worm()
-        w.neuron_network(Network())
+        w = PyOpenWorm.Worm()
+        w.neuron_network(PyOpenWorm.Network())
         w.save()
-        self.assertIsInstance(Worm().get_neuron_network(), Network)
+        self.assertIsInstance(PyOpenWorm.Worm().get_neuron_network(), PyOpenWorm.Network)
 
     def test_muscles1(self):
-        w = Worm()
-        w.muscle(Muscle(name='MDL08'))
-        w.muscle(Muscle(name='MDL15'))
+        w = P.Worm()
+        w.muscle(P.Muscle(name='MDL08'))
+        w.muscle(P.Muscle(name='MDL15'))
         w.save()
-        self.assertIn(Muscle(name='MDL08'), list(Worm().muscles()))
-        self.assertIn(Muscle(name='MDL15'), list(Worm().muscles()))
+        self.assertIn(P.Muscle(name='MDL08'), list(P.Worm().muscles()))
+        self.assertIn(P.Muscle(name='MDL15'), list(P.Worm().muscles()))
 
     def test_get_semantic_net(self):
-        g0 = Worm().get_semantic_net()
+        g0 = P.Worm().get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
 
 class ConfigureTest(unittest.TestCase):
@@ -184,30 +185,30 @@ class ConfigureableTest(unittest.TestCase):
 class CellTest(_DataTest):
 
     def test_DataUser(self):
-        do = Cell('',conf=self.config)
+        do = P.Cell('',conf=self.config)
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
-        c = Cell(name="ADAL",conf=self.config)
+        c = P.Cell(name="ADAL",conf=self.config)
         c.lineageName("AB plapaaaapp")
         c.save()
-        self.assertEqual(["AB plapaaaapp"], list(Cell(name="ADAL").lineageName()))
+        self.assertEqual(["AB plapaaaapp"], list(P.Cell(name="ADAL").lineageName()))
 
     def test_same_name_same_id(self):
         """
         Test that two Cell objects with the same name have the same identifier()
         Saves us from having too many inserts of the same object.
         """
-        c = Cell(name="boots")
-        c1 = Cell(name="boots")
+        c = P.Cell(name="boots")
+        c1 = P.Cell(name="boots")
         self.assertEqual(c.identifier(),c1.identifier())
 
     def test_blast_space(self):
         """
         Test that setting the lineage name gives the blast cell.
         """
-        c = Cell(name="carrots")
+        c = P.Cell(name="carrots")
         c.lineageName("a tahsuetoahusenoatu")
         self.assertEqual(c.blast(), "a")
 
@@ -215,7 +216,7 @@ class CellTest(_DataTest):
         """
         Test that setting the lineage name gives the blast cell.
         """
-        c = Cell(name="peas")
+        c = P.Cell(name="peas")
         c.lineageName("ab.tahsuetoahusenoatu")
         self.assertEqual(c.blast(), "ab")
 
@@ -224,7 +225,7 @@ class CellTest(_DataTest):
         Test that we can get the children of a cell
         Tests for anterior, posterior, left, right, ventral, dorsal divisions
         """
-        p = Cell(name="peas")
+        p = P.Cell(name="peas")
         p.lineageName("ab.tahsuetoahusenoat")
         p.save()
 
@@ -240,7 +241,7 @@ class CellTest(_DataTest):
         for x,l in zip(c, division_directions):
             base = 'ab.tahsuetoahusenoat'
             ln = base + l
-            Cell(name=x,lineageName=ln).save()
+            P.Cell(name=x,lineageName=ln).save()
 
         names = set(str(next(x.name())) for x in p.parentOf())
         self.assertEqual(set(c), names)
@@ -249,11 +250,11 @@ class CellTest(_DataTest):
         """
         Test that we can get the parent of a cell
         """
-        p = Cell(name="peas")
+        p = P.Cell(name="peas")
         p.lineageName("ab.tahsuetoahusenoat")
         p.save()
 
-        c = Cell(name="carrots")
+        c = P.Cell(name="carrots")
         c.lineageName("ab.tahsuetoahusenoatu")
         c.save()
         parent_p = next(c.daughterOf().name())
@@ -262,7 +263,7 @@ class CellTest(_DataTest):
     @unittest.skip('Long runner')
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
-        c = Cell(name="ADAR",conf=self.config)
+        c = P.Cell(name="ADAR",conf=self.config)
         # get the morph
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
@@ -292,35 +293,52 @@ class CellTest(_DataTest):
 class DataObjectTest(_DataTest):
 
     def test_DataUser(self):
-        do = DataObject()
+        do = P.DataObject()
         self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
 
     def test_identifier(self):
         """ Test that we can set and return an identifier """
-        do = DataObject(ident="http://example.org")
+        do = P.DataObject(ident="http://example.org")
         self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
+
+    def test_call_graph_pattern_twice(self):
+        """ Be sure that we can call graph pattern on the same object multiple times and not have it die on us """
+
+        g = make_graph(20)
+        d = P.DataObject(triples=g)
+        self.assertNotEqual(0,len(d.graph_pattern()))
+        self.assertNotEqual(0,len(d.graph_pattern()))
+
+    def test_call_graph_pattern_twice_query(self):
+        """ Be sure that we can call graph pattern on the same object multiple times and not have it die on us """
+
+        g = make_graph(20)
+        d = P.DataObject(triples=g)
+        self.assertNotEqual(0,len(d.graph_pattern(True)))
+        self.assertNotEqual(0,len(d.graph_pattern(True)))
 
     @unittest.skip("Should be tracked by version control")
     def test_uploader(self):
         """ Make sure that we're marking a statement with it's uploader """
+
         g = make_graph(20)
-        r = DataObject(triples=g,conf=self.config)
+        r = P.DataObject(triples=g,conf=self.config)
         r.save()
         u = r.uploader()
         self.assertEqual(self.config['user.email'], u)
 
     def test_object_from_id(self):
-        do = DataObject(ident="http://example.org")
+        do = P.DataObject(ident="http://example.org")
         g = do.object_from_id('http://openworm.org/entities/Neuron')
-        self.assertIsInstance(g,Neuron)
+        self.assertIsInstance(g,P.Neuron)
         g = do.object_from_id('http://openworm.org/entities/Connection')
-        self.assertIsInstance(g,Connection)
+        self.assertIsInstance(g,P.Connection)
 
     @unittest.skip("Should be tracked by version control")
     def test_upload_date(self):
         """ Make sure that we're marking a statement with it's upload date """
         g = make_graph(20)
-        r = DataObject(triples=g)
+        r = P.DataObject(triples=g)
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
@@ -416,11 +434,11 @@ class DataUserTest(_DataTest):
 class NeuronTest(_DataTest):
     def setUp(self):
         _DataTest.setUp(self)
-        self.neur = lambda x : Neuron(name=x)
+        self.neur = lambda x : P.Neuron(name=x)
 
     def test_Cell(self):
         do = self.neur('BDUL')
-        self.assertTrue(isinstance(do,Cell))
+        self.assertTrue(isinstance(do,P.Cell))
 
     def test_receptors(self):
         n = self.neur('AVAL')
@@ -433,8 +451,8 @@ class NeuronTest(_DataTest):
         Test that two Neuron objects with the same name have the same identifier()
         Saves us from having too many inserts of the same object.
         """
-        c = Neuron(name="boots")
-        c1 = Neuron(name="boots")
+        c = P.Neuron(name="boots")
+        c1 = P.Neuron(name="boots")
         self.assertEqual(c.identifier(query=True),c1.identifier(query=True))
 
     def test_type(self):
@@ -457,9 +475,9 @@ class NeuronTest(_DataTest):
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 
     def test_init_from_lineage_name(self):
-        c = Neuron(lineageName="AB plapaaaap",name="ADAL")
+        c = P.Neuron(lineageName="AB plapaaaap",name="ADAL")
         c.save()
-        c = Neuron(lineageName="AB plapaaaap")
+        c = P.Neuron(lineageName="AB plapaaaap")
         self.assertEqual(next(c.name()), 'ADAL')
 
     def test_GJ_degree(self):
@@ -473,24 +491,24 @@ class NeuronTest(_DataTest):
 class NetworkTest(_DataTest):
     def setUp(s):
         _DataTest.setUp(s)
-        s.net = Network(conf=s.config)
+        s.net = P.Network(conf=s.config)
 
     def test(self):
-        self.assertTrue(isinstance(self.net,Network))
+        self.assertTrue(isinstance(self.net,P.Network))
 
     def test_aneuron(self):
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
 
     def test_neurons(self):
-        self.net.neuron(Neuron(name='AVAL'))
-        self.net.neuron(Neuron(name='DD5'))
+        self.net.neuron(P.Neuron(name='AVAL'))
+        self.net.neuron(P.Neuron(name='DD5'))
         self.assertTrue('AVAL' in self.net.neurons())
         self.assertTrue('DD5' in self.net.neurons())
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
         for x in self.net.synapse():
-            self.assertIsInstance(x,Connection)
+            self.assertIsInstance(x,P.Connection)
             break
 
     def test_as_networkx(self):
@@ -513,21 +531,21 @@ class EvidenceTest(_DataTest):
           keywords = {keyword1, keyword2},
         }
         """
-        self.assertEqual(u"Jean César", next(Evidence(bibtex=bibtex).author()))
+        self.assertEqual(u"Jean César", next(P.Evidence(bibtex=bibtex).author()))
 
     def test_pubmed_init1(self):
         """
         A pubmed uri
         """
         uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
-        self.assertIn(u"Frédéric MY", list(Evidence(pmid=uri).author()))
+        self.assertIn(u"Frédéric MY", list(P.Evidence(pmid=uri).author()))
 
     def test_pubmed_init2(self):
         """
         A pubmed id
         """
         pmid = "24098140"
-        self.assertIn(u"Frédéric MY", list(Evidence(pmid=pmid).author()))
+        self.assertIn(u"Frédéric MY", list(P.Evidence(pmid=pmid).author()))
 
     def test_pubmed_multiple_authors_list(self):
         """
@@ -535,7 +553,7 @@ class EvidenceTest(_DataTest):
         """
         pmid = "24098140"
         alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
-        self.assertEqual(set(alist), set(Evidence(pmid=pmid).author()))
+        self.assertEqual(set(alist), set(P.Evidence(pmid=pmid).author()))
 
     @unittest.skip("Fix later")
     def test_doi_init_fail_on_request_prefix(self):
@@ -543,7 +561,7 @@ class EvidenceTest(_DataTest):
         Requesting only the prefix
         """
         with self.assertRaises(EvidenceError):
-            Evidence(doi='http://dx.doi.org/10.1126')
+            P.Evidence(doi='http://dx.doi.org/10.1126')
 
     @unittest.skip("Fix later")
     def test_doi_init_fail_on_request_suffix(self):
@@ -551,26 +569,26 @@ class EvidenceTest(_DataTest):
         Requesting only the prefix
         """
         with self.assertRaises(EvidenceError):
-            Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
+            P.Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
 
     def test_wormbase_init(self):
         """ Initialize with wormbase source """
         # Wormbase lacks anything beyond the author,date format for a lot of papers
-        self.assertIn(u'Frederic et al., 2013', list(Evidence(wormbase="WBPaper00044287").author()))
+        self.assertIn(u'Frederic et al., 2013', list(P.Evidence(wormbase="WBPaper00044287").author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
         for i in range(600,610):
             wbid = 'WBPaper00044' + str(i)
-            e = Evidence(wormbase=wbid)
+            e = P.Evidence(wormbase=wbid)
             e.year()
     def test_asserts(self):
         """
         Asserting something should allow us to get it back.
         """
-        e=Evidence(wormbase='WBPaper00044600')
+        e=P.Evidence(wormbase='WBPaper00044600')
         g = make_graph(20)
-        r = Relationship(graph=g)
+        r = P.Relationship(graph=g)
         e.asserts(r)
         r.identifier = lambda **args : r.make_identifier("test")
         e.save()
@@ -579,11 +597,11 @@ class EvidenceTest(_DataTest):
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = P.Evidence(author='tom@cn.com')
+        r = P.Relationship(make_graph(10))
         e.asserts(r)
         e.save()
-        e0 = Evidence()
+        e0 = P.Evidence()
         e0.asserts(r)
         s = list(e0.load())
         author = next(s[0].author())
@@ -591,16 +609,16 @@ class EvidenceTest(_DataTest):
 
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields distinct results """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = P.Evidence(author='tom@cn.com')
+        r = P.Relationship(make_graph(10))
         e.asserts(r)
         e.save()
 
-        e1 = Evidence(year=1999)
+        e1 = P.Evidence(year=1999)
         e1.asserts(r)
         e1.save()
 
-        e0 = Evidence()
+        e0 = P.Evidence()
         e0.asserts(r)
         for x in e0.load():
             a = list(x.author())
@@ -612,16 +630,16 @@ class EvidenceTest(_DataTest):
 
     def test_asserts_query_multiple_author_matches(self):
         """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = P.Evidence(author='tom@cn.com')
+        r = P.Relationship(make_graph(10))
         e.asserts(r)
         e.save()
 
-        e1 = Evidence(author='tom@cn.com')
+        e1 = P.Evidence(author='tom@cn.com')
         e1.asserts(r)
         e1.save()
 
-        e0 = Evidence()
+        e0 = P.Evidence()
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
 
@@ -764,22 +782,22 @@ class ConnectionTest(_DataTest):
 
     def test_init(self):
         """Initialization with positional parameters"""
-        c = Connection('AVAL','ADAR',3,'send','Serotonin')
-        self.assertIsInstance(next(c.pre_cell()), Neuron)
-        self.assertIsInstance(next(c.post_cell()), Neuron)
+        c = P.Connection('AVAL','ADAR',3,'send','Serotonin')
+        self.assertIsInstance(next(c.pre_cell()), P.Neuron)
+        self.assertIsInstance(next(c.post_cell()), P.Neuron)
         self.assertEqual(next(c.number()), 3)
         self.assertEqual(next(c.syntype()), 'send')
         self.assertEqual(next(c.synclass()), 'Serotonin')
 
     def test_init_number_is_a_number(self):
         with self.assertRaises(Exception):
-            Connection(1,2,"gazillion",4,5)
+            P.Connection(1,2,"gazillion",4,5)
 
     def test_init_with_neuron_objects(self):
-        n1 = Neuron(name="AVAL")
-        n2 = Neuron(name="PVCR")
+        n1 = P.Neuron(name="AVAL")
+        n2 = P.Neuron(name="PVCR")
         try:
-            Connection(n1,n2)
+            P.Connection(n1,n2)
         except:
             self.fail("Shouldn't fail on Connection init")
 
@@ -789,9 +807,9 @@ class ConnectionTest(_DataTest):
         self.config['rdf.graph'] = g
         for t in self.trips:
             g.add(t)
-        c = Connection(conf=self.config)
+        c = P.Connection(conf=self.config)
         for x in c.load():
-            self.assertIsInstance(x,Connection)
+            self.assertIsInstance(x,P.Connection)
 
     def test_load_with_filter(self):
         # Put the appropriate triples in. Try to load them
@@ -799,34 +817,34 @@ class ConnectionTest(_DataTest):
         self.config['rdf.graph'] = g
         for t in self.trips:
             g.add(t)
-        c = Connection(pre_cell="PVCR", conf=self.config)
+        c = P.Connection(pre_cell="PVCR", conf=self.config)
         r = c.load()
         for x in r:
-            self.assertIsInstance(x,Connection)
+            self.assertIsInstance(x,P.Connection)
 
 class MuscleTest(_DataTest):
 
     def test_muscle(self):
-        self.assertTrue(isinstance(Muscle(name='MDL08'), Muscle))
+        self.assertTrue(isinstance(P.Muscle(name='MDL08'), P.Muscle))
 
     def test_innervatedBy(self):
-        m = Muscle('MDL08')
-        n = Neuron('some neuron')
+        m = P.Muscle('MDL08')
+        n = P.Neuron('some neuron')
         m.innervatedBy(n)
         m.save()
 
-        v = Muscle(name='MDL08')
-        self.assertIn(Neuron('some neuron'), list(v.innervatedBy()))
+        v = P.Muscle(name='MDL08')
+        self.assertIn(P.Neuron('some neuron'), list(v.innervatedBy()))
 
     def test_muscle_neurons(self):
         """ Should be the same as innervatedBy """
-        m = Muscle(name='MDL08')
-        neu = Neuron(name="tnnetenba")
+        m = P.Muscle(name='MDL08')
+        neu = P.Neuron(name="tnnetenba")
         m.neurons(neu)
         m.save()
 
-        m = Muscle(name='MDL08')
-        self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
+        m = P.Muscle(name='MDL08')
+        self.assertIn(P.Neuron('tnnetenba'), list(m.neurons()))
 
 class DataTest(unittest.TestCase):
     def test_namespace_manager(self):
@@ -847,6 +865,7 @@ class DataTest(unittest.TestCase):
         try:
             d.openDatabase()
         except:
+            traceback.print_exc()
             self.fail("Bad state")
 
     def test_ZODB_persistence(self):
@@ -958,9 +977,9 @@ class DataTest(unittest.TestCase):
 class PropertyTest(_DataTest):
     def test_one(self):
         """ `one` should return None if there isn't a value or just the value if there is one """
-        class T(Property):
+        class T(P.Property):
             def __init__(self):
-                Property.__init__(self)
+                P.Property.__init__(self)
                 self.b = False
 
             def get(self):
@@ -975,124 +994,82 @@ class SimplePropertyTest(_DataTest):
     def __init__(self,*args,**kwargs):
         _DataTest.__init__(self,*args,**kwargs)
         id_tests = []
+    def setUp(self):
+        _DataTest.setUp(self)
+
+        # Done dynamically to ensure that all of the PyOpenWorm setup happens before the class is created
+        class K(P.DataObject):
+            datatypeProperties = ['boots']
+            objectProperties = ['bats']
+        self.k = K
 
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
         """
         Test that two SimpleProperty objects with the same name have the same identifier()
         """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do1)
-        self.assertEqual(c.identifier(),c1.identifier())
+        do = self.k(ident=R.URIRef("http://example.org"))
+        do1 = self.k(ident=R.URIRef("http://example.org"))
+
+        self.assertEqual(do.boots.identifier(),do1.boots.identifier())
 
     def test_same_value_same_id_not_empty(self):
         """
         Test that two SimpleProperty with the same name have the same identifier()
         """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do1)
+        do = self.k(ident=R.URIRef("http://example.org"))
+        do1 = self.k(ident=R.URIRef("http://example.org"))
         do.boots('partition')
         do1.boots('partition')
-        self.assertEqual(c.identifier(),c1.identifier())
+        self.assertEqual(do.boots.identifier(),do1.boots.identifier())
 
     def test_same_value_same_id_not_empty_object_property(self):
         """
         Test that two SimpleProperty with the same name have the same identifier()
         """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        dz = DataObject(ident=R.URIRef("http://example.org/vip"))
-        dz1 = DataObject(ident=R.URIRef("http://example.org/vip"))
-        c = DataObject.ObjectProperty("boots", do)
-        c1 = DataObject.ObjectProperty("boots", do1)
-        do.boots(dz)
-        do1.boots(dz1)
-        self.assertEqual(c.identifier(),c1.identifier())
+        do = self.k(ident=R.URIRef("http://example.org"))
+        do1 = self.k(ident=R.URIRef("http://example.org"))
+        dz = self.k(ident=R.URIRef("http://example.org/vip"))
+        dz1 = self.k(ident=R.URIRef("http://example.org/vip"))
+        do.bats(dz)
+        do1.bats(dz1)
+        self.assertEqual(do.bats.identifier(),do1.bats.identifier())
 
     def test_diff_value_diff_id_not_empty(self):
         """
         Test that two SimpleProperty with the same name have the same identifier()
         """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do1)
+        do = self.k(ident=R.URIRef("http://example.org"))
+        do1 = self.k(ident=R.URIRef("http://example.org"))
         do.boots('join')
         do1.boots('partition')
-        self.assertNotEqual(c.identifier(),c1.identifier())
-
-    def test_diff_prop_same_name_same_object_same_value_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
-        # why would you ever do this?
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do)
-        c('join')
-        c1('join')
-        self.assertEqual(c.identifier(),c1.identifier())
-
-    def test_diff_prop_same_name_same_object_diff_value_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
-        # why would you ever do this?
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do)
-        c('partition')
-        c1('join')
-        self.assertNotEqual(c.identifier(),c1.identifier())
-
-    def test_diff_value_insert_order_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        c = DataObject.DatatypeProperty("boots", do)
-        c1 = DataObject.DatatypeProperty("boots", do1)
-        do.boots('join')
-        do.boots('simile')
-        do.boots('partition')
-        do1.boots('partition')
-        do1.boots('join')
-        do1.boots('simile')
-        self.assertEqual(c.identifier(),c1.identifier())
+        self.assertNotEqual(do.boots.identifier(),do1.boots.identifier())
 
     def test_diff_value_insert_order_same_id_object_property(self):
         """
         Test that two SimpleProperty with the same name have the same identifier()
         """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        do1 = DataObject(ident=R.URIRef("http://example.org"))
-        oa = DataObject(ident=R.URIRef("http://example.org/a"))
-        ob = DataObject(ident=R.URIRef("http://example.org/b"))
-        oc = DataObject(ident=R.URIRef("http://example.org/c"))
+        do = self.k(ident=R.URIRef("http://example.org"))
+        do1 = self.k(ident=R.URIRef("http://example.org"))
+        oa = self.k(ident=R.URIRef("http://example.org/a"))
+        ob = self.k(ident=R.URIRef("http://example.org/b"))
+        oc = self.k(ident=R.URIRef("http://example.org/c"))
 
-        c = DataObject.ObjectProperty("boots", do)
-        c1 = DataObject.ObjectProperty("boots", do1)
-
-        do.boots(oa)
-        do.boots(ob)
-        do.boots(oc)
-        do1.boots(oc)
-        do1.boots(oa)
-        do1.boots(ob)
-        self.assertEqual(c.identifier(),c1.identifier())
+        do.bats(oa)
+        do.bats(ob)
+        do.bats(oc)
+        do1.bats(oc)
+        do1.bats(oa)
+        do1.bats(ob)
+        self.assertEqual(do.bats.identifier(),do1.bats.identifier())
 
     def test_triples_with_no_value(self):
         """ Test that when there is no value set for a property, it still yields triples """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-        class T(SimpleProperty):
+        do = P.DataObject(ident=R.URIRef("http://example.org"))
+        class T(P.SimpleProperty):
             property_type = 'DatatypeProperty'
             linkName = 'test'
-            owner_type = DataObject
+            owner_type = P.DataObject
 
         sp = T(owner=do)
         self.assertNotEqual(len(list(sp.triples())), 0)

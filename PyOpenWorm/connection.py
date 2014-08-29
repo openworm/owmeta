@@ -23,6 +23,12 @@ class Connection(Relationship):
     synclass : string, optional
         The kind of Neurotransmitter (if any) sent between `pre_cell` and `post_cell`
     """
+    datatypeProperties = ['syntype',
+            'synclass',
+            'number',]
+    objectProperties = [('pre_cell',P.Neuron),
+            ('post_cell',P.Neuron)]
+
     def __init__(self,
                  pre_cell=None,
                  post_cell=None,
@@ -31,12 +37,6 @@ class Connection(Relationship):
                  synclass=None,
                  **kwargs):
         Relationship.__init__(self,**kwargs)
-
-        Connection.DatatypeProperty('syntype',owner=self)
-        Connection.DatatypeProperty('synclass',owner=self)
-        Connection.DatatypeProperty('number',owner=self)
-        Connection.ObjectProperty('pre_cell',owner=self, value_type=Neuron)
-        Connection.ObjectProperty('post_cell',owner=self, value_type=Neuron)
 
         if isinstance(pre_cell,P.Neuron):
             self.pre_cell(pre_cell)

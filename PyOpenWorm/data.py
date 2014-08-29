@@ -7,13 +7,8 @@
 # Works like Configure:
 # Inherit from the DataUser class to access data of all kinds (listed above)
 
-import sqlite3
-import networkx as nx
-import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
+
 import hashlib
-import csv
-import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
@@ -22,6 +17,7 @@ import transaction
 import os
 import traceback
 import logging as L
+from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 
 __all__ = ["Data", "DataUser", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
 
@@ -237,6 +233,8 @@ class Data(Configure, Configureable):
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
 
+        nm.bind("", self['rdf.namespace'])
+
     def closeDatabase(self):
         """ Close a the configured database """
         self.source.close()
@@ -267,6 +265,9 @@ class Data(Configure, Configureable):
         return URIRef(self.molecule_namespace[hashlib.sha224(str(data)).hexdigest()])
 
     def _init_networkX(self):
+        import networkx as nx
+        import csv
+        import urllib2
         g = nx.DiGraph()
 
         # Neuron table
@@ -302,7 +303,7 @@ def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
-class RDFSource(Configureable,PyOpenWorm.ConfigValue):
+class RDFSource(Configureable,ConfigValue):
     """ Base class for data sources.
 
     Alternative sources should dervie from this class
@@ -456,6 +457,7 @@ class SQLiteSource(RDFSource):
     Leaving ``rdf.store`` unconfigured simply gives an in-memory data store.
     """
     def open(self):
+        import sqlite3
         conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
 

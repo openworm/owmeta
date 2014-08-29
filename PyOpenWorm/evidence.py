@@ -110,6 +110,16 @@ class Evidence(DataObject):
     year : string or int
         The date (e.g., publication date) of the evidence
     """
+    fields = ['author',
+            'year',
+            'title',
+            'doi',
+            'wbid',
+            'pmid',
+            'uri']
+    objectProperties = ['asserts']
+    datatypeProperties = fields
+
     def __init__(self, conf=False, **source):
         # The type of the evidence (a paper, a lab, a uri) is
         # determined by the `source` key
@@ -124,18 +134,7 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf=conf)
         self._fields = dict()
-        Evidence.ObjectProperty('asserts', owner=self)
         AssertsAllAbout(owner=self)
-        fields = ('author',
-                'year',
-                'title',
-                'doi',
-                'wbid',
-                'pmid',
-                'uri')
-        for x in fields:
-            Evidence.DatatypeProperty(x, owner=self)
-
         #XXX: I really don't like putting these in two places
         for k in source:
             if k in ('pubmed', 'pmid'):
@@ -152,7 +151,7 @@ class Evidence(DataObject):
                 self.doi(source[k])
             if k in ('bibtex',):
                 self._fields['bibtex'] = source[k]
-            if k in fields:
+            if k in self.fields:
                 getattr(self,k)(source[k])
 
     def add_data(self, k, v):
