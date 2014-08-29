@@ -104,6 +104,8 @@ def disconnect(c=False):
 
     if c == False:
         c = Configureable.conf
+    # Note that `c' could be set in one of the previous branches;
+    # don't try to simplify this logic.
     if c != False:
         c.closeDatabase()
     m.connected = False

@@ -1098,5 +1098,9 @@ class SimplePropertyTest(_DataTest):
         self.assertNotEqual(len(list(sp.triples())), 0)
         self.assertNotEqual(len(list(sp.triples(query=True))), 0)
 
+class QueryTest(_DataTest):
+    def test_litto(self):
+        """ Test that we can query for neuron names """
+
 class NeuroMLTest(_DataTest):
     pass
