@@ -159,7 +159,7 @@ See what neurons express some receptor::
   receptor=TH
 
   >>> s = set(x.name.one() for x in n.load()) 
-  >>> s == set([CEPVL,CEPVR,PDEL,PDER,CEPDR])
+  >>> s == set(['CEPVL','CEPVR','PDEL','PDER','CEPDR'])
   True
 
 ```
@@ -168,14 +168,14 @@ To get any object's possible values, use load()::
 ```python
   >>> list(P.Neuron().load())
   >>>
-    set([IL1DL,
-    OLQDL,
-    OLQDL,
-    OLQDL,
-    IL1DR,
-    IL1R, 
-    AVER, 
-    AVER])
+    set(['IL1DL',
+    'OLQDL',
+    'OLQDL',
+    'OLQDL',
+    'IL1DR',
+    'IL1R', 
+    'AVER', 
+    'AVER'])
   [
    ...
    Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
