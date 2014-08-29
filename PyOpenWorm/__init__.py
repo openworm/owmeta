@@ -57,7 +57,8 @@ __author__ = 'Stephen Larson'
 
 import traceback
 from .configure import Configure,Configureable,ConfigValue,BadConf
-from .data import Data,DataUser,propertyTypes
+from .data import Data
+from .dataUser import DataUser
 from .mapper import DataObjectMapper
 from .quantity import Quantity
 

@@ -17,188 +17,9 @@ import transaction
 import os
 import traceback
 import logging as L
-from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
+from .configure import Configureable, Configure, ConfigValue, BadConf
 
-__all__ = ["Data", "DataUser", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
-
-class _B(ConfigValue):
-    def __init__(self, f):
-        self.v = False
-        self.f = f
-
-    def get(self):
-        if not self.v:
-            self.v = self.f()
-
-        return self.v
-    def invalidate(self):
-        self.v = False
-
-ZERO = datetime.timedelta(0)
-class _UTC(datetime.tzinfo):
-    """UTC"""
-
-    def utcoffset(self, dt):
-        return ZERO
-
-    def tzname(self, dt):
-        return "UTC"
-
-    def dst(self, dt):
-        return ZERO
-utc = _UTC()
-
-propertyTypes = {"send" : 'http://openworm.org/entities/356',
-        "Neuropeptide" : 'http://openworm.org/entities/354',
-        "Receptor" : 'http://openworm.org/entities/361',
-        "is a" : 'http://openworm.org/entities/1515',
-        "neuromuscular junction" : 'http://openworm.org/entities/1516',
-        "Innexin" : 'http://openworm.org/entities/355',
-        "Neurotransmitter" : 'http://openworm.org/entities/313',
-        "gap junction" : 'http://openworm.org/entities/357'}
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    while True:
-        l = []
-        try:
-            for x in args:
-                l.append(next(x))
-        except:
-            pass
-        yield l
-        if len(l) < n:
-            break
-
-class DataUser(Configureable):
-    """ A convenience wrapper for users of the database
-
-    Classes which use the database should inherit from DataUser.
-    """
-    def __init__(self, **kwargs):
-        Configureable.__init__(self, **kwargs)
-        if not isinstance(self.conf,Data):
-            raise BadConf("Not a Data instance: "+ str(self.conf))
-    @property
-    def base_namespace(self):
-        return self.conf['rdf.namespace']
-
-    @base_namespace.setter
-    def base_namespace_set(self, value):
-        self.conf['rdf.namespace'] = value
-
-    @property
-    def rdf(self):
-        return self.conf['rdf.graph']
-
-    @rdf.setter
-    def rdf(self, value):
-        self.conf['rdf.graph'] = value
-
-    def _remove_from_store(self, g):
-        # Note the assymetry with _add_to_store. You must add actual elements, but deletes
-        # can be performed as a query
-        for group in grouper(g, 1000):
-            temp_graph = Graph()
-            for x in group:
-                if x is not None:
-                    temp_graph.add(x)
-                else:
-                    break
-            s = " DELETE DATA {" + temp_graph.serialize(format="nt") + " } "
-            L.debug("deleting. s = " + s)
-            self.conf['rdf.graph'].update(s)
-
-    def _add_to_store(self, g, graph_name=False):
-        if self.conf['rdf.store'] == 'SPARQLUpdateStore':
-            # XXX With Sesame, for instance, it is probably faster to do a PUT with over
-            #     the endpoint's rest interface. Just need to do it for some common endpoints
-
-            try:
-                gs = g.serialize(format="nt")
-            except:
-                gs = _triples_to_bgp(g)
-
-            if graph_name:
-                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + gs + " } } "
-            else:
-                s = " INSERT DATA { " + gs + " } "
-                L.debug("update query = " + s)
-                self.conf['rdf.graph'].update(s)
-        else:
-            gr = self.conf['rdf.graph']
-            for x in g:
-                gr.add(x)
-
-        if self.conf['rdf.source'] == 'ZODB':
-            # Commit the current commit
-            transaction.commit()
-            # Fire off a new one
-            transaction.begin()
-
-        #for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
-            #temp_graph = Graph()
-            #for x in group:
-                #if x is not None:
-                    #temp_graph.add(x)
-                #else:
-                    #break
-            #if graph_name:
-                #s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
-            #else:
-                #s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
-            #L.debug("update query = " + s)
-            #self.conf['rdf.graph'].update(s)
-
-    def add_reference(self, g, reference_iri):
-        """
-        Add a citation to a set of statements in the database
-        :param triples: A set of triples to annotate
-        """
-        new_statements = Graph()
-        ns = self.conf['rdf.namespace']
-        for statement in g:
-            statement_node = self._reify(new_statements,statement)
-            new_statements.add((URIRef(reference_iri), ns['asserts'], statement_node))
-
-        self.add_statements(g + new_statements)
-
-    #def _add_unannotated_statements(self, graph):
-    # A UTC class.
-
-    def retract_statements(self, graph):
-        """
-        Remove a set of statements from the database.
-        :param graph: An iterable of triples
-        """
-        self._remove_from_store_by_query(graph)
-    def _remove_from_store_by_query(self, q):
-        import logging as L
-        s = " DELETE WHERE {" + q + " } "
-        L.debug("deleting. s = " + s)
-        self.conf['rdf.graph'].update(s)
-
-    def add_statements(self, graph):
-        """
-        Add a set of statements to the database.
-        Annotates the addition with uploader name, etc
-        :param graph: An iterable of triples
-        """
-        self._add_to_store(graph)
-
-    def _reify(self,g,s):
-        """
-        Add a statement object to g that binds to s
-        """
-        n = self.conf['new_graph_uri'](s)
-        g.add((n, RDF['type'], RDF['Statement']))
-        g.add((n, RDF['subject'], s[0]))
-        g.add((n, RDF['predicate'], s[1]))
-        g.add((n, RDF['object'], s[2]))
-        return n
-
+__all__ = ["Data", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
 
 class Data(Configure, Configureable):
     """
@@ -215,8 +36,8 @@ class Data(Configure, Configureable):
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
+        self.link('molecule_name', 'new_graph_uri')
         self['molecule_name'] = self._molecule_hash
-        self['new_graph_uri'] = self._molecule_hash
 
     @classmethod
     def open(cls,file_name):
@@ -303,17 +124,14 @@ def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
-class RDFSource(Configureable,ConfigValue):
+class RDFSource(ConfigValue,Configureable):
     """ Base class for data sources.
 
     Alternative sources should dervie from this class
     """
-    i = 0
     def __init__(self, **kwargs):
-        if self.i == 1:
-            raise Exception(self.i)
-        self.i+=1
         Configureable.__init__(self, **kwargs)
+        ConfigValue.__init__(self, **kwargs)
         self.graph = False
 
     def get(self):
@@ -401,14 +219,6 @@ class TrixSource(SerializationSource):
         self.conf.link('rdf.serialization','trix_location')
         self.conf['rdf.serialization'] = h
         self.conf['rdf.serialization_format'] = 'trix'
-
-def _rdf_literal_to_gp(x):
-    return x.n3()
-
-def _triples_to_bgp(trips):
-    # XXX: Collisions could result between the variable names of different objects
-    g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
-    return g
 
 class SPARQLSource(RDFSource):
     """ Reads from and queries against a remote data store
@@ -587,3 +397,31 @@ class ZODBSource(RDFSource):
         self.conn.close()
         self.zdb.close()
         self.graph = False
+
+ZERO = datetime.timedelta(0)
+class _UTC(datetime.tzinfo):
+    """UTC"""
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return ZERO
+utc = _UTC()
+
+class _B(ConfigValue):
+    def __init__(self, f):
+        self.v = False
+        self.f = f
+
+    def get(self):
+        if not self.v:
+            self.v = self.f()
+
+        return self.v
+    def invalidate(self):
+        self.v = False
+

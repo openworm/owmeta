@@ -361,15 +361,6 @@ class DataUserTest(_DataTest):
         """ Should suceed if the default configuration is a Data object """
         DataUser(conf=False)
 
-    def test_init_config_no_Data(self):
-        """ Should fail if given a non-Data configuration """
-        # XXX: This test touches some machinery in
-        # PyOpenWorm/__init__.py. Feel like it's a bad test
-        tmp = Configureable.conf
-        Configureable.conf = Configure()
-        with self.assertRaises(BadConf):
-            DataUser()
-        Configureable.conf = tmp
     @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
@@ -430,6 +421,17 @@ class DataUserTest(_DataTest):
             g.add((s,p,o))
         du = DataUser(conf=self.config)
         du.add_statements(g)
+
+class DataUserTestToo(unittest.TestCase):
+    def test_init_config_no_Data(self):
+        """ Should fail if given a non-Data configuration """
+        # XXX: This test touches some machinery in
+        # PyOpenWorm/__init__.py. Feel like it's a bad test
+        tmp = Configureable.conf
+        Configureable.conf = Configure()
+        with self.assertRaises(BadConf):
+            DataUser()
+        Configureable.conf = tmp
 
 class NeuronTest(_DataTest):
     def setUp(self):
@@ -859,7 +861,9 @@ class DataTest(unittest.TestCase):
 
     def test_init_no_rdf_store(self):
         """ Should be able to init without these values """
-        c = Configure()
+        # XXX: If I don't provide some random config value here, this test doesn't work
+        #      I have no idea why.
+        c = Configure(nothing='something')
         Configureable.conf = c
         d = Data()
         try:
