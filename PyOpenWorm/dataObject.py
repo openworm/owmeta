@@ -1,12 +1,10 @@
 import rdflib as R
-from PyOpenWorm import DataUser
+from .data import DataUser
+from .configure import BadConf
 import traceback
 import logging as L
 
-__all__ = ["DataObject", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
-
-class X():
-   pass
+__all__ = ["DataObject", "Property", "SimpleProperty", "values"]
 
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
@@ -29,10 +27,8 @@ def _triples_to_bgp(trips):
     return g
 
 _DataObjects = dict()
-# TODO: Put the subclass relationships in the database
 _DataObjectsParents = dict()
 
-# We keep a little tree of properties in here
 class DataObject(DataUser):
     """ An object backed by the database
 
@@ -55,7 +51,11 @@ class DataObject(DataUser):
         return self._openSet
 
     def __init__(self,ident=False,triples=False,**kwargs):
-        DataUser.__init__(self,**kwargs)
+        try:
+            DataUser.__init__(self,**kwargs)
+        except BadConf, e:
+            raise Exception("You may need to connect to a database before continuing.")
+
         if not triples:
             self._triples = []
         else:
@@ -208,16 +208,6 @@ class DataObject(DataUser):
 
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
-
-    def _skolemize_triples(self, trips):
-        # Turn all of the BNodes into concrete_identifiers
-        for t in trips:
-            new_t = []
-            for z in t:
-                if isinstance(z,R.BNode):
-                    z = self.make_identifier(z)
-                new_t.append(z)
-            yield new_t
 
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id
@@ -480,7 +470,11 @@ class SimpleProperty(Property):
     def get(self):
         if len(self.v) > 0:
             for x in self.v:
-                yield str(x)
+                if isinstance(x, R.Literal):
+                    x = x.toPython()
+                    if isinstance(x, R.Literal):
+                        x = str(x)
+                yield x
         else:
             owner_id = self.owner.identifier(query=True)
             if DataObject._is_variable(owner_id):
