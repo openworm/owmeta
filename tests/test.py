@@ -62,6 +62,12 @@ class _DataTest(unittest.TestCase):
                 raise e
     def setUp(self):
         # Set do_logging to True if you like walls of text
+        td = '__tempdir__'
+        z=self.TestConfig['rdf.store_conf']
+        if z.startswith(td):
+            x = z[len(td):]
+            h=tempfile.mkdtemp()
+            self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
         PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
 
@@ -185,7 +191,7 @@ class CellTest(_DataTest):
 
     def test_DataUser(self):
         do = Cell('',conf=self.config)
-        self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
+        self.assertTrue(isinstance(do,DataUser))
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
@@ -324,6 +330,12 @@ class DataObjectTest(_DataTest):
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
+
+class DataObjectTestToo(unittest.TestCase):
+    def test_helpful_message_on_non_connection(self):
+        """ The message should say something about connecting """
+        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
+            do = DataObject()
 
 class DataUserTest(_DataTest):
 
