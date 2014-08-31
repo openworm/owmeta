@@ -6,6 +6,8 @@ PyOpenWorm
 
 OpenWorm Unified Data Abstract Layer.
 
+An introduction to PyOpenWorm can be found in the README on our `Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
+
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
 will query against the database for the value or values that are related to ``a`` through ``B``;
