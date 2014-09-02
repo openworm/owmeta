@@ -215,6 +215,18 @@ This library should be easy to use and easy to install, to make it most accessib
 rather than in the programming domain of its underlying technologies.  Values that are returned should be easily interpretable and easy to read.
 Wherever possible, pure-python libraries or those with few compilation requirements, rather than those that create extra dependencies on external native libraries are used.
 
+Versioning data as code
+-----------------------
+As the underlying data sets that define the c. elegans anatomy change over time, these 
+changes can often break a library that attempts to reliably expose those data.  This is 
+because data changes can cause queries to return different answers than before, causing
+unit tests that rely on those answers to no longer correctly return.  As such, to create
+a stable foundational library for others to reuse, the version of the PyOpenWorm library 
+guarantees the user a specific version of the data behind that library.  As data
+are improved, the maintainers of the library can perform appropriate regression tests
+prior to each new release to guarantee stability.
+
+
 Installation
 ------------
 
