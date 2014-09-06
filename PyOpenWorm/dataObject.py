@@ -328,10 +328,13 @@ class DataObject(DataUser):
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
-        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have, for the Properties set, the same values
-        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have,
+        for the Properties set, the same values
+        :param self: An object which limits the set of objects which can be returned. Should have the configuration
+                     necessary to do the query
         """
-        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
+        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that
+        # can make objects in the current
         # graph and convert them into objects of the type of the querying object.
         #
         gp = self.graph_pattern(query=True)
