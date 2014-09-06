@@ -76,22 +76,6 @@ __import__('__main__').connected = False
 def config():
     return Configureable.conf
 
-def useTestConfig():
-    cfg = {
-            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-            "rdf.source" : "default",
-            "rdf.store" : "Sleepycat",
-            "rdf.store_conf" : "db/worm.db",
-            "user.email" : "jerry@cn.com",
-            "rdf.upload_block_statement_count" : 50,
-            "test_variable" : "test_value"
-          }
-
-    for x in cfg:
-        Configureable.conf[x] = cfg[x]
-    Configureable.conf = Data(Configureable.conf)
-
 def loadConfig(f):
     """ Load configuration for the module """
     Configureable.conf = Data.open(f)
