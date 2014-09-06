@@ -74,15 +74,18 @@ from .connection import Connection
 __import__('__main__').connected = False
 
 def config():
+    """ Gets the main configuration for the whole PyOpenWorm library.
+    :return: the instance of the Configure class currently operating.
+    """
     return Configureable.conf
 
 def loadConfig(f):
-    """ Load configuration for the module """
+    """ Load configuration for the module. """
     Configureable.conf = Data.open(f)
     return Configureable.conf
 
 def disconnect(c=False):
-    """ Close the database """
+    """ Close the database. """
     m = __import__('__main__')
     if not m.connected:
         return
@@ -94,6 +97,11 @@ def disconnect(c=False):
     m.connected = False
 
 def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
+    """ Load data into the underlying database of this library.
+    :param data: (Optional) Specify the file to load into the library
+    :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
+    :return:
+    """
     if data:
         sys.stderr.write("Loading data into the graph; this may take several minutes!!")
         sys.stderr.write("have you checked out the docs on http://pyopenworm.readthedocs.org ? :)")
@@ -104,7 +112,15 @@ def connect(configFile='PyOpenWorm/default.conf',
             do_logging=False,
             data=False,
             dataFormat='n3'):
-    """ Load desired configuration and open the database """
+    """
+     Load desired configuration and open the database
+    :param configFile: (Optional) The configuration file for PyOpenWorm
+    :param conf: (Optional) If true, initializes a data object with the PyOpenWorm configuration
+    :param do_logging: (Optional) If true, turn on debug level logging
+    :param data: (Optional) If provided, specify the file to load into the library
+    :param dataFormat: (Optional) If provided, specify the file format to load into the library. Currently n3 is supported
+    :return:
+    """
     import logging
     import atexit
     m = __import__('__main__')
