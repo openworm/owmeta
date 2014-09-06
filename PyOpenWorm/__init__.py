@@ -56,6 +56,7 @@ __version__ = '0.5.0-alpha'
 __author__ = 'Stephen Larson'
 
 import traceback
+import sys
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import *
@@ -110,6 +111,7 @@ def disconnect(c=False):
 
 def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
     if data:
+        sys.stderr.write("Loading data into the graph; this may take several minutes!")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
 def connect(configFile='PyOpenWorm/default.conf',
