@@ -111,7 +111,8 @@ def disconnect(c=False):
 
 def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
     if data:
-        sys.stderr.write("Loading data into the graph; this may take several minutes!")
+        sys.stderr.write("Loading data into the graph; this may take several minutes!!")
+        sys.stderr.write("have you checked out the docs on http://pyopenworm.readthedocs.org ? :)")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
 def connect(configFile='PyOpenWorm/default.conf',
