@@ -317,6 +317,9 @@ class DataObject(DataUser):
 
     @classmethod
     def register(cls):
+        """ Puts this class under the control of the database for metadata
+        :return: None
+        """
         # NOTE: This expects that configuration has been read in and that the database is available
         assert(issubclass(cls, DataObject))
         _DataObjects[cls.__name__] = cls
