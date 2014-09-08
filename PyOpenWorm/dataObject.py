@@ -478,6 +478,9 @@ class SimpleProperty(Property):
             self.link = self.owner_type.rdf_namespace[self.linkName]
 
     def hasValue(self):
+        """ Does this property have some value set for it?
+        :return: True if this data object has a value, False if not.
+        """
         return len(self.v) > 0
 
     def get(self):
