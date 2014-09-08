@@ -154,6 +154,9 @@ def connect(configFile='PyOpenWorm/default.conf',
     # have to register the right one to disconnect...
     atexit.register(disconnect)
 
+    # This takes all the classes that we want to store metadata in the database
+    #  and lets our data handling system know about them.
+    #  Should add new classes here if they need to be tracked!
     DataObject.register()
     Cell.register()
     Network.register()
