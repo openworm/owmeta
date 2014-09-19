@@ -448,6 +448,7 @@ class Property(DataObject):
         else:
             return self.get(*args,**kwargs)
     # Get the property (a relationship) itself
+
 class SimpleProperty(Property):
     """ A property that has just one link to a literal or DataObject """
 
