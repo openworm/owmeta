@@ -220,3 +220,10 @@ a stable foundational library for others to reuse, the version of the PyOpenWorm
 guarantees the user a specific version of the data behind that library.  As data
 are improved, the maintainers of the library can perform appropriate regression tests
 prior to each new release to guarantee stability.
+
+
+Installation
+------------
+
+See INSTALL.md
+
