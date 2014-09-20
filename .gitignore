@@ -7,3 +7,11 @@ tests/*.log
 tests/_test.conf
 db/worm.*
 worm.fs*
+six-1.7.3*
+.idea/*
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/PyOpenWorm-OW.iml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
