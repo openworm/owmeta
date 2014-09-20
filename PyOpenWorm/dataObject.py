@@ -1,12 +1,10 @@
 import rdflib as R
-from PyOpenWorm import DataUser
+from .data import DataUser
+from .configure import BadConf
 import traceback
 import logging as L
 
-__all__ = ["DataObject", "Property", "SimpleProperty", "_DataObjectsParents", "values"]
-
-class X():
-   pass
+__all__ = ["DataObject", "Property", "SimpleProperty", "values"]
 
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
@@ -29,10 +27,8 @@ def _triples_to_bgp(trips):
     return g
 
 _DataObjects = dict()
-# TODO: Put the subclass relationships in the database
 _DataObjectsParents = dict()
 
-# We keep a little tree of properties in here
 class DataObject(DataUser):
     """ An object backed by the database
 
@@ -55,7 +51,11 @@ class DataObject(DataUser):
         return self._openSet
 
     def __init__(self,ident=False,triples=False,**kwargs):
-        DataUser.__init__(self,**kwargs)
+        try:
+            DataUser.__init__(self,**kwargs)
+        except BadConf, e:
+            raise Exception("You may need to connect to a database before continuing.")
+
         if not triples:
             self._triples = []
         else:
@@ -209,16 +209,6 @@ class DataObject(DataUser):
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
 
-    def _skolemize_triples(self, trips):
-        # Turn all of the BNodes into concrete_identifiers
-        for t in trips:
-            new_t = []
-            for z in t:
-                if isinstance(z,R.BNode):
-                    z = self.make_identifier(z)
-                new_t.append(z)
-            yield new_t
-
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id
 
@@ -290,7 +280,7 @@ class DataObject(DataUser):
         return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
 
     @classmethod
-    def _create_property(cls, linkName, owner, property_type, value_type=False):
+    def _create_property(cls, linkName, owner, property_type, value_type=False, multiple=False):
         #XXX This should actually get called for all of the properties when their owner
         #    classes are defined.
         #    The initialization, however, must happen with the owner object's creation
@@ -308,8 +298,7 @@ class DataObject(DataUser):
                 value_rdf_type = value_type.rdf_type
             else:
                 value_rdf_type = False
-
-            c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class))
+            c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class, multiple=multiple))
             _DataObjects[property_class_name] = c
             c.register()
 
@@ -317,7 +306,9 @@ class DataObject(DataUser):
 
     @classmethod
     def register(cls):
-        """ Puts this class under the control of the database for metadata
+        """ Registers the class as a DataObject to be included in the configured rdf graph.
+            Puts this class under the control of the database for metadata.
+
         :return: None
         """
         # NOTE: This expects that configuration has been read in and that the database is available
@@ -402,6 +393,12 @@ class DataObject(DataUser):
         """ Remove this object from the data store. """
         self.retract_statements(self.graph_pattern(query=True))
 
+    def __getitem__(self, x):
+        try:
+            return DataUser.__getitem__(self, x)
+        except KeyError:
+            raise Exception("You attempted to get the value `%s' from `%s'. It isn't here. Perhaps you misspelled the name of a Property?" % (x, self))
+
 # Define a property by writing the get
 class Property(DataObject):
     """ Store a value associated with a DataObject
@@ -423,6 +420,10 @@ class Property(DataObject):
             owner.name
 
     """
+
+    # Indicates whether the Property is multivalued
+    multiple = False
+
     def __init__(self, name=False, owner=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         self.owner = owner
@@ -437,6 +438,10 @@ class Property(DataObject):
     def get(self,*args):
         """ Get the things which are on the other side of this property
 
+        The return value must be iterable. For a ``get`` that just returns
+        a single value, an easy way to make an iterable is to wrap the
+        value in a tuple like ``(value,)``.
+
         Derived classes must override.
         """
         # This should run a query or return a cached value
@@ -448,21 +453,48 @@ class Property(DataObject):
         """
         # This should set some values and call DataObject.save()
         raise NotImplementedError()
+
     def one(self):
-        return next(self.get())
+        """ Returns a single value for the ``Property`` whether or not it is multivalued.
+        """
+
+        try:
+            r = self.get()
+            return next(iter(r))
+        except StopIteration:
+            return None
 
     def hasValue(self):
+        """ Returns true if the Property has any values set on it.
+
+        This may be defined differently for each property
+        """
         return True
 
     def __call__(self,*args,**kwargs):
+        """ If arguments are passed to the ``Property``, its ``set`` method
+        is called. Otherwise, the ``get`` method is called. If the ``multiple``
+        member for the ``Property`` is set to ``True``, then a Python set containing
+        the associated values is returned. Otherwise, a single bare value is returned.
+        """
+
         if len(args) > 0 or len(kwargs) > 0:
             self.set(*args,**kwargs)
             return self
         else:
-            return self.get(*args,**kwargs)
+            r = self.get(*args,**kwargs)
+            if self.multiple:
+                return set(r)
+            else:
+                try:
+                    return next(iter(r))
+                except StopIteration:
+                    return None
+
     # Get the property (a relationship) itself
+
 class SimpleProperty(Property):
-    """ A property that has just one link to a literal or DataObject """
+    """ A property that has one or more links to a literals or DataObjects """
 
     def __init__(self,**kwargs):
         if not hasattr(self,'linkName'):
@@ -478,14 +510,23 @@ class SimpleProperty(Property):
             self.link = self.owner_type.rdf_namespace[self.linkName]
 
     def hasValue(self):
-        """ Does this property have some value set for it?
+        """ Returns true if the ``Property`` has had ``load`` called previously and some value was available or if
+        ``set`` has been called previously
         :return: True if this data object has a value, False if not.
         """
         return len(self.v) > 0
 
     def get(self):
+        """ If the ``Property`` has had ``load`` or ``set`` called previously, returns
+        the resulting values. Otherwise, queries the configured rdf graph for values
+        which are set for the ``Property``'s owner.
+        """
         if len(self.v) > 0:
             for x in self.v:
+                if isinstance(x, R.Literal):
+                    x = x.toPython()
+                    if isinstance(x, R.Literal):
+                        x = str(x)
                 yield x
         else:
             owner_id = self.owner.identifier(query=True)
@@ -543,10 +584,11 @@ class SimpleProperty(Property):
             gv = self._graph_variable(self.linkName)
             yield (owner_id, self.link, ident)
             yield (ident, self.value_property, gv)
-    def load(self):
-        """ Load in data from the database. Derived classes should override this for their own data structures.
 
-        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+    def load(self):
+        """ Loads in values to this ``Property`` which have been set for the associated owner,
+        or if the owner refers to an unspecified member of its class, loads values which could
+        be set based on the constraints on the owner.
 
         """
         # This load is way simpler since we just need the values for this property
