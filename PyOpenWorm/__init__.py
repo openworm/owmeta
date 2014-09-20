@@ -6,6 +6,8 @@ PyOpenWorm
 
 OpenWorm Unified Data Abstract Layer.
 
+An introduction to PyOpenWorm can be found in the README on our `Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
+
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
 will query against the database for the value or values that are related to ``a`` through ``B``;
@@ -96,6 +98,7 @@ def disconnect(c=False):
         c.closeDatabase()
     m.connected = False
 
+
 def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
     """ Load data into the underlying database of this library.
     :param data: (Optional) Specify the file to load into the library
@@ -106,7 +109,7 @@ def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
         sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
-def connect(configFile='PyOpenWorm/default.conf',
+def connect(configFile=False,
             conf=False,
             do_logging=False,
             data=False,
