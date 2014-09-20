@@ -11,7 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   intro
    process
    api
    evidence
@@ -21,9 +20,6 @@ Contents:
    docs
    rdf_format
    rdf_semantics
-
-Modules
--------
 
 .. automodule:: PyOpenWorm
    :members:
