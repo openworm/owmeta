@@ -24,7 +24,7 @@ class Worm(DataObject):
         DataObject.__init__(self,**kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
         Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
-        Worm.ObjectProperty("muscle", owner=self, value_type=Muscle)
+        Worm.ObjectProperty("muscle", owner=self, value_type=Muscle, multiple=True)
         Worm.ObjectProperty("cell", owner=self, value_type=Cell)
 
         if scientific_name:
@@ -39,8 +39,7 @@ class Worm(DataObject):
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
         """
-        for x in self.neuron_network():
-            return x
+        return self.neuron_network()
 
     def muscles(self):
         """
@@ -49,7 +48,7 @@ class Worm(DataObject):
         :returns: A list of all muscle names
         :rtype: list
          """
-        for x in self.muscle():
+        for x in self.muscle.get():
             yield x
 
     def get_semantic_net(self):
