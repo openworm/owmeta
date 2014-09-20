@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import PyOpenWorm as P
-from PyOpenWorm import DataObject
+from .dataObject import DataObject
+from .muscle import Muscle
+from .cell import Cell
+from .network import Network
 
 
 class Worm(DataObject):
@@ -21,9 +23,9 @@ class Worm(DataObject):
     def __init__(self,scientific_name=False,**kwargs):
         DataObject.__init__(self,**kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty("neuron_network", owner=self, value_type=P.Network)
-        Worm.ObjectProperty("muscle", owner=self, value_type=P.Muscle)
-        Worm.ObjectProperty("cell", owner=self, value_type=P.Cell)
+        Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
+        Worm.ObjectProperty("muscle", owner=self, value_type=Muscle, multiple=True)
+        Worm.ObjectProperty("cell", owner=self, value_type=Cell)
 
         if scientific_name:
             self.scientific_name(scientific_name)
@@ -37,8 +39,7 @@ class Worm(DataObject):
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
         """
-        for x in self.neuron_network():
-            return x
+        return self.neuron_network()
 
     def muscles(self):
         """
@@ -47,7 +48,7 @@ class Worm(DataObject):
         :returns: A list of all muscle names
         :rtype: list
          """
-        for x in self.muscle():
+        for x in self.muscle.get():
             yield x
 
     def get_semantic_net(self):
