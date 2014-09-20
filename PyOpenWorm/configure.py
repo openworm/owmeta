@@ -99,7 +99,6 @@ class Configure(object):
         elif default:
             return default
         else:
-            print self._properties
             raise KeyError(pname)
 
 class Configureable(object):
