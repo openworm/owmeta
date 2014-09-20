@@ -54,10 +54,11 @@ Classes
 .. automodule:: PyOpenWorm.configure
 """
 
-__version__ = '0.5.0-alhpa'
+__version__ = '0.5.0-alpha'
 __author__ = 'Stephen Larson'
 
 import traceback
+import sys
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import *
@@ -75,31 +76,18 @@ from .connection import Connection
 __import__('__main__').connected = False
 
 def config():
+    """ Gets the main configuration for the whole PyOpenWorm library.
+    :return: the instance of the Configure class currently operating.
+    """
     return Configureable.conf
 
-def useTestConfig():
-    cfg = {
-            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-            "rdf.source" : "default",
-            "rdf.store" : "Sleepycat",
-            "rdf.store_conf" : "db/worm.db",
-            "user.email" : "jerry@cn.com",
-            "rdf.upload_block_statement_count" : 50,
-            "test_variable" : "test_value"
-          }
-
-    for x in cfg:
-        Configureable.conf[x] = cfg[x]
-    Configureable.conf = Data(Configureable.conf)
-
 def loadConfig(f):
-    """ Load configuration for the module """
+    """ Load configuration for the module. """
     Configureable.conf = Data.open(f)
     return Configureable.conf
 
 def disconnect(c=False):
-    """ Close the database """
+    """ Close the database. """
     m = __import__('__main__')
     if not m.connected:
         return
@@ -110,8 +98,15 @@ def disconnect(c=False):
         c.closeDatabase()
     m.connected = False
 
-def loadData(data, dataFormat):
+
+def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
+    """ Load data into the underlying database of this library.
+    :param data: (Optional) Specify the file to load into the library
+    :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
+    :return:
+    """
     if data:
+        sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
 def connect(configFile=False,
@@ -119,7 +114,15 @@ def connect(configFile=False,
             do_logging=False,
             data=False,
             dataFormat='n3'):
-    """ Load desired configuration and open the database """
+    """
+     Load desired configuration and open the database
+    :param configFile: (Optional) The configuration file for PyOpenWorm
+    :param conf: (Optional) If true, initializes a data object with the PyOpenWorm configuration
+    :param do_logging: (Optional) If true, turn on debug level logging
+    :param data: (Optional) If provided, specify the file to load into the library
+    :param dataFormat: (Optional) If provided, specify the file format to load into the library. Currently n3 is supported
+    :return:
+    """
     import logging
     import atexit
     m = __import__('__main__')
@@ -154,6 +157,9 @@ def connect(configFile=False,
     # have to register the right one to disconnect...
     atexit.register(disconnect)
 
+    # This takes all the classes that we want to store metadata in the database
+    #  and lets our data handling system know about them.
+    #  Should add new classes here if they need to be tracked!
     DataObject.register()
     Cell.register()
     Network.register()
