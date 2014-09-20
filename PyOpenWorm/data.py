@@ -83,8 +83,9 @@ class DataUser(Configureable):
     """
     def __init__(self, **kwargs):
         Configureable.__init__(self, **kwargs)
-        if not isinstance(self.conf,Data):
-            raise BadConf(self)
+        if not isinstance(self.conf, Data):
+            raise BadConf("Not a Data instance: "+ str(self.conf))
+
     @property
     def base_namespace(self):
         return self.conf['rdf.namespace']

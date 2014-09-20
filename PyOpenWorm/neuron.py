@@ -7,6 +7,7 @@ from PyOpenWorm import Cell
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class Neighbor(P.Property):
+    multiple=True
     def __init__(self,**kwargs):
         P.Property.__init__(self,'neighbor',**kwargs)
         self._conns = []
@@ -24,13 +25,11 @@ class Neighbor(P.Property):
         """
         if len(self._conns) > 0:
             for c in self._conns:
-                for x in c.post_cell():
-                    yield x
+                yield c.post_cell()
         else:
             c = P.Connection(pre_cell=self.owner,**kwargs)
             for r in c.load():
-                for x in r.post_cell():
-                    yield x
+                yield r.post_cell()
 
     def set(self, other, **kwargs):
         c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
@@ -43,6 +42,7 @@ class Neighbor(P.Property):
                 yield x
 
 class Connection(P.Property):
+    multiple=True
     def __init__(self,**kwargs):
         P.Property.__init__(self,'connection',**kwargs)
         self._conns = []
@@ -168,8 +168,8 @@ class Neuron(Cell):
         Connection(owner=self)
 
         Neuron.DatatypeProperty("type",self)
-        Neuron.DatatypeProperty("receptor",self)
-        Neuron.DatatypeProperty("innexin",self)
+        Neuron.DatatypeProperty("receptor", self, multiple=True)
+        Neuron.DatatypeProperty("innexin", self, multiple=True)
         ### Aliases ###
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
