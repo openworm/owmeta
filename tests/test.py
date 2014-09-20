@@ -62,6 +62,12 @@ class _DataTest(unittest.TestCase):
                 raise e
     def setUp(self):
         # Set do_logging to True if you like walls of text
+        td = '__tempdir__'
+        z=self.TestConfig['rdf.store_conf']
+        if z.startswith(td):
+            x = z[len(td):]
+            h=tempfile.mkdtemp()
+            self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
         PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
 
@@ -185,14 +191,14 @@ class CellTest(_DataTest):
 
     def test_DataUser(self):
         do = Cell('',conf=self.config)
-        self.assertTrue(isinstance(do,PyOpenWorm.DataUser))
+        self.assertTrue(isinstance(do,DataUser))
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
         c = Cell(name="ADAL",conf=self.config)
         c.lineageName("AB plapaaaapp")
         c.save()
-        self.assertEqual(["AB plapaaaapp"], list(Cell(name="ADAL").lineageName()))
+        self.assertEqual("AB plapaaaapp", Cell(name="ADAL").lineageName())
 
     def test_same_name_same_id(self):
         """
@@ -242,7 +248,7 @@ class CellTest(_DataTest):
             ln = base + l
             Cell(name=x,lineageName=ln).save()
 
-        names = set(str(next(x.name())) for x in p.parentOf())
+        names = set(str(x.name()) for x in p.parentOf())
         self.assertEqual(set(c), names)
 
     def test_daughterOf(self):
@@ -256,7 +262,7 @@ class CellTest(_DataTest):
         c = Cell(name="carrots")
         c.lineageName("ab.tahsuetoahusenoatu")
         c.save()
-        parent_p = next(c.daughterOf().name())
+        parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 
     @unittest.skip('Long runner')
@@ -324,6 +330,13 @@ class DataObjectTest(_DataTest):
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
+
+class DataObjectTestToo(unittest.TestCase):
+    def test_helpful_message_on_non_connection(self):
+        """ The message should say something about connecting """
+        Configureable.conf = False # Ensure that we are disconnected
+        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
+            do = DataObject()
 
 class DataUserTest(_DataTest):
 
@@ -441,18 +454,18 @@ class NeuronTest(_DataTest):
         n = self.neur('AVAL')
         n.type('interneuron')
         n.save()
-        self.assertIn('interneuron', list(self.neur('AVAL').type()))
+        self.assertEqual('interneuron', self.neur('AVAL').type())
 
     def test_name(self):
         """ Test that the name property is set when the neuron is initialized with it """
-        self.assertEqual(next(self.neur('AVAL').name()), 'AVAL')
-        self.assertEqual(next(self.neur('AVAR').name()), 'AVAR')
+        self.assertEqual('AVAL', self.neur('AVAL').name())
+        self.assertEqual('AVAR', self.neur('AVAR').name())
 
     def test_neighbor(self):
         n = self.neur('AVAL')
         n.neighbor(self.neur('PVCL'))
         neighbors = list(n.neighbor())
-        self.assertIn(self.neur('PVCL'),neighbors)
+        self.assertIn(self.neur('PVCL'), neighbors)
         n.save()
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 
@@ -460,14 +473,18 @@ class NeuronTest(_DataTest):
         c = Neuron(lineageName="AB plapaaaap",name="ADAL")
         c.save()
         c = Neuron(lineageName="AB plapaaaap")
-        self.assertEqual(next(c.name()), 'ADAL')
+        self.assertEqual(c.name(), 'ADAL')
 
     def test_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """
+        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
+        # on the configured RDF graph, seeded by this test
         self.assertEqual(self.neur('AVAL').GJ_degree(),60)
 
     def test_Syn_degree(self):
         """ Get the number of chemical synapses from a networkx representation """
+        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
+        # on the configured RDF graph, seeded by this test
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
 
 class NetworkTest(_DataTest):
@@ -586,7 +603,7 @@ class EvidenceTest(_DataTest):
         e0 = Evidence()
         e0.asserts(r)
         s = list(e0.load())
-        author = next(s[0].author())
+        author = s[0].author.one()
         self.assertIn('tom@cn.com', author)
 
     def test_asserts_query_multiple(self):
@@ -603,12 +620,11 @@ class EvidenceTest(_DataTest):
         e0 = Evidence()
         e0.asserts(r)
         for x in e0.load():
-            a = list(x.author())
-            y = list(x.year())
+            a = x.author.one()
+            y = x.year()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
-            self.assertTrue((len(a) > 0 and str(a[0]) == 'tom@cn.com' and len(y) == 0) \
-                    or len(a) == 0 and int(y[0]) == 1999)
+            self.assertTrue((a == 'tom@cn.com' and y is None) or (a is None and int(y) == 1999))
 
     def test_asserts_query_multiple_author_matches(self):
         """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
@@ -637,15 +653,28 @@ class RDFLibTest(unittest.TestCase):
         except:
             self.fail("Doesn't actually fail...which is weird")
     def test_uriref_not_id(self):
+        """ Test that rdflib throws up a warning when we do something bad """
         #XXX: capture the logged warning
-        # import cStringIO
-        # out = cStringIO.StringIO()
-        rdflib.URIRef("some random string")
+        import cStringIO
+        import logging
+
+        out = cStringIO.StringIO()
+        logger = logging.getLogger()
+        stream_handler = logging.StreamHandler(out)
+        logger.addHandler(stream_handler)
+        try:
+            rdflib.URIRef("some random string")
+        finally:
+            logger.removeHandler(stream_handler)
+        v = out.getvalue()
+        out.close()
+        self.assertRegexpMatches(str(v), r".*some random string.*")
 
     def test_BNode_equality1(self):
         a = rdflib.BNode("some random string")
         b = rdflib.BNode("some random string")
         self.assertEqual(a, b)
+
     def test_BNode_equality2(self):
         a = rdflib.BNode()
         b = rdflib.BNode()
@@ -765,11 +794,11 @@ class ConnectionTest(_DataTest):
     def test_init(self):
         """Initialization with positional parameters"""
         c = Connection('AVAL','ADAR',3,'send','Serotonin')
-        self.assertIsInstance(next(c.pre_cell()), Neuron)
-        self.assertIsInstance(next(c.post_cell()), Neuron)
-        self.assertEqual(next(c.number()), 3)
-        self.assertEqual(next(c.syntype()), 'send')
-        self.assertEqual(next(c.synclass()), 'Serotonin')
+        self.assertIsInstance(c.pre_cell(), Neuron)
+        self.assertIsInstance(c.post_cell(), Neuron)
+        self.assertEqual(c.number(), 3)
+        self.assertEqual(c.syntype(), 'send')
+        self.assertEqual(c.synclass(), 'Serotonin')
 
     def test_init_number_is_a_number(self):
         with self.assertRaises(Exception):
@@ -956,7 +985,20 @@ class DataTest(unittest.TestCase):
             disconnect()
 
 class PropertyTest(_DataTest):
-    pass
+    def test_one(self):
+        """ `one` should return None if there isn't a value or just the value if there is one """
+        class T(Property):
+            def __init__(self):
+                Property.__init__(self)
+                self.b = False
+
+            def get(self):
+                if self.b:
+                    yield "12"
+        t = T()
+        self.assertIsNone(t.one())
+        t.b=True
+        self.assertEqual('12', t.one())
 
 class SimplePropertyTest(_DataTest):
     def __init__(self,*args,**kwargs):

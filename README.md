@@ -10,6 +10,44 @@ What does it do?
 
 Enables a simple API for asking various questions about the cells of the *C. elegans*, enabling the sharing of data about *C. elegans* for the purpose of building a data-to-model pipeline for the OpenWorm project.
 
+Installation
+------------
+
+See INSTALL.md
+
+Basic Usage
+-----------
+
+To get started, you'll probably want to load in the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
+by doing 
+
+```python
+  >>> import PyOpenWorm as P
+  >>> P.connect('PyOpenWorm/default.conf')
+
+  >>> P.loadData('OpenWormData/out.n3', 'n3')
+
+  >>> P.disconnect()
+
+```
+
+Then you can try out a few things:
+
+```python
+  # Set up
+  >>> P.connect('PyOpenWorm/default.conf')
+
+  # Grabs the representation of the neuronal network
+  >>> net = P.Worm().get_neuron_network()
+  >>> list(net.aneuron('AVAL').type())
+  ['interneuron']
+
+  #show how many connections go out of AVAL
+  >>> net.aneuron('AVAL').connection.count('pre')
+  77
+
+```
+
 Why is this necessary?
 ----------------------
 
@@ -36,40 +74,6 @@ the user can forget about which representation is being used under the hood.
 
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
-
-Basic Usage
------------
-
-To get started, you'll probably want to load in the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
-by doing 
-
-```python
-  >>> import PyOpenWorm as P
-  >>> P.connect()
-
-  >>> P.loadData()
-  #...this will take a minute or two to load...
-
-```
-
-Then you can try out a few things:
-
-```python
-
-  # Grabs the representation of the neuronal network
-  >>> net = P.Worm().get_neuron_network()
-  >>> list(net.aneuron('AVAL').type())
-  ['interneuron']
-
-  #show how many connections go out of AVAL
-  >>> net.aneuron('AVAL').connection.count('pre')
-  77
-    
-  >>> P.disconnect() #Please use at the end of your sessions.
-
-
-```
-  
   
 More examples
 -------------
@@ -155,7 +159,7 @@ See what neurons express some receptor::
   receptor=TH
 
   >>> s = set(x.name.one() for x in n.load()) 
-  >>> s == set([CEPVL,CEPVR,PDEL,PDER,CEPDR])
+  >>> s == set(['CEPVL','CEPVR','PDEL','PDER','CEPDR'])
   True
 
 ```
@@ -163,15 +167,6 @@ See what neurons express some receptor::
 To get any object's possible values, use load()::
 ```python
   >>> list(P.Neuron().load())
-  >>>
-    set([IL1DL,
-    OLQDL,
-    OLQDL,
-    OLQDL,
-    IL1DR,
-    IL1R, 
-    AVER, 
-    AVER])
   [
    ...
    Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
@@ -231,3 +226,4 @@ Installation
 ------------
 
 See INSTALL.md
+
