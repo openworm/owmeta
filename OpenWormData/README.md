@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/openworm/OpenWormData.png?branch=master)](https://travis-ci.org/openworm/OpenWormData)
-
 
 C. elegans database
 --------------------
