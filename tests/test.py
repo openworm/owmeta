@@ -51,7 +51,7 @@ class DataIntegrityTest(unittest.TestCase):
         #use a simple graph from rdflib so we can look directly at the structure of the data
         g = rdflib.Graph("ZODB")
         #load in the database
-        g.parse("OpenWormData/out.n3", format="n3")
+        g.parse("OpenWormData/WormData.n3", format="n3")
 
         #grab the list of the names of the 302 neurons
 
