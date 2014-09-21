@@ -99,7 +99,7 @@ def disconnect(c=False):
     m.connected = False
 
 
-def loadData(data='OpenWormData/out.n3', dataFormat='n3'):
+def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
     """ Load data into the underlying database of this library.
     :param data: (Optional) Specify the file to load into the library
     :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
