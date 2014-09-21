@@ -25,7 +25,7 @@ by doing
   >>> import PyOpenWorm as P
   >>> P.connect('PyOpenWorm/default.conf')
 
-  >>> P.loadData('OpenWormData/out.n3', 'n3')
+  >>> P.loadData('OpenWormData/WormData.n3', 'n3')
 
   >>> P.disconnect()
 
