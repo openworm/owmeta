@@ -16,6 +16,7 @@ import os
 import subprocess
 import tempfile
 
+
 try:
     import bsddb
     has_bsddb = True
@@ -1161,3 +1162,6 @@ class SimplePropertyTest(_DataTest):
 
 class NeuroMLTest(_DataTest):
     pass
+
+if __name__ == '__main__':
+    unittest.main()
