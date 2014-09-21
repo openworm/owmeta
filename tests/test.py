@@ -62,9 +62,16 @@ class DataIntegrityTest(unittest.TestCase):
             if len(row[0]) > 0: # Only saves valid neuron names
               neurons.append(row[0])
 
+        #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
+
+        results = {}
         for n in neurons:
             qres = g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
-            self.assertEqual(len(qres.result), 1, str(n) + " has " + str(len(qres.result)) + " rdf nodes")
+            results[n] = len(qres.result)
+
+        # If there is not only one result back, then there is more than one RDF node.
+        self.assertNotIn(2, results.values(), "Some neurons have more than 1 node: " + str(results))
+        self.assertNotIn(0, results.values(), "Some neurons have no node: " + str(results))
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
