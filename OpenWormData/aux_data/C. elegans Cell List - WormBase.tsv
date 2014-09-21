@@ -1,0 +1,1359 @@
+	Spreadsheet of C. elegans cells compiled and maintained by the OpenWorm project (http://openworm.org), originally sourced from WormBase (http://wormbase.org) and WormAtlas (http://wormatlas.org).  For more info, please email at info@openworm.org																	
+Cell	Lineage Name	Description	Total count of identified adult-only hermaphrodite cells	Total count of adult-only male cells	Neurons (no male-specific cells)	Neurons (male-specific)	Body wall muscles	Pharynx muscles	Other muscles	Other adult-only cells in the hermaphrodite	Other adult-only hermaphrodite-specific cells (not present in males)	Motor neurons related to body wall muscles	Embryonic cells not present in adult	Male-specific cells	Male-specific adult-only cells	Cells with non-unique name	Cells needing name resolution	VirtualWorm blender model names
+			954	1133	302	70	95	37	20	500	212	125	88	341	321	715	496	
+http://wormbase.org/db/ontology/anatomy?name=ab	P0.a	Embryonic founder cell											1					
+http://wormbase.org/db/ontology/anatomy?name=ADAL	AB.plapaaaapp	Ring interneurons			1													
+http://wormbase.org/db/ontology/anatomy?name=ADAR	AB.prapaaaapp	Ring interneurons			1													
+http://wormbase.org/db/ontology/anatomy?name=ADEL	AB.plapaaaapa	Anterior deirid, sensory neuron, dopaminergic			1													
+http://wormbase.org/db/ontology/anatomy?name=ADER	AB.prapaaaapa	Anterior deirid, sensory neuron, dopaminergic			1													
+http://wormbase.org/db/ontology/anatomy?name=ADEshL	AB.arppaaaa	Anterior deirid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ADEshR	AB.arpppaaa	Anterior deirid sheath								1								
+ADEsoL	H2L.aa	Anterior deirid socket								1								
+ADEsoR	H2R.aa	Anterior deirid socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ADFL	AB.alpppppaa	Amphid neuron, prob. chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=ADFR	AB.praaappaa	Amphid neuron, prob. chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=ADLL	AB.alppppaad	Amphid neuron, prob. chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=ADLR	AB.praaapaad	Amphid neuron, prob. chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=AFDL	AB.alpppapav	Amphid finger cell, neuron associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AFDR	AB.praaaapav	Amphid finger cell, neuron associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AIAL	AB.plppaappa	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIAR	AB.prppaappa	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIBL	AB.plaapappa	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIBR	AB.praapappa	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIML	AB.plpaapppa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIMR	AB.prpaapppa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AINL	AB.alaaaalal	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AINR	AB.alaapaaar	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIYL	AB.plpapaaap	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIYR	AB.prpapaaap	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIZL	AB.plapaaapav	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AIZR	AB.prapaaapav	Amphid interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=ALA	AB.alapppaaa	Neuron, sends processes laterally and along dorsal cord			1													
+http://wormbase.org/db/ontology/anatomy?name=ALML	AB.arppaappa	Anterior lateral microtubule cell, touch receptor			1													
+http://wormbase.org/db/ontology/anatomy?name=ALMR	AB.arpppappa	Anterior lateral microtubule cell, touch receptor			1													
+http://wormbase.org/db/ontology/anatomy?name=ALNL	AB.plapappppap	Neuron associated with ALM			1													
+http://wormbase.org/db/ontology/anatomy?name=ALNR	AB.prapappppap	Neuron associated with ALM			1													
+http://wormbase.org/db/ontology/anatomy?name=AMshL	AB.plaapaap	Amphid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=AMshR	AB.praapaap	Amphid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=AMsoL	AB.plpaapapa	Amphid socket								1								
+http://wormbase.org/db/ontology/anatomy?name=AMsoR	AB.prpaapapa	Amphid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=AQR	QR.ap	Neuron, basal body. not part of a sensillum, projects into ring			1													
+http://wormbase.org/db/ontology/anatomy?name=AS1	P1.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS2	P2.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS3	P3.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS4	P4.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS5	P5.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS6	P6.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS7	P7.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS8	P8.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS9	P9.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS10	P10.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=AS11	P11.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart			1							1						
+http://wormbase.org/db/ontology/anatomy?name=ASEL	AB.alppppppaa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASER	AB.praaapppaa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASGL	AB.plaapapap	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASGR	AB.praapapap	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASHL	AB.plpaappaa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASHR	AB.prpaappaa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASIL	AB.plaapapppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASIR	AB.praapapppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASJL	AB.alpppppppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASJR	AB.praaappppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASKL	AB.alpppapppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=ASKR	AB.praaaapppa	Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil			1													
+http://wormbase.org/db/ontology/anatomy?name=AUAL	AB.alpppppppp	Neuron, process runs with amphid processes but lacks cillialted ending			1													
+http://wormbase.org/db/ontology/anatomy?name=AUAR	AB.praaappppp	Neuron, process runs with amphid processes but lacks cillialted ending			1													
+http://wormbase.org/db/ontology/anatomy?name=AVAL	AB.alppaaapa	Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha			1													
+http://wormbase.org/db/ontology/anatomy?name=AVAR	AB.alaappapa	Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha			1													
+http://wormbase.org/db/ontology/anatomy?name=AVBL	AB.plpaapaap	Ventral cord interneuron, synapsesonto VB and DB motor neurons; formerly called beta			1													
+http://wormbase.org/db/ontology/anatomy?name=AVBR	AB.prpaapaap	Ventral cord interneuron, synapsesonto VB and DB motor neurons; formerly called beta			1													
+http://wormbase.org/db/ontology/anatomy?name=AVDL	AB.alaaapalr	Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta			1													
+http://wormbase.org/db/ontology/anatomy?name=AVDR	AB.alaaapprl	Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta			1													
+http://wormbase.org/db/ontology/anatomy?name=AVEL	AB.alpppaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord			1													
+http://wormbase.org/db/ontology/anatomy?name=AVER	AB.praaaaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord			1													
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003852	P1.aaaa	Interneuron, processes in ventral cord and ring, few synapses			1											1	1	avfr
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003851	W.aaa	Interneuron, processes in ventral cord and ring, few synapses			1											1	1	avfr
+http://wormbase.org/db/ontology/anatomy?name=AVG	AB.prpapppap	Ventral cord interneuron, few synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=AVHL	AB.alapaaaaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring			1													
+http://wormbase.org/db/ontology/anatomy?name=AVHR	AB.alappapaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring			1													
+http://wormbase.org/db/ontology/anatomy?name=AVJL	AB.alapapppa	Neuron, synapses like AVHL/R			1													
+http://wormbase.org/db/ontology/anatomy?name=AVJR	AB.alapppppa	Neuron, synapses like AVHL/R			1													
+http://wormbase.org/db/ontology/anatomy?name=AVKL	AB.plpapapap	Ring and ventral cord interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AVKR	AB.prpapapap	Ring and ventral cord interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=AVL	AB.prpappaap	Ring and ventral cord interneuron, few synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=AVM	QR.paa	Anterior ventral microtubule cell, touch receptor								1								
+http://wormbase.org/db/ontology/anatomy?name=AWAL	AB.plaapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AWAR	AB.praapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AWBL	AB.alpppppap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AWBR	AB.praaappap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AWCL	AB.plpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=AWCR	AB.prpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1													
+http://wormbase.org/db/ontology/anatomy?name=B	AB.prppppapa	Rectal cell, postembryonic blast cell in male											1	1				
+http://wormbase.org/db/ontology/anatomy?name=BAGL	AB.alppappap	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1													
+http://wormbase.org/db/ontology/anatomy?name=BAGR	AB.arappppap	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1													
+http://wormbase.org/db/ontology/anatomy?name=BDUL	AB.arppaappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles			1													
+http://wormbase.org/db/ontology/anatomy?name=BDUR	AB.arpppappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles			1													
+http://wormbase.org/db/ontology/anatomy?name=C	P0.ppa	Embryonic founder cell											1					
+http://wormbase.org/db/ontology/anatomy?name=CA1	P3.aapa	Male specific cell, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA2	P4.aapa	Male specific cell, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA3	P5.aapa	Male specific cell, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA4	P6.aapa	Male specific neuron, innervates dorsal muscles												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA5	P7.aapa	Male specific neuron, innervates dorsal muscles												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA6	P8.aapa	Male specific neuron, innervates dorsal muscles												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA7	P9.aapa	Male specific neuron, innervates dorsal muscles												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA8	P10.aapa	Male specific cell in ventral cord, neuron-like but lacks synapses												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CA9	P11.aapa	Male specific cell in ventral cord, neuron-like but lacks synapses												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CANL	AB.alapaaapa	Process runs along excretory canal, no synapses, essential for survival			1													
+http://wormbase.org/db/ontology/anatomy?name=CANR	AB.alappappa	Process runs along excretory canal, no synapses, essential for survival			1													
+http://wormbase.org/db/ontology/anatomy?name=CEMDL	AB.plaaaaaap	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.											1	1				
+http://wormbase.org/db/ontology/anatomy?name=CEMDR	AB.arpapaaap	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.											1	1				
+http://wormbase.org/db/ontology/anatomy?name=CEMVL	AB.plpaapapp	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.											1	1				
+http://wormbase.org/db/ontology/anatomy?name=CEMVR	AB.prpaapapp	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.											1	1				
+http://wormbase.org/db/ontology/anatomy?name=CEPDL	AB.plaaaaappa	Cephalic neurons, contain dopamine			1													
+http://wormbase.org/db/ontology/anatomy?name=CEPDR	AB.arpapaappa	Cephalic neurons, contain dopamine			1													
+http://wormbase.org/db/ontology/anatomy?name=CEPVL	AB.plpaappppa	Cephalic neurons, contain dopamine			1													
+http://wormbase.org/db/ontology/anatomy?name=CEPVR	AB.prpaappppa	Cephalic neurons, contain dopamine			1													
+http://wormbase.org/db/ontology/anatomy?name=CEPshDL	AB.arpaaaapp	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPshDR	AB.arpaaapap	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPshVL	AB.plpaaapap	Cephalic sheath, sheet-like processes envelop meuropil of the ring and part of ventral ganglion								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPshVR	AB.prpaaapap	Cephalic sheath, sheet-like processes envelop meuropil of the ring and part of ventral ganglion								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPsoDL	AB.alapapppp	Cephalic socket								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPsoDR	AB.alapppppp	Cephalic socket								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPsoVL	AB.alppaappp	Cephalic socket								1								
+http://wormbase.org/db/ontology/anatomy?name=CEPsoVR	AB.alaapappp	Cephalic socket								1								
+http://wormbase.org/db/ontology/anatomy?name=CPO	P2.aap	Male specific cell in ventral cord, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP1	P3.aapp	Male specific cell in ventral cord, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP2	P4.aapp	Male specific cell in ventral cord, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP3	P5.aapp	Male specific cell in ventral cord, not reconstructed												1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP4	P6.aapp	Male specific motor neuron in ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP5	P7.aapp	Male specific motor neuron in ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP6	P8.aapp	Male specific motor neuron in ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP7	P9.aapp	Male specific motor neuron in ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP8	P10.aapp	Male specific interneuron, project into preanal ganglion				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=CP9	P11.aapp	Male specific interneuron, project into preanal ganglion												1	1			
+http://wormbase.org/db/ontology/anatomy?name=D	P0.pppa	Embryonic founder cell											1					
+http://wormbase.org/db/ontology/anatomy?name=DA1	AB.prppapaap	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA2	AB.plppapapa	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA3	AB.prppapapa	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA4	AB.plppapapp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA5	AB.prppapapp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA6	AB.plpppaaap	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA7	AB.prpppaaap	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA8	AB.prpapappp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DA9	AB.plpppaaaa	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB1	AB.plpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB2	AB.arappappa	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB3	AB.prpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB4	AB.prpappapp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB5	AB.plpapappp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB6	AB.plppaappp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DB7	AB.prppaappp	Ventral cord motor neurons, innervate dorsal muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=DD1	AB.plppappap	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DD2	AB.prppappap	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DD3	AB.plppapppa	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DD4	AB.prppapppa	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DD5	AB.plppapppp	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DD6	AB.prppapppp	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development			1							1	1					
+http://wormbase.org/db/ontology/anatomy?name=DVA	AB.prppppapp	Ring interneurons, cell bodies in dorsorectal ganglion			1													
+http://wormbase.org/db/ontology/anatomy?name=DVB	K.p	Ring interneuron, cell body in dorsorectal ganglion, inervates rectal muscles			1													
+http://wormbase.org/db/ontology/anatomy?name=DVC	C.aapaa	Ring interneurons, cell bodies in dorsorectal ganglion			1													
+http://wormbase.org/db/ontology/anatomy?name=DVE	B.ppap	Male specific neuron, cell body in dorsorectal ganglion				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=DVF	B.ppppa	Male specific neuron, cell body in dorsorectal ganglion				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004818	F.lvda	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004817	F.rvda	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004806	U.laa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004805	U.raa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=E	P0.pap	Embryonic founder cell											1					
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004803	F.lvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004802	F.rvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004801	U.lap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A000480	U.rap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=F	AB.plppppapp	Rectal cell, blast cell in male											1	1				
+http://wormbase.org/db/ontology/anatomy?name=FLPL	AB.plapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1													
+http://wormbase.org/db/ontology/anatomy?name=FLPR	AB.prapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRDL	MS.aaaaaal	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRDR	MS.aaaaaar	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRL	MS.apaaaad	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRR	MS.ppaaaad	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRVL	MS.apaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=GLRVR	MS.ppaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=G1	AB.prpaaaapa	Postembryonic blast cell, excretory socket in embryo											1					
+http://wormbase.org/db/ontology/anatomy?name=G2	AB.plapaapa	Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later								1								
+http://wormbase.org/db/ontology/anatomy?name=HOL	AB.plaaappa	Seam hypodermal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=HOR	AB.arpapppa	Seam hypodermal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=H1L	AB.plaaappp	Seam hypodermal cell, postembryonic blast cell								1			1					
+http://wormbase.org/db/ontology/anatomy?name=H1R	AB.arpapppp	Seam hypodermal cell, postembryonic blast cell								1			1					
+http://wormbase.org/db/ontology/anatomy?name=H2L	AB.arppaaap	Seam hyopdermal cell, postemb. blast cell, L1 deirid socket								1			1					
+http://wormbase.org/db/ontology/anatomy?name=H2R	AB.arpppaap	Seam hyopdermal cell, postemb. blast cell, L1 deirid socket								1			1					
+http://wormbase.org/db/ontology/anatomy?name=HOA	P10.pppa	Neuron of hook sensillum, receptor anterior to cloaca in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=HOB	P10.ppap	Neuron of hook sensillum, receptor anterior to cloaca in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=HOsh	P10.ppppp	Sheath of hook sensillum, receptor anterior to cloaca in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=HOso	P10.ppaa	Socket of hook sensillum, receptor anterior to cloaca in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=HSNL	AB.plapppappa	Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic																
+http://wormbase.org/db/ontology/anatomy?name=HSNR	AB.prapppappa	Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic																
+http://wormbase.org/db/ontology/anatomy?name=I1L	AB.alpapppaa	Pharyngeal interneurons: ant sensory, input from RIP			1													
+http://wormbase.org/db/ontology/anatomy?name=I1R	AB.arapappaa	Pharyngeal interneurons: ant sensory, input from RIP			1													
+http://wormbase.org/db/ontology/anatomy?name=I2L	AB.alpappaapa	Pharyngeal interneurons, ant sensory.			1													
+http://wormbase.org/db/ontology/anatomy?name=I2R	AB.arapapaapa	Pharyngeal interneurons, ant sensory.			1													
+http://wormbase.org/db/ontology/anatomy?name=I3	MS.aaaaapaa	Pharyngeal interneuron, ant sensory.			1													
+http://wormbase.org/db/ontology/anatomy?name=I4	MS.aaaapaa	Pharyngeal interneuron.			1													
+http://wormbase.org/db/ontology/anatomy?name=I5	AB.arapapapp	Pharyngeal interneuron, post sensory.			1													
+http://wormbase.org/db/ontology/anatomy?name=I6	MS.paaapaa	Pharyngeal interneuron, post sensory.			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1DL	AB.alapappaaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1DR	AB.alappppaaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1L	AB.alapaappaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1R	AB.alaappppaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1VL	AB.alppapppaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL1VR	AB.arapppppaa	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2DL	AB.alapappap	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2DR	AB.alappppap	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2L	AB.alapaappp	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2R	AB.alaappppp	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2VL	AB.alppapppp	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=IL2VR	AB.arapppppp	Inner labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=ILshDL	AB.alaaaparr	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILshDR	AB.alaaappll	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILshL	AB.alaaaalpp	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILshR	AB.alaapaapp	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILshVL	AB.alppapaap	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILshVR	AB.arapppaap	Inner labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoDL	AB.plaapaaap	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoDR	AB.praapaaap	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoL	AB.alaaapall	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoR	AB.alaaapprr	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoVL	AB.alppapapp	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=ILsoVR	AB.arapppapp	Inner labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=K	AB.plpapppaa	Rectal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=K\'	AB.plpapppap	Rectal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=K.a	K.a	Rectal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=LUAL	AB.plpppaapap	Interneuron, short process in post ventral cord			1													
+http://wormbase.org/db/ontology/anatomy?name=LUAR	AB.prpppaapap	Interneuron, short process in post ventral cord			1													
+http://wormbase.org/db/ontology/anatomy?name=M	MS.apaap	Postembryonic mesoblast											1					
+http://wormbase.org/db/ontology/anatomy?name=M1	MS.paapaaa	Pharyngeal motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M2L	AB.araapappa	Pharyngeal motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M2R	AB.araappppa	Pharyngeal motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M3L	AB.araapappp	Pharyngeal sensory-motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M3R	AB.araappppp	Pharyngeal sensory-motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M4	MS.paaaaaa	Pharyngeal motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=M5	MS.paaapap	Pharyngeal motorneurons			1							1						
+http://wormbase.org/db/ontology/anatomy?name=MCL	AB.alpaaappp	Pharyngeal neurons that synapse onto marginal cells			1													
+http://wormbase.org/db/ontology/anatomy?name=MCR	AB.arapaappp	Pharyngeal neurons that synapse onto marginal cells			1													
+http://wormbase.org/db/ontology/anatomy?name=MI	AB.araappaaa	Pharyngeal motor neuron/interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=MS	P0.paa	Embryonic founder cell											1					
+http://wormbase.org/db/ontology/anatomy?name=NSML	AB.araapapaav	Pharyngeal neurosecretory motorneuron, contain serotonin			1							1						
+http://wormbase.org/db/ontology/anatomy?name=NSMR	AB.araapppaav	Pharyngeal neurosecretory motorneuron, contain serotonin			1							1						
+http://wormbase.org/db/ontology/anatomy?name=OLLL	AB.alppppapaa	Lateral outer labial neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=OLLR	AB.praaapapaa	Lateral outer labial neurons			1													
+http://wormbase.org/db/ontology/anatomy?name=OLLshL	AB.alpppaapd	Lateral outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLLshR	AB.praaaaapd	Lateral outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLLsoL	AB.alapaaapp	Lateral outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=OLLsoR	AB.alappappp	Lateral outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQDL	AB.alapapapaa	Quadrant outer labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=OLQDR	AB.alapppapaa	Quadrant outer labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=OLQVL	AB.plpaaappaa	Quadrant outer labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=OLQVR	AB.prpaaappaa	Quadrant outer labial neuron			1													
+http://wormbase.org/db/ontology/anatomy?name=OLQshDL	AB.arpaaaapa	Quadrant outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQshSR	AB.arpaaapaa	Quadrant outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQshVL	AB.alpppaaap	Quadrant outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQshVR	AB.praaaaaap	Quadrant outer labial sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQsoDL	AB.arpaaaaal	Quadrant outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQsoDR	AB.arpaaaaar	Quadrant outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQsoVL	AB.alppaaapp	Quadrant outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=OLQsoVR	AB.alaappapp	Quadrant outer labial socket								1								
+http://wormbase.org/db/ontology/anatomy?name=P0	Z	Single cell zygote											1					
+http://wormbase.org/db/ontology/anatomy?name=Psub4	P0.pppp	Embryonic founder cell of germ line											1					
+http://wormbase.org/db/ontology/anatomy?name=P1/2L	AB.plapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P1/2R	AB.prapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P3/4L	AB.plappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P3/4R	AB.prappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P5/6L	AB.plappaap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P5/6R	AB.prappaap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P7/8L	AB.plappapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P7/8R	AB.prappapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P9/10L	AB.plapapap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P9/10R	AB.prapapap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P11	AB.plapappa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=P12	AB.prapappa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1				
+http://wormbase.org/db/ontology/anatomy?name=PCAL	Y.plppd	Sensory neuron of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCAR	Y.prppd	Sensory neuron of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCBL	Y.plpa	Neuron, ending is sheath of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCBR	Y.prpa	Neuron, ending is sheath of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCCL	B.arpaaa	Sensory neuron of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCCR	B.alpaaa	Sensory neuron of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PChL	Y.plaa	Hypodermal cell of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PChR	Y.praa	Hypodermal cell of postcloacal sensilla in male				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCshL	Y.plppv	Sheath of postcloacal sensilla in male												1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCshR	Y.prppv	Sheath of postcloacal sensilla in male												1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCsoL	Y.plap	Socket of postcloacal sensilla in male												1	1			
+http://wormbase.org/db/ontology/anatomy?name=PCsoR	Y.prap	Socket of postcloacal sensilla in male												1	1			
+http://wormbase.org/db/ontology/anatomy?name=PDA	AB.prpppaaaa	Motor neuron, process in dorsal cord, same as Y cell in hermaphrodite, Y.a in male										1						
+http://wormbase.org/db/ontology/anatomy?name=PDB	P12.apa	Motor neuron, process in dorsal cord, cell body in pre-anal ganglion			1							1						
+http://wormbase.org/db/ontology/anatomy?name=PDC	P11.papa	Male specific interneuron, preanal ganglion				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PDEL	V5L.paaa	Neuron, dopaminergic of postderid sensillum			1													
+http://wormbase.org/db/ontology/anatomy?name=PDER	V5R.paaa	Neuron, dopaminergic of postderid sensillum			1													
+http://wormbase.org/db/ontology/anatomy?name=PDEshL	V5L.papp	Sheath of PDE								1								
+http://wormbase.org/db/ontology/anatomy?name=PDEshR	V5R.papp	Sheath of PDE								1								
+http://wormbase.org/db/ontology/anatomy?name=PdEsoL	V5L.papa	Socket of PDE								1								
+http://wormbase.org/db/ontology/anatomy?name=PdEsoR	V5R.papa	Socket of PDE								1								
+http://wormbase.org/db/ontology/anatomy?name=PGA	P11.papp	Male specific interneuron, preanal ganglion				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PHAL	AB.plpppaapp	Phasmid neurons, probably chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=PHAR	AB.prpppaapp	Phasmid neurons, probably chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=PHBL	AB.plapppappp	Phasmid neurons, probably chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=PHRB	AB.prapppappp	Phasmid neurons, probably chemosensory			1													
+http://wormbase.org/db/ontology/anatomy?name=PHCL	TL.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PHCR	TR.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PHshL	AB.plpppapaa	Phasmid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=PHshR	AB.prpppapaa	Phasmid sheath								1								
+http://wormbase.org/db/ontology/anatomy?name=PHso1L	TL.paa	Phasmid sockets								1								
+http://wormbase.org/db/ontology/anatomy?name=PHso1R	TR.paa	Phasmid sockets								1								
+http://wormbase.org/db/ontology/anatomy?name=PHso2L	TL.pap	Phasmid sockets								1								
+http://wormbase.org/db/ontology/anatomy?name=PHso2R	TR.pap	Phasmid sockets								1								
+http://wormbase.org/db/ontology/anatomy?name=PLML	AB.plapappppaa	Posterior lateral microtubule cell, touch receptor			1													
+http://wormbase.org/db/ontology/anatomy?name=PLMR	AB.prapappppaa	Posterior lateral microtubule cell, touch receptor			1													
+http://wormbase.org/db/ontology/anatomy?name=PLNL	TL.pppap	Interneuron, associated with PLM			1													
+http://wormbase.org/db/ontology/anatomy?name=PLNR	TR.pppap	Interneuron, associated with PLM			1													
+http://wormbase.org/db/ontology/anatomy?name=PQR	QL.ap	Neuron, basal body, not part of a sensillum, projects into preanal gangion			1													
+http://wormbase.org/db/ontology/anatomy?name=PVCL	AB.plpppaapaa	Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta.			1													
+http://wormbase.org/db/ontology/anatomy?name=PVCR	AB.prpppaapaa	Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta.			1													
+http://wormbase.org/db/ontology/anatomy?name=PVDL	V5L.paapa	Neuron, lateral process adjacent to excretory canal			1													
+http://wormbase.org/db/ontology/anatomy?name=PVDR	V5R.paapa	Neuron, lateral process adjacent to excretory canal			1													
+http://wormbase.org/db/ontology/anatomy?name=PVM	QL.paa	Posterior ventral microtuble cell, touch receptor			1													
+http://wormbase.org/db/ontology/anatomy?name=PVNL	TL.appp	Interneuron/motor neuron, post. vent. cord, few synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=PVNR	TR.appp	Interneuron/motor neuron, post. vent. cord, few synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=PVPL	AB.plppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVPR	AB.prppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVQL	AB.plapppaaa	Interneuron, projects along ventral cord to ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVQR	AB.prapppaaa	Interneuron, projects along ventral cord to ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVR	C.aappa	Interneuron, projects along ventral cord to ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVT	AB.plpappppa	Interneuron, projects along ventral cord to ring			1													
+http://wormbase.org/db/ontology/anatomy?name=PVV	P11.paaa	Male specific motor neuron, ventral cord												1	1			
+http://wormbase.org/db/ontology/anatomy?name=PVWL	TL.ppa	Interneuron, posterior ventral cord, few synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=PVWR	TR.ppa	Interneuron, posterior ventral cord, few synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=PVX	P12.aap	Male specific interneuron, postsynaptic in ring and ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PVY	P11.paap	Neuron class of one male-specific interneuron				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=PVZ	P10.ppppa	Male specific motor neuron, ventral cord				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=QL	AB.plapapaaa	Postembryonic neuroblast, migrates anteriorly											1					
+http://wormbase.org/db/ontology/anatomy?name=QR	AB.prapapaaa	Postembryonic neuroblast, migrates posteriorly											1					
+http://wormbase.org/db/ontology/anatomy?name=R1AL	V5L.pppppaaa, R1.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R1AR	V5R.pppppaaa, R1.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R1BL	V5L.pppppapa, R1.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R1BR	V5R.pppppapa, R1.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R1stL	V5L.pppppapp, R1.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R1stR	V5R.pppppapp, R1.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2AL	V6L.papapaaa, R2.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2AR	V6R.papapaaa, R2.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2BL	V6L.papapapa, R2.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2BR	V6R.papapapa, R2.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2stL	V6L.papapapp, R2.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R2stR	V6R.papapapp, R2.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3AL	V6L.papppaaa, R3.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3AR	V6R.papppaaa, R3.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3BL	V6L.papppapa, R3.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3BR	V6R.papppapa, R3.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3stL	V6L.papppapp, R3.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R3stR	V6R.papppapp, R3.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4AL	V6L.pppapaaa, R4.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4AR	V6R.pppapaaa, R4.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4BL	V6L.pppapapa, R4.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4BR	V6R.pppapapa, R4.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4stL	V6L.pppapapp, R4.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4stR	V6R.pppapapp, R4.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5AL	V6L.pppppaaa, R5.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5AR	V6R.pppppaaa, R5.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5BL	V6L.pppppapa, R5.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5BR	V6R.pppppapa, R5.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5stL	V6L.pppppapp, R5.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5stR	V6R.pppppapp, R5.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6AL	V6L.ppppaaaa, R6.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6AR	V6R.ppppaaaa, R6.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6BL	V6L.ppppaapa, R6.apa	Male sensory rays, neuron, not darkly staining nor open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6BR	V6R.ppppaapa, R6.apa	Male sensory rays, neuron, not darkly staining nor open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6stL	V6L.ppppaapp, R6.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6stR	V6R.ppppaapp, R6.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7AL	TL.apappaaa, R7.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7AR	TR.apappaaa, R7.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7BL	TL.apappapa, R7.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7BR	TR.apappapa, R7.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7stL	TL.apappapp, R7.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7stR	TR.apappapp, R7.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8AL	TL.appaaaaa, R8.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8AR	TR.appaaaaa, R8.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8BL	TL.appaaapa, R8.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8BR	TR.appaaapa, R8.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8stL	TL.appaaapp, R8.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8stR	TR.appaaapp, R8.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9AL	TL.appapaaa, R9.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9AR	TR.appapaaa, R9.aaa	Male sensory rays, neuron, striated rootlet				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9BL	TL.appapapa, R9.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9BR	TR.appapapa, R9.apa	Male sensory rays, neuron, darkly staining tip, open to outside				1								1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9stL	TL.appapapp, R9.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9stR	TR.appapapp, R9.app	Male sensory rays, structural cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=RIAL	AB.alapaapaa	Ring interneuron, many synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=RIAR	AB.alaapppaa	Ring interneuron, many synapses			1													
+http://wormbase.org/db/ontology/anatomy?name=RIBL	AB.plpaappap	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIBR	AB.prpaappap	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RICL	AB.plppaaaapp	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RICR	AB.prppaaaapp	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RID	AB.alappaapa	Ring interneuron, projects along dorsal cord			1													
+http://wormbase.org/db/ontology/anatomy?name=RIFL	AB.plppapaaap	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIFR	AB.prppapaaap	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIGL	AB.plppappaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIGR	AB.prppappaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIH	AB.prpappaaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIML	AB.plppaapap	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RIMR	AB.prppaapap	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RIPL	AB.alpapaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring			1													
+http://wormbase.org/db/ontology/anatomy?name=RIPR	AB.prappaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring			1													
+http://wormbase.org/db/ontology/anatomy?name=RIR	AB.prpapppaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIS	AB.prpappapa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIVL	AB.plpaapaaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RIVR	AB.prpaapaaa	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RMDDL	AB.alpapapaa	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMDDR	AB.arappapaa	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMDL	AB.alpppapad	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMDR	AB.praaaapad	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMDVL	AB.alppapaaa	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMDVR	AB.arapppaaa	Ring motor neuron/interneuron, many synapses			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMED	AB.alapppaap	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMEL	AB.alaaaarlp	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMER	AB.alaaaarrp	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMEV	AB.plpappaaa	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMFL	G2.al	Ring motor neuron/interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMFR	G2.ar	Ring motor neuron/interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMGL	AB.plapaaapp	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RMGR	AB.prapaaapp	Ring interneuron			1													
+http://wormbase.org/db/ontology/anatomy?name=RMHL	G1.l	Ring motor neuron/interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=RMHR	G1.r	Ring motor neuron/interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SAADL	AB.alppapapa	Ring interneuron, anteriorly projecting process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SAADR	AB.arapppapa	Ring interneuron, anteriorly projecting process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SAAVL	AB.plpaaaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SAAVR	AB.prpaaaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SABD	AB.plppapaap	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1			1													
+http://wormbase.org/db/ontology/anatomy?name=SABVL	AB.plppapaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1			1													
+http://wormbase.org/db/ontology/anatomy?name=SABVR	AB.prppapaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1			1													
+http://wormbase.org/db/ontology/anatomy?name=SDQL	QL.pap	Post. lateral interneuron, process projects into ring			1													
+http://wormbase.org/db/ontology/anatomy?name=SDQR	QR.pap	Ant. lateral interneuron, process projects into ring			1													
+http://wormbase.org/db/ontology/anatomy?name=SIADL	AB.plpapaapa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIADR	AB.prpapaapa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIAVL	AB.plpapappa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIAVR	AB.prpapappa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIBDL	AB.plppaaaaa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIBDR	AB.prppaaaaa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIBVL	AB.plpapaapp	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SIBVR	AB.prpapaapp	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally			1													
+http://wormbase.org/db/ontology/anatomy?name=SMBDL	AB.alpapapapp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMBDR	AB.arappapapp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMBVL	AB.alpapappp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMBVR	AB.arappappp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMDDL	AB.plpapaaaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMDDR	AB.prpapaaaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMDVL	AB.alppappaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SMDVR	AB.arappppaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally			1							1						
+http://wormbase.org/db/ontology/anatomy?name=SPCL	B.alpaap	Male specific sensory /motor neuron, innervates spicule protractor muscle												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPCR	B.arpaap	Male specific sensory /motor neuron, innervates spicule protractor muscle												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPDL	B.alpapaa	Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPDR	B.arpapaa	Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPVL	B.al/raalda	Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPVR	B.al/raarda	Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPshDL	B.alpapap	Sheath of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPshDR	B.arpapap	Sheath of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPshVL	B.al/raaldp	Sheath of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SpshVR	B.al/raarda	Sheath of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso1L	B.al/rpppl	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso1R	B.al/rpppr	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso2L	B.al/raald	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso2R	B.al/raard	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso3L	B.al/raalv	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso3R	B.al/raarv	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso4L	B.alpapp	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=SPso4r	B.arpapp	Socket of male copulatory spicule												1	1			
+http://wormbase.org/db/ontology/anatomy?name=TL	AB.plappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1											1					
+http://wormbase.org/db/ontology/anatomy?name=TR	AB.prappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1											1					
+http://wormbase.org/db/ontology/anatomy?name=U	AB.plppppapa	Rectal cell, postembryonic blast cell in male											1	1				
+http://wormbase.org/db/ontology/anatomy?name=URADL	AB.plaaaaaaa	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URADR	AB.arpapaaaa	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URAVL	AB.plpaaapaa	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URAVR	AB.prpaaapaa	Ring motor neuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URBL	AB.plaapaapa	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URBR	AB.praapaapa	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URXL	AB.plaaaaappp	Ring interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URXR	AB.arpapaappp	Ring interneuron			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URYDL	AB.alapapapp	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URYDR	AB.alapppapp	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URYVL	AB.plpaaappp	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=URYVR	AB.prpaaappp	Neuron, presynaptic in ring, ending in head			1							1						
+http://wormbase.org/db/ontology/anatomy?name=V1L	AB.arppapaa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V1R	AB.arppppaa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V2L	AB.arppapap	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V2R	AB.arppppap	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V3L	AB.plappapa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V3R	AB.prappapa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V4L	AB.arppappa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V4R	AB.arpppppa	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V5L	AB.plapapaap	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V5R	AB.prapapaap	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V6L	AB.arppappp	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=V6R	AB.arpppppp	Seam hypodermal cell, postembryonic blast cell											1					
+http://wormbase.org/db/ontology/anatomy?name=VA1	W.pa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA2	P2.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA3	P3.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA4	P4.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA5	P5.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA6	P6.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA7	P7.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA8	P8.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA9	P9.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA10	P10.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA11	P11.aaaa	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VA12	P12.aaaa	Vent. cord motor neuron, innervates vent. body muscles, but also interneuron in preanal ganglion			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB1	P1.aaap	Vent. cord motor neuron, innervates vent. body muscles, also interneuron in ring			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB2	W.aap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB3	P2.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB4	P3.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB5	P4.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB6	P5.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB7	P6.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB8	P7.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB9	P8.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB10	P9.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VB11	P10.aaap	Vent. cord motor neuron, innervates vent. body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC1	P3.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC2	P4.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC3	P5.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC4	P6.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC5	P7.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VC6	P8.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD1	W.pp	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD2	P1.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD3	P2.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD4	P3.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD5	P4.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD6	P5.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD7	P6.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD8	P7.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD9	P8.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD10	P9.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD11	P10.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD12	P11.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=VD13	P12.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1						
+http://wormbase.org/db/ontology/anatomy?name=W	AB.prapaapa	Postembryonic neuroblast, analogous to Pn.a cells											1					
+http://wormbase.org/db/ontology/anatomy?name=XXXL	AB.plaaapaa	Embryonic head hypodermal cell											1					
+http://wormbase.org/db/ontology/anatomy?name=XXXR	AB.arpappaa	Embryonic head hypodermal cell											1					
+http://wormbase.org/db/ontology/anatomy?name=Y	AB.prpppaaaa	Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male											1	1				
+http://wormbase.org/db/ontology/anatomy?name=Z1	MS.pppaap	Somatic gonad precursor cell											1					
+http://wormbase.org/db/ontology/anatomy?name=Z2	P4.p	Germ line precursor cell											1					
+http://wormbase.org/db/ontology/anatomy?name=Z3	P4.a	Germ line precursor cell											1					
+http://wormbase.org/db/ontology/anatomy?name=Z4	MS.appaap	Somatic gonad precursor cell											1					
+http://wormbase.org/db/ontology/anatomy?name=arc_ant_dr	AB.araaapppa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant
+http://wormbase.org/db/ontology/anatomy?name=arc_ant_dl	AB.alpaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant
+http://wormbase.org/db/ontology/anatomy?name=arc_ant_v	AB.alpapaapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant
+http://wormbase.org/db/ontology/anatomy?name=arc_post_dl	AB.alpaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=arc_post_vl	AB.alpaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=arc_post_dr	AB.araaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=arc_post_d	AB.araaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=arc_post_vr	AB.araaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=arc_post_v	AB.arapapapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post
+http://wormbase.org/db/ontology/anatomy?name=ccDL	M.dlpa	Postembryonic coelomocyte in hermaphrodite								1								
+http://wormbase.org/db/ontology/anatomy?name=ccDR	M.drpa	Postembryonic coelomocyte in hermaphrodite								1								
+http://wormbase.org/db/ontology/anatomy?name=ccD	M.dlpappp	Single male postembryonic coelomocyte												1	1			
+http://wormbase.org/db/ontology/anatomy?name=ccAL	MS.apapaaa	Embryonic coelomocytes - present in adult								1								
+http://wormbase.org/db/ontology/anatomy?name=ccAR	MS.ppapaaa	Embryonic coelomocytes - present in adult								1								
+http://wormbase.org/db/ontology/anatomy?name=ccPL	MS.apapaap	Embryonic coelomocytes - present in adult								1								
+http://wormbase.org/db/ontology/anatomy?name=ccPR	MS.ppapaap	Embryonic coelomocytes - present in adult								1								
+http://wormbase.org/db/ontology/anatomy?name=e1D	AB.araaaapap	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e1VL	AB.araaaaaaa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e1VR	AB.araaaaapa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e2DL	AB.alpaapaap	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e2DR	AB.araaapaap	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e2V	AB.alpappapa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e3D	AB.araapaaaa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e3VL	AB.alpaaaaaa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=e3VR	AB.arapaaaaa	Pharyngeal epithelial cells								1								
+http://wormbase.org/db/ontology/anatomy?name=exc_cell	AB.plpappaap	Large H-shaped excretory cell								1								
+http://wormbase.org/db/ontology/anatomy?name=exc_duct	AB.plpaaaapa	Excretory duct								1								
+http://wormbase.org/db/ontology/anatomy?name=exc_gl_L	AB.plpapapaa	Excretory glands, fused, send processes to ring,open into excretory duct								1								
+http://wormbase.org/db/ontology/anatomy?name=exc_gl_R	AB.prpapapaa	Excretory glands, fused, send processes to ring,open into excretory duct								1								
+http://wormbase.org/db/ontology/anatomy?name=exc	G2.p	Excretory socket, links duct to hypodermis								1								
+http://wormbase.org/db/ontology/anatomy?name=g1AL	MS.aapaapaa	Pharyngeal gland cells								1								
+http://wormbase.org/db/ontology/anatomy?name=g1AR	MS.papaapaa	Pharyngeal gland cells								1								
+http://wormbase.org/db/ontology/anatomy?name=g1P	MS.aaaaapap	Pharyngeal gland cells								1								
+http://wormbase.org/db/ontology/anatomy?name=g2L	MS.aapapaa	Pharyngeal gland cells								1								
+http://wormbase.org/db/ontology/anatomy?name=g2R	MS.papapaa	Pharyngeal gland cells								1								
+http://wormbase.org/db/ontology/anatomy?name=gon_herm_anch	Z1.ppp/Z4.aaa	Anchor cell, induces vulva, herm gonad								1	1							
+http://wormbase.org/db/ontology/anatomy?name=gon_herm_dtc_A	Z1.aa	Anterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad								1	1							
+http://wormbase.org/db/ontology/anatomy?name=gon_herm_dtc_P	Z4.pp	Posterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad								1	1							
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004505;class=Anantomy_term	Z1.apa	Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004504;class=Anantomy_term	Z1.paaa	Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004502;class=Anantomy_term	Z4.pap	Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004500;class=Anantomy_term	Z4.appp	Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004498;class=Anantomy_term	Z1.appaaa	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004496;class=Anantomy_term	Z1.appaap	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004494;class=Anantomy_term	Z1.appapa	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004492;class=Anantomy_term	Z1.appapp	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004490;class=Anantomy_term	Z1.paapaaa	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004476;class=Anantomy_term	Z1.paapaap	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004475;class=Anantomy_term	Z1.paapapa	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004474;class=Anantomy_term	Z1.paapapp	Anterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004472;class=Anantomy_term	Z4.paapaa	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004470;class=Anantomy_term	Z4.paapap	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004468;class=Anantomy_term	Z4.paappa	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004466;class=Anantomy_term	Z4.paappp	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004464;class=Anantomy_term	Z4.appapaa	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004462;class=Anantomy_term	Z4.appapap	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004460;class=Anantomy_term	Z4.appappa	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004218;class=Anantomy_term	Z4.appappp	Posterior epithelial sheaths of proximal arms, have muscle fibers								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004216;class=Anantomy_term	Z1.apppaaaa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004214;class=Anantomy_term	Z1.apppaaap	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004212;class=Anantomy_term	Z1.apppaapa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004210;class=Anantomy_term	Z1.apppaapp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004208;class=Anantomy_term	Z1.apppapaa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004206;class=Anantomy_term	Z1.apppapap	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004204;class=Anantomy_term	Z1.apppapp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004203;class=Anantomy_term	Z1.appppa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004202;class=Anantomy_term	Z1.appppp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004198;class=Anantomy_term	Z1.paappaaaa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004196;class=Anantomy_term	Z1.paappaaap	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004194;class=Anantomy_term	Z1.paappaapa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004192;class=Anantomy_term	Z1.paappaapp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004190;class=Anantomy_term	Z1.paappapaa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004188;class=Anantomy_term	Z1.paappapap	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004186;class=Anantomy_term	Z1.paappapp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004184;class=Anantomy_term	Z1.paapppa	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004183;class=Anantomy_term	Z1.paapppp	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004182;class=Anantomy_term	Z1.papaaad	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004178;class=Anantomy_term	Z1.papaaav	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004176;class=Anantomy_term	Z1.papaapv	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004174;class=Anantomy_term	Z4.apaaaad	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004172;class=Anantomy_term	Z4.apaaaav	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004170;class=Anantomy_term	Z4.apaaapv	Anterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004168;class=Anantomy_term	Z4.paaaaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004166;class=Anantomy_term	Z4.paaaap	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004164;class=Anantomy_term	Z4.paaapaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004163;class=Anantomy_term	Z4.paaapapa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004162;class=Anantomy_term	Z4.paaapapp	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004158;class=Anantomy_term	Z4.paaappaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004156;class=Anantomy_term	Z4.paaappap	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004154;class=Anantomy_term	Z4.paaapppa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004152;class=Anantomy_term	Z4.paaapppp	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004150;class=Anantomy_term	Z4.appaaaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004148;class=Anantomy_term	Z4.appaaap	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004146;class=Anantomy_term	Z4.appaapaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004144;class=Anantomy_term	Z4.appaapapa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004143;class=Anantomy_term	Z4.appaapapp	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004142;class=Anantomy_term	Z4.appaappaa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004141;class=Anantomy_term	Z4.appaappap	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004140;class=Anantomy_term	Z4.appaapppa	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004139;class=Anantomy_term	Z4.appaapppp	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004138;class=Anantomy_term	Z4.apappav	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004137;class=Anantomy_term	Z4.apapppd	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004136;class=Anantomy_term	Z4.apapppv	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004135;class=Anantomy_term	Z1.papppav	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004134;class=Anantomy_term	Z1.pappppd	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004133;class=Anantomy_term	Z1.pappppv	Posterior spermathecae								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004132;class=Anantomy_term	Z1.papaapd	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004131;class=Anantomy_term	Z1.papapaaa	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004130;class=Anantomy_term	Z1.ppaaaaa	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004129;class=Anantomy_term	Z1.ppaaapa	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004128;class=Anantomy_term	Z4.apaaapd	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004127;class=Anantomy_term	Z4.apaapaaa	Anterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004126;class=Anantomy_term	Z1.pappappp	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004125;class=Anantomy_term	Z1.papppad	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004124;class=Anantomy_term	Z4.apapappp	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004123;class=Anantomy_term	Z4.apappad	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004122;class=Anantomy_term	Z4.aapppap	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004121;class=Anantomy_term	Z4.aappppp	Posterior spermathecal-uterine junction								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004120;class=Anantomy_term	Z1.papapaap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004119;class=Anantomy_term	Z1.papapapa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004117;class=Anantomy_term	Z1.papapapp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004115;class=Anantomy_term	Z1.papappaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004113;class=Anantomy_term	Z1.papappap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004111;class=Anantomy_term	Z1.papapppa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004109;class=Anantomy_term	Z1.papapppp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004107;class=Anantomy_term	Z1.pappaaaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004105;class=Anantomy_term	Z1.pappaaap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004101;class=Anantomy_term	Z1.pappaapa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004100;class=Anantomy_term	Z1.pappaapp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004099;class=Anantomy_term	Z1.pappapaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004097;class=Anantomy_term	Z1.pappapap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004095;class=Anantomy_term	Z1.pappappa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004093;class=Anantomy_term	Z4.apaapaap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004091;class=Anantomy_term	Z4.apaapapa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004089;class=Anantomy_term	Z4.apaapapp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004087;class=Anantomy_term	Z4.apaappaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004085;class=Anantomy_term	Z4.apaappap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004081;class=Anantomy_term	Z4.apaapppa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004080;class=Anantomy_term	Z4.apaapppp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004079;class=Anantomy_term	Z4.apapaaaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004077;class=Anantomy_term	Z4.apapaaap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004075;class=Anantomy_term	Z4.apapaapa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004073;class=Anantomy_term	Z4.apapaapp	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004071;class=Anantomy_term	Z4.apapapaa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004069;class=Anantomy_term	Z4.apapapap	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004067;class=Anantomy_term	Z4.apapappa	Dorsal uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004065;class=Anantomy_term	Z1.ppaaaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005095;class=Anantomy_term	Z1.ppaaapp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005094;class=Anantomy_term	Z1.ppaapaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005093;class=Anantomy_term	Z1.ppaapap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004057;class=Anantomy_term	Z1.ppaappa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005091;class=Anantomy_term	Z1.ppaappp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004053;class=Anantomy_term	Z1.ppapaaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004051;class=Anantomy_term	Z1.ppapaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004049;class=Anantomy_term	Z1.ppapapa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004047;class=Anantomy_term	Z1.ppapapp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005088;class=Anantomy_term	Z1.ppappd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003782;class=Anantomy_term	Z1.pppaad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003781;class=Anantomy_term	Z1.pppaav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003780;class=Anantomy_term	Z1.pppapd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003779;class=Anantomy_term	Z1.pppapv	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003778;class=Anantomy_term	Z1.ppppad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003777;class=Anantomy_term	Z1.ppppav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003776;class=Anantomy_term	Z1.pppppaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003775;class=Anantomy_term	Z1.pppppap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003774;class=Anantomy_term	Z1.ppppppa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003773;class=Anantomy_term	Z1.ppppppp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005076;class=Anantomy_term	Z4.aapaad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003771;class=Anantomy_term	Z4.aapaav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003770;class=Anantomy_term	Z4.aapapd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003769;class=Anantomy_term	Z4.aapapv	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003768;class=Anantomy_term	Z4.aappaaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003767;class=Anantomy_term	Z4.aappaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003766;class=Anantomy_term	Z4.aappapa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003765;class=Anantomy_term	Z4.aappapp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005066;class=Anantomy_term	Z4.aapppaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005068;class=Anantomy_term	Z4.aappppa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004065;class=Anantomy_term	Z1.ppaaaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005095;class=Anantomy_term	Z1.ppaaapp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005094;class=Anantomy_term	Z1.ppaapaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005093;class=Anantomy_term	Z1.ppaapap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004057;class=Anantomy_term	Z1.ppaappa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005091;class=Anantomy_term	Z1.ppaappp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005090;class=Anantomy_term	Z1.ppapad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005089;class=Anantomy_term	Z1.ppapav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005088;class=Anantomy_term	Z1.ppappd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005087;class=Anantomy_term	Z1.ppappv	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005086;class=Anantomy_term	Z4.aaaaaaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005085;class=Anantomy_term	Z4.aaaaaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005084;class=Anantomy_term	Z4.aaaaapa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005083;class=Anantomy_term	Z4.aaaaapp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005082;class=Anantomy_term	Z4.aaaapd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005081;class=Anantomy_term	Z4.aaaapv	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005080;class=Anantomy_term	Z4.aaapad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005079;class=Anantomy_term	Z4.aaapav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005078;class=Anantomy_term	Z4.aaappv	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005077;class=Anantomy_term	Z4.aaappd	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005076;class=Anantomy_term	Z4.aapaad	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003771;class=Anantomy_term	Z4.aapaav	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005074;class=Anantomy_term	Z4.aapapaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005073;class=Anantomy_term	Z4.aapapap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005072;class=Anantomy_term	Z4.aapappa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005071;class=Anantomy_term	Z4.aapappp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003768;class=Anantomy_term	Z4.aappaaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005069;class=Anantomy_term	Z4.apppaap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005068;class=Anantomy_term	Z4.aappppa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005067;class=Anantomy_term	Z4.aappppp	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005066;class=Anantomy_term	Z4.aapppaa	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005065;class=Anantomy_term	Z4.aapppap	Ventral uterus								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005064;class=Anantomy_term	Z1.a	Distal tip cell, inhibits meiosis in nearby germ cells												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005063;class=Anantomy_term	Z1.p	Distal tip cell, inhibits meiosis in nearby grem cells												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=gon_male_link	Z1.paa/Z4.aaa	Linker cell, leads gonad during morphogenesis and initiates union with cloaca												1	1			
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005061;class=Anantomy_term	Z1.ppaaaaa	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005060;class=Anantomy_term	Z1.ppaaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005059;class=Anantomy_term	Z1.ppaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005058;class=Anantomy_term	Z1.ppaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005057;class=Anantomy_term	Z1.ppap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005056;class=Anantomy_term	Z1.pppaaaa	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005055;class=Anantomy_term	Z1.pppaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005054;class=Anantomy_term	Z1.pppaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005052;class=Anantomy_term	Z1.pppap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005050;class=Anantomy_term	Z1.pppp	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005048;class=Anantomy_term	Z1.pappp	Seminal vesicle, outer												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005046;class=Anantomy_term	Z4.aaapp	Seminal vesicle, outer												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005044;class=Anantomy_term	Z4.aappp	Seminal vesicle, outer												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005042;class=Anantomy_term	Z4.apaaaaa	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005040;class=Anantomy_term	Z4.apaaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005036;class=Anantomy_term	Z4.apaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005035;class=Anantomy_term	Z4.apaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005034;class=Anantomy_term	Z4.apap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005032;class=Anantomy_term	Z4.appaaaa	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005030;class=Anantomy_term	Z4.appaaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005028;class=Anantomy_term	Z4.appaap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005026;class=Anantomy_term	Z4.appap	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005024;class=Anantomy_term	Z4.appp	Seminal vesicle, inner												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005022;class=Anantomy_term	Z1.paapp	Seminal vesicle, outer												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005020;class=Anantomy_term	Z1.papaaaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005016;class=Anantomy_term	Z1.papaaap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005015;class=Anantomy_term	Z1.papaapaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005014;class=Anantomy_term	Z1.papaapap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005012;class=Anantomy_term	Z1.papaappaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005010;class=Anantomy_term	Z1.papaappap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005008;class=Anantomy_term	Z1.papaappp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005006;class=Anantomy_term	Z1.papapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005004;class=Anantomy_term	Z1.papapp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005002;class=Anantomy_term	Z1.pappa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0005000;class=Anantomy_term	Z4.aaaaaaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004996;class=Anantomy_term	Z4.aaaaaap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004995;class=Anantomy_term	Z4.aaaaapaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004994;class=Anantomy_term	Z4.aaaaapap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004992;class=Anantomy_term	Z4.aaaaappaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004990;class=Anantomy_term	Z4.aaaaappap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004988;class=Anantomy_term	Z4.aaaaappp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004986;class=Anantomy_term	Z4.aaaapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004984;class=Anantomy_term	Z4.aaaapp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004982;class=Anantomy_term	Z4.aaapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004980;class=Anantomy_term	Z4.aapaaaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004716;class=Anantomy_term	Z4.aapaaap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004715;class=Anantomy_term	Z4.aapaapaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004714;class=Anantomy_term	Z4.aapaapap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004713;class=Anantomy_term	Z4.aapaappaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004712;class=Anantomy_term	Z4.aapaappap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004711;class=Anantomy_term	Z4.aapaappp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004710;class=Anantomy_term	Z4.aapapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004709;class=Anantomy_term	Z4.aapapp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004708;class=Anantomy_term	Z4.aappa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004707;class=Anantomy_term	Z1.paaaaaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004706;class=Anantomy_term	Z1.paaaaap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004705;class=Anantomy_term	Z1.paaaapaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004704;class=Anantomy_term	Z1.paaaapap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004703;class=Anantomy_term	Z1.paaaappaa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004702;class=Anantomy_term	Z1.paaaappap	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004701;class=Anantomy_term	Z1.paaaappp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004700;class=Anantomy_term	Z1.paaapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004699;class=Anantomy_term	Z1.paaapp	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004698;class=Anantomy_term	Z1.paapa	Vas deferens												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=hmc	MS.appaaa	Head mesodermal cell, function unknown								1								
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004694;class=Anantomy_term	AB.alpaapppa	Cylindrical hypodermal syncytium in head								1						1	1	hyp1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004694;class=Anantomy_term	AB.araaapppp	Cylindrical hypodermal syncytium in head								1						1	1	hyp1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004694;class=Anantomy_term	AB.arappaapa	Cylindrical hypodermal syncytium in head								1						1	1	hyp1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004692;class=Anantomy_term	AB.alpaapppp	Cylindrical hypodermal syncytium in head								1						1	1	hyp2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004692;class=Anantomy_term	AB.alpapaaap	Cylindrical hypodermal syncytium in head								1						1	1	hyp2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004690;class=Anantomy_term	AB.plaapaaaa	Cylindrical hypodermal syncytium in head								1						1	1	hyp3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004690;class=Anantomy_term	AB.praapaaaa	Cylindrical hypodermal syncytium in head								1						1	1	hyp3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004687;class=Anantomy_term	AB.arpapapa	Cylindrical hypodermal syncytium in head								1						1	1	hyp4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004687;class=Anantomy_term	AB.plaappaa	Cylindrical hypodermal syncytium in head								1						1	1	hyp4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004687;class=Anantomy_term	AB.praappaa	Cylindrical hypodermal syncytium in head								1						1	1	hyp4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004685;class=Anantomy_term	AB.arpappap	Cylindrical hypodermal syncytium in head								1						1	1	hyp5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004685;class=Anantomy_term	AB.plaaapap	Cylindrical hypodermal syncytium in head								1						1	1	hyp5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.arpaapaa	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.arpapapp	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.plaaaapa	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.plaaaapp	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.plaappap	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004679;class=Anantomy_term	AB.praappap	Cylindrical hypodermal syncytium in head								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004678;class=Anantomy_term	AB.arpaapap	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004677;class=Anantomy_term	AB.arpaappa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004676;class=Anantomy_term	AB.arpaappp	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004675;class=Anantomy_term	AB.arppaapa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004674;class=Anantomy_term	AB.arpppapa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004673;class=Anantomy_term	AB.plaapppa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004672;class=Anantomy_term	AB.plaapppp	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004671;class=Anantomy_term	AB.plappppa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004670;class=Anantomy_term	AB.praapppa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004669;class=Anantomy_term	AB.praapppp	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004668;class=Anantomy_term	AB.prappppa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004667;class=Anantomy_term	C.aaaaa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004666;class=Anantomy_term	C.aaaap	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004665;class=Anantomy_term	C.aaapa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004664;class=Anantomy_term	C.aaapp	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004663;class=Anantomy_term	C.aappd	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004662;class=Anantomy_term	C.paaaa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004661;class=Anantomy_term	C.paaap	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004660;class=Anantomy_term	C.paapa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004659;class=Anantomy_term	C.paapp	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004658;class=Anantomy_term	C.papaa	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004657;class=Anantomy_term	C.papap	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004656;class=Anantomy_term	C.pappd	Embryonic large hypodermal syncytium											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004655;class=Anantomy_term	H1L.apa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004654;class=Anantomy_term	H1L.appa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004652;class=Anantomy_term	H1L.p	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004650;class=Anantomy_term	H1R.apa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004648;class=Anantomy_term	H1R.appa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004646;class=Anantomy_term	H1R.p	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004644;class=Anantomy_term	H2L.ap	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004642;class=Anantomy_term	H2L.pa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004640;class=Anantomy_term	H2L.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004636;class=Anantomy_term	H2L.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004635;class=Anantomy_term	H2R.ap	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004634;class=Anantomy_term	H2R.pa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004632;class=Anantomy_term	H2R.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004630;class=Anantomy_term	H2R.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004628;class=Anantomy_term	V1L.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004626;class=Anantomy_term	V1L.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004624;class=Anantomy_term	V1L.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004622;class=Anantomy_term	V1L.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004620;class=Anantomy_term	V1L.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004616;class=Anantomy_term	V1L.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004615;class=Anantomy_term	V1L.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004614;class=Anantomy_term	V1R.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004612;class=Anantomy_term	V1R.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004610;class=Anantomy_term	V1R.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004608;class=Anantomy_term	V1R.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004606;class=Anantomy_term	V1R.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004604;class=Anantomy_term	V1R.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004602;class=Anantomy_term	V1R.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004600;class=Anantomy_term	V2L.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004596;class=Anantomy_term	V2L.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004595;class=Anantomy_term	V2L.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004594;class=Anantomy_term	V2L.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004592;class=Anantomy_term	V2L.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004590;class=Anantomy_term	V2L.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004588;class=Anantomy_term	V2L.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004586;class=Anantomy_term	V2R.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004584;class=Anantomy_term	V2R.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004582;class=Anantomy_term	V2R.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004580;class=Anantomy_term	V2R.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004281;class=Anantomy_term	V2R.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004280;class=Anantomy_term	V2R.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004279;class=Anantomy_term	V2R.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004278;class=Anantomy_term	V3L.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004277;class=Anantomy_term	V3L.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004276;class=Anantomy_term	V3L.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004275;class=Anantomy_term	V3L.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004274;class=Anantomy_term	V3L.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004273;class=Anantomy_term	V3L.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004272;class=Anantomy_term	V3L.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004271;class=Anantomy_term	V3R.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004270;class=Anantomy_term	V3R.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004269;class=Anantomy_term	V3R.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004268;class=Anantomy_term	V3R.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004267;class=Anantomy_term	V3R.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004266;class=Anantomy_term	V3R.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004265;class=Anantomy_term	V3R.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004264;class=Anantomy_term	V4L.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004263;class=Anantomy_term	V4L.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004262;class=Anantomy_term	V4L.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004261;class=Anantomy_term	V4L.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004260;class=Anantomy_term	V4L.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004259;class=Anantomy_term	V4L.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004258;class=Anantomy_term	V4L.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004257;class=Anantomy_term	V4R.a	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004256;class=Anantomy_term	V4R.paa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004255;class=Anantomy_term	V4R.papa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004254;class=Anantomy_term	V4R.pappa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004253;class=Anantomy_term	V4R.ppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004252;class=Anantomy_term	V4R.pppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004251;class=Anantomy_term	V4R.ppppa	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004250;class=Anantomy_term	V5L.a	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004249;class=Anantomy_term	V5L.ppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004248;class=Anantomy_term	V5L.pppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004247;class=Anantomy_term	V5L.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004246;class=Anantomy_term	V5R.a	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004219;class=Anantomy_term	V5R.ppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004244;class=Anantomy_term	V5R.pppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004213;class=Anantomy_term	V5R.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004242;class=Anantomy_term	V6L.a	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004209;class=Anantomy_term	V6L.paa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004240;class=Anantomy_term	V6L.papa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004205;class=Anantomy_term	V6L.pappa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004201;class=Anantomy_term	V6L.ppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004237;class=Anantomy_term	V6L.pppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004236;class=Anantomy_term	V6L.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004235;class=Anantomy_term	V6R.a	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004234;class=Anantomy_term	V6R.paa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004233;class=Anantomy_term	V6R.papa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004191;class=Anantomy_term	V6R.pappa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004231;class=Anantomy_term	V6R.ppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004230;class=Anantomy_term	V6R.pppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004229;class=Anantomy_term	V6R.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004181;class=Anantomy_term	TL.aa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004227;class=Anantomy_term	TL.apaa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004226;class=Anantomy_term	TL.apap	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004171;class=Anantomy_term	TR.aa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004169;class=Anantomy_term	TR.apaa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007029;class=Anantomy_term	TR.apap	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004250;class=Anantomy_term	V5L.a	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004249;class=Anantomy_term	V5L.ppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004223;class=Anantomy_term	V5L.pppaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004222;class=Anantomy_term	V5L.pppapa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004247;class=Anantomy_term	V5L.ppppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004246;class=Anantomy_term	V5R.a	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004219;class=Anantomy_term	V5R.ppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004217;class=Anantomy_term	V5R.pppaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004215;class=Anantomy_term	V5R.pppapa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004213;class=Anantomy_term	V5R.ppppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004242;class=Anantomy_term	V6L.a	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004209;class=Anantomy_term	V6L.paa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004207;class=Anantomy_term	V6L.papaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004205;class=Anantomy_term	V6L.pappa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004201;class=Anantomy_term	V6L.ppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004200;class=Anantomy_term	V6L.pppaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004199;class=Anantomy_term	V6L.ppppap	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004235;class=Anantomy_term	V6R.a	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004234;class=Anantomy_term	V6R.paa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004193;class=Anantomy_term	V6R.papaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004191;class=Anantomy_term	V6R.pappa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004231;class=Anantomy_term	V6R.ppa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004187;class=Anantomy_term	V6R.pppaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004185;class=Anantomy_term	V6R.ppppap	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004181;class=Anantomy_term	TL.aa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004227;class=Anantomy_term	TL.apaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004179;class=Anantomy_term	TL.apapa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004177;class=Anantomy_term	TL.apappp	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004175;class=Anantomy_term	TL.appaap	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004173;class=Anantomy_term	TL.appapp	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004171;class=Anantomy_term	TR.aa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004169;class=Anantomy_term	TR.apaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004167;class=Anantomy_term	TR.apapa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004165;class=Anantomy_term	TR.apappp	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004161;class=Anantomy_term	TR.appaap	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004160;class=Anantomy_term	TR.appapp	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004159;class=Anantomy_term	P1.p	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004157;class=Anantomy_term	P2.p	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004155;class=Anantomy_term	P3.pa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004153;class=Anantomy_term	P3.pp	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004151;class=Anantomy_term	P4.pa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004149;class=Anantomy_term	P4.pp	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004147;class=Anantomy_term	P8.pa	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004145;class=Anantomy_term	P8.pp	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004392;class=Anantomy_term	P9.p	Postembryonic large hypodermal syncytium								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004400;class=Anantomy_term	P10.p	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004399;class=Anantomy_term	P11.p	Postembryonic large hypodermal syncytium, hermaphrodite								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004398;class=Anantomy_term	P3.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004397;class=Anantomy_term	P4.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004396;class=Anantomy_term	P5.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004395;class=Anantomy_term	P6.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004394;class=Anantomy_term	P7.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004393;class=Anantomy_term	P8.p	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007217;class=Anantomy_term	P10.paaa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007218;class=Anantomy_term	P10.paap	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007220;class=Anantomy_term	P10.papa	Postembryonic large hypodermal syncytium, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007856;class=Anantomy_term	AB.plpppapap	Tail ventral hypodermis								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0007856;class=Anantomy_term	AB.prpppapap	Tail ventral hypodermis								1						1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004378;class=Anantomy_term	AB.plppppppp	Tail ventral hypodermis								1						1	1	hyp10
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004378;class=Anantomy_term	AB.prppppppp	Tail ventral hypodermis								1						1	1	hyp10
+http://wormbase.org/db/ontology/anatomy?name=hyp11	C.pappa	Tail dorsal hypodermis								1								
+http://wormbase.org/db/ontology/anatomy?name=hyp12	P12.pa	Preanal hypodermis								1								
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004375;class=Anantomy_term	P10.papp	Hook - male												1	1	1		?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004374;class=Anantomy_term	P11.ppaa	Hypodermis associated with hook sensillum of male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004373;class=Anantomy_term	P11.ppap	Hypodermis associated with hook sensillum of male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004372;class=Anantomy_term	P11.ppp	Hypodermis associated with hook sensillum of male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004361;class=Anantomy_term	E.alaad	Intestinal cell								1						1	1	int1dl
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004360;class=Anantomy_term	E.alaav	Intestinal cell								1						1	1	int1vl
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004359;class=Anantomy_term	E.alap	Intestinal cell								1						1	1	int3v
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004358;class=Anantomy_term	E.alpa	Intestinal cell								1						1	1	int2v
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004357;class=Anantomy_term	E.alpp	Intestinal cell								1						1	1	int5l
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004356;class=Anantomy_term	E.araad	Intestinal cell								1						1	1	int1dr
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004355;class=Anantomy_term	E.araav	Intestinal cell								1						1	1	int1vr
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004354;class=Anantomy_term	E.arap	Intestinal cell								1						1	1	int3d
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004353;class=Anantomy_term	E.arpa	Intestinal cell								1						1	1	int2d
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004352;class=Anantomy_term	E.arpp	Intestinal cell								1						1	1	int5r
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004351;class=Anantomy_term	E.plaa	Intestinal cell								1						1	1	int4v
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004350;class=Anantomy_term	E.plap	Intestinal cell								1						1	1	int6l
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004349;class=Anantomy_term	E.plpa	Intestinal cell								1						1	1	int7l
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004348;class=Anantomy_term	E.plppa	Intestinal cell								1						1	1	int8l
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004347;class=Anantomy_term	E.plppp	Intestinal cell								1						1	1	int9l
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004346;class=Anantomy_term	E.praa	Intestinal cell								1						1	1	int4d
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004345;class=Anantomy_term	E.prap	Intestinal cell								1						1	1	int6r
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004344;class=Anantomy_term	E.prpa	Intestinal cell								1						1	1	int7r
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004343;class=Anantomy_term	E.prppa	Intestinal cell								1						1	1	int8r
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004342;class=Anantomy_term	E.prppp	Intestinal cell								1						1	1	int9r
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004341;class=Anantomy_term	In.a	Postembryonic intestinal cell								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004340;class=Anantomy_term	In.p	Postembryonic intestinal cell								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=linker_killer	U.lp or U.rp	One of these cells, sometimes fused with U.l/ra, phagocytoses the male linker cell												1	1			
+http://wormbase.org/db/ontology/anatomy?name=m1DL	AB.araapaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m1DR	AB.araappaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m1L	AB.araaaaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m1R	AB.araaaaapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m1VL	AB.alpaaaapa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m1VR	AB.araaaaapa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2DL	AB.araapaapa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2DR	AB.araappapa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2L	AB.alpaaapaa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2R	AB.arapaapaa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2VL	AB.alpaaaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m2VR	AB.arapaaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3DL	MS.aaapaaa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3DR	MS.paaaapa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3L	AB.alpaapapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3R	AB.arapaappa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3VL	AB.alpappppp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m3VR	AB.arapapppp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4DL	MS.aaaaapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4DR	MS.paaaapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4L	MS.aaapaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4R	AB.araaapapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4VL	MS.aapaaaa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m4VR	MS.papappp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5DL	MS.aaaapap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5DR	MS.paaappa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5L	AB.araapapap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5R	AB.araapppap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5VL	MS.aapaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m5VR	MS.papaaap	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m6D	MS.paaappp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m6VL	MS.aapappa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m6VR	MS.papappa	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m7D	MS.aaaappp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m7VL	MS.aapaapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m7VR	MS.papaapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=m8	MS.aaapapp	Pharyngeal muscle cell						1										
+http://wormbase.org/db/ontology/anatomy?name=mc1DL	AB.alpaapapa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc1DR	AB.araaapapa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc1V	AB.alpappppa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc2DL	AB.araapaapp	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc2DR	AB.araappapp	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc2V	AB.arapapppa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc3DL	MS.aaapapa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc3DR	MS.paapapa	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mc3V	AB.alpappapp	Pharyngeal marginal cell								1								
+http://wormbase.org/db/ontology/anatomy?name=mu_anal	AB.plpppppap	Anal depressor muscle							1									
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004291;class=Anantomy_term	AB.prpppppaa						1									1	1	mu_bod_vr20
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004290;class=Anantomy_term	C.apaaaa						1									1	1	mu_bod_vl9
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004289;class=Anantomy_term	C.apaaap						1									1	1	mu_bod_vl11
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004288;class=Anantomy_term	C.apaapa						1									1	1	mu_bod_vl13
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004287;class=Anantomy_term	C.apaapp						1									1	1	mu_bod_vl15
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004286;class=Anantomy_term	C.apapaa						1									1	1	mu_bod_dl13
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004285;class=Anantomy_term	C.apapap						1									1	1	mu_bod_dl17
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004284;class=Anantomy_term	C.apappa						1									1	1	mu_bod_vl20
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004283;class=Anantomy_term	C.apappp						1									1	1	mu_bod_vl22
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004282;class=Anantomy_term	C.appaaa						1									1	1	mu_bod_dl11
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003982;class=Anantomy_term	C.appaap						1									1	1	mu_bod_dl18
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003981;class=Anantomy_term	C.appapa						1									1	1	mu_bod_dl19
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003980;class=Anantomy_term	C.appapp						1									1	1	mu_bod_dl23
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003979;class=Anantomy_term	C.apppaa						1									1	1	mu_bod_dl20
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003978;class=Anantomy_term	C.apppap						1									1	1	mu_bod_dl22
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003977;class=Anantomy_term	C.appppd						1									1	1	mu_bod_dl24
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003976;class=Anantomy_term	C.appppv						1									1	1	mu_bod_vl23
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003975;class=Anantomy_term	C.ppaaaa						1									1	1	mu_bod_vr9
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003974;class=Anantomy_term	C.ppaaap						1									1	1	mu_bod_vr11
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003973;class=Anantomy_term	C.ppaapa						1									1	1	mu_bod_vr13
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003952;class=Anantomy_term	C.ppaapp						1									1	1	mu_bod_vr15
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003951;class=Anantomy_term	C.ppapaa						1									1	1	mu_bod_dr13
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003950;class=Anantomy_term	C.ppapap						1									1	1	mu_bod_dr17
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003949;class=Anantomy_term	C.ppappa						1									1	1	mu_bod_vr19
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003948;class=Anantomy_term	C.ppappp						1									1	1	mu_bod_vr22
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003947;class=Anantomy_term	C.pppaaa						1									1	1	mu_bod_dr11
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003946;class=Anantomy_term	C.pppaap						1									1	1	mu_bod_dr18
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003945;class=Anantomy_term	C.pppapa						1									1	1	mu_bod_dr19
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003944;class=Anantomy_term	C.pppapp						1									1	1	mu_bod_dr23
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003943;class=Anantomy_term	C.ppppaa						1									1	1	mu_bod_dr20
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003922;class=Anantomy_term	C.ppppap						1									1	1	mu_bod_dr22
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003921;class=Anantomy_term	C.pppppd						1									1	1	mu_bod_dr24
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003920;class=Anantomy_term	C.pppppv						1									1	1	mu_bod_vr24
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003919;class=Anantomy_term	D.aaaa						1									1	1	mu_bod_vl5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003917;class=Anantomy_term	D.aapa						1									1	1	mu_bod_vl4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003918;class=Anantomy_term	D.aaap						1									1	1	mu_bod_dl7
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003916;class=Anantomy_term	D.aapp						1									1	1	mu_bod_vl6
+mu_bod	D.apaa	Embryonic body wall muscle					1									1	1	
+mu_bod	D.apap	Embryonic body wall muscle					1									1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003915;class=Anantomy_term	D.appaa						1									1	1	mu_bod_dl8
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003914;class=Anantomy_term	D.aappap						1									1	1	mu_bod_dl10
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003913;class=Anantomy_term	D.aapppa						1									1	1	mu_bod_dl12
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003902;class=Anantomy_term	D.aapppp						1									1	1	mu_bod_dl14
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003901;class=Anantomy_term	D.paaa						1									1	1	mu_bod_vr5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003900;class=Anantomy_term	D.paap						1									1	1	mu_bod_dr7
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003899;class=Anantomy_term	D.papa						1									1	1	mu_bod_vr4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003898;class=Anantomy_term	D.papp						1									1	1	mu_bod_vr6
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003897;class=Anantomy_term	D.ppaa						1									1	1	mu_bod_vr7
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003896;class=Anantomy_term	D.ppap						1									1	1	mu_bod_dr9
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003895;class=Anantomy_term	D.pppaa						1									1	1	mu_bod_dr8
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003894;class=Anantomy_term	D.pppap						1									1	1	mu_bod_dr10
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003893;class=Anantomy_term	D.ppppa						1									1	1	mu_bod_dr12
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003882;class=Anantomy_term	D.ppppp						1									1	1	mu_bod_dr14
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003881;class=Anantomy_term	MS.aapppaa						1									1	1	mu_bod_vl8
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003880;class=Anantomy_term	MS.aapppap						1									1	1	mu_bod_vl10
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003879;class=Anantomy_term	MS.aappppa						1									1	1	mu_bod_vl12
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003878;class=Anantomy_term	MS.aappppp						1									1	1	mu_bod_vl14
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003877;class=Anantomy_term	MS.apaaap						1									1	1	mu_bod_dl1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003876;class=Anantomy_term	MS.apapap						1									1	1	mu_bod_vl1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003875;class=Anantomy_term	MS.apappa						1									1	1	mu_bod_dl2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003874;class=Anantomy_term	MS.apappp						1									1	1	mu_bod_dl3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003873;class=Anantomy_term	MS.appapp						1									1	1	mu_bod_vl2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003862;class=Anantomy_term	MS.apppaa						1									1	1	mu_bod_vl3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003861;class=Anantomy_term	MS.apppap						1									1	1	mu_bod_dl5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003860;class=Anantomy_term	MS.appppa						1									1	1	mu_bod_dl4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003859;class=Anantomy_term	MS.appppp						1									1	1	mu_bod_dl6
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003858;class=Anantomy_term	MS.pappaa						1									1	1	mu_bod_vl16
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003857;class=Anantomy_term	MS.pappap						1									1	1	mu_bod_vr16
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003856;class=Anantomy_term	MS.papppaa						1									1	1	mu_bod_vr8
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003855;class=Anantomy_term	MS.papppap						1									1	1	mu_bod_vr10
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003854;class=Anantomy_term	MS.pappppa						1									1	1	mu_bod_vr12
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003853;class=Anantomy_term	MS.pappppp						1									1	1	mu_bod_vr14
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003842;class=Anantomy_term	MS.ppaaap						1									1	1	mu_bod_dr1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003841;class=Anantomy_term	MS.ppapap						1									1	1	mu_bod_vr1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003840;class=Anantomy_term	MS.ppappa						1									1	1	mu_bod_dr2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003839;class=Anantomy_term	MS.ppappp						1									1	1	mu_bod_dr3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003838;class=Anantomy_term	MS.pppapp						1									1	1	mu_bod_vr2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003837;class=Anantomy_term	MS.ppppaa						1									1	1	mu_bod_vr3
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003836;class=Anantomy_term	MS.ppppap						1									1	1	mu_bod_dr5
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003835;class=Anantomy_term	MS.pppppa						1									1	1	mu_bod_dr4
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003834;class=Anantomy_term	MS.pppppp						1									1	1	mu_bod_dr6
+mu_bod	M.dlaa	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.dlap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.dlpp	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.draa	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.drap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.drpp	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vlaa	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vlap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vlpap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vlpp	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vraa	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vrap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vrpap	Postembryonic body wall muscle					1									1	1	
+mu_bod	M.vrpp	Postembryonic body wall muscle					1									1	1	
+http://wormbase.org/db/ontology/anatomy?name=mu_int_L	AB.plpppppaa	Intestinal muscles, attach to intestine and body wall anterior to anus							1									
+http://wormbase.org/db/ontology/anatomy?name=mu_int_R	MS.ppaapp	Intestinal muscles, attach to intestine and body wall anterior to anus							1									
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003821;class=Anantomy_term	M.dlpaaaap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003820;class=Anantomy_term	M.dlpaaapa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003819;class=Anantomy_term	M.dlpaaapp	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003818;class=Anantomy_term	M.dlpaapaa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003817;class=Anantomy_term	M.dlpaapap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003816;class=Anantomy_term	M.dlpapaaa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003815;class=Anantomy_term	M.dlpapaap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003814;class=Anantomy_term	M.drpaaaap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003813;class=Anantomy_term	M.drpaaapa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003802;class=Anantomy_term	M.drpaaapp	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003801;class=Anantomy_term	M.drpaapaa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003800;class=Anantomy_term	M.drpaappa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003799;class=Anantomy_term	M.drpaapap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003798;class=Anantomy_term	M.drpapaaa	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003797;class=Anantomy_term	M.drpapaap	Diagonal tail muscles in male body wall												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003796;class=Anantomy_term	M.dlpappap	Gubernaculum erector												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003795;class=Anantomy_term	M.drpappap	Gubernaculum erector												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003794;class=Anantomy_term	M.dlpapapa	Gubernaculum retractor												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003793;class=Anantomy_term	M.drpapapa	Gubernaculum retractor												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003792;class=Anantomy_term	M.vlpaaaaa	Anterior outer longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003791;class=Anantomy_term	M.vlpaaaap	Posterior outer longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003790;class=Anantomy_term	M.vlpaaapa	Anterior inner longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003789;class=Anantomy_term	M.vlpaaapp	Posterior inner longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003788;class=Anantomy_term	M.vlpaapp	Caudal longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003787;class=Anantomy_term	M.vrpaaaaa	Anterior outer longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003786;class=Anantomy_term	M.vrpaaaap	Posterior outer longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003785;class=Anantomy_term	M.vrpaaapa	Anterior inner longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003784;class=Anantomy_term	M.vrpaaapp	Posterior inner longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0003783;class=Anantomy_term	M.vrpaapp	Caudal longitudinal male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004916;class=Anantomy_term	M.dlpapapp	Anterior oblique male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004915;class=Anantomy_term	M.dlpappaa	Posterior oblique male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004914;class=Anantomy_term	M.drpapapp	Anterior oblique male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004913;class=Anantomy_term	M.drpappap	Posterior oblique male muscle												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004912;class=Anantomy_term	M.dlpaaaaa	Ventral spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004911;class=Anantomy_term	M.dlpaappa	Ventral spicule retractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004910;class=Anantomy_term	M.dlpaappp	Dorsal spicule retractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004909;class=Anantomy_term	M.prpaaaaa	Ventral spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004908;class=Anantomy_term	M.drpaappp	Ventral spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004907;class=Anantomy_term	M.drpappaa	Dorsal spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004886;class=Anantomy_term	M.vlpaapa	Dorsal spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004885;class=Anantomy_term	M.vrpaapa	Dorsal spicule protractor, male												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=mu_sph	AB.prpppppap	Sphincter muscle of intestino-rectal valve							1									
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004883;class=Anantomy_term	M.vlpaaaaa	Uterine muscle 2							1		1							?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004882;class=Anantomy_term	M.vlpaaaap	Uterine muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004881;class=Anantomy_term	M.vlpaappa	Uterine muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004880;class=Anantomy_term	M.vlpaappp	Uterine muscle 2							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004879;class=Anantomy_term	M.vrpaaaaa	Uterine muscle 2							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004878;class=Anantomy_term	M.vrpaaaap	Uterine muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004877;class=Anantomy_term	M.vrpaappa	Uterine muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004856;class=Anantomy_term	M.vrpaappp	Uterine muscle 2							1		1							?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004855;class=Anantomy_term	M.vlpaaapa	Vulval muscle 2							1		1							?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004854;class=Anantomy_term	M.vlpaaapp	Vulval muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004853;class=Anantomy_term	M.vlpaapaa	Vulval muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004852;class=Anantomy_term	M.vlpaapap	Vulval muscle 2							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004851;class=Anantomy_term	M.vrpaaapa	Vulval muscle 2							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004850;class=Anantomy_term	M.vrpaaapp	Vulval muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004849;class=Anantomy_term	M.vrpaapaa	Vulval muscle 1							1		1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004848;class=Anantomy_term	M.vrpaapap	Vulval muscle 2							1		1							?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004847;class=Anantomy_term	B.alaalv/B.araalv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004836;class=Anantomy_term	B.alaarv/B.araarv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004835;class=Anantomy_term	B.alapaad	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004834;class=Anantomy_term	B.alapapa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004833;class=Anantomy_term	B.alapapp	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004832;class=Anantomy_term	B.alappv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004831;class=Anantomy_term	B.alppalv/B.arppalv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004830;class=Anantomy_term	B.alppald/B.arppald	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004829;class=Anantomy_term	B.alpparv/B.arpparv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004828;class=Anantomy_term	B.alppl/B.arppl	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004827;class=Anantomy_term	B.alppr/B.arppr	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004816;class=Anantomy_term	B.arapaad	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004815;class=Anantomy_term	B.arapapa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004814;class=Anantomy_term	B.arapapp	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004813;class=Anantomy_term	B.arappv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004812;class=Anantomy_term	B.paa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004811;class=Anantomy_term	B.pap	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004810;class=Anantomy_term	B.pppa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004809;class=Anantomy_term	F.lvv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004808;class=Anantomy_term	F.rvv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=R1_hyp	V5.pppppp, R1.p	Ray 1 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam								1								
+http://wormbase.org/db/ontology/anatomy?name=R2_hyp	V6.papapp, R2.p	Ray 2 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam								1								
+http://wormbase.org/db/ontology/anatomy?name=R3_hyp	V6.papppp, R3.p	Male sensory ray 3 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R4_hyp	V6.pppapp, R4.p	Male sensory ray 4 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R5_hyp	V6.ppppap, R5.p	Male sensory ray 5 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R6_hyp	V6.pppppp, R6.p	Male sensory ray 6 hypodermal cell, fuses with hypodermal syncytium												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R7_hyp	T.apappp, R7.p	Male sensory ray 7 hypodermal cell, fuses with hypodermal syncytium												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R8_hyp	T.appaap, R8.p	Male sensory ray 8 hypodermal cell, fuses with hypodermal syncytium												1	1			
+http://wormbase.org/db/ontology/anatomy?name=R9_hyp	T.appapp, R9.p	Male sensory ray 9 hypodermal cell, fuses with hypodermal syncytium												1	1			
+http://wormbase.org/db/ontology/anatomy?name=rect_D	AB.plpappppp	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1								
+http://wormbase.org/db/ontology/anatomy?name=rect_VL	AB.plppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1								
+http://wormbase.org/db/ontology/anatomy?name=rect_VR	AB.prppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1								
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004775;class=Anantomy_term	H1L.aa	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004774;class=Anantomy_term	H1L.appp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004773;class=Anantomy_term	H1R.aa	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004772;class=Anantomy_term	H1R.appp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004771;class=Anantomy_term	H2L.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004770;class=Anantomy_term	H2R.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004769;class=Anantomy_term	V1L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004768;class=Anantomy_term	V1L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004767;class=Anantomy_term	V1R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004756;class=Anantomy_term	V1R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004755;class=Anantomy_term	V2L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004754;class=Anantomy_term	V2L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004753;class=Anantomy_term	V2R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004752;class=Anantomy_term	V2R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004751;class=Anantomy_term	V3L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004750;class=Anantomy_term	V3L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004749;class=Anantomy_term	V3R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004748;class=Anantomy_term	V3R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004747;class=Anantomy_term	V4L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004736;class=Anantomy_term	V4L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004735;class=Anantomy_term	V4R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004734;class=Anantomy_term	V4R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004733;class=Anantomy_term	V5L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004732;class=Anantomy_term	V5R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004731;class=Anantomy_term	V6L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004730;class=Anantomy_term	V6L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004729;class=Anantomy_term	V6R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004728;class=Anantomy_term	V6R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004727;class=Anantomy_term	TL.appa	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004726;class=Anantomy_term	TR.appa	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004725;class=Anantomy_term	V5L.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004724;class=Anantomy_term	V5R.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1	
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004723;class=Anantomy_term	V5L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004722;class=Anantomy_term	V5R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004721;class=Anantomy_term	V6L.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004720;class=Anantomy_term	V6L.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004719;class=Anantomy_term	V6L.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004718;class=Anantomy_term	V6L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004717;class=Anantomy_term	V6R.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004516;class=Anantomy_term	V6R.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004515;class=Anantomy_term	V6R.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004514;class=Anantomy_term	V6R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004513;class=Anantomy_term	AB.plppppppa	Used during embryogenesis to make tail spike, then die											1			1		
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004512;class=Anantomy_term	AB.prppppppa	Used during embryogenesis to make tail spike, then die											1			1		
+http://wormbase.org/db/ontology/anatomy?name=virL	AB.prpappppp	Intestino-rectal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=virR	AB.prpappppa	Intestino-rectal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi1	MS.paapapp	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi2DL	MS.aapappp	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi2DR	MS.papappp	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi2V	MS.aappaa	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi3D	MS.aaappp	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=vpi3V	MS.aappap	Pharyngo-intestinal valve								1								
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004483;class=Anantomy_term	P5.paaa	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004482;class=Anantomy_term	P5.paap	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004481;class=Anantomy_term	P5.papa	Hermaphrodite vulva								1	1					1	1	vulb1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004480;class=Anantomy_term	P5.papp	Hermaphrodite vulva								1	1					1	1	vulb2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004479;class=Anantomy_term	P5.ppal	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004478;class=Anantomy_term	P5.ppar	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004477;class=Anantomy_term	P5.ppp	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004456;class=Anantomy_term	P6.paal	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004455;class=Anantomy_term	P6.paar	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004454;class=Anantomy_term	P6.papl	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004453;class=Anantomy_term	P6.papr	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004452;class=Anantomy_term	P6.ppal	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004451;class=Anantomy_term	P6.ppar	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004450;class=Anantomy_term	P6.pppl	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004449;class=Anantomy_term	P6.pppr	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004448;class=Anantomy_term	P7.paa	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004447;class=Anantomy_term	P7.papl	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004436;class=Anantomy_term	P7.papr	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004435;class=Anantomy_term	P7.ppaa	Hermaphrodite vulva								1	1					1	1	vulb2
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004434;class=Anantomy_term	P7.ppap	Hermaphrodite vulva								1	1					1	1	vulb1
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004433;class=Anantomy_term	P7.pppa	Hermaphrodite vulva								1	1					1	1	?
+http://wormbase.org/db/ontology/anatomy?name=WBbt%3A0004432;class=Anantomy_term	P7.pppp	Hermaphrodite vulva								1	1					1	1	?
