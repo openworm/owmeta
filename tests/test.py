@@ -44,7 +44,7 @@ except:
 class DataIntegrityTest(unittest.TestCase):
     def testUniqueCellNode(self):
         g = rdflib.Graph("ZODB")
-        g.parse("out.n3", format="n3")
+        g.parse("OpenWormData/out.n3", format="n3")
 
         qres = g.query(
          """ SELECT ?s ?p
@@ -53,6 +53,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         for row in qres.result:
             print("%s %s" % row)
+        self.assertEqual(qres.result.length(), 2)
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
