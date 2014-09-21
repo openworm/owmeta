@@ -53,7 +53,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         for row in qres.result:
             print("%s %s" % row)
-        self.assertEqual(qres.result.length(), 2)
+        self.assertEqual(len(qres.result), 2)
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
