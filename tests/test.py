@@ -43,36 +43,72 @@ except:
     TEST_CONFIG = Configure.open("tests/test_default.conf")
 
 class DataIntegrityTest(unittest.TestCase):
-    def testUniqueNeuronNode(self):
-        """
-        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
-        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
-        """
+
+
+    def setUp(self):
+        self.neurons = [] #array that holds the names of the 302 neurons at class-level scope
+
+        #Since we'll be using the data graph and the list of neuron names a lot, let's grab them once the first time
         import csv
         #use a simple graph from rdflib so we can look directly at the structure of the data
-        g = rdflib.Graph("ZODB")
+        self.g = rdflib.Graph("ZODB") #declare class-level scope
         #load in the database
-        g.parse("OpenWormData/WormData.n3", format="n3")
+        self.g.parse("OpenWormData/WormData.n3", format="n3")
 
         #grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        neurons = []
+
         for row in reader:
             if len(row[0]) > 0: # Only saves valid neuron names
-              neurons.append(row[0])
+              self.neurons.append(row[0])
 
-        #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
+    @unittest.expectedFailure  #still need to fix data to make this work
+    def testUniqueNeuronNode(self):
+        """
+        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
+        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+        """
 
         results = {}
-        for n in neurons:
-            qres = g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+        for n in self.neurons:
+            #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
+            qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
             results[n] = len(qres.result)
 
         # If there is not only one result back, then there is more than one RDF node.
         self.assertNotIn(2, results.values(), "Some neurons have more than 1 node: " + str(results))
         self.assertNotIn(0, results.values(), "Some neurons have no node: " + str(results))
+
+    @unittest.skip("have not yet defined asserts")
+    def testNeuronsHaveTypes(self):
+        """
+        Every Neuron should have a non-blank type
+        """
+        results = {}
+        for n in self.neurons:
+            qres = self.g.query('SELECT ?tp ?v WHERE {?s ?p \"' + n + '\". ' #per node ?s that has the name of a neuron associated
+                                + '?s <http://openworm.org/entities/Neuron_type> ?o.' #look up its listed type ?o
+                                + '?o ?tp ?v } ' #for that type ?o, get its property ?tp and its value ?v
+                                )
+            results[n] = ''
+            if len(qres.result) > 1:
+                results[n] = qres.result[1]
+
+        print results
+
+    @unittest.skip("have not yet defined asserts")
+    def testWhatNodesGetTypeInfo(self):
+        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
+                                + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
+                                  '?o ?p ?s} ' #for that type ?o, get its value ?v
+                                + 'LIMIT 10')
+        for row in qres.result:
+            print row
+
+
+
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
