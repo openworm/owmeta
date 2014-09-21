@@ -42,18 +42,29 @@ except:
     TEST_CONFIG = Configure.open("tests/test_default.conf")
 
 class DataIntegrityTest(unittest.TestCase):
-    def testUniqueCellNode(self):
+    def testUniqueNeuronNode(self):
+        """
+        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
+        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+        """
+        import csv
+        #use a simple graph from rdflib so we can look directly at the structure of the data
         g = rdflib.Graph("ZODB")
+        #load in the database
         g.parse("OpenWormData/out.n3", format="n3")
 
-        qres = g.query(
-         """ SELECT ?s ?p
-            WHERE {?s ?p "AVAL" } LIMIT 5"""
-        )
+        #grab the list of the names of the 302 neurons
 
-        for row in qres.result:
-            print("%s %s" % row)
-        self.assertEqual(len(qres.result), 2)
+        csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+        neurons = []
+        for row in reader:
+            if len(row[0]) > 0: # Only saves valid neuron names
+              neurons.append(row[0])
+
+        for n in neurons:
+            qres = g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+            self.assertEqual(len(qres.result), 1, str(n) + " has " + str(len(qres.result)) + " rdf nodes")
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
