@@ -1,3 +1,0 @@
-ZODB
-rdflib>=4.1.2
-rdflib_zodb==1.0
