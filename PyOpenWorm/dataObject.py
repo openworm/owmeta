@@ -208,8 +208,6 @@ class DataObject(DataUser):
 
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
-        #fire rule engine on upload
-        self.infer()
 
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id
@@ -387,26 +385,6 @@ class DataObject(DataUser):
     def retract(self):
         """ Remove this object from the data store. """
         self.retract_statements(self.graph_pattern(query=True))
-
-    def infer(self):
-        """ Fire FuXi rule engine to infer triples """
-
-        from FuXi.Rete.RuleStore import SetupRuleStore
-        from FuXi.Rete.Util import generateTokenSet
-        from FuXi.Horn.HornRules import HornFromN3
-        #fetch the derived object's graph
-        semnet = self.rdf
-        rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
-        closureDeltaGraph = R.Graph()
-        network.inferredFacts = closureDeltaGraph
-        #build a network of rules
-        for rule in HornFromN3('testrules.n3'):
-            network.buildNetworkFromClause(rule)
-        # apply rules to original facts to infer new facts
-        network.feedFactsToAdd(generateTokenSet(semnet))
-        # combine original facts with inferred facts
-        for x in closureDeltaGraph:
-            self.rdf.add(x)
 
 # Define a property by writing the get
 class Property(DataObject):
