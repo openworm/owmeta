@@ -334,6 +334,7 @@ class DataObjectTest(_DataTest):
 class DataObjectTestToo(unittest.TestCase):
     def test_helpful_message_on_non_connection(self):
         """ The message should say something about connecting """
+        Configureable.conf = False # Ensure that we are disconnected
         with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
             do = DataObject()
 
