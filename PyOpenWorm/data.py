@@ -118,7 +118,7 @@ class DataUser(Configureable):
 
     def _add_to_store(self, g, graph_name=False):
         if self.conf['rdf.store'] == 'SPARQLUpdateStore':
-            # XXX With Sesame, for instance, it is probably faster to do a PUT with over
+            # XXX With Sesame, for instance, it is probably faster to do a PUT over
             #     the endpoint's rest interface. Just need to do it for some common endpoints
 
             try:
@@ -138,24 +138,13 @@ class DataUser(Configureable):
                 gr.add(x)
 
         if self.conf['rdf.source'] == 'ZODB':
-            # Commit the current commit
+            # Commit the current transaction
             transaction.commit()
             # Fire off a new one
             transaction.begin()
 
-        #for group in grouper(g, int(self.conf.get('rdf.upload_block_statement_count',100))):
-            #temp_graph = Graph()
-            #for x in group:
-                #if x is not None:
-                    #temp_graph.add(x)
-                #else:
-                    #break
-            #if graph_name:
-                #s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + temp_graph.serialize(format="nt") + " } } "
-            #else:
-                #s = " INSERT DATA { " + temp_graph.serialize(format="nt") + " } "
-            #L.debug("update query = " + s)
-            #self.conf['rdf.graph'].update(s)
+        #infer from the added statements
+        self.infer()
 
     def add_reference(self, g, reference_iri):
         """
@@ -203,6 +192,30 @@ class DataUser(Configureable):
         g.add((n, RDF['predicate'], s[1]))
         g.add((n, RDF['object'], s[2]))
         return n
+
+    def infer(self):
+        """
+        Fire FuXi rule engine to infer triples
+        """
+
+        from FuXi.Rete.RuleStore import SetupRuleStore
+        from FuXi.Rete.Util import generateTokenSet
+        from FuXi.Horn.HornRules import HornFromN3
+        #fetch the derived object's graph
+        semnet = self.rdf
+        rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
+        closureDeltaGraph = Graph()
+        network.inferredFacts = closureDeltaGraph
+        #build a network of rules
+        for rule in HornFromN3("testrules.n3"):
+            network.buildNetworkFromClause(rule)
+        # apply rules to original facts to infer new facts
+        network.feedFactsToAdd(generateTokenSet(semnet))
+        # combine original facts with inferred facts
+        for x in closureDeltaGraph:
+            self.rdf.add(x)
+            print x #for demo purposes
+
 
 class Data(Configure, Configureable):
     """
