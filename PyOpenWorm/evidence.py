@@ -22,7 +22,7 @@ def _url_request(url,headers={}):
     import urllib2 as U
     try:
         r = U.Request(url, headers=headers)
-        s = U.urlopen(r)
+        s = U.urlopen(r, timeout=1)
         return s
     except U.HTTPError:
         return ""
