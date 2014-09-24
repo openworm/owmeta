@@ -7,3 +7,5 @@ tests/*.log
 tests/_test.conf
 db/worm.*
 worm.fs*
+.DS_Store
+
