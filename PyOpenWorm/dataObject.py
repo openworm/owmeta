@@ -208,8 +208,6 @@ class DataObject(DataUser):
 
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
-        #fire rule engine on upload
-        self.infer()
 
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id

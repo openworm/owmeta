@@ -146,7 +146,7 @@ class DataUser(Configureable):
         #infer from the added statements
         self.infer()
 
-        def infer(self):
+    def infer(self):
         """ Fire FuXi rule engine to infer triples """
 
         from FuXi.Rete.RuleStore import SetupRuleStore
@@ -234,7 +234,6 @@ class DataUser(Configureable):
         # combine original facts with inferred facts
         for x in closureDeltaGraph:
             self.rdf.add(x)
-            print x #for demo purposes
 
 
 class Data(Configure, Configureable):
