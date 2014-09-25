@@ -208,6 +208,8 @@ class DataObject(DataUser):
 
         ss = set()
         self.add_statements(self.triples(check_saved=ss))
+        #fire rule engine on upload
+        self.infer()
 
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id
@@ -532,7 +534,7 @@ class SimpleProperty(Property):
             gv = self._graph_variable(self.linkName)
             yield (owner_id, self.link, ident)
             yield (ident, self.value_property, gv)
-            
+
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
