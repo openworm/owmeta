@@ -8,7 +8,7 @@ evidence for an object means.
 import sys
 import PyOpenWorm as P
 
-#Create dummy database configuration
+#Create dummy database configuration.
 d = P.Data({
     "rdf.upload_block_statement_count" : 50,
     "user.email" : "jerry@cn.com"
@@ -35,7 +35,7 @@ e = P.Evidence(doi='125.41.3/ploscompbiol', pmid='57182010')
 #receptor UNC-8 on neuron AVAL.
 e.asserts(n.receptor('UNC-8'))
 
-#Save the Neuron and Evidence objects to the database
+#Save the Neuron and Evidence objects to the database.
 n.save()
 e.save()
 
