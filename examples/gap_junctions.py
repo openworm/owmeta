@@ -12,17 +12,12 @@ d = P.Data({
     "user.email" : "jerry@cn.com"
 })
 
-P.connect(conf=d)
+P.connect(conf=)
 n = P.Neuron(name='AVAL')
 # insert some connections
 n1 = P.Neuron("DA3")
 c = P.Connection(pre_cell=n, post_cell=n1, syntype="send")
 
-n.connection.set(c)
-
-print n.connection.get(pre_post_or_either='either')
-
-print n.conns
 
 for x in n.connection:
     print x
