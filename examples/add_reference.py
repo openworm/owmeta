@@ -1,5 +1,5 @@
 """
-Demo: How to reference supporting evidence for some object in the database.
+How to reference supporting evidence for some object in the database.
 
 See: "Metadata in PyOpenWorm" for discussion on semantics of what giving
 evidence for an object means.
