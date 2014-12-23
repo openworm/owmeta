@@ -17,7 +17,7 @@ aval = P.Cell(name="AVAL")
 
 #Get the morphology associated with the Cell. Returns a neuroml.Morphology object.
 morph = aval.morphology()
-print morph
+print morph #we're printing it here, but we would normally do something else with the morphology object.
 
 #Disconnect from the database.
 P.disconnect()
