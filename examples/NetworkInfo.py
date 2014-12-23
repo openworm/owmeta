@@ -1,5 +1,3 @@
-
-
 import sys
 import PyOpenWorm as P
 
@@ -19,7 +17,6 @@ for neuron in some_neurons:
         type = 'G' if (s.syntype.one() == "gapJunction") else ('I' if (s.synclass.one() in ['GABA']) else 'E')
         print type
         print s.pre_cell.one()
-        print s.pre_cell
         if s.pre_cell.one() == neuron.name.one():
             print("o-> %s %s"%(type, s))
         elif s.post_cell.one() == neuron.name.one():
