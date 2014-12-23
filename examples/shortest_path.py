@@ -1,5 +1,10 @@
-# Get the length of the shortest path between any two neurons.
-# Takes connection strength into account by taking the inverse of the number as the weight between edges
+"""
+Get the length of the shortest path between any two neurons.
+Takes connection strength into account by taking the inverse of the number as the weight between edges.
+
+Generates some files to be used with numpy.
+"""
+
 import sys
 sys.path.insert(0,'..')
 
@@ -7,7 +12,7 @@ import apsp
 import PyOpenWorm as P
 import numpy as np
 # Start PyOpenWorm
-P.connect(configFile='readme.conf')
+P.connect('default.conf')
 try:
     # make the matrix
     try:
@@ -51,4 +56,3 @@ try:
 finally:
     # Be sure to disconnect from PyOpenWorm to prevent resource leaks!
     P.disconnect()
-
