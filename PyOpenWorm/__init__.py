@@ -106,10 +106,13 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
     :return:
     """
     if data:
+        # TODO: Show the end of the proccess, or at least transfer to the next string with \n
         sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
-def connect(configFile='PyOpenWorm/default.conf',
+# TODO: If to run PyOpenWorm.connect(), the error occured, in the default loading. see next line
+# if to run PyOpenWorm.connect("PyOpenWorm/default.conf") then everything is working
+def connect(configFile="PyOpenWorm/default.conf",
             conf=False,
             do_logging=False,
             data=False,
@@ -139,12 +142,15 @@ def connect(configFile='PyOpenWorm/default.conf',
             # Initializes a Data object with
             # the Configureable.conf
             Configureable.conf = Data()
-    elif configFile:
+    elif configFile: # DEFAULT behavior
+        # TODO: Skipped this sections without arguments in the init stage
         loadConfig(configFile)
     else:
         try:
             from pkg_resources import Requirement, resource_filename
-            filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
+            # TODO: the next string does not work. DB folder is not in the alpha0.5
+            # filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
+            filename = resource_filename(Requirement.parse("PyOpenWorm"),"PyOpenWorm/default.conf")
             Configureable.conf = Data.open(filename)
         except:
             logging.info("Couldn't load default configuration")

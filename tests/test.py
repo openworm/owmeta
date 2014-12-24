@@ -75,13 +75,16 @@ class DataIntegrityTest(unittest.TestCase):
         for n in self.neurons:
             #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
             qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+            # TODO: Change either QUERY or the way result counting
+            # This result always gives 2 as an answer. Even that qres.result itslf consist of several functions, combine
+            # to the two groups (is it ?s ?p responsible?)
             results[n] = len(qres.result)
 
         # If there is not only one result back, then there is more than one RDF node.
         self.assertNotIn(2, results.values(), "Some neurons have more than 1 node: " + str(results))
         self.assertNotIn(0, results.values(), "Some neurons have no node: " + str(results))
 
-    @unittest.skip("have not yet defined asserts")
+    #@unittest.skip("have not yet defined asserts")
     def testNeuronsHaveTypes(self):
         """
         Every Neuron should have a non-blank type
