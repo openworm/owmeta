@@ -9,7 +9,13 @@ def print_evidence():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
+        cur.execute("""
+                    SELECT DISTINCT a.Entity, b.Entity, Citations
+                    FROM tblrelationship, tblentity a, tblentity b
+                    where EnID1=a.id
+                    and EnID2=b.id
+                    and Citations!=''
+                    """)
         for r in cur.fetchall():
             print r
     except Exception:
@@ -25,7 +31,13 @@ def upload_muscles():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity FROM tblrelationship, tblentity b, tblentity a where Relation = '1516' and EnID2=b.id and EnID1=a.id")
+        cur.execute("""
+                    SELECT DISTINCT a.Entity, b.Entity
+                    FROM tblrelationship, tblentity b, tblentity a
+                    where Relation = '1516'
+                    and EnID2=b.id
+                    and EnID1=a.id
+                    """)
         for r in cur.fetchall():
             muscle_name = str(r[1])
             m = P.Muscle(muscle_name)
@@ -125,7 +137,13 @@ def upload_neurons():
         w.neuron_network(n)
         # insert neurons.
         # save
-        cur.execute("SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and Relation = '1515' and EnID2='1'")
+        cur.execute("""
+                    SELECT DISTINCT a.Entity
+                    FROM tblrelationship, tblentity a, tblentity b
+                    where EnID1=a.id
+                    and Relation = '1515'
+                    and EnID2='1'
+                    """)
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
@@ -147,15 +165,12 @@ def upload_receptors_and_innexins():
         # save
         # get the receptor (354) and innexin (355)
         cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM
-        tblrelationship q,
-        tblrelationship r,
-        tblentity a,
-        tblentity b
-        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-        and   r.EnID1=a.id and r.Relation = '354'  and r.EnID2=b.id
-        """)
+                    SELECT DISTINCT a.Entity, b.Entity
+                    FROM tblrelationship q, tblrelationship r,
+                    tblentity a, tblentity b
+                    where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
+                    and   r.EnID1=a.id and r.Relation = '354'  and r.EnID2=b.id
+                    """)
         for r in cur.fetchall():
             neuron_name = str(r[0])
             receptor = str(r[1])
@@ -163,15 +178,12 @@ def upload_receptors_and_innexins():
             neur.receptor(receptor)
             n.neuron(neur)
         cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM
-        tblrelationship q,
-        tblrelationship r,
-        tblentity a,
-        tblentity b
-        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-        and   r.EnID1=a.id and r.Relation = '355'  and r.EnID2=b.id
-        """)
+                    SELECT DISTINCT a.Entity, b.Entity
+                    FROM tblrelationship q, tblrelationship r,
+                    tblentity a, tblentity b
+                    where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
+                    and   r.EnID1=a.id and r.Relation = '355'  and r.EnID2=b.id
+                    """)
         for r in cur.fetchall():
             neuron_name = str(r[0])
             innexin = str(r[1])
@@ -193,8 +205,12 @@ def upload_synapses():
         n = P.Network()
         w.neuron_network(n)
         #second step, get the relationships between them and add them to the graph
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Weight, Relation FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and (Relation = '356' OR Relation = '357')")
-
+        cur.execute("""
+                    SELECT DISTINCT a.Entity, b.Entity, Weight, Relation
+                    FROM tblrelationship, tblentity a, tblentity b
+                    where EnID1=a.id and EnID2=b.id
+                    and (Relation = '356' OR Relation = '357')
+                    """)
         for r in cur.fetchall():
             #all items are numbers -- need to be converted to a string
             first = str(r[0])
