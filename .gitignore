@@ -7,3 +7,9 @@ tests/*.log
 tests/_test.conf
 db/worm.*
 worm.fs*
+worm.db
+worm.db.index
+worm.db.lock
+worm.db.tmp
+examples/*.npy
+examples/cell_indices

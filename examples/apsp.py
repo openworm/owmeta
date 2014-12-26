@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+This file is used as a module in shortest_path.py
+"""
 
 import re
 import sys
