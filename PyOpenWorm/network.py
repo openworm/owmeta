@@ -15,13 +15,12 @@ class Network(DataObject):
     """
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
-        self.synapses = Network.ObjectProperty('synapse',owner=self,value_type=P.Connection)
-        Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron)
+        self.synapses = Network.ObjectProperty('synapse',owner=self,value_type=P.Connection, multiple=True)
+        Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
 
     def neurons(self):
         for x in self.neuron():
-            for n in x.name():
-                yield n
+            yield x.name()
 
     def aneuron(self, name):
         """
