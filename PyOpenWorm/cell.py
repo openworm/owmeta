@@ -77,6 +77,7 @@ class Cell(DataObject):
 
         if name:
             self.name(name)
+
         if lineageName:
             self.lineageName(lineageName)
 
@@ -129,7 +130,7 @@ class Cell(DataObject):
         """
         import re
         try:
-            ln = next(self.lineageName())
+            ln = self.lineageName()
             x = re.split("[. ]", ln)
             return x[0]
         except:
@@ -137,7 +138,7 @@ class Cell(DataObject):
 
     def daughterOf(self):
         """ Get the parent of this cell """
-        ln = next(self.lineageName())
+        ln = self.lineageName()
         parent_ln = ln[:-1]
         return Cell(lineageName=parent_ln)
 
@@ -147,7 +148,7 @@ class Cell(DataObject):
         # custom patterns to the load query.
 
         # hackish. just query for the possible children lineage names...
-        ln = next(self.lineageName())
+        ln = self.lineageName()
         possible_child_lns = [ln + "a", ln + "v",
                               ln + "p", ln + "r",
                               ln + "l", ln + "d"]
@@ -169,14 +170,14 @@ class Cell(DataObject):
 
             if len(self.name.v) > 0:
                 # name is already set, so we can make an identifier from it
-                n = next(self.name())
+                n = self.name()
                 return self.make_identifier(n)
             else:
                 return ident
         else:
             if len(self.name.v) > 0:
                 # name is already set, so we can make an identifier from it
-                n = next(self.name())
+                n = self.name.one()
                 return self.make_identifier(n)
             else:
                 return ident
