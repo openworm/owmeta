@@ -14,13 +14,8 @@ d = P.Data({
     "user.email" : "jerry@cn.com"
 })
 
-#Logging is disabled. Run the script with '-l' to enable.
-logging = False
-if len(sys.argv) > 1 and sys.argv[1] == '-l':
-    logging = True
-
 #Connect to database with dummy configuration
-P.connect(conf=d, do_logging=logging)
+P.connect(conf=d)
 
 #Create a new Neuron object to work with
 n = P.Neuron(name='AVAL')
