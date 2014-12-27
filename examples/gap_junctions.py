@@ -17,8 +17,8 @@ aval = net.aneuron('AVAL')
 print aval.GJ_degree()
 
 #Get all Connections to/from AVAL, and only print out the gap junctions.
-#We could also put them into an array or do other things with them than print.
-for c in net.aneuron('AVAL').connection():
+#We could also put them into an array or do other things with them other than print.
+for c in aval.connection():
     #the `one()` returns a string like "gapJunction" instead of "syntype=gapJunction"
     if c.syntype.one() == 'gapJunction':
         print c
