@@ -3,7 +3,7 @@ Create a new instance of the database.
 The database created will be in this directory (`PyOpenWorm/examples`), and will
 be useful for some other examples.
 """
-
+import sys
 import PyOpenWorm as P
 sys.path.insert(0,'..')
 
