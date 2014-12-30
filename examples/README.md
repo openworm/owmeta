@@ -52,4 +52,36 @@ Ideally, we would like everything we are storing in the db to be backed up by ev
 
 In this example we make a temporary db and create a Neuron. We then make an Evidence object which includes links to the supporting "article". After this we use `e.asserts()` to link our Evidence with the fact that it supports.
 
-Finally, we save our mock db and the evidence/neuron it contains.
+Finally, we save our mock db and the Evidence/Neuron it contains.
+
+#####5. `NetworkInfo.py`
+
+This script is an example of generating simple but useful output by querying with PyOpenWorm.
+Similar to an earlier example, we get the Worm object, then the Network object from it.
+
+We then make a list of neuron names we are interested in, and iterate through each of the corresponding Neuron objects.
+On each iteration we get the `type()` of every synapse, and the pre- and post-synaptic cell names at that connection.
+
+The final output is a long list of symbols representing every connection that a neuron in our list is a part of.
+
+This might be useful as a visual aid in understanding the connectivity of a certain subset of neurons.
+
+#####6. `shortest_path.py`
+
+This file uses an external library (`numpy`) to find the shortest paths between pair of neurons.
+
+You will need some experience with `numpy` to be able to understand this one, and a general understanding of the [Floyd-Warshall "all pairs shortest path" algorithm](http://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm).
+
+This script also uses the `apsp.py` file as a module.
+
+#####7. `test_bgp.py`
+
+This script goes through a number of examples of loading all information about a db object, the iterating over them and printing them out.
+
+This is useful to look at as an exercise, but in order to understand all information that you can gain from querying a db object, the API is the best place to look.
+
+This sort of querying (loading all information about a db object) would be useful if you were looking for 
+
+#####8. `rmgr.py`
+
+This script attempts to model a "hub-and-spoke circuit" from [this paper](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/).
