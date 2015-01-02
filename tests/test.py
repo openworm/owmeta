@@ -62,7 +62,12 @@ class DataIntegrityTest(unittest.TestCase):
 
         for row in reader:
             if len(row[0]) > 0: # Only saves valid neuron names
-              self.neurons.append(row[0])
+                # There are two neurons with * sign. We don't want them to be in neuron name
+                star = row[0].find('*')
+                n_name = row[0]
+                if star > -1:
+                    n_name = n_name[0:star]
+                self.neurons.append(n_name)
 
     @unittest.expectedFailure  #still need to fix data to make this work
     def testUniqueNeuronNode(self):
