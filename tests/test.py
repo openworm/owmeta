@@ -74,15 +74,24 @@ class DataIntegrityTest(unittest.TestCase):
         """
         There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
         then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+
+        Anton: Right now there are from one to three nodes per neuron in the current version of db. All of this nodes
+        correspond to different functions (cell description, neuron properties, connected muscles). To check the unique
+        neuron now we need to look directly to Neuron properties with the following query:
+        'SELECT ?n_name ?neuron WHERE {?n_name ?property "ADAL". ' \
+                                    '?neuron <http://openworm.org/entities/Cell/name> ?n_name. '\
+                                    '?neuron a <http://openworm.org.entities/Neuron> }'
         """
 
         results = {}
         for n in self.neurons:
             #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
-            qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
-            # TODO: Change either QUERY or the way result counting
-            # This result always gives 2 as an answer. Even that qres.result itslf consist of several functions, combine
-            # to the two groups (is it ?s ?p responsible?)
+            #  This query should work only after updating the Notation3 database
+            # qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+            qres = self.g.query('SELECT ?n_name ?neuron WHERE {?n_name ?property \"' + n + '\". '
+                                    + '?neuron <http://openworm.org/entities/Cell/name> ?n_name. '
+                                    + '?neuron a <http://openworm.org.entities/Neuron> }')
+
             results[n] = len(qres.result)
 
         # If there is not only one result back, then there is more than one RDF node.
