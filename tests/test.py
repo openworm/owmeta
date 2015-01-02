@@ -62,26 +62,43 @@ class DataIntegrityTest(unittest.TestCase):
 
         for row in reader:
             if len(row[0]) > 0: # Only saves valid neuron names
-              self.neurons.append(row[0])
+                # There are two neurons with * sign. We don't want them to be in neuron name
+                star = row[0].find('*')
+                n_name = row[0]
+                if star > -1:
+                    n_name = n_name[0:star]
+                self.neurons.append(n_name)
 
     @unittest.expectedFailure  #still need to fix data to make this work
     def testUniqueNeuronNode(self):
         """
         There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
         then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+
+        Anton: Right now there are from one to three nodes per neuron in the current version of db. All of this nodes
+        correspond to different functions (cell description, neuron properties, connected muscles). To check the unique
+        neuron now we need to look directly to Neuron properties with the following query:
+        'SELECT ?n_name ?neuron WHERE {?n_name ?property "ADAL". ' \
+                                    '?neuron <http://openworm.org/entities/Cell/name> ?n_name. '\
+                                    '?neuron a <http://openworm.org.entities/Neuron> }'
         """
 
         results = {}
         for n in self.neurons:
             #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
-            qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+            #  This query should work only after updating the Notation3 database
+            # qres = self.g.query('SELECT ?s ?p WHERE {?s ?p \"' + n + '\" } LIMIT 5')
+            qres = self.g.query('SELECT ?n_name ?neuron WHERE {?n_name ?property \"' + n + '\". '
+                                    + '?neuron <http://openworm.org/entities/Cell/name> ?n_name. '
+                                    + '?neuron a <http://openworm.org.entities/Neuron> }')
+
             results[n] = len(qres.result)
 
         # If there is not only one result back, then there is more than one RDF node.
         self.assertNotIn(2, results.values(), "Some neurons have more than 1 node: " + str(results))
         self.assertNotIn(0, results.values(), "Some neurons have no node: " + str(results))
 
-    @unittest.skip("have not yet defined asserts")
+    #@unittest.skip("have not yet defined asserts")
     def testNeuronsHaveTypes(self):
         """
         Every Neuron should have a non-blank type
