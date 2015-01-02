@@ -1,3 +1,4 @@
 [submodule "OpenWormData"]
 	path = OpenWormData
 	url = https://github.com/mwatts15/OpenWormData.git
+ 	ignore = dirty
