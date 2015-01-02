@@ -31,7 +31,12 @@ csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
 reader = csv.reader(csvfile, delimiter=';', quotechar='|')
 for row in reader:
     if len(row[0]) > 0: # Only saves valid neuron names
-      neurons.append(row[0])
+        # There are two neurons with * sign. We don't want them to be in neuron name
+        star = row[0].find('*')
+        n_name = row[0]
+        if star > -1:
+            n_name = n_name[0:star]
+        neurons.append(n_name)
 
 def select_nodes_by_name (name):
     this_query = 'SELECT ?name ?property WHERE {?name ?property \"'+ name + '\" } LIMIT 5 '
