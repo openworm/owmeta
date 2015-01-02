@@ -3,6 +3,8 @@
 PyOpenWorm
 ===========
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/PyOpenWorm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Unified data access library for data about the *C. elegans* anatomy and model for the OpenWorm project.
 
 What does it do?
