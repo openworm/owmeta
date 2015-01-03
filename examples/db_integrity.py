@@ -122,5 +122,19 @@ def get_prove ():
     for p in prove2:
         print (prove2[p])
 
+def check_types ():
+    ntype_query = "SELECT ?type ?value WHERE {?type a <http://openworm.org/entities/Neuron_type>. " \
+                  "?type <http://openworm.org/entities/SimpleProperty/value> ?value}"
+    return g.query(ntype_query).result
+
+def get_neurons_with_types ():
+    type_neurons_query = "SELECT ?name_value ?type_value WHERE {?type a <http://openworm.org/entities/Neuron_type>." \
+                  "?type <http://openworm.org/entities/SimpleProperty/value> ?type_value." \
+                  "?cell <http://openworm.org/entities/Neuron/type> ?type." \
+                  "?cell <http://openworm.org/entities/Cell/name> ?name." \
+                  "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value." \
+                  "?name a <http://openworm.org/entities/Cell_name>}"
+    return g.query(type_neurons_query).result
+
 
 
