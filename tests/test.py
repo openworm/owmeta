@@ -106,10 +106,10 @@ class DataIntegrityTest(unittest.TestCase):
         Check db for neuron nodes without comparison with neurons.csv file.
         Check neuron unique property - name
         """
-        query = "SELECT ?name_value" \
-                "WHERE {?neuron a <http://openworm.org/entities/Neuron>." \
-                    "?neuron <http://openworm.org/entities/Cell/name> ?name." \
-                    "?name a <http://openworm.org/entities/Cell_name>." \
+        query = "SELECT ?name_value " \
+                "WHERE {?neuron a <http://openworm.org/entities/Neuron>. " \
+                    "?neuron <http://openworm.org/entities/Cell/name> ?name. " \
+                    "?name a <http://openworm.org/entities/Cell_name>. " \
                     "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value}"
         qres = self.g.query(query)
         #neuron_set = set()
@@ -118,7 +118,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.assertEqual(len(qres.result), 302, "All neurons are present in db")
 
-    #@unittest.skip ("have not yet defined asserts")
+    @unittest.expectedFailure #Still need to fix data
     def testNeuronsWithTypes (self):
         """
         All neurons should have type

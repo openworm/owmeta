@@ -1,4 +1,5 @@
 """
+Only for internal use. Methods are for creating tests
 This script helps to look into the database, and its integrity.
 It loads database, and then sort neurons to the dictionary.
 Dictionary structure so far:
