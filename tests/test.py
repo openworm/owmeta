@@ -70,11 +70,11 @@ class DataIntegrityTest(unittest.TestCase):
                 self.neurons.append(n_name)
 
     @unittest.expectedFailure  #still need to fix data to make this work
-    def testUniqueNeuronNode(self):
+    def testNeuronNames(self):
         """
-        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
-        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
-
+        Names of the neurons in the database should be the same as in self.neurons array
+        """
+        """
         Anton: Right now there are from one to three nodes per neuron in the current version of db. All of this nodes
         correspond to different functions (cell description, neuron properties, connected muscles). To check the unique
         neuron now we need to look directly to Neuron properties with the following query:
@@ -98,11 +98,64 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertNotIn(2, results.values(), "Some neurons have more than 1 node: " + str(results))
         self.assertNotIn(0, results.values(), "Some neurons have no node: " + str(results))
 
-    #@unittest.skip("have not yet defined asserts")
+    def testUniqueNeuronsInDB (self):
+        """
+        Database should contain 302 nodes with neurons.
+        """
+        """
+        Check db for neuron nodes without comparison with neurons.csv file.
+        Check neuron unique property - name
+        """
+        query = "SELECT ?name_value" \
+                "WHERE {?neuron a <http://openworm.org/entities/Neuron>." \
+                    "?neuron <http://openworm.org/entities/Cell/name> ?name." \
+                    "?name a <http://openworm.org/entities/Cell_name>." \
+                    "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value}"
+        qres = self.g.query(query)
+        #neuron_set = set()
+        #for row in qres.result:
+        #    neuron_set.add(row[0]._literal_n3())
+
+        self.assertEqual(len(qres.result), 302, "All neurons are present in db")
+
+    #@unittest.skip ("have not yet defined asserts")
+    def testNeuronsWithTypes (self):
+        """
+        All neurons should have type
+        """
+        #Current query is overweight, but soon the database will be fixed, we will change the query
+        query = "SELECT ?name_value ?type_value WHERE {" \
+                        "?type a <http://openworm.org/entities/Neuron_type>." \
+                        "?type <http://openworm.org/entities/SimpleProperty/value> ?type_value." \
+                        "?cell <http://openworm.org/entities/Neuron/type> ?type." \
+                        "?cell <http://openworm.org/entities/Cell/name> ?name." \
+                        "?name a <http://openworm.org/entities/Cell_name>."\
+                        "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value}"
+        q_res = self.g.query(query).result
+        # Check are all types exists in the result. Length of the types set should be equal ??
+        types = set()
+        neur_dic = {} # to find the multiple types
+
+        for row in q_res:
+            neuron = row[0]._literal_n3()[1:-1] # Transfer result to string. It has " from each side. cut it off
+            this_type = row[1]._literal_n3()
+            if neur_dic.has_key(neuron):
+                neur_dic[neuron].append ()
+            else: neur_dic[neuron] = [this_type]
+
+            types.add(this_type)
+
+        # Check how many neurons with types. Should be 302
+        self.assertEqual(len(neur_dic), 302, "All neurons in database have type")
+        #TODO(anton): Here are some tests also can be made.. Like all n from self.neurons should be the same as keys in neur_dic
+
+
+    @unittest.skip("have not yet defined asserts")
     def testNeuronsHaveTypes(self):
         """
         Every Neuron should have a non-blank type
         """
+        #TODO(Anton): This test is the sum of testNeuronNames and testNeuronsWithTypes. Should we delete it?
         results = {}
         for n in self.neurons:
             qres = self.g.query('SELECT ?tp ?v WHERE {?s ?p \"' + n + '\". ' #per node ?s that has the name of a neuron associated
