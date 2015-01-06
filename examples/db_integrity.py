@@ -128,13 +128,28 @@ def check_types ():
     return g.query(ntype_query).result
 
 def get_neurons_with_types ():
-    type_neurons_query = "SELECT ?name_value ?type_value WHERE {?type a <http://openworm.org/entities/Neuron_type>." \
-                  "?type <http://openworm.org/entities/SimpleProperty/value> ?type_value." \
-                  "?cell <http://openworm.org/entities/Neuron/type> ?type." \
-                  "?cell <http://openworm.org/entities/Cell/name> ?name." \
-                  "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value." \
-                  "?name a <http://openworm.org/entities/Cell_name>}"
+    """
+    :return: names and types of the neurons, if they have type
+    """
+    type_neurons_query = "SELECT ?name_value ?type_value " \
+                         "WHERE {?type a <http://openworm.org/entities/Neuron_type>." \
+                                "?type <http://openworm.org/entities/SimpleProperty/value> ?type_value." \
+                                "?cell <http://openworm.org/entities/Neuron/type> ?type." \
+                                "?cell <http://openworm.org/entities/Cell/name> ?name." \
+                                "?name a <http://openworm.org/entities/Cell_name>." \
+                                "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value}"
     return g.query(type_neurons_query).result
+
+def check_db_neurons ():
+    """
+    :return: names of the neurons in the database
+    """
+    query = "SELECT ?name_value " \
+            "WHERE {?neuron a <http://openworm.org/entities/Neuron>." \
+                    "?neuron <http://openworm.org/entities/Cell/name> ?name." \
+                    "?name a <http://openworm.org/entities/Cell_name>." \
+                    "?name <http://openworm.org/entities/SimpleProperty/value> ?name_value}"
+    return g.query(query).result
 
 
 
