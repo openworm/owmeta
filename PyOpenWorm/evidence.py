@@ -39,6 +39,7 @@ def _json_request(url):
 
 class AssertsAllAbout(Property):
     # TODO: Needs tests!
+    multiple=True
     def __init__(self, **kwargs):
         Property.__init__(self, 'asserts_all_about', **kwargs)
 
@@ -124,16 +125,21 @@ class Evidence(DataObject):
         #        ; field3 value3 .
         DataObject.__init__(self, conf=conf)
         self._fields = dict()
-        Evidence.ObjectProperty('asserts', owner=self)
+        Evidence.ObjectProperty('asserts', multiple=True, owner=self)
         AssertsAllAbout(owner=self)
-        fields = ('author',
-                'year',
+
+        multivalued_fields = ('author', 'uri')
+
+        for x in multivalued_fields:
+            Evidence.DatatypeProperty(x, multiple=True, owner=self)
+
+        other_fields = ('year',
                 'title',
                 'doi',
                 'wbid',
-                'pmid',
-                'uri')
-        for x in fields:
+                'pmid')
+        fields = multivalued_fields + other_fields
+        for x in other_fields:
             Evidence.DatatypeProperty(x, owner=self)
 
         #XXX: I really don't like putting these in two places
@@ -152,6 +158,7 @@ class Evidence(DataObject):
                 self.doi(source[k])
             if k in ('bibtex',):
                 self._fields['bibtex'] = source[k]
+
             if k in fields:
                 getattr(self,k)(source[k])
 
