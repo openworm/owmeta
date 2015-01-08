@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5)](https://travis-ci.org/openworm/PyOpenWorm)
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5-slarson)](https://travis-ci.org/openworm/PyOpenWorm)
 
 PyOpenWorm
 ===========
@@ -25,7 +25,7 @@ by doing
   >>> import PyOpenWorm as P
   >>> P.connect('PyOpenWorm/default.conf')
 
-  >>> P.loadData('OpenWormData/out.n3', 'n3')
+  >>> P.loadData('OpenWormData/WormData.n3', 'n3')
 
   >>> P.disconnect()
 
@@ -220,3 +220,4 @@ a stable foundational library for others to reuse, the version of the PyOpenWorm
 guarantees the user a specific version of the data behind that library.  As data
 are improved, the maintainers of the library can perform appropriate regression tests
 prior to each new release to guarantee stability.
+
