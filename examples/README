@@ -1,1 +1,3 @@
 These examples assume that you are running them in the directory they're stored in
+
+* shortest_path.py - Uses PyOpenWorm to pull out neurons and their connections, and then use a shortest path algorithm through the connectome
