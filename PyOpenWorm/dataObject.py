@@ -93,7 +93,7 @@ class DataObject(DataUser):
         return self.__str__()
 
     def _graph_variable(self,var_name):
-        """ Make a variable for storage the graph """
+        """ Make a variable for storage in the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
 
     @classmethod
