@@ -144,7 +144,7 @@ class DataUser(Configureable):
             transaction.begin()
 
         #infer from the added statements
-        self.infer()
+        #self.infer()
 
     def infer(self):
         """ Fire FuXi rule engine to infer triples """
