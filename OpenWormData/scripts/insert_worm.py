@@ -26,12 +26,18 @@ def upload_muscles():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity FROM tblrelationship, tblentity b, tblentity a where Relation = '1516' and EnID2=b.id and EnID1=a.id")
+        cur.execute("""
+        SELECT DISTINCT a.Entity, b.Entity
+        FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
+        WHERE innervatedBy.EnID1=a.id and innervatedBy.Relation = '1516' and innervatedBy.EnID2=b.id
+        and type_b.EnID1 = b.id and type_b.Relation='1515' and type_b.EnID2='1519'
+        """) # 1519 is the
         for r in cur.fetchall():
+            neuron_name = str(r[0])
             muscle_name = str(r[1])
             m = P.Muscle(muscle_name)
+            n = P.Neuron(neuron_name)
             w.muscle(m)
-            n = P.Neuron(str(r[0]))
             m.innervatedBy(n)
 
         ev.asserts(w)
@@ -41,6 +47,7 @@ def upload_muscles():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded muscles")
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -103,6 +110,7 @@ def upload_lineage_and_descriptions():
         ev.save()
     except Exception, e:
         traceback.print_exc()
+    print ("uploaded lineage and descriptions")
 
 def norn(x):
     """ return the next or None of an iterator """
@@ -155,6 +163,7 @@ def upload_neurons():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded neurons")
 
 def upload_receptors_and_innexins():
     try:
@@ -204,6 +213,7 @@ def upload_receptors_and_innexins():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded receptors and innexins")
 
 def upload_synapses():
     try:
@@ -245,6 +255,7 @@ def upload_synapses():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded synapses")
 
 def infer():
     from rdflib import Graph
@@ -278,26 +289,27 @@ def infer():
 
     except Exception, e:
         traceback.print_exc()
+    print ("filled in with inferred data")
 
-def do_insert():
-    import sys
-    logging = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-l':
-        logging = True
-    P.connect(configFile='default.conf', do_logging=logging)
+def do_insert(config="default.conf", logging=False):
+    if config:
+        if isinstance(config, P.Configure):
+            pass
+        elif isinstance(config, str):
+            config = P.Configure.open(config)
+        elif isinstance(config, dict):
+            config = P.Configure().copy(config)
+        else:
+            raise Exception("Invalid configuration object "+ str(config))
+
+    P.connect(conf=config, do_logging=logging)
     try:
         upload_neurons()
-        print ("uploaded neurons")
-        #upload_muscles()
-        print ("uploaded muscles")
+        upload_muscles()
         upload_lineage_and_descriptions()
-        print ("uploaded lineage and descriptions")
         #upload_synapses()
-        print ("uploaded synapses")
         #upload_receptors_and_innexins()
-        print ("uploaded receptors and innexins")
         #infer()
-        print ("filled in with inferred data")
     except:
         traceback.print_exc()
     finally:
@@ -306,4 +318,13 @@ def do_insert():
 if __name__ == '__main__':
     # Takes about 17 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
-    do_insert()
+    import sys
+    import os
+    logging = False
+    if len(sys.argv) > 1 and sys.argv[1] == '-l':
+        logging = True
+    try:
+        do_insert(logging=logging)
+    except IOError as e:
+        if e.errno == 2 and 'default.conf' in e.filename:
+            print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")
