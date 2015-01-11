@@ -1,3 +1,4 @@
+from __future__ import print_function
 import PyOpenWorm as P
 import traceback
 import sqlite3
@@ -11,7 +12,7 @@ def print_evidence():
         cur = conn.cursor()
         cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
         for r in cur.fetchall():
-            print r
+            print(r)
     except Exception:
         traceback.print_exc()
     finally:
@@ -25,12 +26,18 @@ def upload_muscles():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity FROM tblrelationship, tblentity b, tblentity a where Relation = '1516' and EnID2=b.id and EnID1=a.id")
+        cur.execute("""
+        SELECT DISTINCT a.Entity, b.Entity
+        FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
+        WHERE innervatedBy.EnID1=a.id and innervatedBy.Relation = '1516' and innervatedBy.EnID2=b.id
+        and type_b.EnID1 = b.id and type_b.Relation='1515' and type_b.EnID2='1519'
+        """) # 1519 is the
         for r in cur.fetchall():
+            neuron_name = str(r[0])
             muscle_name = str(r[1])
             m = P.Muscle(muscle_name)
+            n = P.Neuron(neuron_name)
             w.muscle(m)
-            n = P.Neuron(str(r[0]))
             m.innervatedBy(n)
 
         ev.asserts(w)
@@ -40,6 +47,7 @@ def upload_muscles():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded muscles")
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -54,37 +62,55 @@ def upload_lineage_and_descriptions():
     cells = dict()
     try:
         w = P.Worm()
+        net = w.neuron_network.one()
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
         # insert neurons.
         # save
-        f = open(LINEAGE_LIST_LOC, "r")
+        cell_data = open(LINEAGE_LIST_LOC, "r")
 
         # Skip headers
-        next(f)
-        names = dict()
-        for x in f:
-             j = [x.strip().strip("\"") for x in x.split("\t")]
-             name=j[0]
-             if name in names:
-                 while (name in names):
-                     names[name] += 1
-                     name = name + "("+ str(names[name]) +")"
-             else:
-                 names[name] = 0
+        next(cell_data)
 
-             c = P.Cell(name,j[1])
-             c.description(j[2])
-             w.cell(c)
-             cells[name] = (j[1],j[2])
-        # We bring in the neurons and muscles through their shared name
-        # -- the name is the only thing that relates these sets of
-        # objects
+        cell_name_counters = dict()
+        data = dict()
+        for x in cell_data:
+             j = [x.strip().strip("\"") for x in x.split("\t")]
+             name = j[0]
+             lineageName = j[1]
+             desc = j[2]
+
+             # XXX: These renaming choices are arbitrary and may be inappropriate
+             if name == "DB1/3":
+                 name = "DB1"
+             elif name == "DB3/1":
+                 name = "DB3"
+             elif name == "AVFL/R":
+                 if lineageName[0] == "W":
+                     name = "AVFL"
+                 elif lineageName[0] == "P":
+                     name = "AVFR"
+
+             if name in cell_name_counters:
+                 while (name in cell_name_counters):
+                     cell_name_counters[name] += 1
+                     name = name + "("+ str(cell_name_counters[name]) +")"
+             else:
+                 cell_name_counters[name] = 0
+
+             data[name] = {"lineageName" : lineageName, "desc": desc}
+
+        for n in net.neuron():
+             name = n.name.one()
+             neuron_data = data[str(name)]
+             n.lineageName(neuron_data['lineageName'])
+             n.description(neuron_data['desc'])
+             w.cell(n)
 
         ev.asserts(w)
         ev.save()
     except Exception, e:
         traceback.print_exc()
-    return cells
+    print ("uploaded lineage and descriptions")
 
 def norn(x):
     """ return the next or None of an iterator """
@@ -93,33 +119,34 @@ def norn(x):
     except StopIteration:
         return None
 
-def update_neurons_and_muscles_with_lineage_and_descriptions():
-    v = P.values('neurons and muscles')
-    #XXX: This could be expensive...the lineage name and description should be loaded with
-    #     the cell though.
-    cells = {next(x.name()) : (norn(x.lineageName()), norn(x.description())) for x in P.Cell().load() }
-    def dtt(x):
-        """ Do the thing """
-        try:
-            name = next(x.name())
-            if cells[name][0] is not None:
-                x.lineageName(cells[name][0])
-            if cells[name][1] is not None:
-                x.description(cells[name][1])
-            v.value(x)
-        except:
-            traceback.print_exc()
-    for x in P.Neuron().load():
-        dtt(x)
-    for x in P.Muscle().load():
-        dtt(x)
+#def update_neurons_and_muscles_with_lineage_and_descriptions():
+    #v = P.values('neurons and muscles')
+    ##XXX: This could be expensive...the lineage name and description should be loaded with
+    ##     the cell though.
+    #cells = {next(x.name()) : (norn(x.lineageName()), norn(x.description())) for x in P.Cell().load() }
+    #def dtt(x):
+        #""" Do the thing """
+        #try:
+            #name = next(x.name())
+            #if cells[name][0] is not None:
+                #x.lineageName(cells[name][0])
+            #if cells[name][1] is not None:
+                #x.description(cells[name][1])
+            #v.value(x)
+        #except:
+            #traceback.print_exc()
+    #for x in P.Neuron().load():
+        #dtt(x)
+    #for x in P.Muscle().load():
+        #dtt(x)
 
-    v.save()
+    #v.save()
 
 def upload_neurons():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
+        ev = P.Evidence(title="C. elegans sqlite database")
         w = P.Worm()
         n = P.Network()
         w.neuron_network(n)
@@ -129,12 +156,14 @@ def upload_neurons():
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
-        n.save()
+        ev.asserts(w)
+        ev.save()
         #second step, get the relationships between them and add them to the graph
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded neurons")
 
 def upload_receptors_and_innexins():
     try:
@@ -184,6 +213,7 @@ def upload_receptors_and_innexins():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded receptors and innexins")
 
 def upload_synapses():
     try:
@@ -225,6 +255,7 @@ def upload_synapses():
         traceback.print_exc()
     finally:
         conn.close()
+    print ("uploaded synapses")
 
 def infer():
     from rdflib import Graph
@@ -258,32 +289,44 @@ def infer():
 
     except Exception, e:
         traceback.print_exc()
+    print ("filled in with inferred data")
 
-def do_insert():
-    import sys
-    logging = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-l':
-        logging = True
-    P.connect(configFile='default.conf', do_logging=logging)
+def do_insert(config="default.conf", logging=False):
+    if config:
+        if isinstance(config, P.Configure):
+            pass
+        elif isinstance(config, str):
+            config = P.Configure.open(config)
+        elif isinstance(config, dict):
+            config = P.Configure().copy(config)
+        else:
+            raise Exception("Invalid configuration object "+ str(config))
+
+    P.connect(conf=config, do_logging=logging)
     try:
+        upload_neurons()
         upload_muscles()
-        print ("uploaded muscles")
         upload_lineage_and_descriptions()
-        print ("uploaded lineage and descriptions")
         upload_synapses()
-        print ("uploaded synapses")
         upload_receptors_and_innexins()
-        print ("uploaded receptors and innexins")
-        update_neurons_and_muscles_with_lineage_and_descriptions()
-        print ("updated muscles and neurons with cell data")
-        infer()
-        print ("filled in with inferred data")
+        #infer()
     except:
         traceback.print_exc()
     finally:
         P.disconnect()
 
 if __name__ == '__main__':
-    # Takes about 17 minutes with ZODB FileStorage store
+    # NOTE: This process will NOT clear out the database if run multiple times.
+    #       Multiple runs will add the data again and again.
+    # Takes about 5 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
-    do_insert()
+    import sys
+    import os
+    logging = False
+    if len(sys.argv) > 1 and sys.argv[1] == '-l':
+        logging = True
+    try:
+        do_insert(logging=logging)
+    except IOError as e:
+        if e.errno == 2 and 'default.conf' in e.filename:
+            print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")
