@@ -297,7 +297,7 @@ PGA	P11.papp	Male specific interneuron, preanal ganglion
 PHAL	AB.plpppaapp	Phasmid neurons, probably chemosensory
 PHAR	AB.prpppaapp	Phasmid neurons, probably chemosensory
 PHBL	AB.plapppappp	Phasmid neurons, probably chemosensory
-PHRB	AB.prapppappp	Phasmid neurons, probably chemosensory
+PHBR	AB.prapppappp	Phasmid neurons, probably chemosensory
 PHCL	TL.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike
 PHCR	TR.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike
 PHshL	AB.plpppapaa	Phasmid sheath
