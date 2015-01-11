@@ -307,8 +307,8 @@ def do_insert(config="default.conf", logging=False):
         upload_neurons()
         upload_muscles()
         upload_lineage_and_descriptions()
-        #upload_synapses()
-        #upload_receptors_and_innexins()
+        upload_synapses()
+        upload_receptors_and_innexins()
         #infer()
     except:
         traceback.print_exc()
