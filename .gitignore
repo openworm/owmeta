@@ -23,3 +23,11 @@ zodb_test_db.fs
 zodb_test_db.fs.index
 
 zodb_test_db.fs.lock
+
+OpenWormData/scripts/worm.db.tmp
+
+OpenWormData/scripts/worm.db.index
+
+OpenWormData/scripts/worm.db.lock
+
+OpenWormData/scripts/worm.db
