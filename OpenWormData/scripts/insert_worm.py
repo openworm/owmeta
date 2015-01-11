@@ -316,7 +316,9 @@ def do_insert(config="default.conf", logging=False):
         P.disconnect()
 
 if __name__ == '__main__':
-    # Takes about 17 minutes with ZODB FileStorage store
+    # NOTE: This process will NOT clear out the database if run multiple times.
+    #       Multiple runs will add the data again and again.
+    # Takes about 5 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
     import sys
     import os
