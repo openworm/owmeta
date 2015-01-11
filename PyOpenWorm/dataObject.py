@@ -93,7 +93,7 @@ class DataObject(DataUser):
         return self.__str__()
 
     def _graph_variable(self,var_name):
-        """ Make a variable for storage the graph """
+        """ Make a variable for storage in the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
 
     @classmethod
@@ -589,7 +589,6 @@ class SimpleProperty(Property):
         """ Loads in values to this ``Property`` which have been set for the associated owner,
         or if the owner refers to an unspecified member of its class, loads values which could
         be set based on the constraints on the owner.
-
         """
         # This load is way simpler since we just need the values for this property
         gp = self.graph_pattern(query=True)
