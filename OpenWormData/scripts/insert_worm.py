@@ -174,7 +174,7 @@ def upload_receptors_and_innexins():
         w.neuron_network(n)
         # insert neurons.
         # save
-        # get the receptor (354) and innexin (355)
+        # get the receptor (361) and innexin (355)
         cur.execute("""
         SELECT DISTINCT a.Entity, b.Entity
         FROM
@@ -183,7 +183,7 @@ def upload_receptors_and_innexins():
         tblentity a,
         tblentity b
         where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-        and   r.EnID1=a.id and r.Relation = '354'  and r.EnID2=b.id
+        and   r.EnID1=a.id and r.Relation = '361'  and r.EnID2=b.id
         """)
         for r in cur.fetchall():
             neuron_name = str(r[0])
