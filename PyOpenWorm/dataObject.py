@@ -13,6 +13,14 @@ __all__ = ["DataObject", "Property", "SimpleProperty", "values"]
 def _bnode_to_var(x):
     return "?" + x
 
+def _rdf_literal_to_gp0(x):
+    if isinstance(x,R.BNode):
+        return _bnode_to_var(x)
+    elif isinstance(x,R.URIRef) and DataObject._is_variable(x):
+        return DataObject._graph_variable_to_var0(x).n3()
+    else:
+        return x.n3()
+
 def _rdf_literal_to_gp(x):
     if isinstance(x,R.BNode):
         return _bnode_to_var(x)
@@ -20,6 +28,11 @@ def _rdf_literal_to_gp(x):
         return DataObject._graph_variable_to_var(x)
     else:
         return x.n3()
+
+def _triples_to_bgp0(trips):
+    # XXX: Collisions could result between the variable names of different objects
+    g = " .\n".join(" ".join(_rdf_literal_to_gp0(x) for x in y) for y in trips)
+    return g
 
 def _triples_to_bgp(trips):
     # XXX: Collisions could result between the variable names of different objects
@@ -117,7 +130,18 @@ class DataObject(DataUser):
         return (cn == 'variable')
 
     @classmethod
+    def _graph_variable_to_var0(self,uri):
+
+        from urlparse import urlparse
+        u = urlparse(uri)
+        x = u.path.split('/')
+        #print uri
+        if x[2] == 'variable':
+            #print 'fragment = ', u.fragment
+            return R.Variable(u.fragment)
+    @classmethod
     def _graph_variable_to_var(self,uri):
+
         from urlparse import urlparse
         u = urlparse(uri)
         x = u.path.split('/')
@@ -141,6 +165,41 @@ class DataObject(DataUser):
     def make_identifier(self, data):
         import hashlib
         return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
+
+    def triples0(self, query=False, visited_list=False):
+        """
+        Should be overridden by derived classes to return appropriate triples
+
+        Returns
+        --------
+        An iterable of triples
+        """
+        if visited_list == False:
+            visited_list = set()
+
+        if self.identifier(query=query) in visited_list:
+            return
+        else:
+            visited_list.add(self.identifier(query=query))
+
+        ident = self.identifier(query=query)
+        yield (ident, R.RDF['type'], self.rdf_type)
+
+        # For objects that are defined by triples, we can just release these.
+        # However, they are still data objects, so they must have the above
+        # triples released as well.
+        for x in self._triples:
+            yield x
+
+        # Properties (of type Property) can be attached to an object
+        # However, we won't require that there even is a property list in this
+        # case.
+        if hasattr(self, 'properties'):
+            for x in self.properties:
+                if x.hasValue():
+                    yield (ident, x.link, x.identifier(query=query))
+                    for y in x.triples0(query=query, visited_list=visited_list):
+                        yield y
 
     def triples(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
@@ -196,12 +255,24 @@ class DataObject(DataUser):
 
             self._is_releasing_triples = False
 
+    def graph_pattern0(self,query=False):
+        """ Get the graph pattern for this object.
+
+        It should be as simple as converting the result of triples() into a BGP
+        """
+        return _triples_to_bgp0(self.triples0(query=query))
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
 
         It should be as simple as converting the result of triples() into a BGP
         """
         return _triples_to_bgp(self.triples(query=query))
+
+    def save0(self):
+        """ Write in-memory data to the database. Derived classes should call this to update the store. """
+
+        ss = set()
+        self.add_statements(self.triples0(visited_list=ss))
 
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
@@ -318,6 +389,27 @@ class DataObject(DataUser):
         cls.parents = _DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
+
+    def load0(self):
+        """ Load in data from the database. Derived classes should override this for their own data structures.
+
+        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have, for the Properties set, the same values
+
+        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+        """
+        if not DataObject._is_variable(self.identifier(query=True)):
+            yield self
+        else:
+            gp = self.graph_pattern0(query=True)
+            ident = self.identifier(query=True)
+            ident = self._graph_variable_to_var0(ident)
+            q = "SELECT DISTINCT {0} where {{ {1} }}".format(ident.n3(), gp)
+            print(q)
+            qres = self.rdf.query(q)
+            for g in qres:
+                new_ident = g[0]
+                new_object = self.object_from_id(new_ident)
+                yield new_object
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -634,6 +726,9 @@ class SimpleProperty(Property):
         if self.property_type == 'DatatypeProperty':
             value_data = "".join(str(x) for x in self.v)
         elif self.property_type == 'ObjectProperty':
+            for value in self.v:
+                if not isinstance(value, DataObject):
+                    raise Exception("Values for an ObjectProperty ({}) must be DataObjects. Given '{}'.".format(self, value))
             value_data = "".join(str(x.identifier()) for x in self.v if self is not x)
 
         return self.make_identifier((self.owner.identifier(query=query), self.link, value_data))
