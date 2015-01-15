@@ -530,7 +530,7 @@ class NeuronTest(_DataTest):
         n = self.neur('AVAL')
         n.type('interneuron')
         n.save()
-        self.assertEqual('interneuron', self.neur('AVAL').type())
+        self.assertEqual('interneuron', self.neur('AVAL').type.one())
 
     def test_name(self):
         """ Test that the name property is set when the neuron is initialized with it """
