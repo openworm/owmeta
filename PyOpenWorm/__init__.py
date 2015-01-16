@@ -75,11 +75,14 @@ from .connection import Connection
 
 __import__('__main__').connected = False
 
-def config():
+def config(key=None):
     """ Gets the main configuration for the whole PyOpenWorm library.
     :return: the instance of the Configure class currently operating.
     """
-    return Configureable.conf
+    if key is None:
+        return Configureable.conf
+    else:
+        return Configureable.conf[key]
 
 def loadConfig(f):
     """ Load configuration for the module. """
