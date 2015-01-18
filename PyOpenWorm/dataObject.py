@@ -93,7 +93,7 @@ class DataObject(DataUser):
         return self.__str__()
 
     def _graph_variable(self,var_name):
-        """ Make a variable for storage the graph """
+        """ Make a variable for storage in the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
 
     @classmethod
@@ -306,7 +306,10 @@ class DataObject(DataUser):
 
     @classmethod
     def register(cls):
-        """ Registers the class as a DataObject to be included in the configured rdf graph
+        """ Registers the class as a DataObject to be included in the configured rdf graph.
+            Puts this class under the control of the database for metadata.
+
+        :return: None
         """
         # NOTE: This expects that configuration has been read in and that the database is available
         assert(issubclass(cls, DataObject))
@@ -319,11 +322,13 @@ class DataObject(DataUser):
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
-        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have, for the Properties set, the same values
-
-        :param self: An object which limits the set of objects which can be returned. Should have the configuration necessary to do the query
+        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have,
+        for the Properties set, the same values
+        :param self: An object which limits the set of objects which can be returned. Should have the configuration
+                     necessary to do the query
         """
-        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that can make objects in the current
+        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that
+        # can make objects in the current
         # graph and convert them into objects of the type of the querying object.
         #
         gp = self.graph_pattern(query=True)
@@ -505,7 +510,10 @@ class SimpleProperty(Property):
             self.link = self.owner_type.rdf_namespace[self.linkName]
 
     def hasValue(self):
-        """ Returns true if the ``Property`` has had ``load`` called previously and some value was available or if ``set`` has been called previously """
+        """ Returns true if the ``Property`` has had ``load`` called previously and some value was available or if
+        ``set`` has been called previously
+        :return: True if this data object has a value, False if not.
+        """
         return len(self.v) > 0
 
     def get(self):
@@ -581,7 +589,6 @@ class SimpleProperty(Property):
         """ Loads in values to this ``Property`` which have been set for the associated owner,
         or if the owner refers to an unspecified member of its class, loads values which could
         be set based on the constraints on the owner.
-
         """
         # This load is way simpler since we just need the values for this property
         gp = self.graph_pattern(query=True)
