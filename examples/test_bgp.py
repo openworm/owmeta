@@ -1,9 +1,14 @@
+"""
+Examples of loading all information about an object or set of objects from the
+database.
+"""
+
 import sys
 sys.path.insert(0,'..')
 
 import PyOpenWorm as P
 
-P.connect(configFile="readme.conf", do_logging=False)
+P.connect(configFile="default.conf", do_logging=False)
 try:
 
     query_object = P.Connection(pre_cell='AVAL')
@@ -47,9 +52,5 @@ try:
         except StopIteration:
             pass
         print
-    print
-    print 'FIRST 100 OBJECTS'
-    for x in zip(P.DataObject().load(), range(100)):
-        print x[0]
 finally:
     P.disconnect()
