@@ -16,6 +16,7 @@ import os
 import subprocess
 import tempfile
 
+
 try:
     import bsddb
     has_bsddb = True
@@ -41,6 +42,84 @@ try:
 except:
     TEST_CONFIG = Configure.open("tests/test_default.conf")
 
+def delete_zodb_data_store(path):
+    os.unlink(path)
+    os.unlink(path + '.index')
+    os.unlink(path + '.tmp')
+    os.unlink(path + '.lock')
+
+class DataIntegrityTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        import csv
+
+        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
+
+        #use a simple graph from rdflib so we can look directly at the structure of the data
+        cls.g = rdflib.Graph("ZODB") #declare class-level scope
+        #load in the database
+        cls.g.parse("OpenWormData/WormData.n3", format="n3")
+
+        #grab the list of the names of the 302 neurons
+
+        csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
+        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
+
+        for row in reader:
+            if len(row[0]) > 0: # Only saves valid neuron names
+                cls.neurons.append(row[0])
+    @classmethod
+    def tearDownClass(cls):
+        PyOpenWorm.disconnect()
+
+    def testUniqueNeuronNode(self):
+        """
+        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
+        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+        """
+
+        results = {}
+        for n in self.neurons:
+            #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
+            qres = self.g.query('SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' + n + '\" } LIMIT 5')
+            results[n] = (len(qres.result), [x[0] for x in qres.result])
+
+        # If there is not only one result back, then there is more than one RDF node.
+        more_than_one = [(x, results[x]) for x in results if results[x][0] > 1]
+        less_than_one = [(x, results[x]) for x in results if results[x][0] < 1]
+        self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
+        self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
+
+    @unittest.skip("have not yet defined asserts")
+    def testNeuronsHaveTypes(self):
+        """
+        Every Neuron should have a non-blank type
+        """
+        results = {}
+        for n in self.neurons:
+            qres = self.g.query('SELECT ?tp ?v WHERE {?s ?p \"' + n + '\". ' #per node ?s that has the name of a neuron associated
+                                + '?s <http://openworm.org/entities/Neuron_type> ?o.' #look up its listed type ?o
+                                + '?o ?tp ?v } ' #for that type ?o, get its property ?tp and its value ?v
+                                )
+            results[n] = ''
+            if len(qres.result) > 1:
+                results[n] = qres.result[1]
+
+        print results
+
+    @unittest.skip("have not yet defined asserts")
+    def testWhatNodesGetTypeInfo(self):
+        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
+                                + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
+                                  '?o ?p ?s} ' #for that type ?o, get its value ?v
+                                + 'LIMIT 10')
+        for row in qres.result:
+            print row
+
+
+
+
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
     TestConfig = TEST_CONFIG
@@ -50,10 +129,7 @@ class _DataTest(unittest.TestCase):
             if self.TestConfig['rdf.source'] == "Sleepycat":
                 subprocess.call("rm -rf "+self.path, shell=True)
             elif self.TestConfig['rdf.source'] == "ZODB":
-                os.unlink(self.path)
-                os.unlink(self.path + '.index')
-                os.unlink(self.path + '.tmp')
-                os.unlink(self.path + '.lock')
+                delete_zodb_data_store(self.path)
         except OSError, e:
             if e.errno == 2:
                 # The file may not exist and that's fine
@@ -899,10 +975,7 @@ class DataTest(unittest.TestCase):
         except:
             traceback.print_exc()
             self.fail("Bad state")
-        os.unlink(fname)
-        os.unlink(fname + '.index')
-        os.unlink(fname + '.tmp')
-        os.unlink(fname + '.lock')
+        delete_zodb_data_store(fname)
 
     @unittest.skipIf((has_bsddb==False), "Sleepycat requires working bsddb")
     def test_Sleepycat_persistence(self):
@@ -932,7 +1005,6 @@ class DataTest(unittest.TestCase):
     def test_trix_source(self):
         """ Test that we can load the datbase up from an XML file.
         """
-        t = tempfile.mkdtemp()
         f = tempfile.mkstemp()
 
         c = Configure()
@@ -960,7 +1032,6 @@ class DataTest(unittest.TestCase):
     def test_trig_source(self):
         """ Test that we can load the datbase up from a trig file.
         """
-        t = tempfile.mkdtemp()
         f = tempfile.mkstemp()
 
         c = Configure()
@@ -1129,3 +1200,6 @@ class SimplePropertyTest(_DataTest):
 
 class NeuroMLTest(_DataTest):
     pass
+
+if __name__ == '__main__':
+    unittest.main()
