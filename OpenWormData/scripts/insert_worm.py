@@ -109,10 +109,10 @@ def upload_lineage_and_descriptions():
         for n in net.neuron():
             add_data_to_cell(n)
 
-        # TODO: Add data for to other cells here. Requires relating named
-        # muscle cells to their counterparts in the cell list: mu_bod(#)
+        # TODO: Add data for other cells here. Requires relating named
+        # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
         # Also requires removing neurons and muscles from the list once
-        # they've been identified
+        # they've been identified so they aren't stored twice
 
         ev.asserts(w)
         ev.save()
@@ -262,13 +262,14 @@ def upload_types():
             types.append('motor')
         data[name] = types
 
-    for n in net.neuron():
-        name = n.name.one()
+    for name in data:
+        print("upload_types: neuron "+str(name))
+        n = P.Neuron(name=name)
         types = data[name]
         for t in types:
             print("setting type {} for {}.".format(t, name))
             n.type(t)
-        w.cell(n)
+        net.neuron(n)
     ev.asserts(w)
     ev.save()
     print ("uploaded types")
