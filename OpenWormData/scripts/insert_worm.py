@@ -270,7 +270,7 @@ def upload_types():
             print("setting type {} for {}.".format(t, name))
             n.type(t)
         net.neuron(n)
-    ev.asserts(w)
+    ev.asserts(net)
     ev.save()
     print ("uploaded types")
 
