@@ -6,7 +6,8 @@ This repository contains a database stored in N3 format. It is meant to be used 
 Compiled from the content at:
 
 1. [Tim Busbice's interactive database](http://www.interintelligence.org/openworm/), stored as a sqlite database in this repository
-2. [C. elegans Cell lists](https://docs.google.com/spreadsheet/ccc?key=0Avt3mQaA-HaMdGFnQldkWm9oUmQ3YjZ1LXJ4OHFnR0E&usp=drive_web#gid=1), stored as tsv files in this repository
+2. [C. elegans Cell lists](https://docs.google.com/spreadsheet/ccc?key=0Avt3mQaA-HaMdGFnQldkWm9oUmQ3YjZ1LXJ4OHFnR0E&usp=drive_web#gid=1), stored as tsv files in this repository.
+3. [Neuronal network details spreadsheet](https://docs.google.com/spreadsheets/d/1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit#gid=2), used for data about neurons. Stored in the `aux_data/neurons.csv` file.
 
 See 'scripts/insert_worm.py' to regenerate the binary database from original sources.
 
