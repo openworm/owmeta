@@ -16,6 +16,8 @@ import os
 import subprocess
 import tempfile
 
+USE_BINARY_DB = False
+BINARY_DB = "OpenWormData/scripts/worm.db"
 
 try:
     import bsddb
@@ -56,10 +58,15 @@ class DataIntegrityTest(unittest.TestCase):
 
         cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
 
-        #use a simple graph from rdflib so we can look directly at the structure of the data
-        cls.g = rdflib.Graph("ZODB") #declare class-level scope
-        #load in the database
-        cls.g.parse("OpenWormData/WormData.n3", format="n3")
+        if not USE_BINARY_DB:
+            #use a simple graph from rdflib so we can look directly at the structure of the data
+            cls.g = rdflib.Graph("ZODB") #declare class-level scope
+            #load in the database
+            cls.g.parse("OpenWormData/WormData.n3", format="n3")
+        else:
+            conf = Configure(**{ "rdf.source" : "ZODB", "rdf.store_conf" : BINARY_DB })
+            PyOpenWorm.connect(conf=conf)
+            cls.g = PyOpenWorm.config('rdf.graph')
 
         #grab the list of the names of the 302 neurons
 
@@ -71,7 +78,8 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
     @classmethod
     def tearDownClass(cls):
-        PyOpenWorm.disconnect()
+        if USE_BINARY_DB:
+            PyOpenWorm.disconnect()
 
     def testUniqueNeuronNode(self):
         """
@@ -91,22 +99,24 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
         self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
 
-    @unittest.skip("have not yet defined asserts")
     def testNeuronsHaveTypes(self):
         """
         Every Neuron should have a non-blank type
         """
-        results = {}
+        results = set()
         for n in self.neurons:
-            qres = self.g.query('SELECT ?tp ?v WHERE {?s ?p \"' + n + '\". ' #per node ?s that has the name of a neuron associated
-                                + '?s <http://openworm.org/entities/Neuron_type> ?o.' #look up its listed type ?o
-                                + '?o ?tp ?v } ' #for that type ?o, get its property ?tp and its value ?v
+            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". ' #per node ?s that has the name of a neuron associated
+                                + '?k <http://openworm.org/entities/Cell/name> ?s .'
+                                + '?k <http://openworm.org/entities/Neuron/type> ?o .' #look up its listed type ?o
+                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } ' #for that type ?o, get its property ?tp and its value ?v
                                 )
-            results[n] = ''
-            if len(qres.result) > 1:
-                results[n] = qres.result[1]
+            for x in qres:
+                v = x[0]
+                if isinstance(v,R.Literal):
+                    results.add(n)
 
-        print results
+        # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
+        self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     @unittest.skip("have not yet defined asserts")
     def testWhatNodesGetTypeInfo(self):
@@ -530,7 +540,7 @@ class NeuronTest(_DataTest):
         n = self.neur('AVAL')
         n.type('interneuron')
         n.save()
-        self.assertEqual('interneuron', self.neur('AVAL').type())
+        self.assertEqual('interneuron', self.neur('AVAL').type.one())
 
     def test_name(self):
         """ Test that the name property is set when the neuron is initialized with it """
@@ -1202,4 +1212,13 @@ class NeuroMLTest(_DataTest):
     pass
 
 if __name__ == '__main__':
-    unittest.main()
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-b", "--use-binary-database", dest="binary_db",
+                      action="store_true", default=False,
+                      help="Use the binary database for data integrity tests")
+
+    (options, args) = parser.parse_args()
+    USE_BINARY_DB = options.binary_db
+    args = [sys.argv[0]] + args # We have to add back the first argument after parse_args
+    unittest.main(argv=args)
