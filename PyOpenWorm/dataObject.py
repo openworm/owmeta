@@ -346,7 +346,7 @@ class DataObject(DataUser):
         owner : PyOpenWorm.dataObject.DataObject
             The name of this Property.
         value_type : type
-            The type of DataObject fro values of this property
+            The type of DataObject for values of this property
         """
         return cls._create_property(*args,property_type='ObjectProperty',**kwargs)
 
