@@ -43,11 +43,11 @@ def upload_muscles():
         ev.asserts(w)
         ev.save()
         #second step, get the relationships between them and add them to the graph
+        print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
-    print ("uploaded muscles")
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -99,18 +99,26 @@ def upload_lineage_and_descriptions():
 
              data[name] = {"lineageName" : lineageName, "desc": desc}
 
+        def add_data_to_cell(n):
+            name = n.name.one()
+            cell_data = data[str(name)]
+            n.lineageName(cell_data['lineageName'])
+            n.description(cell_data['desc'])
+            w.cell(n)
+
         for n in net.neuron():
-             name = n.name.one()
-             neuron_data = data[str(name)]
-             n.lineageName(neuron_data['lineageName'])
-             n.description(neuron_data['desc'])
-             w.cell(n)
+            add_data_to_cell(n)
+
+        # TODO: Add data for other cells here. Requires relating named
+        # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
+        # Also requires removing neurons and muscles from the list once
+        # they've been identified so they aren't stored twice
 
         ev.asserts(w)
         ev.save()
+        print ("uploaded lineage and descriptions")
     except Exception, e:
         traceback.print_exc()
-    print ("uploaded lineage and descriptions")
 
 def norn(x):
     """ return the next or None of an iterator """
@@ -118,29 +126,6 @@ def norn(x):
         return next(x)
     except StopIteration:
         return None
-
-#def update_neurons_and_muscles_with_lineage_and_descriptions():
-    #v = P.values('neurons and muscles')
-    ##XXX: This could be expensive...the lineage name and description should be loaded with
-    ##     the cell though.
-    #cells = {next(x.name()) : (norn(x.lineageName()), norn(x.description())) for x in P.Cell().load() }
-    #def dtt(x):
-        #""" Do the thing """
-        #try:
-            #name = next(x.name())
-            #if cells[name][0] is not None:
-                #x.lineageName(cells[name][0])
-            #if cells[name][1] is not None:
-                #x.description(cells[name][1])
-            #v.value(x)
-        #except:
-            #traceback.print_exc()
-    #for x in P.Neuron().load():
-        #dtt(x)
-    #for x in P.Muscle().load():
-        #dtt(x)
-
-    #v.save()
 
 def upload_neurons():
     try:
@@ -152,18 +137,21 @@ def upload_neurons():
         w.neuron_network(n)
         # insert neurons.
         # save
-        cur.execute("SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and Relation = '1515' and EnID2='1'")
+        cur.execute("""
+        SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b
+        where EnID1=a.id and Relation = '1515' and EnID2='1'
+        """)
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
         ev.asserts(w)
         ev.save()
         #second step, get the relationships between them and add them to the graph
+        print ("uploaded neurons")
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
-    print ("uploaded neurons")
 
 def upload_receptors_and_innexins():
     try:
@@ -174,46 +162,44 @@ def upload_receptors_and_innexins():
         w.neuron_network(n)
         # insert neurons.
         # save
-        # get the receptor (361) and innexin (355)
-        cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM
-        tblrelationship q,
-        tblrelationship r,
-        tblentity a,
-        tblentity b
-        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-        and   r.EnID1=a.id and r.Relation = '361'  and r.EnID2=b.id
-        """)
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            receptor = str(r[1])
-            neur = P.Neuron(name=neuron_name)
-            neur.receptor(receptor)
-            n.neuron(neur)
-        cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM
-        tblrelationship q,
-        tblrelationship r,
-        tblentity a,
-        tblentity b
-        where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-        and   r.EnID1=a.id and r.Relation = '355'  and r.EnID2=b.id
-        """)
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            innexin = str(r[1])
-            neur = P.Neuron(name=neuron_name)
-            neur.innexin(innexin)
-            n.neuron(neur)
+        # get the receptor (361), neurotransmitters (354), and innexins (355)
+        neurons = dict()
+
+        def add_data_to_neuron(data_kind, relation_code):
+            cur.execute("""
+                SELECT DISTINCT a.Entity, b.Entity
+                FROM
+                tblrelationship q,
+                tblrelationship r,
+                tblentity a,
+                tblentity b
+                where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
+                and   r.EnID1=a.id and r.Relation = '{}'  and r.EnID2=b.id
+                """.format(relation_code))
+            for r in cur.fetchall():
+                name = str(r[0])
+                data = str(r[1])
+                if name == "AVAL":
+                    print (data)
+
+                if not (name in neurons):
+                    neurons[name] = P.Neuron(name=name)
+
+                getattr(neurons[name],data_kind)(data)
+
+        add_data_to_neuron('receptor', 361)
+        add_data_to_neuron('innexin', 355)
+        add_data_to_neuron('neurotransmitter', 354)
+
+        for neur in neurons:
+            n.neuron(neurons[neur])
         n.save()
         #second step, get the relationships between them and add them to the graph
+        print ("uploaded receptors and innexins")
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
-    print ("uploaded receptors and innexins")
 
 def upload_synapses():
     try:
@@ -251,11 +237,42 @@ def upload_synapses():
         e = P.Evidence(author='markw@cs.utexas.edu')
         e.asserts(w)
         e.save()
+        print ("uploaded synapses")
     except Exception, e:
         traceback.print_exc()
     finally:
         conn.close()
-    print ("uploaded synapses")
+
+def upload_types():
+    import csv
+    ev = P.Evidence(title="neurons.csv")
+    w = P.Worm()
+    net = w.neuron_network.one()
+
+    data = dict()
+    for x in csv.reader(open('../aux_data/neurons.csv'), delimiter=';'):
+        types = []
+        name = x[0]
+        types_string = x[1]
+        if 'sensory' in (types_string.lower()):
+            types.append('sensory')
+        if 'interneuron' in (types_string.lower()):
+            types.append('interneuron')
+        if 'motor' in (types_string.lower()):
+            types.append('motor')
+        data[name] = types
+
+    for name in data:
+        print("upload_types: neuron "+str(name))
+        n = P.Neuron(name=name)
+        types = data[name]
+        for t in types:
+            print("setting type {} for {}.".format(t, name))
+            n.type(t)
+        net.neuron(n)
+    ev.asserts(net)
+    ev.save()
+    print ("uploaded types")
 
 def infer():
     from rdflib import Graph
@@ -309,6 +326,7 @@ def do_insert(config="default.conf", logging=False):
         upload_lineage_and_descriptions()
         upload_synapses()
         upload_receptors_and_innexins()
+        upload_types()
         #infer()
     except:
         traceback.print_exc()
