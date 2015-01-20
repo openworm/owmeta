@@ -40,8 +40,10 @@ class Configure(object):
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
-    def __init__(self):
-        self._properties = {}
+    def __init__(self, **initial_values):
+        self._properties = dict()
+        for x in initial_values:
+            self._properties[x] = _C(initial_values[x])
 
     def __setitem__(self, pname, value):
         #if the value being put in is not an instance

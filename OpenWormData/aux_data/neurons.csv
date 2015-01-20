@@ -147,8 +147,8 @@ M5;Pharyngeal neuron (Motor);MS.paaapap
 MCL;Pharyngeal neuron (Motor neuron, putative sensory);AB.alpaaappp
 MCR;Pharyngeal neuron (Motor neuron, putative sensory);AB.arapaappp
 MI;Pharyngeal neuron (motor), Interneuron;AB.araappaaa
-NSML;otor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapapaav
-NSMR;otor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapppaav
+NSML;Motor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapapaav
+NSMR;Motor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapppaav
 OLLL;Sensory neuron;AB.alppppapaa
 OLLR;Sensory neuron;AB.praaapapaa
 OLQDL;All polymodal: [Sensory neuron (Mechanosensory) Interneuron];AB.alapapapaa
