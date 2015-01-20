@@ -173,7 +173,7 @@ class Evidence(DataObject):
             Field value
         """
         self._fields[k] = v
-        dp = DatatypeProperty(k,owner=self)
+        dp = Evidence.DatatypeProperty(k,owner=self)
         dp(v)
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
