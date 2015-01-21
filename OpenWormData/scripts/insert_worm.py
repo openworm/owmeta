@@ -202,46 +202,33 @@ def upload_receptors_and_innexins():
         conn.close()
 
 def upload_synapses():
+    import xlrd
+ 
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
         w = P.Worm()
         n = P.Network()
         w.neuron_network(n)
-        #second step, get the relationships between them and add them to the graph
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Weight, Relation FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and (Relation = '356' OR Relation = '357')")
-
-        for r in cur.fetchall():
-            #all items are numbers -- need to be converted to a string
-            first = str(r[0])
-            second = str(r[1])
-            third = str(r[2])
-            syntype = str(r[3])
-            if syntype == '356':
-                syntype = 'send'
-            else:
-                syntype = 'gapjunction'
-            try:
-                weight = int(third)
-                # NMJs have negative weights. we only want the synaptic connections
-                if weight < 0:
-                    syntype = 'gapjunction'
-                    weight = -1 * weight
-
-            except:
-                weight = None
-
-            if weight:
-                c = P.Connection(pre_cell=first, post_cell=second, number=weight, syntype=syntype)
+        #second step, get synapses and gap junctions and add them to the graph
+        s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
+        for row in range(1, s.nrows):
+            if s.cell(row, 2).value not in ('R', 'Rs', 'NMJ'):
+                #We're not going to include 'receives' since they're just the inverse of 'sends'
+                #Also omitting NMJ for the time being
+                pre = s.cell(row, 0).value
+                post = s.cell(row, 1).value
+                if s.cell(row, 2).value == 'EJ':
+                    syntype = 'gapJunction'
+                else:
+                    syntype = 'send'
+                num = int(s.cell(row, 3).value)
+                c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
                 n.synapse(c)
-        e = P.Evidence(author='markw@cs.utexas.edu')
-        e.asserts(w)
+        e = P.Evidence(author='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
+        e.asserts(n)
         e.save()
-        print ("uploaded synapses")
+        print('uploaded synapses')
     except Exception, e:
         traceback.print_exc()
-    finally:
-        conn.close()
 
 def upload_types():
     import csv
