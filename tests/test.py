@@ -604,7 +604,7 @@ class NeuronTest(_DataTest):
         # on the configured RDF graph, seeded by this test
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
 
-    @unittest.expectedFailure()
+    @unittest.expectedFailure
     def testNeuronLoadReturnsQuick(self):
         @timelimit(10)
         def runNeuronLoad(self):
@@ -613,6 +613,7 @@ class NeuronTest(_DataTest):
             runNeuronLoad()
         except TimeoutError:
             self.fail("Neuron().load() took more than 10 seconds to run -- it is too slow.")
+        pass
 
 class NetworkTest(_DataTest):
     def setUp(s):
