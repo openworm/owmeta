@@ -109,14 +109,25 @@ Returns a set of all muscles::
 
 ```python
   >>> P.Worm().muscles()
-  set(['MDR05', 'MDR24', 'MDR17', 'MVR04', 'MDL16', 'MDL15', 'MVL02', 'MDL14', 'MDL12', 'MVR02', 'MVR03', 'MDR11', 
-  'MVR13', 'MDL23', 'MVR11', 'MDL21', 'MVR24', 'MVR22', 'MVR23', 'MVR20', 'MVR21', 'MVR14', 'MVL11', 'MDR15', 'MDR14', 
-  'MVL13', 'MDR16', 'MVL15', 'MDR10', 'MDR13', 'MVL16', 'MVL19', 'MVL18', 'MDR19', 'MDR18', 'MDL22', 'MVR12', 'MDL20', 
-  'MVR10', 'MVR17', 'MVR16', 'MDL24', 'MVL03', 'MVR19', 'MVR18', 'MDR06', 'MDR07', 'MDR04', 'MVL01', 'MVL06', 'MDR03', 
-  'MVL04', 'MVL05', 'MDR02', 'MVL08', 'MVL09', 'MDR08', 'MVL07', 'MDR01', 'MVR08', 'MVR09', 'MDL19', 'MDL18', 'MDL17', 
-  'MVR05', 'MVR06', 'MVR07', 'MDL13', 'MVR01', 'MDL11', 'MDL10', 'MDR09', 'MVL14', 'MANAL', 'MDL08', 'MDL09', 'MVL10', 
-  'MDL01', 'MDL02', 'MDL03', 'MDL04', 'MDL05', 'MDL06', 'MDL07', 'MVL12', 'MVL20', 'MVL21', 'MVL22', 'MVL23', 'MDR20', 
-  'MDR21', 'MDR22', 'MDR23', 'MVL17', 'MDR12', 'MVR15'])
+  set([MANAL, MDL23, MVR02, MDL02, MDL22, MVL06, MDL16, MDR13, MDR06, MDR20, MVR12, MDR08, MDR17, MVL14, MVR16, MDL08, 
+  MVR15, MVR11, MVL13, MDR16, MDL15, MDL06, MVL01, MDR02, MDL21, MVL19, MDR09, MDL18, MVL23, MVL18, MVL05, MVR01, 
+  MVL20, MVR08, MVR24, MDL09, MDR24, MDL04, MVL07, MDR23, MVL04, MDL01, MDR22, MVL16, MDR15, MDL14, MVL03, MVL09, 
+  MVR07, MDR01, MDL19, MDR12, MVL22, MDR14, MVL08, MDL03, MVL10, MDL10, MVL17, MDL12, MDL07, MVR04, MVR05, MVR18, 
+  MDL11, MVR09, MVL15, MDR04, MVR17, MDR19, MDL05, MVR14, MVR20, MVL12, MDL17, MDR10, MVL21, MDR05, MDR11, MVR22, 
+  MDR18, MDL13, MDL20, MVL11, MVR19, MVR03, MVR10, MVR06, MVR13, MDL24, MVR23, MDR21, MDR07, MVL02, MVL09, MVR21, 
+  MDR03])
+
+```
+
+See what neurons innervate a muscle::
+
+```python
+   >>> muscles = P.Worm().muscles()
+   >>> a_muscle = muscles.pop()
+   >>> a_muscle
+   MRV17
+   >>> a_muscle.innervatedBy()
+   set([VB8, VD10, VB9, VD9, VA10])
 
 ```
 
@@ -155,17 +166,6 @@ See what some evidence stated::
 
 ```
 
-See what neurons express some receptor::
-```python
-  >>> n = P.Neuron()
-  >>> n.receptor("TH")
-  receptor=TH
-
-  >>> s = set(x.name.one() for x in n.load()) 
-  >>> s == set(['CEPVL','CEPVR','PDEL','PDER','CEPDR'])
-  True
-
-```
 
 To get any object's possible values, use load()::
 ```python
