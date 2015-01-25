@@ -23,27 +23,29 @@ by doing
 
 ```python
   >>> import PyOpenWorm as P
-  >>> P.connect('PyOpenWorm/default.conf')
+  >>> P.connect()
 
-  >>> P.loadData('OpenWormData/WormData.n3', 'n3')
+  >>> P.loadData()
+  [PyOpenWorm] Loading data into the graph; this may take several minutes!!
 
-  >>> P.disconnect()
 
 ```
 
 Then you can try out a few things:
 
 ```python
-  # Set up
-  >>> P.connect('PyOpenWorm/default.conf')
 
   # Grabs the representation of the neuronal network
   >>> net = P.Worm().get_neuron_network()
-  >>> list(net.aneuron('AVAL').type())
-  ['interneuron']
+  
+  # Grab a specific neuron
+  >>> aval = net.aneuron('AVAL')
+  
+  >>> aval.type()
+  set(['interneuron'])
 
   #show how many connections go out of AVAL
-  >>> net.aneuron('AVAL').connection.count('pre')
+  >>> aval.connection.count('pre')
   77
 
 ```
@@ -81,21 +83,15 @@ More examples
 Returns information about individual neurons::
 
 ```python
-  >>> list(net.aneuron('AVAL').name())
-  ['AVAL']
+  >>> aval.name()
+  'AVAL'
 
   #list all known receptors
-  >>> s = set(net.aneuron('AVAL').receptors())
-  >>> s == set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
-  True
-
-  >>> list(net.aneuron('DD5').type())
-  ['motor']
-  >>> list(net.aneuron('PHAL').type())
-  ['sensory']
+  >>> aval.receptors()
+  set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
 
   #show how many chemical synapses go in and out of AVAL
-  >>> net.aneuron('AVAL').Syn_degree()
+  >>> aval.Syn_degree()
   74
 
 ```
@@ -103,85 +99,31 @@ Returns information about individual neurons::
 Returns the list of all neurons::
 
 ```python
-  >>> len(set(P.Neuron().load()))
+  #NOTE: This is a VERY slow operation right now
+  >>> len(set(net.neurons()))
   302
+  >>> set(net.neurons())
+  set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
 ```
 
-Returns the list of all muscles::
+Returns a set of all muscles::
 
 ```python
-  >>> 'MDL08' in (x.name.one() for x in P.Worm().muscles())
-  True
+  >>> P.Worm().muscles()
+  set([MANAL, MDL23, MVR02, ... MVL09, MVR21, MDR03])
 
 ```
 
-
-Returns provenance information providing evidence about facts::
-
-```python
-  >>> ader = P.Neuron('ADER')
-  >>> s = set(ader.receptors())
-  >>> s == set(['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1'])
-  True
-
-  #look up what reference says this neuron has a receptor EXP-1
-  >>> e = P.Evidence()
-  >>> e.asserts(P.Neuron('ADER').receptor('EXP-1')) 
-  asserts=receptor=EXP-1
-  >>> list(e.doi())
-  ['10.100.123/natneuro']
-
-```
-
-Add provenance information::
+See what neurons innervate a muscle::
 
 ```python
-  >>> e = P.Evidence(author='Sulston et al.', date='1983')
-  >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
-  asserts=lineageName=AB alaaapalr
-  >>> e.save()
-
-```
-
-See what some evidence stated::
-```python
-  >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
-  >>> list(e0.asserts())
-  [Neuron(name=AVDL,lineageName=AB alaaapalr)]
-
-```
-
-See what neurons express some receptor::
-```python
-  >>> n = P.Neuron()
-  >>> n.receptor("TH")
-  receptor=TH
-
-  >>> s = set(x.name.one() for x in n.load()) 
-  >>> s == set(['CEPVL','CEPVR','PDEL','PDER','CEPDR'])
-  True
-
-```
-
-To get any object's possible values, use load()::
-```python
-  >>> list(P.Neuron().load())
-  [
-   ...
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
-   ...
-  ]
-  # Properties are a little different
-  >>> next(P.Neuron().receptor.load())
-  receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
+   >>> muscles = P.Worm().muscles()
+   >>> a_muscle = muscles.pop()
+   >>> a_muscle
+   MRV17
+   >>> a_muscle.innervatedBy()
+   set([VB8, VD10, VB9, VD9, VA10])
 
 ```
 
