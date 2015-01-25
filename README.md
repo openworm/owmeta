@@ -99,17 +99,24 @@ Returns information about individual neurons::
 Returns the list of all neurons::
 
 ```python
-  #NOTE: This is a slow operation right now
+  #NOTE: This is a VERY slow operation right now
   >>> len(set(P.Neuron().load()))
   302
 
 ```
 
-Returns the list of all muscles::
+Returns a set of all muscles::
 
 ```python
-  >>> 'MDL08' in (x.name.one() for x in P.Worm().muscles())
-  True
+  >>> P.Worm().muscles()
+  set(['MDR05', 'MDR24', 'MDR17', 'MVR04', 'MDL16', 'MDL15', 'MVL02', 'MDL14', 'MDL12', 'MVR02', 'MVR03', 'MDR11', 
+  'MVR13', 'MDL23', 'MVR11', 'MDL21', 'MVR24', 'MVR22', 'MVR23', 'MVR20', 'MVR21', 'MVR14', 'MVL11', 'MDR15', 'MDR14', 
+  'MVL13', 'MDR16', 'MVL15', 'MDR10', 'MDR13', 'MVL16', 'MVL19', 'MVL18', 'MDR19', 'MDR18', 'MDL22', 'MVR12', 'MDL20', 
+  'MVR10', 'MVR17', 'MVR16', 'MDL24', 'MVL03', 'MVR19', 'MVR18', 'MDR06', 'MDR07', 'MDR04', 'MVL01', 'MVL06', 'MDR03', 
+  'MVL04', 'MVL05', 'MDR02', 'MVL08', 'MVL09', 'MDR08', 'MVL07', 'MDR01', 'MVR08', 'MVR09', 'MDL19', 'MDL18', 'MDL17', 
+  'MVR05', 'MVR06', 'MVR07', 'MDL13', 'MVR01', 'MDL11', 'MDL10', 'MDR09', 'MVL14', 'MANAL', 'MDL08', 'MDL09', 'MVL10', 
+  'MDL01', 'MDL02', 'MDL03', 'MDL04', 'MDL05', 'MDL06', 'MDL07', 'MVL12', 'MVL20', 'MVL21', 'MVL22', 'MVL23', 'MDR20', 
+  'MDR21', 'MDR22', 'MDR23', 'MVL17', 'MDR12', 'MVR15'])
 
 ```
 
@@ -118,9 +125,8 @@ Returns provenance information providing evidence about facts::
 
 ```python
   >>> ader = P.Neuron('ADER')
-  >>> s = set(ader.receptors())
-  >>> s == set(['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1'])
-  True
+  >>> ader.receptors()
+  set(['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1'])
 
   #look up what reference says this neuron has a receptor EXP-1
   >>> e = P.Evidence()
