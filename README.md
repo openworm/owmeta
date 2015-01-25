@@ -23,9 +23,9 @@ by doing
 
 ```python
   >>> import PyOpenWorm as P
-  >>> P.connect('PyOpenWorm/default.conf')
+  >>> P.connect()
 
-  >>> P.loadData('OpenWormData/WormData.n3', 'n3')
+  >>> P.loadData()
 
   >>> P.disconnect()
 
