@@ -50,37 +50,6 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
-##gives a decorator that enables testing for functions that run too long
-## from: http://code.activestate.com/recipes/483752/
-import threading
-class TimeoutError(Exception): pass
-
-def timelimit(timeout):
-    def internal(function):
-        def internal2(*args, **kw):
-            class Calculator(threading.Thread):
-                def __init__(self):
-                    threading.Thread.__init__(self)
-                    self.result = None
-                    self.error = None
-
-                def run(self):
-                    try:
-                        self.result = function(*args, **kw)
-                    except:
-                        self.error = sys.exc_info()[0]
-
-            c = Calculator()
-            c.start()
-            c.join(timeout)
-            if c.isAlive():
-                raise TimeoutError
-            if c.error:
-                raise c.error
-            return c.result
-        return internal2
-    return internal
-
 class DataIntegrityTest(unittest.TestCase):
 
     @classmethod
@@ -157,8 +126,6 @@ class DataIntegrityTest(unittest.TestCase):
                                 + 'LIMIT 10')
         for row in qres.result:
             print row
-
-
 
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
@@ -604,16 +571,6 @@ class NeuronTest(_DataTest):
         # on the configured RDF graph, seeded by this test
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
 
-    @unittest.expectedFailure
-    def testNeuronLoadReturnsQuick(self):
-        @timelimit(10)
-        def runNeuronLoad(self):
-            Neuron().load()
-        try:
-            runNeuronLoad()
-        except TimeoutError:
-            self.fail("Neuron().load() took more than 10 seconds to run -- it is too slow.")
-        pass
 
 class NetworkTest(_DataTest):
     def setUp(s):
