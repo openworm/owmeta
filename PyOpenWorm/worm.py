@@ -45,9 +45,12 @@ class Worm(DataObject):
         """
         Get all muscles by name
 
-        :returns: A list of all muscle names
-        :rtype: list
+        :returns: A set of all muscle names
+        :rtype: set
          """
+        return set(x.name.one() for x in self._muscles_helper())
+
+    def _muscles_helper(self):
         for x in self.muscle.get():
             yield x
 
