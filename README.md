@@ -132,41 +132,6 @@ See what neurons innervate a muscle::
 ```
 
 
-Returns provenance information providing evidence about facts::
-
-```python
-  >>> ader = P.Neuron('ADER')
-  >>> ader.receptors()
-  set(['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1'])
-
-  #look up what reference says this neuron has a receptor EXP-1
-  >>> e = P.Evidence()
-  >>> e.asserts(P.Neuron('ADER').receptor('EXP-1')) 
-  asserts=receptor=EXP-1
-  >>> list(e.doi())
-  ['10.100.123/natneuro']
-
-```
-
-Add provenance information::
-
-```python
-  >>> e = P.Evidence(author='Sulston et al.', date='1983')
-  >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
-  asserts=lineageName=AB alaaapalr
-  >>> e.save()
-
-```
-
-See what some evidence stated::
-```python
-  >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
-  >>> list(e0.asserts())
-  [Neuron(name=AVDL,lineageName=AB alaaapalr)]
-
-```
-
-
 To get any object's possible values, use load()::
 ```python
   >>> list(P.Neuron().load())
