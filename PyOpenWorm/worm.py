@@ -43,16 +43,17 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all muscles by name
+        Get all muscles objects
 
-        :returns: A set of all muscle names
+        :returns: A set of all muscles
         :rtype: set
          """
-        return set(x.name.one() for x in self._muscles_helper())
+        return set(x for x in self._muscles_helper())
 
     def _muscles_helper(self):
         for x in self.muscle.get():
             yield x
+
 
     def get_semantic_net(self):
         """
