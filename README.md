@@ -127,28 +127,6 @@ See what neurons innervate a muscle::
 
 ```
 
-
-To get any object's possible values, use load()::
-```python
-  >>> list(P.Neuron().load())
-  [
-   ...
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=VGluT, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=EAT-4, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name= Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=FLP-1, innexin=),
-   Neuron(lineageName=, name=Neighbor(), Connection(), type=, receptor=, innexin=),
-   ...
-  ]
-  # Properties are a little different
-  >>> next(P.Neuron().receptor.load())
-  receptor=INS-1;FLP-6;FLP-21;FLP-20;NLP-21...
-
-```
-
 Get direct access to the RDFLib graph::
 ```python
  # we get it from Worm, but any object will do
