@@ -26,24 +26,26 @@ by doing
   >>> P.connect()
 
   >>> P.loadData()
+  [PyOpenWorm] Loading data into the graph; this may take several minutes!!
 
-  >>> P.disconnect()
 
 ```
 
 Then you can try out a few things:
 
 ```python
-  # Set up
-  >>> P.connect('PyOpenWorm/default.conf')
 
   # Grabs the representation of the neuronal network
   >>> net = P.Worm().get_neuron_network()
-  >>> list(net.aneuron('AVAL').type())
-  ['interneuron']
+  
+  # Grab a specific neuron
+  >>> aval = net.aneuron('AVAL')
+  
+  >>> aval.type()
+  set(['interneuron'])
 
   #show how many connections go out of AVAL
-  >>> net.aneuron('AVAL').connection.count('pre')
+  >>> aval.connection.count('pre')
   77
 
 ```
@@ -81,21 +83,15 @@ More examples
 Returns information about individual neurons::
 
 ```python
-  >>> list(net.aneuron('AVAL').name())
-  ['AVAL']
+  >>> aval.name()
+  'AVAL'
 
   #list all known receptors
-  >>> s = set(net.aneuron('AVAL').receptors())
-  >>> s == set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
-  True
-
-  >>> list(net.aneuron('DD5').type())
-  ['motor']
-  >>> list(net.aneuron('PHAL').type())
-  ['sensory']
+  >>> aval.receptors()
+  set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
 
   #show how many chemical synapses go in and out of AVAL
-  >>> net.aneuron('AVAL').Syn_degree()
+  >>> aval.Syn_degree()
   74
 
 ```
@@ -103,6 +99,7 @@ Returns information about individual neurons::
 Returns the list of all neurons::
 
 ```python
+  #NOTE: This is a slow operation right now
   >>> len(set(P.Neuron().load()))
   302
 
