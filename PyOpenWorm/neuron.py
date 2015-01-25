@@ -253,4 +253,6 @@ class Neuron(Cell):
           :rtype: libNeuroML.Neuron
        """
 
+    def __str__(self):
+        return self.name()
 
