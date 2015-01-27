@@ -481,6 +481,10 @@ class DataObject(DataUser):
                         setattr(new_object, link_name, our_value)
             yield new_object
 
+    def name(self):
+        return set(self.name.get()).pop()
+
+
     def retract(self):
         """ Remove this object from the data store. """
         self.retract_statements(self.graph_pattern(query=True))
