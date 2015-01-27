@@ -82,7 +82,6 @@ class Connection(P.Property):
            int
                The number of connections matching the paramters given
         """
-        # XXX: Turn this into a COUNT query
         options = dict()
         options["pre"] = """
                      ?x c:pre_cell ?z .
@@ -155,6 +154,10 @@ class Neuron(Cell):
         The receptor types associated with this neuron
     innexin : DatatypeProperty
         Innexin types associated with this neuron
+    neurotransmitter : DatatypeProperty
+        Neurotransmitters associated with this neuron
+    neuropeptide : DatatypeProperty
+        Name of the gene corresponding to the neuropeptide produced by this neuron
     neighbor : Property
         Get neurons connected to this neuron
     connection : Property
@@ -163,16 +166,17 @@ class Neuron(Cell):
     def __init__(self, name=False, **kwargs):
         Cell.__init__(self,name=name,**kwargs)
         # Get neurons connected to this neuron
-        Neighbor(owner=self)
+        #Neighbor(owner=self)
         # Get connections from this neuron
-        Connection(owner=self)
+        #Connection(owner=self)
 
         Neuron.DatatypeProperty("type",self, multiple=True)
         Neuron.DatatypeProperty("receptor", self, multiple=True)
         Neuron.DatatypeProperty("innexin", self, multiple=True)
         Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
+        Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
         ### Aliases ###
-        self.get_neighbors = self.neighbor
+        #self.get_neighbors = self.neighbor
         self.receptors = self.receptor
 
     def GJ_degree(self):
