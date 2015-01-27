@@ -152,14 +152,14 @@ See what some evidence stated::
 
 ```
 
-See what neurons express some receptor::
+See what neurons express some neuropeptide::
 ```python
   >>> n = P.Neuron()
-  >>> n.receptor("TH")
-  receptor=TH
+  >>> n.neuropeptide("TH")
+  neuropeptide=TH
 
-  >>> s = set(x.name.one() for x in n.load()) 
-  >>> s == set(['CEPVL','CEPVR','PDEL','PDER','CEPDR'])
+  >>> s = set(x.name() for x in n.load()) 
+  >>> s == set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL'])
   True
 
 ```
