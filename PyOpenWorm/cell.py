@@ -145,10 +145,13 @@ class Cell(DataObject):
     def parentOf(self):
         """ Get the daughters of this cell """
         # XXX: This is pretty icky. We sorely need a convenient way to plug-in
-        # custom patterns to the load query.
+        #      custom patterns to the load query.
+        # Alternatively, represent the daughterOf/parentOf relationship with
+        # RDF statements rather than making it implicit in the lineageNames
 
         # hackish. just query for the possible children lineage names...
         ln = self.lineageName()
+        print("Lineage name in parentOf "+ str(ln))
         possible_child_lns = [ln + "a", ln + "v",
                               ln + "p", ln + "r",
                               ln + "l", ln + "d"]
@@ -168,19 +171,12 @@ class Cell(DataObject):
             if not DataObject._is_variable(ident):
                 return ident
 
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name()
-                return self.make_identifier(n)
-            else:
-                return ident
+        if self.name.hasValue():
+            # name is already set, so we can make an identifier from it
+            n = self.name()
+            return self.make_identifier(n)
         else:
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name.one()
-                return self.make_identifier(n)
-            else:
-                return ident
+            return ident
 
     #def rdf(self):
 
