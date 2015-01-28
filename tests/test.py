@@ -155,7 +155,7 @@ class _DataTest(unittest.TestCase):
             h=tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
+        PyOpenWorm.connect(conf=self.TestConfig, do_logging=True)
 
     def tearDown(self):
         PyOpenWorm.disconnect()
@@ -317,7 +317,8 @@ class CellTest(_DataTest):
         Tests for anterior, posterior, left, right, ventral, dorsal divisions
         """
         p = Cell(name="peas")
-        p.lineageName("ab.tahsuetoahusenoat")
+        base = 'ab.tahsuetoahusenoat'
+        p.lineageName(base)
         p.save()
 
         c = ["carrots",
@@ -330,24 +331,27 @@ class CellTest(_DataTest):
         division_directions = "alvpdr"
 
         for x,l in zip(c, division_directions):
-            base = 'ab.tahsuetoahusenoat'
             ln = base + l
             Cell(name=x,lineageName=ln).save()
-
+        print(next(p.parentOf()))
         names = set(str(x.name()) for x in p.parentOf())
+        print(names)
         self.assertEqual(set(c), names)
 
     def test_daughterOf(self):
         """
         Test that we can get the parent of a cell
         """
+        base = "ab.tahsuetoahusenoat"
+        child = base + "u"
         p = Cell(name="peas")
-        p.lineageName("ab.tahsuetoahusenoat")
+        p.lineageName(base)
         p.save()
 
         c = Cell(name="carrots")
-        c.lineageName("ab.tahsuetoahusenoatu")
+        c.lineageName(child)
         c.save()
+        print("Parent = "+str(c.daughterOf()))
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 
