@@ -211,7 +211,7 @@ def upload_synapses():
         #second step, get synapses and gap junctions and add them to the graph
         s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(row, 2).value not in ('R', 'Rs', 'NMJ'):
+            if s.cell(row, 2).value not in ('R', 'Rp', 'NMJ'):
                 #We're not going to include 'receives' since they're just the inverse of 'sends'
                 #Also omitting NMJ for the time being
                 pre = s.cell(row, 0).value
