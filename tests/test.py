@@ -127,6 +127,52 @@ class DataIntegrityTest(unittest.TestCase):
         for row in qres.result:
             print row
 
+    def test_compare_to_xls(self):
+        """ Compare the PyOpenWorm connections to the data in the spreadsheet """
+        SAMPLE_CELL = 'ADAL'
+        xls_conns = []
+        pow_conns = []
+        qres = self.g.query("SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE { " \
+            + "?conn a <http://openworm.org/entities/Connection>." \
+            + "?conn <http://openworm.org/entities/Connection/pre_cell> ?pre." \
+            + "?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell." \
+            + "?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode." \
+            + "?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name." \
+            + "?conn <http://openworm.org/entities/Connection/post_cell> ?post." \
+            + "?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell." \
+            + "?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode." \
+            + "?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name." \
+            + "?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node." \
+            + "?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type." \
+            + "?conn <http://openworm.org/entities/Connection/number> ?number_node." \
+            + "?number_node <http://openworm.org/entities/SimpleProperty/value> ?num." \
+            + "FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'" + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
+        def ff(x):
+            return str(x.value)
+        for line in qres.result:
+            t = tuple(map(ff, line))
+            pow_conns.append(t)
+        #Get connections from the sheet 
+        import xlrd
+        wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
+        sheet = wb.sheets()[0]
+        #Put every ADAL connection (except EMJs and Rs!) in a list as a tuple. This helps us compare them later
+        def floatToStr(x):                  
+            return str(int(x.value))        
+        def sendOrGj(x):                    
+            if x.value == 'EJ':             
+                return 'gapJunction'        
+            else:                           
+                return 'send'               
+
+        for row in range(1, sheet.nrows):
+            if 'ADAL' in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
+                string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
+                t = tuple(string_row)
+                xls_conns.append(t)
+        #assert that these two sorted lists are the same
+        #using sorted lists because Set() removes multiples
+        self.assertTrue(sorted(pow_conns) == sorted(xls_conns))
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
