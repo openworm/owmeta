@@ -134,13 +134,16 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = []
 
         #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?pre_namenode WHERE {
+        qres = self.g.query("""SELECT ?conn WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
                                ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
                                + SAMPLE_CELL +
-                               """\'}""")
+                               """\'.
+                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
+                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre}""")
         def ff(x):
             return str(x)
         for line in qres.result:
