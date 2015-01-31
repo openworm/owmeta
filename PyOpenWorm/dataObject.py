@@ -29,7 +29,7 @@ def _rdf_identifier_to_gp0(x):
     else:
         return x.n3()
 
-def _rdf_identifier_to_python(x):
+def _rdf_literal_to_python(x):
     if isinstance(x, R.Literal):
         x = x.toPython()
         if isinstance(x, R.Literal):
@@ -185,10 +185,10 @@ class DataObject(DataUser):
         if visited_list == False:
             visited_list = set()
 
-        if self.identifier(query=query) in visited_list:
+        if self in visited_list:
             return
         else:
-            visited_list.add(self.identifier(query=query))
+            visited_list.add(self)
 
         ident = self.identifier(query=query)
         yield (ident, R.RDF['type'], self.rdf_type)
@@ -273,7 +273,8 @@ class DataObject(DataUser):
 
         It should be as simple as converting the result of triples() into a BGP
         """
-        return _triples_to_bgp(self.triples(query=query))
+        visited_list = set()
+        return _triples_to_bgp(self.triples(query=query, visited_list=visited_list))
 
     def graph_pattern0(self,query=False):
         """ Get the graph pattern for this object.
@@ -624,30 +625,29 @@ class SimpleProperty(Property):
         """
         return len(self._v) > 0
 
+    def _get(self):
+        for x in self._v:
+            if x is not None and not DataObject._is_variable(x):
+                if self.property_type == 'DatatypeProperty':
+                    yield _rdf_literal_to_python(x)
+                elif self.property_type == 'ObjectProperty':
+                    yield self.object_from_id(x, self.value_rdf_type)
+
     def get(self):
         """ If the ``Property`` has had ``load`` or ``set`` called previously, returns
         the resulting values. Otherwise, queries the configured rdf graph for values
         which are set for the ``Property``'s owner.
         """
         import random as RND
-
-        if len(self._v) > 0:
-            for x in self._v:
-                if isinstance(x, R.Literal):
-                    x = x.toPython()
-                    if isinstance(x, R.Literal):
-                        x = str(x)
-                yield x
-        else:
-            self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
-            gp = self.owner.graph_pattern(query=True)
-            q = "select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
-            for x in self.rdf.query(q):
-                if x[0] is not None and not DataObject._is_variable(x[0]):
-                    if self.property_type == 'DatatypeProperty':
-                        yield _rdf_identifier_to_python(x[0])
-                    elif self.property_type == 'ObjectProperty':
-                        yield self.object_from_id(x[0], self.value_rdf_type)
+        self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
+        gp = self.owner.graph_pattern(query=True)
+        q = "select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
+        for x in self.rdf.query(q):
+            if x[0] is not None and not DataObject._is_variable(x[0]):
+                if self.property_type == 'DatatypeProperty':
+                    yield _rdf_literal_to_python(x[0])
+                elif self.property_type == 'ObjectProperty':
+                    yield self.object_from_id(x[0], self.value_rdf_type)
             #owner_id = self.owner.identifier(query=True)
             #property_predicate = self.owner.identifier(query=True)
             #print("owner_id = " +str(owner_id))
@@ -696,16 +696,17 @@ class SimpleProperty(Property):
 
     def triples(self,*args,**kwargs):
         query=kwargs.get('query',False)
-        ident = self.identifier(query=query)
         visited_list = kwargs.get('visited_list', False)
 
         if visited_list == False:
             visited_list = set()
 
-        if self.identifier(query=query) in visited_list:
+        if self in visited_list:
             return
         else:
-            visited_list.add(self.identifier(query=query))
+            visited_list.add(self)
+
+        ident = self.identifier(query=query)
 
         if len(self._v) > 0:
             for x in Property.triples(self,*args,**kwargs):
