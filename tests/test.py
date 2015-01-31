@@ -164,7 +164,12 @@ class DataIntegrityTest(unittest.TestCase):
                                # Go find the number of the connection and bind to ?num
                                ############################################################
                                ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.}""")
+                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+
+                               ############################################################
+                               # Filter by looking for the ?pre_name and ?post_name passed in
+                               ############################################################
+                               FILTER(isLiteral(?pre_name) && isLiteral(?post_name))}""")
         def ff(x):
             return str(x.value)
         for line in qres.result:
