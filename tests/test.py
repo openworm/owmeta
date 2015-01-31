@@ -135,8 +135,7 @@ class DataIntegrityTest(unittest.TestCase):
         #
         qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
                                #############################################################
-                               # Go find the names for all cells on the "pre" side of the connection
-                               #   and bind to ?pre_name
+                               # Find connections that have the ?pre_name as our passed in value
                                #############################################################
                                ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
                                + SAMPLE_CELL +
@@ -146,8 +145,8 @@ class DataIntegrityTest(unittest.TestCase):
                                ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
 
                                #############################################################
-                               # Go find the names for all cells on the "post" side of the connection
-                               #  and bind to ?post_name
+                               # Find all the cells that are on the post side of those
+                               #  connections and bind their names to ?post_name
                                #############################################################
                                ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
                                ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
@@ -167,7 +166,7 @@ class DataIntegrityTest(unittest.TestCase):
                                ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
 
                                ############################################################
-                               # Filter by looking for the ?pre_name and ?post_name passed in
+                               # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
                                FILTER(isLiteral(?pre_name) && isLiteral(?post_name))}""")
         def ff(x):
