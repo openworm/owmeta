@@ -132,21 +132,22 @@ class DataIntegrityTest(unittest.TestCase):
         SAMPLE_CELL = 'ADAL'
         xls_conns = []
         pow_conns = []
-        qres = self.g.query("SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE { " \
-            + "?conn a <http://openworm.org/entities/Connection>." \
-            + "?conn <http://openworm.org/entities/Connection/pre_cell> ?pre." \
-            + "?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell." \
-            + "?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode." \
-            + "?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name." \
-            + "?conn <http://openworm.org/entities/Connection/post_cell> ?post." \
-            + "?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell." \
-            + "?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode." \
-            + "?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name." \
-            + "?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node." \
-            + "?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type." \
-            + "?conn <http://openworm.org/entities/Connection/number> ?number_node." \
-            + "?number_node <http://openworm.org/entities/SimpleProperty/value> ?num." \
-            + "FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'" + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
+        qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
+                               ?conn a <http://openworm.org/entities/Connection>.
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
+                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
+                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
+                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
+                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
+                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
+                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
+                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
+                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
+                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
+                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+                               FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'"""
+                               + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
         def ff(x):
             return str(x.value)
         for line in qres.result:
