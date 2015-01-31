@@ -132,7 +132,8 @@ class DataIntegrityTest(unittest.TestCase):
         SAMPLE_CELL = 'ADAL'
         xls_conns = []
         pow_conns = []
-        #
+
+        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
         qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
@@ -174,7 +175,52 @@ class DataIntegrityTest(unittest.TestCase):
         for line in qres.result:
             t = tuple(map(ff, line))
             pow_conns.append(t)
-        #Get connections from the sheet 
+
+        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
+        # qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
+        #                        #############################################################
+        #                        # Find connections that have the ?post_name as our passed in value
+        #                        #############################################################
+        #                        ?post_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
+        #                        + SAMPLE_CELL +
+        #                        """\'.
+        #                        ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
+        #                        ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
+        #                        ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
+        #
+        #                        #############################################################
+        #                        # Find all the cells that are on the pre side of those
+        #                        #  connections and bind their names to ?pre_name
+        #                        #############################################################
+        #                        ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
+        #                        ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
+        #                        ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
+        #                        ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
+        #
+        #                        ############################################################
+        #                        # Go find the type of the connection and bind to ?type
+        #                        #############################################################
+        #                        ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
+        #                        ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+        #
+        #                        ############################################################
+        #                        # Go find the number of the connection and bind to ?num
+        #                        ############################################################
+        #                        ?conn <http://openworm.org/entities/Connection/number> ?number_node.
+        #                        ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+        #
+        #                        ############################################################
+        #                        # Filter out any ?pre_names or ?post_names that aren't literals
+        #                        ############################################################
+        #                        FILTER(isLiteral(?pre_name) && isLiteral(?post_name))}""")
+        # def ff(x):
+        #     return str(x.value)
+        # for line in qres.result:
+        #     t = tuple(map(ff, line))
+        #     pow_conns.append(t)
+
+        print pow_conns
+        #Get connections from the sheet
         import xlrd
         wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
         sheet = wb.sheets()[0]
@@ -188,10 +234,12 @@ class DataIntegrityTest(unittest.TestCase):
                 return 'send'               
 
         for row in range(1, sheet.nrows):
-            if 'ADAL' in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
+            if SAMPLE_CELL in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
                 string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
                 t = tuple(string_row)
                 xls_conns.append(t)
+
+        print xls_conns
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples
         self.assertTrue(sorted(pow_conns) == sorted(xls_conns))
