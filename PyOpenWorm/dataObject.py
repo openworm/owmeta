@@ -811,7 +811,7 @@ class SimpleProperty(Property):
         return self.make_identifier((self.owner.identifier(query=query), self.link, value_data))
 
     def __str__(self):
-        return unicode(self.linkName + "=" + unicode(";".join(unicode(x) for x in self._v)))
+        return unicode(self.linkName + "=" + unicode(";".join(u"`{}'".format(unicode(x)) for x in set(self._v))))
 
 
 class values(DataObject):
