@@ -128,8 +128,6 @@ class DataIntegrityTest(unittest.TestCase):
             print row
 
 
-
-
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
     TestConfig = TEST_CONFIG
@@ -573,6 +571,7 @@ class NeuronTest(_DataTest):
         # XXX: This test depends on a remote-hosted CSV file. Change it to depend
         # on the configured RDF graph, seeded by this test
         self.assertEqual(self.neur('AVAL').Syn_degree(),74)
+
 
 class NetworkTest(_DataTest):
     def setUp(s):
