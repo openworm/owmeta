@@ -43,7 +43,7 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all muscles objects
+        Get all Muscle objects attached to the Worm
 
         :returns: A set of all muscles
         :rtype: set
@@ -62,7 +62,7 @@ class Worm(DataObject):
         :rtype: rdflib.ConjunctiveGraph
          """
 
-        return self['semantic_net']
+        return self.rdf
 
     def identifier(self, *args, **kwargs):
         # Shamelessly copy-pasted from cell.py
