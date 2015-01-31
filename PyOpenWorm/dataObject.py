@@ -1,6 +1,7 @@
 import rdflib as R
 from .data import DataUser
 from .configure import BadConf
+import itertools as IT
 import traceback
 import logging as L
 
@@ -204,12 +205,16 @@ class DataObject(DataUser):
         # case.
         if hasattr(self, 'properties'):
             for x in self.properties:
-                if x.hasValue():
-                    yield (ident, x.link, x.identifier(query=query))
-                    for y in x.triples(query=query, visited_list=visited_list):
-                        yield y
-                elif x.hasVariable():
-                    yield (ident, x.link, x.identifier(query=query))
+                if isinstance(x, SimpleProperty):
+                    if x.hasValue():
+                        yield (ident, x.link, x.identifier(query=query))
+                        for y in x.triples(query=query, visited_list=visited_list):
+                            yield y
+                    elif x.hasVariable():
+                        yield (ident, x.link, x.identifier(query=query))
+                        for y in x.triples(query=query, visited_list=visited_list):
+                            yield y
+                else:
                     for y in x.triples(query=query, visited_list=visited_list):
                         yield y
 
@@ -422,7 +427,7 @@ class DataObject(DataUser):
             qres = self.rdf.query(q)
             for g in qres:
                 new_ident = g[0]
-                new_object = self.object_from_id(new_ident)
+                new_object = self.object_from_id(new_ident, self.rdf_type)
                 yield new_object
 
     def load0(self):
@@ -580,6 +585,8 @@ class Property(DataObject):
             return self
         else:
             r = self.get(*args,**kwargs)
+            if isinstance(self, SimpleProperty): #XXX: _get is defined only for SimpleProperty objects
+                r = IT.chain(r, self._get(*args, **kwargs))
             if self.multiple:
                 return set(r)
             else:
@@ -612,10 +619,6 @@ class SimpleProperty(Property):
             self.link = self.owner_type.rdf_namespace[self.linkName]
 
     def hasVariable(self):
-        """ Returns true if the ``Property`` has had ``load`` called previously and some value was available or if
-        ``set`` has been called previously
-        :return: True if this data object has a value, False if not.
-        """
         return (self._var is not None)
 
     def hasValue(self):
@@ -627,11 +630,7 @@ class SimpleProperty(Property):
 
     def _get(self):
         for x in self._v:
-            if x is not None and not DataObject._is_variable(x):
-                if self.property_type == 'DatatypeProperty':
-                    yield _rdf_literal_to_python(x)
-                elif self.property_type == 'ObjectProperty':
-                    yield self.object_from_id(x, self.value_rdf_type)
+            yield x
 
     def get(self):
         """ If the ``Property`` has had ``load`` or ``set`` called previously, returns
@@ -641,7 +640,7 @@ class SimpleProperty(Property):
         import random as RND
         self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
         gp = self.owner.graph_pattern(query=True)
-        q = "select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
+        q = u"select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
         for x in self.rdf.query(q):
             if x[0] is not None and not DataObject._is_variable(x[0]):
                 if self.property_type == 'DatatypeProperty':
@@ -725,8 +724,8 @@ class SimpleProperty(Property):
                 except Exception:
                     traceback.print_exc()
         elif query==True:
-            assert(self.hasVariable())
-            yield (ident, self.value_property, self._var)
+            if self.hasVariable():
+                yield (ident, self.value_property, self._var)
 
     def triples0(self,*args,**kwargs):
         query=kwargs.get('query',False)

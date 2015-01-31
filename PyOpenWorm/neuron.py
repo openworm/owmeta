@@ -166,9 +166,9 @@ class Neuron(Cell):
     def __init__(self, name=False, **kwargs):
         Cell.__init__(self,name=name,**kwargs)
         # Get neurons connected to this neuron
-        #Neighbor(owner=self)
+        Neighbor(owner=self)
         # Get connections from this neuron
-        #Connection(owner=self)
+        Connection(owner=self)
 
         Neuron.DatatypeProperty("type",self, multiple=True)
         Neuron.DatatypeProperty("receptor", self, multiple=True)
@@ -176,7 +176,7 @@ class Neuron(Cell):
         Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
         Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
         ### Aliases ###
-        #self.get_neighbors = self.neighbor
+        self.get_neighbors = self.neighbor
         self.receptors = self.receptor
 
     def GJ_degree(self):
