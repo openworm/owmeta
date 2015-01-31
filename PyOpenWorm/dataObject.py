@@ -647,45 +647,6 @@ class SimpleProperty(Property):
                     yield _rdf_literal_to_python(x[0])
                 elif self.property_type == 'ObjectProperty':
                     yield self.object_from_id(x[0], self.value_rdf_type)
-            #owner_id = self.owner.identifier(query=True)
-            #property_predicate = self.owner.identifier(query=True)
-            #print("owner_id = " +str(owner_id))
-            #var = R.Variable("V"+str(int(RND.random() * 1E10)))
-            #q = """
-            #select {value_variable} where {
-                #{owner} {property_predicate} {property_object} .
-                #{property_object} {value_predicate} {value_variable} .
-            #}
-            #""".format({"owner":owner_id,
-                #"property_predicate":
-            #self.set(var)
-            #if DataObject._is_variable(owner_id):
-                #print("getting the graph pattern _is_variable true" )
-                #gp = self.owner.graph_pattern(query=True)
-                #print(gp)
-            #else:
-            #gp = self.graph_pattern(query=True)
-            #print(list(self.triples(query=True)))
-            #var = "?"+self.linkName
-            ## XXX: varpat is a hack. More design work needs to be done.
-            #L.debug("Own graph pattern = " + str(self.graph_pattern(query=True)))
-            #q = """
-            #select distinct {var} where {{ {gp} . {varpat} }}
-            #""".format(dict(var=var, gp=gp,
-                #varpat=_triples_to_bgp([(owner.identifer(query=True),
-            #L.debug("get query = " + q)
-            #qres = self.rdf.query(q)
-            #for x in qres:
-                #if self.property_type == 'DatatypeProperty' \
-                        #and not DataObject._is_variable(x[0]) \
-                        #and x[0] is not None:
-                    #yield str(x[0])
-                #elif self.property_type == 'ObjectProperty' \
-                        #and not DataObject._is_variable(x[0]) \
-                        #and x[0] is not None:
-                    ## XXX: We can pull the type from the graph. Just be sure
-                    ##   to get the most specific type
-                    #yield self.object_from_id(x[0], self.value_rdf_type)
 
     def set(self,v):
         import bisect
@@ -794,8 +755,6 @@ class SimpleProperty(Property):
             # or our owner's identifier is a variable
             owner_id = self.owner.identifier(query=query)
             vlen = len(self._v)
-            #print vlen
-            #print owner_id
             if vlen == 0 or DataObject._is_variable(owner_id):
                 return ident
         # Intentional fall through from if statement ...
