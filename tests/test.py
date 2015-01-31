@@ -221,7 +221,6 @@ class DataIntegrityTest(unittest.TestCase):
             t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
             pow_conns.append(t)
 
-        print pow_conns
         #Get connections from the sheet
         import xlrd
         wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
@@ -238,13 +237,15 @@ class DataIntegrityTest(unittest.TestCase):
         for row in range(1, sheet.nrows):
             if SAMPLE_CELL in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
                 string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
-                t = tuple(string_row)
+                t = list(string_row)
                 xls_conns.append(t)
 
-        print xls_conns
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples
-        self.assertTrue(sorted(pow_conns) == sorted(xls_conns))
+
+        errorMsg = str(str(sorted(pow_conns)) + "\n***********************************\n" + str(sorted(xls_conns)))
+
+        self.assertTrue(sorted(pow_conns) == sorted(xls_conns), errorMsg)
 
 @unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
