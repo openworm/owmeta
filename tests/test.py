@@ -16,7 +16,7 @@ import os
 import subprocess
 import tempfile
 
-USE_BINARY_DB = False
+USE_BINARY_DB = True
 BINARY_DB = "OpenWormData/scripts/worm.db"
 
 try:
