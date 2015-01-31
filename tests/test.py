@@ -132,20 +132,42 @@ class DataIntegrityTest(unittest.TestCase):
         SAMPLE_CELL = 'ADAL'
         xls_conns = []
         pow_conns = []
+        #
         qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
-                               ?conn a <http://openworm.org/entities/Connection>.
+                               ?conn a <http://openworm.org/entities/Connection>. #Grab all connections
+                               #############################################################
+                               # Go find the names for all cells on the "pre" side of the connection
+                               #   and bind to ?pre_name
+                               #############################################################
                                ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
                                ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
                                ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
                                ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
+
+                               #############################################################
+                               # Go find the names for all cells on the "post" side of the connection
+                               #  and bind to ?post_name
+                               #############################################################
                                ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
                                ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
                                ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
                                ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
+
+                               ############################################################
+                               # Go find the type of the connection and bind to ?type
+                               #############################################################
                                ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
                                ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+
+                               ############################################################
+                               # Go find the number of the connection and bind to ?num
+                               ############################################################
                                ?conn <http://openworm.org/entities/Connection/number> ?number_node.
                                ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+
+                               ############################################################
+                               # Filter by looking for the ?pre_name passed in
+                               ############################################################
                                FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'"""
                                + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
         def ff(x):
