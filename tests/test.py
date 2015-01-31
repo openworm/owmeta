@@ -134,7 +134,7 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = []
 
         #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?conn WHERE {
+        qres = self.g.query("""SELECT ?conn ?post_name WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
@@ -143,7 +143,21 @@ class DataIntegrityTest(unittest.TestCase):
                                """\'.
                                ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
                                ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre}""")
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
+
+                               #############################################################
+                               # Find all the cells that are on the post side of those
+                               #  connections and bind their names to ?post_name
+                               #############################################################
+                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
+                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
+                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
+                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
+
+                               ############################################################
+                               # Filter out any ?pre_names or ?post_names that aren't literals
+                               ############################################################
+                               FILTER(isLiteral(?post_name))}""")
         def ff(x):
             return str(x)
         for line in qres.result:
