@@ -67,6 +67,10 @@ class Cell(DataObject):
         The name of the cell
     lineageName : DatatypeProperty
         The lineageName of the cell
+    description : DatatypeProperty
+        A description of the cell
+    divisionVolume : DatatypeProperty
+        A returns the volume of the cell after division
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
@@ -151,7 +155,6 @@ class Cell(DataObject):
 
         # hackish. just query for the possible children lineage names...
         ln = self.lineageName()
-        print("Lineage name in parentOf "+ str(ln))
         possible_child_lns = [ln + "a", ln + "v",
                               ln + "p", ln + "r",
                               ln + "l", ln + "d"]

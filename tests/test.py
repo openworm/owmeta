@@ -155,7 +155,7 @@ class _DataTest(unittest.TestCase):
             h=tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        PyOpenWorm.connect(conf=self.TestConfig, do_logging=True)
+        PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
 
     def tearDown(self):
         PyOpenWorm.disconnect()
@@ -333,9 +333,7 @@ class CellTest(_DataTest):
         for x,l in zip(c, division_directions):
             ln = base + l
             Cell(name=x,lineageName=ln).save()
-        print(next(p.parentOf()))
         names = set(str(x.name()) for x in p.parentOf())
-        print(names)
         self.assertEqual(set(c), names)
 
     def test_daughterOf(self):
@@ -351,7 +349,6 @@ class CellTest(_DataTest):
         c = Cell(name="carrots")
         c.lineageName(child)
         c.save()
-        print("Parent = "+str(c.daughterOf()))
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 
@@ -1209,8 +1206,8 @@ class SimplePropertyTest(_DataTest):
             owner_type = DataObject
 
         sp = T(owner=do)
-        self.assertNotEqual(len(list(sp.triples())), 0)
-        self.assertNotEqual(len(list(sp.triples(query=True))), 0)
+        self.assertEqual(len(list(sp.triples())), 0)
+        self.assertEqual(len(list(sp.triples(query=True))), 0)
 
 class NeuroMLTest(_DataTest):
     pass
