@@ -134,7 +134,7 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = []
 
         #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?post_name ?type ?num WHERE {
+        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
@@ -171,7 +171,7 @@ class DataIntegrityTest(unittest.TestCase):
                                ############################################################
                                FILTER(isLiteral(?post_name))}""")
         def ff(x):
-            return str(x)
+            return str(x.value)
         for line in qres.result:
             t = tuple(map(ff, line))
             pow_conns.append(t)
