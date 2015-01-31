@@ -139,10 +139,12 @@ class DataIntegrityTest(unittest.TestCase):
                                # Go find the names for all cells on the "pre" side of the connection
                                #   and bind to ?pre_name
                                #############################################################
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
+                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
+                               + SAMPLE_CELL +
+                               """\'.
                                ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
+                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
 
                                #############################################################
                                # Go find the names for all cells on the "post" side of the connection
@@ -168,8 +170,7 @@ class DataIntegrityTest(unittest.TestCase):
                                ############################################################
                                # Filter by looking for the ?pre_name and ?post_name passed in
                                ############################################################
-                               FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'"""
-                               + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
+                               FILTER(isLiteral(?pre_name) && isLiteral(?post_name))}""")
         def ff(x):
             return str(x.value)
         for line in qres.result:
