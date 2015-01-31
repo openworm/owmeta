@@ -85,12 +85,12 @@ class Cell(DataObject):
         if lineageName:
             self.lineageName(lineageName)
 
-    def morphology(self):
+    def _morphology(self):
         morph_name = "morphology_" + str(next(self.name()))
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)
-        qres = self['semantic_net'].query(query, initNs=ns)
+        qres = self.rdf.query(query, initNs=ns)
         morph = neuroml.Morphology(id=morph_name)
         for r in qres:
             par = False
@@ -110,7 +110,7 @@ class Cell(DataObject):
             morph.segments.append(s)
         # Query for segment groups
         query = segment_group_query.substitute(morph_name=morph_name)
-        qres = self['semantic_net'].query(query,initNs=ns)
+        qres = self.rdf.query(query,initNs=ns)
         for r in qres:
             s = neuroml.SegmentGroup(id=r['gid'])
             if r['member']:
