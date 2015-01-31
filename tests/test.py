@@ -134,7 +134,6 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = []
         #
         qres = self.g.query("""SELECT ?pre_name ?post_name ?type (STR(?num) AS ?numval) WHERE {
-                               ?conn a <http://openworm.org/entities/Connection>. #Grab all connections
                                #############################################################
                                # Go find the names for all cells on the "pre" side of the connection
                                #   and bind to ?pre_name
