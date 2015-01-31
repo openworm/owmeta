@@ -134,7 +134,7 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = []
 
         #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?conn ?post_name WHERE {
+        qres = self.g.query("""SELECT ?post_name ?type ?num WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
@@ -153,6 +153,18 @@ class DataIntegrityTest(unittest.TestCase):
                                ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
                                ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
                                ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
+
+                               ############################################################
+                               # Go find the type of the connection and bind to ?type
+                               #############################################################
+                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
+                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+
+                               ############################################################
+                               # Go find the number of the connection and bind to ?num
+                               ############################################################
+                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
+                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
 
                                ############################################################
                                # Filter out any ?pre_names or ?post_names that aren't literals
