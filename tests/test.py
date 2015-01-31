@@ -173,7 +173,8 @@ class DataIntegrityTest(unittest.TestCase):
         def ff(x):
             return str(x.value)
         for line in qres.result:
-            t = tuple(map(ff, line))
+            t = list(map(ff, line))
+            t.insert(0,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
             pow_conns.append(t)
 
         #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
@@ -216,7 +217,8 @@ class DataIntegrityTest(unittest.TestCase):
         def ff(x):
             return str(x.value)
         for line in qres.result:
-            t = tuple(map(ff, line))
+            t = list(map(ff, line))
+            t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
             pow_conns.append(t)
 
         print pow_conns
