@@ -166,7 +166,7 @@ class DataIntegrityTest(unittest.TestCase):
                                ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
 
                                ############################################################
-                               # Filter by looking for the ?pre_name passed in
+                               # Filter by looking for the ?pre_name and ?post_name passed in
                                ############################################################
                                FILTER((isLiteral(?pre_name) && isLiteral(?post_name)) && (str(?pre_name) = \'"""
                                + SAMPLE_CELL + "\' || str(?post_name) = \'" + SAMPLE_CELL + "\'))}")
