@@ -64,7 +64,7 @@ class Cell(DataObject):
     Attributes
     ----------
     name : DatatypeProperty
-        The name of the cell
+        The 'adult' name of the cell typically used by biologists when discussing C. elegans
     lineageName : DatatypeProperty
         The lineageName of the cell
     description : DatatypeProperty
@@ -180,9 +180,6 @@ class Cell(DataObject):
             return self.make_identifier(n)
         else:
             return ident
-
-    #def rdf(self):
-
     #def peptides(self):
 
 
