@@ -147,7 +147,7 @@ def connect(configFile='PyOpenWorm/default.conf',
     else:
         try:
             from pkg_resources import Requirement, resource_filename
-            filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
+            filename = resource_filename(Requirement.parse("PyOpenWorm"),"PyOpenWorm/default.conf")
             Configureable.conf = Data.open(filename)
         except:
             logging.info("Couldn't load default configuration")

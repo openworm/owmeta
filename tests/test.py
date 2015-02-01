@@ -17,7 +17,7 @@ import subprocess
 import tempfile
 
 USE_BINARY_DB = False
-BINARY_DB = "OpenWormData/scripts/worm.db"
+BINARY_DB = "OpenWormData/worm.db"
 
 try:
     import bsddb
@@ -59,10 +59,9 @@ class DataIntegrityTest(unittest.TestCase):
         cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
 
         if not USE_BINARY_DB:
-            #use a simple graph from rdflib so we can look directly at the structure of the data
-            cls.g = rdflib.Graph("ZODB") #declare class-level scope
-            #load in the database
-            cls.g.parse("OpenWormData/WormData.n3", format="n3")
+            PyOpenWorm.connect(conf=Data()) # Connect for integrity tests that use PyOpenWorm functions
+            cls.g = PyOpenWorm.config('rdf.graph') # declare class-level scope for the database
+            cls.g.parse("OpenWormData/WormData.n3", format="n3") # load in the database
         else:
             conf = Configure(**{ "rdf.source" : "ZODB", "rdf.store_conf" : BINARY_DB })
             PyOpenWorm.connect(conf=conf)
@@ -117,6 +116,16 @@ class DataIntegrityTest(unittest.TestCase):
 
         # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
         self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
+
+    def test_neuron_GJ_degree(self):
+        """ Get the number of gap junctions from a networkx representation """
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 40)
+
+    def test_neuron_Syn_degree(self):
+        """ Get the number of chemical synapses from a networkx representation """
+        # XXX: This result is 1 greater compared to what would be expected from the
+        # connectome.csv file
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 91)
 
     @unittest.skip("have not yet defined asserts")
     def testWhatNodesGetTypeInfo(self):
@@ -560,18 +569,6 @@ class NeuronTest(_DataTest):
         c = Neuron(lineageName="AB plapaaaap")
         self.assertEqual(c.name(), 'ADAL')
 
-    def test_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
-        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
-        # on the configured RDF graph, seeded by this test
-        self.assertEqual(self.neur('AVAL').GJ_degree(),60)
-
-    def test_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
-        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
-        # on the configured RDF graph, seeded by this test
-        self.assertEqual(self.neur('AVAL').Syn_degree(),74)
-
 
 class NetworkTest(_DataTest):
     def setUp(s):
@@ -693,7 +690,8 @@ class EvidenceTest(_DataTest):
         self.assertIn('tom@cn.com', author)
 
     def test_asserts_query_multiple(self):
-        """ Show that setting the evidence with distinct objects yields distinct results """
+        """ Show that setting the evidence with distinct objects yields
+            distinct results """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)
@@ -710,10 +708,11 @@ class EvidenceTest(_DataTest):
             y = x.year()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
-            self.assertTrue((a == 'tom@cn.com' and y is None) or (a is None and int(y) == 1999))
+            self.assertTrue(a == 'tom@cn.com' and int(y) == 1999)
 
     def test_asserts_query_multiple_author_matches(self):
-        """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
+        """ Show that setting the evidence with distinct objects yields
+        distinct results even if there are matching values """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)

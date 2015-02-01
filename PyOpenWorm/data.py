@@ -223,9 +223,12 @@ class Data(Configure, Configureable):
     """
     def __init__(self, conf=False):
         Configure.__init__(self)
-        Configureable.__init__(self,conf)
+        Configureable.__init__(self)
         # We copy over all of the configuration that we were given
-        self.copy(self.conf)
+        if conf:
+            self.copy(conf)
+        else:
+            self.copy(Configureable.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
