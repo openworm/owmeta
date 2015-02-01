@@ -70,6 +70,7 @@ class Connection(P.Property):
         for x in c:
             for r in x.load():
                 yield r
+
     def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
         """Get a list of connections associated with the owning neuron.
 
@@ -185,14 +186,10 @@ class Neuron(Cell):
         :returns: total number of incoming and outgoing gap junctions
         :rtype: int
         """
-
         count = 0
-        for item in self['nx'].in_edges_iter(self.name(),data=True):
-            if 'GapJunction' in item[2]['synapse']:
-                count = count + 1
-        for item in self['nx'].out_edges_iter(self.name(),data=True):
-            if 'GapJunction' in item[2]['synapse']:
-                count = count + 1
+        for c in self.connection():
+            if c.syntype.one() == 'gapJunction':
+                count += 1
         return count
 
     def Syn_degree(self):
@@ -202,12 +199,9 @@ class Neuron(Cell):
         :rtype: int
         """
         count = 0
-        for item in self['nx'].in_edges_iter(self.name(),data=True):
-            if 'Send' in item[2]['synapse']:
-                count = count + 1
-        for item in self['nx'].out_edges_iter(self.name(),data=True):
-            if 'Send' in item[2]['synapse']:
-                count = count + 1
+        for c in self.connection.get('either'):
+            if c.syntype.one() == 'send':
+                count += 1
         return count
 
     def _type_semantic(self):
