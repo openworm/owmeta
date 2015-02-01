@@ -133,8 +133,7 @@ def upload_neurons():
         cur = conn.cursor()
         ev = P.Evidence(title="C. elegans sqlite database")
         w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
+        n = w.neuron_network()
         # insert neurons.
         # save
         cur.execute("""
@@ -144,7 +143,7 @@ def upload_neurons():
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
-        ev.asserts(w)
+        ev.asserts(n)
         ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded neurons")
@@ -158,8 +157,7 @@ def upload_receptors_and_innexins():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
+        n = w.neuron_network()
         # insert neurons.
         # save
         # get the receptor (361), neurotransmitters (354), and innexins (355)
@@ -179,8 +177,6 @@ def upload_receptors_and_innexins():
             for r in cur.fetchall():
                 name = str(r[0])
                 data = str(r[1])
-                if name == "AVAL":
-                    print (data)
 
                 if not (name in neurons):
                     neurons[name] = P.Neuron(name=name)
@@ -206,10 +202,14 @@ def upload_synapses():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
+        n = w.neuron_network()
         #second step, get the relationships between them and add them to the graph
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Weight, Relation FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and (Relation = '356' OR Relation = '357')")
+        cur.execute("""SELECT DISTINCT a.Entity, b.Entity, Weight, Relation
+        FROM tblrelationship, tblentity a, tblentity b
+        WHERE EnID1=a.id
+              and EnID2=b.id
+              and (Relation = '356' OR Relation = '357')
+              """)
 
         for r in cur.fetchall():
             #all items are numbers -- need to be converted to a string
@@ -217,10 +217,12 @@ def upload_synapses():
             second = str(r[1])
             third = str(r[2])
             syntype = str(r[3])
+
             if syntype == '356':
                 syntype = 'send'
             else:
                 syntype = 'gapjunction'
+
             try:
                 weight = int(third)
                 # NMJs have negative weights. we only want the synaptic connections
@@ -234,8 +236,9 @@ def upload_synapses():
             if weight:
                 c = P.Connection(pre_cell=first, post_cell=second, number=weight, syntype=syntype)
                 n.synapse(c)
-        e = P.Evidence(author='markw@cs.utexas.edu')
-        e.asserts(w)
+
+        e = P.Evidence(title="C. elegans sqlite database")
+        e.asserts(n)
         e.save()
         print ("uploaded synapses")
     except Exception, e:
@@ -263,11 +266,9 @@ def upload_types():
         data[name] = types
 
     for name in data:
-        print("upload_types: neuron "+str(name))
         n = P.Neuron(name=name)
         types = data[name]
         for t in types:
-            print("setting type {} for {}.".format(t, name))
             n.type(t)
         net.neuron(n)
     ev.asserts(net)
@@ -321,6 +322,11 @@ def do_insert(config="default.conf", logging=False):
 
     P.connect(conf=config, do_logging=logging)
     try:
+        w = P.Worm()
+        net = P.Network()
+        w.neuron_network(net)
+        w.save()
+
         upload_neurons()
         upload_muscles()
         upload_lineage_and_descriptions()
