@@ -175,7 +175,7 @@ class DataObject(DataUser):
 
     def make_identifier(self, data):
         import hashlib
-        return R.URIRef(self.rdf_namespace["a"+hashlib.md5(str(data)).hexdigest()])
+        return R.URIRef(self.rdf_namespace["a"+hashlib.md5(repr(data)).hexdigest()])
 
     def triples(self, query=False, visited_list=False):
         """
@@ -810,7 +810,7 @@ class SimpleProperty(Property):
                     raise Exception("Values for an ObjectProperty ({}) must be DataObjects. Given '{}'.".format(self, value))
             value_data = "".join(str(x.identifier()) for x in self._v if self is not x)
 
-        return self.make_identifier((self.owner.identifier(query=query), self.link, value_data))
+        return self.make_identifier((self.link, value_data))
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(u"`{}'".format(unicode(x)) for x in set(self._v))))
