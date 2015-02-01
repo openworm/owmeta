@@ -11,7 +11,6 @@ P.connect('default.conf')
 
 for x in dir(P):
     if isinstance(getattr(P, x), type) and issubclass(getattr(P, x), P.DataObject):
-        print(x)
         c = getattr(P, x)
         if x == 'values':
             c("dummy")
