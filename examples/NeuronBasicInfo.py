@@ -26,7 +26,7 @@ def get_names(it):
     return res
 
 w = P.Worm()
-net = w.neuron_network.get()
+net = w.neuron_network()
 print("Retrieving names...")
 inter = get_names(net.interneurons())
 motor = get_names(net.motor())
