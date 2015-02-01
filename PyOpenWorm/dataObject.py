@@ -128,17 +128,17 @@ class DataObject(DataUser):
             cls._closedSet.add(o)
 
     @classmethod
-    def _is_variable(self,uri):
+    def _is_variable(cls,uri):
         """ Is the uriref a graph variable? """
         # We should be able to extract the type from the identifier
         if not isinstance(uri,R.URIRef):
             return False
-        cn = self._extract_class_name(uri)
+        cn = cls._extract_class_name(uri)
         #print 'cn = ', cn
         return (cn == 'variable')
 
     @classmethod
-    def _graph_variable_to_var(self,uri):
+    def _graph_variable_to_var(cls,uri):
 
         from urlparse import urlparse
         u = urlparse(uri)
@@ -147,9 +147,11 @@ class DataObject(DataUser):
         if x[2] == 'variable':
             #print 'fragment = ', u.fragment
             return R.Variable(u.fragment)
+        else:
+            return uri
 
     @classmethod
-    def _graph_variable_to_var0(self,uri):
+    def _graph_variable_to_var0(cls,uri):
 
         from urlparse import urlparse
         u = urlparse(uri)
@@ -173,7 +175,7 @@ class DataObject(DataUser):
 
     def make_identifier(self, data):
         import hashlib
-        return R.URIRef(self.rdf_namespace[hashlib.sha224(str(data)).hexdigest()])
+        return R.URIRef(self.rdf_namespace["a"+hashlib.md5(str(data)).hexdigest()])
 
     def triples(self, query=False, visited_list=False):
         """
@@ -409,6 +411,7 @@ class DataObject(DataUser):
         cls.parents = _DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
+        cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
     def load(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -422,13 +425,49 @@ class DataObject(DataUser):
         else:
             gp = self.graph_pattern(query=True)
             ident = self.identifier(query=True)
-            ident = self._graph_variable_to_var(ident)
-            q = "SELECT DISTINCT {0} where {{ {1} }}".format(ident.n3(), gp)
+            ident = self._graph_variable_to_var(ident) # XXX: Assuming that this object doesn't have a set identifier
+            q = "SELECT DISTINCT {0} {0}_type where {{ {1} . {0} rdf:type {0}_type }} ORDER BY {0}".format(ident.n3(), gp)
             qres = self.rdf.query(q)
-            for g in qres:
-                new_ident = g[0]
-                new_object = self.object_from_id(new_ident, self.rdf_type)
-                yield new_object
+            qres = iter(qres)
+            results = []
+            def s():
+                try:
+                    k = next(qres)
+                except StopIteration as e:
+                    k = (None, None)
+                return k
+
+            def g0(ident, types):
+                if ident is None:
+                    return
+                k = s()
+                n_ident = k[0]
+                n_type = k[1]
+                if n_ident != ident:
+                    o = self.object_from_id(ident, DataObject.get_most_specific_type(types))
+                    results.append(o)
+                    g0(n_ident, [n_type])
+                else:
+                    g0(n_ident, [n_type] + types)
+
+            def g():
+                k = s()
+                if k[0] is None:
+                    return
+                else:
+                    g0(k[0], [k[1]])
+            g()
+            for x in results:
+                yield x
+    @classmethod
+    def get_most_specific_type(cls, types):
+        ret = DataObject
+        for x in types:
+            cn = cls._extract_class_name(x)
+            o = _DataObjects[cn]
+            if issubclass(o, ret):
+                ret = o
+        return ret.rdf_type
 
     def load0(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
@@ -638,9 +677,13 @@ class SimpleProperty(Property):
         which are set for the ``Property``'s owner.
         """
         import random as RND
-        self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
-        gp = self.owner.graph_pattern(query=True)
-        q = u"select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
+        try:
+            self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
+            gp = self.owner.graph_pattern(query=True)
+            q = u"select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
+        finally:
+            self._var = None
+
         for x in self.rdf.query(q):
             if x[0] is not None and not DataObject._is_variable(x[0]):
                 if self.property_type == 'DatatypeProperty':
