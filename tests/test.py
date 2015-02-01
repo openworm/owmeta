@@ -77,8 +77,7 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
     @classmethod
     def tearDownClass(cls):
-        if USE_BINARY_DB:
-            PyOpenWorm.disconnect()
+        PyOpenWorm.disconnect()
 
     def testUniqueNeuronNode(self):
         """
