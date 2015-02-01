@@ -97,8 +97,10 @@ def disconnect(c=False):
 
     if c == False:
         c = Configureable.conf
+
     if c != False:
         c.closeDatabase()
+
     m.connected = False
 
 
@@ -137,11 +139,12 @@ def connect(configFile='PyOpenWorm/default.conf',
         logging.basicConfig(level=logging.DEBUG)
 
     if conf:
-        Configureable.conf = conf
         if not isinstance(conf, Data):
             # Initializes a Data object with
             # the Configureable.conf
-            Configureable.conf = Data()
+            Configureable.conf = Data(conf)
+        else:
+            Configureable.conf = conf
     elif configFile:
         loadConfig(configFile)
     else:
