@@ -12,33 +12,49 @@ Example: Something like `adal.name.one()` might return "ADAL", assuming we have
 declared the variable `adal`.
 """
 
+from __future__ import print_function
 import PyOpenWorm as P
 
-#Connect to the database.
-P.connect("default.conf")
+P.connect(conf=P.Data({
+    "rdf.store_conf" : "../OpenWormData/worm.db",
+    "rdf.source" : "ZODB"
+    }))
+def get_names(it):
+    res = []
+    for x in it:
+        res.append(x.name())
+    return res
 
-#Get the worm object.
-worm = P.Worm()
+w = P.Worm()
+net = w.neuron_network.get()
+print("Retrieving names...")
+inter = get_names(net.interneurons())
+motor = get_names(net.motor())
+sensory = get_names(net.sensory())
 
-#Extract the network object from the worm.
-net = worm.get_neuron_network()
+print("Calculating combinations...")
+sensmot = set(sensory) & set(motor)
+sensint = set(sensory) & set(inter)
+motint = set(motor) & set(inter)
+sens_only = set(sensory) - set(motor) - set(inter)
+motor_only = set(motor) - set(sensory) - set(inter)
+inter_only = set(inter) - set(sensory) - set(motor)
+tri = motint & set(sensory)
+motint_no_tri = motint - tri
+sensint_no_tri = sensint - tri
+sensmot_no_tri = sensmot - tri
+def pp_set(title, s):
+    print(title)
+    print("="*(len(title)))
+    print(" ".join(s))
+    print()
 
-#Declare an empty dictionary.
-types = {}
-
-#Go through the neuron objects in the network.
-for neuron in net.neuron():
-    if len(list(neuron.type())) > 0:
-        #i.e. "If there is a type associated with a neuron:"
-        type = list(neuron.type())[0]
-
-        if not types.has_key(type):
-            #If this type key is not already in our dictionary, add it.
-            types[type] = []
-
-        #Add the neuron's name under its type key in our dictionary.
-        types[type].append(list(neuron.name())[0])
-
-for type in types.keys():
-    #Print out the types of neurons and list the associated neurons with each.
-    print("Neurons of type %s:\n  %s\n"%(type, types[type]))
+pp_set("Sensory only neurons",sens_only)
+pp_set("Interneurons (not mechanosensory, etc.)",inter_only)
+pp_set("Motor only neurons",motor_only)
+pp_set("Sensory-motor neurons",sensmot)
+pp_set("Sensory and interneuron?",sensint)
+pp_set("Motor and interneuron?",motint)
+pp_set("Sensory-motor less tri-functional",sensmot_no_tri)
+pp_set("Motor and interneuron less tri-functional",motint_no_tri)
+pp_set("Sensory and interneuron less tri-functional",sensint_no_tri)
