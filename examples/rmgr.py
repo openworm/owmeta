@@ -1,6 +1,7 @@
 import PyOpenWorm as P
 
-P.connect(conf={"rdf.upload_block_statement_count" : 80 })
+P.connect(conf=P.Data({"rdf.store_conf":"../worm.db",
+"rdf.source" : "ZODB" }))
 
 class NC_neighbor(P.Property):
     def __init__(self, *args, **kwargs):
@@ -15,17 +16,17 @@ class NC_neighbor(P.Property):
         for x in self.owner.neighbor():
             yield x
 
-    def set(self,ob, **kwargs):
+    def set(self, ob, **kwargs):
         self.real_neighbor(ob)
         if isinstance(ob, NeuronClass):
-            ob_name = next(ob.name())
-            this_name = next(self.owner.name())
+            ob_name = ob.name()
+            this_name = self.owner.name()
             for x in ob.member():
                 # Get the name for the neighbor
                 # XXX:
 
                 try:
-                    n = next(x.name())
+                    n = x.name()
                     side = n[n.find(ob_name)+len(ob_name):]
 
                     name_here = this_name + side
@@ -47,7 +48,7 @@ class NC_neighbor(P.Property):
 class NeuronClass(P.Neuron):
     def __init__(self, name=False, **kwargs):
         P.Neuron.__init__(self,**kwargs)
-        NeuronClass.ObjectProperty('member', owner=self)
+        NeuronClass.ObjectProperty('member', owner=self, value_type=P.Neuron, multiple=True)
         NC_neighbor(owner=self)
         if name:
             self.name(name)
@@ -130,15 +131,17 @@ for p,x,o in d:
         x='GapJunction'
     else:
         x='Send'
-    p.neighbor(o,syntype=x)
+    p.neighbor(o, syntype=x)
 ev.save()
 
 nc = NeuronClass()
 nc.type('sensory')
 
-print 'Sensory neuron classes in the circuit'
+print 'Sensory neuron classes in the circuit and their neurons'
 # XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
-for x in set(y.name.one() for y in nc.load()):
-    print x
+for x in nc.load():
+    print x.name(), "has:"
+    for y in x.member():
+        print " ", y.name(), "of type", ",".join(y.type())
 
 P.disconnect()
