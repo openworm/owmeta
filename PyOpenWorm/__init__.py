@@ -111,7 +111,7 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
     :return:
     """
     if data:
-        sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!")
+        sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
         config()['rdf.graph'].parse(data, format=dataFormat)
 
 def connect(configFile='PyOpenWorm/default.conf',
