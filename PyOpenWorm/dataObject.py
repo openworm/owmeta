@@ -60,8 +60,9 @@ class DataObject(DataUser):
     rdf_namespace : rdflib.namespace.Namespace
         The rdflib namespace (prefix for URIs) for objects from this class
     properties : list of Property
-        Properties
-
+        Properties belonging to this object
+    owner_properties : list of Property
+        Properties belonging to parents of this object
     """
     _openSet = set()
     _closedSet = set()
@@ -83,6 +84,7 @@ class DataObject(DataUser):
             self._triples = triples
         self._is_releasing_triples = False
         self.properties = []
+        self.owner_properties = []
         # Used in triples()
         self._id_is_set = False
 
@@ -175,7 +177,7 @@ class DataObject(DataUser):
 
     def make_identifier(self, data):
         import hashlib
-        return R.URIRef(self.rdf_namespace["a"+hashlib.md5(repr(data)).hexdigest()])
+        return R.URIRef(self.rdf_namespace["a"+hashlib.md5(str(data)).hexdigest()])
 
     def triples(self, query=False, visited_list=False):
         """
@@ -219,7 +221,6 @@ class DataObject(DataUser):
                 else:
                     for y in x.triples(query=query, visited_list=visited_list):
                         yield y
-
 
     def triples0(self, query=False, check_saved=False):
         """ Should be overridden by derived classes to return appropriate triples
@@ -487,7 +488,7 @@ class DataObject(DataUser):
         if DataObject._is_variable(ident):
             varlist.append(self._graph_variable_to_var(ident)[1:])
         # Do the query/queries
-        q = "Select distinct "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
+        q = "SELECT DISTINCT "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
         L.debug('load_query='+q)
         qres = self.conf['rdf.graph'].query(q)
         for g in qres:
@@ -539,6 +540,15 @@ class DataObject(DataUser):
             return DataUser.__getitem__(self, x)
         except KeyError:
             raise Exception("You attempted to get the value `%s' from `%s'. It isn't here. Perhaps you misspelled the name of a Property?" % (x, self))
+
+    def getOwners(self, property_name):
+        """ Return the owners along a property pointing to this object """
+        res = []
+        for x in self.owner_properties:
+            if isinstance(x, SimpleProperty):
+                if str(x.link) == str(property_name):
+                    res.append(x.owner)
+        return res
 
 # Define a property by writing the get
 class Property(DataObject):
@@ -680,7 +690,7 @@ class SimpleProperty(Property):
         try:
             self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
             gp = self.owner.graph_pattern(query=True)
-            q = u"select distinct {0} where {{ {1} . }}".format(self._var.n3(), gp)
+            q = u"SELECT DISTINCT {0} where {{ {1} . }}".format(self._var.n3(), gp)
         finally:
             self._var = None
 
@@ -693,7 +703,10 @@ class SimpleProperty(Property):
 
     def set(self,v):
         import bisect
-        bisect.insort(self._v,v)
+        bisect.insort(self._v, v)
+        if self.property_type == 'ObjectProperty':
+            v.owner_properties.append(self)
+
         if isinstance(v,DataObject):
             DataObject.removeFromOpenSet(v)
 
@@ -765,7 +778,7 @@ class SimpleProperty(Property):
         """
         # This load is way simpler since we just need the values for this property
         gp = self.graph_pattern(query=True)
-        q = "Select distinct ?"+self.linkName+"  where { "+ gp +" . }"
+        q = "SELECT DISTINCT ?"+self.linkName+"  where { "+ gp +" . }"
         L.debug('load_query='+q)
         qres = self.conf['rdf.graph'].query(q)
         for k in qres:
@@ -800,6 +813,7 @@ class SimpleProperty(Property):
             vlen = len(self._v)
             if vlen == 0 or DataObject._is_variable(owner_id):
                 return ident
+
         # Intentional fall through from if statement ...
         value_data = ""
         if self.property_type == 'DatatypeProperty':
@@ -810,7 +824,7 @@ class SimpleProperty(Property):
                     raise Exception("Values for an ObjectProperty ({}) must be DataObjects. Given '{}'.".format(self, value))
             value_data = "".join(str(x.identifier()) for x in self._v if self is not x)
 
-        return self.make_identifier((self.link, value_data))
+        return self.make_identifier((str(self.owner.identifier(query=False)), self.link, value_data))
 
     def __str__(self):
         return unicode(self.linkName + "=" + unicode(";".join(u"`{}'".format(unicode(x)) for x in set(self._v))))
