@@ -9,10 +9,7 @@ import sys
 import PyOpenWorm as P
 
 #Create dummy database configuration.
-d = P.Data({
-    "rdf.upload_block_statement_count" : 50,
-    "user.email" : "jerry@cn.com"
-})
+d = P.Data({})
 
 #Connect to database with dummy configuration
 P.connect(conf=d)

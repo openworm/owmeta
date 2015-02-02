@@ -7,7 +7,7 @@ import PyOpenWorm as P
 #Connect to existing database.
 P.connect(conf=P.Data({
     "rdf.source" : "ZODB",
-    "rdf.store_conf" : "../OpenWormData/worm.db",
+    "rdf.store_conf" : "../worm.db",
 }))
 #Put the Worm's Network object in a variable.
 net = P.Worm().get_neuron_network()
