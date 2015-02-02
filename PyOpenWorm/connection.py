@@ -73,10 +73,12 @@ class Connection(Relationship):
         if self.pre_cell.hasValue()\
             and self.post_cell.hasValue()\
             and self.syntype.hasValue():
-            data = [next(self.pre_cell._get()),
-                    next(self.post_cell._get()),
+            data = [next(self.pre_cell._get()).identifier(query=False),
+                    next(self.post_cell._get()).identifier(query=False),
                     next(self.syntype._get())]
-
+            for i in range(len(data)):
+                if DataObject._is_variable(data[i]):
+                    data[i] = ""
             if (self.synclass.hasValue()):
                 data.append(next(self.synclass._get()))
             else:

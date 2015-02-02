@@ -93,4 +93,18 @@ class Network(DataObject):
         for x in n.load():
             yield x
 
+    def identifier(self, *args, **kwargs):
+        ident = DataObject.identifier(self, *args, **kwargs)
+        if 'query' in kwargs and kwargs['query'] == True:
+            if not DataObject._is_variable(ident):
+                return ident
+        owners = self.getOwners(P.Worm().neuron_network.link)
+        data = []
+        for x in owners:
+            ident = x.identifier(query=True) # XXX: Query is set to true so a fixed identifier isn't generated randomly
+            if not DataObject._is_variable(ident):
+                data.append(ident)
+        data = sorted(data)
+
+        return self.make_identifier(data)
     #def neuroml(self):
