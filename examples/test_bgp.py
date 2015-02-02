@@ -6,7 +6,7 @@ database.
 import PyOpenWorm as P
 
 P.connect(conf=P.Data({
-    "rdf.store_conf" : "../OpenWormData/worm.db",
+    "rdf.store_conf" : "../worm.db",
     "rdf.source" : "ZODB"
     }))
 def pp_connection(conn):
@@ -46,11 +46,11 @@ try:
         print x.name()
     print
     print 'NEURONS and their RECEPTORS'
-    for x in names:
+    for x in P.Neuron().load():
         # Wrap in a try-block in case there are no receptors listed
         print x,
         try:
-            for r in P.Neuron(name=x).receptor():
+            for r in x.receptor():
                 print ' ', r,
         except StopIteration:
             pass
