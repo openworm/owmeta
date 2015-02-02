@@ -111,8 +111,8 @@ DD6;Motor neuron;AB.prppapppp
 DVA;Interneuron, stretch sensitive sensory neuron;AB.prppppapp
 DVB;Polymodal (Motor neuron/interneuron);K.p
 DVC;Interneuron;C.aapaa
-FLPL;"Sensory neuron (Mechanosensory) (name originally derived from ""FLAP"")";AB.plapaaapad
-FLPR;"Sensory neuron (Mechanosensory) (name originally derived from ""FLAP"")";AB.prapaaapad
+FLPL;"Sensory neuron (Mechanosensory) (name originally derived from 'FLAP')";AB.plapaaapad
+FLPR;"Sensory neuron (Mechanosensory) (name originally derived from 'FLAP')";AB.prapaaapad
 HSNL;Motor neuron;AB.plapppappa
 HSNR;Motor neuron;AB.prapppappa
 I1L;Pharyngeal interneuron;AB.alpapppaa
