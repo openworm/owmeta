@@ -13,6 +13,7 @@ import rdflib
 import rdflib as R
 import pint as Q
 import os
+import subprocess as SP
 import subprocess
 import tempfile
 
@@ -56,51 +57,43 @@ class ExampleRunnerTest(unittest.TestCase):
 
     #Currently these are all failing because we aren't reproducing the actual data that
     # a user gets when they grab the code for the first time
-    
-    def setUp(self):
+
+    @classmethod
+    def setUpClass(self):
         os.chdir('examples')
 
-    @unittest.expectedFailure
-    def test_run_NeuronBasicInfo(self):
-        execfile("NeuronBasicInfo.py")
-        pass
+    @classmethod
+    def tearDownClass(self):
+        os.chdir('..')
 
-    @unittest.expectedFailure
+    def execfile(self, example_file_name):
+        self.assertEqual(0, SP.call(["python", example_file_name]))
+
+    def test_run_NeuronBasicInfo(self):
+        self.execfile("NeuronBasicInfo.py")
+
     def test_run_NetworkInfo(self):
-        execfile("NetworkInfo.py")
-        pass
+        self.execfile("NetworkInfo.py")
 
     @unittest.expectedFailure
     def test_run_morpho(self):
-        execfile("morpho.py")
-        pass
+        self.execfile("morpho.py")
 
-    @unittest.skip("currently takes way too long to run")
     def test_gap_junctions(self):
-        execfile("gap_junctions.py")
-        pass
-    @unittest.expectedFailure
-    def test_add_reference(self):
-        execfile("add_reference.py")
-        pass
+        self.execfile("gap_junctions.py")
 
-    @unittest.expectedFailure
+    def test_add_reference(self):
+        self.execfile("add_reference.py")
+
+    def test_bgp(self):
+        self.execfile("test_bgp.py")
+
     def test_rmgr(self):
-        execfile("rmgr.py")
-        pass
+        self.execfile("rmgr.py")
 
     @unittest.skip("requires numpy -- we don't want to add it as a dependency for now")
     def test_shortest_path(self):
-        execfile("shortest_path.py")
-        pass
-
-    @unittest.skip("currently takes way too long to run")
-    def test_bgp(self):
-        execfile("test_bgp.py")
-        pass
-
-    def tearDown(self):
-        os.chdir('..')
+        self.execfile("shortest_path.py")
 
 class DataIntegrityTest(unittest.TestCase):
 
