@@ -17,7 +17,7 @@ import PyOpenWorm as P
 
 print("Connecting to the database...")
 P.connect(conf=P.Data({
-    "rdf.store_conf" : "../OpenWormData/worm.db",
+    "rdf.store_conf" : "../worm.db",
     "rdf.source" : "ZODB"}))
 
 #Get the worm object.
