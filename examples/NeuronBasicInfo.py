@@ -14,9 +14,10 @@ declared the variable `adal`.
 
 from __future__ import print_function
 import PyOpenWorm as P
-
+import os
+print(os.getcwd())
 P.connect(conf=P.Data({
-    "rdf.store_conf" : "../OpenWormData/worm.db",
+    "rdf.store_conf" : "../worm.db",
     "rdf.source" : "ZODB"
     }))
 def get_names(it):
