@@ -50,6 +50,58 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
+
+class ExampleRunnerTest(unittest.TestCase):
+    """ Try to run the examples to make sure we didn't break the API for them. """
+
+    #Currently these are all failing because we aren't reproducing the actual data that
+    # a user gets when they grab the code for the first time
+    
+    def setUp(self):
+        os.chdir('examples')
+
+    @unittest.expectedFailure
+    def test_run_NeuronBasicInfo(self):
+        execfile("NeuronBasicInfo.py")
+        pass
+
+    @unittest.expectedFailure
+    def test_run_NetworkInfo(self):
+        execfile("NetworkInfo.py")
+        pass
+
+    @unittest.expectedFailure
+    def test_run_morpho(self):
+        execfile("morpho.py")
+        pass
+
+    @unittest.skip("currently takes way too long to run")
+    def test_gap_junctions(self):
+        execfile("gap_junctions.py")
+        pass
+    @unittest.expectedFailure
+    def test_add_reference(self):
+        execfile("add_reference.py")
+        pass
+
+    @unittest.expectedFailure
+    def test_rmgr(self):
+        execfile("rmgr.py")
+        pass
+
+    @unittest.skip("requires numpy -- we don't want to add it as a dependency for now")
+    def test_shortest_path(self):
+        execfile("shortest_path.py")
+        pass
+
+    @unittest.skip("currently takes way too long to run")
+    def test_bgp(self):
+        execfile("test_bgp.py")
+        pass
+
+    def tearDown(self):
+        os.chdir('..')
+
 class DataIntegrityTest(unittest.TestCase):
 
     @classmethod
