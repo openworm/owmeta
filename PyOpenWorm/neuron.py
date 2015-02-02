@@ -204,29 +204,6 @@ class Neuron(Cell):
                 count += 1
         return count
 
-    def _type_semantic(self):
-        """Get type of this neuron (motor, interneuron, sensory)
-
-        Use the semantic database as the source
-
-        :returns: the type
-        :rtype: str
-        """
-
-        qres = self['rdf.graph'].query(
-          """SELECT ?objLabel     #we want to get out the labels associated with the objects
-           WHERE {
-              ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
-              ?node <http://openworm.org/entities/1515> ?object .# having identified that node, here we match an object associated with the node via the 'is a' property (number 1515)
-              ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
-            }""")
-
-        type = ''
-        for r in qres.result:
-            type = str(r[0])
-
-        return type
-
     def _type_networkX(self):
         """Get type of this neuron (motor, interneuron, sensory)
 
@@ -252,8 +229,9 @@ class Neuron(Cell):
        """
 
     def __str__(self):
-        return self.name()
-
-    def __repr__(self):
-        return P.DataObject.__str__(self)
+        n = self.name()
+        if n is not None:
+            return n
+        else:
+            return ""
 
