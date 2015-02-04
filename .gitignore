@@ -30,4 +30,4 @@ worm.db.lock
 worm.db.tmp
 examples/*.npy
 examples/cell_indices
-OpenWormData
+
