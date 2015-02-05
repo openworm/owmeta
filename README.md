@@ -123,6 +123,15 @@ See what some evidence stated::
 
 ```
 
+For most types (i.e., subclasses of `P.DataObject`) that don not have required
+initialization arguments, you can load all members of that type by making an
+object of that type and calling `load()`::
+```python
+  >>> list(P.Neuron().load())
+  [AS6,SIBVL,AS5,AVKL,VD10,VA5,AVG,AUAR,AWAR,PLML,...]
+
+```
+
 See what neurons express some neuropeptide::
 ```python
   >>> n = P.Neuron()
@@ -145,7 +154,6 @@ See what neurons innervate a muscle::
    set([VB8, VD10, VB9, VD9, VA10])
 
 ```
-
 Get direct access to the RDFLib graph::
 ```python
  >>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }")
