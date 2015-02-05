@@ -424,10 +424,22 @@ class DataObject(DataUser):
         if not DataObject._is_variable(self.identifier(query=True)):
             yield self
         else:
-            gp = self.graph_pattern(query=True)
+            trips = list(self.triples(query=True))
+            type_trip_check = lambda t: ((t[1] == R.RDF['type']) and (isinstance(t[0], R.Variable) or DataObject._is_variable(t[0])))
+            non_type_trips = [t for t in trips if not type_trip_check(t)]
+            type_trips = [t for t in trips if type_trip_check(t)]
+
+            if len(non_type_trips) == 0:
+                gp = _triples_to_bgp(type_trips)
+            else:
+                gp = _triples_to_bgp(non_type_trips)
+                if type_trips:
+                    gp = gp + " . FILTER (EXISTS { "+_triples_to_bgp(type_trips)+" })"
+
+
             ident = self.identifier(query=True)
             ident = self._graph_variable_to_var(ident) # XXX: Assuming that this object doesn't have a set identifier
-            q = "SELECT DISTINCT {0} {0}_type where {{ {1} . {0} rdf:type {0}_type }} ORDER BY {0}".format(ident.n3(), gp)
+            q = "SELECT DISTINCT {0} {0}_type where {{ {{ {1} }} . {0} rdf:type {0}_type }} ORDER BY {0}".format(ident.n3(), gp)
             qres = self.rdf.query(q)
             qres = iter(qres)
             results = []
