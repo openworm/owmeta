@@ -76,7 +76,9 @@ from .connection import Connection
 __import__('__main__').connected = False
 
 def config(key=None):
-    """ Gets the main configuration for the whole PyOpenWorm library.
+    """
+    Gets the main configuration for the whole PyOpenWorm library.
+
     :return: the instance of the Configure class currently operating.
     """
     if key is None:
@@ -103,7 +105,9 @@ def disconnect(c=False):
 
 
 def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
-    """ Load data into the underlying database of this library.
+    """ 
+    Load data into the underlying database of this library.
+
     :param data: (Optional) Specify the file to load into the library
     :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
     :return:
@@ -119,6 +123,7 @@ def connect(configFile='PyOpenWorm/default.conf',
             dataFormat='n3'):
     """
      Load desired configuration and open the database
+
     :param configFile: (Optional) The configuration file for PyOpenWorm
     :param conf: (Optional) If true, initializes a data object with the PyOpenWorm configuration
     :param do_logging: (Optional) If true, turn on debug level logging
