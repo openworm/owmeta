@@ -1,9 +1,28 @@
 from PyOpenWorm import *
 
-class ChannelModel(Property):
+class ChannelModel(dataObject):
+    """
+    A model for an ion channel.
+
+    There may be multiple models for a single channel.
+
+    Parameters
+    ----------
+    modelType : DatatypeProperty
+        What this model is based on (either "homology" or "patch-clamp")
+    
+    Attributes
+    ----------
+    ion : DatatypeProperty
+        The type of ion this channel selects for
+    gating : DatatypeProperty
+        The gating mechanism for this channel (either "voltage" or the name of a ligand)
+    """
+
+class Models(Property):
     multiple=True
     def __init__(self, **kwargs):
-        Property.__init__(self, 'channelModel', **kwargs)
+        Property.__init__(self, 'models', **kwargs)
         self._models = []
     
     def get(self, **kwargs):
