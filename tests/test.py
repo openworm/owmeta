@@ -295,9 +295,8 @@ class DataIntegrityTest(unittest.TestCase):
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples
 
-        errorMsg = str(str(sorted(pow_conns)) + "\n***********************************\n" + str(sorted(xls_conns)))
-
-        self.assertEqual(sorted(pow_conns), sorted(xls_conns), errorMsg)
+        self.maxDiff = None
+        self.assertEqual(sorted(pow_conns), sorted(xls_conns))
 
 class _DataTest(unittest.TestCase):
     def delete_dir(self):
@@ -735,9 +734,6 @@ class NetworkTest(_DataTest):
     def setUp(s):
         _DataTest.setUp(s)
         s.net = Network(conf=s.config)
-
-    def test(self):
-        self.assertTrue(isinstance(self.net,Network))
 
     def test_aneuron(self):
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
@@ -1380,7 +1376,6 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
-    args = [sys.argv[0]] + args # We have to add back the first argument after parse_args
 
     def getTests(testCase):
         return unittest.TestLoader().loadTestsFromTestCase(testCase)
@@ -1388,18 +1383,30 @@ if __name__ == '__main__':
     def runTests(suite):
         unittest.TextTestRunner().run(suite)
 
-    print("DataObject tests")
+    all_tests = []
     for x in glob("tests/test_*.conf"):
-        print("Running tests with {}".format(x))
         TEST_CONFIG = x
-        suite = unittest.TestSuite()
-        suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
-        runTests(suite)
-        print()
+        if not ((x == "tests/test_Sleepycat.conf") and (has_bsddb == False)):
+            suite = unittest.TestSuite()
+            suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
+            all_tests.append(suite)
 
-    print("Other tests")
     suite = unittest.TestSuite()
     classes = filter(lambda x : isinstance(x, type), globals().values())
     non_DataTestTests = (x for x in classes if (issubclass(x, unittest.TestCase) and not issubclass(x,  _DataTest)))
     suite.addTests(getTests(x) for x in non_DataTestTests)
+    all_tests.append(suite)
+
+    all_tests_flattened = []
+    for x in all_tests:
+        for y in x:
+            for z in y:
+                all_tests_flattened.append(z)
+
+    suite = unittest.TestSuite()
+    if len(args) == 1:
+        suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
+    else:
+        suite.addTests(all_tests)
     runTests(suite)
+
