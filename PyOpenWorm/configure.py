@@ -81,7 +81,9 @@ class Configure(object):
 
     @classmethod
     def open(cls,file_name):
-        """ Open a configuration file and read it to build the internal state.
+        """ 
+        Open a configuration file and read it to build the internal state.
+
         :param file_name: configuration file encoded as JSON
         :return: a Configure object with the configuration taken from the JSON file
         """
@@ -103,7 +105,9 @@ class Configure(object):
         return c
 
     def copy(self,other):
-        """ Copy this configuration into a different object.
+        """ 
+        Copy this configuration into a different object.
+
         :param other: A different configuration object to copy the configuration from this object into
         :return:
         """
@@ -115,7 +119,9 @@ class Configure(object):
         return self
 
     def get(self, pname, default=False):
-        """ Get some parameter value out by asking for a key
+        """
+        Get some parameter value out by asking for a key
+
         :param pname: they key of the value you want to return.
         :param default: True if you want the default value, False if you don't (default)
         :return: The value corresponding to the key in pname
@@ -135,14 +141,18 @@ class Configureable(object):
         pass
 
     def __getitem__(self,k):
-        """ Get a configuration value out by providing a key k
+        """
+        Get a configuration value out by providing a key k
+
         :param k: the key for the value you wish to retrieve
         :return: the value you want to get back
         """
         return self.conf.get(k)
 
     def __setitem__(self,k,v):
-        """ Set a key - value pair on this object
+        """
+        Set a key - value pair on this object
+
         :param k: The key for the value to set
         :param v: The value to set
         :return: no return
@@ -150,7 +160,9 @@ class Configureable(object):
         self.conf[k] = v
 
     def get(self, pname, default=False):
-        """ The getter for the configuration
+        """
+        The getter for the configuration
+
         :param pname: The key to retreive the value of interest
         :param default: True if you want the default value, False if you don't (default)
         :return: Returns the configuration value corresponding to the key pname.
