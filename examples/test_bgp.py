@@ -40,11 +40,11 @@ try:
     for x in query_object.neighbor():
         print x.name()
     print
-    print 'NEIGHBORS of AVAL with number=3 connections'
-    query_object = P.Neuron(name='AVAL')
-    for x in query_object.neighbor.get(number=3):
-        print x.name()
-    print
+    #print 'NEIGHBORS of AVAL with number=3 connections'
+    #query_object = P.Neuron(name='AVAL')
+    #for x in query_object.neighbor.get(number=3):
+        #print x.name()
+    #print
     print 'NEURONS and their RECEPTORS'
     for x in P.Neuron().load():
         # Wrap in a try-block in case there are no receptors listed
