@@ -27,8 +27,7 @@ worm = P.Worm()
 net = worm.neuron_network()
 
 #Make a list of some arbitrary neuron names.
-#some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR"]
-some_neuron_names = ["ADAL", "AIBL", "I1L", "I1R", "PVCR", "DB5"]
+some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR"]
 
 #Go through our list and get the neuron object associated with each name.
 #Store these in another list.
