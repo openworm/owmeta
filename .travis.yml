@@ -13,4 +13,4 @@ install:
      
 
 script:  
-  - ./runtests.sh
+  - "python tests/test.py"
