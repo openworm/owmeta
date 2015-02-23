@@ -27,6 +27,7 @@ worm = P.Worm()
 net = worm.neuron_network()
 
 #Make a list of some arbitrary neuron names.
+#some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR"]
 some_neuron_names = ["ADAL", "AIBL", "I1L", "I1R", "PVCR", "DB5"]
 
 #Go through our list and get the neuron object associated with each name.
@@ -40,6 +41,7 @@ for neuron in some_neurons:
     #Go through all synapses in the network.
     #Note that we can go through all connection objects (even gap junctions) by
     #using `net.synapses()` and a for loop, as below.
+    conns = {'pre':{"E":[], "I":[]}, 'post':{"E":[], "I":[]}, 'gap':set()}
     for s in neuron.connection.get('either'):
         #Below we print different things depending on the connections we find.
         #If the neuron we are currently looking at from our list is the pre or
@@ -52,6 +54,29 @@ for neuron in some_neurons:
             #want from the database. `s.pre_cell.one()` gives the presynaptic
             #neuron "object" of synapse `s`, so `s.pre_cell.one().name.one()`
             #gives us the name of that presynaptic neuron.
-            print("o","->", s.post_cell().name(), "(%s)"%type)
+            other = s.post_cell().name()
+            if type == 'G':
+                conns['gap'].add(other)
+            else:
+                l = conns['pre'].get(type, [])
+                l.append(other)
+                conns['pre'][type] = l
+
         elif s.post_cell().name() == neuron.name():
-            print(s.pre_cell().name(), "->", "o", "(%s)"%type)
+            other = s.post_cell().name()
+            if type == 'G':
+                conns['gap'].add(other)
+            else:
+                l = conns['post'].get(type, [])
+                l.append(s.pre_cell().name())
+                conns['post'][type] = l
+    print("Excites")
+    print(conns["pre"]["E"])
+    print("Excited by")
+    print(conns["post"]["E"])
+    print("Inhibits")
+    print(conns["pre"]["I"])
+    print("Inhibited by")
+    print(conns["post"]["I"])
+    print("Gap junction neighbors")
+    print(conns["gap"])
