@@ -17,9 +17,11 @@ import subprocess as SP
 import subprocess
 import tempfile
 
+from glob import glob
+
 USE_BINARY_DB = False
 BINARY_DB = "OpenWormData/worm.db"
-
+TEST_CONFIG = "tests/default_test.conf"
 try:
     import bsddb
     has_bsddb = True
@@ -40,10 +42,6 @@ def make_graph(size=100):
         o = rdflib.URIRef("http://somehost.com/o"+str(i))
         g.add((s,p,o))
     return g
-try:
-    TEST_CONFIG = Configure.open("tests/_test.conf")
-except:
-    TEST_CONFIG = Configure.open("tests/test_default.conf")
 
 def delete_zodb_data_store(path):
     os.unlink(path)
@@ -76,6 +74,7 @@ class ExampleRunnerTest(unittest.TestCase):
         self.execfile("NeuronBasicInfo.py")
 
     def test_run_NetworkInfo(self):
+        # XXX: No `synclass' is given, so all neurons are called `excitatory'
         self.execfile("NetworkInfo.py")
 
     @unittest.expectedFailure
@@ -99,7 +98,6 @@ class ExampleRunnerTest(unittest.TestCase):
         self.execfile("shortest_path.py")
 
 class DataIntegrityTest(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         import csv
@@ -270,8 +268,6 @@ class DataIntegrityTest(unittest.TestCase):
                                # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
                                FILTER(isLiteral(?pre_name))}""")
-        def ff(x):
-            return str(x.value)
         for line in qres.result:
             t = list(map(ff, line))
             t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
@@ -301,11 +297,9 @@ class DataIntegrityTest(unittest.TestCase):
 
         errorMsg = str(str(sorted(pow_conns)) + "\n***********************************\n" + str(sorted(xls_conns)))
 
-        self.assertTrue(sorted(pow_conns) == sorted(xls_conns), errorMsg)
+        self.assertEqual(sorted(pow_conns), sorted(xls_conns), errorMsg)
 
-@unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
-    TestConfig = TEST_CONFIG
     def delete_dir(self):
         self.path = self.TestConfig['rdf.store_conf']
         try:
@@ -321,8 +315,9 @@ class _DataTest(unittest.TestCase):
                 raise e
     def setUp(self):
         # Set do_logging to True if you like walls of text
+        self.TestConfig = Configure.open(TEST_CONFIG)
         td = '__tempdir__'
-        z=self.TestConfig['rdf.store_conf']
+        z = self.TestConfig['rdf.store_conf']
         if z.startswith(td):
             x = z[len(td):]
             h=tempfile.mkdtemp()
@@ -1386,4 +1381,25 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
     args = [sys.argv[0]] + args # We have to add back the first argument after parse_args
-    unittest.main(argv=args)
+
+    def getTests(testCase):
+        return unittest.TestLoader().loadTestsFromTestCase(testCase)
+
+    def runTests(suite):
+        unittest.TextTestRunner().run(suite)
+
+    print("DataObject tests")
+    for x in glob("tests/test_*.conf"):
+        print("Running tests with {}".format(x))
+        TEST_CONFIG = x
+        suite = unittest.TestSuite()
+        suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
+        runTests(suite)
+        print()
+
+    print("Other tests")
+    suite = unittest.TestSuite()
+    classes = filter(lambda x : isinstance(x, type), globals().values())
+    non_DataTestTests = (x for x in classes if (issubclass(x, unittest.TestCase) and not issubclass(x,  _DataTest)))
+    suite.addTests(getTests(x) for x in non_DataTestTests)
+    runTests(suite)
