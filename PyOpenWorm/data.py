@@ -169,6 +169,7 @@ class DataUser(Configureable):
     def add_reference(self, g, reference_iri):
         """
         Add a citation to a set of statements in the database
+
         :param triples: A set of triples to annotate
         """
         new_statements = Graph()
@@ -185,6 +186,7 @@ class DataUser(Configureable):
     def retract_statements(self, graph):
         """
         Remove a set of statements from the database.
+
         :param graph: An iterable of triples
         """
         self._remove_from_store_by_query(graph)
@@ -198,6 +200,7 @@ class DataUser(Configureable):
         """
         Add a set of statements to the database.
         Annotates the addition with uploader name, etc
+
         :param graph: An iterable of triples
         """
         self._add_to_store(graph)

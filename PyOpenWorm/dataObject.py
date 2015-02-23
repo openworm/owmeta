@@ -487,6 +487,7 @@ class DataObject(DataUser):
 
         ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have,
         for the Properties set, the same values
+
         :param self: An object which limits the set of objects which can be returned. Should have the configuration
                      necessary to do the query
         """
@@ -685,6 +686,7 @@ class SimpleProperty(Property):
     def hasValue(self):
         """ Returns true if the ``Property`` has had ``load`` called previously and some value was available or if
         ``set`` has been called previously
+
         :return: True if this data object has a value, False if not.
         """
         return len(self._v) > 0
