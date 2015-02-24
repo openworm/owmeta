@@ -13,11 +13,17 @@ class ChannelModel(dataObject):
     
     Attributes
     ----------
+    modelType : DatatypeProperty
+        Passed in on construction 
     ion : DatatypeProperty
         The type of ion this channel selects for
     gating : DatatypeProperty
         The gating mechanism for this channel (either "voltage" or the name of a ligand)
     """
+
+    ChannelModel.DatatypeProperty("modelType", self)
+    ChannelModel.DatatypeProperty("ion", self, multiple=True)
+    ChannelModel.DatatypeProperty("gating", self, multiple=True)
 
 class Models(Property):
     multiple=True
@@ -37,11 +43,28 @@ class Models(Property):
         -------
         list of ChannelModel
         """
+
         if len(self._models) > 0:
             for m in self._models:
                 yield m
         # add something here to load() from db if _models is empty
 
+    def set(self, m, **kwargs):
+        """
+        Add a model to this Channel
+
+        Parameters
+        ----------
+        m : ChannelModel
+            The model to be added (instance of ChannelModel class)
+
+        Returns
+        -------
+        The ChannelModel being inserted (this is a side-effect)
+        """
+
+        _models.append(m)
+        return m
 
 class Channel(DataObject):
     """
