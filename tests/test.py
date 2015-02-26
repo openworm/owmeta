@@ -1381,12 +1381,13 @@ if __name__ == '__main__':
         return unittest.TestLoader().loadTestsFromTestCase(testCase)
 
     def runTests(suite):
-        unittest.TextTestRunner().run(suite)
+        return unittest.TextTestRunner().run(suite)
 
     all_tests = []
     for x in glob("tests/test_*.conf"):
         TEST_CONFIG = x
-        if not ((x == "tests/test_Sleepycat.conf") and (has_bsddb == False)):
+        print "config", x
+        if not ((x == "tests/test_Sleepycat.conf") and (not has_bsddb)):
             suite = unittest.TestSuite()
             suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
             all_tests.append(suite)
@@ -1408,5 +1409,5 @@ if __name__ == '__main__':
         suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
     else:
         suite.addTests(all_tests)
-    runTests(suite)
-
+    res = runTests(suite)
+    sys.exit(len(res.failures)>0)
