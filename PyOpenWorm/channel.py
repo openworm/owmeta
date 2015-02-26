@@ -25,10 +25,10 @@ class ChannelModel(dataObject):
     ChannelModel.DatatypeProperty("ion", self, multiple=True)
     ChannelModel.DatatypeProperty("gating", self, multiple=True)
 
-class Models(Property):
+class Model(Property):
     multiple=True
     def __init__(self, **kwargs):
-        Property.__init__(self, 'models', **kwargs)
+        Property.__init__(self, 'model', **kwargs)
         self._models = []
     
     def get(self, **kwargs):
@@ -63,7 +63,7 @@ class Models(Property):
         The ChannelModel being inserted (this is a side-effect)
         """
 
-        _models.append(m)
+        self._models.append(m)
         return m
 
 class Channel(DataObject):
@@ -81,12 +81,12 @@ class Channel(DataObject):
     ----------
     name : DatatypeProperty
         The subfamily to which the ion channel belongs
-    channelModel : Property
+    Model : Property
         Get experimental models of this ion channel
     """
 
     def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, name=name, **kwargs)
         # Get experimental Models of this Channel
-        ChannelModel(owner=self)
+        Model(owner=self)
         Channel.DatatypeProperty('subfamily',owner=self)
