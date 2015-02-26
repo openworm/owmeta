@@ -1,6 +1,10 @@
 from PyOpenWorm import *
 
-class ChannelModel(dataObject):
+class ChannelModelType:
+    patchClamp = "Patch clamp experiment"
+    homologyEstimate = "Estimation based on homology"
+
+class ChannelModel(DataObject):
     """
     A model for an ion channel.
 
@@ -21,9 +25,19 @@ class ChannelModel(dataObject):
         The gating mechanism for this channel (either "voltage" or the name of a ligand)
     """
 
-    ChannelModel.DatatypeProperty("modelType", self)
-    ChannelModel.DatatypeProperty("ion", self, multiple=True)
-    ChannelModel.DatatypeProperty("gating", self, multiple=True)
+    def __init__(self, modelType, *args, **kwargs):
+        DataObject.__init__(self, **kwargs)
+        ChannelModel.DatatypeProperty("modelType", self)
+        ChannelModel.DatatypeProperty("ion", self, multiple=True)
+        ChannelModel.DatatypeProperty("gating", self, multiple=True)
+
+    #Change modelType value to something from ChannelModelType class
+    if (isinstance(modelType, basestring)):
+        modelType = modelType.lower()
+        if modelType in ('homology', ChannelModelType.homologyEstimate):
+            self.modelType(ChannelModelType.homologyEstimate)
+        elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
+            self.modelType(ChannelModelType.patchClamp)
 
 class Model(Property):
     multiple=True
@@ -87,6 +101,6 @@ class Channel(DataObject):
 
     def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, name=name, **kwargs)
-        # Get experimental Models of this Channel
+        # Get Models of this Channel
         Model(owner=self)
         Channel.DatatypeProperty('subfamily',owner=self)
