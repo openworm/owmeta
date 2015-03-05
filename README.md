@@ -115,6 +115,14 @@ Returns a set of all muscles::
 
 ```
 
+Add some evidence::
+```python
+  >>> e = P.Evidence(author='Sulston et al.', date='1983')
+  >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
+  asserts=`lineageName=`AB alaaapalr''
+  >>> e.save()
+```
+
 See what some evidence stated::
 ```python
   >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
@@ -136,7 +144,7 @@ See what neurons express some neuropeptide::
 ```python
   >>> n = P.Neuron()
   >>> n.neuropeptide("TH")
-  neuropeptide=TH
+  neuropeptide=`TH'
 
   >>> s = set(x.name() for x in n.load()) 
   >>> s == set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL'])
@@ -160,7 +168,7 @@ Get direct access to the RDFLib graph::
 
 ```
 
-Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
+Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
   >>> net.as_networkx()
