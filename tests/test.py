@@ -50,52 +50,53 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.lock')
 
 
-#class ExampleRunnerTest(unittest.TestCase):
-    #""" Try to run the examples to make sure we didn't break the API for them. """
+class ExampleRunnerTest(unittest.TestCase):
+    """ Try to run the examples to make sure we didn't break the API for them. """
 
-    ##Currently these are all failing because we aren't reproducing the actual data that
-    ## a user gets when they grab the code for the first time
+    #Currently these are all failing because we aren't reproducing the actual data that
+    # a user gets when they grab the code for the first time
 
-    #@classmethod
-    #def setUpClass(self):
-        #PyOpenWorm.connect()
-        #PyOpenWorm.loadData()
-        #PyOpenWorm.disconnect()
-        #os.chdir('examples')
+    @classmethod
+    def setUpClass(self):
+        PyOpenWorm.connect()
+        PyOpenWorm.loadData()
+        PyOpenWorm.disconnect()
+        os.chdir('examples')
 
-    #@classmethod
-    #def tearDownClass(self):
-        #os.chdir('..')
+    @classmethod
+    def tearDownClass(self):
+        os.chdir('..')
 
-    #def execfile(self, example_file_name):
-        #self.assertEqual(0, SP.call(["python", example_file_name]))
+    def execfile(self, example_file_name):
+        with open("/dev/null", "w") as out:
+            self.assertEqual(0, SP.call(["python", example_file_name], stdout=out, stderr=out))
 
-    #def test_run_NeuronBasicInfo(self):
-        #self.execfile("NeuronBasicInfo.py")
+    def test_run_NeuronBasicInfo(self):
+        self.execfile("NeuronBasicInfo.py")
 
-    #def test_run_NetworkInfo(self):
-        ## XXX: No `synclass' is given, so all neurons are called `excitatory'
-        #self.execfile("NetworkInfo.py")
+    def test_run_NetworkInfo(self):
+        # XXX: No `synclass' is given, so all neurons are called `excitatory'
+        self.execfile("NetworkInfo.py")
 
-    #@unittest.expectedFailure
-    #def test_run_morpho(self):
-        #self.execfile("morpho.py")
+    @unittest.expectedFailure
+    def test_run_morpho(self):
+        self.execfile("morpho.py")
 
-    #def test_gap_junctions(self):
-        #self.execfile("gap_junctions.py")
+    def test_gap_junctions(self):
+        self.execfile("gap_junctions.py")
 
-    #def test_add_reference(self):
-        #self.execfile("add_reference.py")
+    def test_add_reference(self):
+        self.execfile("add_reference.py")
 
-    #def test_bgp(self):
-        #self.execfile("test_bgp.py")
+    def test_bgp(self):
+        self.execfile("test_bgp.py")
 
-    #def test_rmgr(self):
-        #self.execfile("rmgr.py")
+    def test_rmgr(self):
+        self.execfile("rmgr.py")
 
-    #@unittest.skip("requires numpy -- we don't want to add it as a dependency for now")
-    #def test_shortest_path(self):
-        #self.execfile("shortest_path.py")
+    @unittest.skip("requires numpy -- we don't want to add it as a dependency for now")
+    def test_shortest_path(self):
+        self.execfile("shortest_path.py")
 
 class DataIntegrityTest(unittest.TestCase):
     @classmethod
