@@ -254,6 +254,8 @@ class Data(Configure, Configureable):
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
 
+        nm.bind("", self['rdf.namespace'])
+
     def closeDatabase(self):
         """ Close a the configured database """
         self.source.close()
