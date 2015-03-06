@@ -22,14 +22,6 @@ def _rdf_identifier_to_gp(x):
     else:
         return x.n3()
 
-def _rdf_identifier_to_gp0(x):
-    if isinstance(x,R.BNode):
-        return _bnode_to_var(x)
-    elif isinstance(x,R.URIRef) and DataObject._is_variable(x):
-        return DataObject._graph_variable_to_var(x)
-    else:
-        return x.n3()
-
 def _rdf_literal_to_python(x):
     if isinstance(x, R.Literal):
         x = x.toPython()
@@ -40,11 +32,6 @@ def _rdf_literal_to_python(x):
 def _triples_to_bgp(trips):
     # XXX: Collisions could result between the variable names of different objects
     g = " .\n".join(" ".join(_rdf_identifier_to_gp(x) for x in y) for y in trips)
-    return g
-
-def _triples_to_bgp0(trips):
-    # XXX: Collisions could result between the variable names of different objects
-    g = " .\n".join(" ".join(_rdf_identifier_to_gp0(x) for x in y) for y in trips)
     return g
 
 _DataObjects = dict()
@@ -226,60 +213,6 @@ class DataObject(DataUser):
                     for y in x.triples(query=query, visited_list=visited_list, **kwargs):
                         yield y
 
-    def triples0(self, query=False, check_saved=False):
-        """ Should be overridden by derived classes to return appropriate triples
-
-        Returns
-        --------
-        An iterable of triples
-        """
-        # The default implementation, gives the object no representation or the one
-        # explicitly given in __init__
-        if check_saved == False:
-            check_saved = set()
-
-        if self in check_saved:
-            return
-        else:
-            check_saved.add(self)
-
-        if not self._is_releasing_triples:
-            # Note: We are _definitely_ assuming synchronous operation here.
-            #       Anyway, this code should be idempotent, so that there's no need to lock it...
-            self._is_releasing_triples = True
-            ident = self.identifier(query=query)
-
-            if not query:
-                bases = self.parents
-                while len(bases) > 0:
-                    next_bases = set([])
-                    for x in bases:
-                        t = x.rdf_type
-                        yield (ident, R.RDF['type'], t)
-                        next_bases = next_bases | set(x.parents)
-                    bases = next_bases
-
-            yield (ident, R.RDF['type'], self.rdf_type)
-
-            # For objects that are defined by triples, we can just release these.
-            # However, they are still data objects, so they must have the above
-            # triples released as well.
-            for x in self._triples:
-                yield x
-
-            # Properties (of type Property) can be attached to an object
-            # However, we won't require that there even is a property list in this
-            # case.
-            try:
-                for x in self.properties:
-                    for y in x.triples(query=query, check_saved=check_saved):
-                        yield y
-            except AttributeError:
-                # XXX Is there a way to check what the failed attribute reference was?
-                pass
-
-            self._is_releasing_triples = False
-
     def graph_pattern(self,query=False):
         """ Get the graph pattern for this object.
 
@@ -288,24 +221,11 @@ class DataObject(DataUser):
         visited_list = set()
         return _triples_to_bgp(self.triples(query=query, visited_list=visited_list))
 
-    def graph_pattern0(self,query=False):
-        """ Get the graph pattern for this object.
-
-        It should be as simple as converting the result of triples() into a BGP
-        """
-        return _triples_to_bgp(self.triples0(query=query))
-
     def save(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
         ss = set()
         self.add_statements(self.triples(visited_list=ss, saving=True))
-
-    def save0(self):
-        """ Write in-memory data to the database. Derived classes should call this to update the store. """
-
-        ss = set()
-        self.add_statements(self.triples(check_saved=ss))
 
     def object_from_id(self,identifier,rdf_type=False):
         """ Load an object from the database using its type and id
@@ -448,67 +368,6 @@ class DataObject(DataUser):
             results = _QueryResultsTypeResolver(self, qres)()
             for x in results:
                 yield x
-    def load0(self):
-        """ Load in data from the database. Derived classes should override this for their own data structures.
-
-        ``load()`` returns an iterable object which yields DataObjects which have the same class as the object and have,
-        for the Properties set, the same values
-
-        :param self: An object which limits the set of objects which can be returned. Should have the configuration
-                     necessary to do the query
-        """
-        # 'loading' an object _always_ means doing a query. When we do the query, we identify all of the result sets that
-        # can make objects in the current
-        # graph and convert them into objects of the type of the querying object.
-        #
-        gp = self.graph_pattern(query=True)
-        ident = self.identifier(query=True)
-        varlist = [n.linkName for n in self.properties if isinstance(n, SimpleProperty) ]
-        if DataObject._is_variable(ident):
-            varlist.append(self._graph_variable_to_var(ident)[1:])
-        # Do the query/queries
-        q = "SELECT DISTINCT "+ " ".join("?" + x for x in varlist)+"  where { "+ gp +".}"
-        L.debug('load_query='+q)
-        qres = self.conf['rdf.graph'].query(q)
-        for g in qres:
-            # attempt to get a value for each of the properties this object has
-            # if there isn't a value for this property
-
-            # XXX: Should distinguish datatype and object properties to set them up accordingly.
-
-            # If our own identifier is a BNode, then the binding we get will be for a distinct object
-            # otherwise, the object we get is really the same as this object
-
-            if DataObject._is_variable(ident):
-                new_ident = g[self._graph_variable_to_var(ident)[1:]]
-            else:
-                new_ident = ident
-
-            new_object = self.object_from_id(new_ident)
-
-            for prop in self.properties:
-                if isinstance(prop, SimpleProperty):
-                    # get the linkName
-                    link_name = prop.linkName
-                    # Check if the name is in the result
-                    if g[link_name] is not None:
-                        new_object_prop = getattr(new_object, link_name)
-                        result_value = g[link_name]
-
-                        if result_value is not None \
-                                and not isinstance(result_value, R.BNode) \
-                                and not DataObject._is_variable(result_value):
-                            # XXX: Maybe should verify that it's an rdflib term?
-                            # Create objects from the bound variables
-                            if isinstance(result_value, R.Literal) \
-                            and new_object_prop.property_type == 'DatatypeProperty':
-                                new_object_prop(result_value)
-                            elif new_object_prop.property_type == 'ObjectProperty':
-                                new_object_prop(self.object_from_id(result_value, new_object_prop.value_rdf_type))
-                    else:
-                        our_value = getattr(self, link_name)
-                        setattr(new_object, link_name, our_value)
-            yield new_object
 
     def retract(self):
         """ Remove this object from the data store. """
