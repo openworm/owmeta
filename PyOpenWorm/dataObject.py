@@ -129,6 +129,10 @@ class DataObject(DataUser):
             cls._openSet.remove(o)
             cls._closedSet.add(o)
 
+    def id_is_variable(self):
+        """ Is the uriref a graph variable? """
+        return DataObject._is_variable(self.identifier(query=True))
+
     @classmethod
     def _is_variable(cls,uri):
         """ Is the uriref a graph variable? """
@@ -179,7 +183,7 @@ class DataObject(DataUser):
         import hashlib
         return R.URIRef(self.rdf_namespace["a"+hashlib.md5(str(data)).hexdigest()])
 
-    def triples(self, query=False, visited_list=False):
+    def triples(self, query=False, visited_list=False, **kwargs):
         """
         Should be overridden by derived classes to return appropriate triples
 
@@ -212,14 +216,14 @@ class DataObject(DataUser):
                 if isinstance(x, SimpleProperty):
                     if x.hasValue():
                         yield (ident, x.link, x.identifier(query=query))
-                        for y in x.triples(query=query, visited_list=visited_list):
+                        for y in x.triples(query=query, visited_list=visited_list, **kwargs):
                             yield y
                     elif x.hasVariable():
                         yield (ident, x.link, x.identifier(query=query))
-                        for y in x.triples(query=query, visited_list=visited_list):
+                        for y in x.triples(query=query, visited_list=visited_list, **kwargs):
                             yield y
                 else:
-                    for y in x.triples(query=query, visited_list=visited_list):
+                    for y in x.triples(query=query, visited_list=visited_list, **kwargs):
                         yield y
 
     def triples0(self, query=False, check_saved=False):
@@ -295,7 +299,7 @@ class DataObject(DataUser):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
 
         ss = set()
-        self.add_statements(self.triples(visited_list=ss))
+        self.add_statements(self.triples(visited_list=ss, saving=True))
 
     def save0(self):
         """ Write in-memory data to the database. Derived classes should call this to update the store. """
@@ -441,47 +445,9 @@ class DataObject(DataUser):
             ident = self._graph_variable_to_var(ident) # XXX: Assuming that this object doesn't have a set identifier
             q = "SELECT DISTINCT {0} {0}_type where {{ {{ {1} }} . {0} rdf:type {0}_type }} ORDER BY {0}".format(ident.n3(), gp)
             qres = self.rdf.query(q)
-            qres = iter(qres)
-            results = []
-            def s():
-                try:
-                    k = next(qres)
-                except StopIteration as e:
-                    k = (None, None)
-                return k
-
-            def g0(ident, types):
-                if ident is None:
-                    return
-                k = s()
-                n_ident = k[0]
-                n_type = k[1]
-                if n_ident != ident:
-                    o = self.object_from_id(ident, DataObject.get_most_specific_type(types))
-                    results.append(o)
-                    g0(n_ident, [n_type])
-                else:
-                    g0(n_ident, [n_type] + types)
-
-            def g():
-                k = s()
-                if k[0] is None:
-                    return
-                else:
-                    g0(k[0], [k[1]])
-            g()
+            results = _QueryResultsTypeResolver(self, qres)()
             for x in results:
                 yield x
-    @classmethod
-    def get_most_specific_type(cls, types):
-        ret = DataObject
-        for x in types:
-            cn = cls._extract_class_name(x)
-            o = _DataObjects[cn]
-            if issubclass(o, ret):
-                ret = o
-        return ret.rdf_type
-
     def load0(self):
         """ Load in data from the database. Derived classes should override this for their own data structures.
 
@@ -562,6 +528,58 @@ class DataObject(DataUser):
                 if str(x.link) == str(property_name):
                     res.append(x.owner)
         return res
+
+class _QueryResultsTypeResolver(object):
+    # Takes an iterable of (identifier, type) results in qres, sorted by the identifier
+    # and adds the objects corresponding to the result list
+    def __init__(self, ob, qres):
+        self.ob = ob # The DataObject that created this QRTR
+        self.qres = iter(qres) # The query results
+        self.results = []
+
+    def s(self):
+        try:
+            k = next(self.qres)
+        except StopIteration as e:
+            k = (None, None)
+        return k
+
+    def g0(self, ident, types):
+        if ident is None:
+            return
+        k = self.s()
+        n_ident = k[0]
+        n_type = k[1]
+        if n_ident != ident:
+            o = self.ob.object_from_id(ident, get_most_specific_rdf_type(types))
+            self.results.append(o)
+            self.g0(n_ident, [n_type])
+        else:
+            self.g0(n_ident, [n_type] + types)
+
+    def g(self):
+        k = self.s()
+        if k[0] is None:
+            return
+        else:
+            self.g0(k[0], [k[1]])
+    def __call__(self):
+        self.g()
+        return self.results
+
+def get_most_specific_rdf_type(types):
+    """ Gets the most specific rdf_type.
+
+    Returns the URI corresponding to the lowest in the DataObject class hierarchy
+    from among the given URIs.
+    """
+    most_specific_type = DataObject
+    for x in types:
+        cn = DataObject._extract_class_name(x) # TODO: Make a table to lookup by the class URI
+        class_uri = _DataObjects[cn]
+        if issubclass(class_uri, most_specific_type):
+            most_specific_type = class_uri
+    return most_specific_type.rdf_type
 
 # Define a property by writing the get
 class Property(DataObject):
@@ -701,19 +719,38 @@ class SimpleProperty(Property):
         which are set for the ``Property``'s owner.
         """
         import random as RND
-        try:
-            self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
-            gp = self.owner.graph_pattern(query=True)
-            q = u"SELECT DISTINCT {0} where {{ {1} . }}".format(self._var.n3(), gp)
-        finally:
-            self._var = None
-
-        for x in self.rdf.query(q):
-            if x[0] is not None and not DataObject._is_variable(x[0]):
+        if self.id_is_variable():
+            try:
+                self._var = R.Variable("V"+str(int(RND.random() * 1E10)))
+                gp = self.owner.graph_pattern(query=True)
                 if self.property_type == 'DatatypeProperty':
-                    yield _rdf_literal_to_python(x[0])
+                    q = u"SELECT DISTINCT {0} where {{ {1} . }}".format(self._var.n3(), gp)
                 elif self.property_type == 'ObjectProperty':
-                    yield self.object_from_id(x[0], self.value_rdf_type)
+                    q = "SELECT DISTINCT {0} {0}_type where {{ {{ {1} }} . {0} rdf:type {0}_type }} ORDER BY {0}".format(self._var.n3(), gp)
+                else:
+                    raise Exception("Inappropriate property type "+self.property_type+" in SimpleProperty::get")
+            finally:
+                self._var = None
+            qres = self.rdf.query(q)
+            if self.property_type == 'DatatypeProperty':
+                for x in qres:
+                    if x[0] is not None and not DataObject._is_variable(x[0]):
+                        yield _rdf_literal_to_python(x[0])
+            elif self.property_type == 'ObjectProperty':
+                for x in _QueryResultsTypeResolver(self, qres)():
+                    yield x
+        else:
+            for value in self.rdf.objects(self.identifier(query=False), self.value_property):
+                if self.property_type == 'DatatypeProperty':
+                    if value is not None and not DataObject._is_variable(value):
+                        yield _rdf_literal_to_python(value)
+                elif self.property_type == 'ObjectProperty':
+                    constructed_qres = set()
+                    for rdf_type in self.rdf.objects(value, R.RDF['type']):
+                        constructed_qres.add((value, rdf_type))
+
+                    for ob in _QueryResultsTypeResolver(self, constructed_qres)():
+                        yield ob
 
     def set(self,v):
         import bisect
@@ -723,6 +760,7 @@ class SimpleProperty(Property):
 
         if isinstance(v,DataObject):
             DataObject.removeFromOpenSet(v)
+        self.add_statements([])
 
     def triples(self,*args,**kwargs):
         query=kwargs.get('query',False)
@@ -737,6 +775,9 @@ class SimpleProperty(Property):
             visited_list.add(self)
 
         ident = self.identifier(query=query)
+
+        if kwargs.get('saving', False):
+            yield (self.identifier(), R.RDF['type'], self.rdf_type)
 
         if len(self._v) > 0:
             for x in Property.triples(self,*args,**kwargs):
