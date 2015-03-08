@@ -41,6 +41,8 @@ Notes:
 Classes
 -------
 
+.. automodule:: PyOpenWorm.experiment
+.. automodule:: PyOpenWorm.channel
 .. automodule:: PyOpenWorm.evidence
 .. automodule:: PyOpenWorm.network
 .. automodule:: PyOpenWorm.neuron
@@ -72,6 +74,8 @@ from .muscle import Muscle
 from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
+from .experiment import Experiment
+from .channel import Channel,ChannelModel
 
 __import__('__main__').connected = False
 
@@ -105,7 +109,7 @@ def disconnect(c=False):
 
 
 def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
-    """ 
+    """
     Load data into the underlying database of this library.
 
     :param data: (Optional) Specify the file to load into the library
@@ -179,6 +183,9 @@ def connect(configFile='PyOpenWorm/default.conf',
     SimpleProperty.register()
     Property.register()
     Relationship.register()
+    Channel.register()
+    ChannelModel.register()
+    Experiment.register()
 
     m.connected = True
     if data:
