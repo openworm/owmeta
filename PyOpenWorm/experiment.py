@@ -7,7 +7,7 @@ class Experiment(DataObject):
     Parameters
     ----------
     reference : Evidence
-        Supporting article for this experiment. 
+        Supporting article for this experiment.
 
     Attributes
     ----------
@@ -17,13 +17,11 @@ class Experiment(DataObject):
 
     def __init__(self, ref, **kwargs):
         DataObject.__init__(self, **kwargs)
-        Experiment.ObjectProperty("reference", self, value_type=Experiment)
+        Experiment.ObjectProperty("reference", self, value_type=Evidence)
 
-        if(isinstance(ref,Experiment)):
+        if(isinstance(ref,Evidence)):
             self.reference(ref)
 
-    @classmethod
-    def Condition(cls, cond, val):
-        cls.DatatypeProperty.__init__(cond, self, **kwargs)
-        self.cond(val)
-
+    def Condition(self, cond, val):
+        Experiment.DatatypeProperty(cond, self)
+        exec("self." + cond + "(val)" )
