@@ -14,11 +14,11 @@ class ChannelModel(DataObject):
     ----------
     modelType : DatatypeProperty
         What this model is based on (either "homology" or "patch-clamp")
-    
+
     Attributes
     ----------
     modelType : DatatypeProperty
-        Passed in on construction 
+        Passed in on construction
     ion : DatatypeProperty
         The type of ion this channel selects for
     gating : DatatypeProperty
@@ -31,20 +31,20 @@ class ChannelModel(DataObject):
         ChannelModel.DatatypeProperty("ion", self, multiple=True)
         ChannelModel.DatatypeProperty("gating", self, multiple=True)
 
-    #Change modelType value to something from ChannelModelType class
-    if (isinstance(modelType, basestring)):
-        modelType = modelType.lower()
-        if modelType in ('homology', ChannelModelType.homologyEstimate):
-            self.modelType(ChannelModelType.homologyEstimate)
-        elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
-            self.modelType(ChannelModelType.patchClamp)
+        #Change modelType value to something from ChannelModelType class
+        if (isinstance(modelType, basestring)):
+            modelType = modelType.lower()
+            if modelType in ('homology', ChannelModelType.homologyEstimate):
+                self.modelType(ChannelModelType.homologyEstimate)
+            elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
+                self.modelType(ChannelModelType.patchClamp)
 
 class Model(Property):
     multiple=True
     def __init__(self, **kwargs):
         Property.__init__(self, 'model', **kwargs)
         self._models = []
-    
+
     def get(self, **kwargs):
         """
         Get a list of models for this channel
