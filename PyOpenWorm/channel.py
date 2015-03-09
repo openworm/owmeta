@@ -100,7 +100,7 @@ class Channel(DataObject):
     """
 
     def __init__(self, name=False, **kwargs):
-        DataObject.__init__(self, name=name, **kwargs)
+        DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Model(owner=self)
         Channel.DatatypeProperty('subfamily',owner=self)
