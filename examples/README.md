@@ -2,16 +2,13 @@ Some of these examples employ dummy database configurations just to demonstrate 
 
 To run others (those that connect with `default.conf`) you need to have a database set up.
 
-To set up a database, you can run `init_db.py`. Examine that file to see how it works (there is also an example of creating the database in PyOpenWorm's main README).
+To set up a database, you can run `PyOpenWorm.loadData` in the project root directory (there is also an example of creating the database in PyOpenWorm's main README).
 
-*Note:* These examples assume that you are running them in the directory they're stored in
+*Note:* These examples assume that you are running them in the directory they're stored in.
 
 ###Examples walkthrough
 
 Before you get started with these examples, it would be good to read over [the main README](../README.md).
-
-If this is your first time doing these examples, run `init_db.py` to set up a database for these examples.
-This will take a minute of so to complete, so have a look at the script's comments while you're waiting.
 
 #####1. `gap_junctions.py`
 
