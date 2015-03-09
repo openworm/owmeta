@@ -435,9 +435,9 @@ def get_most_specific_rdf_type(types):
     most_specific_type = DataObject
     for x in types:
         cn = DataObject._extract_class_name(x) # TODO: Make a table to lookup by the class URI
-        class_uri = _DataObjects[cn]
-        if issubclass(class_uri, most_specific_type):
-            most_specific_type = class_uri
+        class_object = _DataObjects[cn]
+        if issubclass(class_object, most_specific_type):
+            most_specific_type = class_object
     return most_specific_type.rdf_type
 
 # Define a property by writing the get
