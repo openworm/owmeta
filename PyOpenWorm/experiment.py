@@ -1,6 +1,6 @@
 from PyOpenWorm import *
 
-class Condition(Property):
+class Condition(DataObject):
     """
     Class for storing a condition of an experiment.
     Takes one value and stores it with a key.
@@ -21,25 +21,63 @@ class Condition(Property):
         State of the condition for the experiment in question.
         Could be an object, string, integer; whatever is relevant.
     """
+
+    def __init__(self, condition=False, value=False, owner=False, **kwargs):
+        DataObject.__init__(self, **kwargs)
+        Condition.DatatypeProperty('condition', self)
+        Condition.DatatypeProperty('value', self)
+        Condition.DatatypeProperty('owner', self)
+
+        if isinstance(condition, basestring):
+            self.condition = condition
+
+        if isinstance(value, basestring):
+            self.value = value
+
+        self.owner = owner
+
+class Conditions(Property):
+    """
+    Used for storing and retrieving Conditions of an Experiment
+    """
     multiple=True
     def __init__(self, *args, **kwargs):
-        Property.__init__(self, 'condition', *args, **kwargs)
-        self._conds = {}
+        Property.__init__(self, 'conditions', *args, **kwargs)
+        self._conds = []
 
     def get(self):
-        #get conditions and values from the db
-        if len(self._conds) > 0:
-            for c in self._conds:
-                yield c
-        else:
-            pass
+        """
+        Get a list of Conditions for this Experiment.
 
-    def set(self, condition, value):
-        #add condition as datatype property to the experiment object
-        Experiment.DatatypeProperty(condition, self)
-        exec("self." + condition + "(value)" )
-        #now add it to the _conds dictionary
-        self._conds[condition] = value
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        set of Condition
+        """
+        if len(self._conds) > 0:
+            for cond in self._conds:
+                yield cond
+        else:
+            #load Condition objects with owner=self.owner
+            c = Condition(owner=self.owner)
+            for cond in c.load():
+                self._conds.append(cond)
+                yield cond
+
+    def set(self, condition=False, value=False):
+        #create new Conditon DataObject
+        c = Condition(condition, value, self.owner)
+        #add Condition key and value to _conds
+        self._conds.append(c)
+
+    def save(self):
+        #overrides save
+        for cond in self._conds:
+            cond.save()
+
 
 class Experiment(DataObject):
     """
@@ -56,11 +94,11 @@ class Experiment(DataObject):
         Experimental conditions, set by key.
     """
 
-    def __init__(self, ref, **kwargs):
+    def __init__(self, reference, **kwargs):
         DataObject.__init__(self, **kwargs)
-        Experiment.ObjectProperty("reference", self, value_type=Evidence)
+        Experiment.ObjectProperty('reference', self, value_type=Evidence)
 
-        if(isinstance(ref,Evidence)):
-            self.reference(ref)
+        if(isinstance(reference,Evidence)):
+            self.reference(reference)
 
-        Condition(owner=self)
+        Conditions(owner=self)
