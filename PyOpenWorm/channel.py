@@ -25,7 +25,7 @@ class ChannelModel(DataObject):
         The gating mechanism for this channel (either "voltage" or the name of a ligand)
     """
 
-    def __init__(self, modelType, *args, **kwargs):
+    def __init__(self, modelType=False, *args, **kwargs):
         DataObject.__init__(self, **kwargs)
         ChannelModel.DatatypeProperty("modelType", self)
         ChannelModel.DatatypeProperty("ion", self, multiple=True)
@@ -39,10 +39,10 @@ class ChannelModel(DataObject):
             elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
                 self.modelType(ChannelModelType.patchClamp)
 
-class Model(Property):
+class Models(Property):
     multiple=True
     def __init__(self, **kwargs):
-        Property.__init__(self, 'model', **kwargs)
+        Property.__init__(self, 'models', **kwargs)
         self._models = []
 
     def get(self, **kwargs):
@@ -55,13 +55,16 @@ class Model(Property):
 
         Returns
         -------
-        list of ChannelModel
+        set of ChannelModel
         """
 
         if len(self._models) > 0:
             for m in self._models:
                 yield m
-        # add something here to load() from db if _models is empty
+        else:
+            c = ChannelModel()
+            for m in c.load():
+                self._models.append(m)
 
     def set(self, m, **kwargs):
         """
@@ -80,6 +83,11 @@ class Model(Property):
         self._models.append(m)
         return m
 
+    def triples(self,**kwargs):
+        for c in self._models:
+            for x in c.triples(**kwargs):
+                yield x
+
 class Channel(DataObject):
     """
     An ion channel.
@@ -95,12 +103,12 @@ class Channel(DataObject):
     ----------
     name : DatatypeProperty
         The subfamily to which the ion channel belongs
-    Model : Property
+    Models : Property
         Get experimental models of this ion channel
     """
 
     def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
-        Model(owner=self)
+        Models(owner=self)
         Channel.DatatypeProperty('subfamily',owner=self)
