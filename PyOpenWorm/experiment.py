@@ -7,7 +7,7 @@ class Condition(DataObject):
 
     Parameters
     ----------
-    condition : String
+    name : String
         Name of the condition (ex: "subject").
     value : any
         State of the condition for the experiment in question.
@@ -15,26 +15,32 @@ class Condition(DataObject):
 
     Attributes
     ----------
-    condition : String
+    name : String
         Name of the condition (ex: "subject").
     value : any
         State of the condition for the experiment in question.
         Could be an object, string, integer; whatever is relevant.
     """
 
-    def __init__(self, condition=False, value=False, owner=False, **kwargs):
+    def __init__(self, name=False, value=False, owner=False, **kwargs):
         DataObject.__init__(self, **kwargs)
-        Condition.DatatypeProperty('condition', self)
+        Condition.DatatypeProperty('name', self)
         Condition.DatatypeProperty('value', self)
         Condition.DatatypeProperty('owner', self)
 
-        if isinstance(condition, basestring):
-            self.condition = condition
+        if isinstance(name, basestring):
+            self.name = name
 
         if isinstance(value, basestring):
             self.value = value
 
         self.owner = owner
+
+    def __str__(self):
+        return str("{ \'" + self.name + "\' : \'" + self.value + "\' }")
+
+    def __dict__(self):
+        return eval(self.__str__())
 
 class Conditions(Property):
     """
@@ -65,6 +71,7 @@ class Conditions(Property):
             c = Condition(owner=self.owner)
             for cond in c.load():
                 self._conds.append(cond)
+            for cond in self._conds:
                 yield cond
 
     def set(self, condition=False, value=False):
@@ -72,12 +79,6 @@ class Conditions(Property):
         c = Condition(condition, value, self.owner)
         #add Condition key and value to _conds
         self._conds.append(c)
-
-    def save(self):
-        #overrides save
-        for cond in self._conds:
-            cond.save()
-
 
 class Experiment(DataObject):
     """
@@ -94,11 +95,12 @@ class Experiment(DataObject):
         Experimental conditions, set by key.
     """
 
-    def __init__(self, reference, **kwargs):
+    def __init__(self, reference=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         Experiment.ObjectProperty('reference', self, value_type=Evidence)
 
         if(isinstance(reference,Evidence)):
+            #TODO: make this so the reference asserts this Experiment when it is added
             self.reference(reference)
 
         Conditions(owner=self)
