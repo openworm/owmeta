@@ -82,7 +82,7 @@ class Cell(DataObject):
             self.lineageName(lineageName)
 
     def morphology(self):
-        morph_name = "morphology_" + str(next(self.name()))
+        morph_name = "morphology_" + str(self.name())
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)
@@ -185,6 +185,3 @@ class Cell(DataObject):
     #def rdf(self):
 
     #def peptides(self):
-
-
-
