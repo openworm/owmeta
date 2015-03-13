@@ -91,10 +91,10 @@ class ChannelModel(DataObject):
         ChannelModel.DatatypeProperty('modelType', self)
         ChannelModel.DatatypeProperty('ion', self, multiple=True)
         ChannelModel.DatatypeProperty('gating', self, multiple=True)
-        ChannelModel.DatatypeProperty('conductance', self) 
+        ChannelModel.DatatypeProperty('conductance', self)
         References(owner=self)
 
-        #Change modelType value to something from ChannelModelType class
+        #Change modelType value to something from ChannelModelType class on init
         if (isinstance(modelType, basestring)):
             modelType = modelType.lower()
             if modelType in ('homology', ChannelModelType.homologyEstimate):
@@ -125,9 +125,12 @@ class Models(Property):
             for m in self._models:
                 yield m
         else:
+            #make a dummy ChannelModel so we can load from db to memory
             c = ChannelModel()
             for m in c.load():
                 self._models.append(m)
+            #call `get()` again to yield ChannelModels the user asked for
+            self.get()
 
     def set(self, m, **kwargs):
         """
