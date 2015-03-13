@@ -91,13 +91,13 @@ class Experiment(DataObject):
 
     Attributes
     ----------
-    condition : Property
+    conditions : Property
         Experimental conditions, set by key.
     """
 
     def __init__(self, reference=False, **kwargs):
         DataObject.__init__(self, **kwargs)
-        Experiment.ObjectProperty('reference', self, value_type=Evidence)
+        Experiment.ObjectProperty('reference', owner=self, value_type=Evidence, multiple=True)
 
         if(isinstance(reference,Evidence)):
             #TODO: make this so the reference asserts this Experiment when it is added
