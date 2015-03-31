@@ -104,10 +104,6 @@ class ExampleRunnerTest(unittest.TestCase):
     def test_rmgr(self):
         self.execfile("rmgr.py")
 
-    @unittest.skipUnless(has_numpy, "This example requires numpy")
-    def test_shortest_path(self):
-        self.execfile("shortest_path.py")
-
 class DataIntegrityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
