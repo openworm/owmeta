@@ -120,10 +120,14 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False
     """
     if skipIfNewer:
         import os
-        data_file_time=os.path.getmtime(data)
-        db_file_time=os.path.getmtime(config('rdf.store_conf'))
-        if data_file_time < db_file_time:
-            return
+        try:
+            data_file_time=os.path.getmtime(data)
+            db_file_time=os.path.getmtime(config('rdf.store_conf'))
+            print db_file_time, data_file_time
+            if data_file_time < db_file_time:
+                return
+        except:
+            pass
     sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
 
