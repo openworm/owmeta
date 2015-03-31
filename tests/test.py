@@ -65,7 +65,7 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         PyOpenWorm.connect()
-        PyOpenWorm.loadData(skipIfNewer=True)
+        PyOpenWorm.loadData(skipIfNewer=False)
         PyOpenWorm.disconnect()
         os.chdir('examples')
 
