@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.insert(0,".")
 import unittest
 import neuroml
 import neuroml.writers as writers
-import sys
-sys.path.insert(0,".")
 import PyOpenWorm
 from PyOpenWorm import *
 import test_data as TD
@@ -65,7 +65,7 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         PyOpenWorm.connect()
-        PyOpenWorm.loadData()
+        PyOpenWorm.loadData(skipIfNewer=True)
         PyOpenWorm.disconnect()
         os.chdir('examples')
 
@@ -74,8 +74,12 @@ class ExampleRunnerTest(unittest.TestCase):
         os.chdir('..')
 
     def execfile(self, example_file_name):
-        with open("/dev/null", "w") as out:
-            self.assertEqual(0, SP.call(["python", example_file_name], stdout=out, stderr=out))
+        fname = tempfile.mkstemp()[1]
+        with open(fname, 'w+') as out:
+            stat = SP.call(["python", example_file_name], stdout=out, stderr=out)
+            out.seek(0)
+            self.assertEqual(0, stat, out.read())
+        os.unlink(fname)
 
     def test_run_NeuronBasicInfo(self):
         self.execfile("NeuronBasicInfo.py")
@@ -1392,13 +1396,15 @@ if __name__ == '__main__':
         return unittest.TextTestRunner().run(suite)
 
     all_tests = []
-    for x in glob("tests/test_*.conf"):
+    configs = glob("tests/test_*.conf")
+    if not has_bsddb:
+        configs = [x for x in configs if 'Sleepycat' not in x]
+    print "Testing with configs:",configs
+    for x in configs:
         TEST_CONFIG = x
-        print "config", x
-        if not ((x == "tests/test_Sleepycat.conf") and (not has_bsddb)):
-            suite = unittest.TestSuite()
-            suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
-            all_tests.append(suite)
+        suite = unittest.TestSuite()
+        suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
+        all_tests.append(suite)
 
     suite = unittest.TestSuite()
     classes = filter(lambda x : isinstance(x, type), globals().values())
