@@ -438,7 +438,7 @@ def get_most_specific_rdf_type(types):
     for x in types:
         cn = DataObject._extract_class_name(x) # TODO: Make a table to lookup by the class URI
         try:
-            class_object = _DataObjects.get[cn]
+            class_object = _DataObjects[cn]
             if issubclass(class_object, most_specific_type):
                 most_specific_type = class_object
         except KeyError as e:
