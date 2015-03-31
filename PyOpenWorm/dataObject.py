@@ -3,9 +3,10 @@ from .data import DataUser
 from .configure import BadConf
 import itertools as IT
 import traceback
-import logging as L
+import logging
 
 __all__ = ["DataObject", "Property", "SimpleProperty", "values"]
+L = logging.getLogger(__name__)
 
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
 # However, this need not be a connected *RDF* graph. Indeed, graph literals may hold information which can yield triples which are not
@@ -404,17 +405,18 @@ class _QueryResultsTypeResolver(object):
         return k
 
     def g0(self, ident, types):
-        if ident is None:
-            return
-        k = self.s()
-        n_ident = k[0]
-        n_type = k[1]
-        if n_ident != ident:
-            o = self.ob.object_from_id(ident, get_most_specific_rdf_type(types))
-            self.results.append(o)
-            self.g0(n_ident, [n_type])
-        else:
-            self.g0(n_ident, [n_type] + types)
+        while ident is not None:
+            k = self.s()
+            n_ident = k[0]
+            n_type = k[1]
+
+            if n_ident != ident:
+                o = self.ob.object_from_id(ident, get_most_specific_rdf_type(types))
+                self.results.append(o)
+                types = [n_type]
+            else:
+                types = [n_type] + types
+            ident = n_ident
 
     def g(self):
         k = self.s()
@@ -435,9 +437,14 @@ def get_most_specific_rdf_type(types):
     most_specific_type = DataObject
     for x in types:
         cn = DataObject._extract_class_name(x) # TODO: Make a table to lookup by the class URI
-        class_object = _DataObjects[cn]
-        if issubclass(class_object, most_specific_type):
-            most_specific_type = class_object
+        try:
+            class_object = _DataObjects.get[cn]
+            if issubclass(class_object, most_specific_type):
+                most_specific_type = class_object
+        except KeyError as e:
+            L.warn("""A a Python class named "{}" corresponding to the type URI "{}" couldn't be found.
+            You may want to import the module containing the class as well as add additional type
+            annotations in order to resolve your objects to a more precise type than DataObject.""".format(cn, x))
     return most_specific_type.rdf_type
 
 # Define a property by writing the get
