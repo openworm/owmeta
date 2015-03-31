@@ -106,17 +106,26 @@ def disconnect(c=False):
     m.connected = False
 
 
-def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
-    """ 
+def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False):
+    """
     Load data into the underlying database of this library.
+
+    XXX: This is only guaranteed to work with the ZODB database.
 
     :param data: (Optional) Specify the file to load into the library
     :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
-    :return:
+    :param skipIfNewer: (Optional) Skips loading of data if the database file is newer
+                        than the data to be loaded in. This is determined by the modified time on the main
+                        database file compared to the modified time on the data file.
     """
-    if data:
-        sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
-        config()['rdf.graph'].parse(data, format=dataFormat)
+    if skipIfNewer:
+        import os
+        data_file_time=os.path.getmtime(data)
+        db_file_time=os.path.getmtime(config('rdf.store_conf'))
+        if data_file_time < db_file_time:
+            return
+    sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
+    config('rdf.graph').parse(data, format=dataFormat)
 
 def connect(configFile='PyOpenWorm/default.conf',
             conf=False,
@@ -131,7 +140,6 @@ def connect(configFile='PyOpenWorm/default.conf',
     :param do_logging: (Optional) If true, turn on debug level logging
     :param data: (Optional) If provided, specify the file to load into the library
     :param dataFormat: (Optional) If provided, specify the file format to load into the library. Currently n3 is supported
-    :return:
     """
     import logging
     import atexit
