@@ -131,7 +131,7 @@ See what some evidence stated::
 
 ```
 
-For most types (i.e., subclasses of `P.DataObject`) that don not have required
+For most types (i.e., subclasses of `P.DataObject`) that do not have required
 initialization arguments, you can load all members of that type by making an
 object of that type and calling `load()`::
 ```python
@@ -152,7 +152,7 @@ See what neurons express some neuropeptide::
 
 ```
 
-See what neurons innervate a muscle::
+See what neurons innervate a muscle (you may get different muscles stored as 'a_muscle' that come out of the un-ordered set)::
 ```python
    >>> muscles = P.Worm().muscles()
    >>> a_muscle = muscles.pop()
