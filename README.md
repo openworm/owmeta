@@ -165,7 +165,7 @@ See what neurons innervate a muscle (you may get different muscles stored as 'a_
 Get direct access to the RDFLib graph::
 ```python
  >>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }")
-
+ <rdflib.plugins.sparql.processor.SPARQLResult object at 0x10fb77f90>
 ```
 
 Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
