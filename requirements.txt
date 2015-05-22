@@ -1,6 +1,6 @@
 xlrd
 libneuroml
-ZODB
+zodb==4.1.0
 Pint
 rdflib>=4.1.2
 BTrees==4.0.8
