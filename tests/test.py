@@ -132,6 +132,25 @@ class DataIntegrityTest(unittest.TestCase):
     def tearDownClass(cls):
         PyOpenWorm.disconnect()
 
+    @unittest.expectedFailure
+    def test_correct_neuron_number(self):
+        """
+        This test verifies that the worm model has exactly 302 neurons.
+        """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        self.assertEqual(302, len(set(net.neurons())))
+        
+    @unittest.expectedFailure
+    def test_TH_neuropeptide_neuron_list(self):
+        """
+        This test verifies that the set of neurons which contain the
+        neuropeptide TH is correct (the list is given below).
+        """
+        neuronlist = PyOpenWorm.Neuron()
+        neuronlist.neuropeptide("TH")
+        thlist = set(x.name() for x in neuronlist.load())
+        self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
+
     def testUniqueNeuronNode(self):
         """
         There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
