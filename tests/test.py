@@ -56,274 +56,87 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
-class ExampleRunnerTest(unittest.TestCase):
-    """ Try to run the examples to make sure we didn't break the API for them. """
+# Need description of these tests
+from ExampleRunnerTest import ExampleRunnerTest
 
-    #Currently these are all failing because we aren't reproducing the actual data that
-    # a user gets when they grab the code for the first time
+# Need description of these tests
+from DataIntegrityTest import DataIntegrityTest
 
-    @classmethod
-    def setUpClass(self):
-        PyOpenWorm.connect()
-        PyOpenWorm.loadData(skipIfNewer=False)
-        PyOpenWorm.disconnect()
-        os.chdir('examples')
+class ConfigureTest(unittest.TestCase):
+    def test_fake_config(self):
+        """ Try to retrieve a config value that hasn't been set """
+        with self.assertRaises(KeyError):
+            c = Configure()
+            c['not_a_valid_config']
 
-    @classmethod
-    def tearDownClass(self):
-        os.chdir('..')
+    def test_literal(self):
+        """ Assign a literal rather than a ConfigValue"""
+        c = Configure()
+        c['seven'] = "coke"
+        self.assertEqual(c['seven'], "coke")
 
-    def execfile(self, example_file_name):
-        fname = tempfile.mkstemp()[1]
-        with open(fname, 'w+') as out:
-            stat = SP.call(["python", example_file_name], stdout=out, stderr=out)
-            out.seek(0)
-            self.assertEqual(0, stat, out.read())
-        os.unlink(fname)
+    def test_ConfigValue(self):
+        """ Assign a ConfigValue"""
+        c = Configure()
+        class pipe(ConfigValue):
+            def get(self):
+                return "sign"
+        c['seven'] = pipe()
+        self.assertEqual("sign",c['seven'])
 
-    def test_run_NeuronBasicInfo(self):
-        self.execfile("NeuronBasicInfo.py")
+    def test_getter_no_ConfigValue(self):
+        """ Assign a method with a "get". Should return a the object rather than calling its get method """
+        c = Configure()
+        class pipe:
+            def get(self):
+                return "sign"
+        c['seven'] = pipe()
+        self.assertIsInstance(c['seven'], pipe)
 
-    def test_run_NetworkInfo(self):
-        # XXX: No `synclass' is given, so all neurons are called `excitatory'
-        self.execfile("NetworkInfo.py")
+    def test_late_get(self):
+        """ "get" shouldn't be called until the value is *dereferenced* """
+        c = Configure()
+        a = {'t' : False}
+        class pipe(ConfigValue):
+            def get(self):
+                a['t'] = True
+                return "sign"
+        c['seven'] = pipe()
+        self.assertFalse(a['t'])
+        self.assertEqual(c['seven'], "sign")
+        self.assertTrue(a['t'])
 
-    @unittest.expectedFailure
-    def test_run_morpho(self):
-        self.execfile("morpho.py")
+    def test_read_from_file(self):
+        """ Read configuration from a JSON file """
+        try:
+            d = Data.open("tests/test.conf")
+            self.assertEqual("test_value", d["test_variable"])
+        except:
+            self.fail("test.conf should exist and be valid JSON")
 
-    def test_gap_junctions(self):
-        self.execfile("gap_junctions.py")
+    def test_read_from_file_fail(self):
+        """ Fail on attempt to read configuration from a non-JSON file """
+        with self.assertRaises(ValueError):
+            Data.open("tests/bad_test.conf")
 
-    def test_add_reference(self):
-        self.execfile("add_reference.py")
 
-    def test_bgp(self):
-        self.execfile("test_bgp.py")
+class ConfigureableTest(unittest.TestCase):
+    def test_init_empty(self):
+        """Ensure Configureable gets init'd with the defalut if nothing's given"""
+        i = Configureable()
+        self.assertEqual(Configureable.conf,i.conf)
 
-    def test_rmgr(self):
-        self.execfile("rmgr.py")
+    def test_init_False(self):
+        """Ensure Configureable gets init'd with the defalut if False is given"""
+        i = Configureable(conf=False)
+        self.assertEqual(Configureable.conf, i.conf)
 
-class DataIntegrityTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        import csv
-
-        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
-
-        if not USE_BINARY_DB:
-            PyOpenWorm.connect(conf=Data()) # Connect for integrity tests that use PyOpenWorm functions
-            cls.g = PyOpenWorm.config('rdf.graph') # declare class-level scope for the database
-            cls.g.parse("OpenWormData/WormData.n3", format="n3") # load in the database
-        else:
-            conf = Configure(**{ "rdf.source" : "ZODB", "rdf.store_conf" : BINARY_DB })
-            PyOpenWorm.connect(conf=conf)
-            cls.g = PyOpenWorm.config('rdf.graph')
-
-        #grab the list of the names of the 302 neurons
-
-        csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-
-        for row in reader:
-            if len(row[0]) > 0: # Only saves valid neuron names
-                cls.neurons.append(row[0])
-    @classmethod
-    def tearDownClass(cls):
-        PyOpenWorm.disconnect()
-
-    @unittest.expectedFailure
-    def test_correct_neuron_number(self):
-        """
-        This test verifies that the worm model has exactly 302 neurons.
-        """
-        net = PyOpenWorm.Worm().get_neuron_network()
-        self.assertEqual(302, len(set(net.neurons())))
-
-    @unittest.expectedFailure
-    def test_TH_neuropeptide_neuron_list(self):
-        """
-        This test verifies that the set of neurons which contain the
-        neuropeptide TH is correct (the list is given below).
-        """
-        neuronlist = PyOpenWorm.Neuron()
-        neuronlist.neuropeptide("TH")
-        thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
-
-    def testUniqueNeuronNode(self):
-        """
-        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
-        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
-        """
-
-        results = {}
-        for n in self.neurons:
-            #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
-            qres = self.g.query('SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' + n + '\" } LIMIT 5')
-            results[n] = (len(qres.result), [x[0] for x in qres.result])
-
-        # If there is not only one result back, then there is more than one RDF node.
-        more_than_one = [(x, results[x]) for x in results if results[x][0] > 1]
-        less_than_one = [(x, results[x]) for x in results if results[x][0] < 1]
-        self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
-        self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
-
-    def testNeuronsHaveTypes(self):
-        """
-        Every Neuron should have a non-blank type
-        """
-        results = set()
-        for n in self.neurons:
-            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". ' #per node ?s that has the name of a neuron associated
-                                + '?k <http://openworm.org/entities/Cell/name> ?s .'
-                                + '?k <http://openworm.org/entities/Neuron/type> ?o .' #look up its listed type ?o
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } ' #for that type ?o, get its property ?tp and its value ?v
-                                )
-            for x in qres:
-                v = x[0]
-                if isinstance(v,R.Literal):
-                    results.add(n)
-
-        # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
-        self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
-
-    def test_neuron_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 40)
-
-    def test_neuron_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
-        # XXX: This result is 1 greater compared to what would be expected from the
-        # connectome.csv file
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 91)
-
-    @unittest.skip("have not yet defined asserts")
-    def testWhatNodesGetTypeInfo(self):
-        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                                  '?o ?p ?s} ' #for that type ?o, get its value ?v
-                                + 'LIMIT 10')
-        for row in qres.result:
-            print row
-
-    @unittest.expectedFailure
-    def test_compare_to_xls(self):
-        """ Compare the PyOpenWorm connections to the data in the spreadsheet """
-        SAMPLE_CELL = 'ADAL'
-        xls_conns = []
-        pow_conns = []
-
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
-                               #############################################################
-                               # Find connections that have the ?pre_name as our passed in value
-                               #############################################################
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-
-                               #############################################################
-                               # Find all the cells that are on the post side of those
-                               #  connections and bind their names to ?post_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?post_name))}""")
-        def ff(x):
-            return str(x.value)
-        for line in qres.result:
-            t = list(map(ff, line))
-            t.insert(0,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
-            pow_conns.append(t)
-
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
-        qres = self.g.query("""SELECT ?pre_name ?type (STR(?num) AS ?numval) WHERE {
-                               #############################################################
-                               # Find connections that have the ?post_name as our passed in value
-                               #############################################################
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
-
-                               #############################################################
-                               # Find all the cells that are on the pre side of those
-                               #  connections and bind their names to ?pre_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?pre_name))}""")
-        for line in qres.result:
-            t = list(map(ff, line))
-            t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
-            pow_conns.append(t)
-
-        #Get connections from the sheet
-        import xlrd
-        wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
-        sheet = wb.sheets()[0]
-        #Put every ADAL connection (except EMJs and Rs!) in a list as a tuple. This helps us compare them later
-        def floatToStr(x):
-            return str(int(x.value))
-        def sendOrGj(x):
-            if x.value == 'EJ':
-                return 'gapJunction'
-            else:
-                return 'send'
-
-        for row in range(1, sheet.nrows):
-            if SAMPLE_CELL in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
-                string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
-                t = list(string_row)
-                xls_conns.append(t)
-
-        #assert that these two sorted lists are the same
-        #using sorted lists because Set() removes multiples
-
-        self.maxDiff = None
-        self.assertEqual(sorted(pow_conns), sorted(xls_conns))
+class DataObjectTestToo(unittest.TestCase):
+    def test_helpful_message_on_non_connection(self):
+        """ The message should say something about connecting """
+        Configureable.conf = False # Ensure that we are disconnected
+        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
+            do = DataObject()
 
 class _DataTest(unittest.TestCase):
     def delete_dir(self):
@@ -398,74 +211,6 @@ class WormTest(_DataTest):
     def test_get_semantic_net(self):
         g0 = Worm().get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
-
-class ConfigureTest(unittest.TestCase):
-    def test_fake_config(self):
-        """ Try to retrieve a config value that hasn't been set """
-        with self.assertRaises(KeyError):
-            c = Configure()
-            c['not_a_valid_config']
-
-    def test_literal(self):
-        """ Assign a literal rather than a ConfigValue"""
-        c = Configure()
-        c['seven'] = "coke"
-        self.assertEqual(c['seven'], "coke")
-
-    def test_ConfigValue(self):
-        """ Assign a ConfigValue"""
-        c = Configure()
-        class pipe(ConfigValue):
-            def get(self):
-                return "sign"
-        c['seven'] = pipe()
-        self.assertEqual("sign",c['seven'])
-
-    def test_getter_no_ConfigValue(self):
-        """ Assign a method with a "get". Should return a the object rather than calling its get method """
-        c = Configure()
-        class pipe:
-            def get(self):
-                return "sign"
-        c['seven'] = pipe()
-        self.assertIsInstance(c['seven'], pipe)
-
-    def test_late_get(self):
-        """ "get" shouldn't be called until the value is *dereferenced* """
-        c = Configure()
-        a = {'t' : False}
-        class pipe(ConfigValue):
-            def get(self):
-                a['t'] = True
-                return "sign"
-        c['seven'] = pipe()
-        self.assertFalse(a['t'])
-        self.assertEqual(c['seven'], "sign")
-        self.assertTrue(a['t'])
-
-    def test_read_from_file(self):
-        """ Read configuration from a JSON file """
-        try:
-            d = Data.open("tests/test.conf")
-            self.assertEqual("test_value", d["test_variable"])
-        except:
-            self.fail("test.conf should exist and be valid JSON")
-
-    def test_read_from_file_fail(self):
-        """ Fail on attempt to read configuration from a non-JSON file """
-        with self.assertRaises(ValueError):
-            Data.open("tests/bad_test.conf")
-
-class ConfigureableTest(unittest.TestCase):
-    def test_init_empty(self):
-        """Ensure Configureable gets init'd with the defalut if nothing's given"""
-        i = Configureable()
-        self.assertEqual(Configureable.conf,i.conf)
-
-    def test_init_False(self):
-        """Ensure Configureable gets init'd with the defalut if False is given"""
-        i = Configureable(conf=False)
-        self.assertEqual(Configureable.conf, i.conf)
 
 class CellTest(_DataTest):
 
@@ -611,13 +356,6 @@ class DataObjectTest(_DataTest):
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
-
-class DataObjectTestToo(unittest.TestCase):
-    def test_helpful_message_on_non_connection(self):
-        """ The message should say something about connecting """
-        Configureable.conf = False # Ensure that we are disconnected
-        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
-            do = DataObject()
 
 class DataUserTest(_DataTest):
 
