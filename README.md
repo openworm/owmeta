@@ -167,7 +167,7 @@ Get direct access to the RDFLib graph::
 ```python
  >>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }") # doctest:+ELLIPSIS
  <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
- 
+
 ```
 
 Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
@@ -175,6 +175,12 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 ```python
 >>> net.as_networkx() # doctest:+ELLIPSIS
 <networkx.classes.digraph.DiGraph object at ...>
+
+```
+
+Finally, when you're done accessing the database, be sure to disconnect from it::
+```python
+>>> P.disconnect()
 
 ```
 
