@@ -581,135 +581,6 @@ class EvidenceTest(_DataTest):
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
 
-class RDFLibTest(unittest.TestCase):
-    """Test for RDFLib."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.ns = {"ns1" : "http://example.org/"}
-    def test_uriref_not_url(self):
-        try:
-            rdflib.URIRef("daniel@example.com")
-        except:
-            self.fail("Doesn't actually fail...which is weird")
-    def test_uriref_not_id(self):
-        """ Test that rdflib throws up a warning when we do something bad """
-        #XXX: capture the logged warning
-        import cStringIO
-        import logging
-
-        out = cStringIO.StringIO()
-        logger = logging.getLogger()
-        stream_handler = logging.StreamHandler(out)
-        logger.addHandler(stream_handler)
-        try:
-            rdflib.URIRef("some random string")
-        finally:
-            logger.removeHandler(stream_handler)
-        v = out.getvalue()
-        out.close()
-        self.assertRegexpMatches(str(v), r".*some random string.*")
-
-    def test_BNode_equality1(self):
-        a = rdflib.BNode("some random string")
-        b = rdflib.BNode("some random string")
-        self.assertEqual(a, b)
-
-    def test_BNode_equality2(self):
-        a = rdflib.BNode()
-        b = rdflib.BNode()
-        self.assertNotEqual(a, b)
-
-#class TimeTest(unittest.TestCase):
-    #def test_datetime_isoformat_has_timezone(self):
-        #time_stamp = now(utc).isoformat()
-        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
-
-class PintTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.ur = Q.UnitRegistry()
-        self.Q = self.ur.Quantity
-    def test_atomic_short(self):
-        q = self.Q(23, "mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_singular(self):
-        q = self.Q(23, "milliliter")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_plural(self):
-        q = self.Q(23, "milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_plural_to_string(self):
-        #XXX: Maybe there's a way to have the unit name pluralized...
-        q = self.Q(23, "milliliters")
-        self.assertEqual("23 milliliter", str(q))
-
-    def test_string_init_long_plural_to_string(self):
-        #XXX: Maybe there's a way to have the unit name pluralized...
-        q = self.Q("23 milliliters")
-        self.assertEqual("23 milliliter", str(q))
-
-    def test_string_init_short(self):
-        q = self.Q("23 mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_short_no_space(self):
-        q = self.Q("23mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_long_singular(self):
-        q = self.Q("23 milliliter")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_long_plural(self):
-        q = self.Q("23 milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_init_magnitude_with_string(self):
-        """ Pint doesn't care if you don't give it a number """
-        q = self.Q("23", "milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual("23", q.magnitude)
-
-        q = self.Q("worm", "milliliters")
-        self.assertEqual("worm", q.magnitude)
-
-class QuantityTest(unittest.TestCase):
-    def test_string_init_short(self):
-        q = Quantity.parse("23 mL")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_string_init_volume(self):
-        q = Quantity.parse("23 inches^3")
-        self.assertEqual("inch ** 3", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_string_init_compound(self):
-        q = Quantity.parse("23 inches/second")
-        self.assertEqual("inch / second", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_atomic_short(self):
-        q = Quantity(23, "mL")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_atomic_long(self):
-        q = Quantity(23, "milliliters")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
-
 class ConnectionTest(_DataTest):
     def setUp(self):
         _DataTest.setUp(self)
@@ -796,128 +667,6 @@ class MuscleTest(_DataTest):
 
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
-
-class DataTest(unittest.TestCase):
-    def test_namespace_manager(self):
-        c = Configure()
-        c['rdf.source'] = 'default'
-        c['rdf.store'] = 'default'
-        Configureable.conf = c
-        d = Data()
-        d.openDatabase()
-
-        self.assertIsInstance(d['rdf.namespace_manager'], R.namespace.NamespaceManager)
-
-    def test_init_no_rdf_store(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-        except:
-            self.fail("Bad state")
-
-    def test_ZODB_persistence(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        fname ='ZODB.fs'
-        c['rdf.source'] = 'ZODB'
-        c['rdf.store_conf'] = fname
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-            g = make_graph(20)
-            for x in g:
-                d['rdf.graph'].add(x)
-            d.closeDatabase()
-
-            d.openDatabase()
-            self.assertEqual(20, len(list(d['rdf.graph'])))
-            d.closeDatabase()
-        except:
-            traceback.print_exc()
-            self.fail("Bad state")
-        delete_zodb_data_store(fname)
-
-    @unittest.skipIf((has_bsddb==False), "Sleepycat requires working bsddb")
-    def test_Sleepycat_persistence(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        fname='Sleepycat_store'
-        c['rdf.source'] = 'Sleepycat'
-        c['rdf.store_conf'] = fname
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-            g = make_graph(20)
-            for x in g:
-                d['rdf.graph'].add(x)
-            d.closeDatabase()
-
-            d.openDatabase()
-            self.assertEqual(20, len(list(d['rdf.graph'])))
-            d.closeDatabase()
-        except:
-            traceback.print_exc()
-            self.fail("Bad state")
-
-        subprocess.call("rm -rf "+fname, shell=True)
-
-    def test_trix_source(self):
-        """ Test that we can load the datbase up from an XML file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'trix'
-        c['rdf.store'] = 'default'
-        c['trix_location'] = f[1]
-
-        with open(f[1],'w') as fo:
-            fo.write(TD.TriX_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
-        os.unlink(f[1])
-
-    def test_trig_source(self):
-        """ Test that we can load the datbase up from a trig file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'serialization'
-        c['rdf.serialization'] = f[1]
-        c['rdf.serialization_format'] = 'trig'
-        c['rdf.store'] = 'default'
-        with open(f[1],'w') as fo:
-            fo.write(TD.Trig_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
 
 class PropertyTest(_DataTest):
     def test_one(self):
@@ -1064,6 +813,23 @@ class SimplePropertyTest(_DataTest):
 
 class NeuroMLTest(_DataTest):
     pass
+
+# Need description of these tests
+from DataTest import DataTest
+
+# Need description of these tests
+from RDFLibTest import RDFLibTest
+
+#class TimeTest(unittest.TestCase):
+    #def test_datetime_isoformat_has_timezone(self):
+        #time_stamp = now(utc).isoformat()
+        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
+
+# Need description of these tests
+from PintTest import PintTest
+
+# Need description of these tests
+from QuantityTest import QuantityTest
 
 class DocumentationTest(unittest.TestCase):
     def test_readme(self):
