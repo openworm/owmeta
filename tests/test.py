@@ -16,6 +16,7 @@ import os
 import subprocess as SP
 import subprocess
 import tempfile
+import doctest
 
 from glob import glob
 
@@ -54,7 +55,6 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.index')
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
-
 
 class ExampleRunnerTest(unittest.TestCase):
     """ Try to run the examples to make sure we didn't break the API for them. """
@@ -139,7 +139,7 @@ class DataIntegrityTest(unittest.TestCase):
         """
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neurons())))
-        
+
     @unittest.expectedFailure
     def test_TH_neuropeptide_neuron_list(self):
         """
@@ -1393,6 +1393,10 @@ class SimplePropertyTest(_DataTest):
 
 class NeuroMLTest(_DataTest):
     pass
+
+class DocumentationTest(unittest.TestCase):
+    def test_readme(self):
+        doctest.testfile("../README.md")
 
 if __name__ == '__main__':
     from optparse import OptionParser
