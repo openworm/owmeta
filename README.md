@@ -42,7 +42,7 @@ Then you can try out a few things:
 >>> aval = net.aneuron('AVAL')
 
 >>> aval.type()
-set(['interneuron'])
+set([u'interneuron'])
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
@@ -84,11 +84,11 @@ Returns information about individual neurons::
 
 ```python
 >>> aval.name()
-'AVAL'
+u'AVAL'
 
 #list all known receptors
->>> aval.receptors()
-set(['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2'])
+>>> sorted(aval.receptors())
+[u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
@@ -110,8 +110,9 @@ set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 Returns a set of all muscles::
 
 ```python
->>> P.Worm().muscles()
-set([MANAL, MDL23, MVR02, ... MVL09, MVR21, MDR03])
+>>> muscles = P.Worm().muscles()
+>>> len(muscles)
+96
 
 ```
 
@@ -136,8 +137,9 @@ For most types (i.e., subclasses of `P.DataObject`) that do not have required
 initialization arguments, you can load all members of that type by making an
 object of that type and calling `load()`::
 ```python
->>> list(P.Neuron().load())
-[AS6,SIBVL,AS5,AVKL,VD10,VA5,AVG,AUAR,AWAR,PLML,...]
+>>> neurons = list(P.Neuron().load())
+>>> len(neurons)
+302
 
 ```
 
@@ -153,14 +155,12 @@ True
 
 ```
 
-See what neurons innervate a muscle (you may get different muscles stored as 'a_muscle' that come out of the un-ordered set)::
+See what neurons innervate a muscle::
 ```python
- >>> muscles = P.Worm().muscles()
- >>> a_muscle = muscles.pop()
- >>> a_muscle
- MRV17
- >>> a_muscle.innervatedBy()
- set([VB8, VD10, VB9, VD9, VA10])
+ >>> mdr21 = P.Muscle('MDR21')
+ >>> innervates_mdr21 = mdr21.innervatedBy()
+ >>> len(innervates_mdr21)
+ 4
 
 ```
 Get direct access to the RDFLib graph::
