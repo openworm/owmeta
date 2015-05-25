@@ -1,5 +1,8 @@
 *.pyc
 *.nml
+*.db
+*.db.index
+*.db.lock
 build/*
 PyOpenWorm.egg-info/*
 dist/*
