@@ -3,6 +3,7 @@
 *.db
 *.db.index
 *.db.lock
+*.db.tmp
 build/*
 PyOpenWorm.egg-info/*
 dist/*
@@ -12,6 +13,7 @@ OpenWormData/worm.*
 worm.fs*
 .DS_Store
 six-1.7.3*
+.eggs/*
 .idea/*
 .idea/encodings.xml
 .idea/misc.xml
