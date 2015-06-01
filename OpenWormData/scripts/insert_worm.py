@@ -160,7 +160,7 @@ def upload_receptors_and_innexins():
         n = w.neuron_network()
         # insert neurons.
         # save
-        # get the receptor (361), neurotransmitters (354), and innexins (355)
+        # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
         neurons = dict()
 
         def add_data_to_neuron(data_kind, relation_code):
@@ -185,13 +185,14 @@ def upload_receptors_and_innexins():
 
         add_data_to_neuron('receptor', 361)
         add_data_to_neuron('innexin', 355)
-        add_data_to_neuron('neurotransmitter', 354)
+        add_data_to_neuron('neurotransmitter', 313)
+        add_data_to_neuron('neuropeptide', 354)
 
         for neur in neurons:
             n.neuron(neurons[neur])
         n.save()
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded receptors and innexins")
+        print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
     except Exception:
         traceback.print_exc()
     finally:
