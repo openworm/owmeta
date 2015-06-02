@@ -133,7 +133,8 @@ def upload_neurons():
         cur = conn.cursor()
         ev = P.Evidence(title="C. elegans sqlite database")
         w = P.Worm()
-        n = w.neuron_network()
+        n = P.Network()
+        w.neuron_network(n)
         # insert neurons.
         # save
         cur.execute("""
@@ -234,7 +235,6 @@ def upload_synapses():
             pre, post, num, syntype = combining_dict[entry]
             c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
             n.synapse(c)
-        #print(len(combining_dict)) # = 170
 
         e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
         e.asserts(n)
