@@ -82,7 +82,6 @@ class DataIntegrityTest(unittest.TestCase):
     def tearDownClass(cls):
         PyOpenWorm.disconnect()
 
-    @unittest.expectedFailure
     def test_correct_neuron_number(self):
         """
         This test verifies that the worm model has exactly 302 neurons.
@@ -90,7 +89,6 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neurons())))
 
-    @unittest.expectedFailure
     def test_TH_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
@@ -144,9 +142,7 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_neuron_Syn_degree(self):
         """ Get the number of chemical synapses from a networkx representation """
-        # XXX: This result is 1 greater compared to what would be expected from the
-        # connectome.csv file
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 91)
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 90)
 
     @unittest.skip("have not yet defined asserts")
     def testWhatNodesGetTypeInfo(self):
@@ -278,8 +274,6 @@ class DataIntegrityTest(unittest.TestCase):
 
 
         xls_conns = combining_dict.values()
-
-        print(pow_conns)
 
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples
