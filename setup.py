@@ -21,9 +21,6 @@ class install(_install):
         self.do_egg_install()
         self.execute(_post_install, (), msg='Running post-install script(s)')
 
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
-
 long_description = open('README.md').read()
 
 setup(
