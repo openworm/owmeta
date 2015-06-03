@@ -42,7 +42,7 @@ setup(
     author_email = 'info@openworm.org',
     description = 'A Python library for working with OpenWorm data and models',
     long_description = long_description,
-    license = 'BSD',
+    license = 'MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
     download_url = 'https://github.com/openworm/PyOpenWorm/archive/master.zip',
     classifiers = [
