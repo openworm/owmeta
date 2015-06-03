@@ -157,10 +157,9 @@ class DataIntegrityTest(unittest.TestCase):
         for row in qres.result:
             print row
 
-    @unittest.expectedFailure
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
-        SAMPLE_CELL = 'ADAL'
+        SAMPLE_CELL = 'AVAL'
         xls_conns = []
         pow_conns = []
 
@@ -252,22 +251,35 @@ class DataIntegrityTest(unittest.TestCase):
 
         #Get connections from the sheet
         import xlrd
-        wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
-        sheet = wb.sheets()[0]
-        #Put every ADAL connection (except EMJs and Rs!) in a list as a tuple. This helps us compare them later
-        def floatToStr(x):
-            return str(int(x.value))
-        def sendOrGj(x):
-            if x.value == 'EJ':
-                return 'gapJunction'
-            else:
-                return 'send'
+        combining_dict = {}
+        # 's' is the workbook sheet
+        s = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
+        for row in range(1, s.nrows):
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and 'AVAL' in [s.cell(row, 0).value, s.cell(row, 1).value]:
+                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
+                #Also omitting 'NMJ' for the time being (no model in db)
+                pre = s.cell(row, 0).value
+                post = s.cell(row, 1).value
+                num = int(s.cell(row, 3).value)
+                if s.cell(row, 2).value == 'EJ':
+                    syntype = 'gapJunction'
+                elif s.cell(row, 2).value in ('S', 'Sp'):
+                    syntype = 'send'
 
-        for row in range(1, sheet.nrows):
-            if SAMPLE_CELL in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
-                string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
-                t = list(string_row)
-                xls_conns.append(t)
+                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
+                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
+                # values are lists if the form [pre, post, number, syntype].
+                string_key = '{},{},{}'.format(pre, post, syntype)
+                if string_key in combining_dict.keys():
+                    # if key already there, add to number
+                    num += int(combining_dict[string_key][3])
+
+                combining_dict[string_key] = [str(pre), str(post), str(syntype), str(int(num))]
+
+
+        xls_conns = combining_dict.values()
+
+        print(pow_conns)
 
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples
