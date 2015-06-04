@@ -117,6 +117,21 @@ Returns a set of all muscles::
 ```
 
 Add some evidence::
+
+```python
+>>> e = P.Evidence(author='Sulston et al.', date='1983')
+>>> avdl = P.Neuron(name="AVDL")
+>>> avdl.lineageName("AB alaaapalr")
+lineageName=`AB alaaapalr'
+>>> e.asserts(avdl)
+asserts=`AVDL'
+>>> e.asserts(avdl.lineageName)
+asserts=`lineageName=`AB alaaapalr'';`AVDL'
+>>> e.save()
+
+```
+
+
 ```python
 >>> e = P.Evidence(author='Sulston et al.', date='1983')
 >>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
@@ -128,8 +143,9 @@ asserts=`lineageName=`AB alaaapalr''
 See what some evidence stated::
 ```python
 >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
->>> list(e0.asserts())
-[Neuron(name=AVDL,lineageName=AB alaaapalr)]
+>>> assertions = e0.asserts()
+>>> assertions == {lineageName=`AB alaaapalr', AVDL}
+True
 
 ```
 
