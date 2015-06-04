@@ -11,13 +11,15 @@ def _post_install():
     import shutil, glob
 
     package_location = os.path.join(get_python_lib(), 'PyOpenWorm')
+    if not os.path.exists(package_location):
+        os.mkdir(package_location)
     pwd = os.path.dirname(os.path.realpath(__file__))
     script_location = os.path.join(pwd, 'OpenWormData', 'scripts')
     call([sys.executable, 'insert_worm.py'], cwd = script_location)
     # move created database files to your library's package directory
     db_files = glob.glob(os.path.join(script_location, 'worm.db*'))
     for db_file in db_files:
-        print('moving {} to {}'.format(db_file, package_location))
+        print('copying {} to {}'.format(db_file, package_location))
         os.chmod(db_file, 0777)
         shutil.copy(db_file, package_location)
 
