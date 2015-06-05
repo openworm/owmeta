@@ -12,7 +12,7 @@ import apsp
 import PyOpenWorm as P
 import numpy as np
 # Start PyOpenWorm
-P.connect('default.conf')
+P.connect()
 try:
     # make the matrix
     try:
