@@ -5,10 +5,7 @@ How to get a particular Neuron's gap junctions from the database.
 import PyOpenWorm as P
 
 #Connect to existing database.
-P.connect(conf=P.Data({
-    "rdf.source" : "ZODB",
-    "rdf.store_conf" : "../worm.db",
-}))
+P.connect()
 #Put the Worm's Network object in a variable.
 net = P.Worm().get_neuron_network()
 

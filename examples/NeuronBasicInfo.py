@@ -16,10 +16,7 @@ from __future__ import print_function
 import PyOpenWorm as P
 import os
 print(os.getcwd())
-P.connect(conf=P.Data({
-    "rdf.store_conf" : "../worm.db",
-    "rdf.source" : "ZODB"
-    }))
+P.connect()
 def get_names(it):
     res = []
     for x in it:
