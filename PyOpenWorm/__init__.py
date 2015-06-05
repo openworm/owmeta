@@ -136,16 +136,8 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False
     sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
 
-def connect(configFile=get_data('default.conf'),
-            conf=Data({
-                "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-                "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-                "rdf.source" : "ZODB",
-                "rdf.store" : "ZODB",
-                "rdf.store_conf" : get_data('worm.db'),
-                "user.email" : "jerry@cn.com",
-                "rdf.upload_block_statement_count" : 50
-            }),
+def connect(configFile=False,
+            conf=False,
             do_logging=False,
             data=False,
             dataFormat='n3'):
@@ -178,14 +170,16 @@ def connect(configFile=get_data('default.conf'),
     elif configFile:
         loadConfig(configFile)
     else:
-        try:
-            from pkg_resources import Requirement, resource_filename
-            filename = resource_filename(Requirement.parse("PyOpenWorm"),"PyOpenWorm/default.conf")
-            Configureable.conf = Data.open(filename)
-        except:
-            logging.info("Couldn't load default configuration")
-            traceback.print_exc()
-            Configureable.conf = Data()
+        conf=Data({
+            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+            "rdf.source" : "ZODB",
+            "rdf.store" : "ZODB",
+            "rdf.store_conf" : get_data('worm.db'),
+            "user.email" : "jerry@cn.com",
+            "rdf.upload_block_statement_count" : 50
+        })
+
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")
