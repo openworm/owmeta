@@ -77,8 +77,11 @@ __import__('__main__').connected = False
 # find package root, wherever you're executing it from
 _ROOT = __path__[0]
 def get_data(path):
-    return os.path.join(_ROOT, path)
-
+    from pkg_resources import Requirement, resource_filename
+    del sys.path[0]
+    filename = resource_filename(Requirement.parse("PyOpenWorm"),path)
+    sys.path.insert(0, '')
+    return filename
 
 def config(key=None):
     """
@@ -170,12 +173,12 @@ def connect(configFile=False,
     elif configFile:
         loadConfig(configFile)
     else:
-        conf=Data({
+        Configureable.conf = Data({
             "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
             "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
             "rdf.source" : "ZODB",
             "rdf.store" : "ZODB",
-            "rdf.store_conf" : get_data('worm.db'),
+            "rdf.store_conf" : get_data('PyOpenWorm/worm.db'),
             "user.email" : "jerry@cn.com",
             "rdf.upload_block_statement_count" : 50
         })
