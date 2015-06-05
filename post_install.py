@@ -10,8 +10,16 @@ user_id = os.stat(pwd).st_uid # this is the person that cloned the repo
 script_location = os.path.join(pwd, 'OpenWormData', 'scripts')
 user_script = 'insert_worm.py' # script(s) we want to be run as non-root
 
-print('Running {}'.format(user_script))
-call([sys.executable, user_script], cwd = script_location, preexec_fn=os.setuid(user_id))
+print('Running {} as UID {}'.format(user_script, user_id))
+pid = os.fork()
+if pid == 0:
+    #child process
+    try:
+        os.seteuid(user_id)
+        process = call([sys.executable, user_script], cwd = script_location)
+    finally:
+        os._exit(0)
+os.waitpid(pid, 0)
 # move created database files to your library's package directory
 db_files = glob.glob(os.path.join(script_location, 'worm.db*'))
 for db_file in db_files:
