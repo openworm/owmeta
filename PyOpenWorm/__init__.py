@@ -57,8 +57,7 @@ Classes
 __version__ = '0.5.0-alpha'
 __author__ = 'Stephen Larson'
 
-import traceback
-import sys
+import traceback, sys, os
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import *
@@ -74,6 +73,12 @@ from .my_neuroml import NeuroML
 from .connection import Connection
 
 __import__('__main__').connected = False
+
+# find package root, wherever you're executing it from
+_ROOT = __path__[0]
+def get_data(path):
+    return os.path.join(_ROOT, path)
+
 
 def config(key=None):
     """
@@ -131,8 +136,16 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False
     sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
 
-def connect(configFile='PyOpenWorm/default.conf',
-            conf=False,
+def connect(configFile=get_data('default.conf'),
+            conf=Data({
+                "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+                "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+                "rdf.source" : "ZODB",
+                "rdf.store" : "ZODB",
+                "rdf.store_conf" : get_data('worm.db'),
+                "user.email" : "jerry@cn.com",
+                "rdf.upload_block_statement_count" : 50
+            }),
             do_logging=False,
             data=False,
             dataFormat='n3'):
