@@ -1,10 +1,11 @@
 """
 How to load morphologies of certain cells from the database.
 """
+#this is an expected failure right now, as morphology is not implemented
 import PyOpenWorm as P
 
 #Connect to database.
-P.connect('default.conf')
+P.connect()
 
 #Create a new Cell object to work with.
 aval = P.Worm().get_neuron_network().aneuron('AVAL')
