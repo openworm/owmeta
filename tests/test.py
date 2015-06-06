@@ -831,6 +831,13 @@ from PintTest import PintTest
 # Need description of these tests
 from QuantityTest import QuantityTest
 
+# Tests from README.md
+class DocumentationTest(unittest.TestCase):
+    @unittest.expectedFailure
+    def test_readme(self):
+        [failure_count, return_count] = doctest.testfile("../README.md")
+        self.assertEqual(failure_count, 0)
+
 if __name__ == '__main__':
     from optparse import OptionParser
     parser = OptionParser()
@@ -875,10 +882,6 @@ if __name__ == '__main__':
         suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
     else:
         suite.addTests(all_tests)
-
-    #Add doctest to the test suite.
-    READMETestSuite = doctest.DocFileSuite("../README.md")
-    suite.addTests(READMETestSuite)
 
     res = runTests(suite)
     sys.exit(len(res.failures)>0)
