@@ -76,9 +76,10 @@ __import__('__main__').connected = False
 
 # find package root, wherever you're executing it from
 def get_data(path):
-    from pkg_resources import Requirement, resource_filename
-    del sys.path[0]
-    filename = resource_filename(Requirement.parse("PyOpenWorm"),path)
+    from pkgutil import get_loader
+    index = sys.path.index('') # find index of current directory in sys.path
+    del sys.path[index]
+    filename = os.path.join(get_loader('PyOpenWorm').filename, path)
     sys.path.insert(0, '')
     print(filename)
     return filename
@@ -178,7 +179,7 @@ def connect(configFile=False,
             "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
             "rdf.source" : "ZODB",
             "rdf.store" : "ZODB",
-            "rdf.store_conf" : get_data('PyOpenWorm/worm.db'),
+            "rdf.store_conf" : get_data('worm.db'),
             "user.email" : "jerry@cn.com",
             "rdf.upload_block_statement_count" : 50
         })
