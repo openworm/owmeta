@@ -5,10 +5,7 @@ database.
 
 import PyOpenWorm as P
 
-P.connect(conf=P.Data({
-    "rdf.store_conf" : "../worm.db",
-    "rdf.source" : "ZODB"
-    }))
+P.connect()
 def pp_connection(conn):
     print conn.pre_cell(), conn.post_cell(), conn.syntype(), conn.synclass(), conn.number()
 
