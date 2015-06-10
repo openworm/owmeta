@@ -6,6 +6,22 @@ import sqlite3
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 
+def serialize_as_n3():
+    dest = '../WormData.n3'
+    # XXX: Properties aren't initialized until the first object of a class is created,
+    #      so we create them here
+
+    for x in dir(P):
+        if isinstance(getattr(P, x), type) and issubclass(getattr(P, x), P.DataObject):
+            c = getattr(P, x)
+            if x == 'values':
+                c("dummy")
+            else:
+                c()
+    P.config('rdf.graph').serialize(dest, format='n3')
+    print('serialized to n3 file')
+
+
 def print_evidence():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
@@ -330,6 +346,7 @@ def do_insert(config="default.conf", logging=False):
         upload_synapses()
         upload_receptors_and_innexins()
         upload_types()
+        serialize_as_n3()
         #infer()
     except:
         traceback.print_exc()

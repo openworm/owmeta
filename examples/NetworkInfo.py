@@ -16,9 +16,7 @@ neuron names in the arbitrary list declared further below.
 import PyOpenWorm as P
 
 print("Connecting to the database...")
-P.connect(conf=P.Data({
-    "rdf.store_conf" : "../worm.db",
-    "rdf.source" : "ZODB"}))
+P.connect()
 
 #Get the worm object.
 worm = P.Worm()
