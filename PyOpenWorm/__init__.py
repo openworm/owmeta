@@ -75,12 +75,12 @@ from .connection import Connection
 __import__('__main__').connected = False
 
 # find package root, wherever you're executing it from
-_ROOT = __path__[0]
 def get_data(path):
     from pkg_resources import Requirement, resource_filename
     del sys.path[0]
     filename = resource_filename(Requirement.parse("PyOpenWorm"),path)
     sys.path.insert(0, '')
+    print(filename)
     return filename
 
 def config(key=None):

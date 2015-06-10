@@ -19,6 +19,7 @@ long_description = open('README.md').read()
 setup(
     name = 'PyOpenWorm',
     cmdclass = {'install': install},
+    zip_safe = False,
     install_requires=[
         'xlrd',
         'libneuroml',
