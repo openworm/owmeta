@@ -1,7 +1,6 @@
 import PyOpenWorm as P
 
-P.connect(conf=P.Data({"rdf.store_conf":"../worm.db",
-"rdf.source" : "ZODB" }))
+P.connect()
 
 class NC_neighbor(P.Property):
     def __init__(self, *args, **kwargs):
