@@ -77,8 +77,11 @@ __import__('__main__').connected = False
 # find package root, wherever you're executing it from
 def get_data(path):
     from pkgutil import get_loader
-    index = sys.path.index('') # find index of current directory in sys.path
-    del sys.path[index]
+    try:
+        index = sys.path.index('') # find index of pwd in sys.path
+        del sys.path[index]
+    except ValueError:
+        pass
     filename = os.path.join(get_loader('PyOpenWorm').filename, path)
     sys.path.insert(0, '')
     print(filename)
