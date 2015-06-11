@@ -92,7 +92,7 @@ u'AVAL'
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
-74
+90
 
 ```
 
@@ -102,8 +102,8 @@ Returns the list of all neurons::
 #NOTE: This is a VERY slow operation right now
 >>> len(set(net.neurons()))
 302
->>> set(net.neurons())
-set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
+>>> sorted(list(net.neurons())) # doctest:+ELLIPSIS
+[u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```
 
@@ -131,20 +131,17 @@ asserts=`lineageName=`AB alaaapalr'';`AVDL'
 
 ```
 
-
-```python
->>> e = P.Evidence(author='Sulston et al.', date='1983')
->>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
-asserts=`lineageName=`AB alaaapalr''
->>> e.save()
-
-```
-
 See what some evidence stated::
 ```python
 >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
 >>> assertions = e0.asserts()
->>> assertions == {lineageName=`AB alaaapalr', AVDL}
+
+# is the neuron's presence asserted?
+>>> avdl in list(e0.asserts())
+True
+
+# is the lineageName of the neuron asserted?
+>>> avdl.lineageName in list(e0.asserts())
 True
 
 ```
