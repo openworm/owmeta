@@ -6,11 +6,11 @@ python:
 # command to install dependencies
 # had to split requirements.txt into
 #  TWO files because they install all or none
-#  and dependencies installed later don't know 
+#  and dependencies installed later don't know
 #  about dependencies installed earlier in the process
 install:
-  - "python setup.py develop"
-     
+  - "python setup.py install"
 
-script:  
-  - ./runtests.sh
+
+script:
+  - "python tests/test.py"
