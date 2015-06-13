@@ -16,7 +16,7 @@ class Network(DataObject):
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
 
-        self.synapses = Network.ObjectProperty('synapse',owner=self,value_type=P.Connection, multiple=True)
+        self.synapses = Network.ObjectProperty('synapse', owner=self, value_type=P.Connection, multiple=True)
         Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
 
     def neurons(self):
@@ -62,6 +62,7 @@ class Network(DataObject):
 
         for x in n.load():
             yield x
+
     def interneurons(self):
         """
         Get all interneurons
@@ -77,4 +78,33 @@ class Network(DataObject):
         for x in n.load():
             yield x
 
+    def motor(self):
+        """
+        Get all motor
+
+        :returns: A iterable of all motor neurons
+        :rtype: iter(Neuron)
+        """
+
+        # TODO: make sure these belong to *this* Network
+        n = P.Neuron()
+        n.type('motor')
+
+        for x in n.load():
+            yield x
+
+    def identifier(self, *args, **kwargs):
+        ident = DataObject.identifier(self, *args, **kwargs)
+        if 'query' in kwargs and kwargs['query'] == True:
+            if not DataObject._is_variable(ident):
+                return ident
+        owners = self.getOwners(P.Worm().neuron_network.link)
+        data = []
+        for x in owners:
+            ident = x.identifier(query=True) # XXX: Query is set to true so a fixed identifier isn't generated randomly
+            if not DataObject._is_variable(ident):
+                data.append(ident)
+        data = sorted(data)
+
+        return self.make_identifier(data)
     #def neuroml(self):

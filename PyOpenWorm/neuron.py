@@ -70,6 +70,7 @@ class Connection(P.Property):
         for x in c:
             for r in x.load():
                 yield r
+
     def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
         """Get a list of connections associated with the owning neuron.
 
@@ -82,7 +83,6 @@ class Connection(P.Property):
            int
                The number of connections matching the paramters given
         """
-        # XXX: Turn this into a COUNT query
         options = dict()
         options["pre"] = """
                      ?x c:pre_cell ?z .
@@ -155,6 +155,10 @@ class Neuron(Cell):
         The receptor types associated with this neuron
     innexin : DatatypeProperty
         Innexin types associated with this neuron
+    neurotransmitter : DatatypeProperty
+        Neurotransmitters associated with this neuron
+    neuropeptide : DatatypeProperty
+        Name of the gene corresponding to the neuropeptide produced by this neuron
     neighbor : Property
         Get neurons connected to this neuron
     connection : Property
@@ -171,6 +175,7 @@ class Neuron(Cell):
         Neuron.DatatypeProperty("receptor", self, multiple=True)
         Neuron.DatatypeProperty("innexin", self, multiple=True)
         Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
+        Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
         ### Aliases ###
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
@@ -181,14 +186,10 @@ class Neuron(Cell):
         :returns: total number of incoming and outgoing gap junctions
         :rtype: int
         """
-
         count = 0
-        for item in self['nx'].in_edges_iter(self.name(),data=True):
-            if 'GapJunction' in item[2]['synapse']:
-                count = count + 1
-        for item in self['nx'].out_edges_iter(self.name(),data=True):
-            if 'GapJunction' in item[2]['synapse']:
-                count = count + 1
+        for c in self.connection():
+            if c.syntype.one() == 'gapJunction':
+                count += 1
         return count
 
     def Syn_degree(self):
@@ -198,36 +199,10 @@ class Neuron(Cell):
         :rtype: int
         """
         count = 0
-        for item in self['nx'].in_edges_iter(self.name(),data=True):
-            if 'Send' in item[2]['synapse']:
-                count = count + 1
-        for item in self['nx'].out_edges_iter(self.name(),data=True):
-            if 'Send' in item[2]['synapse']:
-                count = count + 1
+        for c in self.connection.get('either'):
+            if c.syntype.one() == 'send':
+                count += 1
         return count
-
-    def _type_semantic(self):
-        """Get type of this neuron (motor, interneuron, sensory)
-
-        Use the semantic database as the source
-
-        :returns: the type
-        :rtype: str
-        """
-
-        qres = self['rdf.graph'].query(
-          """SELECT ?objLabel     #we want to get out the labels associated with the objects
-           WHERE {
-              ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
-              ?node <http://openworm.org/entities/1515> ?object .# having identified that node, here we match an object associated with the node via the 'is a' property (number 1515)
-              ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
-            }""")
-
-        type = ''
-        for r in qres.result:
-            type = str(r[0])
-
-        return type
 
     def _type_networkX(self):
         """Get type of this neuron (motor, interneuron, sensory)
@@ -254,5 +229,9 @@ class Neuron(Cell):
        """
 
     def __str__(self):
-        return self.name()
+        n = self.name()
+        if n is not None:
+            return n
+        else:
+            return ""
 
