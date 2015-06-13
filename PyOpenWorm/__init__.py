@@ -59,8 +59,7 @@ Classes
 __version__ = '0.5.0-alpha'
 __author__ = 'Stephen Larson'
 
-import traceback
-import sys
+import traceback, sys, os
 from .configure import Configure,Configureable,ConfigValue,BadConf
 from .data import Data,DataUser,propertyTypes
 from .dataObject import *
@@ -78,6 +77,15 @@ from .experiment import Experiment
 from .channel import Channel,ChannelModel
 
 __import__('__main__').connected = False
+
+# find package root, wherever you're executing it from
+_ROOT = __path__[0]
+def get_data(path):
+    from pkg_resources import Requirement, resource_filename
+    del sys.path[0]
+    filename = resource_filename(Requirement.parse("PyOpenWorm"),path)
+    sys.path.insert(0, '')
+    return filename
 
 def config(key=None):
     """
@@ -103,24 +111,39 @@ def disconnect(c=False):
 
     if c == False:
         c = Configureable.conf
+
     if c != False:
         c.closeDatabase()
+
     m.connected = False
 
 
-def loadData(data='OpenWormData/WormData.n3', dataFormat='n3'):
+def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False):
     """
     Load data into the underlying database of this library.
 
+    XXX: This is only guaranteed to work with the ZODB database.
+
     :param data: (Optional) Specify the file to load into the library
     :param dataFormat: (Optional) Specify the file format to load into the library.  Currently n3 is supported
-    :return:
+    :param skipIfNewer: (Optional) Skips loading of data if the database file is newer
+                        than the data to be loaded in. This is determined by the modified time on the main
+                        database file compared to the modified time on the data file.
     """
-    if data:
-        sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!")
-        config()['rdf.graph'].parse(data, format=dataFormat)
+    if skipIfNewer:
+        import os
+        try:
+            data_file_time=os.path.getmtime(data)
+            db_file_time=os.path.getmtime(config('rdf.store_conf'))
+            print db_file_time, data_file_time
+            if data_file_time < db_file_time:
+                return
+        except:
+            pass
+    sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
+    config('rdf.graph').parse(data, format=dataFormat)
 
-def connect(configFile='PyOpenWorm/default.conf',
+def connect(configFile=False,
             conf=False,
             do_logging=False,
             data=False,
@@ -133,7 +156,6 @@ def connect(configFile='PyOpenWorm/default.conf',
     :param do_logging: (Optional) If true, turn on debug level logging
     :param data: (Optional) If provided, specify the file to load into the library
     :param dataFormat: (Optional) If provided, specify the file format to load into the library. Currently n3 is supported
-    :return:
     """
     import logging
     import atexit
@@ -146,22 +168,25 @@ def connect(configFile='PyOpenWorm/default.conf',
         logging.basicConfig(level=logging.DEBUG)
 
     if conf:
-        Configureable.conf = conf
         if not isinstance(conf, Data):
             # Initializes a Data object with
             # the Configureable.conf
-            Configureable.conf = Data()
+            Configureable.conf = Data(conf)
+        else:
+            Configureable.conf = conf
     elif configFile:
         loadConfig(configFile)
     else:
-        try:
-            from pkg_resources import Requirement, resource_filename
-            filename = resource_filename(Requirement.parse("PyOpenWorm"),"db/default.conf")
-            Configureable.conf = Data.open(filename)
-        except:
-            logging.info("Couldn't load default configuration")
-            traceback.print_exc()
-            Configureable.conf = Data()
+        Configureable.conf = Data({
+            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
+            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+            "rdf.source" : "ZODB",
+            "rdf.store" : "ZODB",
+            "rdf.store_conf" : get_data('PyOpenWorm/worm.db'),
+            "user.email" : "jerry@cn.com",
+            "rdf.upload_block_statement_count" : 50
+        })
+
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")
