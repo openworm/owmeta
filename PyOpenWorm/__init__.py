@@ -74,17 +74,17 @@ from .connection import Connection
 
 __import__('__main__').connected = False
 
-# find package root, wherever you're executing it from
 def get_data(path):
+    # get a resource from the installed package location
+    from distutils.sysconfig import get_python_lib
     from pkgutil import get_loader
-    try:
-        index = sys.path.index('') # find index of pwd in sys.path
-        del sys.path[index]
-    except ValueError:
-        pass
-    filename = os.path.join(get_loader('PyOpenWorm').filename, path)
-    sys.path.insert(0, '')
-    print(filename)
+    from glob import glob
+    package_paths = glob(os.path.join(get_python_lib(), '*'))
+    sys.path = package_paths + sys.path
+    installed_package_root = get_loader('PyOpenWorm').filename
+    sys.path = sys.path[len(package_paths):]
+    filename = os.path.join(installed_package_root, path)
+    print('loading from {}'.format(filename))
     return filename
 
 def config(key=None):
