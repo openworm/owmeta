@@ -43,7 +43,7 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all muscles objects
+        Get all Muscle objects attached to the Worm
 
         :returns: A set of all muscles
         :rtype: set
@@ -54,7 +54,6 @@ class Worm(DataObject):
         for x in self.muscle.get():
             yield x
 
-
     def get_semantic_net(self):
         """
          Get the underlying semantic network as an RDFLib Graph
@@ -63,7 +62,7 @@ class Worm(DataObject):
         :rtype: rdflib.ConjunctiveGraph
          """
 
-        return self['semantic_net']
+        return self.rdf
 
     def identifier(self, *args, **kwargs):
         # Shamelessly copy-pasted from cell.py
@@ -79,16 +78,9 @@ class Worm(DataObject):
             if not DataObject._is_variable(ident):
                 return ident
 
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name.one()
-                return self.make_identifier(n)
-            else:
-                return ident
+        if self.name.hasValue():
+            # name is already set, so we can make an identifier from it
+            n = next(self.name._get())
+            return self.make_identifier(n)
         else:
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name.one()
-                return self.make_identifier(n)
-            else:
-                return ident
+            return ident
