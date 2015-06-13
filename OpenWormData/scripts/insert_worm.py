@@ -6,6 +6,22 @@ import sqlite3
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 
+def serialize_as_n3():
+    dest = '../WormData.n3'
+    # XXX: Properties aren't initialized until the first object of a class is created,
+    #      so we create them here
+
+    for x in dir(P):
+        if isinstance(getattr(P, x), type) and issubclass(getattr(P, x), P.DataObject):
+            c = getattr(P, x)
+            if x == 'values':
+                c("dummy")
+            else:
+                c()
+    P.config('rdf.graph').serialize(dest, format='n3')
+    print('serialized to n3 file')
+
+
 def print_evidence():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
@@ -144,7 +160,7 @@ def upload_neurons():
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
-        ev.asserts(w)
+        ev.asserts(n)
         ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded neurons")
@@ -158,11 +174,10 @@ def upload_receptors_and_innexins():
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
         w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
+        n = w.neuron_network()
         # insert neurons.
         # save
-        # get the receptor (361), neurotransmitters (354), and innexins (355)
+        # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
         neurons = dict()
 
         def add_data_to_neuron(data_kind, relation_code):
@@ -179,8 +194,6 @@ def upload_receptors_and_innexins():
             for r in cur.fetchall():
                 name = str(r[0])
                 data = str(r[1])
-                if name == "AVAL":
-                    print (data)
 
                 if not (name in neurons):
                     neurons[name] = P.Neuron(name=name)
@@ -189,13 +202,14 @@ def upload_receptors_and_innexins():
 
         add_data_to_neuron('receptor', 361)
         add_data_to_neuron('innexin', 355)
-        add_data_to_neuron('neurotransmitter', 354)
+        add_data_to_neuron('neurotransmitter', 313)
+        add_data_to_neuron('neuropeptide', 354)
 
         for neur in neurons:
             n.neuron(neurons[neur])
         n.save()
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded receptors and innexins")
+        print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
     except Exception:
         traceback.print_exc()
     finally:
@@ -203,27 +217,42 @@ def upload_receptors_and_innexins():
 
 def upload_synapses():
     import xlrd
- 
+
     try:
         w = P.Worm()
         n = P.Network()
         w.neuron_network(n)
-        #second step, get synapses and gap junctions and add them to the graph
+        combining_dict = {}
+        # Get synapses and gap junctions and add them to the graph
         s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(row, 2).value not in ('R', 'Rp', 'NMJ'):
-                #We're not going to include 'receives' since they're just the inverse of 'sends'
-                #Also omitting NMJ for the time being
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and 'AVAL' in [s.cell(row, 0).value, s.cell(row, 1).value]:
+                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
+                #Also omitting 'NMJ' for the time being (no model in db)
                 pre = s.cell(row, 0).value
                 post = s.cell(row, 1).value
+                num = int(s.cell(row, 3).value)
                 if s.cell(row, 2).value == 'EJ':
                     syntype = 'gapJunction'
-                else:
+                elif s.cell(row, 2).value in ('S', 'Sp'):
                     syntype = 'send'
-                num = int(s.cell(row, 3).value)
-                c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
-                n.synapse(c)
-        e = P.Evidence(author='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
+
+                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
+                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
+                # values are lists if the form [pre, post, number, syntype].
+                string_key = '{},{},{}'.format(pre, post, syntype)
+                if string_key in combining_dict.keys():
+                    # if key already there, add to number
+                    num += combining_dict[string_key][2]
+
+                combining_dict[string_key] = [pre, post, num, syntype]
+
+        for entry in combining_dict:
+            pre, post, num, syntype = combining_dict[entry]
+            c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
+            n.synapse(c)
+
+        e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
         e.asserts(n)
         e.save()
         print('uploaded synapses')
@@ -250,11 +279,9 @@ def upload_types():
         data[name] = types
 
     for name in data:
-        print("upload_types: neuron "+str(name))
         n = P.Neuron(name=name)
         types = data[name]
         for t in types:
-            print("setting type {} for {}.".format(t, name))
             n.type(t)
         net.neuron(n)
     ev.asserts(net)
@@ -308,12 +335,18 @@ def do_insert(config="default.conf", logging=False):
 
     P.connect(conf=config, do_logging=logging)
     try:
+        w = P.Worm()
+        net = P.Network()
+        w.neuron_network(net)
+        w.save()
+
         upload_neurons()
         upload_muscles()
         upload_lineage_and_descriptions()
         upload_synapses()
         upload_receptors_and_innexins()
         upload_types()
+        serialize_as_n3()
         #infer()
     except:
         traceback.print_exc()
