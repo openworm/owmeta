@@ -72,7 +72,7 @@ class Configure:
                 c[k] = _C(d[k])
             f.close()
             return c
-        except Exception, e:
+        except Exception as e:
             raise BadConf(e)
 
     def copy(self,other):
