@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.insert(0,".")
 import unittest
 import neuroml
 import neuroml.writers as writers
-import sys
-sys.path.insert(0,".")
 import PyOpenWorm
 from PyOpenWorm import *
 import test_data as TD
@@ -13,17 +13,27 @@ import rdflib
 import rdflib as R
 import pint as Q
 import os
+import subprocess as SP
 import subprocess
 import tempfile
+import doctest
+
+from glob import glob
 
 USE_BINARY_DB = False
-BINARY_DB = "OpenWormData/scripts/worm.db"
-
+BINARY_DB = "OpenWormData/worm.db"
+TEST_CONFIG = "tests/default_test.conf"
 try:
     import bsddb
     has_bsddb = True
 except ImportError:
     has_bsddb = False
+
+try:
+    import numpy
+    has_numpy = True
+except ImportError:
+    has_numpy = False
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
@@ -39,10 +49,6 @@ def make_graph(size=100):
         o = rdflib.URIRef("http://somehost.com/o"+str(i))
         g.add((s,p,o))
     return g
-try:
-    TEST_CONFIG = Configure.open("tests/_test.conf")
-except:
-    TEST_CONFIG = Configure.open("tests/test_default.conf")
 
 def delete_zodb_data_store(path):
     os.unlink(path)
@@ -50,258 +56,22 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
+# Need description of these tests
+from ExampleRunnerTest import ExampleRunnerTest
 
-class ExampleRunnerTest(unittest.TestCase):
-    """ Try to run the examples to make sure we didn't break the API for them. """
+# Need description of these tests
+from DataIntegrityTest import DataIntegrityTest
 
-    #Currently these are all failing because we aren't reproducing the actual data that
-    # a user gets when they grab the code for the first time
-    
-    def setUp(self):
-        os.chdir('examples')
+# Need description of these tests
+from ConfigureTest import ConfigureTest
 
-    @unittest.expectedFailure
-    def test_run_NeuronBasicInfo(self):
-        execfile("NeuronBasicInfo.py")
-        pass
+# Need description of these tests
+from ConfigureableTest import ConfigureableTest
 
-    @unittest.expectedFailure
-    def test_run_NetworkInfo(self):
-        execfile("NetworkInfo.py")
-        pass
+# Need description of these tests
+from DataObjectTestToo import DataObjectTestToo
 
-    @unittest.expectedFailure
-    def test_run_morpho(self):
-        execfile("morpho.py")
-        pass
-
-    @unittest.skip("currently takes way too long to run")
-    def test_gap_junctions(self):
-        execfile("gap_junctions.py")
-        pass
-    @unittest.expectedFailure
-    def test_add_reference(self):
-        execfile("add_reference.py")
-        pass
-
-    @unittest.expectedFailure
-    def test_rmgr(self):
-        execfile("rmgr.py")
-        pass
-
-    @unittest.skip("requires numpy -- we don't want to add it as a dependency for now")
-    def test_shortest_path(self):
-        execfile("shortest_path.py")
-        pass
-
-    @unittest.skip("currently takes way too long to run")
-    def test_bgp(self):
-        execfile("test_bgp.py")
-        pass
-
-    def tearDown(self):
-        os.chdir('..')
-
-class DataIntegrityTest(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        import csv
-
-        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
-
-        if not USE_BINARY_DB:
-            #use a simple graph from rdflib so we can look directly at the structure of the data
-            cls.g = rdflib.Graph("ZODB") #declare class-level scope
-            #load in the database
-            cls.g.parse("OpenWormData/WormData.n3", format="n3")
-        else:
-            conf = Configure(**{ "rdf.source" : "ZODB", "rdf.store_conf" : BINARY_DB })
-            PyOpenWorm.connect(conf=conf)
-            cls.g = PyOpenWorm.config('rdf.graph')
-
-        #grab the list of the names of the 302 neurons
-
-        csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-
-        for row in reader:
-            if len(row[0]) > 0: # Only saves valid neuron names
-                cls.neurons.append(row[0])
-    @classmethod
-    def tearDownClass(cls):
-        if USE_BINARY_DB:
-            PyOpenWorm.disconnect()
-
-    def testUniqueNeuronNode(self):
-        """
-        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
-        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
-        """
-
-        results = {}
-        for n in self.neurons:
-            #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
-            qres = self.g.query('SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' + n + '\" } LIMIT 5')
-            results[n] = (len(qres.result), [x[0] for x in qres.result])
-
-        # If there is not only one result back, then there is more than one RDF node.
-        more_than_one = [(x, results[x]) for x in results if results[x][0] > 1]
-        less_than_one = [(x, results[x]) for x in results if results[x][0] < 1]
-        self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
-        self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
-
-    def testNeuronsHaveTypes(self):
-        """
-        Every Neuron should have a non-blank type
-        """
-        results = set()
-        for n in self.neurons:
-            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". ' #per node ?s that has the name of a neuron associated
-                                + '?k <http://openworm.org/entities/Cell/name> ?s .'
-                                + '?k <http://openworm.org/entities/Neuron/type> ?o .' #look up its listed type ?o
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } ' #for that type ?o, get its property ?tp and its value ?v
-                                )
-            for x in qres:
-                v = x[0]
-                if isinstance(v,R.Literal):
-                    results.add(n)
-
-        # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
-        self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
-
-    @unittest.skip("have not yet defined asserts")
-    def testWhatNodesGetTypeInfo(self):
-        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                                  '?o ?p ?s} ' #for that type ?o, get its value ?v
-                                + 'LIMIT 10')
-        for row in qres.result:
-            print row
-
-    def test_compare_to_xls(self):
-        """ Compare the PyOpenWorm connections to the data in the spreadsheet """
-        SAMPLE_CELL = 'ADAL'
-        xls_conns = []
-        pow_conns = []
-
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
-                               #############################################################
-                               # Find connections that have the ?pre_name as our passed in value
-                               #############################################################
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-
-                               #############################################################
-                               # Find all the cells that are on the post side of those
-                               #  connections and bind their names to ?post_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?post_name))}""")
-        def ff(x):
-            return str(x.value)
-        for line in qres.result:
-            t = list(map(ff, line))
-            t.insert(0,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
-            pow_conns.append(t)
-
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
-        qres = self.g.query("""SELECT ?pre_name ?type (STR(?num) AS ?numval) WHERE {
-                               #############################################################
-                               # Find connections that have the ?post_name as our passed in value
-                               #############################################################
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
-
-                               #############################################################
-                               # Find all the cells that are on the pre side of those
-                               #  connections and bind their names to ?pre_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?pre_name))}""")
-        def ff(x):
-            return str(x.value)
-        for line in qres.result:
-            t = list(map(ff, line))
-            t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
-            pow_conns.append(t)
-
-        #Get connections from the sheet
-        import xlrd
-        wb = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls')
-        sheet = wb.sheets()[0]
-        #Put every ADAL connection (except EMJs and Rs!) in a list as a tuple. This helps us compare them later
-        def floatToStr(x):
-            return str(int(x.value))
-        def sendOrGj(x):
-            if x.value == 'EJ':
-                return 'gapJunction'
-            else:
-                return 'send'
-
-        for row in range(1, sheet.nrows):
-            if SAMPLE_CELL in [sheet.cell(row, 0).value, sheet.cell(row, 1).value] and sheet.cell(row, 2).value in ['S', 'Sp', 'EJ']:
-                string_row = [str(sheet.cell(row, 0).value), str(sheet.cell(row, 1).value), sendOrGj(sheet.cell(row, 2)), floatToStr(sheet.cell(row, 3))]
-                t = list(string_row)
-                xls_conns.append(t)
-
-        #assert that these two sorted lists are the same
-        #using sorted lists because Set() removes multiples
-
-        errorMsg = str(str(sorted(pow_conns)) + "\n***********************************\n" + str(sorted(xls_conns)))
-
-        self.assertTrue(sorted(pow_conns) == sorted(xls_conns), errorMsg)
-
-@unittest.skipIf((TEST_CONFIG['rdf.source'] == 'Sleepycat') and (has_bsddb==False), "Sleepycat store will not work without bsddb")
 class _DataTest(unittest.TestCase):
-    TestConfig = TEST_CONFIG
     def delete_dir(self):
         self.path = self.TestConfig['rdf.store_conf']
         try:
@@ -317,8 +87,9 @@ class _DataTest(unittest.TestCase):
                 raise e
     def setUp(self):
         # Set do_logging to True if you like walls of text
+        self.TestConfig = Configure.open(TEST_CONFIG)
         td = '__tempdir__'
-        z=self.TestConfig['rdf.store_conf']
+        z = self.TestConfig['rdf.store_conf']
         if z.startswith(td):
             x = z[len(td):]
             h=tempfile.mkdtemp()
@@ -374,74 +145,6 @@ class WormTest(_DataTest):
         g0 = Worm().get_semantic_net()
         self.assertTrue(isinstance(g0, rdflib.ConjunctiveGraph))
 
-class ConfigureTest(unittest.TestCase):
-    def test_fake_config(self):
-        """ Try to retrieve a config value that hasn't been set """
-        with self.assertRaises(KeyError):
-            c = Configure()
-            c['not_a_valid_config']
-
-    def test_literal(self):
-        """ Assign a literal rather than a ConfigValue"""
-        c = Configure()
-        c['seven'] = "coke"
-        self.assertEqual(c['seven'], "coke")
-
-    def test_ConfigValue(self):
-        """ Assign a ConfigValue"""
-        c = Configure()
-        class pipe(ConfigValue):
-            def get(self):
-                return "sign"
-        c['seven'] = pipe()
-        self.assertEqual("sign",c['seven'])
-
-    def test_getter_no_ConfigValue(self):
-        """ Assign a method with a "get". Should return a the object rather than calling its get method """
-        c = Configure()
-        class pipe:
-            def get(self):
-                return "sign"
-        c['seven'] = pipe()
-        self.assertIsInstance(c['seven'], pipe)
-
-    def test_late_get(self):
-        """ "get" shouldn't be called until the value is *dereferenced* """
-        c = Configure()
-        a = {'t' : False}
-        class pipe(ConfigValue):
-            def get(self):
-                a['t'] = True
-                return "sign"
-        c['seven'] = pipe()
-        self.assertFalse(a['t'])
-        self.assertEqual(c['seven'], "sign")
-        self.assertTrue(a['t'])
-
-    def test_read_from_file(self):
-        """ Read configuration from a JSON file """
-        try:
-            d = Data.open("tests/test.conf")
-            self.assertEqual("test_value", d["test_variable"])
-        except:
-            self.fail("test.conf should exist and be valid JSON")
-
-    def test_read_from_file_fail(self):
-        """ Fail on attempt to read configuration from a non-JSON file """
-        with self.assertRaises(ValueError):
-            Data.open("tests/bad_test.conf")
-
-class ConfigureableTest(unittest.TestCase):
-    def test_init_empty(self):
-        """Ensure Configureable gets init'd with the defalut if nothing's given"""
-        i = Configureable()
-        self.assertEqual(Configureable.conf,i.conf)
-
-    def test_init_False(self):
-        """Ensure Configureable gets init'd with the defalut if False is given"""
-        i = Configureable(conf=False)
-        self.assertEqual(Configureable.conf, i.conf)
-
 class CellTest(_DataTest):
 
     def test_DataUser(self):
@@ -486,7 +189,8 @@ class CellTest(_DataTest):
         Tests for anterior, posterior, left, right, ventral, dorsal divisions
         """
         p = Cell(name="peas")
-        p.lineageName("ab.tahsuetoahusenoat")
+        base = 'ab.tahsuetoahusenoat'
+        p.lineageName(base)
         p.save()
 
         c = ["carrots",
@@ -499,10 +203,8 @@ class CellTest(_DataTest):
         division_directions = "alvpdr"
 
         for x,l in zip(c, division_directions):
-            base = 'ab.tahsuetoahusenoat'
             ln = base + l
             Cell(name=x,lineageName=ln).save()
-
         names = set(str(x.name()) for x in p.parentOf())
         self.assertEqual(set(c), names)
 
@@ -510,12 +212,14 @@ class CellTest(_DataTest):
         """
         Test that we can get the parent of a cell
         """
+        base = "ab.tahsuetoahusenoat"
+        child = base + "u"
         p = Cell(name="peas")
-        p.lineageName("ab.tahsuetoahusenoat")
+        p.lineageName(base)
         p.save()
 
         c = Cell(name="carrots")
-        c.lineageName("ab.tahsuetoahusenoatu")
+        c.lineageName(child)
         c.save()
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
@@ -585,13 +289,6 @@ class DataObjectTest(_DataTest):
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
-
-class DataObjectTestToo(unittest.TestCase):
-    def test_helpful_message_on_non_connection(self):
-        """ The message should say something about connecting """
-        Configureable.conf = False # Ensure that we are disconnected
-        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
-            do = DataObject()
 
 class DataUserTest(_DataTest):
 
@@ -730,26 +427,11 @@ class NeuronTest(_DataTest):
         c = Neuron(lineageName="AB plapaaaap")
         self.assertEqual(c.name(), 'ADAL')
 
-    def test_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
-        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
-        # on the configured RDF graph, seeded by this test
-        self.assertEqual(self.neur('AVAL').GJ_degree(),60)
-
-    def test_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
-        # XXX: This test depends on a remote-hosted CSV file. Change it to depend
-        # on the configured RDF graph, seeded by this test
-        self.assertEqual(self.neur('AVAL').Syn_degree(),74)
-
 
 class NetworkTest(_DataTest):
     def setUp(s):
         _DataTest.setUp(s)
         s.net = Network(conf=s.config)
-
-    def test(self):
-        self.assertTrue(isinstance(self.net,Network))
 
     def test_aneuron(self):
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
@@ -863,7 +545,8 @@ class EvidenceTest(_DataTest):
         self.assertIn('tom@cn.com', author)
 
     def test_asserts_query_multiple(self):
-        """ Show that setting the evidence with distinct objects yields distinct results """
+        """ Show that setting the evidence with distinct objects yields
+            distinct results """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)
@@ -880,10 +563,11 @@ class EvidenceTest(_DataTest):
             y = x.year()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
-            self.assertTrue((a == 'tom@cn.com' and y is None) or (a is None and int(y) == 1999))
+            self.assertTrue(a == 'tom@cn.com' and int(y) == 1999)
 
     def test_asserts_query_multiple_author_matches(self):
-        """ Show that setting the evidence with distinct objects yields distinct results even if there are matching values """
+        """ Show that setting the evidence with distinct objects yields
+        distinct results even if there are matching values """
         e = Evidence(author='tom@cn.com')
         r = Relationship(make_graph(10))
         e.asserts(r)
@@ -896,135 +580,6 @@ class EvidenceTest(_DataTest):
         e0 = Evidence()
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
-
-class RDFLibTest(unittest.TestCase):
-    """Test for RDFLib."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.ns = {"ns1" : "http://example.org/"}
-    def test_uriref_not_url(self):
-        try:
-            rdflib.URIRef("daniel@example.com")
-        except:
-            self.fail("Doesn't actually fail...which is weird")
-    def test_uriref_not_id(self):
-        """ Test that rdflib throws up a warning when we do something bad """
-        #XXX: capture the logged warning
-        import cStringIO
-        import logging
-
-        out = cStringIO.StringIO()
-        logger = logging.getLogger()
-        stream_handler = logging.StreamHandler(out)
-        logger.addHandler(stream_handler)
-        try:
-            rdflib.URIRef("some random string")
-        finally:
-            logger.removeHandler(stream_handler)
-        v = out.getvalue()
-        out.close()
-        self.assertRegexpMatches(str(v), r".*some random string.*")
-
-    def test_BNode_equality1(self):
-        a = rdflib.BNode("some random string")
-        b = rdflib.BNode("some random string")
-        self.assertEqual(a, b)
-
-    def test_BNode_equality2(self):
-        a = rdflib.BNode()
-        b = rdflib.BNode()
-        self.assertNotEqual(a, b)
-
-#class TimeTest(unittest.TestCase):
-    #def test_datetime_isoformat_has_timezone(self):
-        #time_stamp = now(utc).isoformat()
-        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
-
-class PintTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.ur = Q.UnitRegistry()
-        self.Q = self.ur.Quantity
-    def test_atomic_short(self):
-        q = self.Q(23, "mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_singular(self):
-        q = self.Q(23, "milliliter")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_plural(self):
-        q = self.Q(23, "milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_atomic_long_plural_to_string(self):
-        #XXX: Maybe there's a way to have the unit name pluralized...
-        q = self.Q(23, "milliliters")
-        self.assertEqual("23 milliliter", str(q))
-
-    def test_string_init_long_plural_to_string(self):
-        #XXX: Maybe there's a way to have the unit name pluralized...
-        q = self.Q("23 milliliters")
-        self.assertEqual("23 milliliter", str(q))
-
-    def test_string_init_short(self):
-        q = self.Q("23 mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_short_no_space(self):
-        q = self.Q("23mL")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_long_singular(self):
-        q = self.Q("23 milliliter")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_string_init_long_plural(self):
-        q = self.Q("23 milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual(23, q.magnitude)
-
-    def test_init_magnitude_with_string(self):
-        """ Pint doesn't care if you don't give it a number """
-        q = self.Q("23", "milliliters")
-        self.assertEqual("milliliter", str(q.units))
-        self.assertEqual("23", q.magnitude)
-
-        q = self.Q("worm", "milliliters")
-        self.assertEqual("worm", q.magnitude)
-
-class QuantityTest(unittest.TestCase):
-    def test_string_init_short(self):
-        q = Quantity.parse("23 mL")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_string_init_volume(self):
-        q = Quantity.parse("23 inches^3")
-        self.assertEqual("inch ** 3", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_string_init_compound(self):
-        q = Quantity.parse("23 inches/second")
-        self.assertEqual("inch / second", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_atomic_short(self):
-        q = Quantity(23, "mL")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
-
-    def test_atomic_long(self):
-        q = Quantity(23, "milliliters")
-        self.assertEqual("milliliter", q.unit)
-        self.assertEqual(23, q.value)
 
 class ConnectionTest(_DataTest):
     def setUp(self):
@@ -1112,128 +667,6 @@ class MuscleTest(_DataTest):
 
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
-
-class DataTest(unittest.TestCase):
-    def test_namespace_manager(self):
-        c = Configure()
-        c['rdf.source'] = 'default'
-        c['rdf.store'] = 'default'
-        Configureable.conf = c
-        d = Data()
-        d.openDatabase()
-
-        self.assertIsInstance(d['rdf.namespace_manager'], R.namespace.NamespaceManager)
-
-    def test_init_no_rdf_store(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-        except:
-            self.fail("Bad state")
-
-    def test_ZODB_persistence(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        fname ='ZODB.fs'
-        c['rdf.source'] = 'ZODB'
-        c['rdf.store_conf'] = fname
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-            g = make_graph(20)
-            for x in g:
-                d['rdf.graph'].add(x)
-            d.closeDatabase()
-
-            d.openDatabase()
-            self.assertEqual(20, len(list(d['rdf.graph'])))
-            d.closeDatabase()
-        except:
-            traceback.print_exc()
-            self.fail("Bad state")
-        delete_zodb_data_store(fname)
-
-    @unittest.skipIf((has_bsddb==False), "Sleepycat requires working bsddb")
-    def test_Sleepycat_persistence(self):
-        """ Should be able to init without these values """
-        c = Configure()
-        fname='Sleepycat_store'
-        c['rdf.source'] = 'Sleepycat'
-        c['rdf.store_conf'] = fname
-        Configureable.conf = c
-        d = Data()
-        try:
-            d.openDatabase()
-            g = make_graph(20)
-            for x in g:
-                d['rdf.graph'].add(x)
-            d.closeDatabase()
-
-            d.openDatabase()
-            self.assertEqual(20, len(list(d['rdf.graph'])))
-            d.closeDatabase()
-        except:
-            traceback.print_exc()
-            self.fail("Bad state")
-
-        subprocess.call("rm -rf "+fname, shell=True)
-
-    def test_trix_source(self):
-        """ Test that we can load the datbase up from an XML file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'trix'
-        c['rdf.store'] = 'default'
-        c['trix_location'] = f[1]
-
-        with open(f[1],'w') as fo:
-            fo.write(TD.TriX_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
-        os.unlink(f[1])
-
-    def test_trig_source(self):
-        """ Test that we can load the datbase up from a trig file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'serialization'
-        c['rdf.serialization'] = f[1]
-        c['rdf.serialization_format'] = 'trig'
-        c['rdf.store'] = 'default'
-        with open(f[1],'w') as fo:
-            fo.write(TD.Trig_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
 
 class PropertyTest(_DataTest):
     def test_one(self):
@@ -1375,11 +808,35 @@ class SimplePropertyTest(_DataTest):
             owner_type = DataObject
 
         sp = T(owner=do)
-        self.assertNotEqual(len(list(sp.triples())), 0)
-        self.assertNotEqual(len(list(sp.triples(query=True))), 0)
+        self.assertEqual(len(list(sp.triples())), 0)
+        self.assertEqual(len(list(sp.triples(query=True))), 0)
 
 class NeuroMLTest(_DataTest):
     pass
+
+# Need description of these tests
+from DataTest import DataTest
+
+# Need description of these tests
+from RDFLibTest import RDFLibTest
+
+#class TimeTest(unittest.TestCase):
+    #def test_datetime_isoformat_has_timezone(self):
+        #time_stamp = now(utc).isoformat()
+        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
+
+# Need description of these tests
+from PintTest import PintTest
+
+# Need description of these tests
+from QuantityTest import QuantityTest
+
+# Tests from README.md
+class DocumentationTest(unittest.TestCase):
+    @unittest.expectedFailure
+    def test_readme(self):
+        [failure_count, return_count] = doctest.testfile("../README.md")
+        self.assertEqual(failure_count, 0)
 
 if __name__ == '__main__':
     from optparse import OptionParser
@@ -1390,5 +847,41 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
-    args = [sys.argv[0]] + args # We have to add back the first argument after parse_args
-    unittest.main(argv=args)
+
+    def getTests(testCase):
+        return unittest.TestLoader().loadTestsFromTestCase(testCase)
+
+    def runTests(suite):
+        return unittest.TextTestRunner().run(suite)
+
+    all_tests = []
+    configs = glob("tests/test_*.conf")
+    if not has_bsddb:
+        configs = [x for x in configs if 'Sleepycat' not in x]
+    print "Testing with configs:",configs
+    for x in configs:
+        TEST_CONFIG = x
+        suite = unittest.TestSuite()
+        suite.addTests(getTests(x) for x in _DataTest.__subclasses__())
+        all_tests.append(suite)
+
+    suite = unittest.TestSuite()
+    classes = filter(lambda x : isinstance(x, type), globals().values())
+    non_DataTestTests = (x for x in classes if (issubclass(x, unittest.TestCase) and not issubclass(x,  _DataTest)))
+    suite.addTests(getTests(x) for x in non_DataTestTests)
+    all_tests.append(suite)
+
+    all_tests_flattened = []
+    for x in all_tests:
+        for y in x:
+            for z in y:
+                all_tests_flattened.append(z)
+
+    suite = unittest.TestSuite()
+    if len(args) == 1:
+        suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
+    else:
+        suite.addTests(all_tests)
+
+    res = runTests(suite)
+    sys.exit(len(res.failures)>0)

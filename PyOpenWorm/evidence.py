@@ -95,6 +95,8 @@ class Evidence(DataObject):
         The title of the evidence
     year : DatatypeProperty
         The date (e.g., publication date) of the evidence
+    uri : DatatypeProperty
+        A URL that points to evidence
 
     Parameters
     ----------
@@ -110,6 +112,8 @@ class Evidence(DataObject):
         The title of the evidence
     year : string or int
         The date (e.g., publication date) of the evidence
+    uri : string
+        A URL that points to evidence
     """
     def __init__(self, conf=False, **source):
         # The type of the evidence (a paper, a lab, a uri) is

@@ -64,9 +64,13 @@ class Cell(DataObject):
     Attributes
     ----------
     name : DatatypeProperty
-        The name of the cell
+        The 'adult' name of the cell typically used by biologists when discussing C. elegans
     lineageName : DatatypeProperty
         The lineageName of the cell
+    description : DatatypeProperty
+        A description of the cell
+    divisionVolume : DatatypeProperty
+        A returns the volume of the cell after division
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
@@ -81,12 +85,13 @@ class Cell(DataObject):
         if lineageName:
             self.lineageName(lineageName)
 
-    def morphology(self):
-        morph_name = "morphology_" + str(self.name())
+
+    def _morphology(self):
+        morph_name = "morphology_" + str(next(self.name()))
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)
-        qres = self['semantic_net'].query(query, initNs=ns)
+        qres = self.rdf.query(query, initNs=ns)
         morph = neuroml.Morphology(id=morph_name)
         for r in qres:
             par = False
@@ -106,7 +111,7 @@ class Cell(DataObject):
             morph.segments.append(s)
         # Query for segment groups
         query = segment_group_query.substitute(morph_name=morph_name)
-        qres = self['semantic_net'].query(query,initNs=ns)
+        qres = self.rdf.query(query,initNs=ns)
         for r in qres:
             s = neuroml.SegmentGroup(id=r['gid'])
             if r['member']:
@@ -145,7 +150,9 @@ class Cell(DataObject):
     def parentOf(self):
         """ Get the daughters of this cell """
         # XXX: This is pretty icky. We sorely need a convenient way to plug-in
-        # custom patterns to the load query.
+        #      custom patterns to the load query.
+        # Alternatively, represent the daughterOf/parentOf relationship with
+        # RDF statements rather than making it implicit in the lineageNames
 
         # hackish. just query for the possible children lineage names...
         ln = self.lineageName()
@@ -168,20 +175,10 @@ class Cell(DataObject):
             if not DataObject._is_variable(ident):
                 return ident
 
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name()
-                return self.make_identifier(n)
-            else:
-                return ident
+        if self.name.hasValue():
+            # name is already set, so we can make an identifier from it
+            n = next(self.name._get())
+            return self.make_identifier(n)
         else:
-            if len(self.name.v) > 0:
-                # name is already set, so we can make an identifier from it
-                n = self.name.one()
-                return self.make_identifier(n)
-            else:
-                return ident
-
-    #def rdf(self):
-
+            return ident
     #def peptides(self):
