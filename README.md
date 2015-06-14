@@ -18,16 +18,12 @@ See INSTALL.md
 Basic Usage
 -----------
 
-To get started, you'll probably want to load in the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
-by doing
+To get started, you'll need to connect to the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
+by doing:
 
 ```python
 >>> import PyOpenWorm as P
 >>> P.connect()
-
->>> P.loadData()
-
-[PyOpenWorm] Loading data into the graph; this may take several minutes!!
 
 ```
 
