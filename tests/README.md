@@ -16,7 +16,8 @@ in this directory:
   high.
 * DatabaseBackendTest.py - Integration tests that ensure basic functioning of
   the database backend and connection
-* ExampleRunnerTest.py
+* ExampleRunnerTest.py - Runs the examples to make sure we didn't break the API
+  for them.
 * integration_test.py
 * PintTest.py
 * QuantityTest.py
