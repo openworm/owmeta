@@ -69,7 +69,7 @@ from DataIntegrityTest import DataIntegrityTest
 # connection
 from DatabaseBackendTest import DatabaseBackendTest
 
-# Need description of these tests
+# Runs the examples to make sure we didn't break the API for them.
 from ExampleRunnerTest import ExampleRunnerTest
 
 # Need description of these tests

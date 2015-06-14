@@ -19,7 +19,7 @@ import doctest
 from glob import glob
 
 class ExampleRunnerTest(unittest.TestCase):
-    """ Try to run the examples to make sure we didn't break the API for them. """
+    """ Runs the examples to make sure we didn't break the API for them. """
 
     #Currently these are all failing because we aren't reproducing the actual data that
     # a user gets when they grab the code for the first time
