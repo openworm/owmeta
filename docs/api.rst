@@ -17,117 +17,12 @@ Notes
 
 
 
-.. _evidence:
-
-
-
-
-Relationship
-~~~~~~~~~~~~~
-
-Abstract class. A relationship between two entities.
-
-Relationship.pull(class : python class, method_name : String) : SetOf(Relationship)
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Returns a set of Relationship objects associated with the call ``class.method_name()``
-
-Cell(name : String)
-~~~~~~~~~~~~~~~~~~~
-
-A biological cell
-
-Cell.lineageName() : ListOf(String)
-+++++++++++++++++++++++++++++++++++++++++++
-
-Return the lineage name. Multiplicity may result from developmental differences
-
-Example::
-
-    c = Cell(name="ADAL")
-    c.lineageName() # Returns ["AB plapaaaapp"]
-
-Cell.blast() : String
-++++++++++++++++++++++++++++
-
-Return the blast name.
-
-Example::
-
-    c = Cell(name="ADAL")
-    c.blast() # Returns "AB"
-
-
-Cell.parentOf() : ListOf(Cell)
-++++++++++++++++++++++++++++++++
-
-Return the direct daughters of the cell in terms of developmental lineage.
-
-Example::
-
-    c = Cell(lineageName="AB plapaaaap")
-    c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"),Cell(lineageName="AB plapaaaapa")]
-
-Cell.daughterOf() : ListOf(Cell)
-++++++++++++++++++++++++++++++++++
-
-Return the parent(s) of the cell in terms of developmental lineage.
-
-Example::
-
-    c = Cell(lineageName="AB plapaaaap")
-    c.daughterOf() # Returns [Cell(lineageName="AB plapaaaa")]
-
-
-Cell.divisionVolume() : Quantity
-++++++++++++++++++++++++++++++++++++++
-
-Return the volume of the cell at division during development
-
-Example::
-
-    c = Cell(lineageName="AB plapaaaap")
-
-Cell.divisionVolume(volume : Quantity) : Relationship
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Set the volume of the cell at division
-
-Example::
-
-    v = Quantity("600","(um)^3")
-    c = Cell(lineageName="AB plapaaaap")
-    c.divisionVolume(v)
-
-Cell.morphology() : Morphology
-+++++++++++++++++++++++++++++++++++
-
-Return the morphology of the cell. Currently this is restricted to `Neuron <#neuron>`_ objects.
 
 Morphology = neuroml.Morphology
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Physical cell structure
 
-Neuron(name : String)
-~~~~~~~~~~~~~~~~~~~~~
-
-A subclass of Cell
-
-Neuron.connection() : ListOf(Connection)
-+++++++++++++++++++++++++++++++++++++++++++
-
-Get a set of Connection objects describing chemical synapses or gap junctions between this neuron and others
-
-Neuron.neighbor() : ListOf(Neuron)
-+++++++++++++++++++++++++++++++++++
-
-Get the neighboring Neurons
-
-Neuron.neighbor(neuronName : String) : Connection
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-State that neuronName is a neighbor of this Neuron
 
 Muscle(name : String)
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -175,31 +70,7 @@ Example::
     p = Worm.cells()
     p1 = p.filterCells([(Cell.lineageName, "AB")]) # A population of cells with AB as the blast cell
 
-Connection(pre : Neuron, post : Neuron, [strength : Integer, ntrans : Neurotransmitter, type : ConnectionType ] )
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A representation of the connection between neurons. Either a gap junction or a chemical synapse
-
-Connection.type() : ConnectionType
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-Returns the type of connection: 'gap junction' or 'synapse' as a String
-
-Connection.type(type : ConnectionType) : Relationship
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-State that the connection is a gap junction/chemical synapse
-
-Connection.neurotransmitter() : String
-+++++++++++++++++++++++++++++++++++++++++++++++++
-Returns the type of neurotransmitter used in the connection as a String
-
-Connection.strength() : Integer
-++++++++++++++++++++++++++++++++
-Returns the connection strength, the number of synapses and / or gap junctions made between the neurons
-
-ConnectionType = {'gap junction', 'synapse'}
-+++++++++++++++++++++++++++++++++++++++++++++
 
 NeuroML()
 ~~~~~~~~~~
