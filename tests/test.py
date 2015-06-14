@@ -57,10 +57,8 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.lock')
 
 
-# Need description of these tests
-from ConfigureableTest import ConfigureableTest
-
-# Need description of these tests
+# Tests for the Configure class, which provides functionality to modules to
+# allow outside objects to parameterize their behavior
 from ConfigureTest import ConfigureTest
 
 # Need description of these tests
