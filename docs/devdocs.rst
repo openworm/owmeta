@@ -9,3 +9,4 @@ For Developers
    docs
    rdf_format
    rdf_semantics
+   futureapi
