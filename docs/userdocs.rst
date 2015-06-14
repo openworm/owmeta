@@ -2,12 +2,12 @@
 For Users
 #########
 
-.. toctree::
-   :maxdepth: 2
-
-   adding_data
-   process
-   making_dataObjects
-
 .. automodule:: PyOpenWorm
    :members:
+
+.. toctree::
+   :maxdepth: 2
+   process
+   adding_data
+   making_dataObjects
+   sharing
