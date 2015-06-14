@@ -15,81 +15,17 @@ Notes
 - Some terms may be unexplained
 - ``a : {x_0,...,x_n}`` means ``a`` could have the value of any one of ``x_0`` through ``x_n``
 
-Worm()
-~~~~~~~~
 
-A representation of the whole worm
-
-Worm.neuron_network() : Network
-+++++++++++++++++++++++++++++++++
-
-Return the neuron Network of the worm
-
-Worm.cells() : Population
-+++++++++++++++++++++++++++
-
-Return the Population of all cells in the worm
 
 .. _evidence:
 
-Evidence(key = value)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A representation of some document which provides evidence for something. Possible keys include::
-    
-    pmid,pubmed: a pubmed id or url (e.g., 24098140)
-    wbid,wormbase: a wormbase id or url (e.g., WBPaper00044287)
-    doi: a Digitial Object id or url (e.g., s00454-010-9273-0)
 
-Evidence.asserts(relationship : Relationship) : Relationship
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-State that this Evidence asserts that the relationship is true.
-
-Example::
-
-    import bibtex
-    bt = bibtex.parse("my.bib")
-    n1 = Neuron("AVAL")
-    n2 = Neuron("DA3")
-    c = Connection(pre=n1,post=n2,class="synapse")
-    e = Evidence(bibtex=bt['white86'])
-    e.asserts(c)
-
-Other methods return objects which asserts accepts.
-
-Example::
-
-    n1 = Neuron("AVAL")
-    r = n1.neighbor("DA3")
-    e = Evidence(bibtex=bt['white86'])
-    e.asserts(r)
-
-Evidence.asserts() : ListOf(Relationship)
-+++++++++++++++++++++++++++++++++++++++++++
-
-Returns a sequence of statements asserted by this evidence
-
-Example::
-
-    import bibtex
-    bt = bibtex.parse("my.bib")
-    n1 = Neuron("AVAL")
-    n2 = Neuron("DA3")
-    c = Connection(pre=n1,post=n2,class="synapse")
-    e = Evidence(bibtex=bt['white86'])
-    e.asserts(c)
-    list(e.asserts()) # Returns a list [..., d, ...] such that d==c
-
-Evidence.author() : ListOf(String)
-++++++++++++++++++++++++++++++++++
-
-Returns a list of author names
 
 Relationship
 ~~~~~~~~~~~~~
 
-Abstract class. A relationship between two entities. 
+Abstract class. A relationship between two entities.
 
 Relationship.pull(class : python class, method_name : String) : SetOf(Relationship)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -135,7 +71,7 @@ Example::
 Cell.daughterOf() : ListOf(Cell)
 ++++++++++++++++++++++++++++++++++
 
-Return the parent(s) of the cell in terms of developmental lineage.  
+Return the parent(s) of the cell in terms of developmental lineage.
 
 Example::
 
@@ -193,7 +129,7 @@ Neuron.neighbor(neuronName : String) : Connection
 
 State that neuronName is a neighbor of this Neuron
 
-Muscle(name : String) 
+Muscle(name : String)
 ~~~~~~~~~~~~~~~~~~~~~~
 A representation of a muscle cell. `See also: current API`
 
@@ -232,12 +168,12 @@ A collection of cells. Constructor creates an empty population.
 Population.filterCells(filters : ListOf(PairOf(unboundMethod, methodArgument))) : Population
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Allows for groups of cells to be created based on shared properties including neurotransmitter, anatomical location or region, cell type.  
+Allows for groups of cells to be created based on shared properties including neurotransmitter, anatomical location or region, cell type.
 
 Example::
 
     p = Worm.cells()
-    p1 = p.filterCells([(Cell.lineageName, "AB")]) # A population of cells with AB as the blast cell 
+    p1 = p.filterCells([(Cell.lineageName, "AB")]) # A population of cells with AB as the blast cell
 
 Connection(pre : Neuron, post : Neuron, [strength : Integer, ntrans : Neurotransmitter, type : ConnectionType ] )
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,11 +211,11 @@ NeuroML.generate(object : {Network, Neuron, IonChannel}, type : {0,1,2}) : neuro
 
 Get a NeuroML object that represents the given object. The ``type`` determines what content is included in the NeuroML object:
 
-- 0=full morphology+biophysics 
+- 0=full morphology+biophysics
 - 1=cell body only+biophysics
 - 2=full morphology only
 
-NeuroML.write(document : neuroml.NeuroMLDocument, filename : String) 
+NeuroML.write(document : neuroml.NeuroMLDocument, filename : String)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Write out a NeuroMLDocument
