@@ -11,7 +11,9 @@ in this directory:
 * ConfigureTest.py - Tests for the Configure class, which provides
   functionality to modules to allow outside objects to parameterize their
   behavior
-* DataIntegrityTest.py
+* DataIntegrityTest.py - Integration tests that read from the database and
+  ensure that basic queries have expected answers, as a way to keep data quality 
+  high.
 * DataObjectTestToo.py
 * DataTest.py
 * ExampleRunnerTest.py
