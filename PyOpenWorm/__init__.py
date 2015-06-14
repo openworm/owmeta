@@ -41,6 +41,8 @@ Notes:
 Classes
 -------
 
+.. automodule:: PyOpenWorm.experiment
+.. automodule:: PyOpenWorm.channel
 .. automodule:: PyOpenWorm.evidence
 .. automodule:: PyOpenWorm.network
 .. automodule:: PyOpenWorm.neuron
@@ -71,6 +73,8 @@ from .muscle import Muscle
 from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
+from .experiment import Experiment
+from .channel import Channel,ChannelModel
 
 __import__('__main__').connected = False
 
@@ -208,6 +212,9 @@ def connect(configFile=False,
     SimpleProperty.register()
     Property.register()
     Relationship.register()
+    Channel.register()
+    ChannelModel.register()
+    Experiment.register()
 
     m.connected = True
     if data:

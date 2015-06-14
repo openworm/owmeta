@@ -85,6 +85,7 @@ class Cell(DataObject):
         if lineageName:
             self.lineageName(lineageName)
 
+
     def _morphology(self):
         morph_name = "morphology_" + str(next(self.name()))
 
@@ -181,6 +182,3 @@ class Cell(DataObject):
         else:
             return ident
     #def peptides(self):
-
-
-
