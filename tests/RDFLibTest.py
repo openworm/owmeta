@@ -21,7 +21,8 @@ import doctest
 from glob import glob
 
 class RDFLibTest(unittest.TestCase):
-    """Test for RDFLib."""
+    """Tests RDFLib, our backend library that interfaces with the database as an
+       RDF graph."""
 
     @classmethod
     def setUpClass(cls):
