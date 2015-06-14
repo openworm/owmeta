@@ -61,7 +61,8 @@ def delete_zodb_data_store(path):
 # allow outside objects to parameterize their behavior
 from ConfigureTest import ConfigureTest
 
-# Need description of these tests
+# Integration tests that read from the database and ensure that basic queries
+# have expected answers, as a way to keep data quality high.
 from DataIntegrityTest import DataIntegrityTest
 
 # Need description of these tests
