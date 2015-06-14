@@ -20,7 +20,8 @@ in this directory:
   for them.
 * QuantityTest.py - Tests our Quantity class, which is used for defining things
   with measurement units
-* RDFLibTest.py
+* RDFLibTest.py - Tests RDFLib, our backend library that interfaces with the
+  database as an RDF graph.
 
 * integration_test.py - Apparently orphaned test class.  TODO: Integrate this guy
 * test_data.py

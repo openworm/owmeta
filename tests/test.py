@@ -76,7 +76,8 @@ from ExampleRunnerTest import ExampleRunnerTest
 # units
 from QuantityTest import QuantityTest
 
-# Need description of these tests
+# Tests RDFLib, our backend library that interfaces with the database as an
+# RDF graph.
 from RDFLibTest import RDFLibTest
 
 
