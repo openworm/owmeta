@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5-slarson)](https://travis-ci.org/openworm/PyOpenWorm)
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5)](https://travis-ci.org/openworm/PyOpenWorm)
 
 PyOpenWorm
 ===========
