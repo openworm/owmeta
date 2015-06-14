@@ -125,8 +125,8 @@ Add some evidence::
 lineageName=`AB alaaapalr'
 >>> e.asserts(avdl)
 asserts=`AVDL'
->>> e.asserts(avdl.lineageName)
-asserts=`lineageName=`AB alaaapalr'';`AVDL'
+>>> e.asserts(avdl.lineageName) # doctest:+ELLIPSIS
+asserts=...
 >>> e.save()
 
 ```
