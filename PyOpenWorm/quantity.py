@@ -1,6 +1,8 @@
 import pint as Q
 
 class Quantity:
+    """ Enables the use of measurement units in our statements
+    """
     ur = Q.UnitRegistry()
     @classmethod
     def parse(self, s):
