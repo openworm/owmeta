@@ -7,7 +7,7 @@ from .network import Network
 
 class Worm(DataObject):
     """
-    A worm.
+    A representation of the whole worm.
 
     All worms with the same name are considered to be the same object.
 
@@ -34,7 +34,7 @@ class Worm(DataObject):
 
     def get_neuron_network(self):
         """
-        Get the network object
+        Return the neuron network of the worm
 
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
@@ -65,8 +65,6 @@ class Worm(DataObject):
         return self.rdf
 
     def identifier(self, *args, **kwargs):
-        # Shamelessly copy-pasted from cell.py
-
         # If the DataObject identifier isn't variable, then self is a specific
         # object and this identifier should be returned. Otherwise, if our name
         # attribute is _already_ set, then we can get the identifier from it and
