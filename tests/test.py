@@ -246,7 +246,7 @@ class CellTest(_DataTest):
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         # Load in raw morphology for ADAL
-        self.config['rdf.graph'].parse("tests/PVDR.nml.rdf.xml",format='trig')
+        self.config['rdf.graph'].parse("tests/test_data/PVDR.nml.rdf.xml",format='trig')
         n = Neuron(name='PVDR', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
