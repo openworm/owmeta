@@ -13,15 +13,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   api
-   evidence
-   adding_data
-   process
-   making_dataObjects
-   sharing
-   docs
-   rdf_format
-   rdf_semantics
+   userdocs
+   devdocs
+
 
 .. automodule:: PyOpenWorm
    :members:
