@@ -3,23 +3,31 @@
 PyOpenWorm
 ===========
 
-A unified, simple data access library in Python for data, facts, and models of *C. elegans* biology
+A unified, simple data access library in Python for data, facts, and models of
+*C. elegans* biology
 
 What does it do?
 ----------------
 
-Enables a simple Python API for asking various questions about the cells of the *C. elegans*, enabling the sharing of data about *C. elegans* for the purpose of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects) for the OpenWorm project.  In addition, it is a repository for various iterations of inferred / predicted data about *C. elegans*.  Uncontroversial facts and inferred information are distinguished through the use of explicit Evidence references.
+Enables a simple Python API for asking various questions about the cells of the
+*C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
+of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
+for the OpenWorm project.  In addition, it is a repository for various iterations
+of inferred / predicted data about *C. elegans*.  Uncontroversial facts and
+inferred information are distinguished through the use of explicit Evidence
+references.
 
 Installation
 ------------
 
 See INSTALL.md
 
-Basic Usage
+Quickstart
 -----------
 
-To get started, you'll need to connect to the database. If you cloned the repository from Github, then the database will be in the OpenWormData subdirectory. You can read it in
-by doing:
+To get started, you'll need to connect to the database. If you cloned the
+repository from Github, then the database will be in the OpenWormData
+subdirectory. You can read it in by doing:
 
 ```python
 >>> import PyOpenWorm as P
@@ -202,17 +210,36 @@ More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/
 Ease of use
 -----------
 
-This library should be easy to use and easy to install, to make it most accessible.  Python beginners should be able to get information out about c. elegans from this library.  Sytactical constructs in this library should be intuitive and easy to understand what they will return within the knowledge domain of c. elegans,
-rather than in the programming domain of its underlying technologies.  Values that are returned should be easily interpretable and easy to read.
-Wherever possible, pure-python libraries or those with few compilation requirements, rather than those that create extra dependencies on external native libraries are used.
+This library should be easy to use and easy to install, to make it most accessible.  
+Python beginners should be able to get information out about c. elegans from
+this library.  Sytactical constructs in this library should be intuitive and easy
+to understand what they will return within the knowledge domain of c. elegans,
+rather than in the programming domain of its underlying technologies.  Values that
+are returned should be easily interpretable and easy to read.
+Wherever possible, pure-python libraries or those with few compilation requirements,
+rather than those that create extra dependencies on external native libraries are used.
 
 Versioning data as code
 -----------------------
-As the underlying data sets that define the c. elegans anatomy change over time, these
-changes can often break a library that attempts to reliably expose those data.  This is
-because data changes can cause queries to return different answers than before, causing
-unit tests that rely on those answers to no longer correctly return.  As such, to create
-a stable foundational library for others to reuse, the version of the PyOpenWorm library
-guarantees the user a specific version of the data behind that library.  As data
-are improved, the maintainers of the library can perform appropriate regression tests
-prior to each new release to guarantee stability.
+
+A library that attempts to reliably expose dynamic data can often be broken because
+the underlying data sets that define it change over time.  This is because data
+changes can cause queries to return different answers than before, causing
+unpredictable behavior.  As such, to create a stable foundational library for
+others to reuse, the version of the PyOpenWorm library guarantees the user a
+specific version of the data behind that library.  In addition, unit tests are
+used to ensure basic sanity checks on data are maintained.  As data are improved,
+the maintainers of the library can perform appropriate regression tests prior to
+each new release to guarantee stability.
+
+Making it easy to get out authoritative data, keeping inferred data as an advanced feature
+------------------------------------------------------------------------------------------
+
+In an effort to make the library most helpful to experimental scientists, PyOpenWorm
+strives to keep the easiest-to-access features of this API only returning data that is
+uncontroversial and well supported by evidence.  At the same time, there is an
+important need to incorporate information that may not be confirmed by observeration,
+and instead is the result of an inference process.  These inferred data will also
+be marked with evidence that clearly indicates its status as not authoritative.
+PyOpenWorm endeavors to make the access to inferred data clearly separate from
+uncontroversial data reported in peer-reviewed literature.
