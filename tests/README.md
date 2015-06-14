@@ -23,5 +23,31 @@ in this directory:
 * RDFLibTest.py - Tests RDFLib, our backend library that interfaces with the
   database as an RDF graph.
 
+In addition, there are other files in this directory:
+
 * integration_test.py - Apparently orphaned test class.  TODO: Integrate this guy
-* test_data.py
+
+The .conf files in this directory are used to put different configuration
+parameters into different tests.  
+
+* test_default.conf
+* test_ZODB.conf
+* testl.conf
+
+Some key configuration variables that can be used include:
+
+To change to a sparql_endpoint backend:
+
+rdf.source = "sparql_endpoint"
+rdf.store_conf = ["http://107.170.133.175:8080/openrdf-sesame/repositories/test","http://107.170.133.175:8080/openrdf-sesame/repositories/test/statements"]
+
+To change to a sleepycat backend:
+
+"rdf.store" : "Sleepycat",
+"rdf.store_conf" : "testl.db",
+"rdf.upload_block_statement_count" : 50,
+
+Test data is located in the test_data directory:
+
+* test_data/PVDR.nml.rdf.xml - Sample data in TriG format to demonstrate we can
+  parse it.
