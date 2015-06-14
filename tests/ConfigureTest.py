@@ -19,6 +19,11 @@ import doctest
 from glob import glob
 
 class ConfigureTest(unittest.TestCase):
+    """
+    Tests for the Configure class, which provides
+      functionality to modules to allow outside objects to parameterize their
+      behavior
+    """
     def test_fake_config(self):
         """ Try to retrieve a config value that hasn't been set """
         with self.assertRaises(KeyError):
@@ -74,3 +79,13 @@ class ConfigureTest(unittest.TestCase):
         """ Fail on attempt to read configuration from a non-JSON file """
         with self.assertRaises(ValueError):
             Data.open("tests/bad_test.conf")
+
+    def test_configurable_init_empty(self):
+        """Ensure Configureable gets init'd with the defalut if nothing's given"""
+        i = Configureable()
+        self.assertEqual(Configureable.conf,i.conf)
+
+    def test_configurable_init_False(self):
+        """Ensure Configureable gets init'd with the defalut if False is given"""
+        i = Configureable(conf=False)
+        self.assertEqual(Configureable.conf, i.conf)
