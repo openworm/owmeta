@@ -65,7 +65,8 @@ from ConfigureTest import ConfigureTest
 # have expected answers, as a way to keep data quality high.
 from DataIntegrityTest import DataIntegrityTest
 
-# Need description of these tests
+# Integration tests that ensure basic functioning of the database backend and
+# connection
 from DatabaseBackendTest import DatabaseBackendTest
 
 # Need description of these tests
