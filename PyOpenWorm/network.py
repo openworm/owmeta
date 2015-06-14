@@ -4,7 +4,7 @@ import rdflib as R
 from PyOpenWorm import DataObject
 
 class Network(DataObject):
-    """A neuronal network.
+    """A network of neurons
 
     Attributes
     -----------
