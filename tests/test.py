@@ -66,10 +66,7 @@ from ConfigureTest import ConfigureTest
 from DataIntegrityTest import DataIntegrityTest
 
 # Need description of these tests
-from DataObjectTestToo import DataObjectTestToo
-
-# Need description of these tests
-from DataTest import DataTest
+from DatabaseBackendTest import DatabaseBackendTest
 
 # Need description of these tests
 from ExampleRunnerTest import ExampleRunnerTest
