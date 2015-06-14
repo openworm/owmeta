@@ -206,13 +206,17 @@ Finally, when you're done accessing the database, be sure to disconnect from it:
 
 More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
 
+Documentation
+-------------
+
+Further documentation [is available online](http://pyopenworm.readthedocs.org).
 
 Ease of use
 -----------
 
 This library should be easy to use and easy to install, to make it most accessible.  
 Python beginners should be able to get information out about c. elegans from
-this library.  Sytactical constructs in this library should be intuitive and easy
+this library.  Syntactical constructs in this library should be intuitive and easy
 to understand what they will return within the knowledge domain of c. elegans,
 rather than in the programming domain of its underlying technologies.  Values that
 are returned should be easily interpretable and easy to read.
