@@ -56,20 +56,34 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
-# Need description of these tests
-from ExampleRunnerTest import ExampleRunnerTest
-
-# Need description of these tests
-from DataIntegrityTest import DataIntegrityTest
-
-# Need description of these tests
-from ConfigureTest import ConfigureTest
 
 # Need description of these tests
 from ConfigureableTest import ConfigureableTest
 
 # Need description of these tests
+from ConfigureTest import ConfigureTest
+
+# Need description of these tests
+from DataIntegrityTest import DataIntegrityTest
+
+# Need description of these tests
 from DataObjectTestToo import DataObjectTestToo
+
+# Need description of these tests
+from DataTest import DataTest
+
+# Need description of these tests
+from ExampleRunnerTest import ExampleRunnerTest
+
+# Need description of these tests
+from PintTest import PintTest
+
+# Need description of these tests
+from QuantityTest import QuantityTest
+
+# Need description of these tests
+from RDFLibTest import RDFLibTest
+
 
 class _DataTest(unittest.TestCase):
     def delete_dir(self):
@@ -814,22 +828,6 @@ class SimplePropertyTest(_DataTest):
 class NeuroMLTest(_DataTest):
     pass
 
-# Need description of these tests
-from DataTest import DataTest
-
-# Need description of these tests
-from RDFLibTest import RDFLibTest
-
-#class TimeTest(unittest.TestCase):
-    #def test_datetime_isoformat_has_timezone(self):
-        #time_stamp = now(utc).isoformat()
-        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
-
-# Need description of these tests
-from PintTest import PintTest
-
-# Need description of these tests
-from QuantityTest import QuantityTest
 
 # Tests from README.md
 class DocumentationTest(unittest.TestCase):
