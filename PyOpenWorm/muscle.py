@@ -2,12 +2,16 @@ import PyOpenWorm as P
 from PyOpenWorm import Cell
 
 class Muscle(Cell):
-    """A single muscle cell
+    """A single muscle cell.
 
     Attributes
     ----------
     neurons : ObjectProperty
         Neurons synapsing with this muscle
+    receptors : DatatypeProperty
+        Get a list of receptors for this muscle if called with no arguments,
+        or state that this muscle has the given receptor type if called with
+        an argument
     """
 
     def __init__(self, name=False, **kwargs):
