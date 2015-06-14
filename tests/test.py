@@ -72,10 +72,8 @@ from DatabaseBackendTest import DatabaseBackendTest
 # Runs the examples to make sure we didn't break the API for them.
 from ExampleRunnerTest import ExampleRunnerTest
 
-# Need description of these tests
-from PintTest import PintTest
-
-# Need description of these tests
+# Tests our Quantity class, which is used for defining things with measurement
+# units
 from QuantityTest import QuantityTest
 
 # Need description of these tests
