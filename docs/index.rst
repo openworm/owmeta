@@ -17,9 +17,6 @@ Contents:
    devdocs
 
 
-.. automodule:: PyOpenWorm
-   :members:
-
 Issues
 ------
 
