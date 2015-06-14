@@ -261,7 +261,7 @@ class DataIntegrityTest(unittest.TestCase):
         import xlrd
         combining_dict = {}
         # 's' is the workbook sheet
-        s = xlrd.open_workbook('openwormdata/aux_data/neuronconnect.xls').sheets()[0]
+        s = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
             if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and SAMPLE_CELL in [s.cell(row, 0).value, s.cell(row, 1).value]:
                 #we're not going to include 'receives' ('r', 'rp') since they're just the inverse of 'sends'
