@@ -12,10 +12,10 @@ in this directory:
   functionality to modules to allow outside objects to parameterize their
   behavior
 * DataIntegrityTest.py - Integration tests that read from the database and
-  ensure that basic queries have expected answers, as a way to keep data quality 
+  ensure that basic queries have expected answers, as a way to keep data quality
   high.
-* DataObjectTestToo.py
-* DataTest.py
+* DatabaseBackendTest.py - Integration tests that ensure basic functioning of
+  the database backend and connection
 * ExampleRunnerTest.py
 * integration_test.py
 * PintTest.py
