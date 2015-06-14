@@ -55,6 +55,10 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.lock')
 
 class DataIntegrityTest(unittest.TestCase):
+    """ Integration tests that read from the database and ensure that basic
+        queries have expected answers, as a way to keep data quality high.
+
+    """
     @classmethod
     def setUpClass(cls):
         import csv
