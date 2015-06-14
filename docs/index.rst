@@ -13,11 +13,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   process
    api
    evidence
-   making_dataObjects
    adding_data
+   process
+   making_dataObjects
    sharing
    docs
    rdf_format
