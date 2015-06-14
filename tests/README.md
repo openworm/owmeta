@@ -18,8 +18,9 @@ in this directory:
   the database backend and connection
 * ExampleRunnerTest.py - Runs the examples to make sure we didn't break the API
   for them.
-* integration_test.py
-* PintTest.py
-* QuantityTest.py
+* QuantityTest.py - Tests our Quantity class, which is used for defining things
+  with measurement units
 * RDFLibTest.py
+
+* integration_test.py - Apparently orphaned test class.  TODO: Integrate this guy
 * test_data.py
