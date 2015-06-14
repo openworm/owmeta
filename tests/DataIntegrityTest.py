@@ -245,25 +245,37 @@ class DataIntegrityTest(unittest.TestCase):
             t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
             pow_conns.append(t)
 
-        #Get connections from the sheet
+        #get connections from the sheet
+        import re
+        search_string = re.compile(r'\w+[0]+[1-9]+')
+        replace_string = re.compile(r'[0]+')
+
+        def normalize(name):
+            # normalize neuron names to match those used at other points
+            # see #137 for elaboration
+            # if there are zeroes in the middle of a name, remove them
+            if re.match(search_string, name):
+                name = replace_string.sub('', name)
+            return name
+
         import xlrd
         combining_dict = {}
         # 's' is the workbook sheet
-        s = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
+        s = xlrd.open_workbook('openwormdata/aux_data/neuronconnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and 'AVAL' in [s.cell(row, 0).value, s.cell(row, 1).value]:
-                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
-                #Also omitting 'NMJ' for the time being (no model in db)
-                pre = s.cell(row, 0).value
-                post = s.cell(row, 1).value
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and SAMPLE_CELL in [s.cell(row, 0).value, s.cell(row, 1).value]:
+                #we're not going to include 'receives' ('r', 'rp') since they're just the inverse of 'sends'
+                #also omitting 'nmj' for the time being (no model in db)
+                pre = normalize(s.cell(row, 0).value)
+                post = normalize(s.cell(row, 1).value)
                 num = int(s.cell(row, 3).value)
                 if s.cell(row, 2).value == 'EJ':
                     syntype = 'gapJunction'
                 elif s.cell(row, 2).value in ('S', 'Sp'):
                     syntype = 'send'
 
-                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
-                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
+                # add them to a dict to make sure sends ('s') and send-polys ('sp') are summed.
+                # keying by connection pairs as a string (e.g. 'sdql,aval,send').
                 # values are lists if the form [pre, post, number, syntype].
                 string_key = '{},{},{}'.format(pre, post, syntype)
                 if string_key in combining_dict.keys():
