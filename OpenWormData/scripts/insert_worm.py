@@ -216,6 +216,19 @@ def upload_receptors_and_innexins():
         conn.close()
 
 def upload_synapses():
+
+    import re
+    search_string = re.compile(r'\w+[0]+[1-9]+')
+    replace_string = re.compile(r'[0]+')
+
+    def normalize(name):
+        # normalize neuron names to match those used at other points
+        # see #137 for elaboration
+        # if there are zeroes in the middle of a name, remove them
+        if re.match(search_string, name):
+            name = replace_string.sub('', name)
+        return name
+
     import xlrd
 
     try:
@@ -229,8 +242,8 @@ def upload_synapses():
             if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
                 #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
                 #Also omitting 'NMJ' for the time being (no model in db)
-                pre = s.cell(row, 0).value
-                post = s.cell(row, 1).value
+                pre = normalize(s.cell(row, 0).value)
+                post = normalize(s.cell(row, 1).value)
                 num = int(s.cell(row, 3).value)
                 if s.cell(row, 2).value == 'EJ':
                     syntype = 'gapJunction'
