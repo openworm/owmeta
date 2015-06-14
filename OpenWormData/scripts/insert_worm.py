@@ -226,7 +226,7 @@ def upload_synapses():
         # Get synapses and gap junctions and add them to the graph
         s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and 'AVAL' in [s.cell(row, 0).value, s.cell(row, 1).value]:
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
                 #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
                 #Also omitting 'NMJ' for the time being (no model in db)
                 pre = s.cell(row, 0).value
@@ -239,7 +239,7 @@ def upload_synapses():
 
                 # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
                 # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
-                # values are lists if the form [pre, post, number, syntype].
+                # values are lists of the form [pre, post, number, syntype].
                 string_key = '{},{},{}'.format(pre, post, syntype)
                 if string_key in combining_dict.keys():
                     # if key already there, add to number
