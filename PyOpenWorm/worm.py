@@ -11,6 +11,8 @@ class Worm(DataObject):
 
     All worms with the same name are considered to be the same object.
 
+
+
     Attributes
     ----------
     neuron_network : ObjectProperty
@@ -34,7 +36,23 @@ class Worm(DataObject):
 
     def get_neuron_network(self):
         """
-        Return the neuron network of the worm
+        Return the neuron network of the worm.
+
+        ```python
+
+        # Grabs the representation of the neuronal network
+        >>> net = P.Worm().get_neuron_network()
+
+        # Grab a specific neuron
+        >>> aval = net.aneuron('AVAL')
+
+        >>> aval.type()
+        set([u'interneuron'])
+
+        #show how many connections go out of AVAL
+        >>> aval.connection.count('pre')
+        77
+        ```
 
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
@@ -44,6 +62,15 @@ class Worm(DataObject):
     def muscles(self):
         """
         Get all Muscle objects attached to the Worm
+
+        Returns a set of all muscles::
+
+        ```python
+        >>> muscles = P.Worm().muscles()
+        >>> len(muscles)
+        96
+
+        ```
 
         :returns: A set of all muscles
         :rtype: set
