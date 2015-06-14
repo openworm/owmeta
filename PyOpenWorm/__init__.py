@@ -88,7 +88,6 @@ def get_data(path):
     installed_package_root = get_loader('PyOpenWorm').filename
     sys.path = sys.path[len(package_paths):]
     filename = os.path.join(installed_package_root, path)
-    print('loading from {}'.format(filename))
     return filename
 
 def config(key=None):
