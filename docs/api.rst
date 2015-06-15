@@ -1,8 +1,8 @@
-#########
-For Users
-#########
+.. _api:
 
-.. automodule:: PyOpenWorm
+##############
+PyOpenWorm API
+##############
 
 .. currentmodule:: PyOpenWorm
 
@@ -17,7 +17,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-  
+
 
 :class:`Network`
 ***************
@@ -45,12 +45,3 @@ Basic Classes
 .. autoclass:: Neuron
   :members:
   :inherited-members:
-
-
-.. toctree::
-   :maxdepth: 2
-   
-   process
-   adding_data
-   making_dataObjects
-   sharing
