@@ -28,6 +28,15 @@ Basic Classes
   :undoc-members:
   :inherited-members:
 
+:class:`Connection`
+***************
+
+
+.. autoclass:: Connection
+  :members:
+  :undoc-members:
+  :inherited-members:
+
 
 :class:`Cell`
 **************
@@ -35,6 +44,7 @@ Basic Classes
 
 .. autoclass:: Cell
   :members:
+  :undoc-members:
   :inherited-members:
 
 
@@ -44,4 +54,34 @@ Basic Classes
 
 .. autoclass:: Neuron
   :members:
+  :undoc-members:
+  :inherited-members:
+
+
+:class:`Muscle`
+***********************
+
+
+.. autoclass:: Muscle
+  :members:
+  :undoc-members:
+  :inherited-members:
+
+
+:class:`Channel`
+***********************
+
+
+.. autoclass:: Channel
+  :members:
+  :undoc-members:
+  :inherited-members:
+
+:class:`Evidence`
+***********************
+
+
+.. autoclass:: Evidence
+  :members:
+  :undoc-members:
   :inherited-members:
