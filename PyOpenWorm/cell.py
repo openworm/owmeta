@@ -60,6 +60,10 @@ class Cell(DataObject):
         The name of the cell
     lineageName : string
         The lineageName of the cell
+        Example::
+
+            >>> c = Cell(name="ADAL")
+            >>> c.lineageName() # Returns ["AB plapaaaapp"]
 
     Attributes
     ----------
@@ -67,10 +71,7 @@ class Cell(DataObject):
         The 'adult' name of the cell typically used by biologists when discussing C. elegans
     lineageName : DatatypeProperty
         The lineageName of the cell
-        Example::
 
-            c = Cell(name="ADAL")
-            c.lineageName() # Returns ["AB plapaaaapp"]
     description : DatatypeProperty
         A description of the cell
     divisionVolume : DatatypeProperty
@@ -80,9 +81,9 @@ class Cell(DataObject):
         When called with an argument, set the volume of the cell at division
         Example::
 
-            v = Quantity("600","(um)^3")
-            c = Cell(lineageName="AB plapaaaap")
-            c.divisionVolume(v)
+            >>> v = Quantity("600","(um)^3")
+            >>> c = Cell(lineageName="AB plapaaaap")
+            >>> c.divisionVolume(v)
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
@@ -149,8 +150,8 @@ class Cell(DataObject):
 
         Example::
 
-            c = Cell(name="ADAL")
-            c.blast() # Returns "AB"
+            >>> c = Cell(name="ADAL")
+            >>> c.blast() # Returns "AB"
 
         Note that this isn't a Property. It returns the blast extracted from the ''first''
         lineageName saved.
@@ -168,8 +169,8 @@ class Cell(DataObject):
 
         Example::
 
-            c = Cell(lineageName="AB plapaaaap")
-            c.daughterOf() # Returns [Cell(lineageName="AB plapaaaa")]"""
+            >>> c = Cell(lineageName="AB plapaaaap")
+            >>> c.daughterOf() # Returns [Cell(lineageName="AB plapaaaa")]"""
         ln = self.lineageName()
         parent_ln = ln[:-1]
         return Cell(lineageName=parent_ln)
@@ -179,8 +180,8 @@ class Cell(DataObject):
 
         Example::
 
-            c = Cell(lineageName="AB plapaaaap")
-            c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"),Cell(lineageName="AB plapaaaapa")] """
+            >>> c = Cell(lineageName="AB plapaaaap")
+            >>> c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"),Cell(lineageName="AB plapaaaapa")] """
         # XXX: This is pretty icky. We sorely need a convenient way to plug-in
         #      custom patterns to the load query.
         # Alternatively, represent the daughterOf/parentOf relationship with
@@ -213,4 +214,3 @@ class Cell(DataObject):
             return self.make_identifier(n)
         else:
             return ident
-    #def peptides(self):
