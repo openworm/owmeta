@@ -17,7 +17,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-  :exclude-members: DatatypeProperty, ObjectProperty, addToOpenSet, graph_pattern, infer, make_identifier, object_from_id, register, removeFromOpenSet
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 
 :class:`Network`
@@ -28,6 +28,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 :class:`Connection`
 ***************
@@ -37,6 +38,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 
 :class:`Cell`
@@ -47,6 +49,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 
 :class:`Neuron`
@@ -57,7 +60,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 :class:`Muscle`
 ***********************
@@ -67,7 +70,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
 
 :class:`Channel`
 ***********************
@@ -77,6 +80,8 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
+
 
 :class:`Evidence`
 ***********************
@@ -86,3 +91,4 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
+  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
