@@ -23,17 +23,17 @@ class Network(DataObject):
         """
         Gets the complete set of neurons in this network.
 
-        ```python
-        # Grabs the representation of the neuronal network
-        >>> net = P.Worm().get_neuron_network()
+        Example::
 
-        #NOTE: This is a VERY slow operation right now
-        >>> len(set(net.neurons()))
-        302
-        >>> set(net.neurons())
-        set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
+            # Grabs the representation of the neuronal network
+            >>> net = P.Worm().get_neuron_network()
 
-        ```
+            #NOTE: This is a VERY slow operation right now
+            >>> len(set(net.neurons()))
+            302
+            >>> set(net.neurons())
+            set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
+
         """
         for x in self.neuron():
             yield x.name()
@@ -42,16 +42,17 @@ class Network(DataObject):
         """
         Get a neuron by name.
 
-        ```python
-        # Grabs the representation of the neuronal network
-        >>> net = P.Worm().get_neuron_network()
+        Example::
 
-        # Grab a specific neuron
-        >>> aval = net.aneuron('AVAL')
+            # Grabs the representation of the neuronal network
+            >>> net = P.Worm().get_neuron_network()
 
-        >>> aval.type()
-        set([u'interneuron'])
-        ```
+            # Grab a specific neuron
+            >>> aval = net.aneuron('AVAL')
+
+            >>> aval.type()
+            set([u'interneuron'])
+
 
         :param name: Name of a c. elegans neuron
         :returns: Neuron corresponding to the name given
