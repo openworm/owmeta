@@ -883,4 +883,4 @@ if __name__ == '__main__':
         suite.addTests(all_tests)
 
     res = runTests(suite)
-    sys.exit(len(res.failures)>0)
+    sys.exit(len(res.failures + res.errors)>0)
