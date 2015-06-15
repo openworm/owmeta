@@ -10,33 +10,33 @@ class Neuron(Cell):
     """
     A neuron.
 
-    See what neurons express some neuropeptide::
-    ```python
-    # Grabs the representation of the neuronal network
-    >>> net = P.Worm().get_neuron_network()
+    See what neurons express some neuropeptide
 
-    # Grab a specific neuron
-    >>> aval = net.aneuron('AVAL')
+    Example::
 
-    >>> aval.type()
-    set([u'interneuron'])
+        # Grabs the representation of the neuronal network
+        >>> net = P.Worm().get_neuron_network()
 
-    #show how many connections go out of AVAL
-    >>> aval.connection.count('pre')
-    77
+        # Grab a specific neuron
+        >>> aval = net.aneuron('AVAL')
 
-    >>> aval.name()
-    u'AVAL'
+        >>> aval.type()
+        set([u'interneuron'])
 
-    #list all known receptors
-    >>> sorted(aval.receptors())
-    [u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
+        #show how many connections go out of AVAL
+        >>> aval.connection.count('pre')
+        77
 
-    #show how many chemical synapses go in and out of AVAL
-    >>> aval.Syn_degree()
-    90
+        >>> aval.name()
+        u'AVAL'
 
-    ```
+        #list all known receptors
+        >>> sorted(aval.receptors())
+        [u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
+
+        #show how many chemical synapses go in and out of AVAL
+        >>> aval.Syn_degree()
+        90
 
     Parameters
     ----------
