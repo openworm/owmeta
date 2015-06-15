@@ -47,7 +47,11 @@ To change to a sleepycat backend:
 "rdf.store_conf" : "testl.db",
 "rdf.upload_block_statement_count" : 50,
 
+* test_data.py -- this is a python file that is acting as test data.
+
 Test data is located in the test_data directory:
 
 * test_data/PVDR.nml.rdf.xml - Sample data in TriG format to demonstrate we can
   parse it.
+* test_data/bad_test.conf - Sample .conf file for a test that ensures corrupt
+  configuration files will not load (in ConfigureTest)
