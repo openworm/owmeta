@@ -77,7 +77,7 @@ class ConfigureTest(unittest.TestCase):
     def test_read_from_file_fail(self):
         """ Fail on attempt to read configuration from a non-JSON file """
         with self.assertRaises(ValueError):
-            Data.open("tests/bad_test.conf")
+            Data.open("tests/test_data/bad_test.conf")
 
     def test_configurable_init_empty(self):
         """Ensure Configureable gets init'd with the defalut if nothing's given"""
