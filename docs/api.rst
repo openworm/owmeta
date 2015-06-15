@@ -17,7 +17,7 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-  :exclude-members: DatatypeProperty, ObjectProperty, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, retract_statements
+  :exclude-members: DatatypeProperty, ObjectProperty, get, openSet, addToOpenSet, removeFromOpenSet, getOwners, id_is_variable, graph_pattern, infer, identifier, make_identifier, object_from_id, register, base_namespace, base_namespace_set, conf, default, i, rdf, add_statements, retract_statements, triples
 
 
 :class:`Network`
