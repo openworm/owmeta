@@ -833,7 +833,6 @@ from QuantityTest import QuantityTest
 
 # Tests from README.md
 class DocumentationTest(unittest.TestCase):
-    @unittest.expectedFailure
     def test_readme(self):
         [failure_count, return_count] = doctest.testfile("../README.md")
         self.assertEqual(failure_count, 0)
