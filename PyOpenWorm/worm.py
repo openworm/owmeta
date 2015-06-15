@@ -38,21 +38,20 @@ class Worm(DataObject):
         """
         Return the neuron network of the worm.
 
-        ```python
+        Example::
 
-        # Grabs the representation of the neuronal network
-        >>> net = P.Worm().get_neuron_network()
+            # Grabs the representation of the neuronal network
+            >>> net = P.Worm().get_neuron_network()
 
-        # Grab a specific neuron
-        >>> aval = net.aneuron('AVAL')
+            # Grab a specific neuron
+            >>> aval = net.aneuron('AVAL')
 
-        >>> aval.type()
-        set([u'interneuron'])
+            >>> aval.type()
+            set([u'interneuron'])
 
-        #show how many connections go out of AVAL
-        >>> aval.connection.count('pre')
-        77
-        ```
+            #show how many connections go out of AVAL
+            >>> aval.connection.count('pre')
+            77
 
         :returns: An object to work with the network of the worm
         :rtype: PyOpenWorm.Network
@@ -65,12 +64,11 @@ class Worm(DataObject):
 
         Returns a set of all muscles::
 
-        ```python
-        >>> muscles = P.Worm().muscles()
-        >>> len(muscles)
-        96
+        Example::
 
-        ```
+            >>> muscles = P.Worm().muscles()
+            >>> len(muscles)
+            96
 
         :returns: A set of all muscles
         :rtype: set
