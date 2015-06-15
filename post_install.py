@@ -1,10 +1,19 @@
-import sys
-del sys.path[0] # We want to get the installed PyOpenWorm, not the local one
+import os, shutil, glob, sys
+from distutils.sysconfig import get_python_lib
+from glob import glob
+from pkgutil import get_loader
 from setuptools import setup
 from subprocess import call
-import os, shutil, glob, PyOpenWorm
 
-package_location = PyOpenWorm.__path__[0]
+def get_library_location(package):
+    # get abs path of a package in the library, rather than locally
+    library_package_paths = glob(os.path.join(get_python_lib(), '*'))
+    sys.path = library_package_paths + sys.path
+    package_path = get_loader(package).filename
+    sys.path = sys.path[len(library_package_paths):]
+    return package_path
+
+package_location = get_library_location('PyOpenWorm')
 pwd = os.path.dirname(os.path.realpath(__file__))
 user_id = os.stat(pwd).st_uid # this is the person that cloned the repo
 script_location = os.path.join(pwd, 'OpenWormData', 'scripts')
@@ -21,7 +30,7 @@ if pid == 0:
         os._exit(0)
 os.waitpid(pid, 0)
 # move created database files to your library's package directory
-db_files = glob.glob(os.path.join(script_location, 'worm.db*'))
+db_files = glob(os.path.join(script_location, 'worm.db*'))
 for db_file in db_files:
   print('copying {} to {}'.format(db_file, package_location))
   new_location = os.path.join(package_location, os.path.basename(db_file))
