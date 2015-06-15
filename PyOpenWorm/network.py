@@ -4,7 +4,7 @@ import rdflib as R
 from PyOpenWorm import DataObject
 
 class Network(DataObject):
-    """A neuronal network.
+    """A network of neurons
 
     Attributes
     -----------
@@ -20,12 +20,38 @@ class Network(DataObject):
         Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
 
     def neurons(self):
+        """
+        Gets the complete set of neurons in this network.
+
+        ```python
+        # Grabs the representation of the neuronal network
+        >>> net = P.Worm().get_neuron_network()
+
+        #NOTE: This is a VERY slow operation right now
+        >>> len(set(net.neurons()))
+        302
+        >>> set(net.neurons())
+        set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
+
+        ```
+        """
         for x in self.neuron():
             yield x.name()
 
     def aneuron(self, name):
         """
-        Get a neuron by name
+        Get a neuron by name.
+
+        ```python
+        # Grabs the representation of the neuronal network
+        >>> net = P.Worm().get_neuron_network()
+
+        # Grab a specific neuron
+        >>> aval = net.aneuron('AVAL')
+
+        >>> aval.type()
+        set([u'interneuron'])
+        ```
 
         :param name: Name of a c. elegans neuron
         :returns: Neuron corresponding to the name given
@@ -36,7 +62,7 @@ class Network(DataObject):
 
     def _synapses_csv(self):
         """
-        Get all synapses by
+        Get all synapses into CSV
 
         :returns: A generator of Connection objects
         :rtype: generator
