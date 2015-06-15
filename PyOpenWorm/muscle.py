@@ -4,13 +4,14 @@ from PyOpenWorm import Cell
 class Muscle(Cell):
     """A single muscle cell.
 
-    See what neurons innervate a muscle::
-    ```python
-     >>> mdr21 = P.Muscle('MDR21')
-     >>> innervates_mdr21 = mdr21.innervatedBy()
-     >>> len(innervates_mdr21)
-     4
-    ```
+    See what neurons innervate a muscle:
+
+    Example::
+
+        >>> mdr21 = P.Muscle('MDR21')
+        >>> innervates_mdr21 = mdr21.innervatedBy()
+        >>> len(innervates_mdr21)
+        4
 
     Attributes
     ----------
