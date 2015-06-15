@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5)](https://travis-ci.org/openworm/PyOpenWorm/builds)
-[![Docs](https://readthedocs.org/projects/PyOpenWorm/badge/?version=alpha0.5)](https://pyopenworm.readthedocs.org/en/alpha0.5)
+[![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=alpha0.5)](https://pyopenworm.readthedocs.org/en/alpha0.5)
+[![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)
+
 
 PyOpenWorm
 ===========
