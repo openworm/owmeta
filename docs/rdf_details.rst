@@ -1,9 +1,21 @@
-.. _rdf_format:
+.. _rdf_details:
+
+RDF semantics for |pow|
+=======================
+
+In the context of |pow|, biological objects are classes of, for instance, anatomical features of a worm. That is to say, statements made about C. elegans are not about a specific worm, but are stated about the entire class of worms. The semantics of a ``property SimpleProperty/value value`` triple are that if any value is set, then without any additional statements being made, an instance of the object has been observed to have the value at some point in time, somewhere, under some set of conditions. In other words, the statement is an existential quantification over the associated object(class).
+
+The purpose of the identifiers for Properties is to allow statements to be made about them directly. An example::
+
+    <http://openworm.org/entities/Entity/1> <http://openworm.org/entities/Entity/interactsWith> <http://openworm.org/entities/Entity_interactsWith/2> .
+    <http://openworm.org/entities/Entity_interactsWith/2> <http://openworm.org/entities/SimpleProperty/value> <http://openworm.org/entities/Entity/3> .
+
+    <http://openworm.org/entities/Entity/4> <http://openworm.org/entities/Entity/modulates> <http://openworm.org/entities/Entity_modulates/5> .
+    <http://openworm.org/entities/Entity_modulates/5> <http://openworm.org/entities/SimpleProperty/value> <http://openworm.org/entities/Entity_interactsWith/2>
+
 
 RDF structure for |pow|
 =======================
-
-*It may be helpful to read this document together with* :ref:`the RDF semantics document <rdf_semantics>`.
 
 For most use cases, it is (hopefully) not necessary to write custom queries over the RDF graph in order to work with |pow|. However, if it does become necessary, it will be helpful to have an understanding of the structure of the RDF graph. Thus, a summary is given below.
 
@@ -33,4 +45,3 @@ A DataObject's identifier is connected to a property in a triple like::
 and the property is connected to its values like::
 
     <http://openworm.org/entities/OwnerType_propertyName/md5sum> <http://openworm.org/entities/SimpleProperty/value> "A literal value"
-
