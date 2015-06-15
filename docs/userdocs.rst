@@ -17,7 +17,6 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-  :exclude-members: 
   
 
 :class:`Network`
@@ -28,7 +27,6 @@ Basic Classes
   :members:
   :undoc-members:
   :inherited-members:
-  :exclude-members: 
 
 
 :class:`Cell`
