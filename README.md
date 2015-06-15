@@ -102,8 +102,8 @@ Returns the list of all neurons::
 #NOTE: This is a VERY slow operation right now
 >>> len(set(net.neurons()))
 302
->>> set(net.neurons())
-set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
+>>> sorted(list(net.neurons())) # doctest:+ELLIPSIS
+[u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```
 
@@ -125,17 +125,8 @@ Add some evidence::
 lineageName=`AB alaaapalr'
 >>> e.asserts(avdl)
 asserts=`AVDL'
->>> e.asserts(avdl.lineageName)
-asserts=`lineageName=`AB alaaapalr'';`AVDL'
->>> e.save()
-
-```
-
-
-```python
->>> e = P.Evidence(author='Sulston et al.', date='1983')
->>> e.asserts(P.Neuron(name="AVDL").lineageName("AB alaaapalr"))
-asserts=`lineageName=`AB alaaapalr''
+>>> e.asserts(avdl.lineageName) # doctest:+ELLIPSIS
+asserts=...
 >>> e.save()
 
 ```
@@ -144,7 +135,13 @@ See what some evidence stated::
 ```python
 >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
 >>> assertions = e0.asserts()
->>> assertions == {lineageName=`AB alaaapalr', AVDL}
+
+# is the neuron's presence asserted?
+>>> avdl in list(e0.asserts())
+True
+
+# is the lineageName of the neuron asserted?
+>>> avdl.lineageName in list(e0.asserts())
 True
 
 ```
