@@ -195,6 +195,7 @@ See what neurons innervate a muscle::
 >>> innervates_mdr21 = mdr21.innervatedBy()
 >>> len(innervates_mdr21)
 4
+
 ```
 
 Get direct access to the RDFLib graph::
