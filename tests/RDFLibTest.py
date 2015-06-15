@@ -7,7 +7,6 @@ import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
 from PyOpenWorm import *
-import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
@@ -21,7 +20,8 @@ import doctest
 from glob import glob
 
 class RDFLibTest(unittest.TestCase):
-    """Test for RDFLib."""
+    """Tests RDFLib, our backend library that interfaces with the database as an
+       RDF graph."""
 
     @classmethod
     def setUpClass(cls):
