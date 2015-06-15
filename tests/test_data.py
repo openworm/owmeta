@@ -13,16 +13,13 @@ TriX_data = """<?xml version='1.0' encoding='UTF-8'?>
 Trig_data = """
 @prefix dc: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-
 <http://example.org/alice> dc:publisher "Alice" .
-
 GRAPH <http://example.org/bob>
 {
    [] foaf:name "Bob" ;
       foaf:mbox <mailto:bob@oldcorp.example.org> ;
       foaf:knows _:b .
 }
-
 GRAPH <http://example.org/alice>
 {
     _:b foaf:name "Alice" ;

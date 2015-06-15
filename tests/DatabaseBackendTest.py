@@ -56,7 +56,10 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
-class DataTest(unittest.TestCase):
+class DatabaseBackendTest(unittest.TestCase):
+    """Integration tests that ensure basic functioning of the database
+      backend and connection.
+    """
     def test_namespace_manager(self):
         c = Configure()
         c['rdf.source'] = 'default'
@@ -177,3 +180,9 @@ class DataTest(unittest.TestCase):
             pass
         finally:
             disconnect()
+
+    def test_helpful_message_on_non_connection(self):
+        """ The message should say something about connecting """
+        Configureable.conf = False # Ensure that we are disconnected
+        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
+            do = DataObject()

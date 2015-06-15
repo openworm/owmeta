@@ -7,7 +7,6 @@ import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
 from PyOpenWorm import *
-import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
@@ -56,20 +55,30 @@ def delete_zodb_data_store(path):
     os.unlink(path + '.tmp')
     os.unlink(path + '.lock')
 
-# Need description of these tests
-from ExampleRunnerTest import ExampleRunnerTest
 
-# Need description of these tests
-from DataIntegrityTest import DataIntegrityTest
-
-# Need description of these tests
+# Tests for the Configure class, which provides functionality to modules to
+# allow outside objects to parameterize their behavior
 from ConfigureTest import ConfigureTest
 
-# Need description of these tests
-from ConfigureableTest import ConfigureableTest
+# Integration tests that read from the database and ensure that basic queries
+# have expected answers, as a way to keep data quality high.
+from DataIntegrityTest import DataIntegrityTest
 
-# Need description of these tests
-from DataObjectTestToo import DataObjectTestToo
+# Integration tests that ensure basic functioning of the database backend and
+# connection
+from DatabaseBackendTest import DatabaseBackendTest
+
+# Runs the examples to make sure we didn't break the API for them.
+from ExampleRunnerTest import ExampleRunnerTest
+
+# Tests our Quantity class, which is used for defining things with measurement
+# units
+from QuantityTest import QuantityTest
+
+# Tests RDFLib, our backend library that interfaces with the database as an
+# RDF graph.
+from RDFLibTest import RDFLibTest
+
 
 class _DataTest(unittest.TestCase):
     def delete_dir(self):
@@ -236,7 +245,7 @@ class CellTest(_DataTest):
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         # Load in raw morphology for ADAL
-        self.config['rdf.graph'].parse("tests/PVDR.nml.rdf.xml",format='trig')
+        self.config['rdf.graph'].parse("tests/test_data/PVDR.nml.rdf.xml",format='trig')
         n = Neuron(name='PVDR', conf=self.config)
         doc = PyOpenWorm.NeuroML.generate(n,1)
         writers.NeuroMLWriter.write(doc, "temp.nml")
@@ -814,22 +823,6 @@ class SimplePropertyTest(_DataTest):
 class NeuroMLTest(_DataTest):
     pass
 
-# Need description of these tests
-from DataTest import DataTest
-
-# Need description of these tests
-from RDFLibTest import RDFLibTest
-
-#class TimeTest(unittest.TestCase):
-    #def test_datetime_isoformat_has_timezone(self):
-        #time_stamp = now(utc).isoformat()
-        #self.assertRegexpMatches(time_stamp, r'.*[+-][0-9][0-9]:[0-9][0-9]$')
-
-# Need description of these tests
-from PintTest import PintTest
-
-# Need description of these tests
-from QuantityTest import QuantityTest
 
 # Tests from README.md
 class DocumentationTest(unittest.TestCase):
