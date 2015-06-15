@@ -191,16 +191,16 @@ True
 
 See what neurons innervate a muscle::
 ```python
- >>> mdr21 = P.Muscle('MDR21')
- >>> innervates_mdr21 = mdr21.innervatedBy()
- >>> len(innervates_mdr21)
- 4
+>>> mdr21 = P.Muscle('MDR21')
+>>> innervates_mdr21 = mdr21.innervatedBy()
+>>> len(innervates_mdr21)
+4
 ```
 
 Get direct access to the RDFLib graph::
 ```python
- >>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }") # doctest:+ELLIPSIS
- <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
+>>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }") # doctest:+ELLIPSIS
+<rdflib.plugins.sparql.processor.SPARQLResult object at ...>
 
 ```
 
