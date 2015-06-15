@@ -7,7 +7,6 @@ import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
 from PyOpenWorm import *
-import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
