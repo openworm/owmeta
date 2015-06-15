@@ -67,10 +67,22 @@ class Cell(DataObject):
         The 'adult' name of the cell typically used by biologists when discussing C. elegans
     lineageName : DatatypeProperty
         The lineageName of the cell
+        Example::
+
+            c = Cell(name="ADAL")
+            c.lineageName() # Returns ["AB plapaaaapp"]
     description : DatatypeProperty
         A description of the cell
     divisionVolume : DatatypeProperty
-        A returns the volume of the cell after division
+        When called with no argument, return the volume of the cell at division
+        during development.
+
+        When called with an argument, set the volume of the cell at division
+        Example::
+
+            v = Quantity("600","(um)^3")
+            c = Cell(lineageName="AB plapaaaap")
+            c.divisionVolume(v)
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
@@ -87,6 +99,9 @@ class Cell(DataObject):
 
 
     def _morphology(self):
+        """Return the morphology of the cell. Currently this is restricted to
+           `Neuron <#neuron>`_ objects.
+        """
         morph_name = "morphology_" + str(next(self.name()))
 
         # Query for segments
@@ -130,6 +145,13 @@ class Cell(DataObject):
 
     def blast(self):
         """
+        Return the blast name.
+
+        Example::
+
+            c = Cell(name="ADAL")
+            c.blast() # Returns "AB"
+
         Note that this isn't a Property. It returns the blast extracted from the ''first''
         lineageName saved.
         """
@@ -142,13 +164,23 @@ class Cell(DataObject):
             return ""
 
     def daughterOf(self):
-        """ Get the parent of this cell """
+        """ Return the parent(s) of the cell in terms of developmental lineage.
+
+        Example::
+
+            c = Cell(lineageName="AB plapaaaap")
+            c.daughterOf() # Returns [Cell(lineageName="AB plapaaaa")]"""
         ln = self.lineageName()
         parent_ln = ln[:-1]
         return Cell(lineageName=parent_ln)
 
     def parentOf(self):
-        """ Get the daughters of this cell """
+        """ Return the direct daughters of the cell in terms of developmental lineage.
+
+        Example::
+
+            c = Cell(lineageName="AB plapaaaap")
+            c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"),Cell(lineageName="AB plapaaaapa")] """
         # XXX: This is pretty icky. We sorely need a convenient way to plug-in
         #      custom patterns to the load query.
         # Alternatively, represent the daughterOf/parentOf relationship with
