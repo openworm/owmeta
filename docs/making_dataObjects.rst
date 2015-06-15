@@ -2,9 +2,11 @@
 
 Making data objects
 ====================
-To make new objects like ``Neuron`` or ``Worm``, for the most part, you just need to make a Python class.
-Say, for example, that I want to record some information about drug reactions in C. elegans. I make
-``Drug`` and ``Experiment`` classes to describe C. elegans reactions::
+To make new objects like ``Neuron`` or ``Worm``, for the most part, you just
+need to make a Python class.
+Say, for example, that I want to record some information about drug reactions in
+C. elegans. I make ``Drug`` and ``Experiment`` classes to describe C. elegans
+reactions::
 
     from PyOpenWorm import (DataObject,
                             DatatypeProperty,
@@ -36,7 +38,8 @@ Say, for example, that I want to record some information about drug reactions in
     Experiment.register()
     Drug.register()
 
-I can then make a Drug object for moon rocks and describe an experiment by Aperture Labs::
+I can then make a Drug object for moon rocks and describe an experiment by
+Aperture Labs::
 
     d = Drug('moon rocks')
     e = Experiment()
@@ -54,10 +57,13 @@ and save it::
 
 For simple objects, this is all we have to do.
 
-You can also add properties to an object after it has been created by calling either ObjectProperty or DatatypeProperty on the object as is done in ``__init__``::
+You can also add properties to an object after it has been created by calling
+either ObjectProperty or DatatypeProperty on the object as is done in
+``__init__``::
 
     d = Drug('moon rocks')
     Drug.DatatypeProperty('granularity', owner=self)
     d.granularity('ground up')
 
-Properties added in this fashion will not propagate to any other objects, but they will be saved along with the object they are attached to.
+Properties added in this fashion will not propagate to any other objects, but
+they will be saved along with the object they are attached to.

@@ -1,28 +1,21 @@
-.. MyTestDocumentation documentation master file, created by
-   sphinx-quickstart on Wed Aug 07 16:13:28 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. PyOpenWorm documentation master file.
 
 Welcome to PyOpenWorm's documentation!
 ======================================
+
+Our main README is available online on Github. [1]_  This documentation contains
+additional materials beyond what is covered there.
+
+.. [1] http://github.com/openworm/PyOpenWorm
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-   process
-   api
-   evidence
-   making_dataObjects
-   adding_data
-   sharing
-   docs
-   rdf_format
-   rdf_semantics
+   userdocs
+   devdocs
 
-.. automodule:: PyOpenWorm
-   :members:
 
 Issues
 ------
