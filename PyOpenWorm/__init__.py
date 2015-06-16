@@ -80,10 +80,10 @@ __import__('__main__').connected = False
 
 def get_data(path):
     # get a resource from the installed package location
-    from distutils.sysconfig import get_python_lib
+    from sysconfig import get_path
     from pkgutil import get_loader
     from glob import glob
-    package_paths = glob(os.path.join(get_python_lib(), '*'))
+    package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = package_paths + sys.path
     installed_package_root = get_loader('PyOpenWorm').filename
     sys.path = sys.path[len(package_paths):]
