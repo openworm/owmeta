@@ -1,5 +1,9 @@
 import os, shutil, glob, sys
+<<<<<<< HEAD
 from distutils.sysconfig import get_python_lib
+=======
+from sysconfig import get_path
+>>>>>>> c329e87ea59dee97a0907c23075b26bd9088635b
 from glob import glob
 from pkgutil import get_loader
 from setuptools import setup
@@ -7,7 +11,8 @@ from subprocess import call
 
 def get_library_location(package):
     # get abs path of a package in the library, rather than locally
-    library_package_paths = glob(os.path.join(get_python_lib(), '*'))
+
+    library_package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = library_package_paths + sys.path
     package_path = get_loader(package).filename
     sys.path = sys.path[len(library_package_paths):]
