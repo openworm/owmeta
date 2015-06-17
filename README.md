@@ -7,7 +7,7 @@ PyOpenWorm
 ===========
 
 A unified, simple data access library in Python for data, facts, and models of
-*C. elegans* biology
+*C. elegans* anatomy for the [OpenWorm project](http://www.openworm.org)
 
 What does it do?
 ----------------
