@@ -81,13 +81,14 @@ class Configure(object):
 
     @classmethod
     def open(cls,file_name):
-        """ 
+        """
         Open a configuration file and read it to build the internal state.
 
         :param file_name: configuration file encoded as JSON
         :return: a Configure object with the configuration taken from the JSON file
         """
         import json
+
         f = open(file_name)
         c = Configure()
         d = json.load(f)
@@ -105,7 +106,7 @@ class Configure(object):
         return c
 
     def copy(self,other):
-        """ 
+        """
         Copy this configuration into a different object.
 
         :param other: A different configuration object to copy the configuration from this object into
