@@ -1,9 +1,5 @@
 import os, shutil, glob, sys
-<<<<<<< HEAD
-from distutils.sysconfig import get_python_lib
-=======
 from sysconfig import get_path
->>>>>>> c329e87ea59dee97a0907c23075b26bd9088635b
 from glob import glob
 from pkgutil import get_loader
 from setuptools import setup
@@ -11,7 +7,6 @@ from subprocess import call
 
 def get_library_location(package):
     # get abs path of a package in the library, rather than locally
-
     library_package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = library_package_paths + sys.path
     package_path = get_loader(package).filename
@@ -37,9 +32,10 @@ os.waitpid(pid, 0)
 # move created database files to your library's package directory
 db_files = glob(os.path.join(script_location, 'worm.db*'))
 for db_file in db_files:
-  print('copying {} to {}'.format(db_file, package_location))
-  new_location = os.path.join(package_location, os.path.basename(db_file))
-  shutil.copy(db_file, package_location)
-  os.chmod(new_location, 0777)
+    print('copying {} to {}'.format(db_file, package_location))
+    new_location = os.path.join(package_location, os.path.basename(db_file))
+    shutil.copy(db_file, package_location)
+    os.chmod(new_location, 0777)
 # change directory owner to allow writing and reading from db in that dir
 os.chown(package_location, user_id, -1)
+
