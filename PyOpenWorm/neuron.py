@@ -1,407 +1,275 @@
-"""
-.. class:: Neuron
-
-   neuron client
-   =============
-
-   This module contains the class that defines the neuron
-
-"""
-
 import sqlite3
-from rdflib import Graph, Namespace, ConjunctiveGraph
-from rdflib.namespace import RDFS
-from rdflib import URIRef, Literal
-import urllib2
-import networkx as nx
-import csv
+import sys
+import PyOpenWorm as P
+from PyOpenWorm import Cell
 
 
-class Neuron:
+# XXX: Should we specify somewhere whether we have NetworkX or something else?
 
-	def __init__(self, name):
-		
-		self._name = name
-		self.networkX = ''
-		self.semantic_net = ''
-		self.semantic_net_new = ''
-			
-	def _init_networkX(self):
-		self.networkX = nx.DiGraph()
-		
-		# Neuron table
-		csvfile = urllib2.urlopen('https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv')
-		
-		reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-		for row in reader:
-			neurontype = ""
-			# Detects neuron function
-			if "sensory" in row[1].lower():
-				neurontype += "sensory"
-			if "motor" in row[1].lower():
-				neurontype += "motor"    
-			if "interneuron" in row[1].lower():
-				neurontype += "interneuron"
-			if len(neurontype) == 0:
-				neurontype = "unknown"
-				
-			if len(row[0]) > 0: # Only saves valid neuron names
-				self.networkX.add_node(row[0], ntype = neurontype)
-		
-		# Connectome table
-		csvfile = urllib2.urlopen('https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv')
-		
-		reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-		for row in reader:
-			self.networkX.add_edge(row[0], row[1], weight = row[3])
-			self.networkX[row[0]][row[1]]['synapse'] = row[2]
-			self.networkX[row[0]][row[1]]['neurotransmitter'] = row[4]
-		
-	def _write_out_db(self):
-          con = sqlite3.connect('db/celegans.db')
-          with open('db/celegans.sql', 'w') as f:
-              for line in con.iterdump():
-                  f.write('%s\n' % line)
+class Neuron(Cell):
+    """
+    A neuron.
 
-	def _init_semantic_net(self):
-		conn = sqlite3.connect('db/celegans.db')
-	   
-		cur = conn.cursor()
-	
-		#first step, grab all entities and add them to the graph
-	
-		cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
-	
-		n = Namespace("http://openworm.org/entities/")
-	
-		# print cur.description
-	
-		g = Graph()
-	
-		for r in cur.fetchall():
-			#first item is a number -- needs to be converted to a string
-			first = str(r[0])
-			#second item is text 
-			second = str(r[1])
-		
-			# This is the backbone of any RDF graph.  The unique
-			# ID for each entity is encoded as a URI and every other piece of 
-			# knowledge about that entity is connected via triples to that URI
-			# In this case, we connect the common name of that entity to the 
-			# root URI via the RDFS label property.
-			g.add( (n[first], RDFS.label, Literal(second)) )
-	
-	
-		#second step, get the relationships between them and add them to the graph
-		cur.execute("SELECT DISTINCT EnID1, Relation, EnID2 FROM tblrelationship")
-	
-		for r in cur.fetchall():
-			#print r
-			#all items are numbers -- need to be converted to a string
-			first = str(r[0])
-			second = str(r[1])
-			third = str(r[2])
-		
-			g.add( (n[first], n[second], n[third]) )
-	
-		cur.close()
-		conn.close()
-	
-		self.semantic_net = g
+    See what neurons express some neuropeptide
 
-        def _init_semantic_net_new(self):
-         conn = sqlite3.connect('db/celegans.db')
-       
-         cur = conn.cursor()
-    
-         #first step, grab all entities and add them to the graph
-    
-         cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
-    
-         n = Namespace("http://openworm.org/entities/")
-    
-         # print cur.description
-    
-         g0 = ConjunctiveGraph()
-    
-         for r in cur.fetchall():
-            #first item is a number -- needs to be converted to a string
-            first = str(r[0])
-            #second item is text 
-            second = str(r[1])
-            
-            # This is the backbone of any RDF graph.  The unique
-            # ID for each entity is encoded as a URI and every other piece of 
-            # knowledge about that entity is connected via triples to that URI
-            # In this case, we connect the common name of that entity to the 
-            # root URI via the RDFS label property.
-            g0.add( (n[first], RDFS.label, Literal(second)) )
-        
-    
-         #second step, get the relationships between them and add them to the graph
-         cur.execute("SELECT DISTINCT EnID1, Relation, EnID2, Citations FROM tblrelationship")
-    
-         gi = ''    
-    
-         i = 0
-         for r in cur.fetchall():
-            #print r
-            #all items are numbers -- need to be converted to a string
-            first = str(r[0])
-            second = str(r[1])
-            third = str(r[2])
-            prov = str(r[3])
-            
-            ui = URIRef(u'http://openworm.org/rdfmolecules/' + str(i))
-            gi = Graph(g0.store, ui)
-        
-            gi.add( (n[first], n[second], n[third]) )
-            
-            g0.add([ui, RDFS.label, Literal(str(i))])
-            if (prov is not None):
-                g0.add([ui, n[u'text_reference'], Literal(prov)])
-                
-            i = i + 1
-    
-         cur.close()
-         conn.close()
-    
-         self.semantic_net_new = g0
-		
-	def GJ_degree(self):
-		"""Get the degree of this neuron for gap junction edges only
-		
-		:returns: total number of incoming and outgoing gap junctions
-		:rtype: int
-		"""
-		if (self.networkX == ''):
-			self._init_networkX()
-		
-		count = 0
-		for item in self.networkX.in_edges_iter(self.name(),data=True):
-			if 'GapJunction' in item[2]['synapse']:
-				count = count + 1
-		for item in self.networkX.out_edges_iter(self.name(),data=True):
-			if 'GapJunction' in item[2]['synapse']:
-				count = count + 1
-		return count
-	
-	
-	def Syn_degree(self):
-		"""Get the degree of a this neuron for chemical synapse edges only
-		
-		:returns: total number of incoming and outgoing chemical synapses
-		:rtype: int
-		"""
-		if (self.networkX == ''):
-			self._init_networkX()
-		count = 0
-		for item in self.networkX.in_edges_iter(self.name(),data=True):
-			if 'Send' in item[2]['synapse']:
-				count = count + 1
-		for item in self.networkX.out_edges_iter(self.name(),data=True):
-			if 'Send' in item[2]['synapse']:
-				count = count + 1
-		return count
-		
-	def type_semantic(self):
-		"""Get type of this neuron (motor, interneuron, sensory)
-		
-		Use the semantic database as the source
-			
-		:returns: the type
-		:rtype: str
-		"""
-		if (self.semantic_net == ''):
-			self._init_semantic_net()
-	
-		qres = self.semantic_net.query(
-		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
-		   WHERE {
-			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified neuron
-			  ?node <http://openworm.org/entities/1515> ?object .# having identified that node, here we match an object associated with the node via the 'is a' property (number 1515)
-			  ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
-			}""")       
-	
-		type = ''
-		for r in qres.result:
-			type = str(r[0])
-		
-		return type
-		
-	def type_networkX(self):
-		"""Get type of this neuron (motor, interneuron, sensory)
-		
-		Use the networkX representation as the source
-			
-		:returns: the type
-		:rtype: str
-		"""
-		if (self.networkX == ''):
-			self._init_networkX()
-		return self.networkX.node[self.name()]['ntype']		
+    Example::
 
-	def type(self):
-		"""Get type of this neuron (motor, interneuron, sensory)
-			
-		:returns: the type
-		:rtype: str
-		"""
-		return self.type_networkX().lower()
-		
-	def name(self):
-		"""Get name of this neuron (e.g. AVAL)
-			
-		:returns: the name
-		:rtype: str
-		"""
-		return self._name
-	
-	def receptors(self):
-		"""Get receptors associated with this neuron
-			
-		:returns: a list of all known receptors
-		:rtype: list
-		"""
-		if (self.semantic_net == ''):
-			self._init_semantic_net()
-	
-		qres = self.semantic_net.query(
-		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
-		   WHERE {
-                    #we are looking first for the node that is the anchor of 
-                    # all information about the specified neuron
-			  ?node ?p '"""+self.name()+"""' .   
-                    # having identified that node, here we match an object 
-                    #  associated with the node via the 'receptor' property 
-                    #  (number 361)
-			  ?node <http://openworm.org/entities/361> ?object .
-                    #for the object, look up their plain text label.
-			  ?object rdfs:label ?objLabel  
-			}""")       
-	
-		receptors = []
-		for r in qres.result:
-			receptors.append(str(r[0]))
-			
-		return receptors
-		
-	def _add_reference(self, type, item, pmid = '', doi = '', wormbaseid = ''):
-         """Add a reference that provides evidence of the relationship between 
-            this neuron and one of its elements.
-            
-            Example::
-		   
-		       >>>aval = PyOpenWorm.Neuron('AVAL')
-		       >>>aval.receptors()
- 			   ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
- 			   #look up what reference says this neuron has a receptor GLR-1
-		       >>>aval.get_reference(0,'GLR-1')
-		       None
-                   >>>aval.add_reference(0,'GLR-1', doi='125.41.3/ploscompbiol',
-                                                    pmid = '57182010')
-                   >>>aval.get_reference(0,'GLR-1')
-                   ['http://dx.doi.org/125.41.3/ploscompbiol', 'http://pubmedcentral.nih.gov/57182010']
-		:param type: The kind of thing to add.  Valid options are: 0=receptor, 1=neighbor 
-		:param item: Name of the item
-            :param doi: A Digital Object Identifier (DOI) that provides evidence, optional
-            :param pmid: A PubMed ID (PMID) that point to a paper that provides evidence, optional
-            :param wormbaseid: An ID from WormBase that points to a record that provides evidence, optional
-         """
-         #Validate inputs using evidence object, throw errors if bad
-         evidence = PyOpenWorm.Evidence(pmid,doi,wormbaseid)
-         
-         #run semantic query to find the id of the items requested, throw errors if can't find
-         neuronid = ''
-         relationid = ''
-         itemid = ''
-         
-         #update the sqlite database with the reference content
-         conn = sqlite3.connect('db/celegans.db')
-         cur = conn.cursor()
-         cur.execute("UPDATE EnID1, Relation, EnID2, Citations FROM " + 
-                     "tblrelationship WHERE EnID1 = " + neuronid + ", Relation = " + 
-                     + relationid + ", EndID2 = " + itemid)
-                     
-         #rebuild the semantic network
-         self._init_semantic_net_new()
-         
-	def get_reference(self, type, item=''):
-         """Get a reference back that provides the evidence that this neuron is
-		   associated with the item requested as a list of URLs.
-		   
-		   Example::
-		   
-		       >>>ader = PyOpenWorm.Neuron('ADER')
-		       >>>ader.receptors()
- 			 ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
- 			   #look up what reference says this neuron has a receptor EXP-1
-		       >>>ader.get_reference(0,'EXP-1')
-		       ['http://dx.doi.org/10.100.123/natneuro']
-		       #look up what reference says this neuron has a neighbor DD5
-		       >>>ader.get_reference(1, 'DD5')
-		       ['http://dx.doi.org/20.140.521/ploscompbiol']
-		   
-		   :param type: The kind of thing to search for.  Valid options are: 0=receptor, 1=neighbor 
-		   :param item: Name of the item requested, if appropriate
-		   :returns: a list of URLs that points to references
-		   :rtype: list
-		"""
-         if (self.semantic_net_new == ''):
-		  self._init_semantic_net_new()
-         qres = self.semantic_net_new.query(
-            """
-            SELECT ?prov #we want to get out the labels associated with the objects
-            WHERE {
-              ?node rdfs:label '"""+self.name()+"""' . #identify this neuron
-              ?node2 rdfs:label '"""+item+"""' . #identify the argument
-              GRAPH ?g { #Each triple is in its own sub-graph to enable provenance
-                # find the triple that connects the neuron node to the receptor node
-                # via the 'receptor' (361) relation
-                ?node <http://openworm.org/entities/361> ?node2 .
-                }
-              #Triples with prov information are in the main graph only
-              #For the sub-graph, find the prov associated
-              ?g <http://openworm.org/entities/text_reference> ?prov  
-            }
-            """)       
-    
-         ref = []
-         for r in qres.result:
-            ref.append(str(r[0]))
-         if ref[0] == '':
-             return None
-         return ref
-		   
-	def _get_neighbors(self, type=0):
-		"""Get a list of neighboring neurons.  
-		
-		   :param type: What kind of junction to look for.  
-		                0=all, 1=gap junctions only, 2=all chemical synapses
-		                3=incoming chemical synapses, 4=outgoing chemical synapses
-		   :returns: a list of neuron names
-		   :rtype: List
-		   """
-	
-	def _get_connections(self, type=0):
-		"""Get a list of Connections between this neuron and other neurons.  
-		
-		   :param type: What kind of junction to look for.  
-		                0=all, 1=gap junctions only, 2=all chemical synapses
-		                3=incoming chemical synapses, 4=outgoing chemical synapses
-		   :returns: a list of PyOpenWorm.Connection objects
-		   :rtype: List
-		   """
-	
+        # Grabs the representation of the neuronal network
+        >>> net = P.Worm().get_neuron_network()
 
-	def _as_neuroml(self):
-	   """Return this neuron as a NeuroML representation
-	   
-		  :rtype: libNeuroML.Neuron
-	   """
-	
-	#def rdf(self):
-	
-	#def peptides(self):
-	
-	
+        # Grab a specific neuron
+        >>> aval = net.aneuron('AVAL')
+
+        >>> aval.type()
+        set([u'interneuron'])
+
+        #show how many connections go out of AVAL
+        >>> aval.connection.count('pre')
+        77
+
+        >>> aval.name()
+        u'AVAL'
+
+        #list all known receptors
+        >>> sorted(aval.receptors())
+        [u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
+
+        #show how many chemical synapses go in and out of AVAL
+        >>> aval.Syn_degree()
+        90
+
+    Parameters
+    ----------
+    name : string
+        The name of the neuron.
+
+    Attributes
+    ----------
+    type : DatatypeProperty
+        The neuron type (i.e., sensory, interneuron, motor)
+    receptor : DatatypeProperty
+        The receptor types associated with this neuron
+    innexin : DatatypeProperty
+        Innexin types associated with this neuron
+    neurotransmitter : DatatypeProperty
+        Neurotransmitters associated with this neuron
+    neuropeptide : DatatypeProperty
+        Name of the gene corresponding to the neuropeptide produced by this neuron
+    neighbor : Property
+        Get neurons connected to this neuron if called with no arguments, or
+        with arguments, state that neuronName is a neighbor of this Neuron
+    connection : Property
+        Get a set of Connection objects describing chemical synapses or gap
+        junctions between this neuron and others
+
+    """
+    def __init__(self, name=False, **kwargs):
+        Cell.__init__(self,name=name,**kwargs)
+        # Get neurons connected to this neuron
+        Neighbor(owner=self)
+        # Get connections from this neuron
+        Connection(owner=self)
+
+        Neuron.DatatypeProperty("type",self, multiple=True)
+        Neuron.DatatypeProperty("receptor", self, multiple=True)
+        Neuron.DatatypeProperty("innexin", self, multiple=True)
+        Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
+        Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
+        ### Aliases ###
+        self.get_neighbors = self.neighbor
+        self.receptors = self.receptor
+
+    def GJ_degree(self):
+        """Get the degree of this neuron for gap junction edges only
+
+        :returns: total number of incoming and outgoing gap junctions
+        :rtype: int
+        """
+        count = 0
+        for c in self.connection():
+            if c.syntype.one() == 'gapJunction':
+                count += 1
+        return count
+
+    def Syn_degree(self):
+        """Get the degree of a this neuron for chemical synapse edges only
+
+        :returns: total number of incoming and outgoing chemical synapses
+        :rtype: int
+        """
+        count = 0
+        for c in self.connection.get('either'):
+            if c.syntype.one() == 'send':
+                count += 1
+        return count
+
+    def _type_networkX(self):
+        """Get type of this neuron (motor, interneuron, sensory)
+
+        Use the networkX representation as the source
+
+        :returns: the type
+        :rtype: str
+        """
+        return self['nx'].node[self.name.one()]['ntype']
+
+
+    def get_incidents(self, type=0):
+        """ Get neurons which synapse at this neuron """
+        # Directed graph. Getting accessible _from_ this node
+        for item in self['nx'].in_edges_iter(self.name(),data=True):
+            if 'GapJunction' in item[2]['synapse']:
+                yield item[0]
+
+    def _as_neuroml(self):
+       """Return this neuron as a NeuroML representation
+
+          :rtype: libNeuroML.Neuron
+       """
+
+    def __str__(self):
+        n = self.name()
+        if n is not None:
+            return n
+        else:
+            return ""
+
+
+class Neighbor(P.Property):
+    multiple=True
+    def __init__(self,**kwargs):
+        P.Property.__init__(self,'neighbor',**kwargs)
+        self._conns = []
+
+    def get(self,**kwargs):
+        """Get a list of neighboring neurons.
+
+           Parameters
+           ----------
+           See parameters for PyOpenWorm.connection.Connection
+
+           Returns
+           -------
+           list of Neuron
+        """
+        if len(self._conns) > 0:
+            for c in self._conns:
+                yield c.post_cell()
+        else:
+            c = P.Connection(pre_cell=self.owner,**kwargs)
+            for r in c.load():
+                yield r.post_cell()
+
+    def set(self, other, **kwargs):
+        c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
+        self._conns.append(c)
+        return c
+
+    def triples(self,**kwargs):
+        for c in self._conns:
+            for x in c.triples(**kwargs):
+                yield x
+
+class Connection(P.Property):
+    """A representation of the connection between neurons. Either a gap junction
+    or a chemical synapse
+
+    TODO: Add neurotransmitter type.
+    TODO: Add connection strength
+    """
+
+    multiple=True
+    def __init__(self,**kwargs):
+        P.Property.__init__(self,'connection',**kwargs)
+        self._conns = []
+
+    def get(self,pre_post_or_either='pre',**kwargs):
+        """Get a list of connections associated with the owning neuron.
+
+           Parameters
+           ----------
+           type: What kind of junction to look for.
+                        0=all, 1=gap junctions only, 2=all chemical synapses
+                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           Returns
+           -------
+           list of Connection
+        """
+        c = []
+        if pre_post_or_either == 'pre':
+            c.append(P.Connection(pre_cell=self.owner,**kwargs))
+        elif pre_post_or_either == 'post':
+            c.append(P.Connection(post_cell=self.owner,**kwargs))
+        elif pre_post_or_either == 'either':
+            c.append(P.Connection(pre_cell=self.owner,**kwargs))
+            c.append(P.Connection(post_cell=self.owner,**kwargs))
+        for x in c:
+            for r in x.load():
+                yield r
+
+    def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
+        """Get a list of connections associated with the owning neuron.
+
+           Parameters
+           ----------
+           See parameters for PyOpenWorm.connection.Connection
+
+           Returns
+           -------
+           int
+               The number of connections matching the paramters given
+        """
+        options = dict()
+        options["pre"] = """
+                     ?x c:pre_cell ?z .
+                     ?z sp:value <%s> .
+                     """ % self.owner.identifier()
+        options["post"] = """
+                      ?x c:post_cell ?z .
+                      ?z sp:value <%s> .
+                      """ % self.owner.identifier()
+        options["either"] = " { %s } UNION { %s } . " % (options['post'], options['pre'])
+
+        if syntype is not None:
+            if syntype.lower() == 'gapjunction':
+                syntype='gapJunction'
+            syntype_pattern = "FILTER( EXISTS { ?x c:syntype ?v . ?v sp:value \"%s\" . }) ." % syntype
+        else:
+            syntype_pattern = ''
+
+        q = """
+        prefix ow: <http://openworm.org/entities/>
+        prefix c: <http://openworm.org/entities/Connection/>
+        prefix sp: <http://openworm.org/entities/SimpleProperty/>
+        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        SELECT (COUNT(?x) as ?count) WHERE {
+         %s
+         %s
+        }
+        """ % (options[pre_post_or_either], syntype_pattern)
+
+        res = 0
+        for x in self.conf['rdf.graph'].query(q):
+            res = x['count']
+        return int(res)
+
+    def set(self, conn, **kwargs):
+        """Add a connection associated with the owner Neuron
+
+           Parameters
+           ----------
+           conn : PyOpenWorm.connection.Connection
+               connection associated with the owner neuron
+
+           Returns
+           -------
+           A PyOpenWorm.neuron.Connection
+        """
+        #XXX: Should this create a Connection here instead?
+        assert(isinstance(conn, P.Connection))
+        self._conns.append(conn)
+
+    def triples(self,**kwargs):
+        for c in self._conns:
+            for x in c.triples(**kwargs):
+                yield x
