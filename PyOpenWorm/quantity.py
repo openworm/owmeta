@@ -1,6 +1,8 @@
 import pint as Q
 
 class Quantity:
+    """ Enables the use of measurement units in our statements
+    """
     ur = Q.UnitRegistry()
     @classmethod
     def parse(self, s):
@@ -20,3 +22,8 @@ class Quantity:
     def value(self):
         return self._quant.magnitude
 
+    def serialize(self):
+        return (str(self.value) + self.unit)
+
+    #alias call to string
+    __str__ = serialize
