@@ -4,12 +4,13 @@ python:
   - "2.7"
 
 # command to install dependencies
+# had to split requirements.txt into
+#  TWO files because they install all or none
+#  and dependencies installed later don't know
+#  about dependencies installed earlier in the process
 install:
-  - "pip install discover"
-  - "pip install rdflib"
-  - "pip install networkx"  
-  - "pip install . --use-mirrors"
+  - "python setup.py install"
 
 
-script:  
-  - python -m unittest discover -s tests
+script:
+  - "python tests/test.py"

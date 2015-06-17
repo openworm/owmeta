@@ -1,56 +1,32 @@
-"""
-.. class:: Muscle
+import PyOpenWorm as P
+from PyOpenWorm import Cell
 
-   muscle client
-   =============
+class Muscle(Cell):
+    """A single muscle cell.
 
-   This module contains the class that defines the muscle
+    See what neurons innervate a muscle:
 
-"""
+    Example::
 
-import sqlite3
-from rdflib import Graph
-from rdflib import Namespace
-from rdflib.namespace import RDF, RDFS
-from rdflib import URIRef, BNode, Literal
-import urllib2
-import networkx as nx
-import csv
+        >>> mdr21 = P.Muscle('MDR21')
+        >>> innervates_mdr21 = mdr21.innervatedBy()
+        >>> len(innervates_mdr21)
+        4
 
-class Muscle:
+    Attributes
+    ----------
+    neurons : ObjectProperty
+        Neurons synapsing with this muscle
+    receptors : DatatypeProperty
+        Get a list of receptors for this muscle if called with no arguments,
+        or state that this muscle has the given receptor type if called with
+        an argument
+    """
 
-	def __init__(self, name):
-		self._name = name
+    def __init__(self, name=False, **kwargs):
+        Cell.__init__(self, name=name, **kwargs)
+        self.innervatedBy = Muscle.ObjectProperty("neurons",owner=self,value_type=P.Neuron, multiple=True)
+        Muscle.DatatypeProperty("receptors",owner=self,multiple=True)
 
-	def name(self):
-		"""Get name of this muscle
-			
-		:returns: the name
-		:rtype: str
-		"""
-		return self._name
-
-	def _receptors(self):
-		"""Get receptors associated with this muscle
-			
-		:returns: a list of all known receptors
-		:rtype: list
-		"""
-		if (self.semantic_net == ''):
-			self._init_semantic_net()
-
-		qres = self.semantic_net.query(
-		  """SELECT ?objLabel     #we want to get out the labels associated with the objects
-		   WHERE {
-			  ?node ?p '"""+self.name()+"""' .   #we are looking first for the node that is the anchor of all information about the specified muscle
-			  ?node <http://openworm.org/entities/361> ?object .# having identified that node, here we match an object associated with the node via the 'receptor' property (number 361)
-			  ?object rdfs:label ?objLabel  #for the object, look up their plain text label.
-			}""")       
-
-		receptors = []
-		for r in qres.result:
-			receptors.append(str(r[0]))
-
-		return receptors
-
-
+    def __str__(self):
+        return self.name()

@@ -1,85 +1,77 @@
-[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=master)](https://travis-ci.org/openworm/PyOpenWorm)
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=alpha0.5)](https://travis-ci.org/openworm/PyOpenWorm/builds)
+[![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=alpha0.5)](https://pyopenworm.readthedocs.org/en/alpha0.5)
+[![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)
+
 
 PyOpenWorm
 ===========
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/PyOpenWorm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Unified data access library for data about the *C. elegans* anatomy and model for the OpenWorm project.
+A unified, simple data access library in Python for data, facts, and models of
+*C. elegans* anatomy for the [OpenWorm project](http://www.openworm.org)
 
 What does it do?
 ----------------
 
-Allows asking various questions about the *C. elegans* nervous system.
+Enables a simple Python API for asking various questions about the cells of the
+*C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
+of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
+for the OpenWorm project.  In addition, it is a repository for various iterations
+of inferred / predicted data about *C. elegans*.  Uncontroversial facts and
+inferred information are distinguished through the use of explicit Evidence
+references.
 
-Basic Usage
+Installation
+------------
+
+See INSTALL.md
+
+Quickstart
 -----------
 
-```python
-  >>>import openworm
-  
-  # Grabs the representation of the neuronal network
-  >>>net = PyOpenWorm.Worm().get_neuron_network()
-  >>>net.aneuron('AVAL').type()
-  Interneuron
-  #show how many gap junctions go in and out of AVAL
-  >>>net.aneuron('AVAL').GJ_degree()
-  60
-```
-  
-  
-More examples
--------------
-  
-Returns information about individual neurons::
+To get started, you'll need to connect to the database. If you cloned the
+repository from Github, then the database will be in the OpenWormData
+subdirectory. You can read it in by doing:
 
 ```python
-  >>>net.aneuron('AVAL').name()
-  AVAL
-  #list all known receptors
-  >>>net.aneuron('AVAL').receptors()
-  ['GLR-1', 'NMR-1', 'GLR-4', 'GLR-2', 'GGR-3', 'UNC-8', 'GLR-5', 'NMR-2']
-  >>>net.aneuron('DD5').type()
-  motor
-  >>>net.aneuron('PHAL').type()
-  sensory
-  #show how many chemical synapses go in and out of AVAL
-  >>>net.aneuron('AVAL').Syn_degree()
-  74
+>>> import PyOpenWorm as P
+>>> P.connect()
+
 ```
 
-Returns the list of all neurons::
+Then you can try out a few things:
 
 ```python
-  >>>len(net.neurons())
-  302
+
+# Grabs the representation of the neuronal network
+>>> net = P.Worm().get_neuron_network()
+
+# Grab a specific neuron
+>>> aval = net.aneuron('AVAL')
+
+>>> aval.type()
+set([u'interneuron'])
+
+#show how many connections go out of AVAL
+>>> aval.connection.count('pre')
+77
+
 ```
 
-Returns the list of all muscles::
+How to use this library
+-----------------------
 
-```python
-  >>>'MDL08' in PyOpenWorm.Worm().muscles()
-  True
-```
+PyOpenWorm enables making statements about biological entities in the worm or
+querying previously made statements. In addition, statements may concern the
+evidence for statements, called Relationships.  ``a.B()``, the Query form, will
+query against the database for the value or values that are related to ``a``
+through ``B``; on the other hand, ``a.B(c)``, the Update form, will add a
+statement to the database that ``a`` relates to ``c`` through ``B``. For the
+Update form, a Relationship object describing the relationship stated is
+returned as a side-effect of the update.
 
-
-Returns provenance information providing evidence about facts::
-
-```python
-  >>>ader = PyOpenWorm.Neuron('ADER')
-  >>>ader.receptors()
-  ['ACR-16', 'TYRA-3', 'DOP-2', 'EXP-1']
-  #look up what reference says this neuron has a receptor EXP-1
-  >>>ader.get_reference(0,'EXP-1')
-  ['http://dx.doi.org/10.100.123/natneuro']
-```
-
-Returns the c. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
-
-```python
-  >>>net.as_networkx()
-  <networkx.classes.digraph.DiGraph object at 0x10f28bc10>
-```
+Relationship objects are key to the `Evidence class <#evidence>`_ for making
+statements which can be sourced. Relationships can themselves be members in a
+relationship, allowing for fairly complex statements to be made about entities.
 
 Why is this necessary?
 ----------------------
@@ -88,42 +80,192 @@ There are many different useful ways to compute with data related to the worm.
 Different data structures have different strengths and answer different questions.
 For example, a NetworkX representation of the connectome as a complex graph enables
 questions to be asked about first and second nearest neighbors of a given neuron.
-In contrast, an RDF semantic graph representation is useful for reading and 
-writing annotations about multiple aspects of a neuron, such as what papers 
+In contrast, an RDF semantic graph representation is useful for reading and
+writing annotations about multiple aspects of a neuron, such as what papers
 have been written about it, multiple different properties it may have such as
 ion channels and neurotransmitter receptors.  A NeuroML representation is useful
 for answering questions about model morphology and simulation parameters.  Lastly,
-a Blender representation is a full 3D shape definition that can be used for 
+a Blender representation is a full 3D shape definition that can be used for
 calculations in 3D space.  Further representations regarding activity patterns
 such as Neo or simulated activity can be considered as well.
 
 Using these different representations separately leads to ad hoc scripting for
-for each representation.  This presents a challenge for data integration and 
+for each representation.  This presents a challenge for data integration and
 consolidation of information in 'master' authoritative representations.  By
 creating a unified data access layer, different representations
 can become encapsulated into an abstract view.  This allows the user to work with
-objects related to the biological reality of the worm.  This has the advantage that 
+objects related to the biological reality of the worm.  This has the advantage that
 the user can forget about which representation is being used under the hood.  
 
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
 
-Installation
-------------
-
-From PyPi using [pip](http://pip.readthedocs.org/en/latest/installing.html):
-
-    pip install pyopenworm --pre
-    
-From source:
-
-    git clone https://github.com/slarson/PyOpenWorm.git
-    cd PyOpenWorm
-    python setup.py install
-
-Running tests
+More examples
 -------------
 
-After checking out the project, tests can be run on the command line with::
+Returns information about individual neurons::
 
-    python -m unittest discover -s tests
+```python
+>>> aval.name()
+u'AVAL'
+
+#list all known receptors
+>>> sorted(aval.receptors())
+[u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
+
+#show how many chemical synapses go in and out of AVAL
+>>> aval.Syn_degree()
+90
+
+```
+
+Returns the list of all neurons::
+
+```python
+#NOTE: This is a VERY slow operation right now
+>>> len(set(net.neurons()))
+302
+>>> sorted(list(net.neurons())) # doctest:+ELLIPSIS
+[u'ADAL', u'ADAR', ... u'VD8', u'VD9']
+
+```
+
+Returns a set of all muscles::
+
+```python
+>>> muscles = P.Worm().muscles()
+>>> len(muscles)
+96
+
+```
+
+Add some evidence::
+
+```python
+>>> e = P.Evidence(author='Sulston et al.', date='1983')
+>>> avdl = P.Neuron(name="AVDL")
+>>> avdl.lineageName("AB alaaapalr")
+lineageName=`AB alaaapalr'
+>>> e.asserts(avdl)
+asserts=`AVDL'
+>>> e.asserts(avdl.lineageName) # doctest:+ELLIPSIS
+asserts=...
+>>> e.save()
+
+```
+
+See what some evidence stated::
+```python
+>>> e0 = P.Evidence(author='Sulston et al.', date='1983')
+>>> assertions = e0.asserts()
+
+# is the neuron's presence asserted?
+>>> avdl in list(e0.asserts())
+True
+
+# is the lineageName of the neuron asserted?
+>>> avdl.lineageName in list(e0.asserts())
+True
+
+```
+
+For most types (i.e., subclasses of `P.DataObject`) that do not have required
+initialization arguments, you can load all members of that type by making an
+object of that type and calling `load()`::
+```python
+>>> neurons = list(P.Neuron().load())
+>>> len(neurons)
+302
+
+```
+
+See what neurons express some neuropeptide::
+```python
+>>> n = P.Neuron()
+>>> n.neuropeptide("TH")
+neuropeptide=`TH'
+
+>>> s = set(x.name() for x in n.load())
+>>> s == set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL'])
+True
+
+```
+
+See what neurons innervate a muscle::
+```python
+>>> mdr21 = P.Muscle('MDR21')
+>>> innervates_mdr21 = mdr21.innervatedBy()
+>>> len(innervates_mdr21)
+4
+
+```
+
+Get direct access to the RDFLib graph::
+```python
+>>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }") # doctest:+ELLIPSIS
+<rdflib.plugins.sparql.processor.SPARQLResult object at ...>
+
+```
+
+Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
+
+```python
+>>> net.as_networkx() # doctest:+ELLIPSIS
+<networkx.classes.digraph.DiGraph object at ...>
+
+```
+
+Finally, when you're done accessing the database, be sure to disconnect from it::
+```python
+>>> P.disconnect()
+
+```
+
+More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
+
+Documentation
+-------------
+
+Further documentation [is available online](http://pyopenworm.readthedocs.org).
+
+Ease of use
+-----------
+
+PyOpenWorm should be easy to use and easy to install, to make it most accessible.  
+Python beginners should be able to get information out about c. elegans from
+this library.  
+
+Syntactical constructs in this library should be intuitive and easy
+to understand what they will return within the knowledge domain of c. elegans,
+rather than in the programming domain of its underlying technologies.  Values that
+are returned should be easily interpretable and easy to read.
+
+Wherever possible, pure-python libraries or those with few compilation requirements,
+rather than those that create extra dependencies on external native libraries are used.
+
+Versioning data as code
+-----------------------
+
+A library that attempts to reliably expose dynamic data can often be broken because
+the underlying data sets that define it change over time.  This is because data
+changes can cause queries to return different answers than before, causing
+unpredictable behavior.  
+
+As such, to create a stable foundational library for others to reuse, the version
+of the PyOpenWorm library guarantees the user a specific version of the data
+behind that library.  In addition, unit tests are used to ensure basic sanity
+checks on data are maintained.  As data are improved, the maintainers of the
+library can perform appropriate regression tests prior to each new release to
+guarantee stability.
+
+Making it easy to get out authoritative data, keeping inferred data as an advanced feature
+------------------------------------------------------------------------------------------
+
+In an effort to make the library most helpful to experimental scientists, PyOpenWorm
+strives to keep the easiest-to-access features of this API only returning data that is
+uncontroversial and well supported by evidence.  At the same time, there is an
+important need to incorporate information that may not be confirmed by observation,
+and instead is the result of an inference process.  These inferred data will also
+be marked with evidence that clearly indicates its status as not authoritative.
+PyOpenWorm endeavors to make the access to inferred data clearly separate from
+uncontroversial data reported in peer-reviewed literature.
