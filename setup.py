@@ -67,7 +67,7 @@ setup(
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
     ],
     setup_requires = "six==1.9.0",
-    version = '0.5.0',
+    version = '0.5.1',
     packages = ['PyOpenWorm'],
     package_data = {'PyOpenWorm':['default.conf']},
     author = 'OpenWorm.org authors and contributors',
