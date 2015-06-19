@@ -8,7 +8,7 @@ Typically the steps below should be sufficient for a successful install:
 
 Alternatively, you can use [pip](http://pip.readthedocs.org/en/latest/installing.html):
 
-    pip install pyopenworm --pre
+    pip install pyopenworm
     
 However, some users have experienced difficulty installing on Mac OSX. If the install
 fails when attempting to install lxml, you might try installing it separately before
