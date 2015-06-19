@@ -69,7 +69,10 @@ setup(
     setup_requires = "six==1.9.0",
     version = '0.5.1',
     packages = ['PyOpenWorm'],
-    package_data = {'PyOpenWorm':['default.conf']},
+    package_data = {
+        'PyOpenWorm':['default.conf']
+    },
+    include_package_data=True,
     author = 'OpenWorm.org authors and contributors',
     author_email = 'info@openworm.org',
     description = 'A Python library for working with OpenWorm data and models',
