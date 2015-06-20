@@ -56,7 +56,7 @@ Classes
 .. automodule:: PyOpenWorm.configure
 """
 
-__version__ = '0.5.1'
+__version__ = '0.5.3'
 __author__ = 'Stephen Larson'
 
 import traceback, sys, os
