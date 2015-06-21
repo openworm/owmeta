@@ -221,7 +221,7 @@ Finally, when you're done accessing the database, be sure to disconnect from it:
 
 ```
 
-More examples can be found [here](http://pyopenworm.readthedocs.org/en/alpha0.5/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/alpha0.5/examples).
+More examples can be found [here](http://pyopenworm.readthedocs.org/en/latest/making_dataObjects.html) and [here](https://github.com/openworm/PyOpenWorm/tree/master/examples).
 
 Documentation
 -------------
