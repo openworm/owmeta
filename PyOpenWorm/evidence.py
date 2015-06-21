@@ -1,7 +1,6 @@
 from PyOpenWorm import *
 
 
-
 class EvidenceError(Exception):
     pass
 
