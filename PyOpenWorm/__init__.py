@@ -75,7 +75,7 @@ from .my_neuroml import NeuroML
 from .connection import Connection
 from .experiment import Experiment
 from .channel import Channel
-from .channelworm import ChannelModel
+from .channelworm import ChannelModel, PatchClampExperiment
 
 __import__('__main__').connected = False
 

@@ -37,7 +37,7 @@ class Condition(DataObject):
         self.owner = owner
 
     def __str__(self):
-        return str("{ \'" + self.name + "\' : \'" + self.value + "\' }")
+        return str("{ \'" + str(self.name) + "\' : \'" + str(self.value) + "\' }")
 
     def __dict__(self):
         return eval(self.__str__())
@@ -77,7 +77,8 @@ class Conditions(Property):
     def set(self, condition=False, value=False):
         #create new Conditon DataObject
         c = Condition(condition, value, self.owner)
-        #add Condition key and value to _conds
+        #add Condition key and value to _conds, overriding current value
+        self._conds = [x for x in self._conds if not x.name == condition]
         self._conds.append(c)
 
 class Experiment(DataObject):

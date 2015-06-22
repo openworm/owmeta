@@ -1,7 +1,28 @@
 from PyOpenWorm import *
 
 class PatchClampExperiment(Experiment):
-    pass
+    def __init__(self, reference=False, **kwargs):
+        Experiment.__init__(self, reference)
+        
+        # enumerate conditions patch-clamp experiments should have
+        patch_clamp_conditions = [
+            'type',
+            'duration',
+            'delta_t',
+            'start_time',
+            'end_time',
+            'protocol_start',
+            'protocol_end',
+            'protocol_step'
+        ]
+ 
+        for c in patch_clamp_conditions:
+            self.conditions.set(c, None)
+
+        for c, v in kwargs.iteritems():
+            print('sup')
+            self.conditions.set(c, v)
+
 
 class References(Property):
     multiple=True
