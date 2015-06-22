@@ -74,7 +74,8 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 from .experiment import Experiment
-from .channel import Channel,ChannelModel
+from .channel import Channel
+from .channelworm import ChannelModel
 
 __import__('__main__').connected = False
 
@@ -215,6 +216,7 @@ def connect(configFile=False,
     Channel.register()
     ChannelModel.register()
     Experiment.register()
+    PatchClampExperiment.register()
 
     m.connected = True
     if data:
