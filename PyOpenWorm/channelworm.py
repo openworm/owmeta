@@ -1,6 +1,10 @@
 from PyOpenWorm import *
 
 class PatchClampExperiment(Experiment):
+    """
+    Store experimental conditions for a patch clamp experiment.
+    """
+
     def __init__(self, reference=False, **kwargs):
         Experiment.__init__(self, reference)
         
@@ -20,7 +24,6 @@ class PatchClampExperiment(Experiment):
             self.conditions.set(c, None)
 
         for c, v in kwargs.iteritems():
-            print('sup')
             self.conditions.set(c, v)
 
 
