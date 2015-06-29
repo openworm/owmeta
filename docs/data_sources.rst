@@ -3,18 +3,17 @@
 |pow| Data Sources
 ==================
 
+The sources of data for PyOpenWorm are stored under the `OpenWormData/aux_data 
+directory <https://github.com/openworm/PyOpenWorm/tree/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/aux_data>`_.  
+These data sources are brought into PyOpenWorm by means of the 
+`insert_worm.py script <https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py>`_, which shows exactly how a given kind of data is 
+brought into the system.  For example `this method <https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py#L37>`_ shows where data about muscles 
+comes from, while `this method <https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py#L218>`_ shows where the connectivity data comes from.  
+A more detailed human readable key is provided below.
+
+
 A Note on |pow| Data
 --------------------
-There are various different sources for *C. elegans* data
-available, each with their own idiosyncrasies. To provide the most
-accurate and up-to-date information in PyOpenWorm, some decisions had
-to be made about which data sources should be used. In the interest of 
-transparency and reproducibility, this page details the choices that went into
-curating the various data sources that form the backbone of |pow|.
-
-The database behind |pow| also has the ability to tag each fact with a
-source using the `evidence module described here <process.html#provenance>`_.
-
 Below, each major element of the worm's anatomy that |pow| stores data
 on is considered individually. The data being used is tagged by source
 in a superscript, and the decisions made during the curation process 
