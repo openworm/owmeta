@@ -1,5 +1,6 @@
 from PyOpenWorm import *
 
+
 class PatchClampExperiment(Experiment):
     """
     Store experimental conditions for a patch clamp experiment.
@@ -47,6 +48,12 @@ class References(Property):
         Returns
         -------
         None
+
+        Example::
+
+            e = P.Evidence(author='Sulston et al.', date='1983')
+            cm = ChannelModel()
+            cm.references.set(e)
         """
         if isinstance(e, Evidence):
             e.asserts(self.owner)

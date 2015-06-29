@@ -215,6 +215,30 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 
 ```
 
+Modelling data
+--------------
+
+PyOpenWorm also provides access to store and retrieve data about models.
+Following are some examples of these types of operations.
+
+Retrieve an ion channel's models from the database::
+
+```python
+# Get data for a subtype of voltage-gated potassium channels
+>> kv1 = P.IonChannel('Kv1')
+>> mods = list(kv1.models.get())
+
+```
+
+The same type of operation can be used for the experiment data model.
+
+```python
+# Get experiment(s) that back up the data model
+>> some_model = mods[0]
+>> some_model.references.get()
+
+```
+
 Finally, when you're done accessing the database, be sure to disconnect from it::
 ```python
 >>> P.disconnect()

@@ -79,3 +79,4 @@ class Channel(DataObject):
 
         if isinstance(subfamily, basestring):
             self.subfamily = subfamily
+

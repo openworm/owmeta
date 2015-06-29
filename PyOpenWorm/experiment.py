@@ -1,5 +1,6 @@
 from PyOpenWorm import *
 
+
 class Condition(DataObject):
     """
     Class for storing a condition of an experiment.
@@ -36,11 +37,12 @@ class Condition(DataObject):
 
         self.owner = owner
 
+    def __repr__(self):
+        return (self.name, self.value)
+
     def __str__(self):
         return str("{ \'" + str(self.name) + "\' : \'" + str(self.value) + "\' }")
 
-    def __dict__(self):
-        return eval(self.__str__())
 
 class Conditions(Property):
     """
@@ -49,7 +51,7 @@ class Conditions(Property):
     multiple=True
     def __init__(self, *args, **kwargs):
         Property.__init__(self, 'conditions', *args, **kwargs)
-        self._conds = []
+        self._conds = dict()
 
     def get(self):
         """
@@ -70,7 +72,7 @@ class Conditions(Property):
             #load Condition objects with owner=self.owner
             c = Condition(owner=self.owner)
             for cond in c.load():
-                self._conds.append(cond)
+                self._conds[cond.name] = cond.value
             for cond in self._conds:
                 yield cond
 
