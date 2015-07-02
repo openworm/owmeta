@@ -151,3 +151,8 @@ class EvidenceTest(_DataTest):
         e0 = Evidence()
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
+
+    def test_verify_facts_have_evidence(self):
+        """ For each fact in PyOpenWorm, verify
+        that there is supporting evidence"""
+        pass 
