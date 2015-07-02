@@ -4,11 +4,6 @@ The recommended way to get PyOpenWorm is from [pip](http://pip.readthedocs.org/e
 
     pip install pyopenworm
 
-However, some users have experienced difficulty installing on Mac OSX. If the install
-fails when attempting to install lxml, you might try installing it separately before
-attempting to install PyOpenWorm. At least one user has found this [Stack Overflow](http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9)
-post to be helpful.
-
 Alternatively, you can grab the contents from GitHub:
 
     git clone https://github.com/openworm/PyOpenWorm.git
