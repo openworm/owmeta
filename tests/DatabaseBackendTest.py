@@ -20,41 +20,7 @@ import doctest
 
 from glob import glob
 
-USE_BINARY_DB = False
-BINARY_DB = "OpenWormData/worm.db"
-TEST_CONFIG = "tests/default_test.conf"
-try:
-    import bsddb
-    has_bsddb = True
-except ImportError:
-    has_bsddb = False
-
-try:
-    import numpy
-    has_numpy = True
-except ImportError:
-    has_numpy = False
-
-namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
-
-def clear_graph(graph):
-    graph.update("CLEAR ALL")
-
-def make_graph(size=100):
-    """ Make an rdflib graph """
-    g = R.Graph()
-    for i in range(size):
-        s = rdflib.URIRef("http://somehost.com/s"+str(i))
-        p = rdflib.URIRef("http://somehost.com/p"+str(i))
-        o = rdflib.URIRef("http://somehost.com/o"+str(i))
-        g.add((s,p,o))
-    return g
-
-def delete_zodb_data_store(path):
-    os.unlink(path)
-    os.unlink(path + '.index')
-    os.unlink(path + '.tmp')
-    os.unlink(path + '.lock')
+from GraphDBInit import * 
 
 class DatabaseBackendTest(unittest.TestCase):
     """Integration tests that ensure basic functioning of the database
