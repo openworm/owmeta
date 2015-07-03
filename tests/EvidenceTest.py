@@ -155,4 +155,14 @@ class EvidenceTest(_DataTest):
     def test_verify_facts_have_evidence(self):
         """ For each fact in PyOpenWorm, verify
         that there is supporting evidence"""
-        pass 
+        net = Worm().neuron_network()
+        neurons = list(net.neurons())
+        evcheck = []
+        for n in neurons:
+            ev = Evidence()
+            nobj = net.aneuron(n)
+            ev.asserts(nobj)
+            hasEvidence = len(list(ev.load()))
+            evcheck.append(hasEvidence)
+
+        assert 0 not in evcheck
