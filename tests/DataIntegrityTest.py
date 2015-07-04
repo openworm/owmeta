@@ -1,24 +1,12 @@
+from __future__ import print_function
 import sys
 sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
 import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
+from PyOpenWorm import Configure
 import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
 
-from glob import glob
-
-from GraphDBInit import * 
-from DataTestTemplate import _DataTest
+from GraphDBInit import copy_zodb_data_store
 
 class DataIntegrityTest(unittest.TestCase):
     """ Integration tests that read from the database and ensure that basic
@@ -29,22 +17,18 @@ class DataIntegrityTest(unittest.TestCase):
     def setUpClass(cls):
         import csv
 
-        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
-
-        if not USE_BINARY_DB:
-            PyOpenWorm.connect(conf=Data()) # Connect for integrity tests that use PyOpenWorm functions
-            cls.g = PyOpenWorm.config('rdf.graph') # declare class-level scope for the database
-            cls.g.parse("OpenWormData/WormData.n3", format="n3") # load in the database
-        else:
-            conf = Configure(**{ "rdf.source" : "ZODB", "rdf.store_conf" : BINARY_DB })
-            PyOpenWorm.connect(conf=conf)
-            cls.g = PyOpenWorm.config('rdf.graph')
-
+        copy_zodb_data_store('worm.db', "tests/test.db") # copy to a test_database
+        PyOpenWorm.connect(
+            {'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'})
+        PyOpenWorm.loadData(skipIfNewer=True)
+        PyOpenWorm.disconnect()
+        os.chdir('examples')
         #grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
 
+        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
         for row in reader:
             if len(row[0]) > 0: # Only saves valid neuron names
                 cls.neurons.append(row[0])
@@ -121,7 +105,7 @@ class DataIntegrityTest(unittest.TestCase):
                                   '?o ?p ?s} ' #for that type ?o, get its value ?v
                                 + 'LIMIT 10')
         for row in qres.result:
-            print row
+            print(row)
 
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """

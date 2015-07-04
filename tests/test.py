@@ -175,9 +175,9 @@ if __name__ == '__main__':
     if PERFORMANCE_PROFILE:
         # DecoratorSuite subclasses TestSuite, overriding its addTest method
         suite = ExecutionProfileSuite.ExecutionProfileSuite()
-    else: 
+    else:
         suite = unittest.TestSuite()
-    
+
     if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:
