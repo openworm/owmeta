@@ -34,3 +34,4 @@ examples/cell_indices
 OpenWormData/WormData.n3
 *.ipynb
 *.out
+*.nb
