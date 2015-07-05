@@ -56,6 +56,7 @@ Classes
 .. automodule:: PyOpenWorm.configure
 """
 
+from __future__ import print_function
 __version__ = '0.5.3'
 __author__ = 'Stephen Larson'
 
@@ -149,7 +150,7 @@ def loadData(
         try:
             data_file_time = os.path.getmtime(data)
             db_file_time = os.path.getmtime(config('rdf.store_conf'))
-            print db_file_time, data_file_time
+            print(db_file_time, data_file_time)
             if data_file_time < db_file_time:
                 return
         except:
@@ -177,7 +178,7 @@ def connect(configFile=False,
     import atexit
     m = __import__('__main__')
     if m.connected:
-        print "PyOpenWorm already connected"
+        print ("PyOpenWorm already connected")
         return
 
     if do_logging:

@@ -52,18 +52,11 @@ class DataObject(DataUser):
     owner_properties : list of Property
         Properties belonging to parents of this object
     """
-    _openSet = set()
-    _closedSet = set()
-    i = 0
-
-    @classmethod
-    def openSet(self):
-        return self._openSet
 
     def __init__(self,ident=False,triples=False,**kwargs):
         try:
             DataUser.__init__(self,**kwargs)
-        except BadConf, e:
+        except BadConf:
             raise Exception("You may need to connect to a database before continuing.")
 
         if not triples:
@@ -89,7 +82,6 @@ class DataObject(DataUser):
             cname = self.__class__.__name__
             self._id_variable = self._graph_variable(cname + v.encode('hex'))
             self._id = self.make_identifier(v)
-        DataObject.addToOpenSet(self)
 
     def __eq__(self,other):
         return isinstance(other,DataObject) and (self.identifier() == other.identifier())
@@ -106,16 +98,6 @@ class DataObject(DataUser):
     def _graph_variable(self,var_name):
         """ Make a variable for storage in the graph """
         return self.conf['rdf.namespace']["variable#"+var_name]
-
-    @classmethod
-    def addToOpenSet(cls,o):
-        cls._openSet.add(o)
-
-    @classmethod
-    def removeFromOpenSet(cls,o):
-        if o not in cls._closedSet:
-            cls._openSet.remove(o)
-            cls._closedSet.add(o)
 
     def id_is_variable(self):
         """ Is the uriref a graph variable? """
@@ -400,7 +382,7 @@ class _QueryResultsTypeResolver(object):
     def s(self):
         try:
             k = next(self.qres)
-        except StopIteration as e:
+        except StopIteration:
             k = (None, None)
         return k
 
@@ -441,7 +423,7 @@ def get_most_specific_rdf_type(types):
             class_object = _DataObjects[cn]
             if issubclass(class_object, most_specific_type):
                 most_specific_type = class_object
-        except KeyError as e:
+        except KeyError:
             L.warn("""A a Python class named "{}" corresponding to the type URI "{}" couldn't be found.
             You may want to import the module containing the class as well as add additional type
             annotations in order to resolve your objects to a more precise type than DataObject.""".format(cn, x))
@@ -479,7 +461,6 @@ class Property(DataObject):
             self.owner.properties.append(self)
             if name:
                 setattr(self.owner, name, self)
-            DataObject.removeFromOpenSet(self)
         # XXX: Default implementation is a box for a value
         self._value = False
 
@@ -624,8 +605,6 @@ class SimpleProperty(Property):
         if self.property_type == 'ObjectProperty':
             v.owner_properties.append(self)
 
-        if isinstance(v,DataObject):
-            DataObject.removeFromOpenSet(v)
         self.add_statements([])
 
     def triples(self,*args,**kwargs):

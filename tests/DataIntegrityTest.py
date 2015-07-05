@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-sys.path.insert(0,".")
+sys.path.insert(0, ".")
 import unittest
 import PyOpenWorm
 from PyOpenWorm import Configure
@@ -8,7 +8,9 @@ import rdflib as R
 
 from GraphDBInit import copy_zodb_data_store
 
+
 class DataIntegrityTest(unittest.TestCase):
+
     """ Integration tests that read from the database and ensure that basic
         queries have expected answers, as a way to keep data quality high.
 
@@ -17,21 +19,25 @@ class DataIntegrityTest(unittest.TestCase):
     def setUpClass(cls):
         import csv
 
-        copy_zodb_data_store('worm.db', "tests/test.db") # copy to a test_database
+        copy_zodb_data_store(
+            'worm.db',
+            "tests/test.db")  # copy to a test_database
         PyOpenWorm.connect(
-            {'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'})
+            conf=Configure(
+                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
         PyOpenWorm.loadData(skipIfNewer=True)
         PyOpenWorm.disconnect()
-        os.chdir('examples')
-        #grab the list of the names of the 302 neurons
+        # grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
 
-        cls.neurons = [] #array that holds the names of the 302 neurons at class-level scope
+        # array that holds the names of the 302 neurons at class-level scope
+        cls.neurons = []
         for row in reader:
-            if len(row[0]) > 0: # Only saves valid neuron names
+            if len(row[0]) > 0:  # Only saves valid neuron names
                 cls.neurons.append(row[0])
+
     @classmethod
     def tearDownClass(cls):
         PyOpenWorm.disconnect()
@@ -51,7 +57,9 @@ class DataIntegrityTest(unittest.TestCase):
         neuronlist = PyOpenWorm.Neuron()
         neuronlist.neuropeptide("TH")
         thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
+        self.assertEqual(
+            set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']),
+            thlist)
 
     def testUniqueNeuronNode(self):
         """
@@ -61,15 +69,30 @@ class DataIntegrityTest(unittest.TestCase):
 
         results = {}
         for n in self.neurons:
-            #Create a SPARQL query per neuron that looks for all RDF nodes that have text matching the name of the neuron
-            qres = self.g.query('SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' + n + '\" } LIMIT 5')
+            # Create a SPARQL query per neuron that looks for all RDF nodes that
+            # have text matching the name of the neuron
+            qres = self.g.query(
+                'SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' +
+                n +
+                '\" } LIMIT 5')
             results[n] = (len(qres.result), [x[0] for x in qres.result])
 
-        # If there is not only one result back, then there is more than one RDF node.
+        # If there is not only one result back, then there is more than one RDF
+        # node.
         more_than_one = [(x, results[x]) for x in results if results[x][0] > 1]
         less_than_one = [(x, results[x]) for x in results if results[x][0] < 1]
-        self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
-        self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
+        self.assertEqual(
+            0,
+            len(more_than_one),
+            "Some neurons have more than 1 node: " +
+            "\n".join(
+                str(x) for x in more_than_one))
+        self.assertEqual(
+            0,
+            len(less_than_one),
+            "Some neurons have no node: " +
+            "\n".join(
+                str(x) for x in less_than_one))
 
     def testNeuronsHaveTypes(self):
         """
@@ -77,18 +100,24 @@ class DataIntegrityTest(unittest.TestCase):
         """
         results = set()
         for n in self.neurons:
-            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". ' #per node ?s that has the name of a neuron associated
+            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". '  # per node ?s that has the name of a neuron associated
                                 + '?k <http://openworm.org/entities/Cell/name> ?s .'
-                                + '?k <http://openworm.org/entities/Neuron/type> ?o .' #look up its listed type ?o
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } ' #for that type ?o, get its property ?tp and its value ?v
+                                # look up its listed type ?o
+                                + '?k <http://openworm.org/entities/Neuron/type> ?o .'
+                                # for that type ?o, get its property ?tp and its
+                                # value ?v
+                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } '
                                 )
             for x in qres:
                 v = x[0]
-                if isinstance(v,R.Literal):
+                if isinstance(v, R.Literal):
                     results.add(n)
 
         # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
-        self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
+        self.assertEqual(len(results),
+                         len(self.neurons) - 4,
+                         "Some neurons are missing a type: {}".format(
+                             set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """
@@ -101,9 +130,9 @@ class DataIntegrityTest(unittest.TestCase):
     @unittest.skip("have not yet defined asserts")
     def testWhatNodesGetTypeInfo(self):
         qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                                  '?o ?p ?s} ' #for that type ?o, get its value ?v
-                                + 'LIMIT 10')
+                            + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
+                            '?o ?p ?s} '  # for that type ?o, get its value ?v
+                            + 'LIMIT 10')
         for row in qres.result:
             print(row)
 
@@ -113,14 +142,14 @@ class DataIntegrityTest(unittest.TestCase):
         xls_conns = []
         pow_conns = []
 
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
+        # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
         qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
                                ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
+                            + SAMPLE_CELL +
+                            """\'.
                                ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
                                ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
                                ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
@@ -150,21 +179,23 @@ class DataIntegrityTest(unittest.TestCase):
                                # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
                                FILTER(isLiteral(?post_name))}""")
+
         def ff(x):
             return str(x.value)
         for line in qres.result:
             t = list(map(ff, line))
-            t.insert(0,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
+            # Insert sample cell name into the result set after the fact
+            t.insert(0, SAMPLE_CELL)
             pow_conns.append(t)
 
-        #QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
+        # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
         qres = self.g.query("""SELECT ?pre_name ?type (STR(?num) AS ?numval) WHERE {
                                #############################################################
                                # Find connections that have the ?post_name as our passed in value
                                #############################################################
                                ?post_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                               + SAMPLE_CELL +
-                               """\'.
+                            + SAMPLE_CELL +
+                            """\'.
                                ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
                                ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
                                ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
@@ -196,10 +227,11 @@ class DataIntegrityTest(unittest.TestCase):
                                FILTER(isLiteral(?pre_name))}""")
         for line in qres.result:
             t = list(map(ff, line))
-            t.insert(1,SAMPLE_CELL) #Insert sample cell name into the result set after the fact
+            # Insert sample cell name into the result set after the fact
+            t.insert(1, SAMPLE_CELL)
             pow_conns.append(t)
 
-        #get connections from the sheet
+        # get connections from the sheet
         import re
         search_string = re.compile(r'\w+[0]+[1-9]+')
         replace_string = re.compile(r'[0]+')
@@ -215,11 +247,17 @@ class DataIntegrityTest(unittest.TestCase):
         import xlrd
         combining_dict = {}
         # 's' is the workbook sheet
-        s = xlrd.open_workbook('OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
+        s = xlrd.open_workbook(
+            'OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and SAMPLE_CELL in [s.cell(row, 0).value, s.cell(row, 1).value]:
-                #we're not going to include 'receives' ('r', 'rp') since they're just the inverse of 'sends'
-                #also omitting 'nmj' for the time being (no model in db)
+            if s.cell(
+                row, 2).value in (
+                'S', 'Sp', 'EJ') and SAMPLE_CELL in [
+                s.cell(
+                    row, 0).value, s.cell(
+                    row, 1).value]:
+                # we're not going to include 'receives' ('r', 'rp') since they're just the inverse of 'sends'
+                # also omitting 'nmj' for the time being (no model in db)
                 pre = normalize(s.cell(row, 0).value)
                 post = normalize(s.cell(row, 1).value)
                 num = int(s.cell(row, 3).value)
@@ -236,13 +274,16 @@ class DataIntegrityTest(unittest.TestCase):
                     # if key already there, add to number
                     num += int(combining_dict[string_key][3])
 
-                combining_dict[string_key] = [str(pre), str(post), str(syntype), str(int(num))]
-
+                combining_dict[string_key] = [
+                    str(pre),
+                    str(post),
+                    str(syntype),
+                    str(int(num))]
 
         xls_conns = combining_dict.values()
 
-        #assert that these two sorted lists are the same
-        #using sorted lists because Set() removes multiples
+        # assert that these two sorted lists are the same
+        # using sorted lists because Set() removes multiples
 
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))

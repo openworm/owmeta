@@ -1,30 +1,19 @@
 import sys
 sys.path.insert(0,".")
-import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
+from PyOpenWorm import DataObject, SimpleProperty
 import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
-
-from glob import glob
-
-from GraphDBInit import * 
 
 from DataTestTemplate import _DataTest
 
 class SimplePropertyTest(_DataTest):
     def __init__(self,*args,**kwargs):
         _DataTest.__init__(self,*args,**kwargs)
-        id_tests = []
+
+        class K(DataObject):
+            def __init__(self):
+                K.DatatypeProperty('boots', self)
+                K.ObjectProperty('bats', self)
+        self.k = K
 
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
@@ -147,3 +136,56 @@ class SimplePropertyTest(_DataTest):
         sp = T(owner=do)
         self.assertEqual(len(list(sp.triples())), 0)
         self.assertEqual(len(list(sp.triples(query=True))), 0)
+
+    def test_non_multiple_saves_single_values(self):
+        class C(DataObject):
+            datatypeProperties = [{'name':'t', 'multiple':False}]
+        do = C(key="s")
+        do.t("value1")
+        do.t("vaule2")
+        do.save()
+
+        do1 = C(key="s")
+        self.assertEqual(len(list(do1.t.get())), 1)
+
+    def test_unset_single(self):
+        boots = self.k().boots
+
+        boots.set("l")
+        boots.unset("l")
+        self.assertEqual(len(boots.values), 0)
+
+    def test_unset_single_property_value(self):
+        from PyOpenWorm.dataObject import PropertyValue
+        boots = self.k().boots
+
+        boots.set("l")
+        boots.unset(PropertyValue("l"))
+        self.assertEqual(len(boots.values), 0)
+
+    def test_unset_single_by_identifier(self):
+        bats = self.k().bats
+
+        o = self.k(key='blah')
+        bats.set(o)
+        bats.unset(o.identifier())
+        self.assertEqual(len(bats.values), 0)
+
+    def test_unset_multiple(self):
+        bets = self.k().bets
+        bets.set("l")
+        bets.unset("l")
+        self.assertEqual(len(bets.values), 0)
+
+    def test_unset_empty(self):
+        """ Attempting to unset a value that isn't set should raise an error """
+        bits = self.k().bits
+        with self.assertRaises(Exception):
+            bits.unset("random")
+
+    def test_unset_wrong_value(self):
+        """ Attempting to unset a value that isn't set should raise an error """
+        bits = self.k().bits
+        bits.set(self.k(key='roger'))
+        with self.assertRaises(Exception):
+            bits.unset("random")

@@ -155,7 +155,7 @@ class DataUser(Configureable):
         #fetch the derived object's graph
         semnet = self.rdf
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
-        closureDeltaGraph = R.Graph()
+        closureDeltaGraph = Graph()
         network.inferredFacts = closureDeltaGraph
         #build a network of rules
         for rule in HornFromN3('testrules.n3'):
@@ -575,7 +575,7 @@ class ZODBSource(RDFSource):
         self.graph = root['rdflib']
         try:
             transaction.commit()
-        except Exception as e:
+        except Exception:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
@@ -594,7 +594,7 @@ class ZODBSource(RDFSource):
 
         try:
             transaction.commit()
-        except Exception as e:
+        except Exception:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
