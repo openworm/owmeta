@@ -153,8 +153,8 @@ class EvidenceTest(_DataTest):
         self.assertTrue(len(list(e0.load())) == 2)
 
     @unittest.expectedFailure
-    def test_verify_facts_have_evidence(self):
-        """ For each fact in PyOpenWorm, verify
+    def test_verify_neurons_have_evidence(self):
+        """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
         net = Worm().neuron_network()
         neurons = list(net.neurons())
@@ -167,3 +167,17 @@ class EvidenceTest(_DataTest):
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck)
+
+    @unittest.expectedFailure
+    def test_verify_muslces_have_evidence(self):
+        """ For each muscle in PyOpenWorm, verify
+        that there is supporting evidence"""
+        muscles = list(Worm().muscles())
+        muscle_evcheck = []
+        for mobj in muscles:
+            ev = Evidence()
+            ev.asserts(mobj)
+            hasEvidence = len(list(ev.load()))
+            muscle_evcheck.append(hasEvidence)
+
+        self.assertTrue(0 not in muscle_evcheck)
