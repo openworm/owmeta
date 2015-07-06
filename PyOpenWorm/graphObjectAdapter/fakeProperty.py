@@ -1,9 +1,12 @@
-from yarom.yProperty import Property as P
+from PyOpenWorm.pProperty import Property
 
-class FakeProperty(P):
-
+class FakeProperty(Property):
     def __init__(self, prop):
         self._p = prop
+
+    @property
+    def owner(self):
+        return self._p.owner
 
     @property
     def link(self):
@@ -17,4 +20,23 @@ class FakeProperty(P):
         self._p.set(v)
 
     def unset(self, v):
-        pass
+        self._p.unset()
+
+    def get(self):
+        return self._p.get()
+
+    @property
+    def owner(self):
+        return self._p.owner
+
+    @property
+    def multiple(self):
+        return False
+
+    @property
+    def rdf(self):
+        return self._p.rdf
+
+    def __str__(self):
+        return "FakeProperty("+str(self._p.idl.n3())+")"
+

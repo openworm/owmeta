@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0,".")
-from PyOpenWorm import DataObject, SimpleProperty
+from PyOpenWorm import DataObject
+from PyOpenWorm.simpleProperty import SimpleProperty
 import rdflib as R
 
 from DataTestTemplate import _DataTest

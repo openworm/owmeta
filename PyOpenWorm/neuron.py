@@ -160,6 +160,10 @@ class Neighbor(P.Property):
             for r in c.load():
                 yield r.post_cell()
 
+    @property
+    def values(self):
+        return []
+
     def set(self, other, **kwargs):
         c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
         self._conns.append(c)
@@ -206,6 +210,10 @@ class Connection(P.Property):
         for x in c:
             for r in x.load():
                 yield r
+
+    @property
+    def values(self):
+        return []
 
     def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
         """Get a list of connections associated with the owning neuron.

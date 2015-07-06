@@ -1,4 +1,5 @@
-from PyOpenWorm import *
+from __future__ import print_function
+from PyOpenWorm.dataObject import DataObject
 from string import Template
 import neuroml
 __all__ = [ "Cell" ]
@@ -213,7 +214,7 @@ class Cell(DataObject):
 
         if self.name.hasValue():
             # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
+            n = list(self.name.values)[0]
             return self.make_identifier(n)
         else:
             return ident

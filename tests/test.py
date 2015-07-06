@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 
 import sys
 sys.path.insert(0,".")
@@ -154,7 +153,7 @@ if __name__ == '__main__':
     configs = glob("tests/test_*.conf")
     if not has_bsddb:
         configs = [x for x in configs if 'Sleepycat' not in x]
-    print("Testing with configs:",configs)
+    print "Testing with configs:",configs
     for x in configs:
         TEST_CONFIG = x
         suite = unittest.TestSuite()

@@ -65,7 +65,9 @@ import sys
 import os
 from .configure import Configure, Configureable, ConfigValue, BadConf
 from .data import Data, DataUser, propertyTypes
-from .dataObject import *
+from .dataObject import DataObject
+from .pProperty import Property
+from .simpleProperty import SimpleProperty
 from .cell import Cell
 from .network import Network
 from .neuron import Neuron
