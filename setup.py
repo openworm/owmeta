@@ -2,7 +2,7 @@
 
 from setuptools import setup
 from setuptools.command.install import install as _install
-import os, sys
+import sys
 
 
 def _post_install():
@@ -57,6 +57,7 @@ setup(
         'transaction==1.4.3',
         'wsgiref==0.1.2',
         'xlrd',
+        'yarom',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',

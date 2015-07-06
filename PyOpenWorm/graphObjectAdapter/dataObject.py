@@ -1,4 +1,5 @@
-from yarom.graphObject import GraphObject
+import rdflib as R
+from yarom.graphObject import GraphObject, ComponentTripler
 from PyOpenWorm.dataObject import DataObject as DO
 from .simpleProperty import SimpleProperty
 from .fakeProperty import FakeProperty
@@ -30,8 +31,14 @@ class DataObject(GraphObject, DO):
     """ Adapts a DataObject to the GraphObject interface """
 
     def __init__(self, *args, **kwargs):
+        key=None
+        if 'key' in kwargs:
+            key=kwargs['key']
+            del kwargs['key']
         GraphObject.__init__(self)
         DO.__init__(self, *args, **kwargs)
+        self.setKey(key)
+
 
     def __repr__(self):
         s = self.__class__.__name__ + "("
@@ -39,6 +46,22 @@ class DataObject(GraphObject, DO):
             s += self._id
         s += ")"
         return s
+
+    def setKey(self, key):
+        if isinstance(key, str):
+            self._id = self.make_identifier_direct(key)
+        else:
+            self._id = self.make_identifier(key)
+
+    @classmethod
+    def make_identifier_direct(cls, string):
+        if not isinstance(string, str):
+            raise Exception("make_identifier_direct only accepts strings")
+        from urllib import quote
+        return R.URIRef(cls.rdf_namespace[quote(string)])
+
+    def triples(self,*args, **kwargs):
+        return ComponentTripler(self)()
 
     def __str__(self):
         return str(self.idl)
@@ -93,7 +116,6 @@ class DataObject(GraphObject, DO):
             c.register()
         res = c(owner=_FakeOwner(owner))
         fp = FakeProperty(res)
-        print("creating " + linkName)
         owner.properties.append(fp)
         setattr(owner, linkName, fp)
 

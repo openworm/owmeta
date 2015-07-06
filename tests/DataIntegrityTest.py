@@ -38,8 +38,13 @@ class DataIntegrityTest(unittest.TestCase):
             if len(row[0]) > 0:  # Only saves valid neuron names
                 cls.neurons.append(row[0])
 
-    @classmethod
-    def tearDownClass(cls):
+    def setUp(self):
+        PyOpenWorm.connect(
+            conf=Configure(
+                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
+        self.g = PyOpenWorm.config("rdf.graph")
+
+    def tearDown(self):
         PyOpenWorm.disconnect()
 
     def test_correct_neuron_number(self):

@@ -16,3 +16,5 @@ class FakeProperty(P):
     def set(self, v):
         self._p.set(v)
 
+    def unset(self, v):
+        pass
