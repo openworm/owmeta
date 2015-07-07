@@ -191,6 +191,7 @@ class EvidenceTest(_DataTest):
         self.assertTrue(0 not in evcheck)
 
     # There is no information at present about channels
+    # Dummy message to debug sourcetree
     @unittest.skip
     def test_verify_channel_have_evidence(self):
         """ For each channel in PyOpenWorm, verify that there is
