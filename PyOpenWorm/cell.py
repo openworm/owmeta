@@ -91,6 +91,7 @@ class Cell(DataObject):
         Cell.DatatypeProperty('name',owner=self)
         Cell.DatatypeProperty('divisionVolume',owner=self)
         Cell.DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('wormbaseID', owner=self)
 
         if name:
             self.name(name)
@@ -214,3 +215,37 @@ class Cell(DataObject):
             return self.make_identifier(n)
         else:
             return ident
+
+
+class Synonym(Property):
+    """A list of synonyms for this Cell, from WormBase."""
+
+    multiple=True
+    def __init__(self, **kwargs):
+        Property.__init__(self, 'synonym', **kwargs)
+        self._synons = []
+
+    def get(self):
+        """
+        Return a set of synonyms for a Cell's name.
+
+        Returns
+        -------
+        A Set object containing synonyms for this Cell
+        """
+        return set(self._synons)
+
+    def set(self, syn_list):
+        """
+        Add synonyms for a Cell.
+
+        Parameters
+        ----------
+        syn_list : A list of synonyms for this Cell
+        """
+
+        if not type(syn_list) is list:
+            syn_list = [syn_list]
+
+        self._synons + syn_list
+
