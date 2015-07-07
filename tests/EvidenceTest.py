@@ -160,10 +160,7 @@ class EvidenceTest(_DataTest):
         neurons = list(net.neurons())
         evcheck = []
         for n in neurons:
-            ev = Evidence()
-            nobj = net.aneuron(n)
-            ev.asserts(nobj)
-            hasEvidence = len(list(ev.load()))
+            hasEvidence = len(get_supporting_evidence(nobj))
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck)
@@ -175,9 +172,28 @@ class EvidenceTest(_DataTest):
         muscles = list(Worm().muscles())
         muscle_evcheck = []
         for mobj in muscles:
-            ev = Evidence()
-            ev.asserts(mobj)
-            hasEvidence = len(list(ev.load()))
+            hasEvidence = len(get_supporting_evidence(mobj))
             muscle_evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in muscle_evcheck)
+
+    @unittest.expectedFailure
+    def test_verify_connections_have_evidence(self):
+        """ For each connection in PyOpenWorm, verify that there is 
+        supporting evidence. """
+        net = Worm().neuron_network()
+        connections = list(net.synapses())
+        evcheck = []
+        for c in connections:
+            has_evidence = len(get_supporting_evidence(c))
+            evcheck.append(has_evidence)
+
+        self.assertTrue(0 not in evcheck)
+
+    def get_supporting_evidence(fact):
+        """ Helper function for checking amount of Evidence.
+        Returns list of Evidence supporting fact. """
+        ev = Evidence()
+        ev.asserts(fact)
+        return list(ev.load())
+
