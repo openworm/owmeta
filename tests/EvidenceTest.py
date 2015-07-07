@@ -179,7 +179,7 @@ class EvidenceTest(_DataTest):
 
     @unittest.expectedFailure
     def test_verify_connections_have_evidence(self):
-        """ For each connection in PyOpenWorm, verify that there is 
+        """ For each connection in PyOpenWorm, verify that there is
         supporting evidence. """
         net = Worm().neuron_network()
         connections = list(net.synapses())
@@ -190,10 +190,16 @@ class EvidenceTest(_DataTest):
 
         self.assertTrue(0 not in evcheck)
 
+    # There is no information at present about channels
+    @unittest.skip
+    def test_verify_channel_have_evidence(self):
+        """ For each channel in PyOpenWorm, verify that there is
+        supporting evidence. """
+        pass
+
     def get_supporting_evidence(fact):
         """ Helper function for checking amount of Evidence.
         Returns list of Evidence supporting fact. """
         ev = Evidence()
         ev.asserts(fact)
         return list(ev.load())
-
