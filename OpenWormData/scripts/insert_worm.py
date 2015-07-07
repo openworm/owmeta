@@ -215,8 +215,17 @@ def upload_receptors_and_innexins():
     finally:
         conn.close()
 
-def upload_connections():
+def new_connections():
+    """we can replace the old function (upload_connections) with this
+    once it is ready to go"""
+    try:
+        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:    
+            edge_reader = csv.reader(csvfile)                                
+            edge_reader.next()    # skip header row                          
+            for row in edge_reader:
+                source, target, weight, syn_type = map(str.strip, row)
 
+def upload_connections():
     import re
     search_string = re.compile(r'\w+[0]+[1-9]+')
     replace_string = re.compile(r'[0]+')
@@ -229,57 +238,49 @@ def upload_connections():
             name = replace_string.sub('', name)
         return name
 
+    import xlrd
+
     try:
-        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
-            edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
-            for row in edge_reader:
-                source, target, weight, syn_type = map(str.strip, row)
+        w = P.Worm()
+        n = P.Network()
+        w.neuron_network(n)
+        combining_dict = {}
+        # Get synapses and gap junctions and add them to the graph
+        s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
+        for row in range(1, s.nrows):
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
+                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
+                #Also omitting 'NMJ' for the time being (no model in db)
+                pre = normalize(s.cell(row, 0).value)
+                post = normalize(s.cell(row, 1).value)
+                num = int(s.cell(row, 3).value)
+                if s.cell(row, 2).value == 'EJ':
+                    syntype = 'gapJunction'
+                elif s.cell(row, 2).value in ('S', 'Sp'):
+                    syntype = 'send'
+
+                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
+                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
+                # values are lists of the form [pre, post, number, syntype].
+                string_key = '{},{},{}'.format(pre, post, syntype)
+                if string_key in combining_dict.keys():
+                    # if key already there, add to number
+                    num += combining_dict[string_key][2]
+
+                combining_dict[string_key] = [pre, post, num, syntype]
+
+        for entry in combining_dict:
+            pre, post, num, syntype = combining_dict[entry]
+            c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
+            n.synapse(c)
+
+        e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
+        e.asserts(n)
+        e.save()
+        print('uploaded connections')
 
     except Exception, e:
         traceback.print_exc()
-
-
-#    import xlrd
-#
-#    try:
-#        w = P.Worm()
-#        n = P.Network()
-#        w.neuron_network(n)
-#        combining_dict = {}
-#        # Get synapses and gap junctions and add them to the graph
-#        s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
-#        for row in range(1, s.nrows):
-#            if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
-#                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
-#                #Also omitting 'NMJ' for the time being (no model in db)
-#                pre = normalize(s.cell(row, 0).value)
-#                post = normalize(s.cell(row, 1).value)
-#                num = int(s.cell(row, 3).value)
-#                if s.cell(row, 2).value == 'EJ':
-#                    syntype = 'gapJunction'
-#                elif s.cell(row, 2).value in ('S', 'Sp'):
-#                    syntype = 'send'
-#
-#                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
-#                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
-#                # values are lists of the form [pre, post, number, syntype].
-#                string_key = '{},{},{}'.format(pre, post, syntype)
-#                if string_key in combining_dict.keys():
-#                    # if key already there, add to number
-#                    num += combining_dict[string_key][2]
-#
-#                combining_dict[string_key] = [pre, post, num, syntype]
-#
-#        for entry in combining_dict:
-#            pre, post, num, syntype = combining_dict[entry]
-#            c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
-#            n.synapse(c)
-#
-#        e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
-#        e.asserts(n)
-#        e.save()
-#        print('uploaded connections')
 
 def upload_types():
     import csv
