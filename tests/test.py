@@ -99,6 +99,9 @@ from SimplePropertyTest import SimplePropertyTest
 # TODO: This test is empty!
 from NeuroMLTest import NeuroMLTest
 
+# Miscellaneous Tests
+from Misc import Misc
+
 # Tests from README.md
 from DocumentationTest import DocumentationTest
 
