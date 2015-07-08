@@ -3,10 +3,7 @@ from PyOpenWorm.pProperty import Property
 class FakeProperty(Property):
     def __init__(self, prop):
         self._p = prop
-
-    @property
-    def owner(self):
-        return self._p.owner
+        self._p.owner_properties.append(self)
 
     @property
     def link(self):

@@ -24,8 +24,7 @@ class DataObject(GraphObject, DO):
 
     def __repr__(self):
         s = self.__class__.__name__ + "("
-        if self._id is not None:
-            s += self._id
+        s += self.idl
         s += ")"
         return s
 

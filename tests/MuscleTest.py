@@ -32,21 +32,15 @@ class MuscleTest(_DataTest):
         n = Neuron('some neuron')
         m.innervatedBy(n)
         m.save()
-        print(m.rdf.serialize(format="n3"))
         v = Muscle(name='MDL08')
-        print("defined?",v.innervatedBy.defined)
-        print("fp?",v.properties)
-        print()
-        for t in v.triples():
-            print(t)
-        self.assertIn(Neuron('some neuron'), list(v.innervatedBy()))
+        self.assertIn(n, list(v.innervatedBy()))
 
-    #def test_muscle_neurons(self):
-        #""" Should be the same as innervatedBy """
-        #m = Muscle(name='MDL08')
-        #neu = Neuron(name="tnnetenba")
-        #m.neurons(neu)
-        #m.save()
+    def test_muscle_neurons(self):
+        """ Should be the same as innervatedBy """
+        m = Muscle(name='MDL08')
+        neu = Neuron(name="tnnetenba")
+        m.neurons(neu)
+        m.save()
 
-        #m = Muscle(name='MDL08')
-        #self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
+        m = Muscle(name='MDL08')
+        self.assertIn(Neuron('tnnetenba'), list(m.neurons()))

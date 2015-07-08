@@ -128,11 +128,11 @@ class Neuron(Cell):
        """
 
     def __str__(self):
-        n = self.name()
-        if n is not None:
-            return n
+        n = list(self.name.values)
+        if len(n) > 0:
+            return "Neuron(name="+str(n[0])+")"
         else:
-            return ""
+            return "Neuron()"
 
 
 class Neighbor(P.Property):

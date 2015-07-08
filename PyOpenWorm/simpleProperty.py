@@ -9,6 +9,7 @@ import rdflib as R
 import random as RND
 
 
+# TODO: Support ObjectProperty/DatatypeProperty differences a la yarom
 class _ValueProperty(object):
     def __init__(self, conf, owner_property):
         self._owner_property = owner_property
