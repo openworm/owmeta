@@ -190,8 +190,7 @@ class EvidenceTest(_DataTest):
 
         self.assertTrue(0 not in evcheck)
 
-    # There is no information at present about channels
-    @unittest.skip
+    @unittest.skip('There is no information at present about channels')
     def test_verify_channels_have_evidence(self):
         """ For each channel in PyOpenWorm, verify that there is
         supporting evidence. """

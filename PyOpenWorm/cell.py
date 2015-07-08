@@ -87,10 +87,13 @@ class Cell(DataObject):
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
         DataObject.__init__(self,**kwargs)
+
         Cell.DatatypeProperty('lineageName',owner=self)
         Cell.DatatypeProperty('name',owner=self)
         Cell.DatatypeProperty('divisionVolume',owner=self)
         Cell.DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('wormbaseID', owner=self)
+        Cell.DatatypeProperty('synonym', owner=self, multiple=True)
 
         if name:
             self.name(name)
@@ -214,3 +217,4 @@ class Cell(DataObject):
             return self.make_identifier(n)
         else:
             return ident
+

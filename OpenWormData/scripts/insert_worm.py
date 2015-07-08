@@ -224,6 +224,8 @@ def new_connections():
             edge_reader.next()    # skip header row                          
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
+    except:
+        pass
 
 def upload_connections():
     import re
@@ -278,7 +280,6 @@ def upload_connections():
         e.asserts(n)
         e.save()
         print('uploaded connections')
-
     except Exception, e:
         traceback.print_exc()
 
