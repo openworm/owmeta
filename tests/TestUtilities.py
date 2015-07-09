@@ -23,7 +23,7 @@ def findSkippedTests():
                     print '\n'
                     count = False
 
-# Function to list function names in tests suites so we can quickly see \
+# Function to list function names in test suite so we can quickly see \
 # which ones do not adhere to the proper naming convention.
 def listFunctionNames():
         for fname in os.listdir('.'):
