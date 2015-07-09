@@ -22,3 +22,20 @@ def findSkippedTests():
                 if count:
                     print '\n'
                     count = False
+
+# Function to list function names in tests suites so we can quickly see \
+# which ones do not adhere to the proper naming convention.
+def listFunctionNames():
+        for fname in os.listdir('.'):
+            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+                with open(fname) as f:
+                    count = False
+                    for line in f:
+                        check = line.strip()[4:8]
+                        if 'def ' in line and check != 'test' and check != '__in':
+                            print line.strip() + ' in file ' + fname
+                            count = True
+
+                    if count:
+                        print '\n'
+                        count = False
