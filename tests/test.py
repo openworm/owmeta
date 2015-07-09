@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
     if len(args) == 1:
-        suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
+        suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:
         suite.addTests(all_tests)
 
