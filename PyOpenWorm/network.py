@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import PyOpenWorm as P
 import rdflib as R
-from PyOpenWorm import DataObject
+
+from PyOpenWorm.dataObject import DataObject
 
 class Network(DataObject):
     """A network of neurons
@@ -121,17 +122,22 @@ class Network(DataObject):
             yield x
 
     def identifier(self, *args, **kwargs):
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-        owners = self.getOwners(P.Worm().neuron_network.link)
-        data = []
-        for x in owners:
-            ident = x.identifier(query=True) # XXX: Query is set to true so a fixed identifier isn't generated randomly
-            if not DataObject._is_variable(ident):
-                data.append(ident)
-        data = sorted(data)
+        ident = DataObject.identifier(self)
+        if ident is None:
+            owners = self.getOwners('Worm_neuron_network')
+            data = []
+            if len(owners) != 1:
+                ident = None
+            else:
+                owner = owners[0]
+                # XXX: Make sure the defined status of the owner is never dependent
+                # on whether this network is defined!
+                # TODO: Add a check for circular definition of identifier
+                if owner.defined:
+                    data = owner.identifier()
+                    ident = self.make_identifier(data)
+                else:
+                    ident = None
+        return ident
 
-        return self.make_identifier(data)
     #def neuroml(self):

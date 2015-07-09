@@ -6,7 +6,7 @@ import logging
 import random
 import struct
 
-__all__ = ["DataObject", "Property", "values"]
+__all__ = ["DataObject", "Property", "values", "DataObjectTypes", "RDFTypeTable"]
 L = logging.getLogger(__name__)
 
 # in general it should be possible to recover the entire object from its identifier: the object should be representable as a connected graph.
@@ -36,7 +36,8 @@ def _triples_to_bgp(trips):
     g = " .\n".join(" ".join(_rdf_identifier_to_gp(x) for x in y) for y in trips)
     return g
 
-_DataObjects = dict()
+DataObjectTypes = dict()
+RDFTypeTable = dict()
 _DataObjectsParents = dict()
 
 class DataObject(DataUser):
@@ -221,17 +222,13 @@ class DataObject(DataUser):
         rdf_type : rdflib.term.URIRef
             the object's type. Optional.
         """
-        # XXX: This is a class method because we need to get the conf
-        # We should be able to extract the type from the identifier
         if rdf_type:
             uri = rdf_type
         else:
             uri = identifier
 
         cn = self._extract_class_name(uri)
-        # if its our class name, then make our own object
-        # if there's a part after that, that's the property name
-        o = _DataObjects[cn](ident=identifier)
+        o = DataObjectTypes[cn](ident=identifier)
         return o
 
     @classmethod
@@ -294,15 +291,15 @@ class DataObject(DataUser):
             value_type = DataObject
 
         c = None
-        if property_class_name in _DataObjects:
-            c = _DataObjects[property_class_name]
+        if property_class_name in DataObjectTypes:
+            c = DataObjectTypes[property_class_name]
         else:
             if property_type == 'ObjectProperty':
                 value_rdf_type = value_type.rdf_type
             else:
                 value_rdf_type = False
             c = type(property_class_name,(SimpleProperty,),dict(linkName=linkName, property_type=property_type, value_rdf_type=value_rdf_type, owner_type=owner_class, multiple=multiple))
-            _DataObjects[property_class_name] = c
+            DataObjectTypes[property_class_name] = c
             c.register()
 
         return c(owner=owner)
@@ -316,10 +313,11 @@ class DataObject(DataUser):
         """
         # NOTE: This expects that configuration has been read in and that the database is available
         assert(issubclass(cls, DataObject))
-        _DataObjects[cls.__name__] = cls
+        DataObjectTypes[cls.__name__] = cls
         _DataObjectsParents[cls.__name__] = [x for x in cls.__bases__ if issubclass(x, DataObject)]
         cls.parents = _DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
+        RDFTypeTable[cls.rdf_type] = cls
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
@@ -366,10 +364,11 @@ class DataObject(DataUser):
 
     def getOwners(self, property_name):
         """ Return the owners along a property pointing to this object """
+        from PyOpenWorm.v0.simpleProperty import SimpleProperty
         res = []
         for x in self.owner_properties:
             if isinstance(x, SimpleProperty):
-                if str(x.link) == str(property_name):
+                if str(x.linkName) == str(property_name):
                     res.append(x.owner)
         return res
 
@@ -422,7 +421,7 @@ def get_most_specific_rdf_type(types):
     for x in types:
         cn = DataObject._extract_class_name(x) # TODO: Make a table to lookup by the class URI
         try:
-            class_object = _DataObjects[cn]
+            class_object = DataObjectTypes[cn]
             if issubclass(class_object, most_specific_type):
                 most_specific_type = class_object
         except KeyError:

@@ -103,7 +103,7 @@ class Worm(DataObject):
 
         if self.name.hasValue():
             # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
+            n = list(self.name.values)[0]
             return self.make_identifier(n)
         else:
             return ident

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -17,7 +18,7 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import * 
+from GraphDBInit import *
 
 from DataTestTemplate import _DataTest
 
@@ -43,7 +44,7 @@ class NeuronTest(_DataTest):
         """
         c = Neuron(name="boots")
         c1 = Neuron(name="boots")
-        self.assertEqual(c.identifier(query=True),c1.identifier(query=True))
+        self.assertEqual(c.identifier(),c1.identifier())
 
     def test_type(self):
         n = self.neur('AVAL')
@@ -61,6 +62,12 @@ class NeuronTest(_DataTest):
         n.neighbor(self.neur('PVCL'))
         neighbors = list(n.neighbor())
         self.assertIn(self.neur('PVCL'), neighbors)
+        print()
+        g = R.Graph()
+        for t in n.triples():
+            g.add(t)
+        print(g.serialize(format="n3"))
+        print()
         n.save()
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 

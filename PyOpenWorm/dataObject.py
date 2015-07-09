@@ -1,11 +1,17 @@
+from __future__ import print_function
 import rdflib as R
 import random as RND
+import logging
+
 from yarom.graphObject import GraphObject, ComponentTripler
 from PyOpenWorm.v0.dataObject import DataObject as DO
+from PyOpenWorm.v0.dataObject import DataObjectTypes, RDFTypeTable
 from .simpleProperty import SimpleProperty
 from graphObjectAdapter.fakeProperty import FakeProperty
 
-_DataObjects = dict()
+L = logging.getLogger(__name__)
+
+PropertyTypes = dict()
 
 
 class DataObject(GraphObject, DO):
@@ -17,10 +23,11 @@ class DataObject(GraphObject, DO):
         if 'key' in kwargs:
             key = kwargs['key']
             del kwargs['key']
+            self.setKey(key)
+
         GraphObject.__init__(self)
         DO.__init__(self, *args, **kwargs)
         self._variable = R.Variable("V" + str(RND.random()))
-        self.setKey(key)
 
     def __repr__(self):
         s = self.__class__.__name__ + "("
@@ -60,6 +67,15 @@ class DataObject(GraphObject, DO):
     def __hash__(self):
         return hash(self.idl)
 
+    def getOwners(self, property_class_name):
+        """ Return the owners along a property pointing to this object """
+        from PyOpenWorm.simpleProperty import SimpleProperty
+        res = []
+        for x in self.owner_properties:
+            if str(x.__class__.__name__) == str(property_class_name):
+                res.append(x.owner)
+        return res
+
     @classmethod
     def _create_property(
             cls,
@@ -78,8 +94,8 @@ class DataObject(GraphObject, DO):
             value_type = DataObject
 
         c = None
-        if property_class_name in _DataObjects:
-            c = _DataObjects[property_class_name]
+        if property_class_name in PropertyTypes:
+            c = PropertyTypes[property_class_name]
         else:
             if property_type == 'ObjectProperty':
                 value_rdf_type = value_type.rdf_type
@@ -92,9 +108,10 @@ class DataObject(GraphObject, DO):
                           link=link,
                           property_type=property_type,
                           value_rdf_type=value_rdf_type,
+                          value_type=value_type,
                           owner_type=owner_class,
                           multiple=multiple))
-            _DataObjects[property_class_name] = c
+            PropertyTypes[property_class_name] = c
             c.register()
         # The fake property has the object as owner and the property as value
         res = c(owner=owner)
@@ -107,3 +124,64 @@ class DataObject(GraphObject, DO):
         setattr(owner, linkName, res)
 
         return res
+
+
+def oid(identifier_or_rdf_type, rdf_type=None):
+    """ Create an object from its rdf type
+
+    Parameters
+    ----------
+    identifier_or_rdf_type : :class:`str` or :class:`rdflib.term.URIRef`
+        If `rdf_type` is provided, then this value is used as the identifier
+        for the newly created object. Otherwise, this value will be the
+        :attr:`rdf_type` of the object used to determine the Python type and the
+        object's identifier will be randomly generated.
+    rdf_type : :class:`str`, :class:`rdflib.term.URIRef`, :const:`False`
+        If provided, this will be the :attr:`rdf_type` of the newly created object.
+
+    Returns
+    -------
+       The newly created object
+
+    """
+    identifier = identifier_or_rdf_type
+    if rdf_type is None:
+        rdf_type = identifier_or_rdf_type
+        identifier = None
+
+    L.debug("oid making a {} with ident {}".format(rdf_type, identifier))
+    c = None
+    try:
+        c = RDFTypeTable[rdf_type]
+    except KeyError:
+        c = DataObject
+
+    # if its our class name, then make our own object
+    # if there's a part after that, that's the property name
+    o = None
+    if identifier is not None:
+        o = c(ident=identifier)
+    else:
+        o = c()
+    return o
+
+
+def get_most_specific_rdf_type(types):
+    """ Gets the most specific rdf_type.
+
+    Returns the URI corresponding to the lowest in the DataObject class hierarchy
+    from among the given URIs.
+    """
+    most_specific_type = DataObject
+    mapping = dict()
+    for x in types:
+        try:
+            class_object = RDFTypeTable[x]
+            if issubclass(class_object, most_specific_type):
+                most_specific_type = class_object
+        except KeyError:
+            L.warn(
+                """A Python class corresponding to the type URI "{}" couldn't be found.
+            You may want to import the module containing the class as well as add additional type
+            annotations in order to resolve your objects to a more precise type.""".format(x))
+    return most_specific_type.rdf_type

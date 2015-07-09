@@ -45,6 +45,7 @@ class ConnectionTest(_DataTest):
     def test_init(self):
         """Initialization with positional parameters"""
         c = Connection('AVAL','ADAR',3,'send','Serotonin')
+        print(type(c.pre_cell))
         self.assertIsInstance(c.pre_cell(), Neuron)
         self.assertIsInstance(c.post_cell(), Neuron)
         self.assertEqual(c.number(), 3)

@@ -44,6 +44,10 @@ class AssertsAllAbout(Property):
     def __init__(self, **kwargs):
         Property.__init__(self, 'asserts_all_about', **kwargs)
 
+    @property
+    def values(self):
+        return []
+
     def set(self, o, **kwargs):
         """Establish the "asserts" relationship for all of the properties of the given object"""
         self.owner.asserts(o)

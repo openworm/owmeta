@@ -1,5 +1,7 @@
 import PyOpenWorm as P
-from PyOpenWorm import *
+from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.relationship import Relationship
+from PyOpenWorm.neuron import Neuron
 
 __all__ = ['Connection']
 
