@@ -9,8 +9,12 @@ python:
 #  and dependencies installed later don't know
 #  about dependencies installed earlier in the process
 install:
+  - "pip install coveralls"
   - "python setup.py install"
 
 
 script:
-  - "python tests/test.py"
+  - "coverage run --source=PyOpenWorm tests/test.py"
+
+after_success:
+  - "coveralls"
