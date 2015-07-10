@@ -2,6 +2,7 @@
 [![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.org/en/latest)
 [![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)
 
+[![Coverage Status](https://coveralls.io/repos/openworm/PyOpenWorm/badge.svg?branch=dev&service=github)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
 
 PyOpenWorm
 ===========
