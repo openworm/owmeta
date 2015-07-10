@@ -39,3 +39,19 @@ def listFunctionNames():
                     if count:
                         print '\n'
                         count = False
+
+# Add function to find dummy tests, i.e. ones that are simply marked pass.
+# TODO: improve this to list function names
+def findDummyTests():
+        for fname in os.listdir('.'):
+            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+                with open(fname) as f:
+                    count = False
+                    for line in f:
+                        if 'pass' in line:
+                            print 'dummy test' + ' in file ' + fname
+                            count = True
+
+                    if count:
+                        print '\n'
+                        count = False
