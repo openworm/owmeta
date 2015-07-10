@@ -55,7 +55,8 @@ from DataTestTemplate import _DataTest
 from WormTest import WormTest
 
 # CellTest
-# TODO: Add description for this set of tests
+# Test various properties of Cell objects. For example, that we can get
+# the parent of a cell, or the children, etc.
 from CellTest import CellTest
 
 # DataObjecTest
@@ -63,19 +64,20 @@ from CellTest import CellTest
 from DataObjectTest import DataObjectTest
 
 # DataUserTest
-# TODO: Add description for this set of tests
+# Test basic operations on DataObjects
 from DataUserTest import DataUserTest
 
 # NeuronTest
-# TODO: Add description for this set of tests
+# Test basic operations on Neuron objects. For example, that that two Neuron
+# objects with the same name have the same identifier.
 from NeuronTest import NeuronTest
 
 # NetworkTest
-# TODO: Add description for this set of tests
+# Basic tests for neuron network
 from NetworkTest import NetworkTest
 
 # EvidenceTest
-# TODO: Add description for this set of tests
+# Tests for evidence for the corresponding facts in the PyOpenWorm database.
 from EvidenceTest import EvidenceTest
 
 # ConnectionTest
@@ -83,7 +85,7 @@ from EvidenceTest import EvidenceTest
 from ConnectionTest import ConnectionTest
 
 # Muscle Test
-# TODO: Add description for this set of tests
+# Tests for various properties of Muscle objects.
 from MuscleTest import MuscleTest
 
 # Property Test
@@ -91,7 +93,8 @@ from MuscleTest import MuscleTest
 from PropertyTest import PropertyTest
 
 # SimplePropertyTest
-# TODO: Add description for this set of tests
+# Sanity checks for DataObjects.  For example, that two objects with the same
+# name have the same identifier.
 from SimplePropertyTest import SimplePropertyTest
 
 # NeuroMLTest
@@ -100,6 +103,7 @@ from SimplePropertyTest import SimplePropertyTest
 from NeuroMLTest import NeuroMLTest
 
 # Miscellaneous Tests
+# These are tests for miscellaneous bugs that have come up.
 from Misc import Misc
 
 # Tests from README.md
