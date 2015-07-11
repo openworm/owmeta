@@ -3,9 +3,29 @@ from .dataObject import DataObject
 from .muscle import Muscle
 from .cell import Cell
 from .network import Network
+from .simpleProperty import SimpleProperty
+
+
+class NeuronNetworkProperty(SimpleProperty):
+    value_type = Network
+    linkName = 'neuron_network'
+    multiple = False
+    property_type = 'ObjectProperty'
+
+    def __init__(self, **kwargs):
+        super(NeuronNetworkProperty, self).__init__(**kwargs)
+        self.link = self.owner.rdf_namespace[self.linkName]
+
+        # XXX: with a DataUser metaclass we could do this properly
+        self.value_rdf_type = Network.rdf_type
+
+    def set(self, v):
+        super(NeuronNetworkProperty, self).set(v)
+        v.worm(self.owner)
 
 
 class Worm(DataObject):
+
     """
     A representation of the whole worm.
 
@@ -22,12 +42,16 @@ class Worm(DataObject):
 
     """
 
-    def __init__(self,scientific_name=False,**kwargs):
-        DataObject.__init__(self,**kwargs)
+    def __init__(self, scientific_name=False, **kwargs):
+        DataObject.__init__(self, **kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
-        Worm.ObjectProperty("muscle", owner=self, value_type=Muscle, multiple=True)
+        Worm.ObjectProperty(
+            "muscle",
+            owner=self,
+            value_type=Muscle,
+            multiple=True)
         Worm.ObjectProperty("cell", owner=self, value_type=Cell)
+        self.attach_property(self, NeuronNetworkProperty)
 
         if scientific_name:
             self.scientific_name(scientific_name)

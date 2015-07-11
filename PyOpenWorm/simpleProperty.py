@@ -4,7 +4,7 @@ import rdflib as R
 import random as RND
 import logging
 
-from yarom.graphObject import GraphObject, GraphObjectQuerier
+from yarom.graphObject import GraphObject, GraphObjectQuerier, ComponentTripler
 from yarom.yProperty import Property as P
 from yarom.rdfUtils import deserialize_rdflib_term
 from yarom.variable import Variable
@@ -17,15 +17,15 @@ L = logging.getLogger(__name__)
 # TODO: Support ObjectProperty/DatatypeProperty differences a la yarom
 
 
-class _ValueProperty(object):
+class RealSimpleProperty(object):
+    multiple = False
+    link = R.URIRef("property")
+    linkName = "property"
 
-    def __init__(self, conf, owner_property):
-        self._owner_property = owner_property
+    def __init__(self, conf, owner):
         self.conf = conf
         self._v = []
-        self.rdf_namespace = R.Namespace(
-            conf['rdf.namespace']["SimpleProperty"] + "/")
-        self.link = self.rdf_namespace["value"]
+        self.owner = owner
 
     def hasValue(self):
         res = len([x for x in self._v if x.defined]) > 0
@@ -46,24 +46,12 @@ class _ValueProperty(object):
             self._v = [v]
 
     @property
-    def owner(self):
-        return self._owner_property
-
-    @property
     def values(self):
         return self._v
 
     @property
-    def multiple(self):
-        return self._owner_property.multiple
-
-    @property
-    def value_rdf_type(self):
-        return self._owner_property.value_rdf_type
-
-    @property
     def rdf(self):
-        return self._owner_property.rdf
+        return self.conf['rdf.graph']
 
     def get(self):
         v = Variable("var" + str(id(self)))
@@ -82,21 +70,47 @@ class _ValueProperty(object):
             raise Exception("Can't find value {}".format(v))
 
 
-class _DatatypeProperty(_ValueProperty):
+class _ValueProperty(RealSimpleProperty):
+
+    def __init__(self, conf, owner_property):
+        super(_ValueProperty,self).__init__(conf, owner_property)
+        self._owner_property = owner_property
+        self.rdf_namespace = R.Namespace(
+            conf['rdf.namespace']["SimpleProperty"] + "/")
+        self.link = self.rdf_namespace["value"]
+
+    @property
+    def multiple(self):
+        return self._owner_property.multiple
+
+    @property
+    def value_rdf_type(self):
+        return self._owner_property.value_rdf_type
+
+    @property
+    def rdf(self):
+        return self._owner_property.rdf
+
+    def __str__(self):
+        return "_ValueProperty("+str(self._owner_property)+")"
+
+
+class DatatypePropertyMixin(object):
 
     def set(self, v):
         from .dataObject import DataObject
         if isinstance(v, DataObject):
             L.warn(
-                'You are attempting to set a DataObject where a literal is expected.')
-        return _ValueProperty.set(self, v)
+                ('You are attempting to set a DataObject "{}"'
+                ' on {} where a literal is expected.').format(v, self))
+        return super(DatatypePropertyMixin,self).set(v)
 
     def get(self):
-        for val in _ValueProperty.get(self):
+        for val in super(DatatypePropertyMixin,self).get():
             yield deserialize_rdflib_term(val)
 
 
-class _ObjectProperty(_ValueProperty):
+class ObjectPropertyMixin(object):
 
     def set(self, v):
         from .dataObject import DataObject
@@ -104,12 +118,12 @@ class _ObjectProperty(_ValueProperty):
             raise Exception(
                 "An ObjectProperty only accepts DataObject "
                 "or Variable instances. Got a " + str(type(v)))
-        return _ValueProperty.set(self, v)
+        return super(ObjectPropertyMixin,self).set(v)
 
     def get(self):
         from .dataObject import DataObject, oid, get_most_specific_rdf_type
 
-        for ident in _ValueProperty.get(self):
+        for ident in super(ObjectPropertyMixin,self).get():
             if not isinstance(ident, R.URIRef):
                 L.warn(
                     'ObjectProperty.get: Skipping non-URI term, "' +
@@ -126,21 +140,31 @@ class _ObjectProperty(_ValueProperty):
             the_type = get_most_specific_rdf_type(types)
             yield oid(ident, the_type)
 
+class _ObjectVaulueProperty (ObjectPropertyMixin,_ValueProperty):
+    pass
+
+class _DatatypeValueProperty (DatatypePropertyMixin,_ValueProperty):
+    pass
+
+class ObjectProperty (ObjectPropertyMixin,RealSimpleProperty):
+    pass
+
+class DatatypeProperty (DatatypePropertyMixin,RealSimpleProperty):
+    pass
 
 class SimpleProperty(GraphObject, DataUser):
 
     """ Adapts a SimpleProperty to the GraphObject interface """
 
-    def __init__(self, owner):
-        GraphObject.__init__(self)
-        DataUser.__init__(self)
+    def __init__(self, owner, **kwargs):
+        super(SimpleProperty,self).__init__(**kwargs)
         self.owner = owner
         self._id = None
         self._variable = R.Variable("V" + str(RND.random()))
         if self.property_type == "ObjectProperty":
-            self._pp = _ObjectProperty(self.conf, self)
+            self._pp = _ObjectVaulueProperty(self.conf, self)
         else:
-            self._pp = _DatatypeProperty(self.conf, self)
+            self._pp = _DatatypeValueProperty(self.conf, self)
 
         self.properties.append(self._pp)
 
@@ -152,7 +176,7 @@ class SimpleProperty(GraphObject, DataUser):
         return s
 
     def __str__(self):
-        return str(self.idl)
+        return str(self.__class__.__name__) + "("+ str(self.idl.n3())+")"
 
     def __hash__(self):
         return hash(self.idl)
@@ -173,7 +197,11 @@ class SimpleProperty(GraphObject, DataUser):
 
     def get(self):
         if self._pp.hasValue():
-            return self._pp.values
+            res = []
+            if self.property_type == 'ObjectProperty':
+                return self._pp.values
+            else:
+                return [deserialize_rdflib_term(x.idl) for x in self._pp.values]
         else:
             return self._pp.get()
 
@@ -187,6 +215,9 @@ class SimpleProperty(GraphObject, DataUser):
 
     def variable(self):
         return self._variable
+
+    def triples(self, *args, **kwargs):
+        return ComponentTripler(self)()
 
     def hasValue(self):
         return self._pp.hasValue()

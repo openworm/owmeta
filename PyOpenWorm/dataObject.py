@@ -6,13 +6,13 @@ import logging
 from yarom.graphObject import GraphObject, ComponentTripler
 from PyOpenWorm.v0.dataObject import DataObject as DO
 from PyOpenWorm.v0.dataObject import DataObjectTypes, RDFTypeTable
-from .simpleProperty import SimpleProperty
+from PyOpenWorm.v0.dataObject import disconnect as DODisconnect
+from .simpleProperty import SimpleProperty, DatatypeProperty
 from graphObjectAdapter.fakeProperty import FakeProperty
 
 L = logging.getLogger(__name__)
 
 PropertyTypes = dict()
-
 
 class DataObject(GraphObject, DO):
 
@@ -24,16 +24,13 @@ class DataObject(GraphObject, DO):
             key = kwargs['key']
             del kwargs['key']
             self.setKey(key)
-
-        GraphObject.__init__(self)
-        DO.__init__(self, *args, **kwargs)
+        super(DataObject, self).__init__(**kwargs)
         self._variable = R.Variable("V" + str(RND.random()))
+        DataObject.attach_property_ex(self, RDFTypeProperty)
+        self.rdf_type_property.set(self.rdf_type)
 
     def __repr__(self):
-        s = self.__class__.__name__ + "("
-        s += self.idl
-        s += ")"
-        return s
+        return str(self)
 
     def setKey(self, key):
         if isinstance(key, str):
@@ -52,7 +49,10 @@ class DataObject(GraphObject, DO):
         return ComponentTripler(self)()
 
     def __str__(self):
-        return str(self.idl)
+        s = self.__class__.__name__ + "("
+        s += str(self.idl.n3())
+        s += ")"
+        return s
 
     def identifier(self, query=False):
         return DO.identifier(self)
@@ -113,6 +113,18 @@ class DataObject(GraphObject, DO):
                           multiple=multiple))
             PropertyTypes[property_class_name] = c
             c.register()
+        return cls.attach_property(owner, c)
+
+    @classmethod
+    def attach_property_ex(cls, owner, c):
+        res = c(owner=owner, conf=owner.conf)
+        owner.properties.append(res)
+        setattr(owner, c.linkName, res)
+
+        return res
+
+    @classmethod
+    def attach_property(self, owner, c):
         # The fake property has the object as owner and the property as value
         res = c(owner=owner)
         # XXX: Hack for graph object traversal of properties while still
@@ -121,10 +133,15 @@ class DataObject(GraphObject, DO):
         fp = FakeProperty(res)
         # ... and the properties of the owner only list the FakeProperty
         owner.properties.append(fp)
-        setattr(owner, linkName, res)
+        setattr(owner, c.linkName, res)
 
         return res
 
+class RDFTypeProperty(DatatypeProperty):
+    link = R.RDF['type']
+    linkName = "rdf_type_property"
+    owner_type = DataObject
+    multiple = True
 
 def oid(identifier_or_rdf_type, rdf_type=None):
     """ Create an object from its rdf type
@@ -165,6 +182,10 @@ def oid(identifier_or_rdf_type, rdf_type=None):
         o = c()
     return o
 
+def disconnect():
+    global PropertyTypes
+    DODisconnect()
+    PropertyTypes.clear()
 
 def get_most_specific_rdf_type(types):
     """ Gets the most specific rdf_type.

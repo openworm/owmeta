@@ -57,7 +57,7 @@ class DataObject(DataUser):
 
     def __init__(self,ident=False,triples=False,**kwargs):
         try:
-            DataUser.__init__(self,**kwargs)
+            super(DataObject,self).__init__(**kwargs)
         except BadConf:
             raise Exception("You may need to connect to a database before continuing.")
 
@@ -80,7 +80,7 @@ class DataObject(DataUser):
             # Randomly generate an identifier if the derived class can't
             # come up with one from the start. Ensures we always have something
             # that functions as an identifier
-            self._id = self.make_identifier(v)
+            self._id = None
 
         cname = self.__class__.__name__
         self._id_variable = self._graph_variable(cname + v.encode('hex'))
@@ -371,6 +371,15 @@ class DataObject(DataUser):
                 if str(x.linkName) == str(property_name):
                     res.append(x.owner)
         return res
+
+def disconnect():
+    global DataObjectTypes
+    global RDFTypeTable
+    global _DataObjectsParents
+    DataObjectTypes.clear()
+    RDFTypeTable.clear()
+    _DataObjectsParents.clear()
+
 
 class _QueryResultsTypeResolver(object):
     # Takes an iterable of (identifier, type) results in qres, sorted by the identifier

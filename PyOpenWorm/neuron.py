@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sqlite3
 import sys
 import PyOpenWorm as P
@@ -156,6 +157,7 @@ class Neighbor(P.Property):
             for c in self._conns:
                 yield c.post_cell()
         else:
+            from yarom.graphObject import _QueryPreparer
             c = P.Connection(pre_cell=self.owner,**kwargs)
             for r in c.load():
                 yield r.post_cell()

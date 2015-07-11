@@ -119,6 +119,7 @@ def loadConfig(f):
 
 def disconnect(c=False):
     """ Close the database. """
+
     m = __import__('__main__')
     if not m.connected:
         return
@@ -128,6 +129,11 @@ def disconnect(c=False):
 
     if c:
         c.closeDatabase()
+
+    from .dataObject import disconnect as DODisconnect
+    from .dataObject import PropertyTypes
+    DODisconnect()
+    assert(len(PropertyTypes) == 0)
 
     m.connected = False
 
@@ -152,7 +158,6 @@ def loadData(
         try:
             data_file_time = os.path.getmtime(data)
             db_file_time = os.path.getmtime(config('rdf.store_conf'))
-            print(db_file_time, data_file_time)
             if data_file_time < db_file_time:
                 return
         except:

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # A consolidation of the data sources for the project
 # includes:
 # NetworkX!
@@ -82,7 +83,7 @@ class DataUser(Configureable):
     Classes which use the database should inherit from DataUser.
     """
     def __init__(self, **kwargs):
-        Configureable.__init__(self, **kwargs)
+        super(DataUser,self).__init__(**kwargs)
         if not isinstance(self.conf, Data):
             raise BadConf("Not a Data instance: "+ str(self.conf))
 

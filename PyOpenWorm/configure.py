@@ -1,3 +1,4 @@
+from __future__ import print_function
 # a class for modules that need outside objects to parameterize their behavior (because what are generics?)
 # Modules inherit from this class and use their
 # self['expected_configured_property']

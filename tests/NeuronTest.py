@@ -23,6 +23,11 @@ from GraphDBInit import *
 from DataTestTemplate import _DataTest
 
 class NeuronTest(_DataTest):
+    @classmethod
+    def setUpClass(cls):
+        import logging
+        #logging.basicConfig(level=logging.DEBUG)
+
     def setUp(self):
         _DataTest.setUp(self)
         self.neur = lambda x : Neuron(name=x)
@@ -59,15 +64,12 @@ class NeuronTest(_DataTest):
 
     def test_neighbor(self):
         n = self.neur('AVAL')
-        n.neighbor(self.neur('PVCL'))
+        n.neighbor(self.neur('PVCL'), syntype='send')
         neighbors = list(n.neighbor())
         self.assertIn(self.neur('PVCL'), neighbors)
-        print()
         g = R.Graph()
         for t in n.triples():
             g.add(t)
-        print(g.serialize(format="n3"))
-        print()
         n.save()
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import PyOpenWorm as P
-import rdflib as R
 
 from PyOpenWorm.dataObject import DataObject
 
+
 class Network(DataObject):
+
     """A network of neurons
 
     Attributes
@@ -14,11 +15,25 @@ class Network(DataObject):
     synapse
         Representation of synapses in the network
     """
-    def __init__(self, **kwargs):
-        DataObject.__init__(self,**kwargs)
 
-        self.synapses = Network.ObjectProperty('synapse', owner=self, value_type=P.Connection, multiple=True)
-        Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
+    def __init__(self, **kwargs):
+        DataObject.__init__(self, **kwargs)
+
+        self.synapses = Network.ObjectProperty(
+            'synapse',
+            owner=self,
+            value_type=P.Connection,
+            multiple=True)
+        Network.ObjectProperty(
+            'neuron',
+            owner=self,
+            value_type=P.Neuron,
+            multiple=True)
+        Network.ObjectProperty(
+            'worm',
+            owner=self,
+            value_type=P.Worm,
+            multiple=False)
 
     def neurons(self):
         """
@@ -59,7 +74,7 @@ class Network(DataObject):
         :returns: Neuron corresponding to the name given
         :rtype: PyOpenWorm.Neuron
         """
-        n = P.Neuron(name=name,conf=self.conf)
+        n = P.Neuron(name=name, conf=self.conf)
         return n
 
     def _synapses_csv(self):
@@ -69,9 +84,9 @@ class Network(DataObject):
         :returns: A generator of Connection objects
         :rtype: generator
         """
-        for n,nbrs in self['nx'].adjacency_iter():
-            for nbr,eattr in nbrs.items():
-                yield P.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
+        for n, nbrs in self['nx'].adjacency_iter():
+            for nbr, eattr in nbrs.items():
+                yield P.Connection(n, nbr, int(eattr['weight']), eattr['synapse'], eattr['neurotransmitter'], conf=self.conf)
 
     def as_networkx(self):
         return self['nx']
@@ -124,20 +139,8 @@ class Network(DataObject):
     def identifier(self, *args, **kwargs):
         ident = DataObject.identifier(self)
         if ident is None:
-            owners = self.getOwners('Worm_neuron_network')
-            data = []
-            if len(owners) != 1:
-                ident = None
-            else:
-                owner = owners[0]
-                # XXX: Make sure the defined status of the owner is never dependent
-                # on whether this network is defined!
-                # TODO: Add a check for circular definition of identifier
-                if owner.defined:
-                    data = owner.identifier()
-                    ident = self.make_identifier(data)
-                else:
-                    ident = None
+            if self.worm.hasValue() and self.worm.values[0].defined:
+                return self.make_identifier(self.worm.values[0])
         return ident
 
-    #def neuroml(self):
+    # def neuroml(self):
