@@ -14,6 +14,8 @@ import subprocess as SP
 import subprocess
 import tempfile
 import doctest
+import cProfile
+from pstats import Stats
 
 from glob import glob
 
@@ -24,7 +26,15 @@ from DataTestTemplate import _DataTest
 class WormTest(_DataTest):
     """Test for Worm."""
     def setUp(self):
+        # http://stackoverflow.com/a/20251400
         _DataTest.setUp(self)
+
+        # TODO DO NOT MERGE
+        sys.stderr.write("Got here: setUp of WormTest\n")
+        sys.stderr.flush()
+        self.pr = cProfile.Profile()
+        self.pr.enable()
+
         ns = self.config['rdf.namespace']
         self.trips = [(ns['64'], ns['356'], ns['184']),
                 (ns['john'], R.RDF['type'], ns['Connection']),
@@ -42,6 +52,14 @@ class WormTest(_DataTest):
                 (ns['luke'], ns['Connection/number'], R.Literal('1', datatype=R.XSD.integer)),
                 (ns['185'], R.RDFS['label'], R.Literal("AVAR")),
                 (ns['luke'], ns['Connection/post'], ns['185'])]
+
+    # TODO DO NOT MERGE
+    def tearDown(self):
+        self.pr.disable()
+        p = Stats(self.pr)
+        p.strip_dirs()
+        p.sort_stats('cumtime')
+        p.print_stats()
 
     def test_get_network(self):
         w = Worm()
