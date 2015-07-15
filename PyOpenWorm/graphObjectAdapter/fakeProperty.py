@@ -10,6 +10,10 @@ class FakeProperty(Property):
         return self._p.link
 
     @property
+    def linkName(self):
+        return self._p.linkName
+
+    @property
     def values(self):
         return (self._p,)
 

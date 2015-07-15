@@ -3,34 +3,32 @@ import rdflib as R
 import random as RND
 import logging
 
-from yarom.graphObject import GraphObject, ComponentTripler
+from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from PyOpenWorm.v0.dataObject import DataObject as DO
-from PyOpenWorm.v0.dataObject import DataObjectTypes, RDFTypeTable
+from PyOpenWorm.v0.dataObject import RDFTypeTable
 from PyOpenWorm.v0.dataObject import disconnect as DODisconnect
-from .simpleProperty import SimpleProperty, DatatypeProperty
+from .simpleProperty import DatatypeProperty,SimpleProperty
 from graphObjectAdapter.fakeProperty import FakeProperty
 
 L = logging.getLogger(__name__)
 
 PropertyTypes = dict()
 
+
 class DataObject(GraphObject, DO):
 
     """ Adapts a DataObject to the GraphObject interface """
 
-    def __init__(self, *args, **kwargs):
-        key = None
-        if 'key' in kwargs:
-            key = kwargs['key']
-            del kwargs['key']
-            self.setKey(key)
+    def __init__(self, key=None, *args, **kwargs):
         super(DataObject, self).__init__(**kwargs)
+        if key is not None:
+            self.setKey(key)
         self._variable = R.Variable("V" + str(RND.random()))
         DataObject.attach_property_ex(self, RDFTypeProperty)
         self.rdf_type_property.set(self.rdf_type)
 
     def __repr__(self):
-        return str(self)
+        return DataObject.__str__(self)
 
     def setKey(self, key):
         if isinstance(key, str):
@@ -54,6 +52,14 @@ class DataObject(GraphObject, DO):
         s += ")"
         return s
 
+    def load(self):
+        for ident in GraphObjectQuerier(self, self.rdf)():
+            types = set()
+            for rdf_type in self.rdf.objects(ident, R.RDF['type']):
+                types.add(rdf_type)
+            the_type = get_most_specific_rdf_type(types)
+            yield oid(ident, the_type)
+
     def identifier(self, query=False):
         return DO.identifier(self)
 
@@ -69,7 +75,6 @@ class DataObject(GraphObject, DO):
 
     def getOwners(self, property_class_name):
         """ Return the owners along a property pointing to this object """
-        from PyOpenWorm.simpleProperty import SimpleProperty
         res = []
         for x in self.owner_properties:
             if str(x.__class__.__name__) == str(property_class_name):
@@ -137,11 +142,13 @@ class DataObject(GraphObject, DO):
 
         return res
 
+
 class RDFTypeProperty(DatatypeProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
     owner_type = DataObject
     multiple = True
+
 
 def oid(identifier_or_rdf_type, rdf_type=None):
     """ Create an object from its rdf type
@@ -182,10 +189,12 @@ def oid(identifier_or_rdf_type, rdf_type=None):
         o = c()
     return o
 
+
 def disconnect():
     global PropertyTypes
     DODisconnect()
     PropertyTypes.clear()
+
 
 def get_most_specific_rdf_type(types):
     """ Gets the most specific rdf_type.
@@ -194,7 +203,6 @@ def get_most_specific_rdf_type(types):
     from among the given URIs.
     """
     most_specific_type = DataObject
-    mapping = dict()
     for x in types:
         try:
             class_object = RDFTypeTable[x]
