@@ -36,15 +36,13 @@ class ExecutionProfileSuite(unittest.TestSuite):
         try:
             # If the "decorator" keyword argument is passed, use custom method wrapper.
             self.decorator = kwargs.pop("decorator")
-            decorator_callable = callable(self.decorator)
-            if not decorator_callable:
+            if not callable(self.decorator):
                 raise ValueError("DecoratorSuite kwarg 'decorator' must be callable.")
         except KeyError:
             # Default to the performance regression wrapper
             self.decorator = self.profile
 
         super(ExecutionProfileSuite, self).__init__(*args, **kwargs)
-
 
     def addTest(self, test):
         """
