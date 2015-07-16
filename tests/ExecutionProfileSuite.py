@@ -1,22 +1,32 @@
-
-import sys
-import time
 import unittest
+import functools
+import cProfile
 
-from functools import wraps
+import FunctionProfile
 
 
 class ExecutionProfileSuite(unittest.TestSuite):
 
     def profile(self, f):
         """
-        :param f: Function to be wrapped
+        :param f: instancemethod to be wrapped
         :return: Wrapped function that outputs profiling data.
         """
-        @wraps(f)
+        @functools.wraps(f)
         def wrapper(*args, **kwds):
-            print 'Calling decorated function'
-            return f(*args, **kwds)
+            # cProfile Prologue
+            pr = cProfile.Profile()
+            pr.enable()
+
+            result = f(*args, **kwds)
+
+            # cProfile Epilogue
+            pr.disable()
+            function_profile = FunctionProfile.FunctionProfile(pr, f.im_func.func_name)
+            print "\n\n" + str(function_profile)
+
+            return result
+
         return wrapper
 
     def __init__(self, *args, **kwargs):

@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     def getTests(testCase):
         decorating_test_loader = unittest.TestLoader()
-        if PERFORMANCE_PROFILE is not None:
+        if PERFORMANCE_PROFILE:
             # Override the TestLoader's default TestSuite
             decorating_test_loader.suiteClass = ExecutionProfileSuite.ExecutionProfileSuite
         return decorating_test_loader.loadTestsFromTestCase(testCase)
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             for z in y:
                 all_tests_flattened.append(z)
 
-    if PERFORMANCE_PROFILE is not None:
+    if PERFORMANCE_PROFILE:
         # DecoratorSuite subclasses TestSuite, overriding its addTest method
         suite = ExecutionProfileSuite.ExecutionProfileSuite()
     else: 

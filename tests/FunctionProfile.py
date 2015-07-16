@@ -1,72 +1,76 @@
+import re
+import os
 import numpy as np
-import cProfile
 import pstats
+import cProfile
+
+
+def get_method_name(profile_string):
+    """
+    :param profile_string: String from Stats object, of the form:
+        "<method 'random_sample' of 'mtrand.RandomState' objects>"
+    :returns: Method name.
+    """
+    return re.match(r"^<method \'(?P<method_name>[^']+)", profile_string).group("method_name")
 
 
 class FunctionProfile(object):
 
-    def __init__(self, function_tuple, stats_object):
+    def __init__(self, cprofile, function_name):
         """
         :param function_tuple: Function tuple (filename, line #, function name), retrieve from Stats' get_print_list(.)
-        :param stats_object: Stats object returned from stats.stats[function_tuple]
+        :param stats_object: Stats object
 
         # Example usage:
-        >>> import numpy as np
-        >>> import cProfile
-        >>> import pstats
         >>> pr = cProfile.Profile()
         >>> pr.enable()
-        >>> np.random.random(50000)
+        >>> x = np.var(np.random.random(100000))
         >>> pr.disable()
-        >>>
-        >>> stats = pstats.Stats(pr)
-        >>> stats.sort_stats('cumulative')
-        >>> width, list = stats.get_print_list("")
-        >>> for func_tuple in list:
-        >>>     function_profile = FunctionProfile(func_tuple, stats.stats[func_tuple])
-
+        >>> function_profile = FunctionProfile(pr, "var")
+        >>> print function_profile
         """
-        # stats.stats[func_tuple] gives us:
+        stats = pstats.Stats(cprofile, stream=open(os.devnull, "w"))
+
+        width, lst = stats.get_print_list("")
+
+        try:
+            # function_tuple = filter(lambda func_tuple: function_name == func_tuple[2], lst)[0]
+            function_tuple = filter(lambda func_tuple: function_name in func_tuple[2], lst)[0]
+        except IndexError:
+            # Could not find function_name in lst
+            possible_methods = ", ".join(x[2] for x in lst)
+            raise ValueError("Function Profile received invalid function name.  Options are: " + str(possible_methods))
+
+        # stats.stats[func_tuple] returns tuple of the form:
         #  (# primitive (non-recursive) calls , # calls, total_time, cumulative_time, dictionary of callers)
-        self.primitve_calls = stats_object[0]
-        self.calls = stats_object[1]
-        self.total_time = stats_object[2]
-        self.cumulative_time = stats_object[3]
-        self.callers = stats_object[4]
+        stats_tuple = stats.stats[function_tuple]
+
+        self.function_name   = function_name
+        self.primitive_calls = stats_tuple[0]
+        self.calls = stats_tuple[1]
+        self.total_time = stats_tuple[2]
+        self.cumulative_time = stats_tuple[3]
+        self.callers = stats_tuple[4]
+
+    def __str__(self):
+        l = []
+        l.append("Function Name: " + self.function_name)
+        l.append("Primitive Calls: " + str(self.primitive_calls))
+        l.append("Calls: " + str(self.calls))
+        l.append("Total Time: " + str(self.total_time))
+        l.append("Cumulative Time: " + str(self.cumulative_time))
+        # l.append("Callers: " + str(self.callers))
+        return "\n".join(l)
+
 
 def main():
-
     pr = cProfile.Profile()
     pr.enable()
-    x = np.std(np.random.random(50000))
     x = np.var(np.random.random(100000))
-    x = np.diff(np.random.random(1000000))
     pr.disable()
-    stats = pstats.Stats(pr)
-    stats.sort_stats('cumulative')
-    width, list = stats.get_print_list("")
+    function_profile = FunctionProfile(pr, "var")
+    print function_profile
 
-    for func_tuple in list:
-
-        # func_tuple: (filename, line #, function name)
-        print func_tuple
-        # ('~', 0, "<method 'random_sample' of 'mtrand.RandomState' objects>")
-
-        # stats.stats[func_tuple] gives us:
-        #  (# primitive (non-recursive) calls , # calls, total_time, cumulative_time, dictionary of callers)
-        print stats.stats[func_tuple]
-        # (3, 3, 0.023063999999999998, 0.023063999999999998, {})
-
-        function_profile = FunctionProfile(func_tuple, stats.stats[func_tuple])
-        print dir(stats.stats[func_tuple])
-
-        print "\n"
-
-    stats.print_stats()
-
-
-    # cc, nc, tt, ct, callers
-    # 3    0.023    0.008    0.023    0.008 {method 'random_sample' of 'mtrand.RandomState' objects}
 
 if __name__ == "__main__":
     main()
