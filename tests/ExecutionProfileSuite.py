@@ -23,7 +23,7 @@ class ExecutionProfileSuite(unittest.TestSuite):
             # cProfile Epilogue
             pr.disable()
             function_profile = FunctionProfile.FunctionProfile(pr, f.im_func.func_name)
-            print "\n\n" + str(function_profile)
+            print "\n\nCumulative Time: " + str(function_profile.cumulative_time)
 
             return result
 
