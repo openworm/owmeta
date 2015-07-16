@@ -7,11 +7,10 @@ class FunctionProfile(object):
 
     def __init__(self, function_tuple, stats_object):
         """
-
-        :param function_tuple: Function (filename, line #, function name) that is accessible from a
+        :param function_tuple: Function tuple (filename, line #, function name), retrieve from Stats' get_print_list(.)
         :param stats_object: Stats object returned from stats.stats[function_tuple]
 
-        # Example based usages
+        # Example usage:
         >>> import numpy as np
         >>> import cProfile
         >>> import pstats

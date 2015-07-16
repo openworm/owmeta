@@ -17,6 +17,8 @@ import subprocess
 import tempfile
 import doctest
 
+import ExecutionProfileSuite
+
 from glob import glob
 
 # Import configuration files for tests and create worm graph
@@ -120,7 +122,10 @@ if __name__ == '__main__':
     USE_BINARY_DB = options.binary_db
 
     def getTests(testCase):
-        return unittest.TestLoader().loadTestsFromTestCase(testCase)
+        decorating_test_loader = unittest.TestLoader()
+        # Override the TestLoader's default TestSuite
+        decorating_test_loader.suiteClass = ExecutionProfileSuite.ExecutionProfileSuite
+        return decorating_test_loader.loadTestsFromTestCase(testCase)
 
     def runTests(suite):
         return unittest.TextTestRunner().run(suite)
@@ -148,7 +153,10 @@ if __name__ == '__main__':
             for z in y:
                 all_tests_flattened.append(z)
 
-    suite = unittest.TestSuite()
+    # suite = unittest.TestSuite()
+    # DecoratorSuite subclasses TestSuite, overriding its addTest method
+    suite = ExecutionProfileSuite.ExecutionProfileSuite()
+
     if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:
