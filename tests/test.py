@@ -162,8 +162,8 @@ if __name__ == '__main__':
         suite = ExecutionProfileSuite.ExecutionProfileSuite()
     else: 
         suite = unittest.TestSuite()
-
-    if USE_BINARY_DB:
+    
+    if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:
         suite.addTests(all_tests)
