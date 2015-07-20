@@ -1,6 +1,5 @@
 import re
 import os
-import numpy as np
 import pstats
 import cProfile
 
@@ -21,10 +20,10 @@ class FunctionProfile(object):
         :param function_tuple: Function tuple (filename, line #, function name), retrieve from Stats' get_print_list(.)
         :param stats_object: Stats object
 
-        # Example usage:
+        # Example usage (with additional numpy dependency):
         >>> pr = cProfile.Profile()
         >>> pr.enable()
-        >>> x = np.var(np.random.random(100000))
+        >>> x = numpy.var(np.random.random(100000))
         >>> pr.disable()
         >>> function_profile = FunctionProfile(pr, "var")
         >>> print function_profile
@@ -62,15 +61,3 @@ class FunctionProfile(object):
         # l.append("Callers: " + str(self.callers))
         return "\n".join(l)
 
-
-def main():
-    pr = cProfile.Profile()
-    pr.enable()
-    x = np.var(np.random.random(100000))
-    pr.disable()
-    function_profile = FunctionProfile(pr, "var")
-    print function_profile
-
-
-if __name__ == "__main__":
-    main()
