@@ -235,14 +235,15 @@ def new_connections():
     try:
         w = P.Worm()
         n = P.Network()
+        neurons = set(n.neurons())
         w.neuron_network(n)
 
         # Evidence object to assert each connection
         e  = P.Evidence(uri='http://www.wormwiring.org')
 
-        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:    
-            edge_reader = csv.reader(csvfile)                                
-            edge_reader.next()    # skip header row                          
+        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+            edge_reader = csv.reader(csvfile)
+            edge_reader.next()    # skip header row
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
 
@@ -254,14 +255,14 @@ def new_connections():
                     syn_type = 'send'
                 source = normalize(source)
                 target = normalize(target)
-
-                c = P.connection(
+                if source in neurons and target in neurons:
+                    c = P.connection(
                         pre_cell=source, post_cell=target,
                         number=weight, syntype=syn_type
                     )
 
-                n.synapse(c)
-                e.asserts(c)
+                    n.synapse(c)
+                    e.asserts(c)
 
         e.asserts(n) # assert the whole connectome too
         e.save()
