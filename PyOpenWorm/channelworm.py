@@ -10,22 +10,36 @@ class PatchClampExperiment(Experiment):
         Experiment.__init__(self, reference)
         
         # enumerate conditions patch-clamp experiments should have
-        patch_clamp_conditions = [
-            'type',
-            'duration',
+        self.conditions = [
+            'Ca_concentration',
+            'Cl_concentration',
+            'blockers',
+            'cell',
+            'cell_age',
             'delta_t',
-            'start_time',
+            'duration',
             'end_time',
-            'protocol_start',
+            'extra_solution',
+            'initial_voltage',
+            'ion_channel',
+            'membrane_capacitance',
+            'mutants',
+            'patch_type',
+            'pipette_solution',
             'protocol_end',
-            'protocol_step'
+            'protocol_start',
+            'protocol_step',
+            'start_time',
+            'temperature',
+            'type',
         ]
  
-        for c in patch_clamp_conditions:
-            self.conditions.set(c, None)
+        for c in self.conditions:
+            PatchClampExperiment.DatatypeProperty(c, self)
 
         for c, v in kwargs.iteritems():
-            self.conditions.set(c, v)
+            if c in self.conditions:
+                setattr(self, c, v)
 
 
 class References(Property):
