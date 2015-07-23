@@ -34,6 +34,13 @@ class CellTest(_DataTest):
         c.save()
         self.assertEqual("AB plapaaaapp", Cell(name="ADAL").lineageName())
 
+    def test_wormbaseID(self):
+        """ Test that a Cell object has a wormbase ID """
+        c = Cell(name="ADAL",conf=self.config)
+        c.wormbaseID("WBbt:0004013")
+        c.save()
+        self.assertEqual("WBbt:0004013", Cell(name="ADAL").wormbaseID())
+
     def test_same_name_same_id(self):
         """
         Test that two Cell objects with the same name have the same identifier()
