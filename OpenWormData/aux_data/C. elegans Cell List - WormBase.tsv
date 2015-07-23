@@ -8,8 +8,8 @@ ADEL	AB.plapaaaapa	Anterior deirid, sensory neuron, dopaminergic			1												
 ADER	AB.prapaaaapa	Anterior deirid, sensory neuron, dopaminergic			1														WBbt:0004007	lineage name: ABprapaaaapa
 ADEshL	AB.arppaaaa	Anterior deirid sheath								1									WBbt:0004005	lineage name: ABarppaaaa
 ADEshR	AB.arpppaaa	Anterior deirid sheath								1									WBbt:0004004	lineage name: ABarpppaaa
-ADEsoL	H2L.aa	Anterior deirid socket								1									ERROR: No WBID for this query.	ERROR: No formula found in cell
-ADEsoR	H2R.aa	Anterior deirid socket								1									ERROR: No WBID for this query.	ERROR: No formula found in cell
+ADEsoL	H2L.aa	Anterior deirid socket								1									WBbt:0005602	lineage name: H2L.aa
+ADEsoR	H2R.aa	Anterior deirid socket								1									WBbt:0005603	lineage name: H2R.aa
 ADFL	AB.alpppppaa	Amphid neuron, prob. chemosensory			1														WBbt:0004003	lineage name: ABalpppppaa
 ADFR	AB.praaappaa	Amphid neuron, prob. chemosensory			1														WBbt:0003999	lineage name: ABpraaappaa
 ADLL	AB.alppppaad	Amphid neuron, prob. chemosensory			1														WBbt:0003997	lineage name: ABalppppaad
@@ -88,12 +88,12 @@ AWBL	AB.alpppppap	Amphid wing cells, neurons having ciliated sheet-like sensory 
 AWBR	AB.praaappap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003828	lineage name: ABpraaappap
 AWCL	AB.plpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003827	lineage name: ABplpaaaaap
 AWCR	AB.prpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003826	lineage name: ABprpaaaaap
-B	AB.prppppapa	Rectal cell, postembryonic blast cell in male											1	1					ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+B	AB.prppppapa	Rectal cell, postembryonic blast cell in male											1	1					WBbt:0003627	None
 BAGL	AB.alppappap	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1														WBbt:0003824	lineage name: ABalppappap
 BAGR	AB.arappppap	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1														WBbt:0003823	lineage name: ABarappppap
 BDUL	AB.arppaappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles			1														WBbt:0003812	lineage name: ABarppaappp
 BDUR	AB.arpppappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles			1														WBbt:0003811	lineage name: ABarpppappp
-C	P0.ppa	Embryonic founder cell											1						ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+C	P0.ppa	Embryonic founder cell											1						WBbt:0003810	None
 CA1	P3.aapa	Male specific cell, not reconstructed												1	1				WBbt:0003809	lineage name: P3.aapa
 CA2	P4.aapa	Male specific cell, not reconstructed												1	1				WBbt:0003808	lineage name: P4.aapa
 CA3	P5.aapa	Male specific cell, not reconstructed												1	1				WBbt:0003807	lineage name: P5.aapa
@@ -121,7 +121,7 @@ CEPsoDL	AB.alapapppp	Cephalic socket								1									WBbt:0004921	lineage name:
 CEPsoDR	AB.alapppppp	Cephalic socket								1									WBbt:0004919	lineage name: ABalapppppp
 CEPsoVL	AB.alppaappp	Cephalic socket								1									WBbt:0004918	lineage name: ABalppaappp
 CEPsoVR	AB.alaapappp	Cephalic socket								1									WBbt:0004917	lineage name: ABalaapappp
-CPO	P2.aap	Male specific cell in ventral cord, not reconstructed												1	1				ERROR: No WBID for this query.	ERROR: Exception: Request failed for http://api.wormbase.org/rest/field/anatomy_term/WBbt:false/synonyms returned code 500. Truncated server response:                                                                                     <!DOCTYPE HTML> <html>   <head>     <meta charset="UTF-8">     ... (use muteHttpExceptions option to examine full response)
+CPO	P2.aap	Male specific cell in ventral cord, not reconstructed												1	1				WBbt:0002471	None
 CP1	P3.aapp	Male specific cell in ventral cord, not reconstructed												1	1				WBbt:0004901	lineage name: P3.aapp
 CP2	P4.aapp	Male specific cell in ventral cord, not reconstructed												1	1				WBbt:0004899	lineage name: P4.aapp
 CP3	P5.aapp	Male specific cell in ventral cord, not reconstructed												1	1				WBbt:0004897	lineage name: P5.aapp
@@ -131,7 +131,7 @@ CP6	P8.aapp	Male specific motor neuron in ventral cord				1								1	1				WBbt:0
 CP7	P9.aapp	Male specific motor neuron in ventral cord				1								1	1				WBbt:0004889	lineage name: P9.aapp
 CP8	P10.aapp	Male specific interneuron, project into preanal ganglion				1								1	1				WBbt:0004888	lineage name: P10.aapp
 CP9	P11.aapp	Male specific interneuron, project into preanal ganglion												1	1				WBbt:0004887	lineage name: P11.aapp
-D	P0.pppa	Embryonic founder cell											1						ERROR: No WBID for this query.	ERROR: Exception: Request failed for http://api.wormbase.org/rest/field/anatomy_term/WBbt:false/synonyms returned code 500. Truncated server response:                                                                                     <!DOCTYPE HTML> <html>   <head>     <meta charset="UTF-8">     ... (use muteHttpExceptions option to examine full response)
+D	P0.pppa	Embryonic founder cell											1						WBbt:0004873	None
 DA1	AB.prppapaap	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004871	lineage name: ABprppapaap
 DA2	AB.plppapapa	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004869	lineage name: ABplppapapa
 DA3	AB.prppapapa	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004867	lineage name: ABprppapapa
@@ -163,12 +163,12 @@ DX1/2	F.lvda	Male specific neuron, darkly staining cell body in pre- anal gangli
 DX1/2	F.rvda	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1			WBbt:0004817	lineage name: F.rvda
 DX3/4	U.laa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1			WBbt:0004806	lineage name: U.laa
 DX3/4	U.raa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles				1								1	1	1			WBbt:0004805	lineage name: U.raa
-E	P0.pap	Embryonic founder cell											1						ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+E	P0.pap	Embryonic founder cell											1						WBbt:0004804	None
 EF1/2	F.lvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1			WBbt:0004803	F.lvdp,lineage name: F.lvda
 EF1/2	F.rvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1			WBbt:0004802	F.rvdp,lineage name: F.rvda
 EF3/4	U.lap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1			WBbt:0004801	lineage name: U.lap
-EF3/4	U.rap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1			WBbt:000480	ERROR: TypeError: Cannot read property "name" from undefined.
-F	AB.plppppapp	Rectal cell, blast cell in male											1	1					ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+EF3/4	U.rap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.				1								1	1	1			WBbt:000480	None
+F	AB.plppppapp	Rectal cell, blast cell in male											1	1					WBbt:0004799	None
 FLPL	AB.plapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1														WBbt:0004798	lineage name: ABplapaaapad
 FLPR	AB.prapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso			1														WBbt:0004797	lineage name: ABprapaaapad
 GLRDL	MS.aaaaaal	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1														WBbt:0004786	lineage name: MSaaaaaal
@@ -177,10 +177,10 @@ GLRL	MS.apaaaad	Set of six cells that form a thin cylindrical sheet between phar
 GLRR	MS.ppaaaad	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1														WBbt:0004783	lineage name: MSppaaaad
 GLRVL	MS.apaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1														WBbt:0004782	lineage name: MSapaaaav
 GLRVR	MS.ppaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons			1														WBbt:0004781	lineage name: MSppaaaav
-G1	AB.prpaaaapa	Postembryonic blast cell, excretory socket in embryo											1						WBbt:0003712	ERROR: TypeError: Cannot call method "join" of null.
-G2	AB.plapaapa	Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later								1									WBbt:0003710	ERROR: TypeError: Cannot call method "join" of null.
-HOL	AB.plaaappa	Seam hypodermal cell								1									ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
-HOR	AB.arpapppa	Seam hypodermal cell								1									ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+G1	AB.prpaaaapa	Postembryonic blast cell, excretory socket in embryo											1						WBbt:0003712	None
+G2	AB.plapaapa	Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later								1									WBbt:0003710	None
+HOL	AB.plaaappa	Seam hypodermal cell								1									WBbt:0004778	None
+HOR	AB.arpapppa	Seam hypodermal cell								1									WBbt:0004777	None
 H1L	AB.plaaappp	Seam hypodermal cell, postembryonic blast cell								1			1						WBbt:0004766	lineage name: ABplaaappp
 H1R	AB.arpapppp	Seam hypodermal cell, postembryonic blast cell								1			1						WBbt:0004765	lineage name: ABarpapppp
 H2L	AB.arppaaap	Seam hyopdermal cell, postemb. blast cell, L1 deirid socket								1			1						WBbt:0004764	lineage name: ABarppaaap
@@ -195,10 +195,10 @@ I1L	AB.alpapppaa	Pharyngeal interneurons: ant sensory, input from RIP			1							
 I1R	AB.arapappaa	Pharyngeal interneurons: ant sensory, input from RIP			1														WBbt:0004745	lineage name: ABarapappaa
 I2L	AB.alpappaapa	Pharyngeal interneurons, ant sensory.			1														WBbt:0004744	lineage name: ABalpappaapa
 I2R	AB.arapapaapa	Pharyngeal interneurons, ant sensory.			1														WBbt:0004743	lineage name: ABarapapaapa
-I3	MS.aaaaapaa	Pharyngeal interneuron, ant sensory.			1														ERROR: No WBID for this query.	I3,lineage name: MSaaaaapaa
-I4	MS.aaaapaa	Pharyngeal interneuron.			1														ERROR: No WBID for this query.	I4,lineage name: MSaaaapaa
-I5	AB.arapapapp	Pharyngeal interneuron, post sensory.			1														ERROR: No WBID for this query.	I5,lineage name: ABarapapapp
-I6	MS.paaapaa	Pharyngeal interneuron, post sensory.			1														ERROR: No WBID for this query.	I6,lineage name: MSpaaapaa
+I3	MS.aaaaapaa	Pharyngeal interneuron, ant sensory.			1														WBbt:0004742	I3,lineage name: MSaaaaapaa
+I4	MS.aaaapaa	Pharyngeal interneuron.			1														WBbt:0004741	I4,lineage name: MSaaaapaa
+I5	AB.arapapapp	Pharyngeal interneuron, post sensory.			1														WBbt:0004740	I5,lineage name: ABarapapapp
+I6	MS.paaapaa	Pharyngeal interneuron, post sensory.			1														WBbt:0004739	I6,lineage name: MSpaaapaa
 IL1DL	AB.alapappaaa	Inner labial neuron			1														WBbt:0004738	lineage name: ABalapappaaa
 IL1DR	AB.alappppaaa	Inner labial neuron			1														WBbt:0004737	lineage name: ABalappppaaa
 IL1L	AB.alapaappaa	Inner labial neuron			1														WBbt:0004553	lineage name: ABalapaappaa
@@ -223,22 +223,22 @@ ILsoL	AB.alaaapall	Inner labial socket								1									WBbt:0004518	lineage nam
 ILsoR	AB.alaaapprr	Inner labial socket								1									WBbt:0004517	lineage name: ABalaaapprr
 ILsoVL	AB.alppapapp	Inner labial socket								1									WBbt:0004503	lineage name: ABalppapapp
 ILsoVR	AB.arapppapp	Inner labial socket								1									WBbt:0004501	lineage name: ABarapppapp
-K	AB.plpapppaa	Rectal cell, postembryonic blast cell											1						ERROR: No WBID for this query.	lineage name: K.a,rect_hyp
-K\'	AB.plpapppap	Rectal cell								1									ERROR: Exception: Invalid argument: http://wormbase.org/db/ontology/anatomy?name=K\'	ERROR: Exception: Invalid argument: http://wormbase.org/db/ontology/anatomy?name=K\'
+K	AB.plpapppaa	Rectal cell, postembryonic blast cell											1						WBbt:0004499	lineage name: K.a,rect_hyp
+K\'	AB.plpapppap	Rectal cell								1									WBbt:0004497	lineage name: ABplpapppap, rect_hyp
 K.a	K.a	Rectal cell								1									WBbt:0004495	lineage name: K.a,rect_hyp
 LUAL	AB.plpppaapap	Interneuron, short process in post ventral cord			1														WBbt:0004493	lineage name: ABplpppaapap
 LUAR	AB.prpppaapap	Interneuron, short process in post ventral cord			1														WBbt:0004491	lineage name: ABprpppaapap
-M	MS.apaap	Postembryonic mesoblast											1						ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
-M1	MS.paapaaa	Pharyngeal motorneurons			1							1							ERROR: No WBID for this query.	lineage name: MSpaapaaa,M1 neuron
+M	MS.apaap	Postembryonic mesoblast											1						WBbt:0006072	None
+M1	MS.paapaaa	Pharyngeal motorneurons			1							1							WBbt:0004488	lineage name: MSpaapaaa,M1 neuron
 M2L	AB.araapappa	Pharyngeal motorneurons			1							1							WBbt:0004487	lineage name: ABaraapappa
 M2R	AB.araappppa	Pharyngeal motorneurons			1							1							WBbt:0004473	lineage name: ABaraappppa
 M3L	AB.araapappp	Pharyngeal sensory-motorneurons			1							1							WBbt:0004471	lineage name: ABaraapappp
 M3R	AB.araappppp	Pharyngeal sensory-motorneurons			1							1							WBbt:0004469	lineage name: ABaraappppp
-M4	MS.paaaaaa	Pharyngeal motorneurons			1							1							ERROR: No WBID for this query.	lineage name: MSpaaaaaa,M4 neuron,MSpaaaaaa
-M5	MS.paaapap	Pharyngeal motorneurons			1							1							ERROR: No WBID for this query.	lineage name: MSpaaapap,M5 neuron
+M4	MS.paaaaaa	Pharyngeal motorneurons			1							1							WBbt:0004467	lineage name: MSpaaaaaa,M4 neuron,MSpaaaaaa
+M5	MS.paaapap	Pharyngeal motorneurons			1							1							WBbt:0004465	lineage name: MSpaaapap,M5 neuron
 MCL	AB.alpaaappp	Pharyngeal neurons that synapse onto marginal cells			1														WBbt:0004463	lineage name: ABalpaaappp
 MCR	AB.arapaappp	Pharyngeal neurons that synapse onto marginal cells			1														WBbt:0004461	lineage name: ABarapaappp
-MI	AB.araappaaa	Pharyngeal motor neuron/interneuron			1							1							ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+MI	AB.araappaaa	Pharyngeal motor neuron/interneuron			1							1							WBbt:0003664	None
 MS	P0.paa	Embryonic founder cell											1						WBbt:0004458	lineage name: P0.paa
 NSML	AB.araapapaav	Pharyngeal neurosecretory motorneuron, contain serotonin			1							1							WBbt:0004457	lineage name: ABaraapapaav
 NSMR	AB.araapppaav	Pharyngeal neurosecretory motorneuron, contain serotonin			1							1							WBbt:0004446	lineage name: ABaraapppaav
@@ -253,7 +253,7 @@ OLQDR	AB.alapppapaa	Quadrant outer labial neuron			1														WBbt:0004438	l
 OLQVL	AB.plpaaappaa	Quadrant outer labial neuron			1														WBbt:0004437	lineage name: ABplpaaappaa
 OLQVR	AB.prpaaappaa	Quadrant outer labial neuron			1														WBbt:0004431	lineage name: ABprpaaappaa
 OLQshDL	AB.arpaaaapa	Quadrant outer labial sheath								1									WBbt:0004430	lineage name: ABarpaaaapa
-OLQshSR	AB.arpaaapaa	Quadrant outer labial sheath								1									ERROR: No WBID for this query.	ERROR: TypeError: Cannot read property "name" from undefined.
+OLQshSR	AB.arpaaapaa	Quadrant outer labial sheath								1									WBbt:0004429	lineage name: ABarpaaapaa
 OLQshVL	AB.alpppaaap	Quadrant outer labial sheath								1									WBbt:0004428	lineage name: ABalpppaaap
 OLQshVR	AB.praaaaaap	Quadrant outer labial sheath								1									WBbt:0004427	lineage name: ABpraaaaaap
 OLQsoDL	AB.arpaaaaal	Quadrant outer labial socket								1									WBbt:0004426	lineage name: ABarpaaaaal
@@ -262,8 +262,8 @@ OLQsoVL	AB.alppaaapp	Quadrant outer labial socket								1									WBbt:0004424	
 OLQsoVR	AB.alaappapp	Quadrant outer labial socket								1									WBbt:0004423	lineage name: ABalaappapp
 P0	Z	Single cell zygote											1						WBbt:0004422	lineage name: Z
 P4	P0.pppp	Embryonic founder cell of germ line											1						WBbt:0004421	lineage name: P0.pppp,P4,P4'
-P1/2L	AB.plapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
-P1/2R	AB.prapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+P1/2L	AB.plapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					WBbt:0006175	None
+P1/2R	AB.prapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					WBbt:0006379	None
 P3/4L	AB.plappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					WBbt:0004418	lineage name: ABplappaaa
 P3/4R	AB.prappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					WBbt:0004417	lineage name: ABprappaaa
 P5/6L	AB.plappaap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1											1	1					WBbt:0004416	lineage name: ABplappaap
@@ -286,7 +286,7 @@ PCshL	Y.plppv	Sheath of postcloacal sensilla in male												1	1				WBbt:0004
 PCshR	Y.prppv	Sheath of postcloacal sensilla in male												1	1				WBbt:0004389	lineage name: Y.prppv
 PCsoL	Y.plap	Socket of postcloacal sensilla in male												1	1				WBbt:0004388	lineage name: Y.plap
 PCsoR	Y.prap	Socket of postcloacal sensilla in male												1	1				WBbt:0004387	lineage name: Y.prap
-PDA	AB.prpppaaaa	Motor neuron, process in dorsal cord, same as Y cell in hermaphrodite, Y.a in male										1							WBbt:0004386	ERROR: TypeError: Cannot call method "join" of null.
+PDA	AB.prpppaaaa	Motor neuron, process in dorsal cord, same as Y cell in hermaphrodite, Y.a in male										1							WBbt:0004386	None
 PDB	P12.apa	Motor neuron, process in dorsal cord, cell body in pre-anal ganglion			1							1							WBbt:0004385	lineage name: P12.apa
 PDC	P11.papa	Male specific interneuron, preanal ganglion				1								1	1				WBbt:0004384	lineage name: P11.papa
 PDEL	V5L.paaa	Neuron, dopaminergic of postderid sensillum			1														WBbt:0004383	lineage name: V5L.paaa
@@ -299,7 +299,7 @@ PGA	P11.papp	Male specific interneuron, preanal ganglion				1								1	1				WBbt
 PHAL	AB.plpppaapp	Phasmid neurons, probably chemosensory			1														WBbt:0004366	lineage name: ABplpppaapp
 PHAR	AB.prpppaapp	Phasmid neurons, probably chemosensory			1														WBbt:0004365	lineage name: ABprpppaapp
 PHBL	AB.plapppappp	Phasmid neurons, probably chemosensory			1														WBbt:0004364	lineage name: ABplapppappp
-PHRB	AB.prapppappp	Phasmid neurons, probably chemosensory			1														ERROR: No WBID for this query.	lineage name: ABprapppappp,PHRB
+PHRB	AB.prapppappp	Phasmid neurons, probably chemosensory			1														WBbt:0005659	lineage name: ABprapppappp,PHRB
 PHCL	TL.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike				1								1	1				WBbt:0004362	lineage name: TL.pppaa
 PHCR	TR.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike				1								1	1				WBbt:0004118	lineage name: TR.pppaa
 PHshL	AB.plpppapaa	Phasmid sheath								1									WBbt:0004116	lineage name: ABplpppapaa
@@ -469,7 +469,7 @@ SPso4L	B.alpapp	Socket of male copulatory spicule												1	1				WBbt:0004950
 SPso4r	B.arpapp	Socket of male copulatory spicule												1	1				WBbt:0004948	lineage name: B.arpapp
 TL	AB.plappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1											1						WBbt:0004946	lineage name: ABplappppp
 TR	AB.prappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1											1						WBbt:0004944	lineage name: ABprappppp
-U	AB.plppppapa	Rectal cell, postembryonic blast cell in male											1	1					ERROR: No WBID for this query.	ERROR: Exception: Request failed for http://api.wormbase.org/rest/field/anatomy_term/WBbt:false/synonyms returned code 500. Truncated server response:                                                                                     <!DOCTYPE HTML> <html>   <head>     <meta charset="UTF-8">     ... (use muteHttpExceptions option to examine full response)
+U	AB.plppppapa	Rectal cell, postembryonic blast cell in male											1	1					WBbt:0004942	None
 URADL	AB.plaaaaaaa	Ring motor neuron			1							1							WBbt:0004940	lineage name: ABplaaaaaaa
 URADR	AB.arpapaaaa	Ring motor neuron			1							1							WBbt:0004936	lineage name: ABarpapaaaa
 URAVL	AB.plpaaapaa	Ring motor neuron			1							1							WBbt:0004935	lineage name: ABplpaaapaa
@@ -536,23 +536,23 @@ VD10	P9.app	Vent cord motor neuron, innervates vent body muscles, probably recip
 VD11	P10.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1							WBbt:0004589	lineage name: P10.app
 VD12	P11.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1							WBbt:0004587	lineage name: P11.app
 VD13	P12.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor			1							1							WBbt:0004585	lineage name: P12.app
-W	AB.prapaapa	Postembryonic neuroblast, analogous to Pn.a cells											1						ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+W	AB.prapaapa	Postembryonic neuroblast, analogous to Pn.a cells											1						WBbt:0004583	None
 XXXL	AB.plaaapaa	Embryonic head hypodermal cell											1						WBbt:0004581	lineage name: ABplaaapaa
 XXXR	AB.arpappaa	Embryonic head hypodermal cell											1						WBbt:0004579	lineage name: ABarpappaa
-Y	AB.prpppaaaa	Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male											1	1					ERROR: No WBID for this query.	ERROR: TypeError: Cannot call method "join" of null.
+Y	AB.prpppaaaa	Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male											1	1					WBbt:0003623	None
 Z1	MS.pppaap	Somatic gonad precursor cell											1						WBbt:0004577	lineage name: MSpppaap
 Z2	P4.p	Germ line precursor cell											1						WBbt:0004576	lineage name: P4.p
 Z3	P4.a	Germ line precursor cell											1						WBbt:0004575	lineage name: P4.a
 Z4	MS.appaap	Somatic gonad precursor cell											1						WBbt:0004574	lineage name: MSappaap
-arc_ant	AB.araaapppa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	ERROR: No WBID for this query.	ABaraaapppa,arc_ant_DR,lineage name: ABaraaapppa
-arc_ant	AB.alpaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	ERROR: No WBID for this query.	ABalpaappaa,arc_ant_DL,lineage name: ABalpaappaa
-arc_ant	AB.alpapaapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	ERROR: No WBID for this query.	ABalpapaapa,arc_ant_V,lineage name: ABalpapaapa
-arcpost	AB.alpaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABalpaapaaa,arc_post_DL,lineage name: ABalpaapaaa
-arcpost	AB.alpaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABalpaappap,arc_post_VL,lineage name: ABalpaappap
-arcpost	AB.araaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABaraaapaaa,arc_post_DR,lineage name: ABaraaapaaa,lineage name; ABaraaapaaa
-arcpost	AB.araaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABaraaappaa,arc_post_D,lineage name: ABaraaappaa
-arcpost	AB.araaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABaraaappap,arc_post_VR,lineage name: ABaraaappap
-arcpost	AB.arapapapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	ERROR: No WBID for this query.	ABaraaappap,arc_post_VR,lineage name: ABaraaappap
+arc_ant	AB.araaapppa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	WBbt:0004571	ABaraaapppa,arc_ant_DR,lineage name: ABaraaapppa
+arc_ant	AB.alpaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	WBbt:0004572	ABalpaappaa,arc_ant_DL,lineage name: ABalpaappaa
+arc_ant	AB.alpapaapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_ant	WBbt:0004573	ABalpapaapa,arc_ant_V,lineage name: ABalpapaapa
+arcpost	AB.alpaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004570	ABalpaapaaa,arc_post_DL,lineage name: ABalpaapaaa
+arcpost	AB.alpaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004568	ABalpaappap,arc_post_VL,lineage name: ABalpaappap
+arcpost	AB.araaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004569	ABaraaapaaa,arc_post_DR,lineage name: ABaraaapaaa,lineage name; ABaraaapaaa
+arcpost	AB.araaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004565	ABaraaappaa,arc_post_D,lineage name: ABaraaappaa
+arcpost	AB.araaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004566	ABaraaappap,arc_post_VR,lineage name: ABaraaappap
+arcpost	AB.arapapapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity								1						1	1	arcade_cell_post	WBbt:0004567	ABaraaappap,arc_post_VR,lineage name: ABaraaappap
 cc_DL	M.dlpa	Postembryonic coelomocyte in hermaphrodite								1									WBbt:0004564	lineage name: M.dlpa
 cc_DR	M.drpa	Postembryonic coelomocyte in hermaphrodite								1									WBbt:0004563	lineage name: M.drpa
 cc_male_D	M.dlpappp	Single male postembryonic coelomocyte												1	1				WBbt:0004562	lineage name: M.dlpappp
@@ -569,17 +569,17 @@ e2V	AB.alpappapa	Pharyngeal epithelial cells								1									WBbt:0004550	linea
 e3D	AB.araapaaaa	Pharyngeal epithelial cells								1									WBbt:0004548	lineage name: ABaraapaaaa
 e3VL	AB.alpaaaaaa	Pharyngeal epithelial cells								1									WBbt:0004546	lineage name: ABalpaaaaaa
 e3VR	AB.arapaaaaa	Pharyngeal epithelial cells								1									WBbt:0004544	lineage name: ABarapaaaaa
-exc_cell	AB.plpappaap	Large H-shaped excretory cell								1									ERROR: No WBID for this query.	excretory canal cell,exc_cell,lineage name: ABplpappaap
-exc_duct	AB.plpaaaapa	Excretory duct								1									ERROR: No WBID for this query.	exc duct,lineage name: ABplpaaaapa
+exc_cell	AB.plpappaap	Large H-shaped excretory cell								1									WBbt:0005812	excretory canal cell,exc_cell,lineage name: ABplpappaap
+exc_duct	AB.plpaaaapa	Excretory duct								1									WBbt:0004540	exc duct,lineage name: ABplpaaaapa
 exc_gl_L	AB.plpapapaa	Excretory glands, fused, send processes to ring,open into excretory duct								1									WBbt:0004536	ABplpapapaa nucleus,lineage name: ABplpapapaa
 exc_gl_R	AB.prpapapaa	Excretory glands, fused, send processes to ring,open into excretory duct								1									WBbt:0004535	ABprpapapaa nucleus,lineage name: ABprpapapaa
-socket exc_socket	G2.p	Excretory socket, links duct to hypodermis								1									ERROR: No WBID for this query.	excretory canal cell,exc_cell,lineage name: ABplpappaap
+socket exc_socket	G2.p	Excretory socket, links duct to hypodermis								1									WBbt:0004534	excretory canal cell,exc_cell,lineage name: ABplpappaap
 g1AL	MS.aapaapaa	Pharyngeal gland cells								1									WBbt:0004532	lineage name: MSaapaapaa
 g1AR	MS.papaapaa	Pharyngeal gland cells								1									WBbt:0004530	lineage name: MSpapaapaa
 g1P	MS.aaaaapap	Pharyngeal gland cells								1									WBbt:0004528	lineage name: MSaaaaapap
 g2L	MS.aapapaa	Pharyngeal gland cells								1									WBbt:0004526	lineage name: MSaapapaa
 g2R	MS.papapaa	Pharyngeal gland cells								1									WBbt:0004524	lineage name: MSpapapaa
-gon_herm_anch	Z1.ppp/Z4.aaa	Anchor cell, induces vulva, herm gonad								1	1								ERROR: No WBID for this query.	AC,gon_herm_anch,lineage name: Z1.ppp/Z4.aaa
+gon_herm_anch	Z1.ppp/Z4.aaa	Anchor cell, induces vulva, herm gonad								1	1								WBbt:0004522	AC,gon_herm_anch,lineage name: Z1.ppp/Z4.aaa
 gon_herm_dtc_A	Z1.aa	Anterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad								1	1								WBbt:0004520	lineage name: Z1.aa
 gon_herm_dtc_P	Z4.pp	Posterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad								1	1								WBbt:0004506	lineage name: Z4.pp
 gon_herm_dish_A	Z1.apa	Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad								1	1					1	1	?	WBbt:0004505	lineage name: Z1.apa
@@ -623,8 +623,8 @@ gon_herm_spth_A	Z1.paapppp	Anterior spermathecae								1	1					1	1	?	WBbt:00041
 gon_herm_spth_A	Z1.papaaad	Anterior spermathecae								1	1					1	1	?	WBbt:0004182	gon_herm_spth_A,lineage name: Z1.papaaad
 gon_herm_spth_A	Z1.papaaav	Anterior spermathecae								1	1					1	1	?	WBbt:0004178	gon_herm_spth_A,lineage name: Z1.papaaav
 gon_herm_spth_A	Z1.papaapv	Anterior spermathecae								1	1					1	1	?	WBbt:0004176	gon_herm_spth_A,lineage name: Z1.papaapv
-gon_herm_spth_A	Z4.apaaaad	Anterior spermathecae								1	1					1	1	?	WBbt:0004174	ERROR: Exception: Request failed for http://api.wormbase.org/rest/field/anatomy_term/WBbt:0004174/synonyms returned code 500. Truncated server response:                                                                                     <!DOCTYPE HTML> <html>   <head>     <meta charset="UTF-8">     ... (use muteHttpExceptions option to examine full response)
-gon_herm_spth_A	Z4.apaaaav	Anterior spermathecae								1	1					1	1	?	WBbt:0004172	ERROR: Exception: Request failed for http://api.wormbase.org/rest/field/anatomy_term/WBbt:0004172/synonyms returned code 500. Truncated server response:                                                                                     <!DOCTYPE HTML> <html>   <head>     <meta charset="UTF-8">     ... (use muteHttpExceptions option to examine full response)
+gon_herm_spth_A	Z4.apaaaad	Anterior spermathecae								1	1					1	1	?	WBbt:0004174	gon_herm_spth_A,lineage name: Z4.apaaaad
+gon_herm_spth_A	Z4.apaaaav	Anterior spermathecae								1	1					1	1	?	WBbt:0004172	gon_herm_spth_A,lineage name: Z4.apaaaav
 gon_herm_spth_A	Z4.apaaapv	Anterior spermathecae								1	1					1	1	?	WBbt:0004170	gon_herm_spth_A,lineage name: Z4.apaaapv
 gon_herm_spth_P	Z4.paaaaa	Posterior spermathecae								1	1					1	1	?	WBbt:0004168	gon_herm_spth_P,lineage name: Z4.paaaaa
 gon_herm_spth_P	Z4.paaaap	Posterior spermathecae								1	1					1	1	?	WBbt:0004166	gon_herm_spth_P,lineage name: Z4.paaaap
@@ -748,14 +748,14 @@ gon_herm_vut	Z4.aapapap	Ventral uterus								1	1					1	1	?	WBbt:0005073	gon_her
 gon_herm_vut	Z4.aapappa	Ventral uterus								1	1					1	1	?	WBbt:0005072	gon_herm_vut,lineage name: Z4.aapappa
 gon_herm_vut	Z4.aapappp	Ventral uterus								1	1					1	1	?	WBbt:0005071	gon_herm_vut,lineage name: Z4.aapappp
 gon_herm_vut	Z4.aappaaa	Ventral uterus								1	1					1	1	?	WBbt:0003768	gon_herm_vut,lineage name: Z4.aappaaa
-gon_herm_vut	Z4.apppaap	Ventral uterus								1	1					1	1	?	WBbt:0005069	ERROR: TypeError: Cannot read property "name" from undefined.
+gon_herm_vut	Z4.apppaap	Ventral uterus								1	1					1	1	?	WBbt:0005069	gon_herm_vut, lineage name: Z4.aappaaa, lineage name: Z4.apppaap
 gon_herm_vut	Z4.aappppa	Ventral uterus								1	1					1	1	?	WBbt:0005068	gon_herm_vut,lineage name: Z4.aappppa
 gon_herm_vut	Z4.aappppp	Ventral uterus								1	1					1	1	?	WBbt:0005067	gon_herm_vut,lineage name: Z4.aappppp,sujn
 gon_herm_vut	Z4.aapppaa	Ventral uterus								1	1					1	1	?	WBbt:0005066	gon_herm_vut,lineage name: Z4.aapppaa
 gon_herm_vut	Z4.aapppap	Ventral uterus								1	1					1	1	?	WBbt:0005065	gon_herm_vut,lineage name: Z4.aapppap,VT1r
 gon_male_dtc	Z1.a	Distal tip cell, inhibits meiosis in nearby germ cells												1	1	1			WBbt:0005064	lineage name: Z1.a
 gon_male_dtc	Z1.p	Distal tip cell, inhibits meiosis in nearby grem cells												1	1	1			WBbt:0005063	lineage name: Z4.p
-gon_male_link	Z1.paa/Z4.aaa	Linker cell, leads gonad during morphogenesis and initiates union with cloaca												1	1				ERROR: No WBID for this query.	gon_male_link,lineage name: Z1.paa/Z4.aaa
+gon_male_link	Z1.paa/Z4.aaa	Linker cell, leads gonad during morphogenesis and initiates union with cloaca												1	1				WBbt:0005062	gon_male_link,lineage name: Z1.paa/Z4.aaa
 gon_male_sves	Z1.ppaaaaa	Seminal vesicle, inner												1	1	1			WBbt:0005061	lineage name: Z1.ppaaaaa
 gon_male_sves	Z1.ppaaaap	Seminal vesicle, inner												1	1	1			WBbt:0005060	lineage name: Z1.ppaaaap
 gon_male_sves	Z1.ppaaap	Seminal vesicle, inner												1	1	1			WBbt:0005059	lineage name: Z1.ppaaap
@@ -1013,11 +1013,11 @@ hyp7	P5.p	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt
 hyp7	P6.p	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0004395	hyp7,lineage name: P6.p
 hyp7	P7.p	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0004394	hyp7,lineage name: P7.p
 hyp7	P8.p	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0004393	hyp7,lineage name: P8.p
-hyp7	P10.paaa	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007217	ERROR: TypeError: Cannot call method "join" of null.
-hyp7	P10.paap	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007218	ERROR: TypeError: Cannot call method "join" of null.
-hyp7	P10.papa	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007220	ERROR: TypeError: Cannot call method "join" of null.
-hyp8/9	AB.plpppapap	Tail ventral hypodermis								1						1	1	?	WBbt:0007856	ERROR: TypeError: Cannot call method "join" of null.
-hyp8/9	AB.prpppapap	Tail ventral hypodermis								1						1	1	?	WBbt:0007856	ERROR: TypeError: Cannot call method "join" of null.
+hyp7	P10.paaa	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007217	None
+hyp7	P10.paap	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007218	None
+hyp7	P10.papa	Postembryonic large hypodermal syncytium, male												1	1	1			WBbt:0007220	None
+hyp8/9	AB.plpppapap	Tail ventral hypodermis								1						1	1	?	WBbt:0007856	None
+hyp8/9	AB.prpppapap	Tail ventral hypodermis								1						1	1	?	WBbt:0007856	None
 hyp10	AB.plppppppp	Tail ventral hypodermis								1						1	1	hyp10	WBbt:0004378	lineage name: ABplppppppp,lineage name: ABprppppppp
 hyp10	AB.prppppppp	Tail ventral hypodermis								1						1	1	hyp10	WBbt:0004378	lineage name: ABplppppppp,lineage name: ABprppppppp
 hyp11	C.pappa	Tail dorsal hypodermis								1									WBbt:0004377	lineage name: Cpappv
@@ -1049,43 +1049,43 @@ int	E.prppp	Intestinal cell								1						1	1	int9r	WBbt:0004342	lineage name: E
 int	In.a	Postembryonic intestinal cell								1						1	1		WBbt:0004341	lineage name: In.a
 int	In.p	Postembryonic intestinal cell								1						1	1		WBbt:0004340	lineage name: In.p
 linker_killer	U.lp or U.rp	One of these cells, sometimes fused with U.l/ra, phagocytoses the male linker cell												1	1				WBbt:0004339	lineage name: U.lp or U.rp
-m1DL	AB.araapaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraapaaap,m1DL
-m1DR	AB.araappaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraappaap,m1DR
-m1L	AB.araaaaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraaaaaap,m1L
-m1R	AB.araaaaapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraaaaapp,m1R
-m1VL	AB.alpaaaapa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABalpaaaapa,m1VL
-m1VR	AB.araaaaapa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	ABarapaaapa,lineage name: ABarapaaapa,m1VR
-m2DL	AB.araapaapa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraapaapa,m2DL
-m2DR	AB.araappapa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraappapa,m2DR
+m1DL	AB.araapaaap	Pharyngeal muscle cell						1											WBbt:0004338	lineage name: ABaraapaaap,m1DL
+m1DR	AB.araappaap	Pharyngeal muscle cell						1											WBbt:0004337	lineage name: ABaraappaap,m1DR
+m1L	AB.araaaaaap	Pharyngeal muscle cell						1											WBbt:0004336	lineage name: ABaraaaaaap,m1L
+m1R	AB.araaaaapp	Pharyngeal muscle cell						1											WBbt:0004335	lineage name: ABaraaaaapp,m1R
+m1VL	AB.alpaaaapa	Pharyngeal muscle cell						1											WBbt:0004334	lineage name: ABalpaaaapa,m1VL
+m1VR	AB.araaaaapa	Pharyngeal muscle cell						1											WBbt:0004555	ABarapaaapa,lineage name: ABarapaaapa,m1VR
+m2DL	AB.araapaapa	Pharyngeal muscle cell						1											WBbt:0004332	lineage name: ABaraapaapa,m2DL
+m2DR	AB.araappapa	Pharyngeal muscle cell						1											WBbt:0004331	lineage name: ABaraappapa,m2DR
 m2L	AB.alpaaapaa	Pharyngeal muscle cell						1											WBbt:0004487	lineage name: ABaraapappa
 m2R	AB.arapaapaa	Pharyngeal muscle cell						1											WBbt:0004473	lineage name: ABaraappppa
-m2VL	AB.alpaaaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABalpaaaaap,m2VL
-m2VR	AB.arapaaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABarapaaaap,m2VR
-m3DL	MS.aaapaaa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaapaaa,m3DL
-m3DR	MS.paaaapa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpaaaapa,m3DR
+m2VL	AB.alpaaaaap	Pharyngeal muscle cell						1											WBbt:0004328	lineage name: ABalpaaaaap,m2VL
+m2VR	AB.arapaaaap	Pharyngeal muscle cell						1											WBbt:0004327	lineage name: ABarapaaaap,m2VR
+m3DL	MS.aaapaaa	Pharyngeal muscle cell						1											WBbt:0004326	lineage name: MSaaapaaa,m3DL
+m3DR	MS.paaaapa	Pharyngeal muscle cell						1											WBbt:0004325	lineage name: MSpaaaapa,m3DR
 m3L	AB.alpaapapp	Pharyngeal muscle cell						1											WBbt:0004471	lineage name: ABaraapappp
 m3R	AB.arapaappa	Pharyngeal muscle cell						1											WBbt:0004469	lineage name: ABaraappppp
-m3VL	AB.alpappppp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABalpappppp,m3VL
-m3VR	AB.arapapppp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABarapapppp,m3VR
-m4DL	MS.aaaaapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaaaapp,m4DL
-m4DR	MS.paaaapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpaaaapp,m4DR
-m4L	MS.aaapaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaapaap,m4L
-m4R	AB.araaapapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraaapapp,m4R
-m4VL	MS.aapaaaa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaapaaaa,m4VL
-m4VR	MS.papappp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpapaaaa,m4VR
-m5DL	MS.aaaapap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaaapap,m5DL
-m5DR	MS.paaappa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpaaappa,m5DR
-m5L	AB.araapapap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraapapap,m5L
-m5R	AB.araapppap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: ABaraapppap,m5R
-m5VL	MS.aapaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaapaaap,m5VL
-m5VR	MS.papaaap	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpapaaap,m5VR
-m6D	MS.paaappp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpaaappp,m6D
-m6VL	MS.aapappa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaapappa,m6VL
-m6VR	MS.papappa	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpapappa,m6VR
-m7D	MS.aaaappp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaaappp,m7D
-m7VL	MS.aapaapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaapaapp,m7VL
-m7VR	MS.papaapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSpapaapp,m7VR
-m8	MS.aaapapp	Pharyngeal muscle cell						1											ERROR: No WBID for this query.	lineage name: MSaaapapp,m8
+m3VL	AB.alpappppp	Pharyngeal muscle cell						1											WBbt:0004322	lineage name: ABalpappppp,m3VL
+m3VR	AB.arapapppp	Pharyngeal muscle cell						1											WBbt:0004321	lineage name: ABarapapppp,m3VR
+m4DL	MS.aaaaapp	Pharyngeal muscle cell						1											WBbt:0004320	lineage name: MSaaaaapp,m4DL
+m4DR	MS.paaaapp	Pharyngeal muscle cell						1											WBbt:0004319	lineage name: MSpaaaapp,m4DR
+m4L	MS.aaapaap	Pharyngeal muscle cell						1											WBbt:0004318	lineage name: MSaaapaap,m4L
+m4R	AB.araaapapp	Pharyngeal muscle cell						1											WBbt:0004317	lineage name: ABaraaapapp,m4R
+m4VL	MS.aapaaaa	Pharyngeal muscle cell						1											WBbt:0004316	lineage name: MSaapaaaa,m4VL
+m4VR	MS.papappp	Pharyngeal muscle cell						1											WBbt:0004507	lineage name: MSpapaaaa,m4VR
+m5DL	MS.aaaapap	Pharyngeal muscle cell						1											WBbt:0004314	lineage name: MSaaaapap,m5DL
+m5DR	MS.paaappa	Pharyngeal muscle cell						1											WBbt:0004313	lineage name: MSpaaappa,m5DR
+m5L	AB.araapapap	Pharyngeal muscle cell						1											WBbt:0004312	lineage name: ABaraapapap,m5L
+m5R	AB.araapppap	Pharyngeal muscle cell						1											WBbt:0004311	lineage name: ABaraapppap,m5R
+m5VL	MS.aapaaap	Pharyngeal muscle cell						1											WBbt:0004310	lineage name: MSaapaaap,m5VL
+m5VR	MS.papaaap	Pharyngeal muscle cell						1											WBbt:0004309	lineage name: MSpapaaap,m5VR
+m6D	MS.paaappp	Pharyngeal muscle cell						1											WBbt:0004308	lineage name: MSpaaappp,m6D
+m6VL	MS.aapappa	Pharyngeal muscle cell						1											WBbt:0004307	lineage name: MSaapappa,m6VL
+m6VR	MS.papappa	Pharyngeal muscle cell						1											WBbt:0004306	lineage name: MSpapappa,m6VR
+m7D	MS.aaaappp	Pharyngeal muscle cell						1											WBbt:0004305	lineage name: MSaaaappp,m7D
+m7VL	MS.aapaapp	Pharyngeal muscle cell						1											WBbt:0004304	lineage name: MSaapaapp,m7VL
+m7VR	MS.papaapp	Pharyngeal muscle cell						1											WBbt:0004303	lineage name: MSpapaapp,m7VR
+m8	MS.aaapapp	Pharyngeal muscle cell						1											WBbt:0004302	lineage name: MSaaapapp,m8
 mc1DL	AB.alpaapapa	Pharyngeal marginal cell								1									WBbt:0004301	lineage name: ABalpaapapa
 mc1DR	AB.araaapapa	Pharyngeal marginal cell								1									WBbt:0004300	lineage name: ABaraaapapa
 mc1V	AB.alpappppa	Pharyngeal marginal cell								1									WBbt:0004299	lineage name: ABalpappppa
@@ -1095,7 +1095,7 @@ mc2V	AB.arapapppa	Pharyngeal marginal cell								1									WBbt:0004296	lineage
 mc3DL	MS.aaapapa	Pharyngeal marginal cell								1									WBbt:0004295	lineage name: MSaaapapa
 mc3DR	MS.paapapa	Pharyngeal marginal cell								1									WBbt:0004294	lineage name: MSpaapapa
 mc3V	AB.alpappapp	Pharyngeal marginal cell								1									WBbt:0004293	lineage name: ABalpappapp
-mu_anal	AB.plpppppap	Anal depressor muscle							1										ERROR: No WBID for this query.	ERROR: TypeError: Cannot read property "name" from undefined.
+mu_anal	AB.plpppppap	Anal depressor muscle							1										WBbt:0004292	dilator muscle, lineage name: ABplpppppap, mu anal
 mu_bod	AB.prpppppaa						1									1	1	mu_bod_vr20	WBbt:0004291	lineage name: ABprpppppaa,mu_bod,VR19
 mu_bod	C.apaaaa						1									1	1	mu_bod_vl9	WBbt:0004290	lineage name: Capaaaa,mu_bod,VL10
 mu_bod	C.apaaap						1									1	1	mu_bod_vl11	WBbt:0004289	lineage name: Capaaap,mu_bod,VL12
@@ -1133,8 +1133,8 @@ mu_bod	D.aaaa						1									1	1	mu_bod_vl5	WBbt:0003919	lineage name: Daaaa,mu_
 mu_bod	D.aapa						1									1	1	mu_bod_vl4	WBbt:0003917	lineage name: Daapa,mu_bod,VL3
 mu_bod	D.aaap						1									1	1	mu_bod_dl7	WBbt:0003918	DL8,lineage name: Daaap,mu_bod
 mu_bod	D.aapp						1									1	1	mu_bod_vl6	WBbt:0003916	lineage name: Daapp,mu_bod,VL5
-mu_bod	D.apaa	Embryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	D.apap	Embryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
+mu_bod	D.apaa	Embryonic body wall muscle					1									1	1		WBbt:0006344	lineage name: Dapaa, mu_bod, VL8
+mu_bod	D.apap	Embryonic body wall muscle					1									1	1		WBbt:0006535	DL10, lineage name: Dapap, mu_bod
 mu_bod	D.appaa						1									1	1	mu_bod_dl8	WBbt:0003915	DL7,lineage name: Dappaa,mu_bod
 mu_bod	D.aappap						1									1	1	mu_bod_dl10	WBbt:0003914	DL9,lineage name: Dappap,mu_bod
 mu_bod	D.aapppa						1									1	1	mu_bod_dl12	WBbt:0003913	DL11,lineage name: Dapppa,mu_bod
@@ -1177,20 +1177,20 @@ mu_bod	MS.ppppaa						1									1	1	mu_bod_vr3	WBbt:0003837	lineage name: MSpppp
 mu_bod	MS.ppppap						1									1	1	mu_bod_dr5	WBbt:0003836	DR6,lineage name: MSppppap,mu_bod
 mu_bod	MS.pppppa						1									1	1	mu_bod_dr4	WBbt:0003835	DR3,lineage name: MSpppppa,mu_bod
 mu_bod	MS.pppppp						1									1	1	mu_bod_dr6	WBbt:0003834	DR5,lineage name: MSpppppp,mu_bod
-mu_bod	M.dlaa	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.dlap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.dlpp	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.draa	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.drap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.drpp	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vlaa	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vlap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vlpap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vlpp	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vraa	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vrap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vrpap	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
-mu_bod	M.vrpp	Postembryonic body wall muscle					1									1	1		ERROR: No WBID for this query.	ERROR: No formula found in cell
+mu_bod	M.dlaa	Postembryonic body wall muscle					1									1	1		WBbt:0002185	None
+mu_bod	M.dlap	Postembryonic body wall muscle					1									1	1		WBbt:0002186	None
+mu_bod	M.dlpp	Postembryonic body wall muscle					1									1	1		WBbt:0002189	None
+mu_bod	M.draa	Postembryonic body wall muscle					1									1	1		WBbt:0002192	None
+mu_bod	M.drap	Postembryonic body wall muscle					1									1	1		WBbt:0007172	DR16, mu_bod
+mu_bod	M.drpp	Postembryonic body wall muscle					1									1	1		WBbt:0002196	None
+mu_bod	M.vlaa	Postembryonic body wall muscle					1									1	1		WBbt:0002200	None
+mu_bod	M.vlap	Postembryonic body wall muscle					1									1	1		WBbt:0002201	None
+mu_bod	M.vlpap	Postembryonic body wall muscle					1									1	1		WBbt:0002219	None
+mu_bod	M.vlpp	Postembryonic body wall muscle					1									1	1		WBbt:0002220	None
+mu_bod	M.vraa	Postembryonic body wall muscle					1									1	1		WBbt:0002223	None
+mu_bod	M.vrap	Postembryonic body wall muscle					1									1	1		WBbt:0002224	None
+mu_bod	M.vrpap	Postembryonic body wall muscle					1									1	1		WBbt:0002242	None
+mu_bod	M.vrpp	Postembryonic body wall muscle					1									1	1		WBbt:0002243	None
 mu_int_L	AB.plpppppaa	Intestinal muscles, attach to intestine and body wall anterior to anus							1										WBbt:0003833	lineage name: ABplpppppaa
 mu_int_R	MS.ppaapp	Intestinal muscles, attach to intestine and body wall anterior to anus							1										WBbt:0003822	lineage name: MSppaapp
 mu_male_diag	M.dlpaaaap	Diagonal tail muscles in male body wall												1	1	1			WBbt:0003821	lineage name: M.dlpaaaap
@@ -1234,7 +1234,7 @@ mu_male_spic	M.drpaappp	Ventral spicule protractor, male												1	1	1			WBbt
 mu_male_spic	M.drpappaa	Dorsal spicule protractor, male												1	1	1			WBbt:0004907	dsrR,lineage name: M.drpappaa,mu_male_spic
 mu_male_spic	M.vlpaapa	Dorsal spicule protractor, male												1	1	1			WBbt:0004886	dspL,lineage name: M.vlpaapa,mu_male_spic
 mu_male_spic	M.vrpaapa	Dorsal spicule protractor, male												1	1	1			WBbt:0004885	dspR,lineage name: M.vrpaapa,mu_male_spic
-mu_sph	AB.prpppppap	Sphincter muscle of intestino-rectal valve							1										ERROR: No WBID for this query.	ERROR: TypeError: Cannot read property "name" from undefined.
+mu_sph	AB.prpppppap	Sphincter muscle of intestino-rectal valve							1										WBbt:0005798	lineage name: ABprpppppap, mu sph
 um2	M.vlpaaaaa	Uterine muscle 2							1		1							?	WBbt:0004883	lineage name: M.vlpaaaaa
 um1	M.vlpaaaap	Uterine muscle 1							1		1					1	1	?	WBbt:0004882	lineage name: M.vlpaaaap
 um1	M.vlpaappa	Uterine muscle 1							1		1					1	1	?	WBbt:0004881	lineage name: M.vlpaappa
@@ -1283,77 +1283,77 @@ R9_hyp	T.appapp, R9.p	Male sensory ray 9 hypodermal cell, fuses with hypodermal 
 rect_D	AB.plpappppp	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1									WBbt:0004788	lineage name: ABplpappppp
 rect_VL	AB.plppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1									WBbt:0004787	lineage name: ABplppppaap
 rect_VR	AB.prppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli								1									WBbt:0004776	lineage name: ABprppppaap
-se	H1L.aa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004775	
-se	H1L.appp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004774	
-se	H1R.aa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004773	
-se	H1R.appp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004772	
-se	H2L.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004771	
-se	H2R.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004770	
-se	V1L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004769	
-se	V1L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004768	
-se	V1R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004767	
-se	V1R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004756	
-se	V2L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004755	
-se	V2L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004754	
-se	V2R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004753	
-se	V2R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004752	
-se	V3L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004751	
-se	V3L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004750	
-se	V3R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004749	
-se	V3R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004748	
-se	V4L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004747	
-se	V4L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004736	
-se	V4R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004735	
-se	V4R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004734	
-se_herm	V5L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004733	
-se_herm	V5R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004732	
-se_herm	V6L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004731	
-se_herm	V6L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004730	
-se_herm	V6R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004729	
-se_herm	V6R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004728	
-se_herm	TL.appa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004727	
-se_herm	TR.appa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004726	
-se_male	V5L.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004725	
-se_male	V5R.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004724	
-set	V5L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004723	
-set	V5R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004722	
-set	V6L.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004721	
-set	V6L.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004720	
-set	V6L.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004719	
-set	V6L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004718	
-set	V6R.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004717	
-set	V6R.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004516	
-set	V6R.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004515	
-set	V6R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004514	
-spike	AB.plppppppa	Used during embryogenesis to make tail spike, then die											1			1			WBbt:0004513	
-spike	AB.prppppppa	Used during embryogenesis to make tail spike, then die											1			1			WBbt:0004512	
-virL	AB.prpappppp	Intestino-rectal valve								1									WBbt:0004511	
-virR	AB.prpappppa	Intestino-rectal valve								1									WBbt:0004510	
-vpi1	MS.paapapp	Pharyngo-intestinal valve								1									WBbt:0004509	
-vpi2DL	MS.aapappp	Pharyngo-intestinal valve								1									WBbt:0004508	
-vpi2DR	MS.papappp	Pharyngo-intestinal valve								1									WBbt:0004507	
-vpi2V	MS.aappaa	Pharyngo-intestinal valve								1									WBbt:0004486	
-vpi3D	MS.aaappp	Pharyngo-intestinal valve								1									WBbt:0004485	
-vpi3V	MS.aappap	Pharyngo-intestinal valve								1									WBbt:0004484	
-vulva	P5.paaa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004483	
-vulva	P5.paap	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004482	
-vulva	P5.papa	Hermaphrodite vulva								1	1					1	1	vulb1	WBbt:0004481	
-vulva	P5.papp	Hermaphrodite vulva								1	1					1	1	vulb2	WBbt:0004480	
-vulva	P5.ppal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004479	
-vulva	P5.ppar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004478	
-vulva	P5.ppp	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004477	
-vulva	P6.paal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004456	
-vulva	P6.paar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004455	
-vulva	P6.papl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004454	
-vulva	P6.papr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004453	
-vulva	P6.ppal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004452	
-vulva	P6.ppar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004451	
-vulva	P6.pppl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004450	
-vulva	P6.pppr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004449	
-vulva	P7.paa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004448	
-vulva	P7.papl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004447	
-vulva	P7.papr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004436	
-vulva	P7.ppaa	Hermaphrodite vulva								1	1					1	1	vulb2	WBbt:0004435	
-vulva	P7.ppap	Hermaphrodite vulva								1	1					1	1	vulb1	WBbt:0004434	
-vulva	P7.pppa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004433	
-vulva	P7.pppp	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004432	
+se	H1L.aa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004775	lineage name: H1L.aa,se
+se	H1L.appp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004774	lineage name: H1L.appp,se
+se	H1R.aa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004773	lineage name: H1R.aa,se
+se	H1R.appp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004772	lineage name: H1R.appp,se
+se	H2L.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004771	lineage name: H2L.pppp,se
+se	H2R.pppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004770	lineage name: H2R.pppp,se
+se	V1L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004769	lineage name: V1L.pappp,se
+se	V1L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004768	lineage name: V1L.ppppp,se
+se	V1R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004767	lineage name: V1R.pappp,V1R.pappp
+se	V1R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004756	lineage name: V1R.ppppp,se
+se	V2L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004755	lineage name: V2L.pappp,se
+se	V2L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004754	lineage name: V2L.ppppp,se
+se	V2R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004753	lineage name: V2R.pappp,se
+se	V2R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004752	lineage name: V2R.ppppp,se
+se	V3L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004751	lineage name: V3L.pappp,se
+se	V3L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004750	lineage name: V3L.ppppp,se
+se	V3R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004749	lineage name: V3R.pappp,se
+se	V3R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004748	lineage name: V3R.ppppp,se
+se	V4L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004747	lineage name: V4L.pappp,se
+se	V4L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004736	lineage name: V4L.ppppp,se
+se	V4R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004735	lineage name: V4R.pappp,se
+se	V4R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004734	lineage name: V4R.ppppp,se
+se_herm	V5L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004733	lineage name: V5L.ppppp,se_herm
+se_herm	V5R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004732	lineage name: V5R.ppppp,se_herm
+se_herm	V6L.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004731	lineage name: V6L.pappp,se_herm
+se_herm	V6L.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004730	lineage name: V6L.ppppp,se_herm
+se_herm	V6R.pappp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004729	lineage name: V6R.pappp,se_herm
+se_herm	V6R.ppppp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004728	lineage name: V6R.ppppp,se_herm
+se_herm	TL.appa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004727	lineage name: TL.appa,se_herm
+se_herm	TR.appa	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004726	lineage name: TR.appa,se_herm
+se_male	V5L.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004725	lineage name: V5L.pppapp
+se_male	V5R.pppapp	Postembryonic seam hypodermal cells, make alae								1						1	1		WBbt:0004724	lineage name: V5R.pppapp
+set	V5L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004723	AVFL/R nucleus,lineage name: V5L.pppppp,set
+set	V5R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004722	lineage name: V5R.pppppp,set
+set	V6L.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004721	lineage name: V6L.papapp,set
+set	V6L.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004720	lineage name: V6L.papppp,set
+set	V6L.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004719	lineage name: V6L.pppapp,set
+set	V6L.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004718	hyp7,lineage name: V6L.pppppp
+set	V6R.papapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004717	lineage name: V6R.papapp,set
+set	V6R.papppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004516	lineage name: V6R.papppp,set
+set	V6R.pppapp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004515	lineage name: V6R.pppapp,set
+set	V6R.pppppp	Male tail seam, does not fuse with main seam, does not make alae												1	1	1			WBbt:0004514	hyp7,lineage name: V6R.pppppp
+spike	AB.plppppppa	Used during embryogenesis to make tail spike, then die											1			1			WBbt:0004513	lineage name: ABplppppppa
+spike	AB.prppppppa	Used during embryogenesis to make tail spike, then die											1			1			WBbt:0004512	lineage name: ABprppppppa
+virL	AB.prpappppp	Intestino-rectal valve								1									WBbt:0004511	lineage name: ABprpappppp
+virR	AB.prpappppa	Intestino-rectal valve								1									WBbt:0004510	lineage name: ABprpappppa
+vpi1	MS.paapapp	Pharyngo-intestinal valve								1									WBbt:0004509	lineage name: MSpaapapp
+vpi2DL	MS.aapappp	Pharyngo-intestinal valve								1									WBbt:0004508	lineage name: MSaapappp
+vpi2DR	MS.papappp	Pharyngo-intestinal valve								1									WBbt:0004507	lineage name: MSpapappp
+vpi2V	MS.aappaa	Pharyngo-intestinal valve								1									WBbt:0004486	lineage name: MSaappaa
+vpi3D	MS.aaappp	Pharyngo-intestinal valve								1									WBbt:0004485	lineage name: MSaaappp
+vpi3V	MS.aappap	Pharyngo-intestinal valve								1									WBbt:0004484	lineage name: MSaappap
+vulva	P5.paaa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004483	lineage name: P5.paaa
+vulva	P5.paap	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004482	lineage name: P5.paap
+vulva	P5.papa	Hermaphrodite vulva								1	1					1	1	vulb1	WBbt:0004481	lineage name: P5.papa
+vulva	P5.papp	Hermaphrodite vulva								1	1					1	1	vulb2	WBbt:0004480	lineage name: P5.papp
+vulva	P5.ppal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004479	lineage name: P5.ppal
+vulva	P5.ppar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004478	lineage name: P5.ppar
+vulva	P5.ppp	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004477	lineage name: P5.ppp
+vulva	P6.paal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004456	lineage name: P6.paal
+vulva	P6.paar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004455	lineage name: P6.paar
+vulva	P6.papl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004454	lineage name: P6.papl
+vulva	P6.papr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004453	lineage name: P6.papr
+vulva	P6.ppal	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004452	lineage name: P6.ppal
+vulva	P6.ppar	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004451	lineage name: P6.ppar
+vulva	P6.pppl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004450	lineage name: P6.pppl
+vulva	P6.pppr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004449	lineage name: P6.pppr
+vulva	P7.paa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004448	lineage name: P7.paa
+vulva	P7.papl	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004447	lineage name: P7.papl
+vulva	P7.papr	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004436	lineage name: P7.papr
+vulva	P7.ppaa	Hermaphrodite vulva								1	1					1	1	vulb2	WBbt:0004435	lineage name: P7.ppaa
+vulva	P7.ppap	Hermaphrodite vulva								1	1					1	1	vulb1	WBbt:0004434	lineage name: P7.ppap
+vulva	P7.pppa	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004433	lineage name: P7.pppa
+vulva	P7.pppp	Hermaphrodite vulva								1	1					1	1	?	WBbt:0004432	lineage name: P7.pppp
