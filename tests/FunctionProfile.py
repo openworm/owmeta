@@ -20,7 +20,7 @@ class FunctionProfile(object):
         :param function_tuple: Function tuple (filename, line #, function name), retrieve from Stats' get_print_list(.)
         :param stats_object: Stats object
 
-        # Example usage (with additional numpy dependency):
+        >>> import numpy
         >>> pr = cProfile.Profile()
         >>> pr.enable()
         >>> x = numpy.var(np.random.random(100000))
