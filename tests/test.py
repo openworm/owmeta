@@ -105,7 +105,7 @@ from NeuroMLTest import NeuroMLTest
 
 # Miscellaneous Tests
 # These are tests for miscellaneous bugs that have come up.
-from Misc import Misc
+from MiscTest import MiscTest
 
 # Tests from README.md
 from DocumentationTest import DocumentationTest
