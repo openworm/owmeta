@@ -6,7 +6,7 @@ import PyOpenWorm
 from PyOpenWorm import Configure
 import rdflib as R
 
-from GraphDBInit import copy_zodb_data_store
+from GraphDBInit import copy_zodb_data_store, delete_zodb_data_store
 
 
 class DataIntegrityTest(unittest.TestCase):
@@ -18,7 +18,6 @@ class DataIntegrityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         import csv
-
         PyOpenWorm.connect(
             conf=Configure(
                 **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
@@ -40,14 +39,19 @@ class DataIntegrityTest(unittest.TestCase):
             conf=Configure(
                 **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
         self.g = PyOpenWorm.config("rdf.graph")
+        copy_zodb_data_store('worm.db', "tests/test.db")
 
     def tearDown(self):
         PyOpenWorm.disconnect()
+        delete_zodb_data_store("tests/test.db")
 
     def test_correct_neuron_number(self):
         """
         This test verifies that the worm model has exactly 302 neurons.
         """
+        # FIXME: Test execution is not properly isolated -- it fails if
+        #        test_compare_to_xls fails. Other conditions may cause
+        #        it to pass
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neurons())))
 
@@ -192,8 +196,8 @@ class DataIntegrityTest(unittest.TestCase):
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
         SAMPLE_CELL = 'AVAL'
-        xls_conns = []
-        pow_conns = []
+        xls_conns = set([])
+        pow_conns = set([])
 
         # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
         qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
@@ -239,7 +243,7 @@ class DataIntegrityTest(unittest.TestCase):
             t = list(map(ff, line))
             # Insert sample cell name into the result set after the fact
             t.insert(0, SAMPLE_CELL)
-            pow_conns.append(t)
+            pow_conns.add(tuple(t))
 
         # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
         qres = self.g.query("""SELECT ?pre_name ?type (STR(?num) AS ?numval) WHERE {
@@ -282,7 +286,7 @@ class DataIntegrityTest(unittest.TestCase):
             t = list(map(ff, line))
             # Insert sample cell name into the result set after the fact
             t.insert(1, SAMPLE_CELL)
-            pow_conns.append(t)
+            pow_conns.add(tuple(t))
 
         # get connections from the sheet
         import re
@@ -327,13 +331,13 @@ class DataIntegrityTest(unittest.TestCase):
                     # if key already there, add to number
                     num += int(combining_dict[string_key][3])
 
-                combining_dict[string_key] = [
+                combining_dict[string_key] = (
                     str(pre),
                     str(post),
                     str(syntype),
-                    str(int(num))]
+                    str(int(num)))
 
-        xls_conns = combining_dict.values()
+        xls_conns = set(combining_dict.values())
 
         # assert that these two sorted lists are the same
         # using sorted lists because Set() removes multiples

@@ -101,24 +101,18 @@ class Connection(Relationship):
             return ident
 
         if self.pre_cell.hasValue()\
-                and self.post_cell.hasValue()\
-                and self.syntype.hasValue():
-            data = [self.pre_cell.values[0].identifier(query=False),
-                    self.post_cell.values[0].identifier(query=False),
-                    self.syntype.values[0]]
+            and self.post_cell.hasValue()\
+            and self.syntype.hasValue():
 
-            for i in range(len(data)):
-                if DataObject._is_variable(data[i]):
-                    data[i] = ""
-            if (self.synclass.hasValue()):
-                data.append(next(self.synclass._get()))
-            else:
-                data.append("")
+            data = []
 
-            if (self.number.hasValue()):
-                data.append(next(self.number._get()))
-            else:
-                data.append("")
+            data.append(self.pre_cell.defined_values)
+            data.append(self.post_cell.defined_values)
+            data.append(self.syntype.defined_values)
+
+            data.append(self.synclass.defined_values)
+            data.append(self.number.defined_values)
+
             return self.make_identifier(data)
 
         return None

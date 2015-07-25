@@ -46,6 +46,10 @@ class RealSimpleProperty(object):
             self._v = [v]
 
     @property
+    def defined_values(self):
+        return [x for x in self._v if x.defined]
+
+    @property
     def values(self):
         return self._v
 
@@ -73,7 +77,7 @@ class RealSimpleProperty(object):
 class _ValueProperty(RealSimpleProperty):
 
     def __init__(self, conf, owner_property):
-        super(_ValueProperty,self).__init__(conf, owner_property)
+        super(_ValueProperty, self).__init__(conf, owner_property)
         self._owner_property = owner_property
         self.rdf_namespace = R.Namespace(
             conf['rdf.namespace']["SimpleProperty"] + "/")
@@ -92,7 +96,7 @@ class _ValueProperty(RealSimpleProperty):
         return self._owner_property.rdf
 
     def __str__(self):
-        return "_ValueProperty("+str(self._owner_property)+")"
+        return "_ValueProperty(" + str(self._owner_property) + ")"
 
 
 class DatatypePropertyMixin(object):
@@ -102,11 +106,11 @@ class DatatypePropertyMixin(object):
         if isinstance(v, DataObject):
             L.warn(
                 ('You are attempting to set a DataObject "{}"'
-                ' on {} where a literal is expected.').format(v, self))
-        return super(DatatypePropertyMixin,self).set(v)
+                 ' on {} where a literal is expected.').format(v, self))
+        return super(DatatypePropertyMixin, self).set(v)
 
     def get(self):
-        for val in super(DatatypePropertyMixin,self).get():
+        for val in super(DatatypePropertyMixin, self).get():
             yield deserialize_rdflib_term(val)
 
 
@@ -118,12 +122,12 @@ class ObjectPropertyMixin(object):
             raise Exception(
                 "An ObjectProperty only accepts DataObject "
                 "or Variable instances. Got a " + str(type(v)))
-        return super(ObjectPropertyMixin,self).set(v)
+        return super(ObjectPropertyMixin, self).set(v)
 
     def get(self):
         from .dataObject import DataObject, oid, get_most_specific_rdf_type
 
-        for ident in super(ObjectPropertyMixin,self).get():
+        for ident in super(ObjectPropertyMixin, self).get():
             if not isinstance(ident, R.URIRef):
                 L.warn(
                     'ObjectProperty.get: Skipping non-URI term, "' +
@@ -140,24 +144,29 @@ class ObjectPropertyMixin(object):
             the_type = get_most_specific_rdf_type(types)
             yield oid(ident, the_type)
 
-class _ObjectVaulueProperty (ObjectPropertyMixin,_ValueProperty):
+
+class _ObjectVaulueProperty (ObjectPropertyMixin, _ValueProperty):
     pass
 
-class _DatatypeValueProperty (DatatypePropertyMixin,_ValueProperty):
+
+class _DatatypeValueProperty (DatatypePropertyMixin, _ValueProperty):
     pass
 
-class ObjectProperty (ObjectPropertyMixin,RealSimpleProperty):
+
+class ObjectProperty (ObjectPropertyMixin, RealSimpleProperty):
     pass
 
-class DatatypeProperty (DatatypePropertyMixin,RealSimpleProperty):
+
+class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
     pass
+
 
 class SimpleProperty(GraphObject, DataUser):
 
     """ Adapts a SimpleProperty to the GraphObject interface """
 
     def __init__(self, owner, **kwargs):
-        super(SimpleProperty,self).__init__(**kwargs)
+        super(SimpleProperty, self).__init__(**kwargs)
         self.owner = owner
         self._id = None
         self._variable = R.Variable("V" + str(RND.random()))
@@ -176,7 +185,7 @@ class SimpleProperty(GraphObject, DataUser):
         return s
 
     def __str__(self):
-        return str(self.__class__.__name__) + "("+ str(self.idl.n3())+")"
+        return str(self.__class__.__name__) + "(" + str(self.idl.n3()) + ")"
 
     def __hash__(self):
         return hash(self.idl)
@@ -208,6 +217,10 @@ class SimpleProperty(GraphObject, DataUser):
     @property
     def values(self):
         return self._pp.values
+
+    @property
+    def defined_values(self):
+        return self._pp.defined_values
 
     @property
     def defined(self):

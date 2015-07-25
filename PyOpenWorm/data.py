@@ -24,9 +24,20 @@ import os
 import traceback
 import logging as L
 
-__all__ = ["Data", "DataUser", "RDFSource", "SerializationSource", "TrixSource", "SPARQLSource", "SleepyCatSource", "DefaultSource", "ZODBSource"]
+__all__ = [
+    "Data",
+    "DataUser",
+    "RDFSource",
+    "SerializationSource",
+    "TrixSource",
+    "SPARQLSource",
+    "SleepyCatSource",
+    "DefaultSource",
+    "ZODBSource"]
+
 
 class _B(ConfigValue):
+
     def __init__(self, f):
         self.v = False
         self.f = f
@@ -36,11 +47,15 @@ class _B(ConfigValue):
             self.v = self.f()
 
         return self.v
+
     def invalidate(self):
         self.v = False
 
 ZERO = datetime.timedelta(0)
+
+
 class _UTC(datetime.tzinfo):
+
     """UTC"""
 
     def utcoffset(self, dt):
@@ -53,14 +68,15 @@ class _UTC(datetime.tzinfo):
         return ZERO
 utc = _UTC()
 
-propertyTypes = {"send" : 'http://openworm.org/entities/356',
-        "Neuropeptide" : 'http://openworm.org/entities/354',
-        "Receptor" : 'http://openworm.org/entities/361',
-        "is a" : 'http://openworm.org/entities/1515',
-        "neuromuscular junction" : 'http://openworm.org/entities/1516',
-        "Innexin" : 'http://openworm.org/entities/355',
-        "Neurotransmitter" : 'http://openworm.org/entities/313',
-        "gap junction" : 'http://openworm.org/entities/357'}
+propertyTypes = {"send": 'http://openworm.org/entities/356',
+                 "Neuropeptide": 'http://openworm.org/entities/354',
+                 "Receptor": 'http://openworm.org/entities/361',
+                 "is a": 'http://openworm.org/entities/1515',
+                 "neuromuscular junction": 'http://openworm.org/entities/1516',
+                 "Innexin": 'http://openworm.org/entities/355',
+                 "Neurotransmitter": 'http://openworm.org/entities/313',
+                 "gap junction": 'http://openworm.org/entities/357'}
+
 
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
@@ -77,15 +93,18 @@ def grouper(iterable, n, fillvalue=None):
         if len(l) < n:
             break
 
+
 class DataUser(Configureable):
+
     """ A convenience wrapper for users of the database
 
     Classes which use the database should inherit from DataUser.
     """
+
     def __init__(self, **kwargs):
-        super(DataUser,self).__init__(**kwargs)
+        super(DataUser, self).__init__(**kwargs)
         if not isinstance(self.conf, Data):
-            raise BadConf("Not a Data instance: "+ str(self.conf))
+            raise BadConf("Not a Data instance: " + str(self.conf))
 
     @property
     def base_namespace(self):
@@ -124,7 +143,8 @@ class DataUser(Configureable):
     def _add_to_store(self, g, graph_name=False):
         if self.conf['rdf.store'] == 'SPARQLUpdateStore':
             # XXX With Sesame, for instance, it is probably faster to do a PUT over
-            #     the endpoint's rest interface. Just need to do it for some common endpoints
+            # the endpoint's rest interface. Just need to do it for some common
+            # endpoints
 
             try:
                 gs = g.serialize(format="nt")
@@ -132,7 +152,7 @@ class DataUser(Configureable):
                 gs = _triples_to_bgp(g)
 
             if graph_name:
-                s = " INSERT DATA { GRAPH "+graph_name.n3()+" {" + gs + " } } "
+                s = " INSERT DATA { GRAPH " + graph_name.n3() + " {" + gs + " } } "
             else:
                 s = " INSERT DATA { " + gs + " } "
                 L.debug("update query = " + s)
@@ -148,8 +168,8 @@ class DataUser(Configureable):
             # Fire off a new one
             transaction.begin()
 
-        #infer from the added statements
-        #self.infer()
+        # infer from the added statements
+        # self.infer()
 
     def infer(self):
         """ Fire FuXi rule engine to infer triples """
@@ -157,12 +177,12 @@ class DataUser(Configureable):
         from FuXi.Rete.RuleStore import SetupRuleStore
         from FuXi.Rete.Util import generateTokenSet
         from FuXi.Horn.HornRules import HornFromN3
-        #fetch the derived object's graph
+        # fetch the derived object's graph
         semnet = self.rdf
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
         closureDeltaGraph = Graph()
         network.inferredFacts = closureDeltaGraph
-        #build a network of rules
+        # build a network of rules
         for rule in HornFromN3('testrules.n3'):
             network.buildNetworkFromClause(rule)
         # apply rules to original facts to infer new facts
@@ -180,12 +200,15 @@ class DataUser(Configureable):
         new_statements = Graph()
         ns = self.conf['rdf.namespace']
         for statement in g:
-            statement_node = self._reify(new_statements,statement)
-            new_statements.add((URIRef(reference_iri), ns['asserts'], statement_node))
+            statement_node = self._reify(new_statements, statement)
+            new_statements.add(
+                (URIRef(reference_iri),
+                 ns['asserts'],
+                    statement_node))
 
         self.add_statements(g + new_statements)
 
-    #def _add_unannotated_statements(self, graph):
+    # def _add_unannotated_statements(self, graph):
     # A UTC class.
 
     def retract_statements(self, graph):
@@ -195,6 +218,7 @@ class DataUser(Configureable):
         :param graph: An iterable of triples
         """
         self._remove_from_store_by_query(graph)
+
     def _remove_from_store_by_query(self, q):
         import logging as L
         s = " DELETE WHERE {" + q + " } "
@@ -210,7 +234,7 @@ class DataUser(Configureable):
         """
         self._add_to_store(graph)
 
-    def _reify(self,g,s):
+    def _reify(self, g, s):
         """
         Add a statement object to g that binds to s
         """
@@ -222,13 +246,14 @@ class DataUser(Configureable):
         return n
 
 
-
 class Data(Configure, Configureable):
+
     """
     Provides configuration for access to the database.
 
     Usally doesn't need to be accessed directly
     """
+
     def __init__(self, conf=False):
         Configure.__init__(self)
         Configureable.__init__(self)
@@ -238,14 +263,15 @@ class Data(Configure, Configureable):
         else:
             self.copy(Configureable.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
-        self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
+        self.molecule_namespace = Namespace(
+            "http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
 
     @classmethod
-    def open(cls,file_name):
+    def open(cls, file_name):
         """ Open a file storing configuration in a JSON format """
         Configureable.conf = Configure.open(file_name)
         return cls()
@@ -270,17 +296,19 @@ class Data(Configure, Configureable):
         c = self.conf
         self['rdf.source'] = c['rdf.source'] = c.get('rdf.source', 'default')
         self['rdf.store'] = c['rdf.store'] = c.get('rdf.store', 'default')
-        self['rdf.store_conf'] = c['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
+        self['rdf.store_conf'] = c['rdf.store_conf'] = c.get(
+            'rdf.store_conf',
+            'default')
 
         # XXX:The conf=self can probably be removed
-        self.sources = {'sqlite' : SQLiteSource,
-                'sparql_endpoint' : SPARQLSource,
-                'sleepycat' : SleepyCatSource,
-                'default' : DefaultSource,
-                'trix' : TrixSource,
-                'serialization' : SerializationSource,
-                'zodb' : ZODBSource
-                }
+        self.sources = {'sqlite': SQLiteSource,
+                        'sparql_endpoint': SPARQLSource,
+                        'sleepycat': SleepyCatSource,
+                        'default': DefaultSource,
+                        'trix': TrixSource,
+                        'serialization': SerializationSource,
+                        'zodb': ZODBSource
+                        }
         i = self.sources[self['rdf.source'].lower()]()
         self.source = i
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
@@ -288,7 +316,10 @@ class Data(Configure, Configureable):
         return i
 
     def _molecule_hash(self, data):
-        return URIRef(self.molecule_namespace[hashlib.sha224(str(data)).hexdigest()])
+        return URIRef(
+            self.molecule_namespace[
+                hashlib.sha224(
+                    str(data)).hexdigest()])
 
     def _init_networkX(self):
         g = nx.DiGraph()
@@ -309,39 +340,44 @@ class Data(Configure, Configureable):
             if len(neurontype) == 0:
                 neurontype = "unknown"
 
-            if len(row[0]) > 0: # Only saves valid neuron names
-                g.add_node(row[0], ntype = neurontype)
+            if len(row[0]) > 0:  # Only saves valid neuron names
+                g.add_node(row[0], ntype=neurontype)
 
         # Connectome table
         csvfile = urllib2.urlopen(self.conf['connectomecsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
-            g.add_edge(row[0], row[1], weight = row[3])
+            g.add_edge(row[0], row[1], weight=row[3])
             g[row[0]][row[1]]['synapse'] = row[2]
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
         return g
+
 
 def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
 
-class RDFSource(Configureable,PyOpenWorm.ConfigValue):
+
+class RDFSource(Configureable, PyOpenWorm.ConfigValue):
+
     """ Base class for data sources.
 
     Alternative sources should dervie from this class
     """
     i = 0
+
     def __init__(self, **kwargs):
         if self.i == 1:
             raise Exception(self.i)
-        self.i+=1
+        self.i += 1
         Configureable.__init__(self, **kwargs)
         self.graph = False
 
     def get(self):
         if self.graph == False:
-            raise Exception("Must call openDatabase on Data object before using the database")
+            raise Exception(
+                "Must call openDatabase on Data object before using the database")
         return self.graph
 
     def close(self):
@@ -356,7 +392,9 @@ class RDFSource(Configureable,PyOpenWorm.ConfigValue):
         """
         raise NotImplementedError()
 
+
 class SerializationSource(RDFSource):
+
     """ Reads from an RDF serialization or, if the configured database is more recent, then from that.
 
         The database store is configured with::
@@ -384,7 +422,7 @@ class SerializationSource(RDFSource):
                 store_time = modification_date(database_store)
                 # If the store is newer than the serialization
                 # get the newest file in the store
-                for x in glob.glob(database_store +"/*"):
+                for x in glob.glob(database_store + "/*"):
                     mod = modification_date(x)
                     if store_time < mod:
                         store_time = mod
@@ -401,13 +439,15 @@ class SerializationSource(RDFSource):
             else:
                 # delete the database and read in the new one
                 # read in the serialized format
-                g0.parse(source_file,format=file_format)
+                g0.parse(source_file, format=file_format)
 
             self.graph = g0
 
         return self.graph
 
+
 class TrixSource(SerializationSource):
+
     """ A SerializationSource specialized for TriX
 
         The database store is configured with::
@@ -418,36 +458,46 @@ class TrixSource(SerializationSource):
             "rdf.store_conf" = <your rdflib store configuration here>
 
     """
-    def __init__(self,**kwargs):
-        SerializationSource.__init__(self,**kwargs)
-        h = self.conf.get('trix_location','UNSET')
-        self.conf.link('rdf.serialization','trix_location')
+
+    def __init__(self, **kwargs):
+        SerializationSource.__init__(self, **kwargs)
+        h = self.conf.get('trix_location', 'UNSET')
+        self.conf.link('rdf.serialization', 'trix_location')
         self.conf['rdf.serialization'] = h
         self.conf['rdf.serialization_format'] = 'trix'
+
 
 def _rdf_literal_to_gp(x):
     return x.n3()
 
+
 def _triples_to_bgp(trips):
-    # XXX: Collisions could result between the variable names of different objects
+    # XXX: Collisions could result between the variable names of different
+    # objects
     g = " .\n".join(" ".join(_rdf_literal_to_gp(x) for x in y) for y in trips)
     return g
 
+
 class SPARQLSource(RDFSource):
+
     """ Reads from and queries against a remote data store
 
         ::
 
             "rdf.source" = "sparql_endpoint"
     """
+
     def open(self):
-        # XXX: If we have a source that's read only, should we need to set the store separately??
+        # XXX: If we have a source that's read only, should we need to set the
+        # store separately??
         g0 = ConjunctiveGraph('SPARQLUpdateStore')
         g0.open(tuple(self.conf['rdf.store_conf']))
         self.graph = g0
         return self.graph
 
+
 class SleepyCatSource(RDFSource):
+
     """ Reads from and queries against a local Sleepycat database
 
         The database can be configured like::
@@ -455,17 +505,20 @@ class SleepyCatSource(RDFSource):
             "rdf.source" = "Sleepycat"
             "rdf.store_conf" = <your database location here>
     """
+
     def open(self):
         import logging
-        # XXX: If we have a source that's read only, should we need to set the store separately??
+        # XXX: If we have a source that's read only, should we need to set the
+        # store separately??
         g0 = ConjunctiveGraph('Sleepycat')
         self.conf['rdf.store'] = 'Sleepycat'
-        g0.open(self.conf['rdf.store_conf'],create=True)
+        g0.open(self.conf['rdf.store_conf'], create=True)
         self.graph = g0
         logging.debug("Opened SleepyCatSource")
 
 
 class SQLiteSource(RDFSource):
+
     """ Reads from and queries against a SQLite database
 
     See see the SQLite database :file:`db/celegans.db` for the format
@@ -479,11 +532,12 @@ class SQLiteSource(RDFSource):
 
     Leaving ``rdf.store`` unconfigured simply gives an in-memory data store.
     """
+
     def open(self):
         conn = sqlite3.connect(self.conf['sqldb'])
         cur = conn.cursor()
 
-        #first step, grab all entities and add them to the graph
+        # first step, grab all entities and add them to the graph
         n = self.conf['rdf.namespace']
 
         cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
@@ -491,48 +545,51 @@ class SQLiteSource(RDFSource):
         g0.open(self.conf['rdf.store_conf'], create=True)
 
         for r in cur.fetchall():
-            #first item is a number -- needs to be converted to a string
-           first = str(r[0])
-           #second item is text
-           second = str(r[1])
+            # first item is a number -- needs to be converted to a string
+            first = str(r[0])
+            # second item is text
+            second = str(r[1])
 
-           # This is the backbone of any RDF graph.  The unique
-           # ID for each entity is encoded as a URI and every other piece of
-           # knowledge about that entity is connected via triples to that URI
-           # In this case, we connect the common name of that entity to the
-           # root URI via the RDFS label property.
-           g0.add( (n[first], RDFS.label, Literal(second)) )
+            # This is the backbone of any RDF graph.  The unique
+            # ID for each entity is encoded as a URI and every other piece of
+            # knowledge about that entity is connected via triples to that URI
+            # In this case, we connect the common name of that entity to the
+            # root URI via the RDFS label property.
+            g0.add((n[first], RDFS.label, Literal(second)))
 
-
-        #second step, get the relationships between them and add them to the graph
-        cur.execute("SELECT DISTINCT EnID1, Relation, EnID2, Citations FROM tblrelationship")
+        # second step, get the relationships between them and add them to the
+        # graph
+        cur.execute(
+            "SELECT DISTINCT EnID1, Relation, EnID2, Citations FROM tblrelationship")
 
         gi = ''
 
         i = 0
         for r in cur.fetchall():
-           #all items are numbers -- need to be converted to a string
-           first = str(r[0])
-           second = str(r[1])
-           third = str(r[2])
-           prov = str(r[3])
+            # all items are numbers -- need to be converted to a string
+            first = str(r[0])
+            second = str(r[1])
+            third = str(r[2])
+            prov = str(r[3])
 
-           ui = self.conf['molecule_name'](prov)
-           gi = Graph(g0.store, ui)
+            ui = self.conf['molecule_name'](prov)
+            gi = Graph(g0.store, ui)
 
-           gi.add( (n[first], n[second], n[third]) )
+            gi.add((n[first], n[second], n[third]))
 
-           g0.add([ui, RDFS.label, Literal(str(i))])
-           if (prov != ''):
-               g0.add([ui, n[u'text_reference'], Literal(prov)])
+            g0.add([ui, RDFS.label, Literal(str(i))])
+            if (prov != ''):
+                g0.add([ui, n[u'text_reference'], Literal(prov)])
 
-           i = i + 1
+            i = i + 1
 
         cur.close()
         conn.close()
         self.graph = g0
 
+
 class DefaultSource(RDFSource):
+
     """ Reads from and queries against a configured database.
 
         The default configuration.
@@ -545,11 +602,14 @@ class DefaultSource(RDFSource):
 
         Leaving unconfigured simply gives an in-memory data store.
     """
+
     def open(self):
         self.graph = ConjunctiveGraph(self.conf['rdf.store'])
-        self.graph.open(self.conf['rdf.store_conf'],create=True)
+        self.graph.open(self.conf['rdf.store_conf'], create=True)
+
 
 class ZODBSource(RDFSource):
+
     """ Reads from and queries against a configured Zope Object Database.
 
         If the configured database does not exist, it is created.
@@ -561,8 +621,9 @@ class ZODBSource(RDFSource):
 
         Leaving unconfigured simply gives an in-memory data store.
     """
-    def __init__(self,*args,**kwargs):
-        RDFSource.__init__(self,*args,**kwargs)
+
+    def __init__(self, *args, **kwargs):
+        RDFSource.__init__(self, *args, **kwargs)
         self.conf['rdf.store'] = "ZODB"
 
     def open(self):
@@ -571,10 +632,10 @@ class ZODBSource(RDFSource):
         self.path = self.conf['rdf.store_conf']
         openstr = os.path.abspath(self.path)
 
-        fs=FileStorage(openstr)
-        self.zdb=ZODB.DB(fs)
-        self.conn=self.zdb.open()
-        root=self.conn.root()
+        fs = FileStorage(openstr)
+        self.zdb = ZODB.DB(fs)
+        self.conn = self.zdb.open()
+        root = self.conn.root()
         if 'rdflib' not in root:
             root['rdflib'] = ConjunctiveGraph('ZODB')
         self.graph = root['rdflib']
@@ -589,7 +650,6 @@ class ZODBSource(RDFSource):
             transaction.abort()
         transaction.begin()
         self.graph.open(self.path)
-
 
     def close(self):
         if self.graph == False:

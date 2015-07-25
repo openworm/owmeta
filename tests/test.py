@@ -1,3 +1,4 @@
+from __future__ import print_function
 # -*- coding: utf-8 -*-
 
 import sys
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     configs = glob("tests/test_*.conf")
     if not has_bsddb:
         configs = [x for x in configs if 'Sleepycat' not in x]
-    print "Testing with configs:",configs
+    print("Testing with configs:",configs)
     for x in configs:
         TEST_CONFIG = x
         suite = unittest.TestSuite()
@@ -178,8 +179,9 @@ if __name__ == '__main__':
     else:
         suite = unittest.TestSuite()
 
-    if len(args) == 1:
-        suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
+    if len(args) > 0:
+        for arg in args:
+            suite.addTests(filter(lambda x: x.id().startswith(arg), all_tests_flattened))
     else:
         suite.addTests(all_tests)
 

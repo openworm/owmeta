@@ -129,7 +129,7 @@ class Neuron(Cell):
        """
 
     def __str__(self):
-        n = list(self.name.values)
+        n = list(self.name.defined_values)
         if len(n) > 0:
             return "Neuron(name="+str(n[0])+")"
         else:

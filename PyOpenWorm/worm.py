@@ -120,14 +120,13 @@ class Worm(DataObject):
         # return that. Otherwise, there's no telling from here what our identifier
         # should be, so the variable identifier (from DataObject.identifier() must
         # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
+        ident = super(Worm, self).identifier()
+        if ident is not None:
+            return ident
 
         if self.name.hasValue():
             # name is already set, so we can make an identifier from it
-            n = list(self.name.values)[0]
+            n = list(self.name.defined_values)[0]
             return self.make_identifier(n)
         else:
             return ident

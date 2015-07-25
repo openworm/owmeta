@@ -30,6 +30,6 @@ class Muscle(Cell):
 
     def __str__(self):
         if self.name.hasValue():
-            return "Muscle(name='"+str(list(self.name.values)[0])+"')"
+            return "Muscle(name='"+str(self.name.defined_values[0])+"')"
         else:
             return "Muscle()"

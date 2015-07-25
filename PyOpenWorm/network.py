@@ -139,8 +139,8 @@ class Network(DataObject):
     def identifier(self, *args, **kwargs):
         ident = DataObject.identifier(self)
         if ident is None:
-            if self.worm.hasValue() and self.worm.values[0].defined:
-                return self.make_identifier(self.worm.values[0])
+            if self.worm.hasValue() and self.worm.defined_values[0]:
+                return self.make_identifier(self.worm.defined_values[0])
         return ident
 
     # def neuroml(self):

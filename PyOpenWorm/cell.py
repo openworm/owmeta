@@ -214,7 +214,7 @@ class Cell(DataObject):
 
         if self.name.hasValue():
             # name is already set, so we can make an identifier from it
-            n = list(self.name.values)[0]
+            n = list(self.name.defined_values)[0]
             return self.make_identifier(n)
         else:
             return ident
