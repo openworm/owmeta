@@ -4,10 +4,11 @@ import random as RND
 import logging
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
+from yarom.rdfUtils import triples_to_bgp
 from PyOpenWorm.v0.dataObject import DataObject as DO
 from PyOpenWorm.v0.dataObject import RDFTypeTable
 from PyOpenWorm.v0.dataObject import disconnect as DODisconnect
-from .simpleProperty import DatatypeProperty,SimpleProperty
+from .simpleProperty import DatatypeProperty, SimpleProperty
 from graphObjectAdapter.fakeProperty import FakeProperty
 
 L = logging.getLogger(__name__)
@@ -141,6 +142,28 @@ class DataObject(GraphObject, DO):
         setattr(owner, c.linkName, res)
 
         return res
+
+    def graph_pattern(self, shorten=False):
+        """ Get the graph pattern for this object.
+
+        It should be as simple as converting the result of triples() into a BGP
+
+        Parameters
+        ----------
+        query : bool
+            Indicates whether or not the graph_pattern is to be used for querying
+            (as in a SPARQL query) or for storage
+        shorten : bool
+            Indicates whether to shorten the URLs with the namespace manager
+            attached to the ``self``
+        """
+
+        nm = None
+        if shorten:
+            nm = self.namespace_manager
+        print("graph_pattern", self.__class__.__name__)
+        print("graph_pattern",self.triples())
+        return triples_to_bgp(self.triples(), namespace_manager=nm)
 
 
 class RDFTypeProperty(DatatypeProperty):

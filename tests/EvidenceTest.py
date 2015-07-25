@@ -103,19 +103,18 @@ class EvidenceTest(_DataTest):
         """
         Asserting something should allow us to get it back.
         """
-        e = Evidence(wormbase='WBPaper00044600')
+        e = Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
         g = make_graph(20)
-        r = Relationship(graph=g)
+        r = DataObject(key="relationship")
         e.asserts(r)
-        r.identifier = lambda **args: r.make_identifier("test")
         e.save()
         l = list(e.asserts())
         self.assertIn(r, l)
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = Evidence(key="a", author='tom@cn.com')
+        r = DataObject(key="relationship")
         e.asserts(r)
         e.save()
         e0 = Evidence()
@@ -127,10 +126,12 @@ class EvidenceTest(_DataTest):
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields
             distinct results """
+        r = DataObject(key='relationship')
+
         e = Evidence(key="a", author='tom@cn.com')
-        r = Relationship(make_graph(10))
         e.asserts(r)
         e.save()
+
         e1 = Evidence(key="b", year=1999)
         e1.asserts(r)
         e1.save()
@@ -142,9 +143,9 @@ class EvidenceTest(_DataTest):
             y = x.year()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
-            if x.idl == e.idl:
+            if x.idl == e1.idl:
                 self.assertEqual(y, 1999)
-            elif x.idl == e1.idl:
+            elif x.idl == e.idl:
                 self.assertEqual(a, 'tom@cn.com')
             else:
                 self.fail("Unknown object returned from load")

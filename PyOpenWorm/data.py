@@ -99,6 +99,10 @@ class DataUser(Configureable):
     def rdf(self):
         return self.conf['rdf.graph']
 
+    @property
+    def namespace_manager(self):
+        return self.conf['rdf.namespace_manager']
+
     @rdf.setter
     def rdf(self, value):
         self.conf['rdf.graph'] = value

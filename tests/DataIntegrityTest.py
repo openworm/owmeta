@@ -19,9 +19,6 @@ class DataIntegrityTest(unittest.TestCase):
     def setUpClass(cls):
         import csv
 
-        copy_zodb_data_store(
-            'worm.db',
-            "tests/test.db")  # copy to a test_database
         PyOpenWorm.connect(
             conf=Configure(
                 **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
