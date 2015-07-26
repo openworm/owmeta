@@ -16,6 +16,7 @@ import subprocess as SP
 import subprocess
 import tempfile
 import doctest
+import ExecutionProfileSuite
 
 from glob import glob
 
@@ -115,12 +116,20 @@ if __name__ == '__main__':
     parser.add_option("-b", "--use-binary-database", dest="binary_db",
                       action="store_true", default=False,
                       help="Use the binary database for data integrity tests")
+    parser.add_option("-p", "--performance-profile", dest="performance_profile",
+                      action="store_true", default=False,
+                      help="Profile each test using cProfile")
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
+    PERFORMANCE_PROFILE = options.performance_profile
 
     def getTests(testCase):
-        return unittest.TestLoader().loadTestsFromTestCase(testCase)
+        decorating_test_loader = unittest.TestLoader()
+        if PERFORMANCE_PROFILE:
+            # Override the TestLoader's default TestSuite
+            decorating_test_loader.suiteClass = ExecutionProfileSuite.ExecutionProfileSuite
+        return decorating_test_loader.loadTestsFromTestCase(testCase)
 
     def runTests(suite):
         return unittest.TextTestRunner().run(suite)
@@ -148,7 +157,12 @@ if __name__ == '__main__':
             for z in y:
                 all_tests_flattened.append(z)
 
-    suite = unittest.TestSuite()
+    if PERFORMANCE_PROFILE:
+        # DecoratorSuite subclasses TestSuite, overriding its addTest method
+        suite = ExecutionProfileSuite.ExecutionProfileSuite()
+    else: 
+        suite = unittest.TestSuite()
+    
     if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:

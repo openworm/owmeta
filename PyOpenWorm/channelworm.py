@@ -4,28 +4,87 @@ from PyOpenWorm import *
 class PatchClampExperiment(Experiment):
     """
     Store experimental conditions for a patch clamp experiment.
+
+    Attributes
+    ----------
+    Ca_concentration : DatatypeProperty
+        Calcium concentration
+    Cl_concentration : DatatypeProperty
+        Chlorine concentration
+    blockers : DatatypeProperty
+        Channel blockers used for this experiment
+    cell : DatatypeProperty
+        The cell this experiment was performed on
+    cell_age : DatatypeProperty
+        Age of the cell
+    delta_t : DatatypeProperty
+        
+    duration : DatatypeProperty
+        
+    end_time : DatatypeProperty
+        
+    extra_solution : DatatypeProperty
+        
+    initial_voltage : DatatypeProperty
+        Starting voltage of the patch clamp
+    ion_channel : DatatypeProperty
+        The ion channel being clamped
+    membrane_capacitance : DatatypeProperty
+        Initial membrane capacitance
+    mutants : DatatypeProperty
+        Type(s) of mutants being used in this experiment
+    patch_type : DatatypeProperty
+        Type of patch clamp being used ('voltage' or 'current')
+    pipette_solution : DatatypeProperty
+        Type of solution in the pipette
+    protocol_end : DatatypeProperty
+        
+    protocol_start : DatatypeProperty
+        
+    protocol_step : DatatypeProperty
+        
+    start_time : DatatypeProperty
+        
+    temperature : DatatypeProperty
+        
+    type : DatatypeProperty
+
     """
 
     def __init__(self, reference=False, **kwargs):
         Experiment.__init__(self, reference)
         
         # enumerate conditions patch-clamp experiments should have
-        patch_clamp_conditions = [
-            'type',
-            'duration',
+        self.conditions = [
+            'Ca_concentration',
+            'Cl_concentration',
+            'blockers',
+            'cell',
+            'cell_age',
             'delta_t',
-            'start_time',
+            'duration',
             'end_time',
-            'protocol_start',
+            'extra_solution',
+            'initial_voltage',
+            'ion_channel',
+            'membrane_capacitance',
+            'mutants',
+            'patch_type',
+            'pipette_solution',
             'protocol_end',
-            'protocol_step'
+            'protocol_start',
+            'protocol_step',
+            'start_time',
+            'temperature',
+            'type',
         ]
  
-        for c in patch_clamp_conditions:
-            self.conditions.set(c, None)
+        for c in self.conditions:
+            PatchClampExperiment.DatatypeProperty(c, self)
 
         for c, v in kwargs.iteritems():
-            self.conditions.set(c, v)
+            if c in self.conditions:
+                setattr(self, c, v)
 
 
 class References(Property):
