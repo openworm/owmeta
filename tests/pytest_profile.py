@@ -34,8 +34,8 @@ def pytest_runtest_call(item):
 
 def pytest_runtest_teardown(item):
     # Item's Excinfo will indicate any exceptions thrown
-    test_success = not (hasattr(item, '_excinfo') and item._excinfo is not None)
-    if test_success and enabled:
+    test_fail = hasattr(item, '_excinfo') and item._excinfo is not None
+    if not test_fail and item.enabled:
         # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
         fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
         function_profile_list.append(fp)
@@ -86,14 +86,14 @@ def compare_stats(files, scale_threshold=1.05):
         current = lst[-1]
         previous = lst[-2]
         if current.cumulative_time > previous.cumulative_time * scale_threshold:
-            println('+ <{0}> execution time has increased {1:0.2f}% from {2} ms to {3} ms.'.format(
+            sys.stdout.write('+ <{0}> execution time has increased {1:0.2f}% from {2} ms to {3} ms.'.format(
                 name,
                 current.cumulative_time / previous.cumulative_time * 100,
                 previous.cumulative_time * 1000.0,
                 current.cumulative_time * 1000.0,
             ))
         elif current.cumulative_time * scale_threshold < previous.cumulative_time:
-            println('- <{0}> execution time has sped up {1:0.02f}x from {2} ms to {3} ms.'.format(
+            sys.stdout.write('- <{0}> execution time has sped up {1:0.02f}x from {2} ms to {3} ms.'.format(
                 name,
                 previous.cumulative_time / current.cumulative_time,
                 previous.cumulative_time * 1000.0,
