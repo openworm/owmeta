@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -16,11 +15,10 @@ import subprocess as SP
 import subprocess
 import tempfile
 import doctest
+from glob import glob
 from nose import with_setup
 
-from glob import glob
-
-class TestQuantity():
+class Quantity_Test():
     def test_string_init_short(self):
         q = Quantity.parse("23 mL")
         assert "milliliter" == q.unit
