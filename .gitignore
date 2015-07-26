@@ -10,6 +10,7 @@ PyOpenWorm.egg-info/*
 dist/*
 tests/*.log
 tests/_test.conf
+tests/test_data/test_profiles
 OpenWormData/worm.*
 worm.fs*
 .DS_Store
