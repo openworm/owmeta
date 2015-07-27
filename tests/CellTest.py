@@ -136,3 +136,20 @@ class CellTest(_DataTest):
             print e
             self.fail("Should validate")
         sys.stdout = f
+
+    def test_loading_cells_retrieves_all_cells(self):
+        """
+        Test that retrieving all Cells gives us the right number of Cell objects.
+        """
+        num_cells = len(list(Cell().load()))
+
+        m = list(Muscle().load())
+        num_muscles = len(m)
+
+        n = list(Neuron().load())
+        num_neurons = len(n)
+
+        sum_cells = num_neurons + num_muscles
+
+        self.assertEqual(sum_cells, num_cells)
+
