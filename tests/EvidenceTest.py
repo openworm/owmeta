@@ -153,4 +153,18 @@ class EvidenceTest(_DataTest):
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
 
+    def test_evidence_retrieves_instead_of_overwrites(self):
+        """
+        Test that creating a new Evidence with the same attributes of an
+        already-saved Evidence does not overwrite the previous Evidence,
+        but instead retrieves it.
+        """
+        e = Evidence(author='Rodney Dangerfield')
+        r = Relationship(make_graph(10))
+        e.asserts(r)
+        e.save()
+
+        e1 = Evidence(author='Rodney Dangerfield')
+        facts = list(e1.asserts())
+        assert facts[0] == r
 
