@@ -1,0 +1,6 @@
+-e git+https://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML
+-e git+https://github.com/zopefoundation/ZODB.git#egg=ZODB
+-e git+https://github.com/RDFLib/FuXi#egg=FuXi
+
+# runs setup.py
+-e .
