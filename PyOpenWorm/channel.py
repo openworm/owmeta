@@ -56,15 +56,9 @@ class Channel(DataObject):
     """
     An ion channel.
 
-    Parameters
-    ----------
-    subfamily : string
-        The subfamily to which the ion channel belongs
 
     Attributes
     ----------
-    subfamily : DatatypeProperty
-        The subfamily to which the ion channel belongs
     Models : Property
         Get experimental models of this ion channel
     channel_name : DatatypeProperty
@@ -73,14 +67,6 @@ class Channel(DataObject):
         
     description_evidences : DatatypeProperty
         
-    channel_type : DatatypeProperty
-        
-    channel_subtype : DatatypeProperty
-        
-    ion_type : DatatypeProperty
-        
-    ligand_type : DatatypeProperty
-        
     gene_name : DatatypeProperty
         
     gene_WB_ID : DatatypeProperty
@@ -88,18 +74,6 @@ class Channel(DataObject):
     gene_class : DatatypeProperty
         
     proteins : DatatypeProperty
-        
-    protein_sequence : DatatypeProperty
-        
-    uniprot_ID : DatatypeProperty
-        
-    pdb_ID : DatatypeProperty
-        
-    interpro_ID : DatatypeProperty
-        
-    structure : DatatypeProperty
-        
-    structure_image : DatatypeProperty
         
     expression_pattern : DatatypeProperty
         
@@ -111,31 +85,17 @@ class Channel(DataObject):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-        Channel.DatatypeProperty('subfamily', owner=self)
 
-        if isinstance(subfamily, basestring):
-            self.subfamily = subfamily
-
-#TODO: decide which of these parameters from CW we want to use in PyOW
-#    channel_name 
-#    description 
-#    description_evidences 
-#    channel_type 
-#    channel_subtype 
-#    ion_type 
-#    ligand_type 
-#    gene_name 
-#    gene_WB_ID 
-#    gene_class 
-#    proteins 
-#    protein_sequence 
-#    uniprot_ID 
-#    pdb_ID 
-#    interpro_ID 
-#    structure 
-#    structure_image 
-#    expression_pattern 
-#    expression_evidences 
+        Channel.DatatypeProperty('name', self) #channel_name
+        Channel.DatatypeProperty('description',self) #description
+        Channel.DatatypeProperty('gene_name', self) #gene_name
+        Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
+        Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
+        Channel.DatatypeProperty('proteins', self, multiple=true) #proteins
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('description_evidences', self)
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('expression_evidences', self)
         
     def appearsIn(self):
         """
