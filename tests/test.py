@@ -60,7 +60,7 @@ from WormTest import WormTest
 # the parent of a cell, or the children, etc.
 from CellTest import CellTest
 
-# DataObjecTest
+# DataObjectTest
 # TODO: Add description for this set of tests
 from DataObjectTest import DataObjectTest
 
@@ -78,8 +78,12 @@ from NeuronTest import NeuronTest
 from NetworkTest import NetworkTest
 
 # EvidenceTest
-# Tests for evidence for the corresponding facts in the PyOpenWorm database.
+# Tests for the Evidence object capabilities/functions
 from EvidenceTest import EvidenceTest
+
+# EvidenceCoverageTest
+# Tests for evidence for objects in the PyOpenWorm database
+from EvidenceCoverageTest import EvidenceCoverageTest
 
 # ConnectionTest
 # TODO: Add description for this set of tests

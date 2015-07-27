@@ -90,6 +90,7 @@ class EvidenceTest(_DataTest):
             wbid = 'WBPaper00044' + str(i)
             e = Evidence(wormbase=wbid)
             e.year()
+
     def test_asserts(self):
         """
         Asserting something should allow us to get it back.
@@ -152,53 +153,4 @@ class EvidenceTest(_DataTest):
         e0.asserts(r)
         self.assertTrue(len(list(e0.load())) == 2)
 
-    @unittest.expectedFailure
-    def test_verify_neurons_have_evidence(self):
-        """ For each neuron in PyOpenWorm, verify
-        that there is supporting evidence"""
-        net = Worm().neuron_network()
-        neurons = list(net.neurons())
-        evcheck = []
-        for n in neurons:
-            hasEvidence = len(get_supporting_evidence(nobj))
-            evcheck.append(hasEvidence)
 
-        self.assertTrue(0 not in evcheck)
-
-    @unittest.expectedFailure
-    def test_verify_muslces_have_evidence(self):
-        """ For each muscle in PyOpenWorm, verify
-        that there is supporting evidence"""
-        muscles = list(Worm().muscles())
-        muscle_evcheck = []
-        for mobj in muscles:
-            hasEvidence = len(get_supporting_evidence(mobj))
-            muscle_evcheck.append(hasEvidence)
-
-        self.assertTrue(0 not in muscle_evcheck)
-
-    @unittest.expectedFailure
-    def test_verify_connections_have_evidence(self):
-        """ For each connection in PyOpenWorm, verify that there is
-        supporting evidence. """
-        net = Worm().neuron_network()
-        connections = list(net.synapses())
-        evcheck = []
-        for c in connections:
-            has_evidence = len(get_supporting_evidence(c))
-            evcheck.append(has_evidence)
-
-        self.assertTrue(0 not in evcheck)
-
-    @unittest.skip('There is no information at present about channels')
-    def test_verify_channels_have_evidence(self):
-        """ For each channel in PyOpenWorm, verify that there is
-        supporting evidence. """
-        pass
-
-    def get_supporting_evidence(fact):
-        """ Helper function for checking amount of Evidence.
-        Returns list of Evidence supporting fact. """
-        ev = Evidence()
-        ev.asserts(fact)
-        return list(ev.load())
