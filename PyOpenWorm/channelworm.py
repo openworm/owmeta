@@ -177,6 +177,16 @@ class ChannelModel(DataObject):
     conductance : DatatypeProperty
         The conductance of this ion channel. This is the initial value, and
         should be entered as a Quantity object.
+
+    Example usage::
+
+        # Create a ChannelModel
+        >>> cm = P.ChannelModel()
+        # Create Evidence object
+        >>> ev = P.Evidence(author='White et al.', date='1986')
+        # Assert
+        >>> ev.asserts(cm)
+        >>> ev.save()
     """
 
     def __init__(self, modelType=False, *args, **kwargs):
@@ -194,5 +204,4 @@ class ChannelModel(DataObject):
                 self.modelType(ChannelModelType.homologyEstimate)
             elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
                 self.modelType(ChannelModelType.patchClamp)
-
 
