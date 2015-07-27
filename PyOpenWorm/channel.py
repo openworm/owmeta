@@ -116,6 +116,7 @@ class Channel(DataObject):
         if isinstance(subfamily, basestring):
             self.subfamily = subfamily
 
+#TODO: decide which of these parameters from CW we want to use in PyOW
 #    channel_name 
 #    description 
 #    description_evidences 
@@ -135,4 +136,10 @@ class Channel(DataObject):
 #    structure_image 
 #    expression_pattern 
 #    expression_evidences 
-
+        
+    def appearsIn(self):
+        """
+        TODO: Implement this method.
+        Return a list of Cells that this ion channel appears in.
+        """
+        pass
