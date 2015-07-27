@@ -63,10 +63,6 @@ setup(
         'zodb==4.1.0',
         'zope.interface==4.1.1'
     ],
-    dependency_links = [
-        'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
-        'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-    ],
     version = '0.5.3',
     packages = ['PyOpenWorm'],
     package_data = {
