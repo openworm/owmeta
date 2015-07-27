@@ -56,8 +56,6 @@ class Channel(DataObject):
     """
     An ion channel.
 
-    Channels are identified by subtype name.
-
     Parameters
     ----------
     subfamily : string
@@ -69,6 +67,44 @@ class Channel(DataObject):
         The subfamily to which the ion channel belongs
     Models : Property
         Get experimental models of this ion channel
+    channel_name : DatatypeProperty
+        
+    description : DatatypeProperty
+        
+    description_evidences : DatatypeProperty
+        
+    channel_type : DatatypeProperty
+        
+    channel_subtype : DatatypeProperty
+        
+    ion_type : DatatypeProperty
+        
+    ligand_type : DatatypeProperty
+        
+    gene_name : DatatypeProperty
+        
+    gene_WB_ID : DatatypeProperty
+        
+    gene_class : DatatypeProperty
+        
+    proteins : DatatypeProperty
+        
+    protein_sequence : DatatypeProperty
+        
+    uniprot_ID : DatatypeProperty
+        
+    pdb_ID : DatatypeProperty
+        
+    interpro_ID : DatatypeProperty
+        
+    structure : DatatypeProperty
+        
+    structure_image : DatatypeProperty
+        
+    expression_pattern : DatatypeProperty
+        
+    expression_evidences : DatatypeProperty
+        
     """
 
     def __init__(self, subfamily=False, **kwargs):
@@ -79,4 +115,24 @@ class Channel(DataObject):
 
         if isinstance(subfamily, basestring):
             self.subfamily = subfamily
+
+#    channel_name 
+#    description 
+#    description_evidences 
+#    channel_type 
+#    channel_subtype 
+#    ion_type 
+#    ligand_type 
+#    gene_name 
+#    gene_WB_ID 
+#    gene_class 
+#    proteins 
+#    protein_sequence 
+#    uniprot_ID 
+#    pdb_ID 
+#    interpro_ID 
+#    structure 
+#    structure_image 
+#    expression_pattern 
+#    expression_evidences 
 
