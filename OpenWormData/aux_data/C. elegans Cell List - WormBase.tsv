@@ -1,6 +1,6 @@
 	Spreadsheet of C. elegans cells compiled and maintained by the OpenWorm project (http://openworm.org), originally sourced from WormBase (http://wormbase.org) and WormAtlas (http://wormatlas.org).  Latest version is online at: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1  For more info, please email at info@openworm.org																			
 Cell	Lineage Name	Description	Total count of identified adult-only hermaphrodite cells	Total count of adult-only male cells	Neurons (no male-specific cells)	Neurons (male-specific)	Body wall muscles	Pharynx muscles	Other muscles	Other adult-only cells in the hermaphrodite	Other adult-only hermaphrodite-specific cells (not present in males)	Motor neurons related to body wall muscles	Embryonic cells not present in adult	Male-specific cells	Male-specific adult-only cells	Cells with non-unique name	Cells needing name resolution	VirtualWorm blender model names	WormBase ID	Synonyms
-			954	1133	302	70	95	37	20	500	212	125		341	321	715	496			
+			954	1133	302	70	95	37	20	500	212	125		341	321	620	401			
 AB	P0.a	Embryonic founder cell											1						WBbt:0004015	AB blastomere,lineage name: P0.a
 ADAL	AB.plapaaaapp	Ring interneurons			1														WBbt:0004013	lineage name: ABplapaaaapp
 ADAR	AB.prapaaaapp	Ring interneurons			1														WBbt:0004011	lineage name: ABprapaaaapp
@@ -1049,43 +1049,43 @@ int	E.prppp	Intestinal cell								1						1	1	int9r	WBbt:0004342	lineage name: E
 int	In.a	Postembryonic intestinal cell								1						1	1		WBbt:0004341	lineage name: In.a
 int	In.p	Postembryonic intestinal cell								1						1	1		WBbt:0004340	lineage name: In.p
 linker_killer	U.lp or U.rp	One of these cells, sometimes fused with U.l/ra, phagocytoses the male linker cell												1	1				WBbt:0004339	lineage name: U.lp or U.rp
-m1DL	AB.araapaaap	Pharyngeal muscle cell						1											WBbt:0004338	lineage name: ABaraapaaap,m1DL
-m1DR	AB.araappaap	Pharyngeal muscle cell						1											WBbt:0004337	lineage name: ABaraappaap,m1DR
-m1L	AB.araaaaaap	Pharyngeal muscle cell						1											WBbt:0004336	lineage name: ABaraaaaaap,m1L
-m1R	AB.araaaaapp	Pharyngeal muscle cell						1											WBbt:0004335	lineage name: ABaraaaaapp,m1R
-m1VL	AB.alpaaaapa	Pharyngeal muscle cell						1											WBbt:0004334	lineage name: ABalpaaaapa,m1VL
-m1VR	AB.araaaaapa	Pharyngeal muscle cell						1											WBbt:0004555	ABarapaaapa,lineage name: ABarapaaapa,m1VR
-m2DL	AB.araapaapa	Pharyngeal muscle cell						1											WBbt:0004332	lineage name: ABaraapaapa,m2DL
-m2DR	AB.araappapa	Pharyngeal muscle cell						1											WBbt:0004331	lineage name: ABaraappapa,m2DR
-m2L	AB.alpaaapaa	Pharyngeal muscle cell						1											WBbt:0004487	lineage name: ABaraapappa
-m2R	AB.arapaapaa	Pharyngeal muscle cell						1											WBbt:0004473	lineage name: ABaraappppa
-m2VL	AB.alpaaaaap	Pharyngeal muscle cell						1											WBbt:0004328	lineage name: ABalpaaaaap,m2VL
-m2VR	AB.arapaaaap	Pharyngeal muscle cell						1											WBbt:0004327	lineage name: ABarapaaaap,m2VR
-m3DL	MS.aaapaaa	Pharyngeal muscle cell						1											WBbt:0004326	lineage name: MSaaapaaa,m3DL
-m3DR	MS.paaaapa	Pharyngeal muscle cell						1											WBbt:0004325	lineage name: MSpaaaapa,m3DR
-m3L	AB.alpaapapp	Pharyngeal muscle cell						1											WBbt:0004471	lineage name: ABaraapappp
-m3R	AB.arapaappa	Pharyngeal muscle cell						1											WBbt:0004469	lineage name: ABaraappppp
-m3VL	AB.alpappppp	Pharyngeal muscle cell						1											WBbt:0004322	lineage name: ABalpappppp,m3VL
-m3VR	AB.arapapppp	Pharyngeal muscle cell						1											WBbt:0004321	lineage name: ABarapapppp,m3VR
-m4DL	MS.aaaaapp	Pharyngeal muscle cell						1											WBbt:0004320	lineage name: MSaaaaapp,m4DL
-m4DR	MS.paaaapp	Pharyngeal muscle cell						1											WBbt:0004319	lineage name: MSpaaaapp,m4DR
-m4L	MS.aaapaap	Pharyngeal muscle cell						1											WBbt:0004318	lineage name: MSaaapaap,m4L
-m4R	AB.araaapapp	Pharyngeal muscle cell						1											WBbt:0004317	lineage name: ABaraaapapp,m4R
-m4VL	MS.aapaaaa	Pharyngeal muscle cell						1											WBbt:0004316	lineage name: MSaapaaaa,m4VL
-m4VR	MS.papappp	Pharyngeal muscle cell						1											WBbt:0004507	lineage name: MSpapaaaa,m4VR
-m5DL	MS.aaaapap	Pharyngeal muscle cell						1											WBbt:0004314	lineage name: MSaaaapap,m5DL
-m5DR	MS.paaappa	Pharyngeal muscle cell						1											WBbt:0004313	lineage name: MSpaaappa,m5DR
-m5L	AB.araapapap	Pharyngeal muscle cell						1											WBbt:0004312	lineage name: ABaraapapap,m5L
-m5R	AB.araapppap	Pharyngeal muscle cell						1											WBbt:0004311	lineage name: ABaraapppap,m5R
-m5VL	MS.aapaaap	Pharyngeal muscle cell						1											WBbt:0004310	lineage name: MSaapaaap,m5VL
-m5VR	MS.papaaap	Pharyngeal muscle cell						1											WBbt:0004309	lineage name: MSpapaaap,m5VR
-m6D	MS.paaappp	Pharyngeal muscle cell						1											WBbt:0004308	lineage name: MSpaaappp,m6D
-m6VL	MS.aapappa	Pharyngeal muscle cell						1											WBbt:0004307	lineage name: MSaapappa,m6VL
-m6VR	MS.papappa	Pharyngeal muscle cell						1											WBbt:0004306	lineage name: MSpapappa,m6VR
-m7D	MS.aaaappp	Pharyngeal muscle cell						1											WBbt:0004305	lineage name: MSaaaappp,m7D
-m7VL	MS.aapaapp	Pharyngeal muscle cell						1											WBbt:0004304	lineage name: MSaapaapp,m7VL
-m7VR	MS.papaapp	Pharyngeal muscle cell						1											WBbt:0004303	lineage name: MSpapaapp,m7VR
-m8	MS.aaapapp	Pharyngeal muscle cell						1											WBbt:0004302	lineage name: MSaaapapp,m8
+pm1DL	AB.araapaaap	Pharyngeal muscle cell						1											WBbt:0004338	lineage name: ABaraapaaap,m1DL
+pm1DR	AB.araappaap	Pharyngeal muscle cell						1											WBbt:0004337	lineage name: ABaraappaap,m1DR
+pm1L	AB.araaaaaap	Pharyngeal muscle cell						1											WBbt:0004336	lineage name: ABaraaaaaap,m1L
+pm1R	AB.araaaaapp	Pharyngeal muscle cell						1											WBbt:0004335	lineage name: ABaraaaaapp,m1R
+pm1VL	AB.alpaaaapa	Pharyngeal muscle cell						1											WBbt:0004334	lineage name: ABalpaaaapa,m1VL
+pm1VR	AB.araaaaapa	Pharyngeal muscle cell						1											WBbt:0004555	ABarapaaapa,lineage name: ABarapaaapa,m1VR
+pm2DL	AB.araapaapa	Pharyngeal muscle cell						1											WBbt:0004332	lineage name: ABaraapaapa,m2DL
+pm2DR	AB.araappapa	Pharyngeal muscle cell						1											WBbt:0004331	lineage name: ABaraappapa,m2DR
+pm2L	AB.alpaaapaa	Pharyngeal muscle cell						1											WBbt:0004487	lineage name: ABaraapappa
+pm2R	AB.arapaapaa	Pharyngeal muscle cell						1											WBbt:0004473	lineage name: ABaraappppa
+pm2VL	AB.alpaaaaap	Pharyngeal muscle cell						1											WBbt:0004328	lineage name: ABalpaaaaap,m2VL
+pm2VR	AB.arapaaaap	Pharyngeal muscle cell						1											WBbt:0004327	lineage name: ABarapaaaap,m2VR
+pm3DL	MS.aaapaaa	Pharyngeal muscle cell						1											WBbt:0004326	lineage name: MSaaapaaa,m3DL
+pm3DR	MS.paaaapa	Pharyngeal muscle cell						1											WBbt:0004325	lineage name: MSpaaaapa,m3DR
+pm3L	AB.alpaapapp	Pharyngeal muscle cell						1											WBbt:0004471	lineage name: ABaraapappp
+pm3R	AB.arapaappa	Pharyngeal muscle cell						1											WBbt:0004469	lineage name: ABaraappppp
+pm3VL	AB.alpappppp	Pharyngeal muscle cell						1											WBbt:0004322	lineage name: ABalpappppp,m3VL
+pm3VR	AB.arapapppp	Pharyngeal muscle cell						1											WBbt:0004321	lineage name: ABarapapppp,m3VR
+pm4DL	MS.aaaaapp	Pharyngeal muscle cell						1											WBbt:0004320	lineage name: MSaaaaapp,m4DL
+pm4DR	MS.paaaapp	Pharyngeal muscle cell						1											WBbt:0004319	lineage name: MSpaaaapp,m4DR
+pm4L	MS.aaapaap	Pharyngeal muscle cell						1											WBbt:0004318	lineage name: MSaaapaap,m4L
+pm4R	AB.araaapapp	Pharyngeal muscle cell						1											WBbt:0004317	lineage name: ABaraaapapp,m4R
+pm4VL	MS.aapaaaa	Pharyngeal muscle cell						1											WBbt:0004316	lineage name: MSaapaaaa,m4VL
+pm4VR	MS.papappp	Pharyngeal muscle cell						1											WBbt:0004507	lineage name: MSpapaaaa,m4VR
+pm5DL	MS.aaaapap	Pharyngeal muscle cell						1											WBbt:0004314	lineage name: MSaaaapap,m5DL
+pm5DR	MS.paaappa	Pharyngeal muscle cell						1											WBbt:0004313	lineage name: MSpaaappa,m5DR
+om5L	AB.araapapap	Pharyngeal muscle cell						1											WBbt:0004312	lineage name: ABaraapapap,m5L
+pm5R	AB.araapppap	Pharyngeal muscle cell						1											WBbt:0004311	lineage name: ABaraapppap,m5R
+pm5VL	MS.aapaaap	Pharyngeal muscle cell						1											WBbt:0004310	lineage name: MSaapaaap,m5VL
+pm5VR	MS.papaaap	Pharyngeal muscle cell						1											WBbt:0004309	lineage name: MSpapaaap,m5VR
+pm6D	MS.paaappp	Pharyngeal muscle cell						1											WBbt:0004308	lineage name: MSpaaappp,m6D
+pm6VL	MS.aapappa	Pharyngeal muscle cell						1											WBbt:0004307	lineage name: MSaapappa,m6VL
+pm6VR	MS.papappa	Pharyngeal muscle cell						1											WBbt:0004306	lineage name: MSpapappa,m6VR
+pm7D	MS.aaaappp	Pharyngeal muscle cell						1											WBbt:0004305	lineage name: MSaaaappp,m7D
+pm7VL	MS.aapaapp	Pharyngeal muscle cell						1											WBbt:0004304	lineage name: MSaapaapp,m7VL
+pm7VR	MS.papaapp	Pharyngeal muscle cell						1											WBbt:0004303	lineage name: MSpapaapp,m7VR
+pm8	MS.aaapapp	Pharyngeal muscle cell						1											WBbt:0004302	lineage name: MSaaapapp,m8
 mc1DL	AB.alpaapapa	Pharyngeal marginal cell								1									WBbt:0004301	lineage name: ABalpaapapa
 mc1DR	AB.araaapapa	Pharyngeal marginal cell								1									WBbt:0004300	lineage name: ABaraaapapa
 mc1V	AB.alpappppa	Pharyngeal marginal cell								1									WBbt:0004299	lineage name: ABalpappppa
@@ -1096,101 +1096,101 @@ mc3DL	MS.aaapapa	Pharyngeal marginal cell								1									WBbt:0004295	lineage 
 mc3DR	MS.paapapa	Pharyngeal marginal cell								1									WBbt:0004294	lineage name: MSpaapapa
 mc3V	AB.alpappapp	Pharyngeal marginal cell								1									WBbt:0004293	lineage name: ABalpappapp
 mu_anal	AB.plpppppap	Anal depressor muscle							1										WBbt:0004292	dilator muscle, lineage name: ABplpppppap, mu anal
-mu_bod	AB.prpppppaa						1									1	1	mu_bod_vr20	WBbt:0004291	lineage name: ABprpppppaa,mu_bod,VR19
-mu_bod	C.apaaaa						1									1	1	mu_bod_vl9	WBbt:0004290	lineage name: Capaaaa,mu_bod,VL10
-mu_bod	C.apaaap						1									1	1	mu_bod_vl11	WBbt:0004289	lineage name: Capaaap,mu_bod,VL12
-mu_bod	C.apaapa						1									1	1	mu_bod_vl13	WBbt:0004288	lineage name: Capaapa,mu_bod,VL14
-mu_bod	C.apaapp						1									1	1	mu_bod_vl15	WBbt:0004287	lineage name: Capaapp,mu_bod,VL16
-mu_bod	C.apapaa						1									1	1	mu_bod_dl13	WBbt:0004286	DL14,lineage name: Capapaa,mu_bod
-mu_bod	C.apapap						1									1	1	mu_bod_dl17	WBbt:0004285	DL18,lineage name: Capapap,mu_bod
-mu_bod	C.apappa						1									1	1	mu_bod_vl20	WBbt:0004284	lineage name: Capappa,mu_bod,VL19
-mu_bod	C.apappp						1									1	1	mu_bod_vl22	WBbt:0004283	lineage name: Capappp,mu_bod,VL22
-mu_bod	C.appaaa						1									1	1	mu_bod_dl11	WBbt:0004282	DL12,lineage name: Cappaaa,mu_bod
-mu_bod	C.appaap						1									1	1	mu_bod_dl18	WBbt:0003982	DL17,lineage name: Cappaap,mu_bod
-mu_bod	C.appapa						1									1	1	mu_bod_dl19	WBbt:0003981	DL20,lineage name: Cappapa,mu_bod
-mu_bod	C.appapp						1									1	1	mu_bod_dl23	WBbt:0003980	DL24,lineage name: Cappapp,mu_bod
-mu_bod	C.apppaa						1									1	1	mu_bod_dl20	WBbt:0003979	DL19,lineage name: Capppaa,mu_bod
-mu_bod	C.apppap						1									1	1	mu_bod_dl22	WBbt:0003978	DL21,lineage name: Capppap,mu_bod
-mu_bod	C.appppd						1									1	1	mu_bod_dl24	WBbt:0003977	DL23,lineage name: Cappppd,mu_bod
-mu_bod	C.appppv						1									1	1	mu_bod_vl23	WBbt:0003976	lineage name: Cappppv,mu_bod,VL23
-mu_bod	C.ppaaaa						1									1	1	mu_bod_vr9	WBbt:0003975	lineage name: Cppaaaa,mu_bod,VR10
-mu_bod	C.ppaaap						1									1	1	mu_bod_vr11	WBbt:0003974	lineage name: Cppaaap,mu_bod,VR12
-mu_bod	C.ppaapa						1									1	1	mu_bod_vr13	WBbt:0003973	lineage name: Cppaapa,mu_bod,VR14
-mu_bod	C.ppaapp						1									1	1	mu_bod_vr15	WBbt:0003952	lineage name: Cppaapp,mu_bod,VR16
-mu_bod	C.ppapaa						1									1	1	mu_bod_dr13	WBbt:0003951	DR14,lineage name: Cppapaa,mu_bod
-mu_bod	C.ppapap						1									1	1	mu_bod_dr17	WBbt:0003950	DR18,lineage name: Cppapap,mu_bod
-mu_bod	C.ppappa						1									1	1	mu_bod_vr19	WBbt:0003949	lineage name: Cppappa,mu_bod,VR20
-mu_bod	C.ppappp						1									1	1	mu_bod_vr22	WBbt:0003948	lineage name: Cppappp,mu_bod,VR21
-mu_bod	C.pppaaa						1									1	1	mu_bod_dr11	WBbt:0003947	DR12,lineage name: Cpppaaa,mu_bod
-mu_bod	C.pppaap						1									1	1	mu_bod_dr18	WBbt:0003946	DR17,lineage name: Cpppaap,mu_bod
-mu_bod	C.pppapa						1									1	1	mu_bod_dr19	WBbt:0003945	DR20,lineage name: Cpppapa,mu_bod
-mu_bod	C.pppapp						1									1	1	mu_bod_dr23	WBbt:0003944	DR24,lineage name: Cpppapp,mu_bod
-mu_bod	C.ppppaa						1									1	1	mu_bod_dr20	WBbt:0003943	DR19,lineage name: Cppppaa,mu_bod
-mu_bod	C.ppppap						1									1	1	mu_bod_dr22	WBbt:0003922	DR21,lineage name: Cppppap,mu_bod
-mu_bod	C.pppppd						1									1	1	mu_bod_dr24	WBbt:0003921	DR23,lineage name: Cpppppd,mu_bod
-mu_bod	C.pppppv						1									1	1	mu_bod_vr24	WBbt:0003920	lineage name: Cpppppv,mu_bod,VR24
-mu_bod	D.aaaa						1									1	1	mu_bod_vl5	WBbt:0003919	lineage name: Daaaa,mu_bod,VL6
-mu_bod	D.aapa						1									1	1	mu_bod_vl4	WBbt:0003917	lineage name: Daapa,mu_bod,VL3
-mu_bod	D.aaap						1									1	1	mu_bod_dl7	WBbt:0003918	DL8,lineage name: Daaap,mu_bod
-mu_bod	D.aapp						1									1	1	mu_bod_vl6	WBbt:0003916	lineage name: Daapp,mu_bod,VL5
-mu_bod	D.apaa	Embryonic body wall muscle					1									1	1		WBbt:0006344	lineage name: Dapaa, mu_bod, VL8
-mu_bod	D.apap	Embryonic body wall muscle					1									1	1		WBbt:0006535	DL10, lineage name: Dapap, mu_bod
-mu_bod	D.appaa						1									1	1	mu_bod_dl8	WBbt:0003915	DL7,lineage name: Dappaa,mu_bod
-mu_bod	D.aappap						1									1	1	mu_bod_dl10	WBbt:0003914	DL9,lineage name: Dappap,mu_bod
-mu_bod	D.aapppa						1									1	1	mu_bod_dl12	WBbt:0003913	DL11,lineage name: Dapppa,mu_bod
-mu_bod	D.aapppp						1									1	1	mu_bod_dl14	WBbt:0003902	DL13,lineage name: Dapppp,mu_bod
-mu_bod	D.paaa						1									1	1	mu_bod_vr5	WBbt:0003901	lineage name: Dpaaa,mu_bod,VR6
-mu_bod	D.paap						1									1	1	mu_bod_dr7	WBbt:0003900	DR8,lineage name: Dpaap,mu_bod
-mu_bod	D.papa						1									1	1	mu_bod_vr4	WBbt:0003899	lineage name: Dpapa,mu_bod,VR3
-mu_bod	D.papp						1									1	1	mu_bod_vr6	WBbt:0003898	lineage name: Dpapp,mu_bod,VR5
-mu_bod	D.ppaa						1									1	1	mu_bod_vr7	WBbt:0003897	lineage name: Dppaa,mu_bod,VR8
-mu_bod	D.ppap						1									1	1	mu_bod_dr9	WBbt:0003896	DR10,lineage name: Dppap,mu_bod
-mu_bod	D.pppaa						1									1	1	mu_bod_dr8	WBbt:0003895	DR7,lineage name: Dpppaa,mu_bod
-mu_bod	D.pppap						1									1	1	mu_bod_dr10	WBbt:0003894	DR9,lineage name: Dpppap,mu_bod
-mu_bod	D.ppppa						1									1	1	mu_bod_dr12	WBbt:0003893	DR11,lineage name: Dppppa,mu_bod
-mu_bod	D.ppppp						1									1	1	mu_bod_dr14	WBbt:0003882	DR13,lineage name: Dppppp,mu_bod
-mu_bod	MS.aapppaa						1									1	1	mu_bod_vl8	WBbt:0003881	lineage name: MSaapppaa,mu_bod,VL7
-mu_bod	MS.aapppap						1									1	1	mu_bod_vl10	WBbt:0003880	lineage name: MSaapppap,mu_bod,VL9
-mu_bod	MS.aappppa						1									1	1	mu_bod_vl12	WBbt:0003879	lineage name: MSaappppa,mu_bod,VL11
-mu_bod	MS.aappppp						1									1	1	mu_bod_vl14	WBbt:0003878	lineage name: MSaappppp,mu_bod,VL13
-mu_bod	MS.apaaap						1									1	1	mu_bod_dl1	WBbt:0003877	DL2,lineage name: MSapaaap,mu_bod
-mu_bod	MS.apapap						1									1	1	mu_bod_vl1	WBbt:0003876	lineage name: MSapapap,mu_bod,VL2
-mu_bod	MS.apappa						1									1	1	mu_bod_dl2	WBbt:0003875	DL1,lineage name: MSapappa,mu_bod
-mu_bod	MS.apappp						1									1	1	mu_bod_dl3	WBbt:0003874	DL4,lineage name: MSapappp,mu_bod
-mu_bod	MS.appapp						1									1	1	mu_bod_vl2	WBbt:0003873	lineage name: MSappapp,mu_bod,VL1
-mu_bod	MS.apppaa						1									1	1	mu_bod_vl3	WBbt:0003862	lineage name: MSapppaa,mu_bod,VL4
-mu_bod	MS.apppap						1									1	1	mu_bod_dl5	WBbt:0003861	DL6,lineage name: MSapppap,mu_bod
-mu_bod	MS.appppa						1									1	1	mu_bod_dl4	WBbt:0003860	DL3,lineage name: MSappppa,mu_bod
-mu_bod	MS.appppp						1									1	1	mu_bod_dl6	WBbt:0003859	DL5,lineage name: MSappppp,mu_bod
-mu_bod	MS.pappaa						1									1	1	mu_bod_vl16	WBbt:0003858	lineage name: MSpappaa,MSpappal,mu_bod,VL15
-mu_bod	MS.pappap						1									1	1	mu_bod_vr16	WBbt:0003857	lineage name: MSpappap,mu_bod,VR15
-mu_bod	MS.papppaa						1									1	1	mu_bod_vr8	WBbt:0003856	lineage name: MSpapppaa,mu_bod,VR7
-mu_bod	MS.papppap						1									1	1	mu_bod_vr10	WBbt:0003855	lineage name: MSpapppap,mu_bod,VR9
-mu_bod	MS.pappppa						1									1	1	mu_bod_vr12	WBbt:0003854	lineage name: MSpappppa,mu_bod,VR11
-mu_bod	MS.pappppp						1									1	1	mu_bod_vr14	WBbt:0003853	lineage name: MSpappppp,mu_bod,VR13
-mu_bod	MS.ppaaap						1									1	1	mu_bod_dr1	WBbt:0003842	DR2,lineage name: MSppaaap,mu_bod
-mu_bod	MS.ppapap						1									1	1	mu_bod_vr1	WBbt:0003841	lineage name: MSppapap,mu_bod,VR2
-mu_bod	MS.ppappa						1									1	1	mu_bod_dr2	WBbt:0003840	DR1,lineage name: MSppappa,mu_bod
-mu_bod	MS.ppappp						1									1	1	mu_bod_dr3	WBbt:0003839	DR4,lineage name: MSppappp,mu_bod
-mu_bod	MS.pppapp						1									1	1	mu_bod_vr2	WBbt:0003838	lineage name: MSpppapp,mu_bod,VR1
-mu_bod	MS.ppppaa						1									1	1	mu_bod_vr3	WBbt:0003837	lineage name: MSppppaa,mu_bod,VR4
-mu_bod	MS.ppppap						1									1	1	mu_bod_dr5	WBbt:0003836	DR6,lineage name: MSppppap,mu_bod
-mu_bod	MS.pppppa						1									1	1	mu_bod_dr4	WBbt:0003835	DR3,lineage name: MSpppppa,mu_bod
-mu_bod	MS.pppppp						1									1	1	mu_bod_dr6	WBbt:0003834	DR5,lineage name: MSpppppp,mu_bod
-mu_bod	M.dlaa	Postembryonic body wall muscle					1									1	1		WBbt:0002185	None
-mu_bod	M.dlap	Postembryonic body wall muscle					1									1	1		WBbt:0002186	None
-mu_bod	M.dlpp	Postembryonic body wall muscle					1									1	1		WBbt:0002189	None
-mu_bod	M.draa	Postembryonic body wall muscle					1									1	1		WBbt:0002192	None
-mu_bod	M.drap	Postembryonic body wall muscle					1									1	1		WBbt:0007172	DR16, mu_bod
-mu_bod	M.drpp	Postembryonic body wall muscle					1									1	1		WBbt:0002196	None
-mu_bod	M.vlaa	Postembryonic body wall muscle					1									1	1		WBbt:0002200	None
-mu_bod	M.vlap	Postembryonic body wall muscle					1									1	1		WBbt:0002201	None
-mu_bod	M.vlpap	Postembryonic body wall muscle					1									1	1		WBbt:0002219	None
-mu_bod	M.vlpp	Postembryonic body wall muscle					1									1	1		WBbt:0002220	None
-mu_bod	M.vraa	Postembryonic body wall muscle					1									1	1		WBbt:0002223	None
-mu_bod	M.vrap	Postembryonic body wall muscle					1									1	1		WBbt:0002224	None
-mu_bod	M.vrpap	Postembryonic body wall muscle					1									1	1		WBbt:0002242	None
-mu_bod	M.vrpp	Postembryonic body wall muscle					1									1	1		WBbt:0002243	None
+VR19	AB.prpppppaa						1											mu_bod_vr20	WBbt:0004291	lineage name: ABprpppppaa,mu_bod
+VL10	C.apaaaa						1											mu_bod_vl9	WBbt:0004290	lineage name: Capaaaa,mu_bod
+VL12	C.apaaap						1											mu_bod_vl11	WBbt:0004289	lineage name: Capaaap,mu_bod
+VL14	C.apaapa						1											mu_bod_vl13	WBbt:0004288	lineage name: Capaapa,mu_bod
+VL16	C.apaapp						1											mu_bod_vl15	WBbt:0004287	lineage name: Capaapp,mu_bod
+DL14	C.apapaa						1											mu_bod_dl13	WBbt:0004286	lineage name: Capapaa,mu_bod
+DL18	C.apapap						1											mu_bod_dl17	WBbt:0004285	lineage name: Capapap,mu_bod
+VL19	C.apappa						1											mu_bod_vl20	WBbt:0004284	lineage name: Capappa,mu_bod
+VL22	C.apappp						1											mu_bod_vl22	WBbt:0004283	lineage name: Capappp,mu_bod
+DL12	C.appaaa						1											mu_bod_dl11	WBbt:0004282	lineage name: Cappaaa,mu_bod
+DL17	C.appaap						1											mu_bod_dl18	WBbt:0003982	lineage name: Cappaap,mu_bod
+DL20	C.appapa						1											mu_bod_dl19	WBbt:0003981	lineage name: Cappapa,mu_bod
+DL24	C.appapp						1											mu_bod_dl23	WBbt:0003980	lineage name: Cappapp,mu_bod
+DL19	C.apppaa						1											mu_bod_dl20	WBbt:0003979	lineage name: Capppaa,mu_bod
+DL21	C.apppap						1											mu_bod_dl22	WBbt:0003978	lineage name: Capppap,mu_bod
+DL23	C.appppd						1											mu_bod_dl24	WBbt:0003977	lineage name: Cappppd,mu_bod
+VL23	C.appppv						1											mu_bod_vl23	WBbt:0003976	lineage name: Cappppv,mu_bod
+VR10	C.ppaaaa						1											mu_bod_vr9	WBbt:0003975	lineage name: Cppaaaa,mu_bod
+VR12	C.ppaaap						1											mu_bod_vr11	WBbt:0003974	lineage name: Cppaaap,mu_bod
+VR14	C.ppaapa						1											mu_bod_vr13	WBbt:0003973	lineage name: Cppaapa,mu_bod
+VR16	C.ppaapp						1											mu_bod_vr15	WBbt:0003952	lineage name: Cppaapp,mu_bod
+DR14	C.ppapaa						1											mu_bod_dr13	WBbt:0003951	lineage name: Cppapaa,mu_bod
+DR18	C.ppapap						1											mu_bod_dr17	WBbt:0003950	lineage name: Cppapap,mu_bod
+VR20	C.ppappa						1											mu_bod_vr19	WBbt:0003949	lineage name: Cppappa,mu_bod
+VR21	C.ppappp						1											mu_bod_vr22	WBbt:0003948	lineage name: Cppappp,mu_bod
+DR12	C.pppaaa						1											mu_bod_dr11	WBbt:0003947	lineage name: Cpppaaa,mu_bod
+DR17	C.pppaap						1											mu_bod_dr18	WBbt:0003946	lineage name: Cpppaap,mu_bod
+DR20	C.pppapa						1											mu_bod_dr19	WBbt:0003945	lineage name: Cpppapa,mu_bod
+DR24	C.pppapp						1											mu_bod_dr23	WBbt:0003944	lineage name: Cpppapp,mu_bod
+DR19	C.ppppaa						1											mu_bod_dr20	WBbt:0003943	lineage name: Cppppaa,mu_bod
+DR21	C.ppppap						1											mu_bod_dr22	WBbt:0003922	lineage name: Cppppap,mu_bod
+DR23	C.pppppd						1											mu_bod_dr24	WBbt:0003921	lineage name: Cpppppd,mu_bod
+VR24	C.pppppv						1											mu_bod_vr24	WBbt:0003920	lineage name: Cpppppv,mu_bod
+VL6	D.aaaa						1											mu_bod_vl5	WBbt:0003919	lineage name: Daaaa,mu_bod
+VL3	D.aapa						1											mu_bod_vl4	WBbt:0003917	lineage name: Daapa,mu_bod
+DL8	D.aaap						1											mu_bod_dl7	WBbt:0003918	lineage name: Daaap,mu_bod
+VL5	D.aapp						1											mu_bod_vl6	WBbt:0003916	lineage name: Daapp,mu_bod
+VL8	D.apaa	Embryonic body wall muscle					1												WBbt:0006344	lineage name: Dapaa, mu_bod
+DL10	D.apap	Embryonic body wall muscle					1												WBbt:0006535	lineage name: Dapap, mu_bod
+DL7	D.appaa						1											mu_bod_dl8	WBbt:0003915	lineage name: Dappaa,mu_bod
+DL9	D.aappap						1											mu_bod_dl10	WBbt:0003914	lineage name: Dappap,mu_bod
+DL11	D.aapppa						1											mu_bod_dl12	WBbt:0003913	lineage name: Dapppa,mu_bod
+DL13	D.aapppp						1											mu_bod_dl14	WBbt:0003902	lineage name: Dapppp,mu_bod
+VR6	D.paaa						1											mu_bod_vr5	WBbt:0003901	lineage name: Dpaaa,mu_bod
+DR8	D.paap						1											mu_bod_dr7	WBbt:0003900	lineage name: Dpaap,mu_bod
+VR3	D.papa						1											mu_bod_vr4	WBbt:0003899	lineage name: Dpapa,mu_bod
+VR5	D.papp						1											mu_bod_vr6	WBbt:0003898	lineage name: Dpapp,mu_bod
+VR8	D.ppaa						1											mu_bod_vr7	WBbt:0003897	lineage name: Dppaa,mu_bod
+DR10	D.ppap						1											mu_bod_dr9	WBbt:0003896	lineage name: Dppap,mu_bod
+DR7	D.pppaa						1											mu_bod_dr8	WBbt:0003895	lineage name: Dpppaa,mu_bod
+DR9	D.pppap						1											mu_bod_dr10	WBbt:0003894	lineage name: Dpppap,mu_bod
+DR11	D.ppppa						1											mu_bod_dr12	WBbt:0003893	lineage name: Dppppa,mu_bod
+DR13	D.ppppp						1											mu_bod_dr14	WBbt:0003882	lineage name: Dppppp,mu_bod
+VL7	MS.aapppaa						1											mu_bod_vl8	WBbt:0003881	lineage name: MSaapppaa,mu_bod
+VL9	MS.aapppap						1											mu_bod_vl10	WBbt:0003880	lineage name: MSaapppap,mu_bod
+VL11	MS.aappppa						1											mu_bod_vl12	WBbt:0003879	lineage name: MSaappppa,mu_bod
+VL13	MS.aappppp						1											mu_bod_vl14	WBbt:0003878	lineage name: MSaappppp,mu_bod
+DL2	MS.apaaap						1											mu_bod_dl1	WBbt:0003877	lineage name: MSapaaap,mu_bod
+VL2	MS.apapap						1											mu_bod_vl1	WBbt:0003876	lineage name: MSapapap,mu_bod
+DL1	MS.apappa						1											mu_bod_dl2	WBbt:0003875	lineage name: MSapappa,mu_bod
+DL4	MS.apappp						1											mu_bod_dl3	WBbt:0003874	lineage name: MSapappp,mu_bod
+VL1	MS.appapp						1											mu_bod_vl2	WBbt:0003873	lineage name: MSappapp,mu_bod
+VL4	MS.apppaa						1											mu_bod_vl3	WBbt:0003862	lineage name: MSapppaa,mu_bod
+DL6	MS.apppap						1											mu_bod_dl5	WBbt:0003861	lineage name: MSapppap,mu_bod
+DL3	MS.appppa						1											mu_bod_dl4	WBbt:0003860	lineage name: MSappppa,mu_bod
+DL5	MS.appppp						1											mu_bod_dl6	WBbt:0003859	lineage name: MSappppp,mu_bod
+VL15	MS.pappaa						1											mu_bod_vl16	WBbt:0003858	lineage name: MSpappaa,MSpappal,mu_bod
+VR15	MS.pappap						1											mu_bod_vr16	WBbt:0003857	lineage name: MSpappap,mu_bod
+VR7	MS.papppaa						1											mu_bod_vr8	WBbt:0003856	lineage name: MSpapppaa,mu_bod
+VR9	MS.papppap						1											mu_bod_vr10	WBbt:0003855	lineage name: MSpapppap,mu_bod
+VR11	MS.pappppa						1											mu_bod_vr12	WBbt:0003854	lineage name: MSpappppa,mu_bod
+VR13	MS.pappppp						1											mu_bod_vr14	WBbt:0003853	lineage name: MSpappppp,mu_bod
+DR2	MS.ppaaap						1											mu_bod_dr1	WBbt:0003842	lineage name: MSppaaap,mu_bod
+VR2	MS.ppapap						1											mu_bod_vr1	WBbt:0003841	lineage name: MSppapap,mu_bod
+DR1	MS.ppappa						1											mu_bod_dr2	WBbt:0003840	lineage name: MSppappa,mu_bod
+DR4	MS.ppappp						1											mu_bod_dr3	WBbt:0003839	lineage name: MSppappp,mu_bod
+VR1	MS.pppapp						1											mu_bod_vr2	WBbt:0003838	lineage name: MSpppapp,mu_bod
+VR4	MS.ppppaa						1											mu_bod_vr3	WBbt:0003837	lineage name: MSppppaa,mu_bod
+DR6	MS.ppppap						1											mu_bod_dr5	WBbt:0003836	lineage name: MSppppap,mu_bod
+DR3	MS.pppppa						1											mu_bod_dr4	WBbt:0003835	lineage name: MSpppppa,mu_bod
+DR5	MS.pppppp						1											mu_bod_dr6	WBbt:0003834	lineage name: MSpppppp,mu_bod
+DL15	M.dlaa	Postembryonic body wall muscle					1												WBbt:0007163	DL15
+DL16	M.dlap	Postembryonic body wall muscle					1												WBbt:0007164	DL16
+DL22	M.dlpp	Postembryonic body wall muscle					1												WBbt:0007168	DL22
+DR15	M.draa	Postembryonic body wall muscle					1												WBbt:0007171	DR15
+DR16	M.drap	Postembryonic body wall muscle					1												WBbt:0007172	DR16
+DR22	M.drpp	Postembryonic body wall muscle					1												WBbt:0007176	DR22
+VL17	M.vlaa	Postembryonic body wall muscle					1												WBbt:0007180	VL17
+VL18	M.vlap	Postembryonic body wall muscle					1												WBbt:0007181	VL18
+VL20	M.vlpap	Postembryonic body wall muscle					1												WBbt:0007189	VL20
+VL21	M.vlpp	Postembryonic body wall muscle					1												WBbt:0007190	VL21
+VR17	M.vraa	Postembryonic body wall muscle					1												WBbt:0007193	VR17
+VR18	M.vrap	Postembryonic body wall muscle					1												WBbt:0007194	VR18
+VR22	M.vrpap	Postembryonic body wall muscle					1												WBbt:0007202	VR22
+VR23	M.vrpp	Postembryonic body wall muscle					1												WBbt:0007203	VR23
 mu_int_L	AB.plpppppaa	Intestinal muscles, attach to intestine and body wall anterior to anus							1										WBbt:0003833	lineage name: ABplpppppaa
 mu_int_R	MS.ppaapp	Intestinal muscles, attach to intestine and body wall anterior to anus							1										WBbt:0003822	lineage name: MSppaapp
 mu_male_diag	M.dlpaaaap	Diagonal tail muscles in male body wall												1	1	1			WBbt:0003821	lineage name: M.dlpaaaap
