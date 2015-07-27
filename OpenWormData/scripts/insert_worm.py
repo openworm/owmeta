@@ -372,7 +372,7 @@ def infer():
         network.inferredFacts = closureDeltaGraph
 
         #build a network of rules
-        for rule in HornFromN3('testrules.n3'):
+        for rule in HornFromN3('inference_rules.n3'):
             network.buildNetworkFromClause(rule)
 
         network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
@@ -416,7 +416,7 @@ def do_insert(config="default.conf", logging=False):
         upload_receptors_and_innexins()
         upload_types()
         serialize_as_n3()
-        #infer()
+        infer()
     except:
         traceback.print_exc()
     finally:
