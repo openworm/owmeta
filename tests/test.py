@@ -107,6 +107,9 @@ from SimplePropertyTest import SimplePropertyTest
 # TODO: This test is empty!
 from NeuroMLTest import NeuroMLTest
 
+# InferenceTest
+from InferenceTest import InferenceTest
+
 # Miscellaneous Tests
 # These are tests for miscellaneous bugs that have come up.
 from Misc import Misc
