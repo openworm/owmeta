@@ -24,6 +24,9 @@ from DataTestTemplate import _DataTest
 class ChannelTest(_DataTest):
 
     def test_DataUser(self):
+        """
+        Test that the Channel object is a DataUser object as well.
+        """
         do = Channel('', conf=self.config)
         self.assertTrue(isinstance(do, DataUser))
 
