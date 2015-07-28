@@ -54,25 +54,24 @@ class Models(Property):
 
 class Channel(DataObject):
     """
-    An ion channel.
-
+    A biological ion channel.
 
     Attributes
     ----------
     Models : Property
         Get experimental models of this ion channel
     channel_name : DatatypeProperty
-        
+        Ion channel's name
     description : DatatypeProperty
-        
+        A description of the ion channel
     gene_name : DatatypeProperty
-        
+        Name of the gene that codes for this ion channel
     gene_WB_ID : DatatypeProperty
-        
+        Wormbase ID of the encoding gene
     gene_class : DatatypeProperty
-        
+        Classification of the encoding gene
     proteins : DatatypeProperty
-        
+        Proteins associated with this channel
     expression_pattern : DatatypeProperty
        
     """
@@ -82,12 +81,12 @@ class Channel(DataObject):
         # Get Models of this Channel
         Models(owner=self)
 
-        Channel.DatatypeProperty('name', owner=self) #channel_name
-        Channel.DatatypeProperty('description', owner=self) #description
-        Channel.DatatypeProperty('gene_name', owner=self) #gene_name
-        Channel.DatatypeProperty('gene_WB_ID', owner=self) #gene_WB_ID
-        Channel.DatatypeProperty('expression_pattern', owner=self) #expression_pattern
-        Channel.DatatypeProperty('proteins', owner=self, multiple=True) #proteins
+        Channel.DatatypeProperty('name', self) #channel_name
+        Channel.DatatypeProperty('description',self) #description
+        Channel.DatatypeProperty('gene_name', self) #gene_name
+        Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
+        Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
+        Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
         #TODO: assert this in the adapter instead
         #Channel.DatatypeProperty('description_evidences', self)
         #TODO: assert this in the adapter instead
