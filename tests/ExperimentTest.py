@@ -22,7 +22,20 @@ from GraphDBInit import *
 from DataTestTemplate import _DataTest
 
 class ExperimentTest(_DataTest):
+
     def test_DataUser(self):
+        """
+        Test that the Experiment object is a DataUser object as well.
+        """ 
         do = Experiment('', conf=self.config)
         self.assertTrue(isinstance(do, DataUser))
+
+    def test_unimplemented_conditions(self):
+        """
+        Test that an Experiment with no conditions attribute raises an
+        error when get_conditions() is called.
+        """
+        ex = Experiment()
+        with self.assertRaises(NotImplementedError):
+            ex.get_conditions()
 
