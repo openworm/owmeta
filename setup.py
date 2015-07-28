@@ -49,7 +49,7 @@ setup(
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.0.2',
-        'rdflib>=4.1.2',
+        'rdflib==4.1.2',
         'rdflib_zodb==1.0',
         'requirements==0.1',
         'six==1.9.0',
