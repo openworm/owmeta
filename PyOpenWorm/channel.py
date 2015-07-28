@@ -65,8 +65,6 @@ class Channel(DataObject):
         
     description : DatatypeProperty
         
-    description_evidences : DatatypeProperty
-        
     gene_name : DatatypeProperty
         
     gene_WB_ID : DatatypeProperty
@@ -76,9 +74,7 @@ class Channel(DataObject):
     proteins : DatatypeProperty
         
     expression_pattern : DatatypeProperty
-        
-    expression_evidences : DatatypeProperty
-        
+       
     """
 
     def __init__(self, subfamily=False, **kwargs):
@@ -96,7 +92,7 @@ class Channel(DataObject):
         #Channel.DatatypeProperty('description_evidences', self)
         #TODO: assert this in the adapter instead
         #Channel.DatatypeProperty('expression_evidences', self)
-        
+
     def appearsIn(self):
         """
         TODO: Implement this method.
