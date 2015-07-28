@@ -56,27 +56,71 @@ class Channel(DataObject):
     """
     An ion channel.
 
-    Channels are identified by subtype name.
-
-    Parameters
-    ----------
-    subfamily : string
-        The subfamily to which the ion channel belongs
 
     Attributes
     ----------
-    subfamily : DatatypeProperty
-        The subfamily to which the ion channel belongs
     Models : Property
         Get experimental models of this ion channel
+    channel_name : DatatypeProperty
+        
+    description : DatatypeProperty
+        
+    gene_name : DatatypeProperty
+        
+    gene_WB_ID : DatatypeProperty
+        
+    gene_class : DatatypeProperty
+        
+    proteins : DatatypeProperty
+        
+    expression_pattern : DatatypeProperty
+       
     """
 
-    def __init__(self, subfamily=False, **kwargs):
+    def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-        Channel.DatatypeProperty('subfamily', owner=self)
 
-        if isinstance(subfamily, basestring):
-            self.subfamily = subfamily
+        Channel.DatatypeProperty('name', owner=self) #channel_name
+        Channel.DatatypeProperty('description', owner=self) #description
+        Channel.DatatypeProperty('gene_name', owner=self) #gene_name
+        Channel.DatatypeProperty('gene_WB_ID', owner=self) #gene_WB_ID
+        Channel.DatatypeProperty('expression_pattern', owner=self) #expression_pattern
+        Channel.DatatypeProperty('proteins', owner=self, multiple=True) #proteins
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('description_evidences', self)
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('expression_evidences', self)
+
+        if name:
+            self.name(name)
+
+    def appearsIn(self):
+        """
+        TODO: Implement this method.
+        Return a list of Cells that this ion channel appears in.
+        """
+        pass
+
+    def identifier(self, *args, **kwargs):
+        # Copied from cell.py
+
+        # If the DataObject identifier isn't variable, then self is a specific
+        # object and this identifier should be returned. Otherwise, if our name
+        # attribute is _already_ set, then we can get the identifier from it and
+        # return that. Otherwise, there's no telling from here what our identifier
+        # should be, so the variable identifier (from DataObject.identifier() must
+        # be returned
+        ident = DataObject.identifier(self, *args, **kwargs)
+        if 'query' in kwargs and kwargs['query'] == True:
+            if not DataObject._is_variable(ident):
+                return ident
+
+        if self.name.hasValue():
+            # name is already set, so we can make an identifier from it
+            n = next(self.name._get())
+            return self.make_identifier(n)
+        else:
+            return ident
 

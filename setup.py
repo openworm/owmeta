@@ -61,11 +61,13 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
-        'zope.interface==4.1.1'
+        'zope.interface==4.1.1',
+        'FuXi'
     ],
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
+        'git://github.com/RDFLib/FuXi#egg=FuXi',
     ],
     version = '0.5.3',
     packages = ['PyOpenWorm'],
