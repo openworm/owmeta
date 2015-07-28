@@ -68,6 +68,14 @@ from DataObjectTest import DataObjectTest
 # Test basic operations on DataObjects
 from DataUserTest import DataUserTest
 
+# ChannelTest
+# Test basic operations on Channel objects.
+from ChannelTest import ChannelTest
+
+# ExperimentTest
+# Test basic operations on Experiment objects.
+from ExperimentTest import ExperimentTest
+
 # NeuronTest
 # Test basic operations on Neuron objects. For example, that that two Neuron
 # objects with the same name have the same identifier.
