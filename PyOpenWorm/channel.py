@@ -91,7 +91,7 @@ class Channel(DataObject):
         Channel.DatatypeProperty('gene_name', self) #gene_name
         Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
         Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
-        Channel.DatatypeProperty('proteins', self, multiple=true) #proteins
+        Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
         #TODO: assert this in the adapter instead
         #Channel.DatatypeProperty('description_evidences', self)
         #TODO: assert this in the adapter instead
