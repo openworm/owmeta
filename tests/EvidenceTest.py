@@ -168,3 +168,30 @@ class EvidenceTest(_DataTest):
         facts = list(e1.asserts())
         assert facts[0] == r
 
+    @unittest.expectedFailure
+    def test_multiple_evidence_for_single_fact(self):
+        """
+        Can we assert the same fact with two distinct pieces of Evidence?
+        """
+
+        e1 = Evidence()
+        e1.pmid('777')
+
+        e2 = Evidence()
+        e2.pmid('888')
+
+        c = Channel()   # using a Channel here, but it could be any fact...
+        e1.asserts(c)
+        e2.asserts(c)
+
+        e1.save()
+        e2.save()
+
+        evs = Evidence()
+        evs.asserts(c.description)
+
+        saved_pmids = set(['777', '888'])
+        loaded_pmids = set([x.pmid() for x in evs.load()])
+
+        assert saved_pmids.issubset(loaded_pmids)
+
