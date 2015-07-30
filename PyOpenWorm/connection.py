@@ -1,8 +1,8 @@
 from __future__ import print_function
 import PyOpenWorm as P
-from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.relationship import Relationship
-from PyOpenWorm.neuron import Neuron
+from .dataObject import DataObject
+from .relationship import Relationship
+from .neuron import Neuron
 
 __all__ = ['Connection']
 
@@ -17,7 +17,7 @@ class Termination:
     Muscle = 'muscle'
 
 
-class Connection(Relationship):
+class Connection(DataObject):
 
     """Connection between Cells
 
@@ -49,7 +49,7 @@ class Connection(Relationship):
                  synclass=None,
                  termination=None,
                  **kwargs):
-        Relationship.__init__(self, **kwargs)
+        super(Connection, self).__init__(**kwargs)
 
         Connection.ObjectProperty('post_cell', owner=self, value_type=Cell)
         Connection.ObjectProperty('pre_cell', owner=self, value_type=Cell)
@@ -94,25 +94,23 @@ class Connection(Relationship):
 
         if isinstance(synclass, basestring):
             self.synclass(synclass)
+        if (not super(Connection, self).defined) and \
+                self.pre_cell.hasValue() and \
+                self.post_cell.hasValue() and \
+                self.syntype.hasValue():
+            data = (self.pre_cell.defined_values[0],
+                    self.post_cell.defined_values[0],
+                    self.syntype.defined_values[0])
+            self._ident = self.make_identifier(data)
+
+    @property
+    def defined(self):
+        return super(Connection, self).defined or (self.pre_cell.hasValue()
+                                                   and self.post_cell.hasValue()
+                                                   and self.syntype.hasValue())
 
     def identifier(self, *args, **kwargs):
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if ident is not None:
-            return ident
-
-        if self.pre_cell.hasValue()\
-            and self.post_cell.hasValue()\
-            and self.syntype.hasValue():
-
-            data = []
-
-            data.append(self.pre_cell.defined_values)
-            data.append(self.post_cell.defined_values)
-            data.append(self.syntype.defined_values)
-
-            data.append(self.synclass.defined_values)
-            data.append(self.number.defined_values)
-
-            return self.make_identifier(data)
-
-        return None
+        if super(Connection, self).defined:
+            return super(Connection, self).identifier()
+        else:
+            return self._ident

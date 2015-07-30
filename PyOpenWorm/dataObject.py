@@ -62,11 +62,11 @@ class DataObject(GraphObject, DO):
             yield oid(ident, the_type)
 
     def identifier(self, query=False):
-        return DO.identifier(self)
+        return self._id
 
     @property
     def defined(self):
-        return (self.identifier() is not None)
+        return self._id is not None
 
     def variable(self):
         return self._variable

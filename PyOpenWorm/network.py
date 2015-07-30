@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import PyOpenWorm as P
 
 from PyOpenWorm.dataObject import DataObject
@@ -17,7 +18,7 @@ class Network(DataObject):
     """
 
     def __init__(self, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(Network, self).__init__(**kwargs)
 
         self.synapses = Network.ObjectProperty(
             'synapse',
@@ -137,10 +138,13 @@ class Network(DataObject):
             yield x
 
     def identifier(self, *args, **kwargs):
-        ident = DataObject.identifier(self)
-        if ident is None:
-            if self.worm.hasValue() and self.worm.defined_values[0]:
-                return self.make_identifier(self.worm.defined_values[0])
-        return ident
+        if super(Network,self).defined:
+            return super(Network, self).identifier()
+        else:
+            return self.make_identifier(self.worm.defined_values[0])
+
+    @property
+    def defined(self):
+        return super(Network,self).defined or self.worm.hasValue()
 
     # def neuroml(self):

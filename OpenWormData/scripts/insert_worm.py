@@ -2,22 +2,23 @@ from __future__ import print_function
 import PyOpenWorm as P
 import traceback
 import sqlite3
+import re
+import xlrd
+import csv
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
+SQLITE_EVIDENCE = None
+WORM = None
+NETWORK = None
+
+OPTIONS = None
 
 def serialize_as_n3():
     dest = '../WormData.n3'
     # XXX: Properties aren't initialized until the first object of a class is created,
     #      so we create them here
 
-    for x in dir(P):
-        if isinstance(getattr(P, x), type) and issubclass(getattr(P, x), P.DataObject):
-            c = getattr(P, x)
-            if x == 'values':
-                c("dummy")
-            else:
-                c()
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
@@ -34,14 +35,13 @@ def print_evidence():
     finally:
         conn.close()
 
-def upload_muscles():
+def add_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
-        ev = P.Evidence(title="C. elegans sqlite database")
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        w = P.Worm()
+        w = WORM
         cur.execute("""
         SELECT DISTINCT a.Entity, b.Entity
         FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
@@ -51,21 +51,20 @@ def upload_muscles():
         for r in cur.fetchall():
             neuron_name = str(r[0])
             muscle_name = str(r[1])
-            m = P.Muscle(muscle_name)
-            n = P.Neuron(neuron_name)
+            print("muscle", muscle_name)
+            m = P.Muscle(key=muscle_name, name=muscle_name)
+            n = P.Neuron(name=neuron_name)
             w.muscle(m)
             m.innervatedBy(n)
 
-        ev.asserts(w)
-        ev.save()
-        #second step, get the relationships between them and add them to the graph
+        SQLITE_EVIDENCE.asserts(w)
         print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
 
-def upload_lineage_and_descriptions():
+def add_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
 
     Assumes that Neurons and Muscles have already been added
@@ -77,11 +76,9 @@ def upload_lineage_and_descriptions():
     # the two sets of inserts.
     cells = dict()
     try:
-        w = P.Worm()
-        net = w.neuron_network.one()
+        w = WORM
+        net = NETWORK
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
-        # insert neurons.
-        # save
         cell_data = open(LINEAGE_LIST_LOC, "r")
 
         # Skip headers
@@ -131,7 +128,6 @@ def upload_lineage_and_descriptions():
         # they've been identified so they aren't stored twice
 
         ev.asserts(w)
-        ev.save()
         print ("uploaded lineage and descriptions")
     except Exception, e:
         traceback.print_exc()
@@ -143,44 +139,41 @@ def norn(x):
     except StopIteration:
         return None
 
-def upload_neurons():
+def add_neurons():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        ev = P.Evidence(title="C. elegans sqlite database")
-        w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
-        # insert neurons.
-        # save
+        w = WORM
+        n = NETWORK
+
         cur.execute("""
         SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b
         where EnID1=a.id and Relation = '1515' and EnID2='1'
         """)
+        neuron_count = 0
         for r in cur.fetchall():
             neuron_name = str(r[0])
             n.neuron(P.Neuron(name=neuron_name))
-        ev.asserts(n)
-        ev.save()
+            neuron_count += 1
+        SQLITE_EVIDENCE.asserts(n)
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded neurons")
+        print("uploaded neurons")
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
 
-def upload_receptors_and_innexins():
+def add_receptors_and_innexins():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        w = P.Worm()
-        n = w.neuron_network()
-        # insert neurons.
-        # save
+        w = WORM
+        n = NETWORK
         # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
         neurons = dict()
 
         def add_data_to_neuron(data_kind, relation_code):
+            print("Adding", data_kind, "data")
             cur.execute("""
                 SELECT DISTINCT a.Entity, b.Entity
                 FROM
@@ -195,10 +188,11 @@ def upload_receptors_and_innexins():
                 name = str(r[0])
                 data = str(r[1])
 
-                if not (name in neurons):
+                if name not in neurons:
                     neurons[name] = P.Neuron(name=name)
 
-                getattr(neurons[name],data_kind)(data)
+                getattr(neurons[name], data_kind)(data)
+            print("Added", data_kind, "data")
 
         add_data_to_neuron('receptor', 361)
         add_data_to_neuron('innexin', 355)
@@ -207,19 +201,18 @@ def upload_receptors_and_innexins():
 
         for neur in neurons:
             n.neuron(neurons[neur])
-        n.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
+        sys.stdout.flush()
     except Exception:
         traceback.print_exc()
     finally:
         conn.close()
 
 def new_connections():
-    """we can replace the old function (upload_connections) with this
+    """we can replace the old function, add_connections, with this
     once it is ready to go"""
 
-    import re
     search_string = re.compile(r'\w+[0]+[1-9]+')
     replace_string = re.compile(r'[0]+')
 
@@ -233,10 +226,9 @@ def new_connections():
 
 
     try:
-        w = P.Worm()
-        n = P.Network()
+        w = WORM
+        n = NETWORK
         neurons = set(n.neurons())
-        w.neuron_network(n)
 
         # Evidence object to assert each connection
         e  = P.Evidence(uri='http://www.wormwiring.org')
@@ -265,15 +257,13 @@ def new_connections():
                     e.asserts(c)
 
         e.asserts(n) # assert the whole connectome too
-        e.save()
         print('uploaded connections')
 
     except Exception, e:
         traceback.print_exc()
 
 
-def upload_connections():
-    import re
+def add_connections():
     search_string = re.compile(r'\w+[0]+[1-9]+')
     replace_string = re.compile(r'[0]+')
 
@@ -285,12 +275,8 @@ def upload_connections():
             name = replace_string.sub('', name)
         return name
 
-    import xlrd
-
     try:
-        w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
+        n = NETWORK
         combining_dict = {}
         # Get synapses and gap junctions and add them to the graph
         s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
@@ -312,27 +298,27 @@ def upload_connections():
                 string_key = '{},{},{}'.format(pre, post, syntype)
                 if string_key in combining_dict.keys():
                     # if key already there, add to number
-                    num += combining_dict[string_key][2]
-
-                combining_dict[string_key] = [pre, post, num, syntype]
-
+                    combining_dict[string_key][2] += num
+                else:
+                    combining_dict[string_key] = [pre, post, num, syntype]
+        i = 0
         for entry in combining_dict:
+            if i % 25 == 0:
+                print(".",)
             pre, post, num, syntype = combining_dict[entry]
             c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
             n.synapse(c)
+            i += 1
 
         e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
         e.asserts(n)
-        e.save()
         print('uploaded connections')
     except Exception, e:
         traceback.print_exc()
 
-def upload_types():
-    import csv
+def add_types():
     ev = P.Evidence(title="neurons.csv")
-    w = P.Worm()
-    net = w.neuron_network.one()
+    net = NETWORK
 
     data = dict()
     for x in csv.reader(open('../aux_data/neurons.csv'), delimiter=';'):
@@ -354,7 +340,6 @@ def upload_types():
             n.type(t)
         net.neuron(n)
     ev.asserts(net)
-    ev.save()
     print ("uploaded types")
 
 def infer():
@@ -364,7 +349,7 @@ def infer():
     from FuXi.Horn.HornRules import HornFromN3
 
     try:
-        w = P.Worm()
+        w = WORM
         semnet = w.rdf #fetches the entire worm.db graph
 
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
@@ -392,6 +377,10 @@ def infer():
     print ("filled in with inferred data")
 
 def do_insert(config="default.conf", logging=False):
+    global SQLITE_EVIDENCE
+    global WORM
+    global NETWORK
+
     if config:
         if isinstance(config, P.Configure):
             pass
@@ -403,18 +392,24 @@ def do_insert(config="default.conf", logging=False):
             raise Exception("Invalid configuration object "+ str(config))
 
     P.connect(conf=config, do_logging=logging)
+    SQLITE_EVIDENCE = P.Evidence(key="C_elegans_SQLite_DB", title="C. elegans sqlite database")
     try:
-        w = P.Worm()
-        net = P.Network()
-        w.neuron_network(net)
-        w.save()
+        WORM = P.Worm()
+        NETWORK = P.Network()
+        WORM.neuron_network(NETWORK)
+        NETWORK.worm(WORM)
 
-        upload_neurons()
-        upload_muscles()
-        upload_lineage_and_descriptions()
-        upload_connections()
-        upload_receptors_and_innexins()
-        upload_types()
+        add_neurons()
+        add_muscles()
+        add_lineage_and_descriptions()
+        add_connections()
+        add_receptors_and_innexins()
+        add_types()
+
+        print("Saving...")
+        WORM.save()
+
+        print("Serializing...")
         serialize_as_n3()
         infer()
     except:
@@ -427,13 +422,20 @@ if __name__ == '__main__':
     #       Multiple runs will add the data again and again.
     # Takes about 5 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
+
     import sys
     import os
-    logging = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-l':
-        logging = True
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-l", "--do-logging", dest="do_logging",
+                      action="store_true", default=False,
+                      help="Enable log output")
+
+    (options, _) = parser.parse_args()
+    OPTIONS = options
+
     try:
-        do_insert(logging=logging)
+        do_insert(logging=options.do_logging)
     except IOError as e:
         if e.errno == 2 and 'default.conf' in e.filename:
             print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")

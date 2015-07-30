@@ -11,11 +11,15 @@ from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
 from PyOpenWorm.v0.simpleProperty import SimpleProperty as SP
 from PyOpenWorm.data import DataUser
+import hashlib
 
 L = logging.getLogger(__name__)
 
 # TODO: Support ObjectProperty/DatatypeProperty differences a la yarom
 
+class _values(list):
+    def add(self, v):
+        super(_values, self).append(v)
 
 class RealSimpleProperty(object):
     multiple = False
@@ -24,16 +28,13 @@ class RealSimpleProperty(object):
 
     def __init__(self, conf, owner):
         self.conf = conf
-        self._v = []
+        self._v = _values()
         self.owner = owner
 
     def hasValue(self):
-        res = len([x for x in self._v if x.defined]) > 0
-        return res
+        return len(self._v) > 0
 
     def set(self, v):
-        import bisect
-
         if not hasattr(v, "idl"):
             v = PropertyValue(v)
 
@@ -41,13 +42,14 @@ class RealSimpleProperty(object):
             v.owner_properties.append(self)
 
         if self.multiple:
-            bisect.insort(self._v, v)
+            self._v.add(v)
         else:
-            self._v = [v]
+            self._v = _values()
+            self._v.add(v)
 
     @property
     def defined_values(self):
-        return [x for x in self._v if x.defined]
+        return tuple(x for x in self._v if x.defined)
 
     @property
     def values(self):
@@ -65,14 +67,8 @@ class RealSimpleProperty(object):
         return results
 
     def unset(self, v):
-        idx = self._v.index(v)
-        if idx >= 0:
-            actual_val = self._v[idx]
-            actual_val.owner_properties.remove(self)
-            self._v.remove(actual_val)
-        else:
-            raise Exception("Can't find value {}".format(v))
-
+        self._v.remove(v)
+        v.owner_properties.remove(self)
 
 class _ValueProperty(RealSimpleProperty):
 
@@ -191,12 +187,9 @@ class SimpleProperty(GraphObject, DataUser):
         return hash(self.idl)
 
     def identifier(self, *args, **kwargs):
-        import hashlib
-        ident = R.URIRef(self.rdf_namespace["a" +
-                                            hashlib.md5(str(self.owner.idl) +
-                                                        str(self.linkName) +
-                                                        str(self.values)).hexdigest()])
-        return ident
+        return R.URIRef(self.rdf_namespace["a" +
+                                            hashlib.md5(str(self.owner.identifier()) +
+                                                        str(self.linkName)).hexdigest()])
 
     def set(self, v):
         self._pp.set(v)

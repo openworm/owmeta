@@ -9,7 +9,7 @@ class Relationship(DataObject):
     """Relationships relate two or more DataObjects
     """
     def __init__(self,triples=None,graph=None,**kwargs):
-        super(DataObject,self).__init__(**kwargs)
+        super(Relationship,self).__init__(**kwargs)
         if triples is None:
             triples = []
 
@@ -19,13 +19,3 @@ class Relationship(DataObject):
                 self._triples.append(trip)
         else:
             self._triples = triples
-
-    def identifier(self):
-        data = sorted(self._triples)
-        if len(data) == 0:
-            return None
-        else:
-            res = 1
-            for x in data:
-                res = 31*res + hash(tuple(x))
-            return self.make_identifier(res)

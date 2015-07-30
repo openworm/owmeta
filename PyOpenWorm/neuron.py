@@ -65,7 +65,7 @@ class Neuron(Cell):
 
     """
     def __init__(self, name=False, **kwargs):
-        Cell.__init__(self,name=name,**kwargs)
+        super(Neuron,self).__init__(name=name,**kwargs)
         # Get neurons connected to this neuron
         Neighbor(owner=self)
         # Get connections from this neuron

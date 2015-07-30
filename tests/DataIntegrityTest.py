@@ -20,7 +20,7 @@ class DataIntegrityTest(unittest.TestCase):
         import csv
         PyOpenWorm.connect(
             conf=Configure(
-                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
+                **{'rdf.store_conf': 'worm.db', 'rdf.source': 'ZODB'}))
         PyOpenWorm.loadData(skipIfNewer=True)
         PyOpenWorm.disconnect()
         # grab the list of the names of the 302 neurons
@@ -33,16 +33,19 @@ class DataIntegrityTest(unittest.TestCase):
         for row in reader:
             if len(row[0]) > 0:  # Only saves valid neuron names
                 cls.neurons.append(row[0])
+        copy_zodb_data_store('worm.db', "tests/test.db")
 
     def setUp(self):
         PyOpenWorm.connect(
             conf=Configure(
                 **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
         self.g = PyOpenWorm.config("rdf.graph")
-        copy_zodb_data_store('worm.db', "tests/test.db")
 
     def tearDown(self):
         PyOpenWorm.disconnect()
+
+    @classmethod
+    def tearDownClass(cls):
         delete_zodb_data_store("tests/test.db")
 
     def test_correct_neuron_number(self):
