@@ -4,13 +4,10 @@ import sys
 sys.path.insert(0, ".")
 import unittest
 from PyOpenWorm.evidence import Evidence, EvidenceError
-from PyOpenWorm.relationship import Relationship
 from PyOpenWorm.dataObject import DataObject
-
-from GraphDBInit import make_graph
+from PyOpenWorm.channel import Channel
 
 from DataTestTemplate import _DataTest
-
 
 class EvidenceTest(_DataTest):
 
@@ -104,7 +101,6 @@ class EvidenceTest(_DataTest):
         Asserting something should allow us to get it back.
         """
         e = Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
-        g = make_graph(20)
         r = DataObject(key="relationship")
         e.asserts(r)
         e.save()
@@ -164,7 +160,7 @@ class EvidenceTest(_DataTest):
 
         e0 = Evidence()
         e0.asserts(r)
-        self.assertTrue(len(list(e0.load())) == 2)
+        self.assertEqual(2, len(list(e0.load())))
 
     def test_evidence_retrieves_instead_of_overwrites(self):
         """
@@ -172,16 +168,15 @@ class EvidenceTest(_DataTest):
         already-saved Evidence does not overwrite the previous Evidence,
         but instead retrieves it.
         """
-        e = Evidence(author='Rodney Dangerfield')
-        r = Relationship(make_graph(10))
+        e = Evidence(key="NBK", author='Rodney Dangerfield', title="Natural Born Killers")
+        r = DataObject(key='Dangerfields_dramatic_range')
         e.asserts(r)
         e.save()
 
         e1 = Evidence(author='Rodney Dangerfield')
         facts = list(e1.asserts())
-        assert facts[0] == r
+        self.assertIn(r, facts)
 
-    @unittest.expectedFailure
     def test_multiple_evidence_for_single_fact(self):
         """
         Can we assert the same fact with two distinct pieces of Evidence?
@@ -193,7 +188,7 @@ class EvidenceTest(_DataTest):
         e2 = Evidence()
         e2.pmid('888')
 
-        c = Channel()   # using a Channel here, but it could be any fact...
+        c = DataObject(key=23)
         e1.asserts(c)
         e2.asserts(c)
 
@@ -201,9 +196,9 @@ class EvidenceTest(_DataTest):
         e2.save()
 
         evs = Evidence()
-        evs.asserts(c.description)
+        evs.asserts(c)
 
         saved_pmids = set(['777', '888'])
         loaded_pmids = set([x.pmid() for x in evs.load()])
 
-        assert saved_pmids.issubset(loaded_pmids)
+        self.assertTrue(saved_pmids.issubset(loaded_pmids))

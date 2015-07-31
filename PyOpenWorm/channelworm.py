@@ -1,5 +1,7 @@
-from PyOpenWorm import *
-
+from .experiment import Experiment
+from .pProperty import Property
+from .evidence import Evidence
+from .dataObject import DataObject
 
 class PatchClampExperiment(Experiment):
     """
@@ -18,13 +20,13 @@ class PatchClampExperiment(Experiment):
     cell_age : DatatypeProperty
         Age of the cell
     delta_t : DatatypeProperty
-        
+
     duration : DatatypeProperty
-        
+
     end_time : DatatypeProperty
-        
+
     extra_solution : DatatypeProperty
-        
+
     initial_voltage : DatatypeProperty
         Starting voltage of the patch clamp
     ion_channel : DatatypeProperty
@@ -38,22 +40,22 @@ class PatchClampExperiment(Experiment):
     pipette_solution : DatatypeProperty
         Type of solution in the pipette
     protocol_end : DatatypeProperty
-        
+
     protocol_start : DatatypeProperty
-        
+
     protocol_step : DatatypeProperty
-        
+
     start_time : DatatypeProperty
-        
+
     temperature : DatatypeProperty
-        
+
     type : DatatypeProperty
 
     """
 
     def __init__(self, reference=False, **kwargs):
         Experiment.__init__(self, reference)
-        
+
         # enumerate conditions patch-clamp experiments should have
         self.conditions = [
             'Ca_concentration',
@@ -78,7 +80,7 @@ class PatchClampExperiment(Experiment):
             'temperature',
             'type',
         ]
- 
+
         for c in self.conditions:
             PatchClampExperiment.DatatypeProperty(c, self)
 
@@ -198,7 +200,7 @@ class ChannelModel(DataObject):
         References(owner=self)
 
         #Change modelType value to something from ChannelModelType class on init
-        if (isinstance(modelType, basestring)):
+        if (isinstance(modelType, str)):
             modelType = modelType.lower()
             if modelType in ('homology', ChannelModelType.homologyEstimate):
                 self.modelType(ChannelModelType.homologyEstimate)

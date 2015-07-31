@@ -1,5 +1,8 @@
-from PyOpenWorm import *
+from .pProperty import Property
+from .channelworm import ChannelModel
+from .dataObject import DataObject
 
+# XXX: Why is this not an ObjectProperty?
 class Models(Property):
     multiple=True
     def __init__(self, **kwargs):
@@ -28,7 +31,12 @@ class Models(Property):
             for m in c.load():
                 self._models.append(m)
             #call `get()` again to yield ChannelModels the user asked for
-            self.get()
+            if len(self._models) > 0:
+                self.get()
+
+    @property
+    def values(self):
+        return self._models
 
     def set(self, m, **kwargs):
         """

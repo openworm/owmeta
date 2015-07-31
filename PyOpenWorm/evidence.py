@@ -275,7 +275,7 @@ class Evidence(DataObject):
 
         multivalued_fields = ('author', 'uri')
         other_fields = ('year', 'title', 'doi', 'wbid', 'pmid')
-
+        self.id_precedence = ('doi', 'pmid', 'wbid')
         for x in multivalued_fields:
             Evidence.DatatypeProperty(x, multiple=True, owner=self)
 
@@ -334,6 +334,23 @@ class Evidence(DataObject):
         self._fields[k] = v
         dp = Evidence.DatatypeProperty(k, owner=self)
         dp(v)
+
+    @property
+    def defined(self):
+        if super(Evidence, self).defined:
+            return True
+        else:
+            for x in self.id_precedence:
+                if getattr(self, x).has_defined_value():
+                    return True
+
+    def identifier(self):
+        if super(Evidence, self).defined:
+            return super(Evidence, self).identifier()
+        for idKind in self.id_precedence:
+            idprop = getattr(self, idKind)
+            if idprop.has_defined_value():
+                return self.make_identifier((idKind, idprop.defined_values[0]))
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
