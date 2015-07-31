@@ -200,6 +200,13 @@ class Cell(DataObject):
             for z in Cell(lineageName=x).load():
                 yield z
 
+    def __str__(self):
+        n = list(self.name.defined_values)
+        if len(n) > 0:
+            return self.__class__.__name__ + "(name="+str(n[0])+")"
+        else:
+            return super(Cell,self).__str__()
+
     @property
     def defined(self):
         return super(Cell, self).defined or self.name.has_defined_value()

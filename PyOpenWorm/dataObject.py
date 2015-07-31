@@ -49,7 +49,7 @@ class DataObject(GraphObject, DO):
 
     def __str__(self):
         s = self.__class__.__name__ + "("
-        s += str(self.idl.n3())
+        s += str(self.namespace_manager.normalizeUri(self.idl))
         s += ")"
         return s
 

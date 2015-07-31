@@ -80,7 +80,8 @@ class Channel(DataObject):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-
+        Channel.DatatypeProperty('subfamily', owner=self)
+        Channel.DatatypeProperty('description', owner=self)
         Channel.DatatypeProperty('name', self) #channel_name
         Channel.DatatypeProperty('description',self) #description
         Channel.DatatypeProperty('gene_name', self) #gene_name

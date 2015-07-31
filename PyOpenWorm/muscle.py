@@ -28,8 +28,3 @@ class Muscle(Cell):
         self.innervatedBy = Muscle.ObjectProperty("neurons",owner=self,value_type=P.Neuron, multiple=True)
         Muscle.DatatypeProperty("receptors",owner=self,multiple=True)
 
-    def __str__(self):
-        if self.name.has_defined_value():
-            return "Muscle(name='"+str(self.name.defined_values[0])+"')"
-        else:
-            return "Muscle()"

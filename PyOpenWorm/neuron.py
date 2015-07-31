@@ -128,12 +128,6 @@ class Neuron(Cell):
           :rtype: libNeuroML.Neuron
        """
 
-    def __str__(self):
-        n = list(self.name.defined_values)
-        if len(n) > 0:
-            return "Neuron(name="+str(n[0])+")"
-        else:
-            return "Neuron()"
 
 
 class Neighbor(P.Property):

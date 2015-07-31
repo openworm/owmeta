@@ -17,9 +17,12 @@ L = logging.getLogger(__name__)
 
 # TODO: Support ObjectProperty/DatatypeProperty differences a la yarom
 
+
 class _values(list):
+
     def add(self, v):
         super(_values, self).append(v)
+
 
 class RealSimpleProperty(object):
     multiple = False
@@ -76,6 +79,7 @@ class RealSimpleProperty(object):
         self._v.remove(v)
         v.owner_properties.remove(self)
 
+
 class _ValueProperty(RealSimpleProperty):
 
     def __init__(self, conf, owner_property):
@@ -120,10 +124,11 @@ class ObjectPropertyMixin(object):
 
     def set(self, v):
         from .dataObject import DataObject
-        if not isinstance(v, (DataObject, Variable)):
+        if not isinstance(v, (SimpleProperty, DataObject, Variable)):
             raise Exception(
-                "An ObjectProperty only accepts DataObject "
-                "or Variable instances. Got a " + str(type(v)))
+                "An ObjectProperty only accepts DataObject, SimpleProperty"
+                "or Variable instances. Got a " + str(type(v)) + " aka " +
+                str(type(v).__bases__))
         return super(ObjectPropertyMixin, self).set(v)
 
     def get(self):
@@ -193,9 +198,8 @@ class SimpleProperty(GraphObject, DataUser):
         return hash(self.idl)
 
     def identifier(self, *args, **kwargs):
-        return R.URIRef(self.rdf_namespace["a" +
-                                            hashlib.md5(str(self.owner.identifier()) +
-                                                        str(self.linkName)).hexdigest()])
+        return R.URIRef(self.rdf_namespace[
+                        "a" + hashlib.md5(str(self.owner.identifier()) + str(self.linkName)).hexdigest()])
 
     def set(self, v):
         self._pp.set(v)
