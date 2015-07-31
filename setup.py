@@ -67,7 +67,7 @@ setup(
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-        'git://github.com/RDFLib/FuXi@1.4.dev-r0#egg=FuXi',
+        'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
     ],
     version = '0.5.3',
     packages = ['PyOpenWorm'],
