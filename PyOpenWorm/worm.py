@@ -114,7 +114,7 @@ class Worm(DataObject):
         return self.rdf
 
     def defined(self):
-        return super(Worm,self).defined or self.name.hasValue()
+        return super(Worm,self).defined or self.name.has_defined_value()
 
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific

@@ -100,7 +100,6 @@ class CellTest(_DataTest):
         p = Cell(name="peas")
         p.lineageName(base)
         p.save()
-
         c = Cell(name="carrots")
         c.lineageName(child)
         c.save()

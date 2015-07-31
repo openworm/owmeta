@@ -51,7 +51,6 @@ def add_muscles():
         for r in cur.fetchall():
             neuron_name = str(r[0])
             muscle_name = str(r[1])
-            print("muscle", muscle_name)
             m = P.Muscle(key=muscle_name, name=muscle_name)
             n = P.Neuron(name=neuron_name)
             w.muscle(m)

@@ -29,7 +29,7 @@ class Muscle(Cell):
         Muscle.DatatypeProperty("receptors",owner=self,multiple=True)
 
     def __str__(self):
-        if self.name.hasValue():
+        if self.name.has_defined_value():
             return "Muscle(name='"+str(self.name.defined_values[0])+"')"
         else:
             return "Muscle()"

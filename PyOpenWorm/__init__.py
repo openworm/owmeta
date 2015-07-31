@@ -208,7 +208,6 @@ def connect(configFile=False,
             "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
             "rdf.source": "ZODB", "rdf.store": "ZODB",
             "rdf.store_conf": get_data('worm.db'),
-            "user.email": "jerry@cn.com",
             "rdf.upload_block_statement_count": 50})
 
     Configureable.conf.openDatabase()

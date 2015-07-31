@@ -34,6 +34,12 @@ class RealSimpleProperty(object):
     def hasValue(self):
         return len(self._v) > 0
 
+    def has_defined_value(self):
+        for x in self._v:
+            if x.defined:
+                return True
+        return False
+
     def set(self, v):
         if not hasattr(v, "idl"):
             v = PropertyValue(v)
@@ -217,7 +223,7 @@ class SimpleProperty(GraphObject, DataUser):
 
     @property
     def defined(self):
-        return (self.owner.defined and self._pp.hasValue())
+        return self.owner.defined and self._pp.hasValue()
 
     def variable(self):
         return self._variable
@@ -227,6 +233,9 @@ class SimpleProperty(GraphObject, DataUser):
 
     def hasValue(self):
         return self._pp.hasValue()
+
+    def has_defined_value(self):
+        return self._pp.has_defined_value()
 
     def __call__(self, *args, **kwargs):
         """ If arguments are passed to the ``Property``, its ``set`` method

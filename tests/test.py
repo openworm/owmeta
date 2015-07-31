@@ -11,6 +11,7 @@ from PyOpenWorm import *
 import networkx
 import rdflib
 import rdflib as R
+import logging
 import pint as Q
 import os
 import subprocess as SP
@@ -135,11 +136,16 @@ if __name__ == '__main__':
     parser.add_option("-p", "--performance-profile", dest="performance_profile",
                       action="store_true", default=False,
                       help="Profile each test using cProfile")
+    parser.add_option("-l", "--do-logging", dest="do_logging",
+                      action="store_true", default=False,
+                      help="Turn on log output")
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
     PERFORMANCE_PROFILE = options.performance_profile
 
+    if options.do_logging:
+        logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(name)s:%(lineno)s:%(message)s")
     def getTests(testCase):
         decorating_test_loader = unittest.TestLoader()
         if PERFORMANCE_PROFILE:

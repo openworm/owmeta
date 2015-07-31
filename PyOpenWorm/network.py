@@ -145,6 +145,6 @@ class Network(DataObject):
 
     @property
     def defined(self):
-        return super(Network,self).defined or self.worm.hasValue()
+        return super(Network,self).defined or self.worm.has_defined_value()
 
     # def neuroml(self):

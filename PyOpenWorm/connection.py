@@ -95,9 +95,9 @@ class Connection(DataObject):
         if isinstance(synclass, basestring):
             self.synclass(synclass)
         if (not super(Connection, self).defined) and \
-                self.pre_cell.hasValue() and \
-                self.post_cell.hasValue() and \
-                self.syntype.hasValue():
+                self.pre_cell.has_defined_value() and \
+                self.post_cell.has_defined_value() and \
+                self.syntype.has_defined_value():
             data = (self.pre_cell.defined_values[0],
                     self.post_cell.defined_values[0],
                     self.syntype.defined_values[0])
@@ -105,9 +105,9 @@ class Connection(DataObject):
 
     @property
     def defined(self):
-        return super(Connection, self).defined or (self.pre_cell.hasValue()
-                                                   and self.post_cell.hasValue()
-                                                   and self.syntype.hasValue())
+        return super(Connection, self).defined or (self.pre_cell.has_defined_value()
+                                                   and self.post_cell.has_defined_value()
+                                                   and self.syntype.has_defined_value())
 
     def identifier(self, *args, **kwargs):
         if super(Connection, self).defined:

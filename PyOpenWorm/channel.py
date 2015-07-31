@@ -73,7 +73,7 @@ class Channel(DataObject):
     proteins : DatatypeProperty
         Proteins associated with this channel
     expression_pattern : DatatypeProperty
-       
+
     """
 
     def __init__(self, name=False, **kwargs):
@@ -102,7 +102,11 @@ class Channel(DataObject):
         """
         pass
 
-    def identifier(self, *args, **kwargs):
+    @property
+    def defined(self):
+        return super(Channel, self).defined or self.name.has_defined_value()
+
+    def identifier(self):
         # Copied from cell.py
 
         # If the DataObject identifier isn't variable, then self is a specific
@@ -111,15 +115,9 @@ class Channel(DataObject):
         # return that. Otherwise, there's no telling from here what our identifier
         # should be, so the variable identifier (from DataObject.identifier() must
         # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+        if super(Channel, self).defined:
+            return super(Channel, self).identifier()
         else:
-            return ident
+            # name is already set, so we can make an identifier from it
+            return self.make_identifier(self.name.defined_values[0])
 
