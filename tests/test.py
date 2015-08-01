@@ -60,13 +60,21 @@ from WormTest import WormTest
 # the parent of a cell, or the children, etc.
 from CellTest import CellTest
 
-# DataObjecTest
+# DataObjectTest
 # TODO: Add description for this set of tests
 from DataObjectTest import DataObjectTest
 
 # DataUserTest
 # Test basic operations on DataObjects
 from DataUserTest import DataUserTest
+
+# ChannelTest
+# Test basic operations on Channel objects.
+from ChannelTest import ChannelTest
+
+# ExperimentTest
+# Test basic operations on Experiment objects.
+from ExperimentTest import ExperimentTest
 
 # NeuronTest
 # Test basic operations on Neuron objects. For example, that that two Neuron
@@ -78,8 +86,12 @@ from NeuronTest import NeuronTest
 from NetworkTest import NetworkTest
 
 # EvidenceTest
-# Tests for evidence for the corresponding facts in the PyOpenWorm database.
+# Tests for the Evidence object capabilities/functions
 from EvidenceTest import EvidenceTest
+
+# EvidenceCoverageTest
+# Tests for evidence for objects in the PyOpenWorm database
+from EvidenceCoverageTest import EvidenceCoverageTest
 
 # ConnectionTest
 # TODO: Add description for this set of tests
@@ -102,6 +114,9 @@ from SimplePropertyTest import SimplePropertyTest
 # TODO: Add description for this set of tests
 # TODO: This test is empty!
 from NeuroMLTest import NeuroMLTest
+
+# InferenceTest
+from InferenceTest import InferenceTest
 
 # Miscellaneous Tests
 # These are tests for miscellaneous bugs that have come up.
