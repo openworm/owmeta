@@ -19,7 +19,6 @@ class Experiment(DataObject):
     reference : Evidence
         Supporting article for this experiment.
     """
-
     def __init__(self, reference=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         Experiment.ObjectProperty('reference', owner=self, value_type=Evidence, multiple=True)
@@ -32,6 +31,12 @@ class Experiment(DataObject):
 
     def get_conditions(self):
         """Return conditions and their associated values in a dict."""
+        if not hasattr(self, 'conditions'):
+            raise NotImplementedError(
+                '"Conditions" attribute must be overridden'
+            )
+
+
         for c in self.conditions:
             value = getattr(self, c)
             try:
