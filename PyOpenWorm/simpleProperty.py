@@ -4,18 +4,15 @@ import rdflib as R
 import random as RND
 import logging
 
-from yarom.graphObject import GraphObject, GraphObjectQuerier, ComponentTripler
-from yarom.yProperty import Property as P
+from yarom.graphObject import (GraphObject, GraphObjectQuerier, ComponentTripler)
 from yarom.rdfUtils import deserialize_rdflib_term
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
-from PyOpenWorm.v0.simpleProperty import SimpleProperty as SP
+from yarom.propertyMixins import (ObjectPropertyMixin, DatatypePropertyMixin)
 from PyOpenWorm.data import DataUser
 import hashlib
 
 L = logging.getLogger(__name__)
-
-# TODO: Support ObjectProperty/DatatypeProperty differences a la yarom
 
 
 class _values(list):
@@ -105,22 +102,7 @@ class _ValueProperty(RealSimpleProperty):
         return "_ValueProperty(" + str(self._owner_property) + ")"
 
 
-class DatatypePropertyMixin(object):
-
-    def set(self, v):
-        from .dataObject import DataObject
-        if isinstance(v, DataObject):
-            L.warn(
-                ('You are attempting to set a DataObject "{}"'
-                 ' on {} where a literal is expected.').format(v, self))
-        return super(DatatypePropertyMixin, self).set(v)
-
-    def get(self):
-        for val in super(DatatypePropertyMixin, self).get():
-            yield deserialize_rdflib_term(val)
-
-
-class ObjectPropertyMixin(object):
+class _ObjectPropertyMixin(ObjectPropertyMixin):
 
     def set(self, v):
         from .dataObject import DataObject
@@ -131,28 +113,8 @@ class ObjectPropertyMixin(object):
                 str(type(v).__bases__))
         return super(ObjectPropertyMixin, self).set(v)
 
-    def get(self):
-        from .dataObject import DataObject, oid, get_most_specific_rdf_type
 
-        for ident in super(ObjectPropertyMixin, self).get():
-            if not isinstance(ident, R.URIRef):
-                L.warn(
-                    'ObjectProperty.get: Skipping non-URI term, "' +
-                    str(ident) +
-                    '", returned for a DataObject.')
-                continue
-
-            types = set()
-            types.add(self.value_rdf_type)
-
-            for rdf_type in self.rdf.objects(ident, R.RDF['type']):
-                types.add(rdf_type)
-
-            the_type = get_most_specific_rdf_type(types)
-            yield oid(ident, the_type)
-
-
-class _ObjectVaulueProperty (ObjectPropertyMixin, _ValueProperty):
+class _ObjectVaulueProperty (_ObjectPropertyMixin, _ValueProperty):
     pass
 
 
@@ -160,7 +122,7 @@ class _DatatypeValueProperty (DatatypePropertyMixin, _ValueProperty):
     pass
 
 
-class ObjectProperty (ObjectPropertyMixin, RealSimpleProperty):
+class ObjectProperty (_ObjectPropertyMixin, RealSimpleProperty):
     pass
 
 
@@ -172,15 +134,21 @@ class SimpleProperty(GraphObject, DataUser):
 
     """ Adapts a SimpleProperty to the GraphObject interface """
 
-    def __init__(self, owner, **kwargs):
+    def __init__(self, owner, resolver, **kwargs):
         super(SimpleProperty, self).__init__(**kwargs)
         self.owner = owner
         self._id = None
         self._variable = R.Variable("V" + str(RND.random()))
         if self.property_type == "ObjectProperty":
-            self._pp = _ObjectVaulueProperty(self.conf, self)
+            self._pp = _ObjectVaulueProperty(
+                conf=self.conf,
+                owner_property=self,
+                resolver=resolver)
         else:
-            self._pp = _DatatypeValueProperty(self.conf, self)
+            self._pp = _DatatypeValueProperty(
+                conf=self.conf,
+                owner_property=self,
+                resolver=resolver)
 
         self.properties.append(self._pp)
 
@@ -209,7 +177,6 @@ class SimpleProperty(GraphObject, DataUser):
 
     def get(self):
         if self._pp.hasValue():
-            res = []
             if self.property_type == 'ObjectProperty':
                 return self._pp.values
             else:

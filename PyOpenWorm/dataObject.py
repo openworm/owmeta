@@ -4,7 +4,8 @@ import random as RND
 import logging
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
-from yarom.rdfUtils import triples_to_bgp
+from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
+from yarom.rdfTypeResolver import RDFTypeResolver
 from PyOpenWorm.v0.dataObject import DataObject as DO
 from PyOpenWorm.v0.dataObject import RDFTypeTable
 from PyOpenWorm.v0.dataObject import disconnect as DODisconnect
@@ -14,7 +15,6 @@ from graphObjectAdapter.fakeProperty import FakeProperty
 L = logging.getLogger(__name__)
 
 PropertyTypes = dict()
-
 
 class DataObject(GraphObject, DO):
 
@@ -123,7 +123,7 @@ class DataObject(GraphObject, DO):
 
     @classmethod
     def attach_property_ex(cls, owner, c):
-        res = c(owner=owner, conf=owner.conf)
+        res = c(owner=owner, conf=owner.conf, resolver=_Resolver.get_instance())
         owner.properties.append(res)
         setattr(owner, c.linkName, res)
 
@@ -132,7 +132,7 @@ class DataObject(GraphObject, DO):
     @classmethod
     def attach_property(self, owner, c):
         # The fake property has the object as owner and the property as value
-        res = c(owner=owner)
+        res = c(owner=owner, resolver=_Resolver.get_instance())
         # XXX: Hack for graph object traversal of properties while still
         #      allowing to refer to the PyOpenWorm properties.
 
@@ -237,3 +237,18 @@ def get_most_specific_rdf_type(types):
             You may want to import the module containing the class as well as add additional type
             annotations in order to resolve your objects to a more precise type.""".format(x))
     return most_specific_type.rdf_type
+
+class _Resolver(RDFTypeResolver):
+    instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = RDFTypeResolver(
+                DataObject.rdf_type,
+                get_most_specific_rdf_type,
+                oid,
+                deserialize_rdflib_term)
+        return cls.instance
+
+

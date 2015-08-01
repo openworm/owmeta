@@ -135,6 +135,6 @@ class SimplePropertyTest(_DataTest):
             linkName = 'test'
             owner_type = DataObject
 
-        sp = T(owner=do)
+        sp = DataObject.attach_property(do, T)
         self.assertEqual(len(list(sp.triples())), 0)
         self.assertEqual(len(list(sp.triples(query=True))), 0)
