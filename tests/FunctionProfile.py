@@ -3,6 +3,7 @@ import os
 import json
 import pstats
 import cProfile
+import random
 
 def get_method_name(profile_string):
     """
@@ -115,3 +116,19 @@ class FunctionProfile(object):
         self.primitive_calls = json_dict["primitive_calls"]
         self.total_time = json_dict["total_time"]
 
+    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core"):
+        """
+        :param commit: Codespeed current commit argument.
+        :param branch: Codespeed current branch argument.
+        :param environment: Codespeed environment argument.
+        :return: Codespeed formatted dictionary.
+        """
+        return {
+            "commitid": commit,
+            "project": "PyOpenWorm",
+            "branch": branch,
+            "executable": self.function_name,
+            "benchmark": "1 second",
+            "environment": environment,
+            "result_value": self.cumulative_time / self.calls
+        }
