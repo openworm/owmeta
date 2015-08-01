@@ -69,7 +69,7 @@ class DataIntegrityTest(unittest.TestCase):
         thlist = set(x.name() for x in neuronlist.load())
         self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
 
-    def test_UniqueNeuronNode(self):
+    def test_unique_neuron_node(self):
         """
         There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
         then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
@@ -87,7 +87,7 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
         self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
 
-    def test_NeuronsHaveTypes(self):
+    def test_neurons_have_types(self):
         """
         Every Neuron should have a non-blank type
         """
@@ -115,7 +115,7 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 90)
 
     @unittest.skip("have not yet defined asserts")
-    def test_WhatNodesGetTypeInfo(self):
+    def test_what_nodes_get_type_info(self):
         qres = self.g.query('SELECT ?o ?p ?s WHERE {'
                                 + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
                                   '?o ?p ?s} ' #for that type ?o, get its value ?v

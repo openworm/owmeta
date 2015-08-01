@@ -13,7 +13,6 @@ def get_method_name(profile_string):
     """
     return re.match(r"^<method \'(?P<method_name>[^']+)", profile_string).group("method_name")
 
-
 class FunctionProfile(object):
 
     def __init__(self, *args, **kwargs):
@@ -64,8 +63,6 @@ class FunctionProfile(object):
             self._from_json(json_str)
         else:
             raise AssertionError("Invalid initialization arguments to FunctionProfile.")
-
-
 
     def __str__(self):
         l = []
