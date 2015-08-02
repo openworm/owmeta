@@ -1,4 +1,4 @@
-5cw6wimport sys
+import sys
 sys.path.insert(0,".")
 import unittest
 import neuroml
