@@ -1,10 +1,13 @@
 # This file specified pytest plugins
 
+import pstats
 import cProfile
+import json
+import timeit
+import os
+import urllib, urllib2
 import pytest
 
-import urllib, urllib2
-import json
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
 function_profile_list = []
@@ -14,17 +17,20 @@ commit = None
 branch = None
 environment = None
 
+
 def pytest_addoption(parser):
+    profile_group = parser.getgroup('Performance Profiling', description='Use cProfile to profile execution times of test_* functions.')
     # TODO Group these
-    parser.addoption('--profile', dest='profile', action='store_true',
-                     default=False, help='Profile test execution with cProfile')
-    parser.addoption('--code-speed-submit', dest='cs_submit', action='store',
-                     default=None, help='Submit results as JSON to Codespeed instance at URL')
-    parser.addoption('--branch', dest='branch', action='store',
+    #parser.addoption('--profile', dest='profile', action='store_true',
+    #                 default=False, help='Profile test execution with cProfile')
+    profile_group.addoption('--code-speed-submit', dest='cs_submit_url', action='store',
+                     default=None, help='Submit results as JSON to Codespeed instance at URL.' + \
+                     "Must be accompanied by --branch, --commit, and --environment arguments.")
+    profile_group.addoption('--branch', dest='branch', action='store',
                      default=None, help='Branch name')
-    parser.addoption('--commit', dest='commit', action='store',
+    profile_group.addoption('--commit', dest='commit', action='store',
                      default=None, help='Commit ID')
-    parser.addoption('--environment', dest='environment', action='store',
+    profile_group.addoption('--environment', dest='environment', action='store',
                      default=None, help='Environment')
 
 
@@ -34,11 +40,17 @@ def pytest_configure(config):
     """
     global enabled, submit_url, commit, branch, environment
 
-    enabled = config.getoption('profile')
-    submit_url = config.getoption('cs_submit')
+    # enabled = config.getoption('profile') or config.getoption('cs_submit_url') is not None
+    enabled = config.getoption('cs_submit_url') is not None
+    submit_url = config.getoption('cs_submit_url')
     commit = config.getoption('commit')
     branch = config.getoption('branch')
     environment = config.getoption('environment')
+
+    missing_argument = not commit or not branch or not environment
+    if submit_url and missing_argument:
+        raise ValueError("If calling with --code-speed-submit, user must supply " +\
+                         "--commit, --branch, and --environment arguments.")
 
 
 @pytest.mark.hookwrapper
@@ -55,13 +67,14 @@ def pytest_runtest_call(item):
     outcome = yield
     item.profiler.disable() if item.enabled else None
 
-    if item.enabled and outcome.get_result() is not None:
-        # Item's excinfo will indicate any exceptions thrown
-        test_fail = hasattr(item, 'excinfo') and item._excinfo is not None
-        if not test_fail:
-            # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
-            fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
-            function_profile_list.append(fp)
+    result = None if outcome is None else outcome.get_result()
+
+    # Item's excinfo will indicate any exceptions thrown
+    if item.enabled and item._excinfo is None:
+        # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
+        fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
+        function_profile_list.append(fp)
+
 
 def pytest_unconfigure(config):
     """
@@ -69,15 +82,31 @@ def pytest_unconfigure(config):
     """
     global enabled, submit_url, commit, branch, environment
 
-    enabled = config.getoption('profile')
-    submit_url = config.getoption('cs_submit')
-    commit = config.getoption('commit')
-    branch = config.getoption('branch')
-    environment = config.getoption('environment')
-    if not enabled or not submit_url:
+    if not enabled:
         return
 
-    data = map(lambda x: x.to_codespeed_dict(commit=commit, branch=branch, environment=environment), function_profile_list)
+    data_int = map(lambda x: x.to_codespeed_dict(commit=commit,
+                                                 branch=branch,
+                                                 environment=environment,
+                                                 benchmark="int"),
+                   function_profile_list)
+    data_flt = map(lambda x: x.to_codespeed_dict(commit=commit,
+                                                 branch=branch,
+                                                 environment=environment,
+                                                 benchmark="float"),
+                   function_profile_list)
+
+    int_time = timeit.timeit('100 * 99', number=500)
+    float_time = timeit.timeit('100.5 * 99.2', number=500)
+
+    for elt in data_int:
+        # Result is factor of int operation time
+        elt["result_value"] = elt["result_value"] / int_time
+    for elt in data_flt:
+        # Result is factor of int operation time
+        elt["result_value"] = elt["result_value"] / float_time
+
+    data = data_int + data_flt
 
     try:
         f = urllib2.urlopen(submit_url + 'result/add/json/',
@@ -95,7 +124,7 @@ def pytest_unconfigure(config):
         print "Unexpected response while connecting to Codespeed:"
         raise ValueError('Unexpected response from Codespeed server: {}'.format(response))
     else:
-        print "{} records sumbitted.".format(len(function_profile_list))
+        print "{} test benchmarks sumbitted.".format(len(function_profile_list))
 
 
 class FunctionProfile(object):
@@ -198,19 +227,20 @@ class FunctionProfile(object):
         self.primitive_calls = json_dict["primitive_calls"]
         self.total_time = json_dict["total_time"]
 
-    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core"):
+    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", benchmark="int"):
         """
         :param commit: Codespeed current commit argument.
         :param branch: Codespeed current branch argument.
         :param environment: Codespeed environment argument.
+        :param benchmark: "int" or "float"
         :return: Codespeed formatted dictionary.
         """
         return {
             "commitid": commit,
             "project": "PyOpenWorm",
-            "branch": branch,
+            "branch": "88",
             "executable": self.function_name,
-            "benchmark": "1 second",
+            "benchmark": benchmark,
             "environment": environment,
             "result_value": self.cumulative_time / self.calls
         }

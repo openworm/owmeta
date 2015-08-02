@@ -5,8 +5,8 @@
 *.db.lock
 *.db.tmp
 build/*
-env
 PyOpenWorm.egg-info/*
+env
 dist/*
 tests/*.log
 tests/_test.conf
