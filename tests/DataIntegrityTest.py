@@ -1,4 +1,4 @@
-import sys
+5cw6wimport sys
 sys.path.insert(0,".")
 import unittest
 import neuroml
@@ -17,7 +17,7 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import * 
+from GraphDBInit import *
 from DataTestTemplate import _DataTest
 
 class DataIntegrityTest(unittest.TestCase):
@@ -262,3 +262,24 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))
+
+    @unittest.expectedFailure
+    def test_all_cells_have_wormbaseID(self):
+        """ This test verifies that every cell has a Wormbase ID. """
+        cells = set(PyOpenWorm.Cell().load())
+        for cell in cells:
+            self.assertNotEqual(cell.wormbaseID(), '')
+
+    @unittest.expectedFailure
+    def test_all_neurons_have_wormbaseID(self):
+        """ This test verifies that every neuron has a Wormbase ID. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        for neuron_object in net.neurons():
+            self.assertNotEqual(neuron_object.wormbaseID(), '')
+
+    @unittest.expectedFailure
+    def test_all_muscles_have_wormbaseID(self):
+        """ This test verifies that every muscle has a Wormbase ID. """
+        muscles = PyOpenWorm.Worm().muscles()
+        for muscle_object in muscles():
+            self.assertNotEqual(muscle_object.wormbaseID(), '')
