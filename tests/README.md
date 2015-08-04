@@ -1,6 +1,9 @@
 PyOpenWorm Tests
 ================
 
+Run tests by executing the following from your command line.
+  $ py.test
+
 This directory contains the unit and integration tests for PyOpenWorm.
 
 The main test file is test.py.  
