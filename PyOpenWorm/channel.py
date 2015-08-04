@@ -60,7 +60,7 @@ class Channel(DataObject):
     ----------
     Models : Property
         Get experimental models of this ion channel
-    channel_name : DatatypeProperty
+    name : DatatypeProperty
         Ion channel's name
     description : DatatypeProperty
         A description of the ion channel
@@ -73,7 +73,6 @@ class Channel(DataObject):
     proteins : DatatypeProperty
         Proteins associated with this channel
     expression_pattern : DatatypeProperty
-       
     """
 
     def __init__(self, name=False, **kwargs):
@@ -87,10 +86,6 @@ class Channel(DataObject):
         Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
         Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
         Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('description_evidences', self)
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('expression_evidences', self)
 
         if name:
             self.name(name)
