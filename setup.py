@@ -53,7 +53,6 @@ setup(
         'pytest-cov==2.0.0',
         'rdflib==4.1.2',
         'rdflib_zodb==1.0',
-        'requests',
         'requirements==0.1',
         'six==1.9.0',
         'SPARQLWrapper==1.6.2',

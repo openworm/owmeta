@@ -20,18 +20,15 @@ environment = None
 
 def pytest_addoption(parser):
     profile_group = parser.getgroup('Performance Profiling', description='Use cProfile to profile execution times of test_* functions.')
-    # TODO Group these
-    #parser.addoption('--profile', dest='profile', action='store_true',
-    #                 default=False, help='Profile test execution with cProfile')
-    profile_group.addoption('--code-speed-submit', dest='cs_submit_url', action='store',
-                     default=None, help='Submit results as JSON to Codespeed instance at URL.' + \
+    profile_group.addoption('--code-speed-submit', dest='cs_url', action='store',
+                     default=None, help='Submit results as JSON to Codespeed instance at URL. ' + \
                      "Must be accompanied by --branch, --commit, and --environment arguments.")
     profile_group.addoption('--branch', dest='branch', action='store',
-                     default=None, help='Branch name')
+                     default=None, help='Specify Codespeed "Branch" setting.')
     profile_group.addoption('--commit', dest='commit', action='store',
-                     default=None, help='Commit ID')
-    profile_group.addoption('--environment', dest='environment', action='store',
-                     default=None, help='Environment')
+                     default=None, help='Specify Codespeed "Commit ID" setting.')
+    profile_group.addoption('--environment', dest='env', action='store',
+                     default=None, help='Specify Codespeed "Environment" setting.')
 
 
 def pytest_configure(config):
@@ -41,11 +38,11 @@ def pytest_configure(config):
     global enabled, submit_url, commit, branch, environment
 
     # enabled = config.getoption('profile') or config.getoption('cs_submit_url') is not None
-    enabled = config.getoption('cs_submit_url') is not None
-    submit_url = config.getoption('cs_submit_url')
+    enabled = config.getoption('cs_url') is not None
+    submit_url = config.getoption('cs_url')
     commit = config.getoption('commit')
     branch = config.getoption('branch')
-    environment = config.getoption('environment')
+    environment = config.getoption('env')
 
     missing_argument = not commit or not branch or not environment
     if submit_url and missing_argument:

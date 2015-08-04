@@ -14,7 +14,17 @@ install:
 
 
 script:
-  - "coverage run --source=PyOpenWorm tests/test.py"
+# Old, pre-pytest technique.
+# - "coverage run --source=PyOpenWorm tests/test.py"
+
+# Codespeed, default values for variables that break server
+# - "py.test --cov=PyOpenWorm --code-speed-submit=\"http://pyopenworm.pythonanywhere.com/\" ----environment=\"Dual Core\" --branch=\"default\" -commit=\"0\""
+
+# Codespeed, how it will work once Codespeed is fixed.
+# - "py.test --cov=PyOpenWorm --code-speed-submit=\"http://pyopenworm.pythonanywhere.com/\" ----environment=\"Dual Core\" --branch=\"`git symbolic-ref HEAD | sed -e 's,refs/heads/,,'`\" -commit=\"t rev-parse HEAD`\""
+
+  - "py.test --cov=PyOpenWorm"
+  
 
 after_success:
   - "coveralls"
