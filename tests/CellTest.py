@@ -107,7 +107,7 @@ class CellTest(_DataTest):
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 
-    @unittest.skip('Long runner')
+    @unittest.skip('Morphology not implemented')
     def test_morphology_is_NeuroML_morphology(self):
         """ Check that the morphology is the kind made by neuroml """
         c = Cell(name="ADAR",conf=self.config)
@@ -115,7 +115,7 @@ class CellTest(_DataTest):
         m = c.morphology()
         self.assertIsInstance(m, neuroml.Morphology)
 
-    @unittest.skip('Long runner')
+    @unittest.skip('Morphology not implemented')
     def test_morphology_validates(self):
         """ Check that we can generate a cell's file and have it validate """
         # Load in raw morphology for ADAL

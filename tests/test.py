@@ -118,6 +118,9 @@ from NeuroMLTest import NeuroMLTest
 # InferenceTest
 from InferenceTest import InferenceTest
 
+# FunctionTest
+from FunctionTest import FunctionTest
+
 # Miscellaneous Tests
 # These are tests for miscellaneous bugs that have come up.
 from Misc import Misc
@@ -175,9 +178,9 @@ if __name__ == '__main__':
     if PERFORMANCE_PROFILE:
         # DecoratorSuite subclasses TestSuite, overriding its addTest method
         suite = ExecutionProfileSuite.ExecutionProfileSuite()
-    else: 
+    else:
         suite = unittest.TestSuite()
-    
+
     if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:
