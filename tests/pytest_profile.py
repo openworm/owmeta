@@ -100,10 +100,10 @@ def pytest_unconfigure(config):
     float_time = timeit.timeit('100.5 * 99.2', number=500)
 
     for elt in data_int:
-        # Result is factor of int operation time
+        # Result should be factor of int operation time
         elt["result_value"] = elt["result_value"] / int_time
     for elt in data_flt:
-        # Result is factor of int operation time
+        # Result should be factor of int operation time
         elt["result_value"] = elt["result_value"] / float_time
 
     data = data_int + data_flt
@@ -235,10 +235,11 @@ class FunctionProfile(object):
         :param benchmark: "int" or "float"
         :return: Codespeed formatted dictionary.
         """
+        # Currently, Codespeed breaks if a branch named anything other than 'default' is submitted.
         return {
             "commitid": commit,
             "project": "PyOpenWorm",
-            "branch": "88",
+            "branch": "default",
             "executable": self.function_name,
             "benchmark": benchmark,
             "environment": environment,
