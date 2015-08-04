@@ -16,7 +16,6 @@ class NeuronNetworkProperty(SimpleProperty):
     def __init__(self, **kwargs):
         super(NeuronNetworkProperty, self).__init__(**kwargs)
         self.link = self.owner.rdf_namespace[self.linkName]
-        # XXX: with a DataUser metaclass we could do this properly
         self.value_rdf_type = Network.rdf_type
 
     def set(self, v):
@@ -30,8 +29,6 @@ class Worm(DataObject):
     A representation of the whole worm.
 
     All worms with the same name are considered to be the same object.
-
-
 
     Attributes
     ----------

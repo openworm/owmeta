@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#
 
 from setuptools import setup
 from setuptools.command.install import install as _install
@@ -52,9 +53,8 @@ setup(
         'rdflib==4.1.2',
         'rdflib_zodb==1.0',
         'requirements==0.1',
-        'six==1.9.0',
         'SPARQLWrapper==1.6.2',
-        'transaction==1.4.3',
+        'transaction==1.4.4',
         'wsgiref==0.1.2',
         'xlrd',
         'yarom==0.7.0',
@@ -69,10 +69,10 @@ setup(
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
-        'git+https://github.com/mwatts15/YAROM#egg=yarom-0.7.0',
+        'git+https://github.com/mwatts15/YAROM@v0.7.0#egg=yarom-0.7.0',
     ],
     version = '0.5.3',
-    packages = ['PyOpenWorm'],
+    packages = ['PyOpenWorm', 'PyOpenWorm.v0', 'PyOpenWorm.graphObjectAdapter'],
     package_data = {
         'PyOpenWorm':['default.conf']
     },

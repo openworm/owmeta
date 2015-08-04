@@ -6,11 +6,11 @@ import logging
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
-from PyOpenWorm.v0.dataObject import DataObject as DO
-from PyOpenWorm.v0.dataObject import RDFTypeTable
-from PyOpenWorm.v0.dataObject import disconnect as DODisconnect
+from .v0.dataObject import DataObject as DO
+from .v0.dataObject import RDFTypeTable
+from .v0.dataObject import disconnect as DODisconnect
 from .simpleProperty import DatatypeProperty, SimpleProperty
-from graphObjectAdapter.fakeProperty import FakeProperty
+from .graphObjectAdapter.fakeProperty import FakeProperty
 
 L = logging.getLogger(__name__)
 

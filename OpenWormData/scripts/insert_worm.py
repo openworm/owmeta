@@ -73,7 +73,6 @@ def add_lineage_and_descriptions():
     # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
     # at the sub-class insert and have a reasoner relate
     # the two sets of inserts.
-    cells = dict()
     try:
         w = WORM
         net = NETWORK
@@ -128,7 +127,7 @@ def add_lineage_and_descriptions():
 
         ev.asserts(w)
         print ("uploaded lineage and descriptions")
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
 
 def norn(x):
@@ -142,7 +141,6 @@ def add_neurons():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        w = WORM
         n = NETWORK
 
         cur.execute("""
@@ -166,7 +164,6 @@ def add_receptors_and_innexins():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
-        w = WORM
         n = NETWORK
         # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
         neurons = dict()
@@ -225,7 +222,6 @@ def new_connections():
 
 
     try:
-        w = WORM
         n = NETWORK
         neurons = set(n.neurons())
 
@@ -258,7 +254,7 @@ def new_connections():
         e.asserts(n) # assert the whole connectome too
         print('uploaded connections')
 
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
 
 
@@ -302,17 +298,14 @@ def add_connections():
                     combining_dict[string_key] = [pre, post, num, syntype]
         i = 0
         for entry in combining_dict:
-            if i % 25 == 0:
-                print(".",)
             pre, post, num, syntype = combining_dict[entry]
             c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
             n.synapse(c)
             i += 1
-
         e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
         e.asserts(n)
         print('uploaded connections')
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
 
 def add_types():
@@ -371,7 +364,7 @@ def infer():
         #inferred.write(inferred_facts)
         #inferred.close()
 
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
     print ("filled in with inferred data")
 
@@ -423,7 +416,6 @@ if __name__ == '__main__':
     # Takes about 3 minutes with Sleepycat store
 
     import sys
-    import os
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option("-l", "--do-logging", dest="do_logging",
