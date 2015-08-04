@@ -49,6 +49,8 @@ setup(
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.0.2',
+        'pytest==2.6.4',
+        'pytest-cov==2.0.0',
         'rdflib==4.1.2',
         'rdflib_zodb==1.0',
         'requirements==0.1',

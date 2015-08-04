@@ -6,6 +6,7 @@
 *.db.tmp
 build/*
 PyOpenWorm.egg-info/*
+env
 dist/*
 tests/*.log
 tests/_test.conf
