@@ -108,14 +108,12 @@ def pytest_unconfigure(config):
     try:
         f = urllib2.urlopen(submit_url + 'result/add/json/',
                             urllib.urlencode({'json': json.dumps(data)}))
+        response = f.read()
     except urllib2.HTTPError as e:
         print 'Error while connecting to Codespeed:'
         print 'Exception: {}'.format(str(e))
         print 'HTTP Response: {}'.format(e.read())
         raise e
-    finally:
-        response = f.read()
-        f.close()
 
     if not response.startswith('All result data saved successfully'):
         print "Unexpected response while connecting to Codespeed:"
