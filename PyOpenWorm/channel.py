@@ -68,7 +68,9 @@ class Channel(DataObject):
     ----------
     Models : Property
         Get experimental models of this ion channel
-    channel_name : DatatypeProperty
+    subfamily : DatatypeProperty
+        Ion channel's subfamily
+    name : DatatypeProperty
         Ion channel's name
     description : DatatypeProperty
         A description of the ion channel
