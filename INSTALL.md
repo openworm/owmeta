@@ -18,9 +18,17 @@ Uninstall
 Running tests
 -------------
 
-After checking out the project, tests can be run on the command line with::
+After checking out the project, tests can be run from the command line in the root folder with::
 
-    python tests/test.py
+    py.test
+
+You may also run individual test cases with::
+
+    py.test -k <NameOfTest>
+
+For example, where *test_muscles*1 is a test in the *WormTest* suite of tests (see tests/WormTest.py)::
+
+    py.test -k test_muscles1
 
 
 Optional
