@@ -27,9 +27,16 @@ class NetworkTest(_DataTest):
         s.net = Network(conf=s.config)
 
     def test_aneuron(self):
+        """
+        Test that we can retrieve a Neuron by name.
+        """
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
 
     def test_neurons(self):
+        """
+        Test that we can access arbitrary Neurons,
+        and that they are in the Network
+        """
         self.net.neuron(Neuron(name='AVAL'))
         self.net.neuron(Neuron(name='DD5'))
         self.assertTrue('AVAL' in self.net.neurons())
@@ -42,4 +49,6 @@ class NetworkTest(_DataTest):
             break
 
     def test_as_networkx(self):
+        """Test that as_networkx returns the correct type."""
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
+
