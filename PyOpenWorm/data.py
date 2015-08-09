@@ -13,7 +13,6 @@ import PyOpenWorm
 from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 import hashlib
 import csv
-import urllib2
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
@@ -289,7 +288,7 @@ class Data(Configure, Configureable):
         g = nx.DiGraph()
 
         # Neuron table
-        csvfile = urllib2.urlopen(self.conf['neuronscsv'])
+        csvfile = file(self.conf['neuronscsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
@@ -308,7 +307,7 @@ class Data(Configure, Configureable):
                 g.add_node(row[0], ntype = neurontype)
 
         # Connectome table
-        csvfile = urllib2.urlopen(self.conf['connectomecsv'])
+        csvfile = file(self.conf['connectomecsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
