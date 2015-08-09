@@ -2,6 +2,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix worm: <http://openworm.org/entities/> .
 
-{ ?x rdf:type worm:Muscle } => { ?x rdf:type worm:TestClass } .
+{ ?x rdf:type worm:Muscle } => { ?x rdf:type worm:Cell } .
 
+{ ?x rdf:type worm:Neuron } => { ?x rdf:type worm:Cell } .
 

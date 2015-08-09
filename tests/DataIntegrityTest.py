@@ -17,41 +17,8 @@ import doctest
 
 from glob import glob
 
-USE_BINARY_DB = False
-BINARY_DB = "OpenWormData/worm.db"
-TEST_CONFIG = "tests/default_test.conf"
-try:
-    import bsddb
-    has_bsddb = True
-except ImportError:
-    has_bsddb = False
-
-try:
-    import numpy
-    has_numpy = True
-except ImportError:
-    has_numpy = False
-
-namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
-
-def clear_graph(graph):
-    graph.update("CLEAR ALL")
-
-def make_graph(size=100):
-    """ Make an rdflib graph """
-    g = R.Graph()
-    for i in range(size):
-        s = rdflib.URIRef("http://somehost.com/s"+str(i))
-        p = rdflib.URIRef("http://somehost.com/p"+str(i))
-        o = rdflib.URIRef("http://somehost.com/o"+str(i))
-        g.add((s,p,o))
-    return g
-
-def delete_zodb_data_store(path):
-    os.unlink(path)
-    os.unlink(path + '.index')
-    os.unlink(path + '.tmp')
-    os.unlink(path + '.lock')
+from GraphDBInit import *
+from DataTestTemplate import _DataTest
 
 class DataIntegrityTest(unittest.TestCase):
     """ Integration tests that read from the database and ensure that basic
@@ -102,7 +69,7 @@ class DataIntegrityTest(unittest.TestCase):
         thlist = set(x.name() for x in neuronlist.load())
         self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
 
-    def testUniqueNeuronNode(self):
+    def test_unique_neuron_node(self):
         """
         There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
         then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
@@ -120,7 +87,7 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertEqual(0, len(more_than_one), "Some neurons have more than 1 node: " + "\n".join(str(x) for x in more_than_one))
         self.assertEqual(0, len(less_than_one), "Some neurons have no node: " + "\n".join(str(x) for x in less_than_one))
 
-    def testNeuronsHaveTypes(self):
+    def test_neurons_have_types(self):
         """
         Every Neuron should have a non-blank type
         """
@@ -148,7 +115,7 @@ class DataIntegrityTest(unittest.TestCase):
         self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 90)
 
     @unittest.skip("have not yet defined asserts")
-    def testWhatNodesGetTypeInfo(self):
+    def test_what_nodes_get_type_info(self):
         qres = self.g.query('SELECT ?o ?p ?s WHERE {'
                                 + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
                                   '?o ?p ?s} ' #for that type ?o, get its value ?v
@@ -295,3 +262,37 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))
+
+    @unittest.expectedFailure
+    def test_all_cells_have_wormbaseID(self):
+        """ This test verifies that every cell has a Wormbase ID. """
+        cells = set(PyOpenWorm.Cell().load())
+        for cell in cells:
+            self.assertNotEqual(cell.wormbaseID(), '')
+
+    @unittest.expectedFailure
+    def test_all_neurons_have_wormbaseID(self):
+        """ This test verifies that every neuron has a Wormbase ID. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        for neuron_object in net.neurons():
+            self.assertNotEqual(neuron_object.wormbaseID(), '')
+
+    @unittest.expectedFailure
+    def test_all_muscles_have_wormbaseID(self):
+        """ This test verifies that every muscle has a Wormbase ID. """
+        muscles = PyOpenWorm.Worm().muscles()
+        for muscle_object in muscles:
+            self.assertNotEqual(muscle_object.wormbaseID(), '')
+
+    @unittest.expectedFailure
+    def test_all_neurons_are_cells(self):
+        """ This test verifies that all Neuron objects are also Cell objects. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        for neuron_object in net.neurons():
+            assert isinstance(neuron_object, PyOpenWorm.Cell)
+
+    def test_all_muscles_are_cells(self):
+        """ This test verifies that all Muscle objects are also Cell objects. """
+        muscles = PyOpenWorm.Worm().muscles()
+        for muscle_object in muscles:
+            assert isinstance(muscle_object, PyOpenWorm.Cell)

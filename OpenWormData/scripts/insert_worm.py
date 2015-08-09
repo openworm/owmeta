@@ -215,8 +215,64 @@ def upload_receptors_and_innexins():
     finally:
         conn.close()
 
-def upload_synapses():
+def new_connections():
+    """we can replace the old function (upload_connections) with this
+    once it is ready to go"""
 
+    import re
+    search_string = re.compile(r'\w+[0]+[1-9]+')
+    replace_string = re.compile(r'[0]+')
+
+    def normalize(name):
+        # normalize neuron names to match those used at other points
+        # see #137 for elaboration
+        # if there are zeroes in the middle of a name, remove them
+        if re.match(search_string, name):
+            name = replace_string.sub('', name)
+        return name
+
+
+    try:
+        w = P.Worm()
+        n = P.Network()
+        neurons = set(n.neurons())
+        w.neuron_network(n)
+
+        # Evidence object to assert each connection
+        e  = P.Evidence(uri='http://www.wormwiring.org')
+
+        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+            edge_reader = csv.reader(csvfile)
+            edge_reader.next()    # skip header row
+            for row in edge_reader:
+                source, target, weight, syn_type = map(str.strip, row)
+
+                # set synapse type to something the Connection object
+                # expects, and normalize the source and target names
+                if syn_type == 'electrical':
+                    syn_type = 'gapJunction'
+                elif syn_type == 'chemical':
+                    syn_type = 'send'
+                source = normalize(source)
+                target = normalize(target)
+                if source in neurons and target in neurons:
+                    c = P.connection(
+                        pre_cell=source, post_cell=target,
+                        number=weight, syntype=syn_type
+                    )
+
+                    n.synapse(c)
+                    e.asserts(c)
+
+        e.asserts(n) # assert the whole connectome too
+        e.save()
+        print('uploaded connections')
+
+    except Exception, e:
+        traceback.print_exc()
+
+
+def upload_connections():
     import re
     search_string = re.compile(r'\w+[0]+[1-9]+')
     replace_string = re.compile(r'[0]+')
@@ -268,7 +324,7 @@ def upload_synapses():
         e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
         e.asserts(n)
         e.save()
-        print('uploaded synapses')
+        print('uploaded connections')
     except Exception, e:
         traceback.print_exc()
 
@@ -316,7 +372,7 @@ def infer():
         network.inferredFacts = closureDeltaGraph
 
         #build a network of rules
-        for rule in HornFromN3('testrules.n3'):
+        for rule in HornFromN3('inference_rules.n3'):
             network.buildNetworkFromClause(rule)
 
         network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
@@ -356,11 +412,11 @@ def do_insert(config="default.conf", logging=False):
         upload_neurons()
         upload_muscles()
         upload_lineage_and_descriptions()
-        upload_synapses()
+        upload_connections()
         upload_receptors_and_innexins()
         upload_types()
         serialize_as_n3()
-        #infer()
+        infer()
     except:
         traceback.print_exc()
     finally:

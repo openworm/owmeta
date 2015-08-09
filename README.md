@@ -1,7 +1,8 @@
-[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=master)](https://travis-ci.org/openworm/PyOpenWorm/builds)
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=dev)](https://travis-ci.org/openworm/PyOpenWorm/builds)
 [![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.org/en/latest)
 [![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)
 
+[![Coverage Status](https://coveralls.io/repos/openworm/PyOpenWorm/badge.svg?branch=dev&service=github)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
 
 PyOpenWorm
 ===========
@@ -212,6 +213,30 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 ```python
 >>> net.as_networkx() # doctest:+ELLIPSIS
 <networkx.classes.digraph.DiGraph object at ...>
+
+```
+
+Modelling data
+--------------
+
+PyOpenWorm also provides access to store and retrieve data about models.
+Following are some examples of these types of operations.
+
+Retrieve an ion channel's models from the database::
+
+```python
+# Get data for a subtype of voltage-gated potassium channels
+>> kv1 = P.IonChannel('Kv1')
+>> mods = list(kv1.models.get())
+
+```
+
+The same type of operation can be used for the experiment data model.
+
+```python
+# Get experiment(s) that back up the data model
+>> some_model = mods[0]
+>> some_model.references.get()
 
 ```
 

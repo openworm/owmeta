@@ -6,6 +6,7 @@
 *.db.tmp
 build/*
 PyOpenWorm.egg-info/*
+env
 dist/*
 tests/*.log
 tests/_test.conf
@@ -32,3 +33,8 @@ OpenWormData/scripts/worm.db
 examples/*.npy
 examples/cell_indices
 OpenWormData/WormData.n3
+*.ipynb
+*.out
+*.nb
+*.orig
+snakefood

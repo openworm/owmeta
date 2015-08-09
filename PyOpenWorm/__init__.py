@@ -74,7 +74,8 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 from .experiment import Experiment
-from .channel import Channel,ChannelModel
+from .channel import Channel
+from .channelworm import ChannelModel, PatchClampExperiment
 
 __import__('__main__').connected = False
 
@@ -182,8 +183,8 @@ def connect(configFile=False,
         loadConfig(configFile)
     else:
         Configureable.conf = Data({
-            "connectomecsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-            "neuronscsv" : "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
+            "connectomecsv" : "OpenWormData/aux_data/connectome.csv",
+            "neuronscsv" : "OpenWormData/aux_data/neurons.csv",
             "rdf.source" : "ZODB",
             "rdf.store" : "ZODB",
             "rdf.store_conf" : get_data('worm.db'),
@@ -215,6 +216,7 @@ def connect(configFile=False,
     Channel.register()
     ChannelModel.register()
     Experiment.register()
+    PatchClampExperiment.register()
 
     m.connected = True
     if data:

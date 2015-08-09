@@ -1,107 +1,5 @@
 from PyOpenWorm import *
 
-class References(Property):
-    multiple=True
-    def __init__(self, **kwargs):
-        Property.__init__(self, 'references', **kwargs)
-        self._refs = []
-
-    def set(self, e=False, **kwargs):
-        """
-        Add a reference to the list.
-        This method will also take care of mapping the Evidence's assertion to
-        this ChannelModel
-
-        Parameters
-        ----------
-        e : Evidence or Experiment
-            The Experiment or Evidence that supports this ChannelModel
-
-        Returns
-        -------
-        None
-        """
-        if isinstance(e, Evidence):
-            e.asserts(self.owner)
-            self._refs.append(e)
-        elif isinstance(e, Experiment):
-            e = e.reference()
-            e.asserts(self.owner)
-            self._refs.append(e)
-
-    def get(self, **kwargs):
-        """
-        Retrieve the reference list for this ChannelModel
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        Set of Evidence and Experiment objects
-        """
-        if len(self._refs) == 0:
-            #Make dummy Evidence to load from db
-            ev = Evidence()
-            ev.asserts(self.owner)
-            #Make dummy Experiment with this Evidence
-            ex = Experiment(reference=ev)
-            #load from db
-            for e in ev.load():
-                self._refs.append(e)
-            for e in ex.load():
-                self._refs.append(e)
-        #now return the iterable set
-        for r in self._refs:
-            yield r
-
-class ChannelModelType:
-    patchClamp = "Patch clamp experiment"
-    homologyEstimate = "Estimation based on homology"
-
-class ChannelModel(DataObject):
-    """
-    A model for an ion channel.
-
-    There may be multiple models for a single channel.
-
-    Parameters
-    ----------
-    modelType : DatatypeProperty
-        What this model is based on (either "homology" or "patch-clamp")
-
-    Attributes
-    ----------
-    modelType : DatatypeProperty
-        Passed in on construction
-    ion : DatatypeProperty
-        The type of ion this channel selects for
-    gating : DatatypeProperty
-        The gating mechanism for this channel ("voltage" or name of ligand(s) )
-    references : Property
-        Evidence for this model. May be either Experiment or Evidence object(s).
-    conductance : DatatypeProperty
-        The conductance of this ion channel. This is the initial value, and
-        should be entered as a Quantity object.
-    """
-
-    def __init__(self, modelType=False, *args, **kwargs):
-        DataObject.__init__(self, **kwargs)
-        ChannelModel.DatatypeProperty('modelType', self)
-        ChannelModel.DatatypeProperty('ion', self, multiple=True)
-        ChannelModel.DatatypeProperty('gating', self, multiple=True)
-        ChannelModel.DatatypeProperty('conductance', self)
-        References(owner=self)
-
-        #Change modelType value to something from ChannelModelType class on init
-        if (isinstance(modelType, basestring)):
-            modelType = modelType.lower()
-            if modelType in ('homology', ChannelModelType.homologyEstimate):
-                self.modelType(ChannelModelType.homologyEstimate)
-            elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
-                self.modelType(ChannelModelType.patchClamp)
-
 class Models(Property):
     multiple=True
     def __init__(self, **kwargs):
@@ -156,28 +54,72 @@ class Models(Property):
 
 class Channel(DataObject):
     """
-    An ion channel.
-
-    Channels are identified by subtype name.
-
-    Parameters
-    ----------
-    subfamily : string
-        The subfamily to which the ion channel belongs
+    A biological ion channel.
 
     Attributes
     ----------
-    subfamily : DatatypeProperty
-        The subfamily to which the ion channel belongs
     Models : Property
         Get experimental models of this ion channel
+    channel_name : DatatypeProperty
+        Ion channel's name
+    description : DatatypeProperty
+        A description of the ion channel
+    gene_name : DatatypeProperty
+        Name of the gene that codes for this ion channel
+    gene_WB_ID : DatatypeProperty
+        Wormbase ID of the encoding gene
+    gene_class : DatatypeProperty
+        Classification of the encoding gene
+    proteins : DatatypeProperty
+        Proteins associated with this channel
+    expression_pattern : DatatypeProperty
+       
     """
 
-    def __init__(self, subfamily=False, **kwargs):
+    def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-        Channel.DatatypeProperty('subfamily', owner=self)
 
-        if isinstance(subfamily, basestring):
-            self.subfamily = subfamily
+        Channel.DatatypeProperty('name', self) #channel_name
+        Channel.DatatypeProperty('description',self) #description
+        Channel.DatatypeProperty('gene_name', self) #gene_name
+        Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
+        Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
+        Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('description_evidences', self)
+        #TODO: assert this in the adapter instead
+        #Channel.DatatypeProperty('expression_evidences', self)
+
+        if name:
+            self.name(name)
+
+    def appearsIn(self):
+        """
+        TODO: Implement this method.
+        Return a list of Cells that this ion channel appears in.
+        """
+        pass
+
+    def identifier(self, *args, **kwargs):
+        # Copied from cell.py
+
+        # If the DataObject identifier isn't variable, then self is a specific
+        # object and this identifier should be returned. Otherwise, if our name
+        # attribute is _already_ set, then we can get the identifier from it and
+        # return that. Otherwise, there's no telling from here what our identifier
+        # should be, so the variable identifier (from DataObject.identifier() must
+        # be returned
+        ident = DataObject.identifier(self, *args, **kwargs)
+        if 'query' in kwargs and kwargs['query'] == True:
+            if not DataObject._is_variable(ident):
+                return ident
+
+        if self.name.hasValue():
+            # name is already set, so we can make an identifier from it
+            n = next(self.name._get())
+            return self.make_identifier(n)
+        else:
+            return ident
+
