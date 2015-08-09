@@ -281,7 +281,7 @@ class DataIntegrityTest(unittest.TestCase):
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
         muscles = PyOpenWorm.Worm().muscles()
-        for muscle_object in muscles():
+        for muscle_object in muscles:
             self.assertNotEqual(muscle_object.wormbaseID(), '')
 
     def test_all_neurons_are_cells(self):
@@ -293,5 +293,5 @@ class DataIntegrityTest(unittest.TestCase):
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
         muscles = PyOpenWorm.Worm().muscles()
-        for muscle_object in muscles():
+        for muscle_object in muscles:
             self.assertEqual(type(muscle_object), PyOpenWorm.Cell)
