@@ -46,7 +46,7 @@ class CellTest(_DataTest):
         c = Cell(name="ADAL",conf=self.config)
         c.synonym("lineage name: ABplapaaaapp")
         c.save()
-        self.assertEqual("lineage name: ABplapaaaapp", Cell(name="ADAL").synonym())
+        self.assertEqual(set(["lineage name: ABplapaaaapp"]), Cell(name="ADAL").synonym())
 
     def test_same_name_same_id(self):
         """
