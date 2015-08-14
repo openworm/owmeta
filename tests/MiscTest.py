@@ -22,7 +22,7 @@ from GraphDBInit import *
 
 from DataTestTemplate import _DataTest
 
-class Misc(_DataTest):
+class MiscTest(_DataTest):
     """Miscellaneous tests that have cropped up"""
     @unittest.expectedFailure
     def test_generators_do_not_reset(self):

@@ -23,7 +23,7 @@ from DataTestTemplate import _DataTest
 
 class ExperimentTest(_DataTest):
 
-    def test_DataUser(self):
+    def test_data_user(self):
         """
         Test that the Experiment object is a DataUser object as well.
         """ 

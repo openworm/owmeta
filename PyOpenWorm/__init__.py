@@ -202,13 +202,14 @@ def connect(configFile=False,
         loadConfig(configFile)
     else:
         Configureable.conf = Data({
-            "connectomecsv":
-            "https://raw.github.com/openworm/data-viz/master/HivePlots/connectome.csv",
-            "neuronscsv":
-            "https://raw.github.com/openworm/data-viz/master/HivePlots/neurons.csv",
-            "rdf.source": "ZODB", "rdf.store": "ZODB",
-            "rdf.store_conf": get_data('worm.db'),
-            "rdf.upload_block_statement_count": 50})
+            "connectomecsv" : "OpenWormData/aux_data/connectome.csv",
+            "neuronscsv" : "OpenWormData/aux_data/neurons.csv",
+            "rdf.source" : "ZODB",
+            "rdf.store" : "ZODB",
+            "rdf.store_conf" : get_data('worm.db'),
+            "user.email" : "jerry@cn.com",
+            "rdf.upload_block_statement_count" : 50
+        })
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")

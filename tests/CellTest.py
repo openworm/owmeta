@@ -41,6 +41,13 @@ class CellTest(_DataTest):
         c.save()
         self.assertEqual("WBbt:0004013", Cell(name="ADAL").wormbaseID())
 
+    def test_synonyms(self):
+        """ Test that we can add and retrieve synonyms. """
+        c = Cell(name="ADAL",conf=self.config)
+        c.synonym("lineage name: ABplapaaaapp")
+        c.save()
+        self.assertEqual(set(["lineage name: ABplapaaaapp"]), Cell(name="ADAL").synonym())
+
     def test_same_name_same_id(self):
         """
         Test that two Cell objects with the same name have the same identifier()
@@ -151,4 +158,3 @@ class CellTest(_DataTest):
         sum_cells = num_neurons + num_muscles
 
         self.assertEqual(sum_cells, num_cells)
-
