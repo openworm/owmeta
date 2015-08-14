@@ -18,7 +18,6 @@ import subprocess as SP
 import subprocess
 import tempfile
 import doctest
-import ExecutionProfileSuite
 
 from glob import glob
 
@@ -133,12 +132,16 @@ if __name__ == '__main__':
     parser.add_option("-b", "--use-binary-database", dest="binary_db",
                       action="store_true", default=False,
                       help="Use the binary database for data integrity tests")
+    parser.add_option("-l", "--do-logging", dest="do_logging",
+                      action="store_true", default=False,
+                      help="Turn on log output")
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
 
     if options.do_logging:
         logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(name)s:%(lineno)s:%(message)s")
+
     def getTests(testCase):
         test_loader = unittest.TestLoader()
         return test_loader.loadTestsFromTestCase(testCase)

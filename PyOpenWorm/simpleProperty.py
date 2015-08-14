@@ -153,10 +153,7 @@ class SimpleProperty(GraphObject, DataUser):
         self.properties.append(self._pp)
 
     def __repr__(self):
-        s = self.__class__.__name__ + "("
-        if self._id is not None:
-            s += self._id
-        s += ")"
+        s = str(self.linkName) + "=`" + ";".join(str(s) for s in self.defined_values) + "'"
         return s
 
     def __str__(self):

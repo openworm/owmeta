@@ -201,9 +201,9 @@ class Cell(DataObject):
                 yield z
 
     def __str__(self):
-        n = list(self.name.defined_values)
-        if len(n) > 0:
-            return self.__class__.__name__ + "(name="+str(n[0])+")"
+        if self.name.has_defined_value():
+            return str(self.name.defined_values[0])
+            #return self.__class__.__name__ + "(name="+str(self.name.defined_values[0])+")"
         else:
             return super(Cell,self).__str__()
 

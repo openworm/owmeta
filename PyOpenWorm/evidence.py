@@ -350,7 +350,8 @@ class Evidence(DataObject):
         for idKind in self.id_precedence:
             idprop = getattr(self, idKind)
             if idprop.has_defined_value():
-                return self.make_identifier((idKind, idprop.defined_values[0]))
+                s = str(idKind) + ":" + idprop.defined_values[0].identifier().n3()
+                return self.make_identifier(s)
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong

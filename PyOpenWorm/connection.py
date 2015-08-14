@@ -94,23 +94,21 @@ class Connection(DataObject):
 
         if isinstance(synclass, basestring):
             self.synclass(synclass)
-        if (not super(Connection, self).defined) and \
-                self.pre_cell.has_defined_value() and \
-                self.post_cell.has_defined_value() and \
-                self.syntype.has_defined_value():
-            data = (self.pre_cell.defined_values[0],
-                    self.post_cell.defined_values[0],
-                    self.syntype.defined_values[0])
-            self._ident = self.make_identifier(data)
 
     @property
     def defined(self):
-        return super(Connection, self).defined or (self.pre_cell.has_defined_value()
-                                                   and self.post_cell.has_defined_value()
-                                                   and self.syntype.has_defined_value())
+        return super(Connection, self).defined or \
+            (self.pre_cell.has_defined_value()
+             and self.post_cell.has_defined_value()
+             and self.syntype.has_defined_value())
 
     def identifier(self, *args, **kwargs):
         if super(Connection, self).defined:
             return super(Connection, self).identifier()
         else:
-            return self._ident
+            data = (self.pre_cell,
+                    self.post_cell,
+                    self.syntype)
+            data = tuple(x.defined_values[0].identifier().n3() for x in data)
+            data = "".join(data)
+            return self.make_identifier(data)

@@ -93,9 +93,9 @@ class Configure(object):
         return (thing in self._properties)
 
     def __str__(self):
-        return "\n".join(
-            "%s = %s" %
-            (k, self._properties[k]) for k in self._properties)
+        return "{\n"+(",\n".join(
+            "\"%s\" : \"%s\"" %
+            (k, self._properties[k]) for k in self._properties)) + "\n}"
 
     def __len__(self):
         return len(self._properties)

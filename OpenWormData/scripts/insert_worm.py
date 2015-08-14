@@ -400,10 +400,10 @@ def do_insert(config="default.conf", logging=False):
 
         print("Saving...")
         WORM.save()
+        infer()
 
         print("Serializing...")
         serialize_as_n3()
-        infer()
     except:
         traceback.print_exc()
     finally:

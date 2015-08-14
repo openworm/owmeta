@@ -3,10 +3,10 @@ import sys
 sys.path.insert(0, ".")
 import unittest
 import PyOpenWorm
-from PyOpenWorm import Configure
+from PyOpenWorm import Configure, Worm, Evidence
 import rdflib as R
 
-from GraphDBInit import copy_zodb_data_store, delete_zodb_data_store
+from GraphDBInit import delete_zodb_data_store
 
 class DataIntegrityTest(unittest.TestCase):
 
@@ -17,10 +17,11 @@ class DataIntegrityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         import csv
+        delete_zodb_data_store("tests/test.db")
         PyOpenWorm.connect(
             conf=Configure(
-                **{'rdf.store_conf': 'worm.db', 'rdf.source': 'ZODB'}))
-        PyOpenWorm.loadData(skipIfNewer=True)
+                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
+        PyOpenWorm.loadData(skipIfNewer=False)
         PyOpenWorm.disconnect()
         # grab the list of the names of the 302 neurons
 
@@ -32,7 +33,6 @@ class DataIntegrityTest(unittest.TestCase):
         for row in reader:
             if len(row[0]) > 0:  # Only saves valid neuron names
                 cls.neurons.append(row[0])
-        copy_zodb_data_store('worm.db', "tests/test.db")
 
     def setUp(self):
         PyOpenWorm.connect(
@@ -45,7 +45,8 @@ class DataIntegrityTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        delete_zodb_data_store("tests/test.db")
+        #delete_zodb_data_store("tests/test.db")
+        pass
 
     def test_correct_neuron_number(self):
         """
@@ -151,8 +152,8 @@ class DataIntegrityTest(unittest.TestCase):
         net = Worm().neuron_network()
         neurons = list(net.neurons())
         evcheck = []
-        for n in neurons:
-            hasEvidence = len(get_supporting_evidence(nobj))
+        for nobj in neurons:
+            hasEvidence = len(self.get_supporting_evidence(nobj))
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck)
@@ -164,7 +165,7 @@ class DataIntegrityTest(unittest.TestCase):
         muscles = list(Worm().muscles())
         muscle_evcheck = []
         for mobj in muscles:
-            hasEvidence = len(get_supporting_evidence(mobj))
+            hasEvidence = len(self.get_supporting_evidence(mobj))
             muscle_evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in muscle_evcheck)
@@ -177,7 +178,7 @@ class DataIntegrityTest(unittest.TestCase):
         connections = list(net.synapses())
         evcheck = []
         for c in connections:
-            has_evidence = len(get_supporting_evidence(c))
+            has_evidence = len(self.get_supporting_evidence(c))
             evcheck.append(has_evidence)
 
         self.assertTrue(0 not in evcheck)
