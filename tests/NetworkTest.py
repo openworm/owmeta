@@ -39,8 +39,8 @@ class NetworkTest(_DataTest):
         """
         self.net.neuron(Neuron(name='AVAL'))
         self.net.neuron(Neuron(name='DD5'))
-        self.assertTrue('AVAL' in self.net.neurons())
-        self.assertTrue('DD5' in self.net.neurons())
+        self.assertTrue(AVAL in self.net.neurons())
+        self.assertTrue(DD5 in self.net.neurons())
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
@@ -51,4 +51,3 @@ class NetworkTest(_DataTest):
     def test_as_networkx(self):
         """Test that as_networkx returns the correct type."""
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
-
