@@ -17,7 +17,6 @@ class DataIntegrityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         import csv
-        delete_zodb_data_store("tests/test.db")
         PyOpenWorm.connect(
             conf=Configure(
                 **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
@@ -45,8 +44,7 @@ class DataIntegrityTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        #delete_zodb_data_store("tests/test.db")
-        pass
+        delete_zodb_data_store("tests/test.db")
 
     def test_correct_neuron_number(self):
         """
