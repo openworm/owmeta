@@ -124,9 +124,9 @@ Returns the list of all neurons::
 
 ```python
 #NOTE: This is a VERY slow operation right now
->>> len(set(net.neurons()))
+>>> len(set(net.neuron_names()))
 302
->>> sorted(list(net.neurons())) # doctest:+ELLIPSIS
+>>> sorted(list(net.neuron_names())) # doctest:+ELLIPSIS
 [u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```

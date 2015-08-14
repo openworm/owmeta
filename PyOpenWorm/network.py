@@ -35,13 +35,13 @@ class Network(DataObject):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        #TODO change the above to the correct behaviour
+        #TODO change the above example to the correct behaviour
         n = P.Neuron()
 
         for x in n.load():
             yield x
 
-    def neuronslist(self):
+    def neuron_names(self):
         """
         Gets the complete list of names of neurons in this network.
 
@@ -51,16 +51,12 @@ class Network(DataObject):
            >>> net = P.Worm().get_neuron_network()
 
            #NOTE: This is a VERY slow operation right now
-           >>> len(set(net.neuronslist()))
+           >>> len(set(net.neuron_names()))
            302
-           >>> set(net.neuronslist())
+           >>> set(net.neuron_names())
            set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        # Alternatively:
-        #n = P.Neuron()
-        #for x in n.load():
-        #    yield x.name()
         for x in self.neuron():
             yield x.name()
 
