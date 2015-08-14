@@ -1,10 +1,13 @@
 from __future__ import print_function
 import PyOpenWorm as P
 import traceback
+import csv
 import sqlite3
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
+CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.tsv"
+
 
 def serialize_as_n3():
     dest = '../WormData.n3'
@@ -34,36 +37,31 @@ def print_evidence():
     finally:
         conn.close()
 
+
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
-        ev = P.Evidence(title="C. elegans sqlite database")
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        w = P.Worm()
-        cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
-        WHERE innervatedBy.EnID1=a.id and innervatedBy.Relation = '1516' and innervatedBy.EnID2=b.id
-        and type_b.EnID1 = b.id and type_b.Relation='1515' and type_b.EnID2='1519'
-        """) # 1519 is the
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            muscle_name = str(r[1])
-            m = P.Muscle(muscle_name)
-            n = P.Neuron(neuron_name)
-            w.muscle(m)
-            m.innervatedBy(n)
+        with open(CELL_NAMES_SOURCE) as tsvfile:
+            tsvreader = csv.reader(tsvfile, delimiter="\t")
 
-        ev.asserts(w)
-        ev.save()
+            ev = P.Evidence(title="C. elegans Cell List - WormBase.tsv")
+            w = P.Worm()
+            for num, line in enumerate(tsvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[7] or line [8] or line[9] == '1':
+                    muscle_name = line[0]
+                    m = P.Muscle(name=muscle_name)
+                    w.muscle(m)
+            ev.asserts(w)
+            ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -136,6 +134,7 @@ def upload_lineage_and_descriptions():
     except Exception, e:
         traceback.print_exc()
 
+
 def norn(x):
     """ return the next or None of an iterator """
     try:
@@ -143,31 +142,33 @@ def norn(x):
     except StopIteration:
         return None
 
+
 def upload_neurons():
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
         ev = P.Evidence(title="C. elegans sqlite database")
         w = P.Worm()
         n = P.Network()
         w.neuron_network(n)
         # insert neurons.
         # save
-        cur.execute("""
-        SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b
-        where EnID1=a.id and Relation = '1515' and EnID2='1'
-        """)
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            n.neuron(P.Neuron(name=neuron_name))
+        with open(CELL_NAMES_SOURCE) as tsvfile:
+            tsvreader = csv.reader(tsvfile, delimiter="\t")
+
+            for num, line in enumerate(tsvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[5] == '1':
+                    neuron_name = line[0]
+                    n.neuron(name=neuron_name)
+
         ev.asserts(n)
         ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded neurons")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
 
 def upload_receptors_and_innexins():
     try:
@@ -215,6 +216,7 @@ def upload_receptors_and_innexins():
     finally:
         conn.close()
 
+
 def new_connections():
     """we can replace the old function (upload_connections) with this
     once it is ready to go"""
@@ -236,6 +238,7 @@ def new_connections():
         w = P.Worm()
         n = P.Network()
         neurons = set(n.neurons())
+        muscles = w.muscles()
         w.neuron_network(n)
 
         # Evidence object to assert each connection
@@ -372,7 +375,7 @@ def infer():
         network.inferredFacts = closureDeltaGraph
 
         #build a network of rules
-        for rule in HornFromN3('inference_rules.n3'):
+        for rule in HornFromN3('testrules.n3'):
             network.buildNetworkFromClause(rule)
 
         network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
@@ -416,7 +419,7 @@ def do_insert(config="default.conf", logging=False):
         upload_receptors_and_innexins()
         upload_types()
         serialize_as_n3()
-        infer()
+        #infer()
     except:
         traceback.print_exc()
     finally:
