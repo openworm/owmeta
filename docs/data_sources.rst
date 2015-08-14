@@ -23,27 +23,24 @@ Neurons
 -------
 
 - Cell descriptions [2]_
-- Innexins [1]_
 - Lineage names [2]_
-- Neuron names [1]_
+- Neuron names [5]_
 - Neuron types [3]_
-- Neuropeptides [1]_
-- Neurotransmitters [1]_
-- Receptors [1]_
+- Neurotransmitters [8]_
 
 Muscle cells
 ------------
 
 - Cell descriptions [2]_
 - Lineage names [2]_
-- Muscle names [1]_
-- Neurons that innervate each muscle [1]_
+- Muscle names [5]_
+- Neurons that innervate each muscle [6]_
 
 Connectome
 ----------
 
-- Gap junctions [4]_
-- Synapses [4]_
+- Gap junctions [6]_
+- Synapses [6]_
 
 Curation note
 ^^^^^^^^^^^^^
@@ -61,7 +58,9 @@ appears on a reference site (WormAtlas).
 Data Source References
 ----------------------
 
-.. [1] `Tim Busbice's interactive database <http://www.interintelligence.org/openworm/>`_
 .. [2] `WormAtlas Complete Cell List <http://www.wormatlas.org/celllist.htm>`_
 .. [3] `C Elegans Neuronal Network Details <https://docs.google.com/spreadsheets/d/1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit#gid=2>`_
-.. [4] `WormAtlas Connectivity Data <http://www.wormatlas.org/neuronalwiring.html#Connectivitydata>`_
+.. [5] [Citation for Wormbase]
+.. [6] [Steve Cook new data citation]
+.. [7] [Extra Inferred Neurotransmitters: Shterionov, Janssens - 2011 paper citation][link to the neurotransmitters spreadsheet directly] -- starting point was an old connectome with unknown starting assumptions about neurotransmitters / receptors that need to be verified
+.. [8] [Few, conservative neurotransmitters: C. Elegans II http://www.ncbi.nlm.nih.gov/books/NBK20175/]
