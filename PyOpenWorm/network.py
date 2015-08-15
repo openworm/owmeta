@@ -35,13 +35,13 @@ class Network(DataObject):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        for x in self.neuron():
-            yield x
-        #TODO change the above example to the correct behaviour
-        #n = P.Neuron()
-
-        #for x in n.load():
+        #for x in self.neuron():
         #    yield x
+        #TODO change the above example to the correct behaviour
+        n = P.Neuron()
+
+        for x in n.load():
+            yield x
 
     def neuron_names(self):
         """
