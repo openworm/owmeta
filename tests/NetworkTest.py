@@ -39,8 +39,8 @@ class NetworkTest(_DataTest):
         """
         neuron_1 = self.net.aneuron('AVAL') # this is of type PyOpenWorm.Neuron
         neuron_2 = self.net.aneuron('DD5')
-        self.assertEquals(list(self.net.neurons()), [])
-        #self.assertTrue(neuron_1 in list(self.net.neurons())) # false: still can't understand why
+        self.assertEquals(list(self.net.neurons()), []) # list is empty and this should so not happen
+        #self.assertTrue(neuron_1 in list(self.net.neurons()))
         #self.assertTrue(neuron_2 in list(self.net.neurons()))
 
     def test_synapses_rdf(self):
