@@ -153,13 +153,17 @@ def loadData(
                         than the data to be loaded in. This is determined by the modified time on the main
                         database file compared to the modified time on the data file.
     """
+    if not os.path.isfile(data):
+        raise Exception("No such data file: "+data)
+
     if skipIfNewer:
-        import os
         try:
-            data_file_time = os.path.getmtime(data)
-            db_file_time = os.path.getmtime(config('rdf.store_conf'))
-            if data_file_time < db_file_time:
-                return
+            db_file_name = config('rdf.store.conf')
+            if os.path.isfile(db_file_name):
+                data_file_time = os.path.getmtime(data)
+                db_file_time = os.path.getmtime(config('rdf.store_conf'))
+                if data_file_time < db_file_time:
+                    return
         except:
             pass
     sys.stderr.write(

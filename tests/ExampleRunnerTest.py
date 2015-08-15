@@ -1,11 +1,9 @@
 import sys
 sys.path.insert(0, ".")
 import unittest
-import PyOpenWorm
 import os
 import subprocess as SP
 import tempfile
-import GraphDBInit
 
 
 class ExampleRunnerTest(unittest.TestCase):
@@ -17,14 +15,6 @@ class ExampleRunnerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        GraphDBInit.copy_zodb_data_store(
-            'worm.db',
-            "tests/test.db")  # copy to a test_database
-        PyOpenWorm.connect(
-            conf=PyOpenWorm.Configure(
-                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
-        PyOpenWorm.loadData(skipIfNewer=True)
-        PyOpenWorm.disconnect()
         os.chdir('examples')
 
     @classmethod
