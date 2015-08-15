@@ -37,10 +37,10 @@ class NetworkTest(_DataTest):
         Test that we can access arbitrary Neurons,
         and that they are in the Network
         """
-        neuron_1 = self.net.neuron('AVAL')
-        neuron_2 = self.net.neuron('DD5')
-        self.assertTrue(neuron_1 in self.net.neurons())
-        self.assertTrue(neuron_2 in self.net.neurons())
+        neuron_1 = self.net.aneuron('AVAL')
+        neuron_2 = self.net.aneuron('DD5')
+        self.assertTrue(neuron_1 in net.neurons())
+        self.assertTrue(neuron_2 in net.neurons())
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
