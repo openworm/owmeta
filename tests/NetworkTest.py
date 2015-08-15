@@ -37,8 +37,8 @@ class NetworkTest(_DataTest):
         Test that we can access arbitrary Neurons,
         and that they are in the Network
         """
-        neuron_1 = self.net.neuron(name='AVAL')
-        neuron_2 = self.net.neuron(name='DD5')
+        neuron_1 = self.net.neuron('AVAL')
+        neuron_2 = self.net.neuron('DD5')
         self.assertTrue(neuron_1 in self.net.neurons())
         self.assertTrue(neuron_2 in self.net.neurons())
 
