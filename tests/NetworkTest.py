@@ -32,16 +32,15 @@ class NetworkTest(_DataTest):
         """
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),PyOpenWorm.Neuron))
 
-    @unittest.expectedFailure
     def test_neurons(self):
         """
         Test that we can access arbitrary Neurons,
         and that they are in the Network
         """
-        neuron_1 = self.net.aneuron('AVAL')
-        neuron_2 = self.net.aneuron('DD5')
-        self.assertTrue(neuron_1 in self.net.neurons())
-        self.assertTrue(neuron_2 in self.net.neurons())
+        self.net.neuron(Neuron(name='AVAL'))
+        self.net.neuron(Neuron(name='DD5'))
+        self.assertTrue('AVAL' in self.net.neurons())
+        self.assertTrue('DD5' in self.net.neurons())
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
@@ -52,3 +51,4 @@ class NetworkTest(_DataTest):
     def test_as_networkx(self):
         """Test that as_networkx returns the correct type."""
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
+
