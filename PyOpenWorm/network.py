@@ -21,7 +21,7 @@ class Network(DataObject):
 
     def neurons(self):
         """
-        Gets the complete set of neurons in this network.
+        Gets the complete set of neurons' names in this network.
 
         Example::
 
