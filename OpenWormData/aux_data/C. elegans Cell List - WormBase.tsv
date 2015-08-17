@@ -1,6 +1,6 @@
 	Spreadsheet of C. elegans cells compiled and maintained by the OpenWorm project (http://openworm.org), originally sourced from WormBase (http://wormbase.org) and WormAtlas (http://wormatlas.org).  Latest version is online at: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1  For more info, please email at info@openworm.org																			
 Cell	Lineage Name	Description	Total count of identified adult-only hermaphrodite cells	Total count of adult-only male cells	Neurons (no male-specific cells)	Neurons (male-specific)	Body wall muscles	Pharynx muscles	Other muscles	Other adult-only cells in the hermaphrodite	Other adult-only hermaphrodite-specific cells (not present in males)	Motor neurons related to body wall muscles	Embryonic cells not present in adult	Male-specific cells	Male-specific adult-only cells	Cells with non-unique name	Cells needing name resolution	VirtualWorm blender model names	WormBase ID	Synonyms
-			954	1133	302	70	95	37	20	500	212	125		341	321	620	401			
+			954	1133	303	70	95	37	20	499	212	125		341	321	618	399			
 AB	P0.a	Embryonic founder cell											1						WBbt:0004015	AB blastomere,lineage name: P0.a
 ADAL	AB.plapaaaapp	Ring interneurons			1														WBbt:0004013	lineage name: ABplapaaaapp
 ADAR	AB.prapaaaapp	Ring interneurons			1														WBbt:0004011	lineage name: ABprapaaaapp
@@ -71,8 +71,8 @@ AVDL	AB.alaaapalr	Ventral cord interneuron, synapses onto VA, DA, AS motorneuron
 AVDR	AB.alaaapprl	Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta			1														WBbt:0003865	lineage name: ABalaaapprl
 AVEL	AB.alpppaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord			1														WBbt:0003864	lineage name: ABalpppaaaa
 AVER	AB.praaaaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord			1														WBbt:0003863	lineage name: ABpraaaaaaa
-AVFL/R	P1.aaaa	Interneuron, processes in ventral cord and ring, few synapses			1											1	1	avfr	WBbt:0003852	AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa
-AVFL/R	W.aaa	Interneuron, processes in ventral cord and ring, few synapses			1											1	1	avfr	WBbt:0003851	AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa
+AVFL	P1.aaaa	Interneuron, processes in ventral cord and ring, few synapses			1													avfr	WBbt:0005657	AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa
+AVFR	W.aaa	Interneuron, processes in ventral cord and ring, few synapses			1													avfr	WBbt:0005658	AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa
 AVG	AB.prpapppap	Ventral cord interneuron, few synapses			1														WBbt:0003850	lineage name: ABprpapppap
 AVHL	AB.alapaaaaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring			1														WBbt:0003849	lineage name: ABalapaaaaa
 AVHR	AB.alappapaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring			1														WBbt:0003848	lineage name: ABalappapaa
@@ -81,7 +81,7 @@ AVJR	AB.alapppppa	Neuron, synapses like AVHL/R			1														WBbt:0003846	lin
 AVKL	AB.plpapapap	Ring and ventral cord interneuron			1														WBbt:0003845	lineage name: ABplpapapap
 AVKR	AB.prpapapap	Ring and ventral cord interneuron			1														WBbt:0003844	lineage name: ABprpapapap
 AVL	AB.prpappaap	Ring and ventral cord interneuron, few synapses			1														WBbt:0003843	lineage name: ABprpappaap
-AVM	QR.paa	Anterior ventral microtubule cell, touch receptor								1									WBbt:0003832	lineage name: QR.paa
+AVM	QR.paa	Anterior ventral microtubule cell, touch receptor			1														WBbt:0003832	lineage name: QR.paa
 AWAL	AB.plaapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003831	lineage name: ABplaapapaa
 AWAR	AB.praapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003830	lineage name: ABpraapapaa
 AWBL	AB.alpppppap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath			1														WBbt:0003829	lineage name: ABalpppppap
@@ -141,9 +141,9 @@ DA6	AB.plpppaaap	Ventral cord motor neurons, innervate dorsal muscles			1							
 DA7	AB.prpppaaap	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004859	lineage name: ABprpppaaap
 DA8	AB.prpapappp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004858	lineage name: ABprpapappp
 DA9	AB.plpppaaaa	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004857	lineage name: ABplpppaaaa
-DB1/3	AB.plpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004846	lineage name: ABplpaaaapp
+DB1	AB.plpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004846	lineage name: ABplpaaaapp
 DB2	AB.arappappa	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004845	lineage name: ABarappappa
-DB3/1	AB.prpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004844	lineage name: ABprpaaaapp
+DB3	AB.prpaaaapp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004844	lineage name: ABprpaaaapp
 DB4	AB.prpappapp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004843	lineage name: ABprpappapp
 DB5	AB.plpapappp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004842	lineage name: ABplpapappp
 DB6	AB.plppaappp	Ventral cord motor neurons, innervate dorsal muscles			1							1							WBbt:0004841	lineage name: ABplppaappp
