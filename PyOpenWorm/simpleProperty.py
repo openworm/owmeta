@@ -151,10 +151,12 @@ class SimpleProperty(GraphObject, DataUser):
                 resolver=resolver)
 
         self.properties.append(self._pp)
+        self._defined_values_cache = None
+        self._defined_values_string_cache = None
 
     def __repr__(self):
-        s = str(self.linkName) + "=`" + ";".join(str(s) for s in self.defined_values) + "'"
-        return s
+        return str(self.linkName) + "=`" \
+                + ";".join(str(s) for s in self.defined_values) + "'"
 
     def __str__(self):
         return str(self.__class__.__name__) + "(" + str(self.idl.n3()) + ")"
@@ -164,10 +166,14 @@ class SimpleProperty(GraphObject, DataUser):
 
     def identifier(self, *args, **kwargs):
         return R.URIRef(self.rdf_namespace[
-                        "a" + hashlib.md5(str(self.owner.identifier()) + str(self.linkName)).hexdigest()])
+                        "a" + hashlib.md5(str(self.owner.identifier()) +
+                                          str(self.linkName) +
+                                          self._defined_values_string_cache)
+                        .hexdigest()])
 
     def set(self, v):
         self._pp.set(v)
+        self._defined_values_cache = None
 
     def unset(self, v):
         self._pp.unset(v)
@@ -187,7 +193,11 @@ class SimpleProperty(GraphObject, DataUser):
 
     @property
     def defined_values(self):
-        return self._pp.defined_values
+        if self._defined_values_cache is None:
+            self._defined_values_cache = self._pp.defined_values
+            self._defined_values_string_cache = "".join(
+                str(x) for x in self._defined_values_cache)
+        return self._defined_values_cache
 
     @property
     def defined(self):
