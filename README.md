@@ -143,7 +143,7 @@ Returns a set of all muscles::
 Add some evidence::
 
 ```python
->>> e = P.Evidence(author='Sulston et al.', date='1983')
+>>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
 lineageName=`AB alaaapalr'

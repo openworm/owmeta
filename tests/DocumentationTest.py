@@ -20,7 +20,6 @@ import doctest
 from glob import glob
 
 class DocumentationTest(unittest.TestCase):
-    @unittest.expectedFailure
     def test_readme(self):
         [failure_count, return_count] = doctest.testfile("../README.md")
         self.assertEqual(failure_count, 0)
