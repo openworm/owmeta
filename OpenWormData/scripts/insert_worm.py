@@ -235,7 +235,7 @@ def new_connections():
     try:
         w = P.Worm()
         n = P.Network()
-        neurons = set(n.neurons())
+        neurons = set(n.neuron_names())
         w.neuron_network(n)
 
         # Evidence object to assert each connection

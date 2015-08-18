@@ -57,7 +57,7 @@ class DataIntegrityTest(unittest.TestCase):
         This test verifies that the worm model has exactly 302 neurons.
         """
         net = PyOpenWorm.Worm().get_neuron_network()
-        self.assertEqual(302, len(set(net.neurons())))
+        self.assertEqual(302, len(set(net.neuron_names())))
 
     def test_TH_neuropeptide_neuron_list(self):
         """
@@ -274,7 +274,7 @@ class DataIntegrityTest(unittest.TestCase):
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = PyOpenWorm.Worm().get_neuron_network()
-        for neuron_object in net.neurons():
+        for neuron_object in net.neuron():
             self.assertNotEqual(neuron_object.wormbaseID(), '')
 
     @unittest.expectedFailure

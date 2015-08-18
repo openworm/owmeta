@@ -19,7 +19,7 @@ class Network(DataObject):
         self.synapses = Network.ObjectProperty('synapse', owner=self, value_type=P.Connection, multiple=True)
         Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
 
-    def neurons(self):
+    def neuron_names(self):
         """
         Gets the complete set of neurons in this network.
 
@@ -29,9 +29,9 @@ class Network(DataObject):
             >>> net = P.Worm().get_neuron_network()
 
             #NOTE: This is a VERY slow operation right now
-            >>> len(set(net.neurons()))
+            >>> len(set(net.neuron_names()))
             302
-            >>> set(net.neurons())
+            >>> set(net.neuron_names())
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
