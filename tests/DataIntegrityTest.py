@@ -274,7 +274,7 @@ class DataIntegrityTest(unittest.TestCase):
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = PyOpenWorm.Worm().get_neuron_network()
-        for neuron_object in net.neuron():
+        for neuron_object in net.neurons():
             self.assertNotEqual(neuron_object.wormbaseID(), '')
 
     @unittest.expectedFailure

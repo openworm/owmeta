@@ -122,7 +122,7 @@ def upload_lineage_and_descriptions():
             n.description(cell_data['desc'])
             w.cell(n)
 
-        for n in net.neuron():
+        for n in net.neurons():
             add_data_to_cell(n)
 
         # TODO: Add data for other cells here. Requires relating named

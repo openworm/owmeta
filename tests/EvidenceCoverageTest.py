@@ -28,7 +28,7 @@ class EvidenceCoverageTest(_DataTest):
         """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
         net = Worm().neuron_network()
-        neurons = list(net.neuron())
+        neurons = list(net.neurons())
         evcheck = []
         for n in neurons:
             hasEvidence = len(get_supporting_evidence(nobj))
