@@ -168,7 +168,7 @@ class SimpleProperty(GraphObject, DataUser):
         return R.URIRef(self.rdf_namespace[
                         "a" + hashlib.md5(str(self.owner.identifier()) +
                                           str(self.linkName) +
-                                          self._defined_values_string_cache)
+                                          self._defined_values_string)
                         .hexdigest()])
 
     def set(self, v):
@@ -192,11 +192,16 @@ class SimpleProperty(GraphObject, DataUser):
         return self._pp.values
 
     @property
+    def _defined_values_string(self):
+        if self._defined_values_string_cache is None:
+            self._defined_values_string_cache = "".join(
+                x.identifier().n3() for x in self.defined_values)
+        return self._defined_values_string_cache
+
+    @property
     def defined_values(self):
         if self._defined_values_cache is None:
-            self._defined_values_cache = self._pp.defined_values
-            self._defined_values_string_cache = "".join(
-                str(x) for x in self._defined_values_cache)
+            self._defined_values_cache = sorted(self._pp.defined_values)
         return self._defined_values_cache
 
     @property
