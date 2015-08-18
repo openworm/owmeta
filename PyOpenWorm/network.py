@@ -9,9 +9,9 @@ class Network(DataObject):
     Attributes
     -----------
     neuron
-        Representation of neurons in the network
+        Returns a set of all Neuron objects in the network
     synapse
-        Representation of synapses in the network
+        Returns a set of all synapses in the network
     """
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
