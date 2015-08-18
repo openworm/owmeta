@@ -21,19 +21,6 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-
-def print_evidence():
-    try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
-        for r in cur.fetchall():
-            print(r)
-    except Exception:
-        traceback.print_exc()
-    finally:
-        conn.close()
-
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
