@@ -32,7 +32,7 @@ class ChannelTest(_DataTest):
 
     def test_same_name_same_id(self):
         """
-        Test that two Cell objects with the same name have the same identifier()
+        Test that two Channel objects with the same name have the same identifier()
         Saves us from having too many inserts of the same object.
         """
         c = Channel(name="boots")
