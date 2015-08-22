@@ -5,7 +5,16 @@ class Plot(DataObject):
     """
     Object for storing plot data in PyOpenWorm.
 
-    Must be instantiated with a 2D list of coordinates.
+    Parameters
+    ----------
+
+    data : 2D list (list of lists)
+        List of XY coordinates for this Plot.
+
+    Example usage ::
+        >>> pl = Plot([[1, 2], [3, 4]])
+        >>> pl.get_data()
+        # [[1, 2], [3, 4]]
     """
 
     def __init__(self, data=False, *args, **kwargs):
