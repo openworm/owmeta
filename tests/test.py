@@ -101,6 +101,10 @@ from ConnectionTest import ConnectionTest
 # Tests for various properties of Muscle objects.
 from MuscleTest import MuscleTest
 
+# PlotTest
+# Tests for the Plot data object
+from PlotTest import PlotTest
+
 # Property Test
 # TODO: Add description for this set of tests
 from PropertyTest import PropertyTest
