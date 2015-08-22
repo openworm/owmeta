@@ -12,13 +12,9 @@ class Plot(DataObject):
         DataObject.__init__(self, **kwargs)
         Plot.DatatypeProperty('_data_string', self, multiple=False)
 
-        if (isinstance(data, list)) and (isinstance(data[0], list)):
-            # data is user-facing, _data_string is for db
-            self._data_string(self._to_string(data))
-            self.data = data
-        else:
-            raise ValueError('Plot must be instantiated with 2D list.')
-
+        if data:
+            self.set_data(data)
+        
     def _to_string(self, input_list):
         """
         Converts input_list to a string
@@ -42,3 +38,26 @@ class Plot(DataObject):
             )
         return out_list
 
+    def set_data(self, data):
+        """
+        Set the data attribute, which is user-facing,
+        as well as the serialized _data_string
+        attribute, which is used for db storage.
+        """
+        try:
+            # make sure we're dealing with a 2D list
+            assert isinstance(data, list)
+            assert isinstance(data[0], list)
+            self._data_string(self._to_string(data))
+            self.data = data
+        except (AssertionError, IndexError):
+            raise ValueError('Attribute "data" must be a 2D list of numbers.')
+
+    def get_data(self):
+        """
+        Get the data stored for this plot.
+        """
+        if self._data_string():
+            return self._to_list(self._data_string())
+        else:
+            raise AttributeError('You must call "set_data" first.')
