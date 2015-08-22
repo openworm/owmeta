@@ -965,40 +965,180 @@ CEPVR,Neurotransmitter,Dopamine,,
 CEPVR,Neuropeptide,TH,,
 CEPVR,Neuropeptide,CAT-2,,
 CEPVR,Receptor,DOP-2,,
-DA1,Neurotransmitter,Acetylcholine,,
-DA1,Receptor,UNC-8,,
-DA2,Neurotransmitter,Acetylcholine,,
-DA2,Receptor,UNC-8,,
-DA3,Neurotransmitter,Acetylcholine,,
-DA3,Receptor,UNC-8,,
-DA4,Neurotransmitter,Acetylcholine,,
-DA4,Receptor,UNC-8,,
-DA5,Neurotransmitter,Acetylcholine,,
-DA5,Receptor,UNC-8,,
-DA6,Neurotransmitter,Acetylcholine,,
-DA6,Receptor,UNC-8,,
-DA7,Neurotransmitter,Acetylcholine,,
-DA7,Receptor,UNC-8,,
-DA8,Neurotransmitter,Acetylcholine,,
-DA8,Receptor,UNC-8,,
-DA9,Neurotransmitter,Acetylcholine,,
-DA9,Receptor,SER-2,,
-DA9,Receptor,UNC-8,,
-DB1,Neurotransmitter,Acetylcholine,,
-DB2,Neurotransmitter,Acetylcholine,,
-DB3,Neurotransmitter,Acetylcholine,,
-DB4,Neurotransmitter,Acetylcholine,,
-DB5,Neurotransmitter,Acetylcholine,,
-DB6,Neurotransmitter,Acetylcholine,,
-DB7,Neurotransmitter,Acetylcholine,,
-DVA,Receptor,GGR-3,,
-DVA,Receptor,GLR-1,,
-DVA,Receptor,GLR-4,,
-DVA,Receptor,GLR-5,,
-DVA,Receptor,NMR-1,,
-DVA,Receptor,SER-2,,
-DVA,Receptor,SER-4,,
-DVB,Neurotransmitter,GABA,,
+DA1,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA1,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA1,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA1,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA1,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA1,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA1,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA2,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA2,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA2,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA2,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA2,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA2,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA2,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA3,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA3,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA3,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA3,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA3,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA3,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA3,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA4,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA4,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA4,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA4,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA4,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA4,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA4,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA5,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA5,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA5,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA5,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA5,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA5,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA5,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA6,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA6,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA6,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA6,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA6,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA6,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA6,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA7,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA7,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA7,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA7,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA7,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA7,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA7,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA8,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA8,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA8,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA8,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA8,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA8,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA8,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA9,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA9,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA9,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA9,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DA9,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA9,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DA9,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
+DB1,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB1,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB1,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB1,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB2,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB2,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB2,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB2,Receptor,PDFR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB2,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB3,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB3,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB3,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB3,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB4,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB4,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB4,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB4,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB5,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB5,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB5,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB5,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB6,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB6,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB6,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB6,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB7,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DB7,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB7,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DB7,type,"Ventral cord motor neuron, proprioceptive neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DBNmainframe.htm
+DD1,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD1,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD1,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD1,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD1,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD1,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD1,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD2,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD2,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD2,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD2,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD2,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD2,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD2,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD3,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD3,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD3,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD3,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD3,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD3,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD3,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD4,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD4,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD4,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD4,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD4,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD4,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD4,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD5,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD5,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD5,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD5,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD5,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD5,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD5,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD6,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DD6,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD6,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD6,Innexin,INX-14,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD6,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD6,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DD6,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DDNmainframe.htm
+DVA,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,INX-13,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,INX-17,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,INX-18,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVA,Receptor,GGR-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,GLR-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,GLR-5,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,NMR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,SER-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,Receptor,TRP-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVA,type,"Interneuron, stretch sensitive sensory neuron",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVAmainframe.htm
+DVB,Neurotransmitter,GABA,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVBmainframe.htm
+DVB,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,Innexin,INX-13,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVB,type,"Polymodal (motor neuron, interneuron) ",WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVBmainframe.htm
+DVC,Neurotransmitter,Glutamate,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
+DVC,Innexin,INX-4,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-5,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-10,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX11,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-13,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-17,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,INX-18,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,UNC-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+DVC,Receptor,GLR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
+DVC,Receptor,SER-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
+DVC,Receptor,TRP-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
+DVC,type,Interneuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
 FLPL,Neurotransmitter,Glutamate,,
 FLPL,Neuropeptide,VGluT,,
 FLPL,Neuropeptide,EAT-4,,
