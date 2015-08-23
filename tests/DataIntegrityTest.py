@@ -59,6 +59,13 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
 
+    @unittest.expectedFailure
+    def test_correct_connections_number(self):
+        """ This test verifies that there are exactly 3225 connections. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        #TODO Change the number of connections when the new connectome is ready.
+        self.assertEqual(3225, len(net.synapses())
+
     def test_TH_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
@@ -296,3 +303,28 @@ class DataIntegrityTest(unittest.TestCase):
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             assert isinstance(muscle_object, PyOpenWorm.Cell)
+
+    @unittest.expectedFailure
+    def test_connection_content_matches(self):
+        """ This test verifies that the content of each connection matches the
+        content in the source. """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        ignored_cells = ['hyp', 'intestine']
+        unmatched = 0
+
+        # read csv file row by row
+        with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+            edge_reader = csv.reader(csvfile)
+            edge_reader.next()    # skip header row
+
+            for row in edge_reader:
+                source, target, weight, syn_type = map(str.strip, row)
+                # ignore rows where source or target is 'hyp' or 'intestine'
+                if (source in ignored_cells or target in ignored_cells):
+                    continue
+                connection = PyOpenWorm.Connection(source, target, weight, syn_type)
+                # if the connection represented in the row is not in synapses, increment count of unmatched
+                if (connection not in synapses):
+                    unmatched += 1
+
+        assertEqual(0, unmatched)
