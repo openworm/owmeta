@@ -59,13 +59,6 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
 
-    @unittest.expectedFailure
-    def test_correct_connections_number(self):
-        """ This test verifies that there are exactly 3225 connections. """
-        net = PyOpenWorm.Worm().get_neuron_network()
-        #TODO Change the number of connections when the new connectome is ready.
-        self.assertEqual(3225, len(net.synapses())
-
     def test_TH_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
@@ -303,6 +296,13 @@ class DataIntegrityTest(unittest.TestCase):
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             assert isinstance(muscle_object, PyOpenWorm.Cell)
+
+    @unittest.expectedFailure
+    def test_correct_connections_number(self):
+        """ This test verifies that there are exactly 3225 connections. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        #TODO Change the number of connections when the new connectome is ready.
+        self.assertEqual(3225, len(net.synapses())
 
     @unittest.expectedFailure
     def test_connection_content_matches(self):
