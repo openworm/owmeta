@@ -1,6 +1,6 @@
 ,"Spreadsheet of C. elegans cells compiled and maintained by the OpenWorm project (http://openworm.org), originally sourced from WormBase (http://wormbase.org) and WormAtlas (http://wormatlas.org).  Latest version is online at: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1  For more info, please email at info@openworm.org",,,,,,,,,,,,,,,,,,,
 Cell,Lineage Name,Description,Total count of identified adult-only hermaphrodite cells,Total count of adult-only male cells,Neurons (no male-specific cells),Neurons (male-specific),Body wall muscles,Pharynx muscles,Other muscles,Other adult-only cells in the hermaphrodite,Other adult-only hermaphrodite-specific cells (not present in males),Motor neurons related to body wall muscles,Embryonic cells not present in adult,Male-specific cells,Male-specific adult-only cells,Cells with non-unique name,,VirtualWorm blender model names,WormBase ID,Synonyms
-,,,959,1136,302,68,95,37,26,499,212,125,,341,321,610,,,,
+,,,959,1136,302,68,95,37,26,499,212,125,,341,321,606,,,,
 AB,P0.a,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0004015,"AB blastomere,lineage name: P0.a"
 ADAL,AB.plapaaaapp,Ring interneurons,,,1,,,,,,,,,,,,,,WBbt:0004013,lineage name: ABplapaaaapp
 ADAR,AB.prapaaaapp,Ring interneurons,,,1,,,,,,,,,,,,,,WBbt:0004011,lineage name: ABprapaaaapp
@@ -1289,10 +1289,10 @@ VL6,D.aaaa,,,,,,1,,,,,,,,,,,mu_bod_vl5,WBbt:0003919,"lineage name: Daaaa,mu_bod"
 VL7,MS.aapppaa,,,,,,1,,,,,,,,,,,mu_bod_vl8,WBbt:0003881,"lineage name: MSaapppaa,mu_bod"
 VL8,D.apaa,Embryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0006344,"lineage name: Dapaa, mu_bod"
 VL9,MS.aapppap,,,,,,1,,,,,,,,,,,mu_bod_vl10,WBbt:0003880,"lineage name: MSaapppap,mu_bod"
-vm1,M.vlpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,1,,?,WBbt:0004854,lineage name: M.vlpaaapp
-vm1,M.vlpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,1,,?,WBbt:0004853,lineage name: M.vlpaapaa
-vm1,M.vrpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,1,,?,WBbt:0004850,lineage name: M.vrpaaapp
-vm1,M.vrpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,1,,?,WBbt:0004849,lineage name: M.vrpaapaa
+vm1PL,M.vlpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004854,lineage name: M.vlpaaapp
+vm1AL,M.vlpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004853,lineage name: M.vlpaapaa
+vm1PR,M.vrpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004850,lineage name: M.vrpaaapp
+vm1AR,M.vrpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004849,lineage name: M.vrpaapaa
 vm2AL,M.vlpaaapa,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004855,lineage name: M.vlpaaapa
 vm2PL,M.vlpaapap,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004852,lineage name: M.vlpaapap
 vm2AR,M.vrpaaapa,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004851,lineage name: M.vrpaaapa
