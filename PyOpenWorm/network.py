@@ -12,20 +12,19 @@ class Network(DataObject):
     Attributes
     -----------
     neuron
-        Representation of neurons in the network
+        Returns a set of all Neuron objects in the network
     synapse
-        Representation of synapses in the network
+        Returns a set of all synapses in the network
     """
 
     def __init__(self, **kwargs):
         super(Network, self).__init__(**kwargs)
-
         self.synapses = Network.ObjectProperty(
             'synapse',
             owner=self,
             value_type=P.Connection,
             multiple=True)
-        Network.ObjectProperty(
+        self.neurons = Network.ObjectProperty(
             'neuron',
             owner=self,
             value_type=P.Neuron,
@@ -36,9 +35,9 @@ class Network(DataObject):
             value_type=P.Worm,
             multiple=False)
 
-    def neurons(self):
+    def neuron_names(self):
         """
-        Gets the complete set of neurons in this network.
+        Gets the complete set of neurons' names in this network.
 
         Example::
 
@@ -46,13 +45,13 @@ class Network(DataObject):
             >>> net = P.Worm().get_neuron_network()
 
             #NOTE: This is a VERY slow operation right now
-            >>> len(set(net.neurons()))
+            >>> len(set(net.neuron_names()))
             302
-            >>> set(net.neurons())
+            >>> set(net.neuron_names())
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        for x in self.neuron():
+        for x in self.neurons():
             yield x.name()
 
     def aneuron(self, name):
@@ -87,7 +86,12 @@ class Network(DataObject):
         """
         for n, nbrs in self['nx'].adjacency_iter():
             for nbr, eattr in nbrs.items():
-                yield P.Connection(n, nbr, int(eattr['weight']), eattr['synapse'], eattr['neurotransmitter'], conf=self.conf)
+                yield P.Connection(n,
+                                   nbr,
+                                   int(eattr['weight']),
+                                   eattr['synapse'],
+                                   eattr['neurotransmitter'],
+                                   conf=self.conf)
 
     def as_networkx(self):
         return self['nx']
@@ -138,13 +142,13 @@ class Network(DataObject):
             yield x
 
     def identifier(self, *args, **kwargs):
-        if super(Network,self).defined:
+        if super(Network, self).defined:
             return super(Network, self).identifier()
         else:
             return self.make_identifier(self.worm.defined_values[0])
 
     @property
     def defined(self):
-        return super(Network,self).defined or self.worm.has_defined_value()
+        return super(Network, self).defined or self.worm.has_defined_value()
 
     # def neuroml(self):

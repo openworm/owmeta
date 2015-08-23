@@ -117,7 +117,7 @@ def add_lineage_and_descriptions():
             n.description(cell_data['desc'])
             w.cell(n)
 
-        for n in net.neuron():
+        for n in net.neurons():
             add_data_to_cell(n)
 
         # TODO: Add data for other cells here. Requires relating named
@@ -223,7 +223,7 @@ def new_connections():
 
     try:
         n = NETWORK
-        neurons = set(n.neurons())
+        neurons = set(n.neuron_names())
 
         # Evidence object to assert each connection
         e  = P.Evidence(uri='http://www.wormwiring.org')
