@@ -299,10 +299,9 @@ class DataIntegrityTest(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_correct_connections_number(self):
-        """ This test verifies that there are exactly 3225 connections. """
+        """ This test verifies that there are exactly 6916 connections. """
         net = PyOpenWorm.Worm().get_neuron_network()
-        #TODO Change the number of connections when the new connectome is ready.
-        self.assertEqual(3225, len(net.synapses())
+        self.assertEqual(6916, len(net.synapses()))
 
     @unittest.expectedFailure
     def test_connection_content_matches(self):
