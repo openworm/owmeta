@@ -927,44 +927,56 @@ BAGR,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neur
 BAGR,Innexin,INX-19,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
 BAGR,Receptor,GCY-33,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BAGmainframe.htm
 BAGR,type,Sensory neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BAGmainframe.htm
-BDUL,Neuropeptide,NLP-15,,
-BDUL,Neuropeptide,NLP-1,,
-BDUL,Receptor,GLR-8,,
-BDUL,Receptor,SER-2,,
-BDUR,Neuropeptide,NLP-15,,
-BDUR,Neuropeptide,NLP-1,,
-BDUR,Receptor,GLR-8,,
-BDUR,Receptor,SER-2,,
-CANL,Neurotransmitter,Monoamine,,
-CANL,Neuropeptide,VMaT,,
-CANL,Neuropeptide,NLP-10,,
-CANL,Neuropeptide,NLP-15,,
-CANL,Neuropeptide,CAT-1,,
-CANL,Receptor,GGR-2,,
-CANL,Receptor,SER-2,,
-CANR,Neurotransmitter,Monoamine,,
-CANR,Neuropeptide,VMaT,,
-CANR,Neuropeptide,NLP-10,,
-CANR,Neuropeptide,NLP-15,,
-CANR,Neuropeptide,CAT-1,,
-CANR,Receptor,GGR-2,,
-CANR,Receptor,SER-2,,
-CEPDL,Neurotransmitter,Dopamine,,
-CEPDL,Neuropeptide,TH,,
-CEPDL,Neuropeptide,CAT-2,,
-CEPDL,Receptor,DOP-2,,
-CEPDR,Neurotransmitter,Dopamine,,
-CEPDR,Neuropeptide,TH,,
-CEPDR,Neuropeptide,CAT-2,,
-CEPDR,Receptor,DOP-2,,
-CEPVL,Neurotransmitter,Dopamine,,
-CEPVL,Neuropeptide,TH,,
-CEPVL,Neuropeptide,CAT-2,,
-CEPVL,Receptor,DOP-2,,
-CEPVR,Neurotransmitter,Dopamine,,
-CEPVR,Neuropeptide,TH,,
-CEPVR,Neuropeptide,CAT-2,,
-CEPVR,Receptor,DOP-2,,
+BDUL,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUL,Neuropeptide,NLP-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUL,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+BDUL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+BDUL,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUL,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUL,type,Interneuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUR,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUR,Neuropeptide,NLP-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUR,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+BDUR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+BDUR,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUR,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+BDUR,type,Interneuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/BDUmainframe.htm
+CANL,Neuropeptide,NLP-10,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANL,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANL,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANL,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANL,Innexin,INX-12,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANL,Innexin,INX-13,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANL,Receptor,GGR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANL,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANL,type,Neuron with unknown function,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANR,Neuropeptide,NLP-10,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANR,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANR,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANR,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANR,Innexin,INX-12,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANR,Innexin,INX-13,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CANR,Receptor,GGR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANR,Receptor,SER-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CANL,type,Neuron with unknown function,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CANmainframe.htm
+CEPDL,Neurotransmitter,Dopamine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPDL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CEPDL,Receptor,DOP-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPDL,type,Sensory neuron (mechanosensory),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPDR,Neurotransmitter,Dopamine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPDR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CEPDR,Receptor,DOP-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPDR,type,Sensory neuron (mechanosensory),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVL,Neurotransmitter,Dopamine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CEPVL,Receptor,DOP-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVL,type,Sensory neuron (mechanosensory),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVR,Neurotransmitter,Dopamine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+CEPVR,Receptor,DOP-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
+CEPVR,type,Sensory neuron (mechanosensory),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/CEPmainframe.htm
 DA1,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DANmainframe.htm
 DA1,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
 DA1,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
@@ -1139,69 +1151,93 @@ DVC,Receptor,GLR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/D
 DVC,Receptor,SER-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
 DVC,Receptor,TRP-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
 DVC,type,Interneuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/DVCmainframe.htm
-FLPL,Neurotransmitter,Glutamate,,
-FLPL,Neuropeptide,VGluT,,
-FLPL,Neuropeptide,EAT-4,,
-FLPL,Receptor,DEG-3,,
-FLPL,Receptor,DEL-1,,
-FLPL,Receptor,DES-2,,
-FLPL,Receptor,GLR-4,,
-FLPL,Receptor,MEC-10,,
-FLPL,Receptor,OSM-9,,
-FLPL,Receptor,UNC-8,,
-FLPR,Neurotransmitter,Glutamate,,
-FLPR,Neuropeptide,VGluT,,
-FLPR,Neuropeptide,EAT-4,,
-FLPR,Receptor,DEG-3,,
-FLPR,Receptor,DEL-1,,
-FLPR,Receptor,DES-2,,
-FLPR,Receptor,GLR-4,,
-FLPR,Receptor,MEC-10,,
-FLPR,Receptor,OSM-9,,
-FLPR,Receptor,UNC-8,,
-HSNL,Neurotransmitter,Serotonin,,
-HSNL,Neuropeptide,VMaT,,
-HSNL,Neuropeptide,NLP-3,,
-HSNL,Neuropeptide,NLP-8,,
-HSNL,Neuropeptide,NLP-15,,
-HSNL,Neuropeptide,CAT-1,,
-HSNL,Neuropeptide,TPH-1,,
-HSNL,Neuropeptide,FLP-5,,
-HSNL,Receptor,GAR-2,,
-HSNL,Receptor,GGR-2,,
-HSNL,Receptor,GLR-5,,
-HSNL,Receptor,MEC-6,,
-HSNR,Neurotransmitter,Serotonin,,
-HSNR,Neuropeptide,VMaT,,
-HSNR,Neuropeptide,NLP-3,,
-HSNR,Neuropeptide,NLP-8,,
-HSNR,Neuropeptide,NLP-15,,
-HSNR,Neuropeptide,CAT-1,,
-HSNR,Neuropeptide,TPH-1,,
-HSNR,Neuropeptide,FLP-5,,
-HSNR,Receptor,GAR-2,,
-HSNR,Receptor,GGR-2,,
-HSNR,Receptor,GLR-5,,
-HSNR,Receptor,MEC-6,,
-I1L,Neuropeptide,NLP-3,,
-I1L,Receptor,GLR-7,,
-I1L,Receptor,GLR-8,,
-I1R,Neuropeptide,NLP-3,,
-I1R,Receptor,GLR-7,,
-I1R,Receptor,GLR-8,,
-I2L,Neuropeptide,NLP-3,,
-I2L,Neuropeptide,NLP-8,,
-I2L,Receptor,GLR-7,,
-I2L,Receptor,GLR-8,,
-I2R,Neuropeptide,NLP-3,,
-I2R,Neuropeptide,NLP-8,,
-I2R,Receptor,GLR-7,,
-I2R,Receptor,GLR-8,,
-I3,Neuropeptide,NLP-3,,
-I3,Receptor,GLR-7,,
-I3,Receptor,GLR-8,,
-I4,Neuropeptide,NLP-3,,
-I4,Neuropeptide,NLP-13,,
+FLPL,Neurotransmitter,Glutamate,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Neuropeptide,FLP-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Neuropeptide,FLP-21,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Innexin,INX-4,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPL,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPL,Receptor,DEG-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,DEL-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,DES-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,GLR-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,MEC-10,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,OSM-9,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,PDFR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,type,Sensory neuron (polymodal nociceptive for mechanosensation and thermosensation),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Neurotransmitter,Glutamate,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Neuropeptide,FLP-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Neuropeptide,FLP-21,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Innexin,INX-4,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPR,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+FLPR,Receptor,DEG-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,DEL-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,DES-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,GLR-4,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,MEC-10,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,OSM-9,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,PDFR-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPR,Receptor,UNC-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+FLPL,type,Sensory neuron (polymodal nociceptive for mechanosensation and thermosensation),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/FLPmainframe.htm
+HSNL,Neurotransmitter,Serotonin,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Neuropeptide,FLP-5,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Neuropeptide,NLP-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNL,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNL,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNL,Receptor,GAR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Receptor,GGR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Receptor,GLR-5,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,Receptor,MEC-6,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNL,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Neurotransmitter,Serotonin,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Neuropeptide,FLP-5,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Neuropeptide,NLP-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Neuropeptide,NLP-15,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Innexin,INX-3,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNR,Innexin,INX-7,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNR,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+HSNR,Receptor,GAR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Receptor,GGR-2,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Receptor,GLR-5,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,Receptor,MEC-6,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+HSNR,type,Motor neuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/HSNmainframe.htm
+I1L,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1L,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1L,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+I1L,Receptor,GLR-7,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1L,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1L,type,Pharyngeal interneuron (also anterior sensory?),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1R,Neurotransmitter,Acetylcholine,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1R,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1R,Innexin,UNC-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+I1R,Receptor,GLR-7,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1R,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I1R,type,Pharyngeal interneuron (also anterior sensory?),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I1mainframe.htm
+I2L,Neurotransmitter,Glutamate,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2L,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2L,Neuropeptide,NLP-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2L,Receptor,GLR-7,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2L,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2L,type,Pharyngeal interneuron (also anterior sensory?),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2R,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2R,Neuropeptide,NLP-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2R,Receptor,GLR-7,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2R,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I2R,type,Pharyngeal interneuron (also anterior sensory?),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I2mainframe.htm
+I3,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I3mainframe.htm
+I3,Innexin,INX-9,"Altun et al., 2009",http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732576/table/T3/
+I3,Receptor,GLR-7,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I3mainframe.htm
+I3,Receptor,GLR-8,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I3mainframe.htm
+I3,type,Pharyngeal interneuron (also anterior sensory?),WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I3mainframe.htm
+I4,Neuropeptide,NLP-3,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I4mainframe.htm
+I4,Neuropeptide,NLP-13,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I4mainframe.htm
+I4,type,Pharyngeal interneuron,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/I4mainframe.htm
 I5,Neurotransmitter,Serotonin,,
 I6,Neurotransmitter,Acetylcholine,,
 I6,Neuropeptide,NLP-3,,
