@@ -1,8 +1,7 @@
 import sys
 sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
+
 import PyOpenWorm
 from PyOpenWorm import *
 import networkx
@@ -17,7 +16,7 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import * 
+from GraphDBInit import *
 
 class _DataTest(unittest.TestCase):
     def delete_dir(self):

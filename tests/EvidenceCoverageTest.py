@@ -2,8 +2,6 @@
 import sys
 sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
 import PyOpenWorm as P
 from PyOpenWorm import *
 import networkx
@@ -34,9 +32,11 @@ class EvidenceCoverageTest(_DataTest):
 
             hasEvidence = len(get_supporting_evidence(n)) + len(get_supporting_evidence(n.neurotransmitter)) + len(get_supporting_evidence(n.type)) + len(get_supporting_evidence(n.innexin)) + len(get_supporting_evidence(n.neuropeptide)) + len(get_supporting_evidence(n.receptor))
 
+            print get_supporting_evidence(n.neurotransmitter)
+
             evcheck.append(hasEvidence)
 
-        self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + evcheck)
+        self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
 
     @unittest.expectedFailure
     def test_verify_muslces_have_evidence(self):
@@ -72,6 +72,6 @@ class EvidenceCoverageTest(_DataTest):
     def get_supporting_evidence(fact):
         """ Helper function for checking amount of Evidence.
         Returns list of Evidence supporting fact. """
-        ev = Evidence()
+        ev = P.Evidence()
         ev.asserts(fact)
         return list(ev.load())
