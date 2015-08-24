@@ -216,6 +216,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
     from sets import Set
     neurons = Set()
+    uris = dict()
 
     network = P.Worm().neuron_network()
 
@@ -231,12 +232,17 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
       #pick correct evidence given the row
       if 'altun' in evidence.lower():
-          altun_ev.uri(evidenceURL)
           e = altun_ev
 
       elif 'wormatlas' in evidence.lower():
-          wormatlas_ev.uri(evidenceURL)
           e = wormatlas_ev
+
+      e2 = []
+      try:
+          e2 = uris[evidenceURL]
+      except KeyError:
+          e2 = P.Evidence(uri=evidenceURL)
+          uris[evidenceURL] = e2
 
       #grab the neuron object
       n = network.aneuron(neuron_name)
@@ -247,21 +253,25 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
           r = n.neurotransmitter(data)
           #assert the evidence on the relationship
           e.asserts(r)
+          e2.asserts(r)
       elif relation == 'innexin':
           # assign the data, grab the relation into r
           r = n.innexin(data)
           #assert the evidence on the relationship
           e.asserts(r)
+          e2.asserts(r)
       elif relation == 'neuropeptide':
           # assign the data, grab the relation into r
           r = n.neuropeptide(data)
           #assert the evidence on the relationship
           e.asserts(r)
+          e2.asserts(r)
       elif relation == 'receptor':
           # assign the data, grab the relation into r
           r = n.receptor(data)
           #assert the evidence on the relationship
           e.asserts(r)
+          e2.asserts(r)
 
       if relation == 'type':
           types = []
@@ -271,17 +281,21 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               types.append('interneuron')
           if 'motor' in (data.lower()):
               types.append('motor')
+          if 'unknown' in (data.lower()):
+              types.append('unknown')
           # assign the data, grab the relation into r
           for t in types:
               r = n.type(t)
               #assert the evidence on the relationship
               e.asserts(r)
+              e2.asserts(r)
 
-      neurons
       i = i + 1
 
     altun_ev.save()
     wormatlas_ev.save()
+    for uri in uris:
+        uris[uri].save()
     #persist all new neuron information
     for neur in neurons:
         n = network.neuron(neur)
