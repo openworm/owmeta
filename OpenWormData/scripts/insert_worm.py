@@ -157,51 +157,50 @@ def upload_neurons():
         conn.close()
 
 def get_altun_evidence():
-    import bibtexparser
-    e = P.Evidence()
-    with open('../aux_data/bibtex_files/altun2009.bib') as bibtex_file:
-        bib_database = bibtexparser.load(bibtex_file)
-
-        doi = bib_database.entries[0]['doi']
-        if doi:
-          e.doi(doi)
-        author = bib_database.entries[0]['author']
-        if author:
-          e.author(author)
-        title = bib_database.entries[0]['title']
-        if title:
-          e.title(title)
-        year = bib_database.entries[0]['year']
-        if year:
-          e.year(year)
-
-        e.save()
-    return e
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
 
 def get_wormatlas_evidence():
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
+
+def parse_bibtex_into_evidence(file_name):
     import bibtexparser
     e = P.Evidence()
-    with open('../aux_data/bibtex_files/WormAtlas.bib') as bibtex_file:
+    with open(file_name) as bibtex_file:
         bib_database = bibtexparser.load(bibtex_file)
 
-        doi = bib_database.entries[0]['doi']
-        if doi:
-          e.doi(doi)
-        author = bib_database.entries[0]['author']
-        if author:
-          e.author(author)
-        title = bib_database.entries[0]['title']
-        if title:
-          e.title(title)
-        year = bib_database.entries[0]['year']
-        if year:
-          e.year(year)
+        try:
+            doi = bib_database.entries[0]['doi']
+            if doi:
+              e.doi(doi)
+        except KeyError:
+            pass
 
+        try:
+            author = bib_database.entries[0]['author']
+            if author:
+              e.author(author)
+        except KeyError:
+            pass
+
+        try:
+            title = bib_database.entries[0]['title']
+            if title:
+              e.title(title)
+        except KeyError:
+            pass
+        try:
+            year = bib_database.entries[0]['year']
+            if year:
+              e.year(year)
+        except KeyError:
+            pass
         e.save()
     return e
 
 def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
-
+    """ Augment the metadata about neurons with information about receptors,
+        neuron types, neurotransmitters, neuropeptides and innexins.
+        As we go, add evidence objects to each statement."""
     #set up evidence objects in advance
     altun_ev  = get_altun_evidence()
     wormatlas_ev = get_wormatlas_evidence();
@@ -209,6 +208,9 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     import csv
     f = open('../aux_data/Modified celegans db dump.csv')
     reader = csv.reader(f)
+
+    i = 0
+
     for row in reader:
       neuron_name = row[0]
       relation = row[1].lower()
@@ -271,7 +273,8 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               e.asserts(r)
               e.save()
       n.save()
-      print ("uploaded types, receptors, innexins, neurotransmitters and neuropeptides")
+      i++
+    print ("uploaded " + i + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 
 def new_connections():
