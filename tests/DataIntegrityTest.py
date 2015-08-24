@@ -63,7 +63,7 @@ class DataIntegrityTest(unittest.TestCase):
         """
         This test verifies that the worm model has exactly 144 muscles.
         """
-        muscles = P.Worm().muscles()
+        muscles = PyOpenWorm.Worm().muscles()
         self.assertEqual(144, len(muscles))
 
     def test_TH_neuropeptide_neuron_list(self):
