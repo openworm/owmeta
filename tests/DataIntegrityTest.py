@@ -59,6 +59,13 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
 
+    def test_correct_muscle_number(self):
+        """
+        This test verifies that the worm model has exactly 144 muscles.
+        """
+        muscles = P.Worm().muscles()
+        self.assertEqual(144, len(muscles))
+
     def test_TH_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
@@ -307,9 +314,12 @@ class DataIntegrityTest(unittest.TestCase):
     def test_connection_content_matches(self):
         """ This test verifies that the content of each connection matches the
         content in the source. """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        ignored_cells = ['hyp', 'intestine']
+        ignored_cells = ['HYP', 'INTESTINE']
         unmatched = 0
+
+        # get a sorted list of synapses
+        net = PyOpenWorm.Worm().get_neuron_network()
+        synapses = sorted(list(net.neurons()))
 
         # read csv file row by row
         with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
