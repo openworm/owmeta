@@ -214,6 +214,11 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
     i = 0
 
+    from sets import Set
+    neurons = Set()
+
+    network = P.Worm().neuron_network()
+
     for row in reader:
       neuron_name = row[0]
       relation = row[1].lower()
@@ -234,7 +239,8 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
           e = wormatlas_ev
 
       #grab the neuron object
-      n = P.Worm().neuron_network().aneuron(neuron_name)
+      n = network.aneuron(neuron_name)
+      neurons.add(n)
 
       if relation == 'neurotransmitter':
           # assign the data, grab the relation into r
@@ -271,13 +277,15 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               #assert the evidence on the relationship
               e.asserts(r)
 
+      neurons
       i = i + 1
 
     altun_ev.save()
     wormatlas_ev.save()
     #persist all new neuron information
-    for neur in P.Neuron().load():
-        neur.save()
+    for neur in neurons:
+        n = network.neuron(neur)
+    network.save()
     print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 
