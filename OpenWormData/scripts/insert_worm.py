@@ -156,51 +156,62 @@ def upload_neurons():
     finally:
         conn.close()
 
-def upload_receptors_and_innexins():
-    try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        w = P.Worm()
-        n = w.neuron_network()
-        # insert neurons.
-        # save
-        # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
-        neurons = dict()
+def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
+    import csv
+    f = open('../aux_data/Modified celegans db dump.csv')
+    reader = csv.reader(f)
+    for row in reader:
+      neuron_name = row[0]
+      relation = row[1].lower()
+      data = row[2]
+      evidence = row[3]
+      evidenceURL = row[4]
 
-        def add_data_to_neuron(data_kind, relation_code):
-            cur.execute("""
-                SELECT DISTINCT a.Entity, b.Entity
-                FROM
-                tblrelationship q,
-                tblrelationship r,
-                tblentity a,
-                tblentity b
-                where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-                and   r.EnID1=a.id and r.Relation = '{}'  and r.EnID2=b.id
-                """.format(relation_code))
-            for r in cur.fetchall():
-                name = str(r[0])
-                data = str(r[1])
+      #make the evidence statement -- needs to be made better!!
+      e  = P.Evidence(uri=evidenceURL)
+      #grab the neuron object
+      n = P.Neuron(name=neuron_name)
+      if relation == 'neurotransmitter':
+          # assign the data, grab the relation into r
+          r = n.neurotransmitter(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e.save()
+      elif relation == 'innexin':
+          # assign the data, grab the relation into r
+          r = n.innexin(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e.save()
+      elif relation == 'neuropeptide':
+          # assign the data, grab the relation into r
+          r = n.neuropeptide(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e.save()
+      elif relation == 'receptor':
+          # assign the data, grab the relation into r
+          r = n.receptor(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e.save()
+      elif relation == 'type':
+          types = []
+          if 'sensory' in (data.lower()):
+              types.append('sensory')
+          if 'interneuron' in (data.lower()):
+              types.append('interneuron')
+          if 'motor' in (data.lower()):
+              types.append('motor')
+          # assign the data, grab the relation into r
+          for t in types:
+              r = n.type(t)
+              #assert the evidence on the relationship
+              e.asserts(r)
+              e.save()
+      n.save()
+      print ("uploaded types, receptors, innexins, neurotransmitters and neuropeptides")
 
-                if not (name in neurons):
-                    neurons[name] = P.Neuron(name=name)
-
-                getattr(neurons[name],data_kind)(data)
-
-        add_data_to_neuron('receptor', 361)
-        add_data_to_neuron('innexin', 355)
-        add_data_to_neuron('neurotransmitter', 313)
-        add_data_to_neuron('neuropeptide', 354)
-
-        for neur in neurons:
-            n.neuron(neurons[neur])
-        n.save()
-        #second step, get the relationships between them and add them to the graph
-        print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
-    except Exception:
-        traceback.print_exc()
-    finally:
-        conn.close()
 
 def new_connections():
     """we can replace the old function (upload_connections) with this
@@ -314,35 +325,6 @@ def upload_connections():
         print('uploaded connections')
     except Exception, e:
         traceback.print_exc()
-
-def upload_types():
-    import csv
-    ev = P.Evidence(title="neurons.csv")
-    w = P.Worm()
-    net = w.neuron_network.one()
-
-    data = dict()
-    for x in csv.reader(open('../aux_data/neurons.csv'), delimiter=';'):
-        types = []
-        name = x[0]
-        types_string = x[1]
-        if 'sensory' in (types_string.lower()):
-            types.append('sensory')
-        if 'interneuron' in (types_string.lower()):
-            types.append('interneuron')
-        if 'motor' in (types_string.lower()):
-            types.append('motor')
-        data[name] = types
-
-    for name in data:
-        n = P.Neuron(name=name)
-        types = data[name]
-        for t in types:
-            n.type(t)
-        net.neuron(n)
-    ev.asserts(net)
-    ev.save()
-    print ("uploaded types")
 
 def infer():
     from rdflib import Graph
