@@ -32,22 +32,17 @@ class EvidenceCoverageTest(_DataTest):
         evcheck = []
         for n in neurons:
 
-            hasEvidence = len(get_supporting_evidence(n)) +
-            len(get_supporting_evidence(n.neurotransmitter)) +
-            len(get_supporting_evidence(n.type)) +
-            len(get_supporting_evidence(n.innexin)) +
-            len(get_supporting_evidence(n.neuropeptide)) +
-            len(get_supporting_evidence(n.receptor))
+            hasEvidence = len(get_supporting_evidence(n)) + len(get_supporting_evidence(n.neurotransmitter)) + len(get_supporting_evidence(n.type)) + len(get_supporting_evidence(n.innexin)) + len(get_supporting_evidence(n.neuropeptide)) + len(get_supporting_evidence(n.receptor))
 
             evcheck.append(hasEvidence)
 
-        self.assertTrue(0 not in evcheck)
+        self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + evcheck)
 
     @unittest.expectedFailure
     def test_verify_muslces_have_evidence(self):
         """ For each muscle in PyOpenWorm, verify
         that there is supporting evidence"""
-        muscles = list(Worm().muscles())
+        muscles = list(P.Worm().muscles())
         muscle_evcheck = []
         for mobj in muscles:
             hasEvidence = len(get_supporting_evidence(mobj))
@@ -59,7 +54,7 @@ class EvidenceCoverageTest(_DataTest):
     def test_verify_connections_have_evidence(self):
         """ For each connection in PyOpenWorm, verify that there is
         supporting evidence. """
-        net = Worm().neuron_network()
+        net = P.Worm().get_neuron_network()
         connections = list(net.synapses())
         evcheck = []
         for c in connections:
