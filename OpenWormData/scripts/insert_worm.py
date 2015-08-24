@@ -234,7 +234,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
           e = wormatlas_ev
 
       #grab the neuron object
-      n = P.Neuron(name=neuron_name)
+      n = P.Worm().neuron_network().aneuron(neuron_name)
 
       if relation == 'neurotransmitter':
           # assign the data, grab the relation into r
@@ -272,7 +272,6 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               e.asserts(r)
 
       i = i + 1
-      print(str(i) + '.')
     altun_ev.save()
     wormatlas_ev.save()
     print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")

@@ -59,15 +59,15 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neurons())))
 
-    def test_TH_neuropeptide_neuron_list(self):
+    def test_INS_26_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
-        neuropeptide TH is correct (the list is given below).
+        neuropeptide INS-26 is correct (the list is given below).
         """
         neuronlist = PyOpenWorm.Neuron()
-        neuronlist.neuropeptide("TH")
+        neuronlist.neuropeptide("INS-26")
         thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']), thlist)
+        self.assertEqual(set(['ASEL', 'ASER', 'ASIL', 'ASIR']), thlist)
 
     def test_unique_neuron_node(self):
         """

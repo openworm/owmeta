@@ -183,11 +183,11 @@ object of that type and calling `load()`::
 See what neurons express some neuropeptide::
 ```python
 >>> n = P.Neuron()
->>> n.neuropeptide("TH")
-neuropeptide=`TH'
+>>> n.neuropeptide("INS-26")
+neuropeptide=`INS-26'
 
 >>> s = set(x.name() for x in n.load())
->>> s == set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL'])
+>>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
 True
 
 ```
