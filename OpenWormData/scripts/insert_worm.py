@@ -156,7 +156,56 @@ def upload_neurons():
     finally:
         conn.close()
 
+def get_altun_evidence():
+    import bibtexparser
+    e = P.Evidence()
+    with open('../aux_data/bibtex_files/altun2009.bib') as bibtex_file:
+        bib_database = bibtexparser.load(bibtex_file)
+
+        doi = bib_database.entries[0]['doi']
+        if doi:
+          e.doi(doi)
+        author = bib_database.entries[0]['author']
+        if author:
+          e.author(author)
+        title = bib_database.entries[0]['title']
+        if title:
+          e.title(title)
+        year = bib_database.entries[0]['year']
+        if year:
+          e.year(year)
+
+        e.save()
+    return e
+
+def get_wormatlas_evidence():
+    import bibtexparser
+    e = P.Evidence()
+    with open('../aux_data/bibtex_files/WormAtlas.bib') as bibtex_file:
+        bib_database = bibtexparser.load(bibtex_file)
+
+        doi = bib_database.entries[0]['doi']
+        if doi:
+          e.doi(doi)
+        author = bib_database.entries[0]['author']
+        if author:
+          e.author(author)
+        title = bib_database.entries[0]['title']
+        if title:
+          e.title(title)
+        year = bib_database.entries[0]['year']
+        if year:
+          e.year(year)
+
+        e.save()
+    return e
+
 def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
+
+    #set up evidence objects in advance
+    altun_ev  = get_altun_evidence()
+    wormatlas_ev = get_wormatlas_evidence();
+
     import csv
     f = open('../aux_data/Modified celegans db dump.csv')
     reader = csv.reader(f)
@@ -167,27 +216,19 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
       evidence = row[3]
       evidenceURL = row[4]
 
-      #make the evidence statement -- only pulls one bibtex everytime :(
-      e  = P.Evidence(uri=evidenceURL)
+      #prepare evidence
+      e = P.Evidence()
 
-      import bibtexparser
-      with open('../aux_data/bibtex_files/altun2009.bib') as bibtex_file:
-          bib_database = bibtexparser.load(bibtex_file)
+      #pick correct evidence given the row
+      if 'altun' in evidence.lower():
+          altun_ev.uri(evidenceURL)
+          altun_ev.save()
+          e = altun_ev
 
-          doi = bib_database.entries[0]['doi']
-          if doi:
-            e.doi(doi)
-          author = bib_database.entries[0]['author']
-          if author:
-            e.author(author)
-          title = bib_database.entries[0]['title']
-          if title:
-            e.title(title)
-          year = bib_database.entries[0]['year']
-          if year:
-            e.year(year)
-
-          e.save()
+      elif 'wormatlas' in evidence.lower():
+          wormatlas_ev.uri(evidenceURL)
+          wormatlas_ev.save()
+          e = wormatlas_ev
 
       #grab the neuron object
       n = P.Neuron(name=neuron_name)
