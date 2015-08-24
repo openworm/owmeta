@@ -40,13 +40,13 @@ def print_evidence():
         conn.close()
 
 
-# to normalize certain neuron names
+# to normalize certain neuron and muscle names
 search_string = re.compile(r'\w+[0]+[1-9]+')
 replace_string = re.compile(r'[0]+')
 
 
 def normalize(name):
-    # normalize neuron names to match those used at other points
+    # normalize neuron and muscle names to match those used at other points
     # see #137 for elaboration
     # if there are zeroes in the middle of a name, remove them
     if re.match(search_string, name):
@@ -285,7 +285,7 @@ def upload_connections():
         muscles = [muscle.name() for muscle in muscle_objs]
 
         # Evidence object to assert each connection
-        e = P.Evidence(uri='herm_full_edgelist.csv')
+        e = P.Evidence(title='herm_full_edgelist.csv')
 
         with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
