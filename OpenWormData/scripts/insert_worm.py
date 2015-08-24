@@ -272,11 +272,11 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               e.asserts(r)
 
       i = i + 1
-      
+
     altun_ev.save()
     wormatlas_ev.save()
     #persist all new neuron information
-    for neur in P.Worm().neuron_network().neurons():
+    for neur in P.Neuron().load():
         neur.save()
     print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
