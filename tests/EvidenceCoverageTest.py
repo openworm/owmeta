@@ -24,7 +24,6 @@ from DataTestTemplate import _DataTest
 
 class EvidenceCoverageTest(_DataTest):
 
-    @unittest.expectedFailure
     def test_verify_neurons_have_evidence(self):
         """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
@@ -33,6 +32,16 @@ class EvidenceCoverageTest(_DataTest):
         evcheck = []
         for n in neurons:
             hasEvidence = len(get_supporting_evidence(n))
+            evcheck.append(hasEvidence)
+            hasEvidence = len(get_supporting_evidence(n.neurotransmitter))
+            evcheck.append(hasEvidence)
+            hasEvidence = len(get_supporting_evidence(n.type))
+            evcheck.append(hasEvidence)
+            hasEvidence = len(get_supporting_evidence(n.innexin))
+            evcheck.append(hasEvidence)
+            hasEvidence = len(get_supporting_evidence(n.neuropeptide))
+            evcheck.append(hasEvidence)
+            hasEvidence = len(get_supporting_evidence(n.receptor))
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck)
