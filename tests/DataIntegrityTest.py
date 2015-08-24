@@ -103,8 +103,7 @@ class DataIntegrityTest(unittest.TestCase):
                 if isinstance(v,R.Literal):
                     results.add(n)
 
-        # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
-        self.assertEqual(len(results), len(self.neurons) - 4, "Some neurons are missing a type: {}".format(set(self.neurons) - results))
+        self.assertEqual(len(results), len(self.neurons), "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """
