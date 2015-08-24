@@ -273,7 +273,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               e.asserts(r)
               e.save()
       n.save()
-      i++
+      i = i + 1
     print ("uploaded " + i + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 
