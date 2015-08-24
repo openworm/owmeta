@@ -4,7 +4,7 @@ sys.path.insert(0,".")
 import unittest
 import neuroml
 import neuroml.writers as writers
-import PyOpenWorm
+import PyOpenWorm as P
 from PyOpenWorm import *
 import networkx
 import rdflib
@@ -27,21 +27,18 @@ class EvidenceCoverageTest(_DataTest):
     def test_verify_neurons_have_evidence(self):
         """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
-        net = Worm().neuron_network()
-        neurons = list(net.neurons())
+
+        neurons = list(P.Neuron().load())
         evcheck = []
         for n in neurons:
-            hasEvidence = len(get_supporting_evidence(n))
-            evcheck.append(hasEvidence)
-            hasEvidence = len(get_supporting_evidence(n.neurotransmitter))
-            evcheck.append(hasEvidence)
-            hasEvidence = len(get_supporting_evidence(n.type))
-            evcheck.append(hasEvidence)
-            hasEvidence = len(get_supporting_evidence(n.innexin))
-            evcheck.append(hasEvidence)
-            hasEvidence = len(get_supporting_evidence(n.neuropeptide))
-            evcheck.append(hasEvidence)
-            hasEvidence = len(get_supporting_evidence(n.receptor))
+
+            hasEvidence = len(get_supporting_evidence(n)) +
+            len(get_supporting_evidence(n.neurotransmitter)) +
+            len(get_supporting_evidence(n.type)) +
+            len(get_supporting_evidence(n.innexin)) +
+            len(get_supporting_evidence(n.neuropeptide)) +
+            len(get_supporting_evidence(n.receptor))
+
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck)
