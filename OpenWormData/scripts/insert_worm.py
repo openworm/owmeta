@@ -201,13 +201,16 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     """ Augment the metadata about neurons with information about receptors,
         neuron types, neurotransmitters, neuropeptides and innexins.
         As we go, add evidence objects to each statement."""
+    print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+
     #set up evidence objects in advance
     altun_ev  = get_altun_evidence()
     wormatlas_ev = get_wormatlas_evidence();
 
-    import csv
+    import csv, sys
     f = open('../aux_data/Modified celegans db dump.csv')
     reader = csv.reader(f)
+    reader.next() #skip the header row
 
     i = 0
 
@@ -234,31 +237,31 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
       #grab the neuron object
       n = P.Neuron(name=neuron_name)
+
       if relation == 'neurotransmitter':
           # assign the data, grab the relation into r
           r = n.neurotransmitter(data)
           #assert the evidence on the relationship
           e.asserts(r)
-          e.save()
       elif relation == 'innexin':
           # assign the data, grab the relation into r
           r = n.innexin(data)
           #assert the evidence on the relationship
           e.asserts(r)
-          e.save()
       elif relation == 'neuropeptide':
           # assign the data, grab the relation into r
           r = n.neuropeptide(data)
           #assert the evidence on the relationship
           e.asserts(r)
-          e.save()
       elif relation == 'receptor':
           # assign the data, grab the relation into r
           r = n.receptor(data)
           #assert the evidence on the relationship
           e.asserts(r)
-          e.save()
-      elif relation == 'type':
+
+      e.save()
+
+      if relation == 'type':
           types = []
           if 'sensory' in (data.lower()):
               types.append('sensory')
@@ -272,8 +275,10 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               #assert the evidence on the relationship
               e.asserts(r)
               e.save()
+
       n.save()
       i = i + 1
+      print(str(i) + '.')
     print ("uploaded " + i + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 
@@ -444,9 +449,9 @@ def do_insert(config="default.conf", logging=False):
 
         upload_neurons()
         upload_muscles()
+        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
         upload_lineage_and_descriptions()
         upload_connections()
-        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
         serialize_as_n3()
         infer()
     except:
