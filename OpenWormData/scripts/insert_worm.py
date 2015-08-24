@@ -227,12 +227,10 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
       #pick correct evidence given the row
       if 'altun' in evidence.lower():
           altun_ev.uri(evidenceURL)
-          altun_ev.save()
           e = altun_ev
 
       elif 'wormatlas' in evidence.lower():
           wormatlas_ev.uri(evidenceURL)
-          wormatlas_ev.save()
           e = wormatlas_ev
 
       #grab the neuron object
@@ -259,8 +257,6 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
           #assert the evidence on the relationship
           e.asserts(r)
 
-      e.save()
-
       if relation == 'type':
           types = []
           if 'sensory' in (data.lower()):
@@ -274,12 +270,12 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
               r = n.type(t)
               #assert the evidence on the relationship
               e.asserts(r)
-              e.save()
 
-      n.save()
       i = i + 1
       print(str(i) + '.')
-    print ("uploaded " + i + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+    altun_ev.save()
+    wormatlas_ev.save()
+    print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 
 def new_connections():
