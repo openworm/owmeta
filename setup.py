@@ -38,6 +38,7 @@ setup(
     cmdclass = {'install': install},
     zip_safe = False,
     install_requires=[
+        'bibtexparser==0.6.1'
         'BTrees==4.0.8',
         'decorator==3.4.0',
         'discover==0.4.0',

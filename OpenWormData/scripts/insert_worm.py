@@ -167,8 +167,28 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
       evidence = row[3]
       evidenceURL = row[4]
 
-      #make the evidence statement -- needs to be made better!!
+      #make the evidence statement -- only pulls one bibtex everytime :(
       e  = P.Evidence(uri=evidenceURL)
+
+      import bibtexparser
+      with open('../aux_data/bibtex_files/altun2009.bib') as bibtex_file:
+          bib_database = bibtexparser.load(bibtex_file)
+
+          doi = bib_database.entries[0]['doi']
+          if doi:
+            e.doi(doi)
+          author = bib_database.entries[0]['author']
+          if author:
+            e.author(author)
+          title = bib_database.entries[0]['title']
+          if title:
+            e.title(title)
+          year = bib_database.entries[0]['year']
+          if year:
+            e.year(year)
+
+          e.save()
+
       #grab the neuron object
       n = P.Neuron(name=neuron_name)
       if relation == 'neurotransmitter':
@@ -382,8 +402,7 @@ def do_insert(config="default.conf", logging=False):
         upload_muscles()
         upload_lineage_and_descriptions()
         upload_connections()
-        upload_receptors_and_innexins()
-        upload_types()
+        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
         serialize_as_n3()
         infer()
     except:
