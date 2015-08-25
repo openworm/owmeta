@@ -4,7 +4,9 @@ import rdflib as R
 import random as RND
 import logging
 
-from yarom.graphObject import (GraphObject, GraphObjectQuerier, ComponentTripler)
+from yarom.graphObject import (GraphObject,
+                               GraphObjectQuerier,
+                               ComponentTripler)
 from yarom.rdfUtils import deserialize_rdflib_term
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
@@ -156,7 +158,7 @@ class SimpleProperty(GraphObject, DataUser):
 
     def __repr__(self):
         return str(self.linkName) + "=`" \
-                + ";".join(str(s) for s in self.defined_values) + "'"
+            + ";".join(str(s) for s in self.defined_values) + "'"
 
     def __str__(self):
         return str(self.__class__.__name__) + "(" + str(self.idl.n3()) + ")"
@@ -206,7 +208,7 @@ class SimpleProperty(GraphObject, DataUser):
 
     @property
     def defined(self):
-        return self.owner.defined and self._pp.hasValue()
+        return self.owner.defined and self._pp.has_defined_value()
 
     def variable(self):
         return self._variable

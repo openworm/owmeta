@@ -1,6 +1,5 @@
-from PyOpenWorm.pProperty import Property
+class FakeProperty(object):
 
-class FakeProperty(Property):
     def __init__(self, prop):
         self._p = prop
         self._p.owner_properties.append(self)
@@ -39,5 +38,4 @@ class FakeProperty(Property):
         return self._p.rdf
 
     def __str__(self):
-        return "FakeProperty("+str(self._p.idl.n3())+")"
-
+        return "FakeProperty(" + str(self._p.idl.n3()) + ")"

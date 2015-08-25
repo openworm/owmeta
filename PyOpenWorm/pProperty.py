@@ -1,4 +1,4 @@
-from PyOpenWorm.v0.dataObject import DataObject
+from .dataObject import DataObject
 
 class Property(DataObject):
     """ Store a value associated with a DataObject
@@ -89,7 +89,3 @@ class Property(DataObject):
                     return next(iter(r))
                 except StopIteration:
                     return None
-
-    # Get the property (a relationship) itself
-
-

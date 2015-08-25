@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, ".")
 import unittest
 import PyOpenWorm
+from PyOpenWorm.dataObject import RDFTypeTable
 from PyOpenWorm import DataObject, Neuron, Connection
 import rdflib as R
 from GraphDBInit import make_graph
@@ -30,10 +31,10 @@ class DataObjectTest(_DataTest):
         self.assertEqual(self.config['user.email'], u)
 
     def test_object_from_id(self):
-        do = DataObject(ident="http://example.org")
-        g = do.object_from_id('http://openworm.org/entities/Neuron')
+        print(RDFTypeTable)
+        g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
-        g = do.object_from_id('http://openworm.org/entities/Connection')
+        g = DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
 
     @unittest.skip("Should be tracked by version control")
