@@ -77,9 +77,9 @@ setup(
         'git+https://github.com/mwatts15/YAROM@dev#egg=yarom-0.7.1',
     ],
     version = '0.5.3',
-    packages = ['PyOpenWorm', 'PyOpenWorm.v0', 'PyOpenWorm.graphObjectAdapter'],
+    packages = ['PyOpenWorm'],
     package_data = {
-        'PyOpenWorm':['default.conf']
+        'PyOpenWorm': ['default.conf']
     },
     include_package_data=True,
     author = 'OpenWorm.org authors and contributors',

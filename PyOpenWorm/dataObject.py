@@ -10,7 +10,7 @@ from .v0.dataObject import DataObject as DO
 from .v0.dataObject import RDFTypeTable
 from .v0.dataObject import disconnect as DODisconnect
 from .simpleProperty import DatatypeProperty, SimpleProperty
-from .graphObjectAdapter.fakeProperty import FakeProperty
+from .fakeProperty import FakeProperty
 
 L = logging.getLogger(__name__)
 
