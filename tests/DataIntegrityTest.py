@@ -48,6 +48,7 @@ class DataIntegrityTest(unittest.TestCase):
         for row in reader:
             if len(row[0]) > 0: # Only saves valid neuron names
                 cls.neurons.append(row[0])
+
     @classmethod
     def tearDownClass(cls):
         PyOpenWorm.disconnect()
@@ -292,7 +293,6 @@ class DataIntegrityTest(unittest.TestCase):
         for muscle_object in muscles:
             self.assertNotEqual(muscle_object.wormbaseID(), '')
 
-    @unittest.expectedFailure
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
         net = PyOpenWorm.Worm().get_neuron_network()
