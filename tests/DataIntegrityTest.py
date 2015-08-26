@@ -386,3 +386,23 @@ class DataIntegrityTest(unittest.TestCase):
             unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
 
         self.assertEqual(300, len(unique_neurons))
+
+    @unittest.expectedFailure
+    def test_unconnected_neurons(self):
+        """
+        This test verifies that there are exactly 2 unconnected neurons,
+        i.e., CANL and CANR, in the new connectome.
+        """
+        # In previous tests, there is a check for exactly 302 neurons in total.
+        # There is also a test for exactly 300 unique neurons making connections.
+        # That means it should be enough to check that the set {CANL, CANR} and
+        # the set of neurons making connections are disjoint.
+
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        connected_neurons = {}
+        unconnected_neurons = {'CANL', 'CANR'}
+
+        for synapse in synapses:
+            connected_neurons.add(synapse.pre_cell())
+
+        self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))
