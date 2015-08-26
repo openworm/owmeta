@@ -316,8 +316,8 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that the content of each connection matches the
         content in the source. """
         ignored_cells = ['HYP', 'INTESTINE']
-        synapse_tuples = []    # set of tuple representation of synapses
-        csv_tuples = []        # set of tuple representation of csv file
+        synapse_tuples = {}    # set of tuple representation of synapses
+        csv_tuples = {}        # set of tuple representation of csv file
 
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
         for synapse in synapses:
