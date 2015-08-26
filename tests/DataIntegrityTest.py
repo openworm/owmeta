@@ -346,7 +346,8 @@ class DataIntegrityTest(unittest.TestCase):
     @unittest.expectedFailure
     def test_number_neuron_to_neuron(self):
         """
-        This test verifies that the worm model has exactly 5805 neuron to neuron connections.
+        This test verifies that the worm model has exactly 5805 neuron to neuron
+        connections.
         """
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
         count = 0
@@ -360,7 +361,8 @@ class DataIntegrityTest(unittest.TestCase):
     @unittest.expectedFailure
     def test_number_neuron_to_muscle(self):
         """
-        This test verifies that the worm model has exactly 1111 neuron to muscle connections.
+        This test verifies that the worm model has exactly 1111 neuron to muscle
+        connections.
         """
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
         count = 0
@@ -370,3 +372,17 @@ class DataIntegrityTest(unittest.TestCase):
                 count += 1
 
         self.assertEqual(1111, count)
+
+    @unittest.expectedFailure
+    def test_correct_number_unique_neurons(self):
+        """
+        This test verifies that the worm model has exactly 300 unique neurons
+        making connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        unique_neurons = {}    # set of unique neurons
+
+        for synapse in synapses:
+            unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
+
+        self.assertEqual(300, len(unique_neurons))
