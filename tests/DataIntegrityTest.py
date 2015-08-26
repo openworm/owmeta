@@ -342,3 +342,16 @@ class DataIntegrityTest(unittest.TestCase):
                 csv_tuples.add(csv_tuple)
 
         assert(csv_tuples.issubset(synapse_tuples))
+
+    def test_number_neuron_to_neuron(self):
+        """
+        This test verifies that the worm model has exactly 5805 neuron to neuron connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        count = 0
+
+        for synapse in synapses:
+            if synapse.termination() == 'neuron':
+                count += 1
+
+        assertEqual(5805, count)
