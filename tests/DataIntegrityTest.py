@@ -355,3 +355,16 @@ class DataIntegrityTest(unittest.TestCase):
                 count += 1
 
         assertEqual(5805, count)
+
+    def test_number_neuron_to_muscle(self):
+        """
+        This test verifies that the worm model has exactly 1111 neuron to muscle connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        count = 0
+
+        for synapse in synapses:
+            if synapse.termination() == 'muscle':
+                count += 1
+
+        assertEqual(1111, count)
