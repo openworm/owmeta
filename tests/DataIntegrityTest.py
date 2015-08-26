@@ -297,13 +297,13 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that all Neuron objects are also Cell objects. """
         net = PyOpenWorm.Worm().get_neuron_network()
         for neuron_object in net.neurons():
-            assert isinstance(neuron_object, PyOpenWorm.Cell)
+            self.assertIsInstance(neuron_object, PyOpenWorm.Cell)
 
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
-            assert isinstance(muscle_object, PyOpenWorm.Cell)
+            self.assertIsInstance(muscle_object, PyOpenWorm.Cell)
 
     @unittest.expectedFailure
     def test_correct_connections_number(self):
@@ -341,7 +341,7 @@ class DataIntegrityTest(unittest.TestCase):
                 csv_tuple = (source, target, weight, syn_type)
                 csv_tuples.add(csv_tuple)
 
-        assert(csv_tuples.issubset(synapse_tuples))
+        self.assertTrue(csv_tuples.issubset(synapse_tuples))
 
     def test_number_neuron_to_neuron(self):
         """
@@ -354,7 +354,7 @@ class DataIntegrityTest(unittest.TestCase):
             if synapse.termination() == 'neuron':
                 count += 1
 
-        assertEqual(5805, count)
+        self.assertEqual(5805, count)
 
     def test_number_neuron_to_muscle(self):
         """
@@ -367,4 +367,4 @@ class DataIntegrityTest(unittest.TestCase):
             if synapse.termination() == 'muscle':
                 count += 1
 
-        assertEqual(1111, count)
+        self.assertEqual(1111, count)
