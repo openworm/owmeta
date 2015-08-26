@@ -316,11 +316,17 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that the content of each connection matches the
         content in the source. """
         ignored_cells = ['HYP', 'INTESTINE']
-        unmatched = 0
+        synapse_tuples = []    # set of tuple representation of synapses
+        csv_tuples = []        # set of tuple representation of csv file
 
-        # get a sorted list of synapses
-        net = PyOpenWorm.Worm().get_neuron_network()
-        synapses = sorted(list(net.neurons()))
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        for synapse in synapses:
+            if synapse.syntype() == 'gapJunction':
+                syn_type = 'chemical'
+            else:
+                syn_type = 'electrical'
+            syn_tuple = (synapse.pre_cell(), synapse.post_cell(), synapse.number(), syn_type)
+            synapse_tuples.add(syn_tuple)
 
         # read csv file row by row
         with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
@@ -330,11 +336,9 @@ class DataIntegrityTest(unittest.TestCase):
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
                 # ignore rows where source or target is 'hyp' or 'intestine'
-                if (source in ignored_cells or target in ignored_cells):
+                if source in ignored_cells or target in ignored_cells:
                     continue
-                connection = PyOpenWorm.Connection(source, target, weight, syn_type)
-                # if the connection represented in the row is not in synapses, increment count of unmatched
-                if (connection not in synapses):
-                    unmatched += 1
+                csv_tuple = (source, target, weight, syn_type)
+                csv_tuples.add(csv_tuple)
 
-        assertEqual(0, unmatched)
+        assert(csv_tuples.issubset(synapse_tuples))
