@@ -315,7 +315,7 @@ class DataIntegrityTest(unittest.TestCase):
     def test_connection_content_matches(self):
         """ This test verifies that the content of each connection matches the
         content in the source. """
-        ignored_cells = ['HYP', 'INTESTINE']
+        ignored_cells = ['hyp', 'intestine']
         synapse_tuples = {}    # set of tuple representation of synapses
         csv_tuples = {}        # set of tuple representation of csv file
 
