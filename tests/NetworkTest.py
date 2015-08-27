@@ -34,13 +34,13 @@ class NetworkTest(_DataTest):
 
     def test_neurons(self):
         """
-        Test that we can access arbitrary Neurons,
-        and that they are in the Network
+        Test that we can add arbitrary Neurons to the Network,
+        and that they can be accessed afterwards.
         """
         self.net.neuron(Neuron(name='AVAL'))
         self.net.neuron(Neuron(name='DD5'))
-        self.assertTrue('AVAL' in self.net.neurons())
-        self.assertTrue('DD5' in self.net.neurons())
+        self.assertTrue('AVAL' in self.net.neuron_names())
+        self.assertTrue('DD5' in self.net.neuron_names())
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
@@ -51,4 +51,3 @@ class NetworkTest(_DataTest):
     def test_as_networkx(self):
         """Test that as_networkx returns the correct type."""
         self.assertTrue(isinstance(self.net.as_networkx(),networkx.DiGraph))
-

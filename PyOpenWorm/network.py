@@ -9,19 +9,19 @@ class Network(DataObject):
     Attributes
     -----------
     neuron
-        Representation of neurons in the network
+        Returns a set of all Neuron objects in the network
     synapse
-        Representation of synapses in the network
+        Returns a set of all synapses in the network
     """
     def __init__(self, **kwargs):
         DataObject.__init__(self,**kwargs)
 
         self.synapses = Network.ObjectProperty('synapse', owner=self, value_type=P.Connection, multiple=True)
-        Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
+        self.neurons = Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
 
-    def neurons(self):
+    def neuron_names(self):
         """
-        Gets the complete set of neurons in this network.
+        Gets the complete set of neurons' names in this network.
 
         Example::
 
@@ -29,13 +29,13 @@ class Network(DataObject):
             >>> net = P.Worm().get_neuron_network()
 
             #NOTE: This is a VERY slow operation right now
-            >>> len(set(net.neurons()))
+            >>> len(set(net.neuron_names()))
             302
-            >>> set(net.neurons())
+            >>> set(net.neuron_names())
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        for x in self.neuron():
+        for x in self.neurons():
             yield x.name()
 
     def aneuron(self, name):

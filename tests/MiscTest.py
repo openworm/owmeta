@@ -34,7 +34,7 @@ class MiscTest(_DataTest):
         """
 
         net = Worm().neuron_network()
-        neurons = net.neurons()
+        neurons = net.neuron_names()
         check1 = len(list(neurons))
         check2 = len(list(neurons))
         self.assertEqual(check1, check2)

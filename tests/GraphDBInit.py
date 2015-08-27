@@ -3,8 +3,7 @@
 import sys
 sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
+
 import PyOpenWorm
 from PyOpenWorm import *
 import networkx
