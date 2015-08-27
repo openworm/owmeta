@@ -56,17 +56,15 @@ class DataIntegrityTest(unittest.TestCase):
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
 
-    def test_TH_neuropeptide_neuron_list(self):
+    def test_INS_26_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
-        neuropeptide TH is correct (the list is given below).
+        neuropeptide INS-26 is correct (the list is given below).
         """
         neuronlist = PyOpenWorm.Neuron()
-        neuronlist.neuropeptide("TH")
+        neuronlist.neuropeptide("INS-26")
         thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(
-            set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL']),
-            thlist)
+        self.assertEqual(set(['ASEL', 'ASER', 'ASIL', 'ASIR']), thlist)
 
     def test_unique_neuron_node(self):
         """
@@ -120,11 +118,7 @@ class DataIntegrityTest(unittest.TestCase):
                 if isinstance(v, R.Literal):
                     results.add(n)
 
-        # NOTE: Neurons ALNL, CANL, CANR, ALNR have unknown function and type
-        self.assertEqual(len(results),
-                         len(self.neurons) - 4,
-                         "Some neurons are missing a type: {}".format(
-                             set(self.neurons) - results))
+        self.assertEqual(len(results), len(self.neurons), "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """

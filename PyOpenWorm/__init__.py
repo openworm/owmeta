@@ -81,6 +81,7 @@ from .connection import Connection
 from .experiment import Experiment
 from .channel import Channel
 from .channelworm import ChannelModel, PatchClampExperiment
+from .plot import Plot
 
 __import__('__main__').connected = False
 
@@ -239,6 +240,7 @@ def connect(configFile=False,
     ChannelModel.register()
     Experiment.register()
     PatchClampExperiment.register()
+    Plot.register()
 
     m.connected = True
     if data:

@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, ".")
-import unittest
 import PyOpenWorm
+import unittest
 import subprocess
 import tempfile
 

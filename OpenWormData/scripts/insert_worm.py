@@ -22,20 +22,7 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-
-def print_evidence():
-    try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
-        for r in cur.fetchall():
-            print(r)
-    except Exception:
-        traceback.print_exc()
-    finally:
-        conn.close()
-
-def add_muscles():
+def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
@@ -63,7 +50,7 @@ def add_muscles():
     finally:
         conn.close()
 
-def add_lineage_and_descriptions():
+def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
 
     Assumes that Neurons and Muscles have already been added
@@ -137,7 +124,7 @@ def norn(x):
     except StopIteration:
         return None
 
-def add_neurons():
+def upload_neurons():
     try:
         conn = sqlite3.connect(SQLITE_DB_LOC)
         cur = conn.cursor()
@@ -160,53 +147,152 @@ def add_neurons():
     finally:
         conn.close()
 
-def add_receptors_and_innexins():
-    try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        n = NETWORK
-        # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
-        neurons = dict()
+def get_altun_evidence():
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
 
-        def add_data_to_neuron(data_kind, relation_code):
-            print("Adding", data_kind, "data")
-            cur.execute("""
-                SELECT DISTINCT a.Entity, b.Entity
-                FROM
-                tblrelationship q,
-                tblrelationship r,
-                tblentity a,
-                tblentity b
-                where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-                and   r.EnID1=a.id and r.Relation = '{}'  and r.EnID2=b.id
-                """.format(relation_code))
-            for r in cur.fetchall():
-                name = str(r[0])
-                data = str(r[1])
+def get_wormatlas_evidence():
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
 
-                if name not in neurons:
-                    neurons[name] = P.Neuron(name=name)
+def parse_bibtex_into_evidence(file_name):
+    import bibtexparser
+    e = P.Evidence()
+    with open(file_name) as bibtex_file:
+        bib_database = bibtexparser.load(bibtex_file)
 
-                getattr(neurons[name], data_kind)(data)
-            print("Added", data_kind, "data")
+        try:
+            doi = bib_database.entries[0]['doi']
+            if doi:
+              e.doi(doi)
+        except KeyError:
+            pass
 
-        add_data_to_neuron('receptor', 361)
-        add_data_to_neuron('innexin', 355)
-        add_data_to_neuron('neurotransmitter', 313)
-        add_data_to_neuron('neuropeptide', 354)
+        try:
+            author = bib_database.entries[0]['author']
+            if author:
+              e.author(author)
+        except KeyError:
+            pass
 
-        for neur in neurons:
-            n.neuron(neurons[neur])
-        #second step, get the relationships between them and add them to the graph
-        print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
-        sys.stdout.flush()
-    except Exception:
-        traceback.print_exc()
-    finally:
-        conn.close()
+        try:
+            title = bib_database.entries[0]['title']
+            if title:
+              e.title(title)
+        except KeyError:
+            pass
+        try:
+            year = bib_database.entries[0]['year']
+            if year:
+              e.year(year)
+        except KeyError:
+            pass
+        e.save()
+    return e
+
+def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
+    """ Augment the metadata about neurons with information about receptors,
+        neuron types, neurotransmitters, neuropeptides and innexins.
+        As we go, add evidence objects to each statement."""
+    print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+
+    #set up evidence objects in advance
+    altun_ev  = get_altun_evidence()
+    wormatlas_ev = get_wormatlas_evidence()
+
+    import csv
+    f = open('../aux_data/Modified celegans db dump.csv')
+    reader = csv.reader(f)
+    reader.next() #skip the header row
+
+    i = 0
+
+    from sets import Set
+    neurons = Set()
+    uris = dict()
+
+    for row in reader:
+      neuron_name = row[0]
+      relation = row[1].lower()
+      data = row[2]
+      evidence = row[3]
+      evidenceURL = row[4]
+
+      #prepare evidence
+      e = P.Evidence()
+
+      #pick correct evidence given the row
+      if 'altun' in evidence.lower():
+          e = altun_ev
+
+      elif 'wormatlas' in evidence.lower():
+          e = wormatlas_ev
+
+      e2 = []
+      try:
+          e2 = uris[evidenceURL]
+      except KeyError:
+          e2 = P.Evidence(uri=evidenceURL)
+          uris[evidenceURL] = e2
+
+      #grab the neuron object
+      n = NETWORK.aneuron(neuron_name)
+      neurons.add(n)
+
+      if relation == 'neurotransmitter':
+          # assign the data, grab the relation into r
+          r = n.neurotransmitter(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e2.asserts(r)
+      elif relation == 'innexin':
+          # assign the data, grab the relation into r
+          r = n.innexin(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e2.asserts(r)
+      elif relation == 'neuropeptide':
+          # assign the data, grab the relation into r
+          r = n.neuropeptide(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e2.asserts(r)
+      elif relation == 'receptor':
+          # assign the data, grab the relation into r
+          r = n.receptor(data)
+          #assert the evidence on the relationship
+          e.asserts(r)
+          e2.asserts(r)
+
+      if relation == 'type':
+          types = []
+          if 'sensory' in (data.lower()):
+              types.append('sensory')
+          if 'interneuron' in (data.lower()):
+              types.append('interneuron')
+          if 'motor' in (data.lower()):
+              types.append('motor')
+          if 'unknown' in (data.lower()):
+              types.append('unknown')
+          # assign the data, grab the relation into r
+          for t in types:
+              r = n.type(t)
+              #assert the evidence on the relationship
+              e.asserts(r)
+              e2.asserts(r)
+
+      i = i + 1
+
+    #altun_ev.save()
+    #wormatlas_ev.save()
+    #for uri in uris:
+        #uris[uri].save()
+    #persist all new neuron information
+    for neur in neurons:
+        n = NETWORK.neuron(neur)
+    #NETWORK.save()
+    print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 def new_connections():
-    """we can replace the old function, add_connections, with this
+    """we can replace the old function, upload_connections, with this
     once it is ready to go"""
 
     search_string = re.compile(r'\w+[0]+[1-9]+')
@@ -258,7 +344,7 @@ def new_connections():
         traceback.print_exc()
 
 
-def add_connections():
+def upload_connections():
     search_string = re.compile(r'\w+[0]+[1-9]+')
     replace_string = re.compile(r'[0]+')
 
@@ -307,32 +393,6 @@ def add_connections():
         print('uploaded connections')
     except Exception:
         traceback.print_exc()
-
-def add_types():
-    ev = P.Evidence(title="neurons.csv")
-    net = NETWORK
-
-    data = dict()
-    for x in csv.reader(open('../aux_data/neurons.csv'), delimiter=';'):
-        types = []
-        name = x[0]
-        types_string = x[1]
-        if 'sensory' in (types_string.lower()):
-            types.append('sensory')
-        if 'interneuron' in (types_string.lower()):
-            types.append('interneuron')
-        if 'motor' in (types_string.lower()):
-            types.append('motor')
-        data[name] = types
-
-    for name in data:
-        n = P.Neuron(name=name)
-        types = data[name]
-        for t in types:
-            n.type(t)
-        net.neuron(n)
-    ev.asserts(net)
-    print ("uploaded types")
 
 def infer():
     from rdflib import Graph
@@ -391,12 +451,11 @@ def do_insert(config="default.conf", logging=False):
         WORM.neuron_network(NETWORK)
         NETWORK.worm(WORM)
 
-        add_neurons()
-        add_muscles()
-        add_lineage_and_descriptions()
-        add_connections()
-        add_receptors_and_innexins()
-        add_types()
+        upload_neurons()
+        upload_muscles()
+        upload_lineage_and_descriptions()
+        upload_connections()
+        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
 
         print("Saving...")
         WORM.save()
@@ -415,7 +474,6 @@ if __name__ == '__main__':
     # Takes about 5 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
 
-    import sys
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option("-l", "--do-logging", dest="do_logging",
