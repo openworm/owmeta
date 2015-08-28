@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, ".")
 import unittest
 import PyOpenWorm
-from PyOpenWorm import Configure, Worm, Evidence
+from PyOpenWorm import Configure
 import rdflib as R
 
 from GraphDBInit import delete_zodb_data_store
@@ -137,57 +137,6 @@ class DataIntegrityTest(unittest.TestCase):
         for row in qres.result:
             print(row)
 
-    @unittest.expectedFailure
-    def test_verify_neurons_have_evidence(self):
-        """ For each neuron in PyOpenWorm, verify
-        that there is supporting evidence"""
-        net = Worm().neuron_network()
-        neurons = list(net.neurons())
-        evcheck = []
-        for nobj in neurons:
-            hasEvidence = len(self.get_supporting_evidence(nobj))
-            evcheck.append(hasEvidence)
-
-        self.assertTrue(0 not in evcheck)
-
-    @unittest.expectedFailure
-    def test_verify_muslces_have_evidence(self):
-        """ For each muscle in PyOpenWorm, verify
-        that there is supporting evidence"""
-        muscles = list(Worm().muscles())
-        muscle_evcheck = []
-        for mobj in muscles:
-            hasEvidence = len(self.get_supporting_evidence(mobj))
-            muscle_evcheck.append(hasEvidence)
-
-        self.assertTrue(0 not in muscle_evcheck)
-
-    @unittest.expectedFailure
-    def test_verify_connections_have_evidence(self):
-        """ For each connection in PyOpenWorm, verify that there is
-        supporting evidence. """
-        net = Worm().neuron_network()
-        connections = list(net.synapses())
-        evcheck = []
-        for c in connections:
-            has_evidence = len(self.get_supporting_evidence(c))
-            evcheck.append(has_evidence)
-
-        self.assertTrue(0 not in evcheck)
-
-    @unittest.skip('There is no information at present about channels')
-    def test_verify_channels_have_evidence(self):
-        """ For each channel in PyOpenWorm, verify that there is
-        supporting evidence. """
-        pass
-
-    def get_supporting_evidence(fact):
-        """ Helper function for checking amount of Evidence.
-        Returns list of Evidence supporting fact. """
-        ev = Evidence()
-        ev.asserts(fact)
-        return list(ev.load())
-
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
         SAMPLE_CELL = 'AVAL'
@@ -302,14 +251,12 @@ class DataIntegrityTest(unittest.TestCase):
         s = xlrd.open_workbook(
             'OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
         for row in range(1, s.nrows):
-            if s.cell(
-                row, 2).value in (
-                'S', 'Sp', 'EJ') and SAMPLE_CELL in [
-                s.cell(
-                    row, 0).value, s.cell(
-                    row, 1).value]:
-                # we're not going to include 'receives' ('r', 'rp') since they're just the inverse of 'sends'
-                # also omitting 'nmj' for the time being (no model in db)
+            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and \
+                SAMPLE_CELL in [s.cell(row, 0).value,
+                                s.cell(row, 1).value]:
+                # we're not going to include 'receives' ('r', 'rp') since
+                # they're just the inverse of 'sends' also omitting 'nmj'
+                # for the time being (no model in db)
                 pre = normalize(s.cell(row, 0).value)
                 post = normalize(s.cell(row, 1).value)
                 num = int(s.cell(row, 3).value)

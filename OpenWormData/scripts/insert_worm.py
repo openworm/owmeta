@@ -158,7 +158,8 @@ def parse_bibtex_into_evidence(file_name):
     e = P.Evidence()
     with open(file_name) as bibtex_file:
         bib_database = bibtexparser.load(bibtex_file)
-
+        key = bib_database.entries[0]['ID']
+        e.setKey(key)
         try:
             doi = bib_database.entries[0]['doi']
             if doi:
@@ -281,14 +282,14 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
       i = i + 1
 
-    #altun_ev.save()
-    #wormatlas_ev.save()
-    #for uri in uris:
-        #uris[uri].save()
+    altun_ev.save()
+    wormatlas_ev.save()
+    for uri in uris:
+        uris[uri].save()
     #persist all new neuron information
     for neur in neurons:
         n = NETWORK.neuron(neur)
-    #NETWORK.save()
+    NETWORK.save()
     print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
 def new_connections():

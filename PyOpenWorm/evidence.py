@@ -275,7 +275,7 @@ class Evidence(DataObject):
 
         multivalued_fields = ('author', 'uri')
         other_fields = ('year', 'title', 'doi', 'wbid', 'pmid')
-        self.id_precedence = ('doi', 'pmid', 'wbid')
+        self.id_precedence = ('doi', 'pmid', 'wbid', 'uri')
         for x in multivalued_fields:
             Evidence.DatatypeProperty(x, multiple=True, owner=self)
 
