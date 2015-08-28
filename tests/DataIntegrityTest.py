@@ -122,6 +122,8 @@ class DataIntegrityTest(unittest.TestCase):
         for row in qres.result:
             print row
 
+    #TODO: Revise this test to pull from the herm_full_edgelist.csv instead of NeuronConnect.xls
+    @unittest.skip("deprecated because spreadsheet is no longer supposed to match"
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
         SAMPLE_CELL = 'AVAL'

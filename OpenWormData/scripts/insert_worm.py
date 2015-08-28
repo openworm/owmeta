@@ -26,7 +26,9 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-
+# to normalize certain neuron and muscle names
+search_string = re.compile(r'\w+[0]+[1-9]+')
+replace_string = re.compile(r'[0]+')
 
 def normalize(name):
     # normalize neuron and muscle names to match those used at other points
@@ -318,6 +320,8 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
 
 def upload_connections():
+
+    print ("uploading statements about connections.  Buckle up; this will take a while!")
 
     # to normalize certian body wall muscle cell names
     search_string_muscle = re.compile(r'\w+[BWM]+\w+')
@@ -669,7 +673,7 @@ def infer():
         network.inferredFacts = closureDeltaGraph
 
         #build a network of rules
-        for rule in HornFromN3('testrules.n3'):
+        for rule in HornFromN3('inference_rules.n3'):
             network.buildNetworkFromClause(rule)
 
         network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
@@ -712,8 +716,9 @@ def do_insert(config="default.conf", logging=False):
         upload_receptors_types_neurotransmitters_neuropeptides_innexins()
         upload_lineage_and_descriptions()
         upload_connections()
+        infer()
         serialize_as_n3()
-        #infer()
+        
     except:
         traceback.print_exc()
     finally:
