@@ -69,7 +69,7 @@ class DataIntegrityTest(unittest.TestCase):
         muscles = PyOpenWorm.Worm().muscles()
         self.assertEqual(144, len(muscles))
 
-def test_INS_26_neuropeptide_neuron_list(self):
+   def test_INS_26_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
         neuropeptide INS-26 is correct (the list is given below).
