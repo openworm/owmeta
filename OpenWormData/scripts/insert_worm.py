@@ -58,6 +58,7 @@ def upload_muscles():
                     m = P.Muscle(name=muscle_name)
                     w.muscle(m)
             ev.asserts(w)
+            ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
@@ -164,6 +165,7 @@ def upload_neurons():
                     i = i + 1
 
         ev.asserts(n)
+        ev.save()
         #second step, get the relationships between them and add them to the graph
         print ("uploaded " + str(i) + " neurons")
     except Exception:
