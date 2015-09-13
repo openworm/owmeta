@@ -168,7 +168,7 @@ def upload_neurons():
         ev.asserts(n)
         ev.save()
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded " + i + " neurons")
+        print ("uploaded " + str(i) + " neurons")
     except Exception:
         traceback.print_exc()
 
