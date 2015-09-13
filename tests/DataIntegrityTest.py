@@ -117,11 +117,11 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 40)
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 81)
 
     def test_neuron_Syn_degree(self):
         """ Get the number of chemical synapses from a networkx representation """
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 90)
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 187)
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
