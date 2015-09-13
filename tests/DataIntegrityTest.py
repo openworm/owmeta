@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 sys.path.insert(0, ".")
-import unittest
+import unittest, csv
 import PyOpenWorm
 from PyOpenWorm import Configure
 import rdflib as R

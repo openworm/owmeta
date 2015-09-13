@@ -57,7 +57,7 @@ def upload_muscles():
                     muscle_name = normalize(line[0]).upper()
                     m = P.Muscle(name=muscle_name)
                     w.muscle(m)
-            SQLITE_EVIDENCE.asserts(w)
+            ev.asserts(w)
         #second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
@@ -77,6 +77,7 @@ def upload_lineage_and_descriptions():
     try:
         w = WORM
         net = NETWORK
+        #TODO: Improve this evidence marker
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
         cell_data = open(LINEAGE_LIST_LOC, "r")
 
@@ -142,6 +143,7 @@ def norn(x):
 
 def upload_neurons():
     try:
+        #TODO: Improve this evidence marker
         ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
         w = P.Worm()
         n = P.Network()
@@ -161,7 +163,7 @@ def upload_neurons():
                     n.neuron(P.Neuron(name=neuron_name))
                     i = i + 1
 
-        SQLITE_EVIDENCE.asserts(n)
+        ev.asserts(n)
         #second step, get the relationships between them and add them to the graph
         print ("uploaded " + str(i) + " neurons")
     except Exception:
@@ -358,16 +360,13 @@ def upload_connections():
     unwanted_connections = 0
 
     try:
-
-        n = NETWORK
-
         w = P.Worm()
+        n = P.Network()
 
         neuron_objs = list(set(n.neurons()))
         muscle_objs = list(w.muscles())
 
         w.neuron_network(n)
-
 
         # get lists of neuron and muscles names
         neurons = [neuron.name() for neuron in neuron_objs]
