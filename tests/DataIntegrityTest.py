@@ -69,7 +69,7 @@ class DataIntegrityTest(unittest.TestCase):
         muscles = PyOpenWorm.Worm().muscles()
         self.assertEqual(144, len(muscles))
 
-   def test_INS_26_neuropeptide_neuron_list(self):
+    def test_INS_26_neuropeptide_neuron_list(self):
         """
         This test verifies that the set of neurons which contain the
         neuropeptide INS-26 is correct (the list is given below).
@@ -133,7 +133,7 @@ class DataIntegrityTest(unittest.TestCase):
             print row
 
     #TODO: Revise this test to pull from the herm_full_edgelist.csv instead of NeuronConnect.xls
-    @unittest.skip("deprecated because spreadsheet is no longer supposed to match"
+    @unittest.skip("deprecated because spreadsheet is no longer supposed to match")
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
         SAMPLE_CELL = 'AVAL'
