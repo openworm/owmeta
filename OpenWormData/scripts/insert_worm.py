@@ -48,7 +48,7 @@ def upload_muscles():
             csvreader = csv.reader(csvfile)
 
             ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
-            w = P.Worm()
+            w = WORM
             for num, line in enumerate(csvreader):
                 if num < 4:  # skip rows with no data
                     continue
@@ -146,8 +146,8 @@ def upload_neurons():
     try:
         #TODO: Improve this evidence marker
         ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
-        w = P.Worm()
-        n = P.Network()
+        w = WORM
+        n = NETWORK
         w.neuron_network(n)
         # insert neurons.
         # save
@@ -362,8 +362,8 @@ def upload_connections():
     unwanted_connections = 0
 
     try:
-        w = P.Worm()
-        n = P.Network()
+        w = WORM
+        n = NETWORK
 
         neuron_objs = list(set(n.neurons()))
         muscle_objs = list(w.muscles())
