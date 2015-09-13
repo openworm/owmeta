@@ -300,24 +300,28 @@ class DataIntegrityTest(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))
 
+    @unittest.skip("deprecated due to performance")
     def test_all_cells_have_wormbaseID(self):
         """ This test verifies that every cell has a Wormbase ID. """
         cells = set(PyOpenWorm.Cell().load())
         for cell in cells:
             self.assertNotEqual(cell.wormbaseID(), '')
 
+    @unittest.skip("deprecated due to performance")
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = PyOpenWorm.Worm().get_neuron_network()
         for neuron_object in net.neurons():
             self.assertNotEqual(neuron_object.wormbaseID(), '')
 
+    @unittest.skip("deprecated due to performance")
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             self.assertNotEqual(muscle_object.wormbaseID(), '')
 
+    @unittest.skip("deprecated due to performance")
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
         net = PyOpenWorm.Worm().get_neuron_network()
@@ -325,17 +329,20 @@ class DataIntegrityTest(unittest.TestCase):
         for neuron_object in net.neurons():
             self.assertIsInstance(neuron_object, PyOpenWorm.Cell)
 
+    @unittest.skip("deprecated due to performance")
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             self.assertIsInstance(muscle_object, PyOpenWorm.Cell)
 
+    @unittest.skip("deprecated due to performance")
     def test_correct_connections_number(self):
         """ This test verifies that there are exactly 6916 connections. """
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(6916, len(net.synapses()))
 
+    @unittest.skip("deprecated due to performance")
     def test_connection_content_matches(self):
         """ This test verifies that the content of each connection matches the
         content in the source. """
@@ -367,6 +374,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.assertTrue(csv_tuples.issubset(synapse_tuples))
 
+    @unittest.skip("deprecated due to performance")
     def test_number_neuron_to_neuron(self):
         """
         This test verifies that the worm model has exactly 5805 neuron to neuron
@@ -381,6 +389,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.assertEqual(5805, count)
 
+    @unittest.skip("deprecated due to performance")
     def test_number_neuron_to_muscle(self):
         """
         This test verifies that the worm model has exactly 1111 neuron to muscle
@@ -395,6 +404,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.assertEqual(1111, count)
 
+    @unittest.skip("deprecated due to performance")
     def test_correct_number_unique_neurons(self):
         """
         This test verifies that the worm model has exactly 300 unique neurons
@@ -408,6 +418,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         self.assertEqual(300, len(unique_neurons))
 
+    @unittest.skip("deprecated due to performance")
     def test_unconnected_neurons(self):
         """
         This test verifies that there are exactly 2 unconnected neurons,
