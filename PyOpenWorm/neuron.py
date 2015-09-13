@@ -1,5 +1,4 @@
-import sqlite3
-import sys
+from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm import Cell
 
@@ -64,7 +63,7 @@ class Neuron(Cell):
 
     """
     def __init__(self, name=False, **kwargs):
-        Cell.__init__(self,name=name,**kwargs)
+        super(Neuron,self).__init__(name=name,**kwargs)
         # Get neurons connected to this neuron
         Neighbor(owner=self)
         # Get connections from this neuron
@@ -127,12 +126,6 @@ class Neuron(Cell):
           :rtype: libNeuroML.Neuron
        """
 
-    def __str__(self):
-        n = self.name()
-        if n is not None:
-            return n
-        else:
-            return ""
 
 
 class Neighbor(P.Property):
@@ -159,6 +152,10 @@ class Neighbor(P.Property):
             c = P.Connection(pre_cell=self.owner,**kwargs)
             for r in c.load():
                 yield r.post_cell()
+
+    @property
+    def values(self):
+        return []
 
     def set(self, other, **kwargs):
         c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
@@ -206,6 +203,10 @@ class Connection(P.Property):
         for x in c:
             for r in x.load():
                 yield r
+
+    @property
+    def values(self):
+        return []
 
     def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
         """Get a list of connections associated with the owning neuron.

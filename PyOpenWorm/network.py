@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import PyOpenWorm as P
-import rdflib as R
-from PyOpenWorm import DataObject
+
+from PyOpenWorm.dataObject import DataObject
+
 
 class Network(DataObject):
+
     """A network of neurons
 
     Attributes
@@ -13,11 +16,24 @@ class Network(DataObject):
     synapse
         Returns a set of all synapses in the network
     """
-    def __init__(self, **kwargs):
-        DataObject.__init__(self,**kwargs)
 
-        self.synapses = Network.ObjectProperty('synapse', owner=self, value_type=P.Connection, multiple=True)
-        self.neurons = Network.ObjectProperty('neuron',owner=self,value_type=P.Neuron, multiple=True)
+    def __init__(self, **kwargs):
+        super(Network, self).__init__(**kwargs)
+        self.synapses = Network.ObjectProperty(
+            'synapse',
+            owner=self,
+            value_type=P.Connection,
+            multiple=True)
+        self.neurons = Network.ObjectProperty(
+            'neuron',
+            owner=self,
+            value_type=P.Neuron,
+            multiple=True)
+        Network.ObjectProperty(
+            'worm',
+            owner=self,
+            value_type=P.Worm,
+            multiple=False)
 
     def neuron_names(self):
         """
@@ -58,7 +74,7 @@ class Network(DataObject):
         :returns: Neuron corresponding to the name given
         :rtype: PyOpenWorm.Neuron
         """
-        n = P.Neuron(name=name,conf=self.conf)
+        n = P.Neuron(name=name, conf=self.conf)
         return n
 
     def _synapses_csv(self):
@@ -68,9 +84,14 @@ class Network(DataObject):
         :returns: A generator of Connection objects
         :rtype: generator
         """
-        for n,nbrs in self['nx'].adjacency_iter():
-            for nbr,eattr in nbrs.items():
-                yield P.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
+        for n, nbrs in self['nx'].adjacency_iter():
+            for nbr, eattr in nbrs.items():
+                yield P.Connection(n,
+                                   nbr,
+                                   int(eattr['weight']),
+                                   eattr['synapse'],
+                                   eattr['neurotransmitter'],
+                                   conf=self.conf)
 
     def as_networkx(self):
         return self['nx']
@@ -121,17 +142,13 @@ class Network(DataObject):
             yield x
 
     def identifier(self, *args, **kwargs):
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-        owners = self.getOwners(P.Worm().neuron_network.link)
-        data = []
-        for x in owners:
-            ident = x.identifier(query=True) # XXX: Query is set to true so a fixed identifier isn't generated randomly
-            if not DataObject._is_variable(ident):
-                data.append(ident)
-        data = sorted(data)
+        if super(Network, self).defined:
+            return super(Network, self).identifier()
+        else:
+            return self.make_identifier(self.worm.defined_values[0])
 
-        return self.make_identifier(data)
-    #def neuroml(self):
+    @property
+    def defined(self):
+        return super(Network, self).defined or self.worm.has_defined_value()
+
+    # def neuroml(self):
