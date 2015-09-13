@@ -134,7 +134,7 @@ Returns a set of all muscles::
 ```python
 >>> muscles = P.Worm().muscles()
 >>> len(muscles)
-254
+158
 
 ```
 

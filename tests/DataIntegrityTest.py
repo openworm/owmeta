@@ -60,10 +60,12 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_correct_muscle_number(self):
         """
-        This test verifies that the worm model has exactly 254 muscles.
+        This test verifies that the worm model has exactly 158 muscles.
+        95 body wall muscles, 37 Pharynx muscles, 26 other muscles
+        See counts on row 3 here: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1
         """
         muscles = PyOpenWorm.Worm().muscles()
-        self.assertEqual(254, len(muscles))
+        self.assertEqual(158, len(muscles))
 
     def test_INS_26_neuropeptide_neuron_list(self):
         """
@@ -338,8 +340,8 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that the content of each connection matches the
         content in the source. """
         ignored_cells = ['hyp', 'intestine']
-        synapse_tuples = {}    # set of tuple representation of synapses
-        csv_tuples = {}        # set of tuple representation of csv file
+        synapse_tuples = set()   # set of tuple representation of synapses
+        csv_tuples = set()       # set of tuple representation of csv file
 
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
         for synapse in synapses:
@@ -399,7 +401,7 @@ class DataIntegrityTest(unittest.TestCase):
         making connections.
         """
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        unique_neurons = {}    # set of unique neurons
+        unique_neurons = set()    # set of unique neurons
 
         for synapse in synapses:
             unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
@@ -417,7 +419,7 @@ class DataIntegrityTest(unittest.TestCase):
         # the set of neurons making connections are disjoint.
 
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        connected_neurons = {}
+        connected_neurons = set()
         unconnected_neurons = {'CANL', 'CANR'}
 
         for synapse in synapses:
