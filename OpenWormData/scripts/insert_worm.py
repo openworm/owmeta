@@ -1,8 +1,10 @@
 from __future__ import print_function
 import PyOpenWorm as P
 import traceback
+import csv
 import sqlite3
 import re
+
 import xlrd
 import csv
 
@@ -11,8 +13,11 @@ LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 SQLITE_EVIDENCE = None
 WORM = None
 NETWORK = None
-
 OPTIONS = None
+CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
+CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
+
+
 
 def serialize_as_n3():
     dest = '../WormData.n3'
@@ -22,33 +27,42 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
+# to normalize certain neuron and muscle names
+search_string = re.compile(r'\w+[0]+[1-9]+')
+replace_string = re.compile(r'[0]+')
+
+def normalize(name):
+    # normalize neuron and muscle names to match those used at other points
+    # see #137 for elaboration
+    # if there are zeroes in the middle of a name, remove them
+    if re.match(search_string, name):
+        name = replace_string.sub('', name)
+    return name
+
+
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        w = WORM
-        cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
-        WHERE innervatedBy.EnID1=a.id and innervatedBy.Relation = '1516' and innervatedBy.EnID2=b.id
-        and type_b.EnID1 = b.id and type_b.Relation='1515' and type_b.EnID2='1519'
-        """) # 1519 is the
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            muscle_name = str(r[1])
-            m = P.Muscle(key=muscle_name, name=muscle_name)
-            n = P.Neuron(name=neuron_name)
-            w.muscle(m)
-            m.innervatedBy(n)
+        with open(CELL_NAMES_SOURCE) as csvfile:
+            csvreader = csv.reader(csvfile)
 
-        SQLITE_EVIDENCE.asserts(w)
+            ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+            w = P.Worm()
+            for num, line in enumerate(csvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
+                    muscle_name = normalize(line[0]).upper()
+                    m = P.Muscle(name=muscle_name)
+                    w.muscle(m)
+            SQLITE_EVIDENCE.asserts(w)
+        #second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -117,6 +131,7 @@ def upload_lineage_and_descriptions():
     except Exception:
         traceback.print_exc()
 
+
 def norn(x):
     """ return the next or None of an iterator """
     try:
@@ -124,28 +139,34 @@ def norn(x):
     except StopIteration:
         return None
 
+
 def upload_neurons():
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        n = NETWORK
+        ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+        w = P.Worm()
+        n = P.Network()
+        w.neuron_network(n)
+        # insert neurons.
+        # save
+        i = 0
+        with open(CELL_NAMES_SOURCE) as csvfile:
+            csvreader = csv.reader(csvfile)
 
-        cur.execute("""
-        SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b
-        where EnID1=a.id and Relation = '1515' and EnID2='1'
-        """)
-        neuron_count = 0
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            n.neuron(P.Neuron(name=neuron_name))
-            neuron_count += 1
+            for num, line in enumerate(csvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[5] == '1':  # neurons marked in this column
+                    neuron_name = normalize(line[0]).upper()
+                    n.neuron(P.Neuron(name=neuron_name))
+                    i = i + 1
+
         SQLITE_EVIDENCE.asserts(n)
         #second step, get the relationships between them and add them to the graph
-        print("uploaded neurons")
+        print ("uploaded " + str(i) + " neurons")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
 
 def get_altun_evidence():
     return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
@@ -292,30 +313,70 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     NETWORK.save()
     print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
-def new_connections():
-    """we can replace the old function, upload_connections, with this
-    once it is ready to go"""
 
-    search_string = re.compile(r'\w+[0]+[1-9]+')
-    replace_string = re.compile(r'[0]+')
+def upload_connections():
 
-    def normalize(name):
-        # normalize neuron names to match those used at other points
-        # see #137 for elaboration
-        # if there are zeroes in the middle of a name, remove them
-        if re.match(search_string, name):
-            name = replace_string.sub('', name)
+    print ("uploading statements about connections.  Buckle up; this will take a while!")
+
+    # to normalize certian body wall muscle cell names
+    search_string_muscle = re.compile(r'\w+[BWM]+\w+')
+    replace_string_muscle = re.compile(r'[BWM]+')
+
+    def normalize_muscle(name):
+        # normalize names of Body Wall Muscles
+        # if there is 'BWM' in the name, remove it
+        if re.match(search_string_muscle, name):
+            name = replace_string_muscle.sub('', name)
         return name
 
+    # connectome specific definitions
+
+    # cells that are generically definited in source. These will not be added to PyOpenWorm
+    unwanted = ['HYP', 'INTESTINE']
+
+    # muscle cells that are generically defined in source and need to be broken into pair of L and R before being added to PyOpenWorm
+    to_expand_muscles = ['PM1D', 'PM2D', 'PM3D', 'PM4D', 'PM5D']
+
+    # muscle cells that have different names in connectome source and cell list. Their wormbase cell list names will be used in PyOpenWorm
+    changed_muscles = ['ANAL', 'INTR', 'INTL', 'SPH']
+
+    def changed_muscle(x):
+        return {
+            'ANAL': 'MU_ANAL',
+            'INTR': 'MU_INT_R',
+            'INTL': 'MU_INT_L',
+            'SPH': 'MU_SPH'
+        }[x]
+
+    # cells that are neither neurons or muscles. These are marked as 'Other Cells' in the wormbase cell list but are still part of the new connectome. In future work these should be uploaded seperately to PyOpenWorm in a new upload function and should be referred from there instead of this list.
+    other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
+
+    # counters for terminal printing
+    neuron_connections = 0
+    muscle_connections = 0
+    other_connections = 0
+    unwanted_connections = 0
 
     try:
+
         n = NETWORK
-        neurons = set(n.neuron_names())
+
+        w = P.Worm()
+
+        neuron_objs = list(set(n.neurons()))
+        muscle_objs = list(w.muscles())
+
+        w.neuron_network(n)
+
+
+        # get lists of neuron and muscles names
+        neurons = [neuron.name() for neuron in neuron_objs]
+        muscles = [muscle.name() for muscle in muscle_objs]
 
         # Evidence object to assert each connection
-        e  = P.Evidence(uri='http://www.wormwiring.org')
+        e = P.Evidence(title='herm_full_edgelist.csv')
 
-        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+        with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
             edge_reader.next()    # skip header row
             for row in edge_reader:
@@ -327,73 +388,274 @@ def new_connections():
                     syn_type = 'gapJunction'
                 elif syn_type == 'chemical':
                     syn_type = 'send'
-                source = normalize(source)
-                target = normalize(target)
-                if source in neurons and target in neurons:
-                    c = P.connection(
-                        pre_cell=source, post_cell=target,
-                        number=weight, syntype=syn_type
-                    )
 
-                    n.synapse(c)
-                    e.asserts(c)
+                source = normalize(source).upper()
+                target = normalize(target).upper()
 
-        e.asserts(n) # assert the whole connectome too
+                weight = int(weight)
+
+                # remove BMW from Body Wall Muscle cells
+                if 'BWM' in source:
+                    source = normalize_muscle(source)
+                if 'BWM' in target:
+                    target = normalize_muscle(target)
+
+                # change certain muscle names to names in wormbase
+                if source in changed_muscles:
+                    source = changed_muscle(source)
+                if target in changed_muscles:
+                    target = changed_muscle(target)
+
+                # if the source cell is a neuron
+                if source in neurons:
+                    if target in neurons:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        termination='neuron'
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        neuron_connections += 1
+                        continue
+
+                    elif target in muscles:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        muscle_connections += 1
+                        continue
+
+                    elif target in to_expand_muscles:
+                        target_L = target+'L'
+                        target_R = target+'R'
+                        c1 = P.Connection(
+                                        pre_cell=source, post_cell=target_L,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source, post_cell=target_R,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        muscle_connections += 2
+                        continue
+
+                    elif target in other_cells:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        other_connections += 1
+                        continue
+
+                    else:
+                        unwanted_connections += 1
+                        continue
+
+                # if the source cell is a muscle
+                if source in muscles:
+                    if target in neurons:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        muscle_connections += 1
+                        continue
+
+                    elif target in muscles:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        other_connections += 1
+                        continue
+
+                    elif target in to_expand_muscles:
+                        target_L = target+'L'
+                        target_R = target+'R'
+                        c1 = P.Connection(
+                                        pre_cell=source, post_cell=target_L,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source, post_cell=target_R,
+                                        number=weight, syntype=syn_type
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        other_connections += 2
+                        continue
+
+                    elif target in other_cells:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        other_connections += 1
+                        continue
+
+                    else:
+                        unwanted_connections += 1
+                        continue
+
+                # if the source cell is one of the to_expand_muscles
+                if source in to_expand_muscles:
+                    source_L = source + 'L'
+                    source_R = source + 'R'
+
+                    if target in neurons:
+                        c1 = P.Connection(
+                                        pre_cell=source_L, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source_R, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        termination='muscle'
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        muscle_connections += 2
+                        continue
+
+                    elif target in muscles:
+                        c1 = P.Connection(
+                                        pre_cell=source_L, post_cell=target,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source_R, post_cell=target,
+                                        number=weight, syntype=syn_type
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        other_connections += 2
+                        continue
+
+                    elif target in to_expand_muscles:
+                        target_L = target + 'L'
+                        target_R = target + 'R'
+                        c1 = P.Connection(
+                                        pre_cell=source_L, post_cell=target_L,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source_R, post_cell=target_L,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c3 = P.Connection(
+                                        pre_cell=source_L, post_cell=target_R,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c4 = P.Connection(
+                                        pre_cell=source_R, post_cell=target_R,
+                                        number=weight, syntype=syn_type
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        n.synapse(c3)
+                        n.synapse(c4)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        e.asserts(c3)
+                        e.asserts(c4)
+                        other_connections += 4
+                        continue
+
+                    elif target in other_cells:
+                        c1 = P.Connection(
+                                        pre_cell=source_L, post_cell=target,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source_R, post_cell=target,
+                                        number=weight, syntype=syn_type
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        other_connections += 2
+                        continue
+
+                    else:
+                        unwanted_connections += 1
+                        continue
+
+                # if the source cell is in other_cells
+                if source in other_cells:
+                    if target in to_expand_muscles:
+                        target_L = target+'L'
+                        target_R = target+'R'
+                        c1 = P.Connection(
+                                        pre_cell=source, post_cell=target_L,
+                                        number=weight, syntype=syn_type
+                                        )
+                        c2 = P.Connection(
+                                        pre_cell=source, post_cell=target_R,
+                                        number=weight, syntype=syn_type
+                                        )
+                        n.synapse(c1)
+                        n.synapse(c2)
+                        e.asserts(c1)
+                        e.asserts(c2)
+                        other_connections += 2
+                        continue
+
+                    elif target in unwanted:
+                        unwanted_connections += 1
+                        continue
+
+                    else:
+                        c = P.Connection(
+                                        pre_cell=source, post_cell=target,
+                                        number=weight, syntype=syn_type,
+                                        )
+                        n.synapse(c)
+                        e.asserts(c)
+                        other_connections += 1
+                        continue
+
+                # if the source was neither a neuron nor muscle nor other_cell
+                unwanted_connections += 1
+
+        e.asserts(n)  # assert the whole connectome too
+        e.save()
+        print('Total neuron to neuron connections added = %i' %neuron_connections)
+        print('Total neuron to muscle connections added = %i' %muscle_connections)
+        print('Total other connections added = %i' %other_connections)
+        print('Total connections discarded = %i' %unwanted_connections)
         print('uploaded connections')
 
     except Exception:
         traceback.print_exc()
 
-
-def upload_connections():
-    search_string = re.compile(r'\w+[0]+[1-9]+')
-    replace_string = re.compile(r'[0]+')
-
-    def normalize(name):
-        # normalize neuron names to match those used at other points
-        # see #137 for elaboration
-        # if there are zeroes in the middle of a name, remove them
-        if re.match(search_string, name):
-            name = replace_string.sub('', name)
-        return name
-
-    try:
-        n = NETWORK
-        combining_dict = {}
-        # Get synapses and gap junctions and add them to the graph
-        s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
-        for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
-                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
-                #Also omitting 'NMJ' for the time being (no model in db)
-                pre = normalize(s.cell(row, 0).value)
-                post = normalize(s.cell(row, 1).value)
-                num = int(s.cell(row, 3).value)
-                if s.cell(row, 2).value == 'EJ':
-                    syntype = 'gapJunction'
-                elif s.cell(row, 2).value in ('S', 'Sp'):
-                    syntype = 'send'
-
-                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
-                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
-                # values are lists of the form [pre, post, number, syntype].
-                string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in combining_dict.keys():
-                    # if key already there, add to number
-                    combining_dict[string_key][2] += num
-                else:
-                    combining_dict[string_key] = [pre, post, num, syntype]
-        i = 0
-        for entry in combining_dict:
-            pre, post, num, syntype = combining_dict[entry]
-            c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
-            n.synapse(c)
-            i += 1
-        e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
-        e.asserts(n)
-        print('uploaded connections')
-    except Exception:
-        traceback.print_exc()
 
 def infer():
     from rdflib import Graph
@@ -429,6 +691,7 @@ def infer():
         traceback.print_exc()
     print ("filled in with inferred data")
 
+
 def do_insert(config="default.conf", logging=False):
     global SQLITE_EVIDENCE
     global WORM
@@ -460,10 +723,11 @@ def do_insert(config="default.conf", logging=False):
 
         print("Saving...")
         WORM.save()
-        infer()
 
+        infer()
         print("Serializing...")
         serialize_as_n3()
+
     except:
         traceback.print_exc()
     finally:

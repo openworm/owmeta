@@ -52,7 +52,7 @@ set([u'interneuron'])
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
-77
+157
 
 ```
 
@@ -114,7 +114,7 @@ u'AVAL'
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
-90
+187
 
 ```
 
@@ -134,7 +134,7 @@ Returns a set of all muscles::
 ```python
 >>> muscles = P.Worm().muscles()
 >>> len(muscles)
-96
+254
 
 ```
 

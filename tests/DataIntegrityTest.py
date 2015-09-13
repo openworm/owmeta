@@ -42,6 +42,7 @@ class DataIntegrityTest(unittest.TestCase):
     def tearDown(self):
         PyOpenWorm.disconnect()
 
+
     @classmethod
     def tearDownClass(cls):
         delete_zodb_data_store("tests/test.db")
@@ -55,6 +56,14 @@ class DataIntegrityTest(unittest.TestCase):
         #        it to pass
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
+
+
+    def test_correct_muscle_number(self):
+        """
+        This test verifies that the worm model has exactly 254 muscles.
+        """
+        muscles = PyOpenWorm.Worm().muscles()
+        self.assertEqual(254, len(muscles))
 
     def test_INS_26_neuropeptide_neuron_list(self):
         """
@@ -122,11 +131,11 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a networkx representation """
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 40)
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').GJ_degree(), 81)
 
     def test_neuron_Syn_degree(self):
         """ Get the number of chemical synapses from a networkx representation """
-        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 90)
+        self.assertEqual(PyOpenWorm.Neuron(name='AVAL').Syn_degree(), 187)
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
@@ -137,6 +146,8 @@ class DataIntegrityTest(unittest.TestCase):
         for row in qres.result:
             print(row)
 
+    #TODO: Revise this test to pull from the herm_full_edgelist.csv instead of NeuronConnect.xls
+    @unittest.skip("deprecated because spreadsheet is no longer supposed to match")
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
         SAMPLE_CELL = 'AVAL'
@@ -287,21 +298,18 @@ class DataIntegrityTest(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))
 
-    @unittest.expectedFailure
     def test_all_cells_have_wormbaseID(self):
         """ This test verifies that every cell has a Wormbase ID. """
         cells = set(PyOpenWorm.Cell().load())
         for cell in cells:
             self.assertNotEqual(cell.wormbaseID(), '')
 
-    @unittest.expectedFailure
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = PyOpenWorm.Worm().get_neuron_network()
         for neuron_object in net.neurons():
             self.assertNotEqual(neuron_object.wormbaseID(), '')
 
-    @unittest.expectedFailure
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
         muscles = PyOpenWorm.Worm().muscles()
@@ -311,11 +319,108 @@ class DataIntegrityTest(unittest.TestCase):
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
         net = PyOpenWorm.Worm().get_neuron_network()
-        for neuron_object in net.neuron():
-            assert isinstance(neuron_object, PyOpenWorm.Cell)
+
+        for neuron_object in net.neurons():
+            self.assertIsInstance(neuron_object, PyOpenWorm.Cell)
 
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
-            assert isinstance(muscle_object, PyOpenWorm.Cell)
+            self.assertIsInstance(muscle_object, PyOpenWorm.Cell)
+
+    def test_correct_connections_number(self):
+        """ This test verifies that there are exactly 6916 connections. """
+        net = PyOpenWorm.Worm().get_neuron_network()
+        self.assertEqual(6916, len(net.synapses()))
+
+    def test_connection_content_matches(self):
+        """ This test verifies that the content of each connection matches the
+        content in the source. """
+        ignored_cells = ['hyp', 'intestine']
+        synapse_tuples = {}    # set of tuple representation of synapses
+        csv_tuples = {}        # set of tuple representation of csv file
+
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        for synapse in synapses:
+            if synapse.syntype() == 'gapJunction':
+                syn_type = 'chemical'
+            else:
+                syn_type = 'electrical'
+            syn_tuple = (synapse.pre_cell(), synapse.post_cell(), synapse.number(), syn_type)
+            synapse_tuples.add(syn_tuple)
+
+        # read csv file row by row
+        with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+            edge_reader = csv.reader(csvfile)
+            edge_reader.next()    # skip header row
+
+            for row in edge_reader:
+                source, target, weight, syn_type = map(str.strip, row)
+                # ignore rows where source or target is 'hyp' or 'intestine'
+                if source in ignored_cells or target in ignored_cells:
+                    continue
+                csv_tuple = (source, target, weight, syn_type)
+                csv_tuples.add(csv_tuple)
+
+        self.assertTrue(csv_tuples.issubset(synapse_tuples))
+
+    def test_number_neuron_to_neuron(self):
+        """
+        This test verifies that the worm model has exactly 5805 neuron to neuron
+        connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        count = 0
+
+        for synapse in synapses:
+            if synapse.termination() == 'neuron':
+                count += 1
+
+        self.assertEqual(5805, count)
+
+    def test_number_neuron_to_muscle(self):
+        """
+        This test verifies that the worm model has exactly 1111 neuron to muscle
+        connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        count = 0
+
+        for synapse in synapses:
+            if synapse.termination() == 'muscle':
+                count += 1
+
+        self.assertEqual(1111, count)
+
+    def test_correct_number_unique_neurons(self):
+        """
+        This test verifies that the worm model has exactly 300 unique neurons
+        making connections.
+        """
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        unique_neurons = {}    # set of unique neurons
+
+        for synapse in synapses:
+            unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
+
+        self.assertEqual(300, len(unique_neurons))
+
+    def test_unconnected_neurons(self):
+        """
+        This test verifies that there are exactly 2 unconnected neurons,
+        i.e., CANL and CANR, in the new connectome.
+        """
+        # In previous tests, there is a check for exactly 302 neurons in total.
+        # There is also a test for exactly 300 unique neurons making connections.
+        # That means it should be enough to check that the set {CANL, CANR} and
+        # the set of neurons making connections are disjoint.
+
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        connected_neurons = {}
+        unconnected_neurons = {'CANL', 'CANR'}
+
+        for synapse in synapses:
+            connected_neurons.add(synapse.pre_cell())
+
+        self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))
