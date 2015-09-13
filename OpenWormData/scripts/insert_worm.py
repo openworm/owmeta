@@ -152,6 +152,7 @@ def upload_neurons():
         w.neuron_network(n)
         # insert neurons.
         # save
+        i = 0
         with open(CELL_NAMES_SOURCE) as csvfile:
             csvreader = csv.reader(csvfile)
 
@@ -162,11 +163,12 @@ def upload_neurons():
                 if line[5] == '1':  # neurons marked in this column
                     neuron_name = normalize(line[0]).upper()
                     n.neuron(P.Neuron(name=neuron_name))
+                    i = i + 1
 
         ev.asserts(n)
         ev.save()
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded neurons")
+        print ("uploaded " + i + " neurons")
     except Exception:
         traceback.print_exc()
 
@@ -718,7 +720,7 @@ def do_insert(config="default.conf", logging=False):
         upload_connections()
         infer()
         serialize_as_n3()
-        
+
     except:
         traceback.print_exc()
     finally:
