@@ -1,4 +1,5 @@
 from PyOpenWorm import *
+import re
 
 
 class EvidenceError(Exception):
@@ -24,6 +25,11 @@ def _url_request(url,headers={}):
     try:
         r = U.Request(url, headers=headers)
         s = U.urlopen(r, timeout=1)
+        content_type = dict(s.info())['content-type']
+        md = re.search("charset *= *([^ ]+)", content_type)
+        if md:
+            s.charset = md.group(1)
+
         return s
     except U.HTTPError:
         return ""
@@ -34,7 +40,11 @@ def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        return json.load(_url_request(url,headers))
+        data = _url_request(url, headers)
+        if hasattr(data, 'charset'):
+            return json.load(data, encoding=charset)
+        else:
+            return json.load(data)
     except BaseException:
         return {}
 
@@ -353,14 +363,18 @@ class Evidence(DataObject):
             base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
             # XXX: There's more data in esummary.fcgi?, but I don't know how to parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
-            return ET.parse(_url_request(url))
+            s = _url_request(url)
+            return s, ET.parse(s)
 
         pmid = self._fields['pmid']
         if pmid[:4] == 'http':
             # Probably a uri, right?
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
-        tree = pmRequest(pmid)
+        data, tree = pmRequest(pmid)
 
         for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
-            self.author(x.text)
+            if hasattr(data, 'charset'):
+                self.author(x.text.encode(data.charset))
+            else:
+                self.author(x.text)
