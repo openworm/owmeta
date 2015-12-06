@@ -114,7 +114,7 @@ u'AVAL'
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
-187
+105
 
 ```
 
