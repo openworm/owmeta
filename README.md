@@ -52,7 +52,7 @@ set([u'interneuron'])
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
-157
+86
 
 ```
 
@@ -187,15 +187,6 @@ neuropeptide=`INS-26'
 >>> s = set(x.name() for x in n.load())
 >>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
 True
-
-```
-
-See what neurons innervate a muscle::
-```python
->>> mdr21 = P.Muscle('MDR21')
->>> innervates_mdr21 = mdr21.innervatedBy()
->>> len(innervates_mdr21)
-4
 
 ```
 
