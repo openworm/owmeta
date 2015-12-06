@@ -1,28 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import sys
-sys.path.insert(0,".")
+sys.path.insert(0, ".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
-
-from glob import glob
-
-from GraphDBInit import *
+from PyOpenWorm.evidence import Evidence, EvidenceError
+from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.channel import Channel
 
 from DataTestTemplate import _DataTest
 
 class EvidenceTest(_DataTest):
+
     @unittest.skip("Post alpha")
     def test_bibtex_init(self):
         bibtex = u"""@ARTICLE{Cesar2013,
@@ -60,7 +48,19 @@ class EvidenceTest(_DataTest):
         When multiple authors are on a paper, all of their names should be returned in an iterator. Publication order not necessarily preserved
         """
         pmid = "24098140"
-        alist = [u"Frédéric MY","Lundin VF","Whiteside MD","Cueva JG","Tu DK","Kang SY","Singh H","Baillie DL","Hutter H","Goodman MB","Brinkman FS","Leroux MR"]
+        alist = [
+            u"Frédéric MY",
+            "Lundin VF",
+            "Whiteside MD",
+            "Cueva JG",
+            "Tu DK",
+            "Kang SY",
+            "Singh H",
+            "Baillie DL",
+            "Hutter H",
+            "Goodman MB",
+            "Brinkman FS",
+            "Leroux MR"]
         self.assertEqual(set(alist), set(Evidence(pmid=pmid).author()))
 
     @unittest.skip("Fix later")
@@ -81,12 +81,17 @@ class EvidenceTest(_DataTest):
 
     def test_wormbase_init(self):
         """ Initialize with wormbase source """
-        # Wormbase lacks anything beyond the author,date format for a lot of papers
-        self.assertIn(u'Frederic et al., 2013', list(Evidence(wormbase="WBPaper00044287").author()))
+        # Wormbase lacks anything beyond the author,date format for a lot of
+        # papers
+        self.assertIn(
+            u'Frederic et al., 2013',
+            list(
+                Evidence(
+                    wormbase="WBPaper00044287").author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
-        for i in range(600,610):
+        for i in range(600, 610):
             wbid = 'WBPaper00044' + str(i)
             e = Evidence(wormbase=wbid)
             e.year()
@@ -95,19 +100,17 @@ class EvidenceTest(_DataTest):
         """
         Asserting something should allow us to get it back.
         """
-        e=Evidence(wormbase='WBPaper00044600')
-        g = make_graph(20)
-        r = Relationship(graph=g)
+        e = Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
+        r = DataObject(key="relationship")
         e.asserts(r)
-        r.identifier = lambda **args : r.make_identifier("test")
         e.save()
         l = list(e.asserts())
-        self.assertIn(r,l)
+        self.assertIn(r, l)
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = Evidence(key="a", author='tom@cn.com')
+        r = DataObject(key="relationship")
         e.asserts(r)
         e.save()
         e0 = Evidence()
@@ -119,12 +122,13 @@ class EvidenceTest(_DataTest):
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields
             distinct results """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        r = DataObject(key='relationship')
+
+        e = Evidence(key="a", author='tom@cn.com')
         e.asserts(r)
         e.save()
 
-        e1 = Evidence(year=1999)
+        e1 = Evidence(key="b", year=1999)
         e1.asserts(r)
         e1.save()
 
@@ -135,23 +139,28 @@ class EvidenceTest(_DataTest):
             y = x.year()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
-            self.assertTrue(a == 'tom@cn.com' and int(y) == 1999)
+            if x.idl == e1.idl:
+                self.assertEqual(y, 1999)
+            elif x.idl == e.idl:
+                self.assertEqual(a, 'tom@cn.com')
+            else:
+                self.fail("Unknown object returned from load")
 
     def test_asserts_query_multiple_author_matches(self):
         """ Show that setting the evidence with distinct objects yields
         distinct results even if there are matching values """
-        e = Evidence(author='tom@cn.com')
-        r = Relationship(make_graph(10))
+        e = Evidence(key="k", author='tom@cn.com')
+        r = DataObject(key="a_statement")
         e.asserts(r)
         e.save()
 
-        e1 = Evidence(author='tom@cn.com')
+        e1 = Evidence(key="j", author='tom@cn.com')
         e1.asserts(r)
         e1.save()
 
         e0 = Evidence()
         e0.asserts(r)
-        self.assertTrue(len(list(e0.load())) == 2)
+        self.assertEqual(2, len(list(e0.load())))
 
     def test_evidence_retrieves_instead_of_overwrites(self):
         """
@@ -159,16 +168,15 @@ class EvidenceTest(_DataTest):
         already-saved Evidence does not overwrite the previous Evidence,
         but instead retrieves it.
         """
-        e = Evidence(author='Rodney Dangerfield')
-        r = Relationship(make_graph(10))
+        e = Evidence(key="NBK", author='Rodney Dangerfield', title="Natural Born Killers")
+        r = DataObject(key='Dangerfields_dramatic_range')
         e.asserts(r)
         e.save()
 
         e1 = Evidence(author='Rodney Dangerfield')
         facts = list(e1.asserts())
-        assert facts[0] == r
+        self.assertIn(r, facts)
 
-    @unittest.expectedFailure
     def test_multiple_evidence_for_single_fact(self):
         """
         Can we assert the same fact with two distinct pieces of Evidence?
@@ -180,7 +188,7 @@ class EvidenceTest(_DataTest):
         e2 = Evidence()
         e2.pmid('888')
 
-        c = Channel()   # using a Channel here, but it could be any fact...
+        c = DataObject(key=23)
         e1.asserts(c)
         e2.asserts(c)
 
@@ -188,10 +196,9 @@ class EvidenceTest(_DataTest):
         e2.save()
 
         evs = Evidence()
-        evs.asserts(c.description)
+        evs.asserts(c)
 
         saved_pmids = set(['777', '888'])
         loaded_pmids = set([x.pmid() for x in evs.load()])
 
-        assert saved_pmids.issubset(loaded_pmids)
-
+        self.assertTrue(saved_pmids.issubset(loaded_pmids))

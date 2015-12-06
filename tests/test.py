@@ -1,3 +1,4 @@
+from __future__ import print_function
 # -*- coding: utf-8 -*-
 
 import sys
@@ -10,13 +11,13 @@ from PyOpenWorm import *
 import networkx
 import rdflib
 import rdflib as R
+import logging
 import pint as Q
 import os
 import subprocess as SP
 import subprocess
 import tempfile
 import doctest
-import ExecutionProfileSuite
 
 from glob import glob
 
@@ -135,9 +136,15 @@ if __name__ == '__main__':
     parser.add_option("-b", "--use-binary-database", dest="binary_db",
                       action="store_true", default=False,
                       help="Use the binary database for data integrity tests")
+    parser.add_option("-l", "--do-logging", dest="do_logging",
+                      action="store_true", default=False,
+                      help="Turn on log output")
 
     (options, args) = parser.parse_args()
     USE_BINARY_DB = options.binary_db
+
+    if options.do_logging:
+        logging.basicConfig(level=logging.DEBUG, format="%(levelname)s:%(name)s:%(lineno)s:%(message)s")
 
     def getTests(testCase):
         test_loader = unittest.TestLoader()
@@ -150,7 +157,7 @@ if __name__ == '__main__':
     configs = glob("tests/test_*.conf")
     if not has_bsddb:
         configs = [x for x in configs if 'Sleepycat' not in x]
-    print "Testing with configs:",configs
+    print("Testing with configs:",configs)
     for x in configs:
         TEST_CONFIG = x
         suite = unittest.TestSuite()
@@ -170,7 +177,7 @@ if __name__ == '__main__':
                 all_tests_flattened.append(z)
 
     suite = unittest.TestSuite()
-    
+
     if len(args) == 1:
         suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
     else:

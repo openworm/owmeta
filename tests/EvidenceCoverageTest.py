@@ -38,7 +38,7 @@ class EvidenceCoverageTest(_DataTest):
 
         self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
 
-    @unittest.expectedFailure
+
     def test_verify_muslces_have_evidence(self):
         """ For each muscle in PyOpenWorm, verify
         that there is supporting evidence"""

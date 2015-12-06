@@ -56,19 +56,24 @@ Classes
 .. automodule:: PyOpenWorm.configure
 """
 
+from __future__ import print_function
 __version__ = '0.5.3'
 __author__ = 'Stephen Larson'
 
-import traceback, sys, os
-from .configure import Configure,Configureable,ConfigValue,BadConf
-from .data import Data,DataUser,propertyTypes
-from .dataObject import *
+import traceback
+import sys
+import os
+from .configure import Configure, Configureable, ConfigValue, BadConf
+from .data import Data, DataUser, propertyTypes
+from .dataObject import DataObject
+from .pProperty import Property
+from .simpleProperty import SimpleProperty
 from .cell import Cell
 from .network import Network
 from .neuron import Neuron
 from .worm import Worm
 from .relationship import Relationship
-from .evidence import Evidence,EvidenceError
+from .evidence import Evidence, EvidenceError
 from .muscle import Muscle
 from .quantity import Quantity
 from .my_neuroml import NeuroML
@@ -79,6 +84,7 @@ from .channelworm import ChannelModel, PatchClampExperiment
 from .plot import Plot
 
 __import__('__main__').connected = False
+
 
 def get_data(path):
     # get a resource from the installed package location
@@ -93,6 +99,7 @@ def get_data(path):
     filename = os.path.join(installed_package_root, path)
     return filename
 
+
 def config(key=None):
     """
     Gets the main configuration for the whole PyOpenWorm library.
@@ -104,27 +111,38 @@ def config(key=None):
     else:
         return Configureable.conf[key]
 
+
 def loadConfig(f):
     """ Load configuration for the module. """
     Configureable.conf = Data.open(f)
     return Configureable.conf
 
+
 def disconnect(c=False):
     """ Close the database. """
+
     m = __import__('__main__')
     if not m.connected:
         return
 
-    if c == False:
+    if not c:
         c = Configureable.conf
 
-    if c != False:
+    if c:
         c.closeDatabase()
+
+    from .dataObject import disconnect as DODisconnect
+    from .dataObject import PropertyTypes
+    DODisconnect()
+    assert(len(PropertyTypes) == 0)
 
     m.connected = False
 
 
-def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False):
+def loadData(
+        data='OpenWormData/WormData.n3',
+        dataFormat='n3',
+        skipIfNewer=False):
     """
     Load data into the underlying database of this library.
 
@@ -136,18 +154,23 @@ def loadData(data='OpenWormData/WormData.n3', dataFormat='n3', skipIfNewer=False
                         than the data to be loaded in. This is determined by the modified time on the main
                         database file compared to the modified time on the data file.
     """
+    if not os.path.isfile(data):
+        raise Exception("No such data file: "+data)
+
     if skipIfNewer:
-        import os
         try:
-            data_file_time=os.path.getmtime(data)
-            db_file_time=os.path.getmtime(config('rdf.store_conf'))
-            print db_file_time, data_file_time
-            if data_file_time < db_file_time:
-                return
+            db_file_name = config('rdf.store.conf')
+            if os.path.isfile(db_file_name):
+                data_file_time = os.path.getmtime(data)
+                db_file_time = os.path.getmtime(config('rdf.store_conf'))
+                if data_file_time < db_file_time:
+                    return
         except:
             pass
-    sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
+    sys.stderr.write(
+        "[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
+
 
 def connect(configFile=False,
             conf=False,
@@ -166,8 +189,8 @@ def connect(configFile=False,
     import logging
     import atexit
     m = __import__('__main__')
-    if m.connected == True:
-        print "PyOpenWorm already connected"
+    if m.connected:
+        print ("PyOpenWorm already connected")
         return
 
     if do_logging:
@@ -192,7 +215,6 @@ def connect(configFile=False,
             "user.email" : "jerry@cn.com",
             "rdf.upload_block_statement_count" : 50
         })
-
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")

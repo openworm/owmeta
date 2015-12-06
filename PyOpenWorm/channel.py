@@ -1,5 +1,8 @@
-from PyOpenWorm import *
+from .pProperty import Property
+from .channelworm import ChannelModel
+from .dataObject import DataObject
 
+# XXX: Why is this not an ObjectProperty?
 class Models(Property):
     multiple=True
     def __init__(self, **kwargs):
@@ -28,7 +31,12 @@ class Models(Property):
             for m in c.load():
                 self._models.append(m)
             #call `get()` again to yield ChannelModels the user asked for
-            self.get()
+            if len(self._models) > 0:
+                self.get()
+
+    @property
+    def values(self):
+        return self._models
 
     def set(self, m, **kwargs):
         """
@@ -60,7 +68,9 @@ class Channel(DataObject):
     ----------
     Models : Property
         Get experimental models of this ion channel
-    channel_name : DatatypeProperty
+    subfamily : DatatypeProperty
+        Ion channel's subfamily
+    name : DatatypeProperty
         Ion channel's name
     description : DatatypeProperty
         A description of the ion channel
@@ -73,14 +83,15 @@ class Channel(DataObject):
     proteins : DatatypeProperty
         Proteins associated with this channel
     expression_pattern : DatatypeProperty
-       
+
     """
 
     def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-
+        Channel.DatatypeProperty('subfamily', owner=self)
+        Channel.DatatypeProperty('description', owner=self)
         Channel.DatatypeProperty('name', self) #channel_name
         Channel.DatatypeProperty('description',self) #description
         Channel.DatatypeProperty('gene_name', self) #gene_name
@@ -102,7 +113,11 @@ class Channel(DataObject):
         """
         pass
 
-    def identifier(self, *args, **kwargs):
+    @property
+    def defined(self):
+        return super(Channel, self).defined or self.name.has_defined_value()
+
+    def identifier(self):
         # Copied from cell.py
 
         # If the DataObject identifier isn't variable, then self is a specific
@@ -111,15 +126,9 @@ class Channel(DataObject):
         # return that. Otherwise, there's no telling from here what our identifier
         # should be, so the variable identifier (from DataObject.identifier() must
         # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+        if super(Channel, self).defined:
+            return super(Channel, self).identifier()
         else:
-            return ident
+            # name is already set, so we can make an identifier from it
+            return self.make_identifier(self.name.defined_values[0])
 

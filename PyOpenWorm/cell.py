@@ -1,4 +1,5 @@
-from PyOpenWorm import *
+from __future__ import print_function
+from PyOpenWorm.dataObject import DataObject
 from string import Template
 import neuroml
 __all__ = [ "Cell" ]
@@ -86,7 +87,7 @@ class Cell(DataObject):
             >>> c.divisionVolume(v)
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
-        DataObject.__init__(self,**kwargs)
+        super(Cell,self).__init__(**kwargs)
 
         Cell.DatatypeProperty('lineageName',owner=self)
         Cell.DatatypeProperty('name',owner=self)
@@ -199,6 +200,17 @@ class Cell(DataObject):
             for z in Cell(lineageName=x).load():
                 yield z
 
+    def __str__(self):
+        if self.name.has_defined_value():
+            return str(self.name.defined_values[0])
+            #return self.__class__.__name__ + "(name="+str(self.name.defined_values[0])+")"
+        else:
+            return super(Cell,self).__str__()
+
+    @property
+    def defined(self):
+        return super(Cell, self).defined or self.name.has_defined_value()
+
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific
         # object and this identifier should be returned. Otherwise, if our name
@@ -206,15 +218,8 @@ class Cell(DataObject):
         # return that. Otherwise, there's no telling from here what our identifier
         # should be, so the variable identifier (from DataObject.identifier() must
         # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+        if super(Cell, self).defined:
+            return super(Cell, self).identifier()
         else:
-            return ident
+            return self.make_identifier_direct(str(self.name.defined_values[0].identifier()))
 

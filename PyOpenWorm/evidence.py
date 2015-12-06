@@ -1,14 +1,17 @@
-from PyOpenWorm import *
+from PyOpenWorm.pProperty import Property
+from PyOpenWorm.dataObject import DataObject
 
 
 class EvidenceError(Exception):
     pass
+
 
 def _pubmed_uri_to_pmid(uri):
     from urlparse import urlparse
     parsed = urlparse(uri)
     pmid = int(parsed.path.split("/")[2])
     return pmid
+
 
 def _doi_uri_to_doi(uri):
     from urlparse import urlparse
@@ -19,7 +22,8 @@ def _doi_uri_to_doi(uri):
     doi = unquote(doi)
     return doi
 
-def _url_request(url,headers={}):
+
+def _url_request(url, headers={}):
     import urllib2 as U
     try:
         r = U.Request(url, headers=headers)
@@ -30,19 +34,27 @@ def _url_request(url,headers={}):
     except U.URLError:
         return ""
 
+
 def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        return json.load(_url_request(url,headers))
+        return json.load(_url_request(url, headers))
     except BaseException:
         return {}
 
+
 class AssertsAllAbout(Property):
     # TODO: Needs tests!
-    multiple=True
+    multiple = True
+    linkName = "asserts_all_about"
+
     def __init__(self, **kwargs):
         Property.__init__(self, 'asserts_all_about', **kwargs)
+
+    @property
+    def values(self):
+        return []
 
     def set(self, o, **kwargs):
         """Establish the "asserts" relationship for all of the properties of the given object"""
@@ -51,12 +63,13 @@ class AssertsAllAbout(Property):
             self.owner.asserts(p)
 
     def get(self, **kwargs):
-        # traverse the hierarchy of ObjectProperties and return all of the asserts relationships...
-        ns = { "ow": self.base_namespace,
-               "ns1" : self.rdf_namespace,
-               "ev": self.base_namespace["Evidence"] + "/",
-               "ns2" : self.base_namespace["SimpleProperty"] + "/"
-             }
+        # traverse the hierarchy of ObjectProperties and return all of the
+        # asserts relationships...
+        ns = {"ow": self.base_namespace,
+              "ns1": self.rdf_namespace,
+              "ev": self.base_namespace["Evidence"] + "/",
+              "ns2": self.base_namespace["SimpleProperty"] + "/"
+              }
         q = """
         SELECT ?DataObject ?x ?prop WHERE
         {
@@ -72,10 +85,12 @@ class AssertsAllAbout(Property):
         """
 
     def triples(self, **kwargs):
-        #XXX: All triples here are from ``asserts``
+        # XXX: All triples here are from ``asserts``
         return []
 
+
 class Evidence(DataObject):
+
     """
     A representation of some document which provides evidence like scholarly
     references, for other objects.
@@ -225,7 +240,23 @@ class Evidence(DataObject):
     uri : string
         A URL that points to evidence
     """
-    def __init__(self, conf=False, **source):
+
+    def __init__(
+            self,
+            conf=False,
+            author=None,
+            uri=None,
+            year=None,
+            date=None,
+            title=None,
+            doi=None,
+            wbid=None,
+            wormbaseid=None,
+            wormbase=None,
+            bibtex=None,
+            pmid=None,
+            pubmed=None,
+            **kwargs):
         # The type of the evidence (a paper, a lab, a uri) is
         # determined by the `source` key
         # We keep track of a set of fields for the evidence.
@@ -237,44 +268,58 @@ class Evidence(DataObject):
         # Evidence field1 value1
         #        ; field2 value2
         #        ; field3 value3 .
-        DataObject.__init__(self, conf=conf)
+        super(Evidence,self).__init__(conf=conf, **kwargs)
         self._fields = dict()
         Evidence.ObjectProperty('asserts', multiple=True, owner=self)
         AssertsAllAbout(owner=self)
 
         multivalued_fields = ('author', 'uri')
-
+        other_fields = ('year', 'title', 'doi', 'wbid', 'pmid')
+        self.id_precedence = ('doi', 'pmid', 'wbid', 'uri')
         for x in multivalued_fields:
             Evidence.DatatypeProperty(x, multiple=True, owner=self)
 
-        other_fields = ('year',
-                'title',
-                'doi',
-                'wbid',
-                'pmid')
-        fields = multivalued_fields + other_fields
         for x in other_fields:
             Evidence.DatatypeProperty(x, owner=self)
 
-        #XXX: I really don't like putting these in two places
-        for k in source:
-            if k in ('pubmed', 'pmid'):
-                self._fields['pmid'] = source[k]
-                self._pubmed_extract()
-                self.pmid(source[k])
-            if k in ('wormbaseid','wormbase', 'wbid'):
-                self._fields['wormbase'] = source[k]
-                self._wormbase_extract()
-                self.wbid(source[k])
-            if k in ('doi',):
-                self._fields['doi'] = source[k]
-                self._crossref_doi_extract()
-                self.doi(source[k])
-            if k in ('bibtex',):
-                self._fields['bibtex'] = source[k]
+        if pmid is not None:
+            self._fields['pmid'] = pmid
+        elif pubmed is not None:
+            self._fields['pmid'] = pubmed
 
-            if k in fields:
-                getattr(self,k)(source[k])
+        if 'pmid' in self._fields:
+            self._pubmed_extract()
+            self.pmid(self._fields['pmid'])
+
+        if wbid is not None:
+            self._fields['wormbase'] = wbid
+        elif wormbase is not None:
+            self._fields['wormbase'] = wormbase
+        elif wormbaseid is not None:
+            self._fields['wormbase'] = wormbaseid
+
+        if 'wormbase' in self._fields:
+            self._wormbase_extract()
+            self.wbid(self._fields['wormbase'])
+
+        if doi is not None:
+            self._fields['doi'] = doi
+            self._crossref_doi_extract()
+            self.doi(doi)
+
+        if bibtex is not None:
+            self._fields['bibtex'] = bibtex
+
+        if year is not None:
+            self.year(year)
+        elif date is not None:
+            self.year(date)
+
+        if title is not None:
+            self.title(title)
+
+        if author is not None:
+            self.author(author)
 
     def add_data(self, k, v):
         """ Add a field
@@ -287,19 +332,42 @@ class Evidence(DataObject):
             Field value
         """
         self._fields[k] = v
-        dp = Evidence.DatatypeProperty(k,owner=self)
+        dp = Evidence.DatatypeProperty(k, owner=self)
         dp(v)
+
+    @property
+    def defined(self):
+        if super(Evidence, self).defined:
+            return True
+        else:
+            for x in self.id_precedence:
+                if getattr(self, x).has_defined_value():
+                    return True
+
+    def identifier(self):
+        if super(Evidence, self).defined:
+            return super(Evidence, self).identifier()
+        for idKind in self.id_precedence:
+            idprop = getattr(self, idKind)
+            if idprop.has_defined_value():
+                s = str(idKind) + ":" + idprop.defined_values[0].identifier().n3()
+                return self.make_identifier(s)
 
     # Each 'extract' method should attempt to fill in additional fields given which ones
     # are already set as well as correct fields that are wrong
     # TODO: Provide a way to override modification of already set values.
     def _wormbase_extract(self):
-        #XXX: wormbase's REST API is pretty sparse in terms of data provided.
+        # XXX: wormbase's REST API is pretty sparse in terms of data provided.
         #     Would be better off using AQL or the perl interface
         # _Very_ few of these have these fields filled in
         wbid = self._fields['wormbase']
-        def wbRequest(ident,field):
-            return _json_request("http://api.wormbase.org/rest/widget/paper/"+wbid+"/"+field)
+
+        def wbRequest(ident, field):
+            return _json_request(
+                "http://api.wormbase.org/rest/widget/paper/" +
+                wbid +
+                "/" +
+                field)
         # get the author
         j = wbRequest(wbid, 'authors')
         if 'fields' in j:
@@ -324,14 +392,17 @@ class Evidence(DataObject):
             import urllib as U
             data = {'q': doi}
             data_encoded = U.urlencode(data)
-            return _json_request('http://search.labs.crossref.org/dois?%s' % data_encoded)
+            return _json_request(
+                'http://search.labs.crossref.org/dois?%s' %
+                data_encoded)
 
         doi = self._fields['doi']
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
         r = crRequest(doi)
-        #XXX: I don't think coins is meant to be used, but it has structured data...
-        if len(r)>0:
+        # XXX: I don't think coins is meant to be used, but it has structured
+        # data...
+        if len(r) > 0:
             extra_data = r[0]['coins'].split('&amp;')
             fields = (x.split("=") for x in extra_data)
             fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
@@ -340,7 +411,8 @@ class Evidence(DataObject):
                 self.author(a)
             # no error for bad ids, just an empty list
             if len(r) > 0:
-                # Crossref can process multiple doi's at one go and return the metadata. we just need the first one
+                # Crossref can process multiple doi's at one go and return the
+                # metadata. we just need the first one
                 r = r[0]
                 if 'title' in r:
                     self.title(r['title'])
@@ -349,9 +421,10 @@ class Evidence(DataObject):
 
     def _pubmed_extract(self):
         def pmRequest(pmid):
-            import xml.etree.ElementTree as ET # Python 2.5 and up
+            import xml.etree.ElementTree as ET  # Python 2.5 and up
             base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-            # XXX: There's more data in esummary.fcgi?, but I don't know how to parse it
+            # XXX: There's more data in esummary.fcgi?, but I don't know how to
+            # parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
             return ET.parse(_url_request(url))
 

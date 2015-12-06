@@ -52,7 +52,7 @@ set([u'interneuron'])
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
-77
+86
 
 ```
 
@@ -114,7 +114,7 @@ u'AVAL'
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
-90
+105
 
 ```
 
@@ -134,14 +134,14 @@ Returns a set of all muscles::
 ```python
 >>> muscles = P.Worm().muscles()
 >>> len(muscles)
-96
+158
 
 ```
 
 Add some evidence::
 
 ```python
->>> e = P.Evidence(author='Sulston et al.', date='1983')
+>>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
 lineageName=`AB alaaapalr'
@@ -187,15 +187,6 @@ neuropeptide=`INS-26'
 >>> s = set(x.name() for x in n.load())
 >>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
 True
-
-```
-
-See what neurons innervate a muscle::
-```python
->>> mdr21 = P.Muscle('MDR21')
->>> innervates_mdr21 = mdr21.innervatedBy()
->>> len(innervates_mdr21)
-4
 
 ```
 
