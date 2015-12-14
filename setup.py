@@ -62,7 +62,6 @@ setup(
         'transaction==1.4.4',
         'wsgiref==0.1.2',
         'xlrd',
-        'yarom==0.7.1',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
