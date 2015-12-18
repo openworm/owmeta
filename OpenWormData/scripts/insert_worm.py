@@ -16,6 +16,7 @@ NETWORK = None
 OPTIONS = None
 CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
 CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
+RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 
 
@@ -221,7 +222,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     wormatlas_ev = get_wormatlas_evidence()
 
     import csv
-    f = open('../aux_data/Modified celegans db dump.csv')
+    f = open(RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE)
     reader = csv.reader(f)
     reader.next() #skip the header row
 
