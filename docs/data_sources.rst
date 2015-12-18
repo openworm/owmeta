@@ -22,34 +22,36 @@ in a superscript, and the decisions made during the curation process
 Neurons
 -------
 
-- Cell descriptions [1]_
-- Lineage names [1]_
+- Cell descriptions [1]_: Extracted from WormAtlas.org.  Staged in [this tsv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68)
+- Lineage names [1]_: Extracted from WormAtlas.org.  Staged in [this tsv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68)
 - Neuron names [2]_
-- Neuron types [1]_
-- Neurotransmitters [1]_
+- Neuron types [1]_: Extracted from WormAtlas.org.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L287)
+- Neurotransmitters [1]_: Extracted from WormAtlas.org.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L262)
+- Neuropeptides [1]_: Extracted from WormAtlas.org.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L274)
+- Innexins [1]_: Extracted from WormAtlas.org.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L268)
 
 Muscle cells
 ------------
 
 - Cell descriptions [1]_
 - Lineage names [1]_
-- Muscle names [2]_
-- Neurons that innervate each muscle [3]_
+- Muscle names [2]_: Extracted from WormBase.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormBase.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L44)
+- Neurons that innervate each muscle [3]_: Extracted from data personally communicated by S. Cook.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L432)
 
 Connectome
 ----------
 
-- Gap junctions [3]_
-- Synapses [3]_
+- Gap junctions [3]_: Extracted from data personally communicated by S. Cook.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L423)
+- Synapses [3]_: Extracted from data personally communicated by S. Cook.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L423)
 
 Curation note
 ^^^^^^^^^^^^^
 
-There is another source of C. *elegans* connectome data that was created
-by members of the OpenWorm project. The history of this spreadsheet is
+There was another source of C. *elegans* connectome data that was created
+by members of the OpenWorm project that has since been retired. The history of this spreadsheet is
 mostly contained in
 `this forum post <https://groups.google.com/forum/#!topic/openworm-discuss/G9wKoR8N-l0/discussion>`_
-We decided to use the WormAtlas spreadsheet [4]_ as the authoritative source
+We decided to use the WormAtlas spreadsheet [1]_ as the authoritative source
 for connectome data, as it was not processed by members of OpenWorm, and
 appears on a reference site (WormAtlas).
 
