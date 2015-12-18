@@ -33,8 +33,8 @@ Neurons
 Muscle cells
 ------------
 
-- Cell descriptions [1]_
-- Lineage names [1]_
+- Cell descriptions [1]_: Extracted from WormAtlas.org.  Staged in [this tsv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68)
+- Lineage names [1]_: Extracted from WormAtlas.org.  Staged in [this tsv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68)
 - Muscle names [2]_: Extracted from WormBase.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormBase.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L44)
 - Neurons that innervate each muscle [3]_: Extracted from data personally communicated by S. Cook.  Staged in [this csv file](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv).  Parsed by [this method](https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L432)
 
