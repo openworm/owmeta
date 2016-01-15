@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from setuptools import setup
 from setuptools.command.install import install as _install
-import os, sys
+import sys
 
 
 def _post_install():
