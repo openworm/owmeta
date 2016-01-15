@@ -47,7 +47,7 @@ WHERE {
 """)
 def _dict_merge(d1,d2):
     from itertools import chain
-    dict(chain(list(d1.items()), list(d2.items())))
+    dict(chain(d1.items(), d2.items()))
 
 class Cell(DataObject):
     """

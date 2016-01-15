@@ -70,7 +70,7 @@ class Network(DataObject):
         :rtype: generator
         """
         for n,nbrs in self['nx'].adjacency_iter():
-            for nbr,eattr in list(nbrs.items()):
+            for nbr,eattr in nbrs.items():
                 yield P.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
 
     def as_networkx(self):
