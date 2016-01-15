@@ -15,17 +15,6 @@ import os
 USE_BINARY_DB = False
 BINARY_DB = "OpenWormData/worm.db"
 TEST_CONFIG = "tests/default_test.conf"
-try:
-    import bsddb
-    has_bsddb = True
-except ImportError:
-    has_bsddb = False
-
-try:
-    import numpy
-    has_numpy = True
-except ImportError:
-    has_numpy = False
 
 namespaces = { "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#" }
 
