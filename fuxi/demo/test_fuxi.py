@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from rdflib import Graph
 from FuXi.Rete.RuleStore import SetupRuleStore
 

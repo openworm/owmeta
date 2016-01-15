@@ -1,4 +1,6 @@
+from __future__ import absolute_import
 from PyOpenWorm import *
+import six
 
 class Condition(DataObject):
     """
@@ -28,10 +30,10 @@ class Condition(DataObject):
         Condition.DatatypeProperty('value', self)
         Condition.DatatypeProperty('owner', self)
 
-        if isinstance(name, basestring):
+        if isinstance(name, six.string_types):
             self.name = name
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             self.value = value
 
         self.owner = owner

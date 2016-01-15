@@ -1,7 +1,9 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import PyOpenWorm as P
 import traceback
 import sqlite3
+from six.moves import range
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
@@ -133,7 +135,7 @@ def upload_lineage_and_descriptions():
         ev.asserts(w)
         ev.save()
         print ("uploaded lineage and descriptions")
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
 
 def norn(x):
@@ -254,7 +256,7 @@ def upload_synapses():
                 # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
                 # values are lists of the form [pre, post, number, syntype].
                 string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in combining_dict.keys():
+                if string_key in list(combining_dict.keys()):
                     # if key already there, add to number
                     num += combining_dict[string_key][2]
 
@@ -269,7 +271,7 @@ def upload_synapses():
         e.asserts(n)
         e.save()
         print('uploaded synapses')
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
 
 def upload_types():
@@ -331,7 +333,7 @@ def infer():
         #inferred.write(inferred_facts)
         #inferred.close()
 
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
     print ("filled in with inferred data")
 

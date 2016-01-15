@@ -1,6 +1,6 @@
+from __future__ import absolute_import
 # -*- coding: utf-8 -*-
 import PyOpenWorm as P
-import rdflib as R
 from PyOpenWorm import DataObject
 
 class Network(DataObject):

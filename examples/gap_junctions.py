@@ -1,6 +1,8 @@
 """
 How to get a particular Neuron's gap junctions from the database.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import PyOpenWorm as P
 
@@ -19,4 +21,4 @@ for c in aval.connection():
     #the `one()` returns a string like "gapJunction" instead of "syntype=gapJunction"
     if c.syntype.one() == 'gapJunction':
         num_gjs += 1
-        print num_gjs, c
+        print(num_gjs, c)

@@ -1,9 +1,11 @@
+from __future__ import absolute_import
 import rdflib as R
 from .data import DataUser
 from .configure import BadConf
 import itertools as IT
 import traceback
 import logging
+import six
 
 __all__ = ["DataObject", "Property", "SimpleProperty", "values"]
 L = logging.getLogger(__name__)
@@ -63,7 +65,7 @@ class DataObject(DataUser):
     def __init__(self,ident=False,triples=False,**kwargs):
         try:
             DataUser.__init__(self,**kwargs)
-        except BadConf, e:
+        except BadConf as e:
             raise Exception("You may need to connect to a database before continuing.")
 
         if not triples:
@@ -748,7 +750,7 @@ class SimpleProperty(Property):
         return self.make_identifier((str(self.owner.identifier(query=False)), self.link, value_data))
 
     def __str__(self):
-        return unicode(self.linkName + "=" + unicode(";".join(u"`{}'".format(unicode(x)) for x in set(self._v))))
+        return six.text_type(self.linkName + "=" + six.text_type(";".join(u"`{}'".format(six.text_type(x)) for x in set(self._v))))
 
 
 class values(DataObject):

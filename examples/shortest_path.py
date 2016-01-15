@@ -4,8 +4,10 @@ Takes connection strength into account by taking the inverse of the number as th
 
 Generates some files to be used with numpy.
 """
+from __future__ import absolute_import
 
 import sys
+import six
 sys.path.insert(0,'..')
 
 import apsp
@@ -48,8 +50,8 @@ try:
         np.save("celegans.npy", mat)
 
         # save the cell indices
-        f = file("cell_indices",'w')
-        for key, value in sorted(cell_names.iteritems(), key=lambda (k,v): v):
+        f = open("cell_indices",'w')
+        for key, value in sorted(six.iteritems(cell_names), key=lambda k_v: k_v[1]):
             f.write("%s: %s\n" % (key, value))
         f.close()
 

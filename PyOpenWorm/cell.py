@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from PyOpenWorm import *
 from string import Template
 import neuroml
