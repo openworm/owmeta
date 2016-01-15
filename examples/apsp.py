@@ -30,7 +30,7 @@ def tree_from_file(file_name):
         if i == 0:
             numverts = len(vs)
             M = np.zeros( (numverts + 1, numverts) )
-        for (v,j) in zip(vs,list(range(0,numverts))):
+        for (v,j) in zip(vs,range(0,numverts)):
             try:
                 k = float(v)
             except:
