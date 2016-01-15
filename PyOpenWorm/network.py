@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # -*- coding: utf-8 -*-
 import PyOpenWorm as P
 import rdflib as R
@@ -69,7 +70,7 @@ class Network(DataObject):
         :rtype: generator
         """
         for n,nbrs in self['nx'].adjacency_iter():
-            for nbr,eattr in nbrs.items():
+            for nbr,eattr in list(nbrs.items()):
                 yield P.Connection(n,nbr,int(eattr['weight']),eattr['synapse'],eattr['neurotransmitter'],conf=self.conf)
 
     def as_networkx(self):

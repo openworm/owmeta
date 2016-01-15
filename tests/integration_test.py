@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import unittest
 import traceback
 import rdflib as R
 from PyOpenWorm import *
+from six.moves import range
 
 class IntegrationTest(unittest.TestCase):
     """ Integration testing """
@@ -20,7 +23,7 @@ class IntegrationTest(unittest.TestCase):
         c = Connection(pre_cell=n1,post_cell=n2,synclass="synapse")
         e = Evidence(bibtex=bt['white86'])
         e.asserts(c)
-        print list(e.load())
+        print(list(e.load()))
 
     def test_2(self):
         # Reference two neurons
@@ -53,7 +56,7 @@ class IntegrationTest(unittest.TestCase):
 
         # look for all of the evidence for the connection 'c'
         for x in e.load():
-            print x.author()
+            print(x.author())
 
     def test_get_synclasses(self):
         import random
@@ -108,10 +111,10 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual([u'Elizabeth R. Chen', u'Michael Engel', u'Sharon C. Glotzer'], list(Evidence(doi='10.1007/s00454-010-9273-0').author()))
 
     def test_open_set(self):
-        print DataObject.openSet()
+        print(DataObject.openSet())
         values('exo-skeleton')
         values(', ex=')
-        print DataObject.openSet()
+        print(DataObject.openSet())
 
     def test_l(self):
         """
@@ -126,7 +129,7 @@ class IntegrationTest(unittest.TestCase):
         import os
         # Generate data sets from 10 to 10000 in size
         #  query for properties
-        print 'starting testl'
+        print('starting testl')
         class _to(DataObject):
             def __init__(self,x=False):
                 DataObject.__init__(self)
@@ -140,7 +143,7 @@ class IntegrationTest(unittest.TestCase):
         try:
             #for 1000, takes about 10 seconds...
             for x in nums:
-                print 'running ',x,'sized test on a ',Configureable.default['rdf.graph'].store,'store'
+                print('running ',x,'sized test on a ',Configureable.default['rdf.graph'].store,'store')
                 v = values('zim')
                 for z in range(int(x)):
                     v.add(_to(random()))
@@ -149,7 +152,7 @@ class IntegrationTest(unittest.TestCase):
                 for _ in _to().flexo():
                     pass
                 t1 = time()
-                print "took", t1 - t0, "seconds"
+                print("took", t1 - t0, "seconds")
                 Configureable.default['rdf.graph'].remove((None,None,None))
         except:
             traceback.print_exc()

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from PyOpenWorm import *
 from string import Template
 import neuroml
@@ -46,7 +47,7 @@ WHERE {
 """)
 def _dict_merge(d1,d2):
     from itertools import chain
-    dict(chain(d1.items(), d2.items()))
+    dict(chain(list(d1.items()), list(d2.items())))
 
 class Cell(DataObject):
     """

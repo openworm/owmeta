@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from PyOpenWorm import DataObject
 
 # Relationships correspond to a subgraph in the database.

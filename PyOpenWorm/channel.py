@@ -1,4 +1,6 @@
+from __future__ import absolute_import
 from PyOpenWorm import *
+import six
 
 class References(Property):
     multiple=True
@@ -95,7 +97,7 @@ class ChannelModel(DataObject):
         References(owner=self)
 
         #Change modelType value to something from ChannelModelType class on init
-        if (isinstance(modelType, basestring)):
+        if (isinstance(modelType, six.string_types)):
             modelType = modelType.lower()
             if modelType in ('homology', ChannelModelType.homologyEstimate):
                 self.modelType(ChannelModelType.homologyEstimate)
@@ -179,5 +181,5 @@ class Channel(DataObject):
         Models(owner=self)
         Channel.DatatypeProperty('subfamily', owner=self)
 
-        if isinstance(subfamily, basestring):
+        if isinstance(subfamily, six.string_types):
             self.subfamily = subfamily

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import PyOpenWorm as P
 from PyOpenWorm import Cell
 

@@ -1,4 +1,8 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
+from six.moves import map
+from six.moves import range
 sys.path.insert(0,".")
 import unittest
 import neuroml
@@ -154,7 +158,7 @@ class DataIntegrityTest(unittest.TestCase):
                                   '?o ?p ?s} ' #for that type ?o, get its value ?v
                                 + 'LIMIT 10')
         for row in qres.result:
-            print row
+            print(row)
 
     def test_compare_to_xls(self):
         """ Compare the PyOpenWorm connections to the data in the spreadsheet """
@@ -281,14 +285,14 @@ class DataIntegrityTest(unittest.TestCase):
                 # keying by connection pairs as a string (e.g. 'sdql,aval,send').
                 # values are lists if the form [pre, post, number, syntype].
                 string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in combining_dict.keys():
+                if string_key in list(combining_dict.keys()):
                     # if key already there, add to number
                     num += int(combining_dict[string_key][3])
 
                 combining_dict[string_key] = [str(pre), str(post), str(syntype), str(int(num))]
 
 
-        xls_conns = combining_dict.values()
+        xls_conns = list(combining_dict.values())
 
         #assert that these two sorted lists are the same
         #using sorted lists because Set() removes multiples

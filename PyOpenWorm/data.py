@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # A consolidation of the data sources for the project
 # includes:
 # NetworkX!

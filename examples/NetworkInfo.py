@@ -13,6 +13,7 @@ Try running this script and see what it prints out. It takes a while to run
 because there are so many connections, so feel free to comment out some of the
 neuron names in the arbitrary list declared further below.
 """
+from __future__ import absolute_import
 import PyOpenWorm as P
 
 print("Connecting to the database...")

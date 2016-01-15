@@ -1,6 +1,10 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # -*- coding: utf-8 -*-
 
 import sys
+from six.moves import range
+from six.moves import zip
 sys.path.insert(0,".")
 import unittest
 import neuroml
@@ -58,26 +62,26 @@ def delete_zodb_data_store(path):
 
 # Tests for the Configure class, which provides functionality to modules to
 # allow outside objects to parameterize their behavior
-from ConfigureTest import ConfigureTest
+from .ConfigureTest import ConfigureTest
 
 # Integration tests that read from the database and ensure that basic queries
 # have expected answers, as a way to keep data quality high.
-from DataIntegrityTest import DataIntegrityTest
+from .DataIntegrityTest import DataIntegrityTest
 
 # Integration tests that ensure basic functioning of the database backend and
 # connection
-from DatabaseBackendTest import DatabaseBackendTest
+from .DatabaseBackendTest import DatabaseBackendTest
 
 # Runs the examples to make sure we didn't break the API for them.
-from ExampleRunnerTest import ExampleRunnerTest
+from .ExampleRunnerTest import ExampleRunnerTest
 
 # Tests our Quantity class, which is used for defining things with measurement
 # units
-from QuantityTest import QuantityTest
+from .QuantityTest import QuantityTest
 
 # Tests RDFLib, our backend library that interfaces with the database as an
 # RDF graph.
-from RDFLibTest import RDFLibTest
+from .RDFLibTest import RDFLibTest
 
 
 class _DataTest(unittest.TestCase):
@@ -88,7 +92,7 @@ class _DataTest(unittest.TestCase):
                 subprocess.call("rm -rf "+self.path, shell=True)
             elif self.TestConfig['rdf.source'] == "ZODB":
                 delete_zodb_data_store(self.path)
-        except OSError, e:
+        except OSError as e:
             if e.errno == 2:
                 # The file may not exist and that's fine
                 pass
@@ -258,8 +262,8 @@ class CellTest(_DataTest):
 
         try:
             validate_neuroml2("temp.nml")
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             self.fail("Should validate")
         sys.stdout = f
 
@@ -345,7 +349,7 @@ class DataUserTest(_DataTest):
         try:
             # Add all of the statements in the graph
             du.add_statements(g)
-        except Exception, e:
+        except Exception as e:
             self.fail("Should be able to add statements in the first place: "+str(e))
 
         g0 = du.conf['rdf.graph']
@@ -850,7 +854,7 @@ if __name__ == '__main__':
     configs = glob("tests/test_*.conf")
     if not has_bsddb:
         configs = [x for x in configs if 'Sleepycat' not in x]
-    print "Testing with configs:",configs
+    print("Testing with configs:",configs)
     for x in configs:
         TEST_CONFIG = x
         suite = unittest.TestSuite()
@@ -858,7 +862,7 @@ if __name__ == '__main__':
         all_tests.append(suite)
 
     suite = unittest.TestSuite()
-    classes = filter(lambda x : isinstance(x, type), globals().values())
+    classes = [x for x in list(globals().values()) if isinstance(x, type)]
     non_DataTestTests = (x for x in classes if (issubclass(x, unittest.TestCase) and not issubclass(x,  _DataTest)))
     suite.addTests(getTests(x) for x in non_DataTestTests)
     all_tests.append(suite)
@@ -871,7 +875,7 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
     if len(args) == 1:
-        suite.addTests(filter(lambda x: x.id().startswith("__main__."+args[0]), all_tests_flattened))
+        suite.addTests([x for x in all_tests_flattened if x.id().startswith("__main__."+args[0])])
     else:
         suite.addTests(all_tests)
 

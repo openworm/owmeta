@@ -1,6 +1,8 @@
+from __future__ import absolute_import
 # a class for modules that need outside objects to parameterize their behavior (because what are generics?)
 # Modules inherit from this class and use their self['expected_configured_property']
 import traceback
+import six
 class ConfigValue(object):
     """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
     """
@@ -94,7 +96,7 @@ class Configure(object):
         d = json.load(f)
         for k in d:
             value = d[k]
-            if isinstance(value,basestring):
+            if isinstance(value,six.string_types):
                 if value.startswith("BASE/"):
                     from pkg_resources import Requirement, resource_filename
                     value = value[4:]

@@ -1,5 +1,8 @@
+from __future__ import absolute_import
 import PyOpenWorm as P
 from PyOpenWorm import *
+import six
+from six.moves import range
 
 __all__ = ['Connection']
 
@@ -55,13 +58,13 @@ class Connection(Relationship):
         elif number is not None:
             raise Exception("Connection number must be an int, given %s" % number)
 
-        if isinstance(syntype,basestring):
+        if isinstance(syntype,six.string_types):
             syntype=syntype.lower()
             if syntype in ('send', SynapseType.Chemical):
                 self.syntype(SynapseType.Chemical)
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
-        if isinstance(synclass,basestring):
+        if isinstance(synclass,six.string_types):
             self.synclass(synclass)
 
     def identifier(self, *args, **kwargs):
