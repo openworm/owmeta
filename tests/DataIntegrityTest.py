@@ -265,7 +265,7 @@ class DataIntegrityTest(unittest.TestCase):
                 # keying by connection pairs as a string (e.g. 'sdql,aval,send').
                 # values are lists if the form [pre, post, number, syntype].
                 string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in list(combining_dict.keys()):
+                if string_key in combining_dict:
                     # if key already there, add to number
                     num += int(combining_dict[string_key][3])
 
