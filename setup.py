@@ -76,7 +76,7 @@ setup(
         'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
         'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
     ],
-    version = '0.5.3',
+    version = '0.6.0',
     packages = ['PyOpenWorm'],
     package_data = {
         'PyOpenWorm': ['default.conf']
