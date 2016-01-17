@@ -1,0 +1,1359 @@
+,"Spreadsheet of C. elegans cells compiled and maintained by the OpenWorm project (http://openworm.org), originally sourced from WormBase (http://wormbase.org) and WormAtlas (http://wormatlas.org).  Latest version is online at: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1  For more info, please email at info@openworm.org",,,,,,,,,,,,,,,,,,,
+Cell,Lineage Name,Description,Total count of identified adult-only hermaphrodite cells,Total count of adult-only male cells,Neurons (no male-specific cells),Neurons (male-specific),Body wall muscles,Pharynx muscles,Other muscles,Other adult-only cells in the hermaphrodite,Other adult-only hermaphrodite-specific cells (not present in males),Motor neurons related to body wall muscles,Embryonic cells not present in adult,Male-specific cells,Male-specific adult-only cells,Cells with non-unique name,,VirtualWorm blender model names,WormBase ID,Synonyms
+,,,959,1136,302,68,95,37,26,499,212,125,,341,321,606,,,,
+AB,P0.a,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0004015,"AB blastomere,lineage name: P0.a"
+ADAL,AB.plapaaaapp,Ring interneurons,,,1,,,,,,,,,,,,,,WBbt:0004013,lineage name: ABplapaaaapp
+ADAR,AB.prapaaaapp,Ring interneurons,,,1,,,,,,,,,,,,,,WBbt:0004011,lineage name: ABprapaaaapp
+ADEL,AB.plapaaaapa,"Anterior deirid, sensory neuron, dopaminergic",,,1,,,,,,,,,,,,,,WBbt:0004009,lineage name: ABplapaaaapa
+ADER,AB.prapaaaapa,"Anterior deirid, sensory neuron, dopaminergic",,,1,,,,,,,,,,,,,,WBbt:0004007,lineage name: ABprapaaaapa
+ADEshL,AB.arppaaaa,Anterior deirid sheath,,,,,,,,1,,,,,,,,,WBbt:0004005,lineage name: ABarppaaaa
+ADEshR,AB.arpppaaa,Anterior deirid sheath,,,,,,,,1,,,,,,,,,WBbt:0004004,lineage name: ABarpppaaa
+ADEsoL,H2L.aa,Anterior deirid socket,,,,,,,,1,,,,,,,,,WBbt:0005602,lineage name: H2L.aa
+ADEsoR,H2R.aa,Anterior deirid socket,,,,,,,,1,,,,,,,,,WBbt:0005603,lineage name: H2R.aa
+ADFL,AB.alpppppaa,"Amphid neuron, prob. chemosensory",,,1,,,,,,,,,,,,,,WBbt:0004003,lineage name: ABalpppppaa
+ADFR,AB.praaappaa,"Amphid neuron, prob. chemosensory",,,1,,,,,,,,,,,,,,WBbt:0003999,lineage name: ABpraaappaa
+ADLL,AB.alppppaad,"Amphid neuron, prob. chemosensory",,,1,,,,,,,,,,,,,,WBbt:0003997,lineage name: ABalppppaad
+ADLR,AB.praaapaad,"Amphid neuron, prob. chemosensory",,,1,,,,,,,,,,,,,,WBbt:0003995,lineage name: ABpraaapaad
+AFDL,AB.alpppapav,"Amphid finger cell, neuron associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003993,lineage name: ABalpppapav
+AFDR,AB.praaaapav,"Amphid finger cell, neuron associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003991,lineage name: ABpraaaapav
+AIAL,AB.plppaappa,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003989,lineage name: ABplppaappa
+AIAR,AB.prppaappa,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003987,lineage name: ABprppaappa
+AIBL,AB.plaapappa,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003985,lineage name: ABplaapappa
+AIBR,AB.praapappa,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003984,lineage name: ABpraapappa
+AIML,AB.plpaapppa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003983,lineage name: ABplpaapppa
+AIMR,AB.prpaapppa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003969,lineage name: ABprpaapppa
+AINL,AB.alaaaalal,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003967,lineage name: ABalaaaalal
+AINR,AB.alaapaaar,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003965,lineage name: ABalaapaaar
+AIYL,AB.plpapaaap,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003963,lineage name: ABplpapaaap
+AIYR,AB.prpapaaap,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003961,lineage name: ABprpapaaap
+AIZL,AB.plapaaapav,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003959,lineage name: ABplapaaapav
+AIZR,AB.prapaaapav,Amphid interneuron,,,1,,,,,,,,,,,,,,WBbt:0003957,lineage name: ABprapaaapav
+ALA,AB.alapppaaa,"Neuron, sends processes laterally and along dorsal cord",,,1,,,,,,,,,,,,,,WBbt:0003955,lineage name: ABalapppaaa
+ALML,AB.arppaappa,"Anterior lateral microtubule cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0003954,lineage name: ABarppaappa
+ALMR,AB.arpppappa,"Anterior lateral microtubule cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0003953,lineage name: ABarpppappa
+ALNL,AB.plapappppap,Neuron associated with ALM,,,1,,,,,,,,,,,,,,WBbt:0003939,lineage name: ABplapappppap
+ALNR,AB.prapappppap,Neuron associated with ALM,,,1,,,,,,,,,,,,,,WBbt:0003937,lineage name: ABprapappppap
+AMshL,AB.plaapaap,Amphid sheath,,,,,,,,1,,,,,,,,,WBbt:0003935,"ABplaapaapp,lineage name: ABplaapaapp"
+AMshR,AB.praapaap,Amphid sheath,,,,,,,,1,,,,,,,,,WBbt:0003933,"ABpraapaapp,lineage name: ABpraapaapp"
+AMsoL,AB.plpaapapa,Amphid socket,,,,,,,,1,,,,,,,,,WBbt:0003931,lineage name: ABplpaapapa
+AMsoR,AB.prpaapapa,Amphid sheath,,,,,,,,1,,,,,,,,,WBbt:0003929,lineage name: ABprpaapapa
+AQR,QR.ap,"Neuron, basal body. not part of a sensillum, projects into ring",,,1,,,,,,,,,,,,,,WBbt:0003927,lineage name: QR.ap
+arc_ant,AB.araaapppa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_ant,WBbt:0004571,"ABaraaapppa,arc_ant_DR,lineage name: ABaraaapppa"
+arc_ant,AB.alpaappaa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_ant,WBbt:0004572,"ABalpaappaa,arc_ant_DL,lineage name: ABalpaappaa"
+arc_ant,AB.alpapaapa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_ant,WBbt:0004573,"ABalpapaapa,arc_ant_V,lineage name: ABalpapaapa"
+arcpost,AB.alpaapaaa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004570,"ABalpaapaaa,arc_post_DL,lineage name: ABalpaapaaa"
+arcpost,AB.alpaappap,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004568,"ABalpaappap,arc_post_VL,lineage name: ABalpaappap"
+arcpost,AB.araaapaaa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004569,"ABaraaapaaa,arc_post_DR,lineage name: ABaraaapaaa,lineage name; ABaraaapaaa"
+arcpost,AB.araaappaa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004565,"ABaraaappaa,arc_post_D,lineage name: ABaraaappaa"
+arcpost,AB.araaappap,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004566,"ABaraaappap,arc_post_VR,lineage name: ABaraaappap"
+arcpost,AB.arapapapa,"Interface between pharynx and hypodermis, form anterior part of the buccal cavity",,,,,,,,1,,,,,,1,,arcade_cell_post,WBbt:0004567,"ABaraaappap,arc_post_VR,lineage name: ABaraaappap"
+AS1,P1.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003925,lineage name: P1.apa
+AS10,P10.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003906,lineage name: P10.apa
+AS11,P11.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003905,lineage name: P11.apa
+AS2,P2.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003924,lineage name: P2.apa
+AS3,P3.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003923,lineage name: P3.apa
+AS4,P4.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003912,lineage name: P4.apa
+AS5,P5.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003911,lineage name: P5.apa
+AS6,P6.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003910,lineage name: P6.apa
+AS7,P7.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003909,lineage name: P7.apa
+AS8,P8.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003908,lineage name: P8.apa
+AS9,P9.apa,"Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart",,,1,,,,,,,1,,,,,,,WBbt:0003907,lineage name: P9.apa
+ASEL,AB.alppppppaa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003904,lineage name: ABalppppppaa
+ASER,AB.praaapppaa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003903,lineage name: ABpraaapppaa
+ASGL,AB.plaapapap,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003892,lineage name: ABplaapapap
+ASGR,AB.praapapap,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003891,lineage name: ABpraapapap
+ASHL,AB.plpaappaa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003890,lineage name: ABplpaappaa
+ASHR,AB.prpaappaa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003889,lineage name: ABprpaappaa
+ASIL,AB.plaapapppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003888,lineage name: ABplaapapppa
+ASIR,AB.praapapppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003887,lineage name: ABpraapapppa
+ASJL,AB.alpppppppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003886,lineage name: ABalpppppppa
+ASJR,AB.praaappppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003885,lineage name: ABpraaappppa
+ASKL,AB.alpppapppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003884,lineage name: ABalpppapppa
+ASKR,AB.praaaapppa,"Amphid neurons, single ciliated endngs, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptie connections in ring neuropil",,,1,,,,,,,,,,,,,,WBbt:0003883,lineage name: ABpraaaapppa
+AUAL,AB.alpppppppp,"Neuron, process runs with amphid processes but lacks cillialted ending",,,1,,,,,,,,,,,,,,WBbt:0003872,lineage name: ABalpppppppp
+AUAR,AB.praaappppp,"Neuron, process runs with amphid processes but lacks cillialted ending",,,1,,,,,,,,,,,,,,WBbt:0003871,lineage name: ABpraaappppp
+AVAL,AB.alppaaapa,"Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha",,,1,,,,,,,,,,,,,,WBbt:0003870,lineage name: ABalppaaapa
+AVAR,AB.alaappapa,"Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha",,,1,,,,,,,,,,,,,,WBbt:0003869,lineage name: ABalaappapa
+AVBL,AB.plpaapaap,"Ventral cord interneuron, synapsesonto VB and DB motor neurons; formerly called beta",,,1,,,,,,,,,,,,,,WBbt:0003868,lineage name: ABplpaapaap
+AVBR,AB.prpaapaap,"Ventral cord interneuron, synapsesonto VB and DB motor neurons; formerly called beta",,,1,,,,,,,,,,,,,,WBbt:0003867,lineage name: ABprpaapaap
+AVDL,AB.alaaapalr,"Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta",,,1,,,,,,,,,,,,,,WBbt:0003866,lineage name: ABalaaapalr
+AVDR,AB.alaaapprl,"Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta",,,1,,,,,,,,,,,,,,WBbt:0003865,lineage name: ABalaaapprl
+AVEL,AB.alpppaaaa,"Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord",,,1,,,,,,,,,,,,,,WBbt:0003864,lineage name: ABalpppaaaa
+AVER,AB.praaaaaaa,"Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord",,,1,,,,,,,,,,,,,,WBbt:0003863,lineage name: ABpraaaaaaa
+AVFL,P1.aaaa,"Interneuron, processes in ventral cord and ring, few synapses",,,1,,,,,,,,,,,,,avfr,WBbt:0005657,"AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa"
+AVFR,W.aaa,"Interneuron, processes in ventral cord and ring, few synapses",,,1,,,,,,,,,,,,,avfr,WBbt:0005658,"AVFL/R,lineage name: P1.aaaa,lineage name: W.aaa"
+AVG,AB.prpapppap,"Ventral cord interneuron, few synapses",,,1,,,,,,,,,,,,,,WBbt:0003850,lineage name: ABprpapppap
+AVHL,AB.alapaaaaa,"Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring",,,1,,,,,,,,,,,,,,WBbt:0003849,lineage name: ABalapaaaaa
+AVHR,AB.alappapaa,"Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring",,,1,,,,,,,,,,,,,,WBbt:0003848,lineage name: ABalappapaa
+AVJL,AB.alapapppa,"Neuron, synapses like AVHL/R",,,1,,,,,,,,,,,,,,WBbt:0003847,lineage name: ABalapapppa
+AVJR,AB.alapppppa,"Neuron, synapses like AVHL/R",,,1,,,,,,,,,,,,,,WBbt:0003846,lineage name: ABalapppppa
+AVKL,AB.plpapapap,Ring and ventral cord interneuron,,,1,,,,,,,,,,,,,,WBbt:0003845,lineage name: ABplpapapap
+AVKR,AB.prpapapap,Ring and ventral cord interneuron,,,1,,,,,,,,,,,,,,WBbt:0003844,lineage name: ABprpapapap
+AVL,AB.prpappaap,"Ring and ventral cord interneuron, few synapses",,,1,,,,,,,,,,,,,,WBbt:0003843,lineage name: ABprpappaap
+AVM,QR.paa,"Anterior ventral microtubule cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0003832,lineage name: QR.paa
+AWAL,AB.plaapapaa,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003831,lineage name: ABplaapapaa
+AWAR,AB.praapapaa,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003830,lineage name: ABpraapapaa
+AWBL,AB.alpppppap,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003829,lineage name: ABalpppppap
+AWBR,AB.praaappap,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003828,lineage name: ABpraaappap
+AWCL,AB.plpaaaaap,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003827,lineage name: ABplpaaaaap
+AWCR,AB.prpaaaaap,"Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath",,,1,,,,,,,,,,,,,,WBbt:0003826,lineage name: ABprpaaaaap
+B,AB.prppppapa,"Rectal cell, postembryonic blast cell in male",,,,,,,,,,,1,1,,,,,WBbt:0003627,None
+BAGL,AB.alppappap,"Neuron, ciliated ending in head, no supporting cells, associated with ILso",,,1,,,,,,,,,,,,,,WBbt:0003824,lineage name: ABalppappap
+BAGR,AB.arappppap,"Neuron, ciliated ending in head, no supporting cells, associated with ILso",,,1,,,,,,,,,,,,,,WBbt:0003823,lineage name: ABarappppap
+BDUL,AB.arppaappp,"Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles",,,1,,,,,,,,,,,,,,WBbt:0003812,lineage name: ABarppaappp
+BDUR,AB.arpppappp,"Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles",,,1,,,,,,,,,,,,,,WBbt:0003811,lineage name: ABarpppappp
+C,P0.ppa,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0003810,None
+CA1,P3.aapa,"Male specific cell, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0003809,lineage name: P3.aapa
+CA2,P4.aapa,"Male specific cell, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0003808,lineage name: P4.aapa
+CA3,P5.aapa,"Male specific cell, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0003807,lineage name: P5.aapa
+CA4,P6.aapa,"Male specific neuron, innervates dorsal muscles",,,,,,,,,,,,1,1,,,,WBbt:0003806,lineage name: P6.aapa
+CA5,P7.aapa,"Male specific neuron, innervates dorsal muscles",,,,,,,,,,,,1,1,,,,WBbt:0003805,lineage name: P7.aapa
+CA6,P8.aapa,"Male specific neuron, innervates dorsal muscles",,,,,,,,,,,,1,1,,,,WBbt:0003804,lineage name: P8.aapa
+CA7,P9.aapa,"Male specific neuron, innervates dorsal muscles",,,,,,,,,,,,1,1,,,,WBbt:0003803,lineage name: P9.aapa
+CA8,P10.aapa,"Male specific cell in ventral cord, neuron-like but lacks synapses",,,,,,,,,,,,1,1,,,,WBbt:0006853,lineage name: P10.aapa
+CA9,P11.aapa,"Male specific cell in ventral cord, neuron-like but lacks synapses",,,,,,,,,,,,1,1,,,,WBbt:0006854,lineage name: P11.aapa
+CANL,AB.alapaaapa,"Process runs along excretory canal, no synapses, essential for survival",,,1,,,,,,,,,,,,,,WBbt:0004949,lineage name: ABalapaaapa
+CANR,AB.alappappa,"Process runs along excretory canal, no synapses, essential for survival",,,1,,,,,,,,,,,,,,WBbt:0004947,lineage name: ABalappappa
+cc_DL,M.dlpa,Postembryonic coelomocyte in hermaphrodite,,,,,,,,1,,,,,,,,,WBbt:0004564,lineage name: M.dlpa
+cc_DR,M.drpa,Postembryonic coelomocyte in hermaphrodite,,,,,,,,1,,,,,,,,,WBbt:0004563,lineage name: M.drpa
+cc_male_D,M.dlpappp,Single male postembryonic coelomocyte,,,,,,,,,,,,1,1,,,,WBbt:0004562,lineage name: M.dlpappp
+ccAL,MS.apapaaa,Embryonic coelomocytes - present in adult,,,,,,,,1,,,,,,,,,WBbt:0004561,lineage name: MSapapaaa
+ccAR,MS.ppapaaa,Embryonic coelomocytes - present in adult,,,,,,,,1,,,,,,,,,WBbt:0004560,lineage name: MSppapaaa
+ccPL,MS.apapaap,Embryonic coelomocytes - present in adult,,,,,,,,1,,,,,,,,,WBbt:0004559,lineage name: MSapapaap
+ccPR,MS.ppapaap,Embryonic coelomocytes - present in adult,,,,,,,,1,,,,,,,,,WBbt:0004558,lineage name: MSppapaap
+CEMDL,AB.plaaaaaap,"Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.",,,,,,,,,,,1,1,,,,,WBbt:0004945,lineage name: ABplaaaaaap
+CEMDR,AB.arpapaaap,"Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.",,,,,,,,,,,1,1,,,,,WBbt:0004943,lineage name: ABarpapaaap
+CEMVL,AB.plpaapapp,"Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.",,,,,,,,,,,1,1,,,,,WBbt:0004941,lineage name: ABplpaapapp
+CEMVR,AB.prpaapapp,"Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.",,,,,,,,,,,1,1,,,,,WBbt:0004939,lineage name: ABprpaapapp
+CEPDL,AB.plaaaaappa,"Cephalic neurons, contain dopamine",,,1,,,,,,,,,,,,,,WBbt:0004938,lineage name: ABplaaaaappa
+CEPDR,AB.arpapaappa,"Cephalic neurons, contain dopamine",,,1,,,,,,,,,,,,,,WBbt:0004937,lineage name: ABarpapaappa
+CEPshDL,AB.arpaaaapp,"Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion",,,,,,,,1,,,,,,,,,WBbt:0004929,lineage name: ABarpaaaapp
+CEPshDR,AB.arpaaapap,"Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion",,,,,,,,1,,,,,,,,,WBbt:0004927,lineage name: ABarpaaapap
+CEPshVL,AB.plpaaapap,"Cephalic sheath, sheet-like processes envelop meuropil of the ring and part of ventral ganglion",,,,,,,,1,,,,,,,,,WBbt:0004925,lineage name: ABplpaaapap
+CEPshVR,AB.prpaaapap,"Cephalic sheath, sheet-like processes envelop meuropil of the ring and part of ventral ganglion",,,,,,,,1,,,,,,,,,WBbt:0004923,lineage name: ABprpaaapap
+CEPsoDL,AB.alapapppp,Cephalic socket,,,,,,,,1,,,,,,,,,WBbt:0004921,lineage name: ABalapapppp
+CEPsoDR,AB.alapppppp,Cephalic socket,,,,,,,,1,,,,,,,,,WBbt:0004919,lineage name: ABalapppppp
+CEPsoVL,AB.alppaappp,Cephalic socket,,,,,,,,1,,,,,,,,,WBbt:0004918,lineage name: ABalppaappp
+CEPsoVR,AB.alaapappp,Cephalic socket,,,,,,,,1,,,,,,,,,WBbt:0004917,lineage name: ABalaapappp
+CEPVL,AB.plpaappppa,"Cephalic neurons, contain dopamine",,,1,,,,,,,,,,,,,,WBbt:0004933,lineage name: ABplpaappppa
+CEPVR,AB.prpaappppa,"Cephalic neurons, contain dopamine",,,1,,,,,,,,,,,,,,WBbt:0004931,lineage name: ABprpaappppa
+CP1,P3.aapp,"Male specific cell in ventral cord, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0004901,lineage name: P3.aapp
+CP2,P4.aapp,"Male specific cell in ventral cord, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0004899,lineage name: P4.aapp
+CP3,P5.aapp,"Male specific cell in ventral cord, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0004897,lineage name: P5.aapp
+CP4,P6.aapp,Male specific motor neuron in ventral cord,,,,1,,,,,,,,1,1,,,,WBbt:0004895,lineage name: P6.aapp
+CP5,P7.aapp,Male specific motor neuron in ventral cord,,,,1,,,,,,,,1,1,,,,WBbt:0004893,lineage name: P7.aapp
+CP6,P8.aapp,Male specific motor neuron in ventral cord,,,,1,,,,,,,,1,1,,,,WBbt:0004891,lineage name: P8.aapp
+CP7,P9.aapp,Male specific motor neuron in ventral cord,,,,1,,,,,,,,1,1,,,,WBbt:0004889,lineage name: P9.aapp
+CP8,P10.aapp,"Male specific interneuron, project into preanal ganglion",,,,1,,,,,,,,1,1,,,,WBbt:0004888,lineage name: P10.aapp
+CP9,P11.aapp,"Male specific interneuron, project into preanal ganglion",,,,,,,,,,,,1,1,,,,WBbt:0004887,lineage name: P11.aapp
+CPO,P2.aap,"Male specific cell in ventral cord, not reconstructed",,,,,,,,,,,,1,1,,,,WBbt:0002471,None
+D,P0.pppa,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0004873,None
+DA1,AB.prppapaap,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004871,lineage name: ABprppapaap
+DA2,AB.plppapapa,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004869,lineage name: ABplppapapa
+DA3,AB.prppapapa,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004867,lineage name: ABprppapapa
+DA4,AB.plppapapp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004865,lineage name: ABplppapapp
+DA5,AB.prppapapp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004863,lineage name: ABprppapapp
+DA6,AB.plpppaaap,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004861,lineage name: ABplpppaaap
+DA7,AB.prpppaaap,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004859,lineage name: ABprpppaaap
+DA8,AB.prpapappp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004858,lineage name: ABprpapappp
+DA9,AB.plpppaaaa,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004857,lineage name: ABplpppaaaa
+DB1,AB.plpaaaapp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004846,lineage name: ABplpaaaapp
+DB2,AB.arappappa,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004845,lineage name: ABarappappa
+DB3,AB.prpaaaapp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004844,lineage name: ABprpaaaapp
+DB4,AB.prpappapp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004843,lineage name: ABprpappapp
+DB5,AB.plpapappp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004842,lineage name: ABplpapappp
+DB6,AB.plppaappp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004841,lineage name: ABplppaappp
+DB7,AB.prppaappp,"Ventral cord motor neurons, innervate dorsal muscles",,,1,,,,,,,1,,,,,,,WBbt:0004840,lineage name: ABprppaappp
+DD1,AB.plppappap,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004839,lineage name: ABplppappap
+DD2,AB.prppappap,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004838,lineage name: ABprppappap
+DD3,AB.plppapppa,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004837,lineage name: ABplppapppa
+DD4,AB.prppapppa,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004826,lineage name: ABprppapppa
+DD5,AB.plppapppp,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004825,lineage name: ABplppapppp
+DD6,AB.prppapppp,"Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development",,,1,,,,,,,1,1,,,,,,WBbt:0004824,lineage name: ABprppapppp
+DL1,MS.apappa,,,,,,1,,,,,,,,,,,mu_bod_dl2,WBbt:0003875,"lineage name: MSapappa,mu_bod"
+DL10,D.apap,Embryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0006535,"lineage name: Dapap, mu_bod"
+DL11,D.aapppa,,,,,,1,,,,,,,,,,,mu_bod_dl12,WBbt:0003913,"lineage name: Dapppa,mu_bod"
+DL12,C.appaaa,,,,,,1,,,,,,,,,,,mu_bod_dl11,WBbt:0004282,"lineage name: Cappaaa,mu_bod"
+DL13,D.aapppp,,,,,,1,,,,,,,,,,,mu_bod_dl14,WBbt:0003902,"lineage name: Dapppp,mu_bod"
+DL14,C.apapaa,,,,,,1,,,,,,,,,,,mu_bod_dl13,WBbt:0004286,"lineage name: Capapaa,mu_bod"
+DL15,M.dlaa,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007163,DL15
+DL16,M.dlap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007164,DL16
+DL17,C.appaap,,,,,,1,,,,,,,,,,,mu_bod_dl18,WBbt:0003982,"lineage name: Cappaap,mu_bod"
+DL18,C.apapap,,,,,,1,,,,,,,,,,,mu_bod_dl17,WBbt:0004285,"lineage name: Capapap,mu_bod"
+DL19,C.apppaa,,,,,,1,,,,,,,,,,,mu_bod_dl20,WBbt:0003979,"lineage name: Capppaa,mu_bod"
+DL2,MS.apaaap,,,,,,1,,,,,,,,,,,mu_bod_dl1,WBbt:0003877,"lineage name: MSapaaap,mu_bod"
+DL20,C.appapa,,,,,,1,,,,,,,,,,,mu_bod_dl19,WBbt:0003981,"lineage name: Cappapa,mu_bod"
+DL21,C.apppap,,,,,,1,,,,,,,,,,,mu_bod_dl22,WBbt:0003978,"lineage name: Capppap,mu_bod"
+DL22,M.dlpp,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007168,DL22
+DL23,C.appppd,,,,,,1,,,,,,,,,,,mu_bod_dl24,WBbt:0003977,"lineage name: Cappppd,mu_bod"
+DL24,C.appapp,,,,,,1,,,,,,,,,,,mu_bod_dl23,WBbt:0003980,"lineage name: Cappapp,mu_bod"
+DL3,MS.appppa,,,,,,1,,,,,,,,,,,mu_bod_dl4,WBbt:0003860,"lineage name: MSappppa,mu_bod"
+DL4,MS.apappp,,,,,,1,,,,,,,,,,,mu_bod_dl3,WBbt:0003874,"lineage name: MSapappp,mu_bod"
+DL5,MS.appppp,,,,,,1,,,,,,,,,,,mu_bod_dl6,WBbt:0003859,"lineage name: MSappppp,mu_bod"
+DL6,MS.apppap,,,,,,1,,,,,,,,,,,mu_bod_dl5,WBbt:0003861,"lineage name: MSapppap,mu_bod"
+DL7,D.appaa,,,,,,1,,,,,,,,,,,mu_bod_dl8,WBbt:0003915,"lineage name: Dappaa,mu_bod"
+DL8,D.aaap,,,,,,1,,,,,,,,,,,mu_bod_dl7,WBbt:0003918,"lineage name: Daaap,mu_bod"
+DL9,D.aappap,,,,,,1,,,,,,,,,,,mu_bod_dl10,WBbt:0003914,"lineage name: Dappap,mu_bod"
+DR1,MS.ppappa,,,,,,1,,,,,,,,,,,mu_bod_dr2,WBbt:0003840,"lineage name: MSppappa,mu_bod"
+DR10,D.ppap,,,,,,1,,,,,,,,,,,mu_bod_dr9,WBbt:0003896,"lineage name: Dppap,mu_bod"
+DR11,D.ppppa,,,,,,1,,,,,,,,,,,mu_bod_dr12,WBbt:0003893,"lineage name: Dppppa,mu_bod"
+DR12,C.pppaaa,,,,,,1,,,,,,,,,,,mu_bod_dr11,WBbt:0003947,"lineage name: Cpppaaa,mu_bod"
+DR13,D.ppppp,,,,,,1,,,,,,,,,,,mu_bod_dr14,WBbt:0003882,"lineage name: Dppppp,mu_bod"
+DR14,C.ppapaa,,,,,,1,,,,,,,,,,,mu_bod_dr13,WBbt:0003951,"lineage name: Cppapaa,mu_bod"
+DR15,M.draa,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007171,DR15
+DR16,M.drap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007172,DR16
+DR17,C.pppaap,,,,,,1,,,,,,,,,,,mu_bod_dr18,WBbt:0003946,"lineage name: Cpppaap,mu_bod"
+DR18,C.ppapap,,,,,,1,,,,,,,,,,,mu_bod_dr17,WBbt:0003950,"lineage name: Cppapap,mu_bod"
+DR19,C.ppppaa,,,,,,1,,,,,,,,,,,mu_bod_dr20,WBbt:0003943,"lineage name: Cppppaa,mu_bod"
+DR2,MS.ppaaap,,,,,,1,,,,,,,,,,,mu_bod_dr1,WBbt:0003842,"lineage name: MSppaaap,mu_bod"
+DR20,C.pppapa,,,,,,1,,,,,,,,,,,mu_bod_dr19,WBbt:0003945,"lineage name: Cpppapa,mu_bod"
+DR21,C.ppppap,,,,,,1,,,,,,,,,,,mu_bod_dr22,WBbt:0003922,"lineage name: Cppppap,mu_bod"
+DR22,M.drpp,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007176,DR22
+DR23,C.pppppd,,,,,,1,,,,,,,,,,,mu_bod_dr24,WBbt:0003921,"lineage name: Cpppppd,mu_bod"
+DR24,C.pppapp,,,,,,1,,,,,,,,,,,mu_bod_dr23,WBbt:0003944,"lineage name: Cpppapp,mu_bod"
+DR3,MS.pppppa,,,,,,1,,,,,,,,,,,mu_bod_dr4,WBbt:0003835,"lineage name: MSpppppa,mu_bod"
+DR4,MS.ppappp,,,,,,1,,,,,,,,,,,mu_bod_dr3,WBbt:0003839,"lineage name: MSppappp,mu_bod"
+DR5,MS.pppppp,,,,,,1,,,,,,,,,,,mu_bod_dr6,WBbt:0003834,"lineage name: MSpppppp,mu_bod"
+DR6,MS.ppppap,,,,,,1,,,,,,,,,,,mu_bod_dr5,WBbt:0003836,"lineage name: MSppppap,mu_bod"
+DR7,D.pppaa,,,,,,1,,,,,,,,,,,mu_bod_dr8,WBbt:0003895,"lineage name: Dpppaa,mu_bod"
+DR8,D.paap,,,,,,1,,,,,,,,,,,mu_bod_dr7,WBbt:0003900,"lineage name: Dpaap,mu_bod"
+DR9,D.pppap,,,,,,1,,,,,,,,,,,mu_bod_dr10,WBbt:0003894,"lineage name: Dpppap,mu_bod"
+DVA,AB.prppppapp,"Ring interneurons, cell bodies in dorsorectal ganglion",,,1,,,,,,,,,,,,,,WBbt:0004823,lineage name: ABprppppapp
+DVB,K.p,"Ring interneuron, cell body in dorsorectal ganglion, inervates rectal muscles",,,1,,,,,,,,,,,,,,WBbt:0004822,lineage name: K.p
+DVC,C.aapaa,"Ring interneurons, cell bodies in dorsorectal ganglion",,,1,,,,,,,,,,,,,,WBbt:0004821,lineage name: Caapaa
+DVE,B.ppap,"Male specific neuron, cell body in dorsorectal ganglion",,,,1,,,,,,,,1,1,,,,WBbt:0004820,lineage name: B.ppap
+DVF,B.ppppa,"Male specific neuron, cell body in dorsorectal ganglion",,,,1,,,,,,,,1,1,,,,WBbt:0004819,lineage name: B.ppppa
+DX1/2,F.lvda,"Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles",,,,1,,,,,,,,1,1,1,,,WBbt:0004818,lineage name: F.lvda
+DX1/2,F.rvda,"Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles",,,,1,,,,,,,,1,1,1,,,WBbt:0004817,lineage name: F.rvda
+DX3/4,U.laa,"Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles",,,,1,,,,,,,,1,1,1,,,WBbt:0004806,lineage name: U.laa
+DX3/4,U.raa,"Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles",,,,1,,,,,,,,1,1,1,,,WBbt:0004805,lineage name: U.raa
+E,P0.pap,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0004804,None
+e1D,AB.araaaapap,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0003701,lineage name: ABaraaaapap
+e1VL,AB.araaaaaaa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004556,lineage name: ABaraaaaaaa
+e1VR,AB.araaaaapa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004555,lineage name: ABaraaaaapa
+e2DL,AB.alpaapaap,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004554,lineage name: ABalpaapaap
+e2DR,AB.araaapaap,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004552,lineage name: ABaraaapaap
+e2V,AB.alpappapa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004550,lineage name: ABalpappapa
+e3D,AB.araapaaaa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004548,lineage name: ABaraapaaaa
+e3VL,AB.alpaaaaaa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004546,lineage name: ABalpaaaaaa
+e3VR,AB.arapaaaaa,Pharyngeal epithelial cells,,,,,,,,1,,,,,,,,,WBbt:0004544,lineage name: ABarapaaaaa
+EF1/2,F.lvda,"Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.",,,,1,,,,,,,,1,1,1,,,WBbt:0004803,"F.lvdp,lineage name: F.lvda"
+EF1/2,F.rvda,"Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.",,,,1,,,,,,,,1,1,1,,,WBbt:0004802,"F.rvdp,lineage name: F.rvda"
+EF3/4,U.lap,"Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.",,,,1,,,,,,,,1,1,1,,,WBbt:0004801,lineage name: U.lap
+EF3/4,U.rap,"Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.",,,,1,,,,,,,,1,1,1,,,WBbt:000480,None
+exc_cell,AB.plpappaap,Large H-shaped excretory cell,,,,,,,,1,,,,,,,,,WBbt:0005812,"excretory canal cell,exc_cell,lineage name: ABplpappaap"
+exc_duct,AB.plpaaaapa,Excretory duct,,,,,,,,1,,,,,,,,,WBbt:0004540,"exc duct,lineage name: ABplpaaaapa"
+exc_gl_L,AB.plpapapaa,"Excretory glands, fused, send processes to ring,open into excretory duct",,,,,,,,1,,,,,,,,,WBbt:0004536,"ABplpapapaa nucleus,lineage name: ABplpapapaa"
+exc_gl_R,AB.prpapapaa,"Excretory glands, fused, send processes to ring,open into excretory duct",,,,,,,,1,,,,,,,,,WBbt:0004535,"ABprpapapaa nucleus,lineage name: ABprpapapaa"
+F,AB.plppppapp,"Rectal cell, blast cell in male",,,,,,,,,,,1,1,,,,,WBbt:0004799,None
+FLPL,AB.plapaaapad,"Neuron, ciliated ending in head, no supporting cells, associated with ILso",,,1,,,,,,,,,,,,,,WBbt:0004798,lineage name: ABplapaaapad
+FLPR,AB.prapaaapad,"Neuron, ciliated ending in head, no supporting cells, associated with ILso",,,1,,,,,,,,,,,,,,WBbt:0004797,lineage name: ABprapaaapad
+G1,AB.prpaaaapa,"Postembryonic blast cell, excretory socket in embryo",,,,,,,,,,,1,,,,,,WBbt:0003712,None
+g1AL,MS.aapaapaa,Pharyngeal gland cells,,,,,,,,1,,,,,,,,,WBbt:0004532,lineage name: MSaapaapaa
+g1AR,MS.papaapaa,Pharyngeal gland cells,,,,,,,,1,,,,,,,,,WBbt:0004530,lineage name: MSpapaapaa
+g1P,MS.aaaaapap,Pharyngeal gland cells,,,,,,,,1,,,,,,,,,WBbt:0004528,lineage name: MSaaaaapap
+G2,AB.plapaapa,"Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later",,,,,,,,1,,,,,,,,,WBbt:0003710,None
+g2L,MS.aapapaa,Pharyngeal gland cells,,,,,,,,1,,,,,,,,,WBbt:0004526,lineage name: MSaapapaa
+g2R,MS.papapaa,Pharyngeal gland cells,,,,,,,,1,,,,,,,,,WBbt:0004524,lineage name: MSpapapaa
+GLRDL,MS.aaaaaal,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004786,lineage name: MSaaaaaal
+GLRDR,MS.aaaaaar,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004785,lineage name: MSaaaaaar
+GLRL,MS.apaaaad,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004784,lineage name: MSapaaaad
+GLRR,MS.ppaaaad,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004783,lineage name: MSppaaaad
+GLRVL,MS.apaaaav,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004782,lineage name: MSapaaaav
+GLRVR,MS.ppaaaav,"Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons",,,,,,,1,,,,,,,,,,WBbt:0004781,lineage name: MSppaaaav
+gon_herm_anch,Z1.ppp/Z4.aaa,"Anchor cell, induces vulva, herm gonad",,,,,,,,1,1,,,,,,,,WBbt:0004522,"AC,gon_herm_anch,lineage name: Z1.ppp/Z4.aaa"
+gon_herm_dish_A,Z1.apa,"Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad",,,,,,,,1,1,,,,,1,,?,WBbt:0004505,lineage name: Z1.apa
+gon_herm_dish_A,Z1.paaa,"Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad",,,,,,,,1,1,,,,,1,,?,WBbt:0004504,lineage name: Z1.paaa
+gon_herm_dish_P,Z4.pap,"Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad",,,,,,,,1,1,,,,,1,,?,WBbt:0004502,lineage name: Z4.pap
+gon_herm_dish_P,Z4.appp,"Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad",,,,,,,,1,1,,,,,1,,?,WBbt:0004500,lineage name: Z4.appp
+gon_herm_dtc_A,Z1.aa,"Anterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad",,,,,,,,1,1,,,,,,,,WBbt:0004520,lineage name: Z1.aa
+gon_herm_dtc_P,Z4.pp,"Posterior distal tip cell, inhibit meiosis in neighbour- ing germ cells, lead gonad during morphogenesis, herm gonad",,,,,,,,1,1,,,,,,,,WBbt:0004506,lineage name: Z4.pp
+gon_herm_dut,Z1.papapaap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004120,"gon_herm_dut,lineage name: Z1.papapaap"
+gon_herm_dut,Z1.papapapa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004119,"gon_herm_dut,lineage name: Z1.papapapa"
+gon_herm_dut,Z1.papapapp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004117,"gon_herm_dut,lineage name: Z1.papapapp"
+gon_herm_dut,Z1.papappaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004115,"DE4aa,gon_herm_dut,lineage name: Z1.papappaa,uv3"
+gon_herm_dut,Z1.papappap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004113,"DE4vd,gon_herm_dut,lineage name: Z1.papappap,uv2"
+gon_herm_dut,Z1.papapppa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004111,"gon_herm_dut,lineage name: Z1.papapppa"
+gon_herm_dut,Z1.papapppp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004109,"gon_herm_dut,lineage name: Z1.papapppp"
+gon_herm_dut,Z1.pappaaaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004107,"gon_herm_dut,lineage name: Z1.pappaaaa"
+gon_herm_dut,Z1.pappaaap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004105,"gon_herm_dut,lineage name: Z1.pappaaap"
+gon_herm_dut,Z1.pappaapa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004101,"DE5pa,gon_herm_dut,lineage name: Z1.pappaapa,uv2"
+gon_herm_dut,Z1.pappaapp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004100,"DE5pp,gon_herm_dut,lineage name: Z1.pappaapp"
+gon_herm_dut,Z1.pappapaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004099,"gon_herm_dut,lineage name: Z1.pappapaa"
+gon_herm_dut,Z1.pappapap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004097,"gon_herm_dut,lineage name: Z1.pappapap"
+gon_herm_dut,Z1.pappappa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004095,"gon_herm_dut,lineage name: Z1.pappappa"
+gon_herm_dut,Z4.apaapaap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004093,"gon_herm_dut,lineage name: Z4.apaapaap"
+gon_herm_dut,Z4.apaapapa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004091,"gon_herm_dut,lineage name: Z4.apaapapa"
+gon_herm_dut,Z4.apaapapp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004089,"gon_herm_dut,lineage name: Z4.apaapapp"
+gon_herm_dut,Z4.apaappaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004087,"gon_herm_dut,lineage name: Z4.apaappaa"
+gon_herm_dut,Z4.apaappap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004085,"gon_herm_dut,lineage name: Z4.apaappap,uv2"
+gon_herm_dut,Z4.apaapppa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004081,"gon_herm_dut,lineage name: Z4.apaapppa"
+gon_herm_dut,Z4.apaapppp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004080,"gon_herm_dut,lineage name: Z4.apaapppp"
+gon_herm_dut,Z4.apapaaaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004079,"gon_herm_dut,lineage name: Z4.apapaaaa"
+gon_herm_dut,Z4.apapaaap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004077,"gon_herm_dut,lineage name: Z4.apapaaap"
+gon_herm_dut,Z4.apapaapa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004075,"gon_herm_dut,lineage name: Z4.apapaapa,uv2"
+gon_herm_dut,Z4.apapaapp,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004073,"gon_herm_dut,lineage name: Z4.apapaapp"
+gon_herm_dut,Z4.apapapaa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004071,"gon_herm_dut,lineage name: Z4.apapapaa"
+gon_herm_dut,Z4.apapapap,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004069,"gon_herm_dut,lineage name: Z4.apapapap"
+gon_herm_dut,Z4.apapappa,Dorsal uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004067,"gon_herm_dut,lineage name: Z4.apapappa"
+gon_herm_prsh_A,Z1.appaaa,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004498,lineage name: Z1.appaaa
+gon_herm_prsh_A,Z1.appaap,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004496,lineage name: Z1.appaap
+gon_herm_prsh_A,Z1.appapa,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004494,lineage name: Z1.appapa
+gon_herm_prsh_A,Z1.appapp,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004492,lineage name: Z1.appapp
+gon_herm_prsh_A,Z1.paapaaa,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004490,lineage name: Z1.paapaaa
+gon_herm_prsh_A,Z1.paapaap,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004476,lineage name: Z1.paapaap
+gon_herm_prsh_A,Z1.paapapa,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004475,lineage name: Z1.paapapa
+gon_herm_prsh_A,Z1.paapapp,"Anterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004474,lineage name: Z1.paapapp
+gon_herm_prsh_P,Z4.paapaa,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004472,lineage name: Z4.paapaa
+gon_herm_prsh_P,Z4.paapap,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004470,lineage name: Z4.paapap
+gon_herm_prsh_P,Z4.paappa,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004468,lineage name: Z4.paappa
+gon_herm_prsh_P,Z4.paappp,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004466,lineage name: Z4.paappp
+gon_herm_prsh_P,Z4.appapaa,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004464,lineage name: Z4.appapaa
+gon_herm_prsh_P,Z4.appapap,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004462,lineage name: Z4.appapap
+gon_herm_prsh_P,Z4.appappa,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004460,lineage name: Z4.appappa
+gon_herm_prsh_P,Z4.appappp,"Posterior epithelial sheaths of proximal arms, have muscle fibers",,,,,,,,1,1,,,,,1,,?,WBbt:0004218,lineage name: Z4.appappp
+gon_herm_spth_A,Z1.apppaaaa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004216,"gon_herm_spth_A,lineage name: Z1.apppaaaa"
+gon_herm_spth_A,Z1.apppaaap,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004214,"gon_herm_spth_A,lineage name: Z1.apppaaap"
+gon_herm_spth_A,Z1.apppaapa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004212,"gon_herm_spth_A,lineage name: Z1.apppaapa"
+gon_herm_spth_A,Z1.apppaapp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004210,"gon_herm_spth_A,lineage name: Z1.apppaapp"
+gon_herm_spth_A,Z1.apppapaa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004208,"gon_herm_spth_A,lineage name: Z1.apppapaa"
+gon_herm_spth_A,Z1.apppapap,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004206,"gon_herm_spth_A,lineage name: Z1.apppapap"
+gon_herm_spth_A,Z1.apppapp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004204,"gon_herm_spth_A,lineage name: Z1.apppapp"
+gon_herm_spth_A,Z1.appppa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004203,"gon_herm_spth_A,lineage name: Z1.appppa"
+gon_herm_spth_A,Z1.appppp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004202,"gon_herm_spth_A,lineage name: Z1.appppp"
+gon_herm_spth_A,Z1.paappaaaa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004198,"gon_herm_spth_A,lineage name: Z1.paappaaaa"
+gon_herm_spth_A,Z1.paappaaap,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004196,"gon_herm_spth_A,lineage name: Z1.paappaaap"
+gon_herm_spth_A,Z1.paappaapa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004194,"gon_herm_spth_A,lineage name: Z1.paappaapa"
+gon_herm_spth_A,Z1.paappaapp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004192,"gon_herm_spth_A,lineage name: Z1.paappaapp,Z1.paappaapp"
+gon_herm_spth_A,Z1.paappapaa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004190,"gon_herm_spth_A,lineage name: Z1.paappapaa"
+gon_herm_spth_A,Z1.paappapap,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004188,"gon_herm_spth_A,lineage name: Z1.paappapap"
+gon_herm_spth_A,Z1.paappapp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004186,"gon_herm_spth_A,lineage name: Z1.paappapp"
+gon_herm_spth_A,Z1.paapppa,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004184,"gon_herm_spth_A,lineage name: Z1.paapppa"
+gon_herm_spth_A,Z1.paapppp,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004183,"gon_herm_spth_A,lineage name: Z1.paapppp"
+gon_herm_spth_A,Z1.papaaad,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004182,"gon_herm_spth_A,lineage name: Z1.papaaad"
+gon_herm_spth_A,Z1.papaaav,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004178,"gon_herm_spth_A,lineage name: Z1.papaaav"
+gon_herm_spth_A,Z1.papaapv,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004176,"gon_herm_spth_A,lineage name: Z1.papaapv"
+gon_herm_spth_A,Z4.apaaaad,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004174,"gon_herm_spth_A,lineage name: Z4.apaaaad"
+gon_herm_spth_A,Z4.apaaaav,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004172,"gon_herm_spth_A,lineage name: Z4.apaaaav"
+gon_herm_spth_A,Z4.apaaapv,Anterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004170,"gon_herm_spth_A,lineage name: Z4.apaaapv"
+gon_herm_spth_P,Z4.paaaaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004168,"gon_herm_spth_P,lineage name: Z4.paaaaa"
+gon_herm_spth_P,Z4.paaaap,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004166,"gon_herm_spth_P,lineage name: Z4.paaaap"
+gon_herm_spth_P,Z4.paaapaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004164,"gon_herm_spth_P,lineage name: Z4.paaapaa"
+gon_herm_spth_P,Z4.paaapapa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004163,"gon_herm_spth_P,lineage name: Z4.paaapapa"
+gon_herm_spth_P,Z4.paaapapp,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004162,"gon_herm_spth_P,lineage name: Z4.paaapapp"
+gon_herm_spth_P,Z4.paaappaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004158,"gon_herm_spth_P,lineage name: Z4.paaappaa"
+gon_herm_spth_P,Z4.paaappap,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004156,"gon_herm_spth_P,lineage name: Z4.paaappap"
+gon_herm_spth_P,Z4.paaapppa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004154,"gon_herm_spth_P,lineage name: Z4.paaapppa"
+gon_herm_spth_P,Z4.paaapppp,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004152,"gon_herm_spth_P,lineage name: Z4.paaapppp"
+gon_herm_spth_P,Z4.appaaaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004150,"gon_herm_spth_P,lineage name: Z4.appaaaa"
+gon_herm_spth_P,Z4.appaaap,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004148,"gon_herm_spth_P,lineage name: Z4.appaaap"
+gon_herm_spth_P,Z4.appaapaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004146,"gon_herm_spth_P,lineage name: Z4.appaapaa"
+gon_herm_spth_P,Z4.appaapapa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004144,"gon_herm_spth_P,lineage name: Z4.appaapapa"
+gon_herm_spth_P,Z4.appaapapp,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004143,"gon_herm_spth_P,lineage name: Z4.appaapapp"
+gon_herm_spth_P,Z4.appaappaa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004142,"gon_herm_spth_P,lineage name: Z4.appaappaa"
+gon_herm_spth_P,Z4.appaappap,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004141,"gon_herm_spth_P,lineage name: Z4.appaappap"
+gon_herm_spth_P,Z4.appaapppa,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004140,"gon_herm_spth_P,lineage name: Z4.appaapppa"
+gon_herm_spth_P,Z4.appaapppp,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004139,"gon_herm_spth_P,lineage name: Z4.appaapppp"
+gon_herm_spth_P,Z4.apappav,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004138,"gon_herm_spth_P,lineage name: Z4.apappav"
+gon_herm_spth_P,Z4.apapppd,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004137,"gon_herm_spth_P,lineage name: Z4.apapppd"
+gon_herm_spth_P,Z4.apapppv,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004136,"gon_herm_spth_P,lineage name: Z4.apapppv"
+gon_herm_spth_P,Z1.papppav,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004135,"gon_herm_spth_P,lineage name: Z1.papppav"
+gon_herm_spth_P,Z1.pappppd,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004134,"gon_herm_spth_P,lineage name: Z1.pappppd"
+gon_herm_spth_P,Z1.pappppv,Posterior spermathecae,,,,,,,,1,1,,,,,1,,?,WBbt:0004133,"gon_herm_spth_P,lineage name: Z1.pappppv"
+gon_herm_sujn_A,Z1.papaapd,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004132,"DE2d,gon_herm_sujn,lineage name: Z1.papaapd"
+gon_herm_sujn_A,Z1.papapaaa,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004131,"DE3aa,gon_herm_sujn,lineage name: Z1.papapaaa"
+gon_herm_sujn_A,Z1.ppaaaaa,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004130,"gon_herm_sujn,lineage name: Z1.ppaaaaa,VT1la"
+gon_herm_sujn_A,Z1.ppaaapa,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004129,"gon_herm_sujn,lineage name: Z1.ppaaapa"
+gon_herm_sujn_A,Z4.apaaapd,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004128,"DE2d,gon_herm_sujn,lineage name: Z4.apaaapd"
+gon_herm_sujn_A,Z4.apaapaaa,Anterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004127,"DE3aa,gon_herm_sujn,lineage name: Z4.apaapaaa"
+gon_herm_sujn_P,Z1.pappappp,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004126,"DE6pp,gon_herm_sujn,lineage name: Z1.pappappp"
+gon_herm_sujn_P,Z1.papppad,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004125,"DE7d,gon_herm_sujn,lineage name: Z1.papppad"
+gon_herm_sujn_P,Z4.apapappp,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004124,"DE6pp,gon_herm_sujn,lineage name: Z4.apapappp"
+gon_herm_sujn_P,Z4.apappad,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004123,"DE7d,gon_herm_sujn,lineage name: Z4.apappad"
+gon_herm_sujn_P,Z4.aapppap,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004122,"gon_herm_sujn,lineage name: Z4.aapppap"
+gon_herm_sujn_P,Z4.aappppp,Posterior spermathecal-uterine junction,,,,,,,,1,1,,,,,1,,?,WBbt:0004121,"gon_herm_sujn,lineage name: Z4.aappppp"
+gon_herm_vut,Z1.ppaaaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004065,"gon_herm_vut,lineage name: Z1.ppaaaap"
+gon_herm_vut,Z1.ppaaapp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005095,"gon_herm_vut,lineage name: Z1.ppaaapp"
+gon_herm_vut,Z1.ppaapaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005094,"gon_herm_vut,lineage name: Z1.ppaapaa"
+gon_herm_vut,Z1.ppaapap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005093,"gon_herm_vut,lineage name: Z1.ppaapap"
+gon_herm_vut,Z1.ppaappa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004057,"gon_herm_vut,lineage name: Z1.ppaappa"
+gon_herm_vut,Z1.ppaappp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005091,"gon_herm_vut,lineage name: Z1.ppaappp"
+gon_herm_vut,Z1.ppapaaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004053,"gon_herm_vut,lineage name: Z1.ppapaaa,Z1.ppapaaa"
+gon_herm_vut,Z1.ppapaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004051,"gon_herm_vut,lineage name: Z1.ppapaap,Z1.ppapaap"
+gon_herm_vut,Z1.ppapapa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004049,"gon_herm_vut,lineage name: Z1.ppapapa"
+gon_herm_vut,Z1.ppapapp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004047,"gon_herm_vut,lineage name: Z1.ppapapp"
+gon_herm_vut,Z1.ppappd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005088,"gon_herm_vut,lineage name: Z1.ppappd,utse precursor"
+gon_herm_vut,Z1.pppaad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003782,"gon_herm_vut,lineage name: Z1.pppaad"
+gon_herm_vut,Z1.pppaav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003781,"gon_herm_vut,lineage name: Z1.pppaav"
+gon_herm_vut,Z1.pppapd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003780,"gon_herm_vut,lineage name: Z1.pppapd"
+gon_herm_vut,Z1.pppapv,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003779,"gon_herm_vut,lineage name: Z1.pppapv"
+gon_herm_vut,Z1.ppppad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003778,"gon_herm_vut,lineage name: Z1.ppppad"
+gon_herm_vut,Z1.ppppav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003777,"gon_herm_vut,lineage name: Z1.ppppav"
+gon_herm_vut,Z1.pppppaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003776,"gon_herm_vut,lineage name: Z1.pppppaa"
+gon_herm_vut,Z1.pppppap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003775,"gon_herm_vut,lineage name: Z1.pppppap"
+gon_herm_vut,Z1.ppppppa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003774,"gon_herm_vut,lineage name: Z1.ppppppa"
+gon_herm_vut,Z1.ppppppp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003773,"gon_herm_vut,lineage name: Z1.ppppppp"
+gon_herm_vut,Z4.aapaad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005076,"gon_herm_vut,lineage name: Z4.aapaad,utse precursor"
+gon_herm_vut,Z4.aapaav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003771,"gon_herm_vut,lineage name: Z4.aapaav"
+gon_herm_vut,Z4.aapapd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003770,"gon_herm_vut,lineage name: Z4.aapapd"
+gon_herm_vut,Z4.aapapv,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003769,"gon_herm_vut,lineage name: Z4.aapapv"
+gon_herm_vut,Z4.aappaaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003768,"gon_herm_vut,lineage name: Z4.aappaaa"
+gon_herm_vut,Z4.aappaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003767,"gon_herm_vut,lineage name: Z4.aappaap"
+gon_herm_vut,Z4.aappapa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003766,"gon_herm_vut,lineage name: Z4.aappapa"
+gon_herm_vut,Z4.aappapp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003765,"gon_herm_vut,lineage name: Z4.aappapp"
+gon_herm_vut,Z4.aapppaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005066,"gon_herm_vut,lineage name: Z4.aapppaa"
+gon_herm_vut,Z4.aappppa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005068,"gon_herm_vut,lineage name: Z4.aappppa"
+gon_herm_vut,Z1.ppaaaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004065,"gon_herm_vut,lineage name: Z1.ppaaaap"
+gon_herm_vut,Z1.ppaaapp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005095,"gon_herm_vut,lineage name: Z1.ppaaapp"
+gon_herm_vut,Z1.ppaapaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005094,"gon_herm_vut,lineage name: Z1.ppaapaa"
+gon_herm_vut,Z1.ppaapap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005093,"gon_herm_vut,lineage name: Z1.ppaapap"
+gon_herm_vut,Z1.ppaappa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0004057,"gon_herm_vut,lineage name: Z1.ppaappa"
+gon_herm_vut,Z1.ppaappp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005091,"gon_herm_vut,lineage name: Z1.ppaappp"
+gon_herm_vut,Z1.ppapad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005090,"gon_herm_vut,lineage name: Z1.ppapad,utse precursor,Z1.ppapad"
+gon_herm_vut,Z1.ppapav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005089,"gon_herm_vut,lineage name: Z1.ppapav,VT4l,Z1.ppapav"
+gon_herm_vut,Z1.ppappd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005088,"gon_herm_vut,lineage name: Z1.ppappd,utse precursor"
+gon_herm_vut,Z1.ppappv,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005087,"gon_herm_vut,lineage name: Z1.ppappv,utse precursor"
+gon_herm_vut,Z4.aaaaaaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005086,"gon_herm_vut,lineage name: Z4.aaaaaaa"
+gon_herm_vut,Z4.aaaaaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005085,"gon_herm_vut,lineage name: Z4.aaaaaap"
+gon_herm_vut,Z4.aaaaapa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005084,"gon_herm_vut,lineage name: Z4.aaaaapa"
+gon_herm_vut,Z4.aaaaapp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005083,"gon_herm_vut,lineage name: Z4.aaaaapp"
+gon_herm_vut,Z4.aaaapd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005082,"gon_herm_vut,lineage name: Z4.aaaapd,utse precursor"
+gon_herm_vut,Z4.aaaapv,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005081,"gon_herm_vut,lineage name: Z4.aaaapv,VT4r"
+gon_herm_vut,Z4.aaapad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005080,"gon_herm_vut,lineage name: Z4.aaapad,utse precursor"
+gon_herm_vut,Z4.aaapav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005079,"gon_herm_vut,lineage name: Z4.aaapav,utse precursor"
+gon_herm_vut,Z4.aaappv,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005078,"gon_herm_vut,lineage name: Z4.aaappv,VT8r"
+gon_herm_vut,Z4.aaappd,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005077,"gon_herm_vut,lineage name: Z4.aaappd,utse precursor"
+gon_herm_vut,Z4.aapaad,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005076,"gon_herm_vut,lineage name: Z4.aapaad,utse precursor"
+gon_herm_vut,Z4.aapaav,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003771,"gon_herm_vut,lineage name: Z4.aapaav"
+gon_herm_vut,Z4.aapapaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005074,"gon_herm_vut,lineage name: Z4.aapapaa"
+gon_herm_vut,Z4.aapapap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005073,"gon_herm_vut,lineage name: Z4.aapapap"
+gon_herm_vut,Z4.aapappa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005072,"gon_herm_vut,lineage name: Z4.aapappa"
+gon_herm_vut,Z4.aapappp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005071,"gon_herm_vut,lineage name: Z4.aapappp"
+gon_herm_vut,Z4.aappaaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0003768,"gon_herm_vut,lineage name: Z4.aappaaa"
+gon_herm_vut,Z4.apppaap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005069,"gon_herm_vut, lineage name: Z4.aappaaa, lineage name: Z4.apppaap"
+gon_herm_vut,Z4.aappppa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005068,"gon_herm_vut,lineage name: Z4.aappppa"
+gon_herm_vut,Z4.aappppp,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005067,"gon_herm_vut,lineage name: Z4.aappppp,sujn"
+gon_herm_vut,Z4.aapppaa,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005066,"gon_herm_vut,lineage name: Z4.aapppaa"
+gon_herm_vut,Z4.aapppap,Ventral uterus,,,,,,,,1,1,,,,,1,,?,WBbt:0005065,"gon_herm_vut,lineage name: Z4.aapppap,VT1r"
+gon_male_dtc,Z1.a,"Distal tip cell, inhibits meiosis in nearby germ cells",,,,,,,,,,,,1,1,1,,,WBbt:0005064,lineage name: Z1.a
+gon_male_dtc,Z1.p,"Distal tip cell, inhibits meiosis in nearby grem cells",,,,,,,,,,,,1,1,1,,,WBbt:0005063,lineage name: Z4.p
+gon_male_link,Z1.paa/Z4.aaa,"Linker cell, leads gonad during morphogenesis and initiates union with cloaca",,,,,,,,,,,,1,1,,,,WBbt:0005062,"gon_male_link,lineage name: Z1.paa/Z4.aaa"
+gon_male_sves,Z1.ppaaaaa,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005061,lineage name: Z1.ppaaaaa
+gon_male_sves,Z1.ppaaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005060,lineage name: Z1.ppaaaap
+gon_male_sves,Z1.ppaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005059,lineage name: Z1.ppaaap
+gon_male_sves,Z1.ppaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005058,"gon_male_sves,lineage name: Z1.ppaap"
+gon_male_sves,Z1.ppap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005057,lineage name: Z1.ppap
+gon_male_sves,Z1.pppaaaa,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005056,lineage name: Z1.pppaaaa
+gon_male_sves,Z1.pppaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005055,lineage name: Z1.pppaaap
+gon_male_sves,Z1.pppaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005054,lineage name: Z1.pppaap
+gon_male_sves,Z1.pppap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005052,"gon_male_sves,lineage name: Z1.pppap"
+gon_male_sves,Z1.pppp,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005050,lineage name: Z1.pppp
+gon_male_sves,Z1.pappp,"Seminal vesicle, outer",,,,,,,,,,,,1,1,1,,,WBbt:0005048,lineage name: Z1.pappp
+gon_male_sves,Z4.aaapp,"Seminal vesicle, outer",,,,,,,,,,,,1,1,1,,,WBbt:0005046,"gon_male_sves,lineage name: Z4.aaapp"
+gon_male_sves,Z4.aappp,"Seminal vesicle, outer",,,,,,,,,,,,1,1,1,,,WBbt:0005044,"gon_male_sves,lineage name: Z4.aappp"
+gon_male_sves,Z4.apaaaaa,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005042,lineage name: Z4.apaaaaa
+gon_male_sves,Z4.apaaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005040,lineage name: Z4.apaaaap
+gon_male_sves,Z4.apaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005036,lineage name: Z4.apaaap
+gon_male_sves,Z4.apaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005035,lineage name: Z4.apaap
+gon_male_sves,Z4.apap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005034,lineage name: Z4.apap
+gon_male_sves,Z4.appaaaa,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005032,lineage name: Z4.appaaaa
+gon_male_sves,Z4.appaaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005030,lineage name: Z4.appaaap
+gon_male_sves,Z4.appaap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005028,lineage name: Z4.appaap
+gon_male_sves,Z4.appap,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005026,lineage name: Z4.appap
+gon_male_sves,Z4.appp,"Seminal vesicle, inner",,,,,,,,,,,,1,1,1,,,WBbt:0005024,lineage name: Z4.appp
+gon_male_sves,Z1.paapp,"Seminal vesicle, outer",,,,,,,,,,,,1,1,1,,,WBbt:0005022,"gon_male_sves,lineage name: Z1.paapp"
+gon_male_vdef,Z1.papaaaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005020,lineage name: Z1.papaaaa
+gon_male_vdef,Z1.papaaap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005016,lineage name: Z1.papaaap
+gon_male_vdef,Z1.papaapaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005015,lineage name: Z1.papaapaa
+gon_male_vdef,Z1.papaapap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005014,lineage name: Z1.papaapap
+gon_male_vdef,Z1.papaappaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005012,lineage name: Z1.papaappaa
+gon_male_vdef,Z1.papaappap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005010,lineage name: Z1.papaappap
+gon_male_vdef,Z1.papaappp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005008,lineage name: Z1.papaappp
+gon_male_vdef,Z1.papapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005006,lineage name: Z1.papapa
+gon_male_vdef,Z1.papapp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005004,lineage name: Z1.papapp
+gon_male_vdef,Z1.pappa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005002,lineage name: Z1.pappa
+gon_male_vdef,Z4.aaaaaaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0005000,lineage name: Z4.aaaaaaa
+gon_male_vdef,Z4.aaaaaap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004996,lineage name: Z4.aaaaaap
+gon_male_vdef,Z4.aaaaapaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004995,lineage name: Z4.aaaaapaa
+gon_male_vdef,Z4.aaaaapap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004994,lineage name: Z4.aaaaapap
+gon_male_vdef,Z4.aaaaappaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004992,lineage name: Z4.aaaaappaa
+gon_male_vdef,Z4.aaaaappap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004990,lineage name: Z4.aaaaappap
+gon_male_vdef,Z4.aaaaappp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004988,lineage name: Z4.aaaaappp
+gon_male_vdef,Z4.aaaapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004986,lineage name: Z4.aaaapa
+gon_male_vdef,Z4.aaaapp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004984,lineage name: Z4.aaaapp
+gon_male_vdef,Z4.aaapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004982,lineage name: Z4.aaapa
+gon_male_vdef,Z4.aapaaaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004980,lineage name: Z4.aapaaaa
+gon_male_vdef,Z4.aapaaap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004716,lineage name: Z4.aapaaap
+gon_male_vdef,Z4.aapaapaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004715,lineage name: Z4.aapaapaa
+gon_male_vdef,Z4.aapaapap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004714,lineage name: Z4.aapaapap
+gon_male_vdef,Z4.aapaappaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004713,lineage name: Z4.aapaappaa
+gon_male_vdef,Z4.aapaappap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004712,lineage name: Z4.aapaappap
+gon_male_vdef,Z4.aapaappp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004711,lineage name: Z4.aapaappp
+gon_male_vdef,Z4.aapapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004710,lineage name: Z4.aapapa
+gon_male_vdef,Z4.aapapp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004709,lineage name: Z4.aapapp
+gon_male_vdef,Z4.aappa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004708,"gon_male_vdef,lineage name: Z4.aappa"
+gon_male_vdef,Z1.paaaaaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004707,lineage name: Z1.paaaaaa
+gon_male_vdef,Z1.paaaaap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004706,lineage name: Z1.paaaaap
+gon_male_vdef,Z1.paaaapaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004705,lineage name: Z1.paaaapaa
+gon_male_vdef,Z1.paaaapap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004704,lineage name: Z1.paaaapap
+gon_male_vdef,Z1.paaaappaa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004703,lineage name: Z1.paaaappaa
+gon_male_vdef,Z1.paaaappap,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004702,lineage name: Z1.paaaappap
+gon_male_vdef,Z1.paaaappp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004701,lineage name: Z1.paaaappp
+gon_male_vdef,Z1.paaapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004700,lineage name: Z1.paaapa
+gon_male_vdef,Z1.paaapp,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004699,lineage name: Z1.paaapp
+gon_male_vdef,Z1.paapa,Vas deferens,,,,,,,,,,,,1,1,1,,,WBbt:0004698,lineage name: Z1.paapa
+H1L,AB.plaaappp,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,1,,,1,,,,,,WBbt:0004766,lineage name: ABplaaappp
+H1R,AB.arpapppp,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,1,,,1,,,,,,WBbt:0004765,lineage name: ABarpapppp
+H2L,AB.arppaaap,"Seam hyopdermal cell, postemb. blast cell, L1 deirid socket",,,,,,,,1,,,1,,,,,,WBbt:0004764,lineage name: ABarppaaap
+H2R,AB.arpppaap,"Seam hyopdermal cell, postemb. blast cell, L1 deirid socket",,,,,,,,1,,,1,,,,,,WBbt:0004763,lineage name: ABarpppaap
+hmc,MS.appaaa,"Head mesodermal cell, function unknown",,,,,,,,1,,,,,,,,,WBbt:0004697,"head mesoderm cell,lineage name: MSappaaa"
+HOA,P10.pppa,"Neuron of hook sensillum, receptor anterior to cloaca in male",,,,1,,,,,,,,1,1,,,,WBbt:0004762,lineage name: P10.pppa
+HOB,P10.ppap,"Neuron of hook sensillum, receptor anterior to cloaca in male",,,,1,,,,,,,,1,1,,,,WBbt:0004761,lineage name: P10.ppap
+HOL,AB.plaaappa,Seam hypodermal cell,,,,,,,,1,,,,,,,,,WBbt:0004778,None
+HOR,AB.arpapppa,Seam hypodermal cell,,,,,,,,1,,,,,,,,,WBbt:0004777,None
+HOsh,P10.ppppp,"Sheath of hook sensillum, receptor anterior to cloaca in male",,,,1,,,,,,,,1,1,,,,WBbt:0004760,lineage name: P10.ppppp
+HOso,P10.ppaa,"Socket of hook sensillum, receptor anterior to cloaca in male",,,,1,,,,,,,,1,1,,,,WBbt:0004759,lineage name: P10.ppaa
+HSNL,AB.plapppappa,"Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic",,,1,,,,,,,,,,,,,,WBbt:0004758,lineage name: ABplapppappa
+HSNR,AB.prapppappa,"Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic",,,1,,,,,,,,,,,,,,WBbt:0004757,lineage name: ABprapppappa
+hyp_hook,P10.papp,Hook - male,,,,,,,,,,,,1,1,1,,?,WBbt:0004375,lineage name: P10.papp
+hyp_hook,P11.ppaa,Hypodermis associated with hook sensillum of male,,,,,,,,,,,,1,1,1,,,WBbt:0004374,lineage name: P11.ppaa
+hyp_hook,P11.ppap,Hypodermis associated with hook sensillum of male,,,,,,,,,,,,1,1,1,,,WBbt:0004373,lineage name: P11.ppap
+hyp_hook,P11.ppp,Hypodermis associated with hook sensillum of male,,,,,,,,,,,,1,1,1,,,WBbt:0004372,lineage name: P11.ppp
+hyp1,AB.alpaapppa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp1,WBbt:0004694,"lineage name: ABalpaapppa,lineage name: ABaraaapppp,lineage name: ABarappaapa"
+hyp1,AB.araaapppp,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp1,WBbt:0004694,"lineage name: ABalpaapppa,lineage name: ABaraaapppp,lineage name: ABarappaapa"
+hyp1,AB.arappaapa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp1,WBbt:0004694,"lineage name: ABalpaapppa,lineage name: ABaraaapppp,lineage name: ABarappaapa"
+hyp10,AB.plppppppp,Tail ventral hypodermis,,,,,,,,1,,,,,,1,,hyp10,WBbt:0004378,"lineage name: ABplppppppp,lineage name: ABprppppppp"
+hyp10,AB.prppppppp,Tail ventral hypodermis,,,,,,,,1,,,,,,1,,hyp10,WBbt:0004378,"lineage name: ABplppppppp,lineage name: ABprppppppp"
+hyp11,C.pappa,Tail dorsal hypodermis,,,,,,,,1,,,,,,,,,WBbt:0004377,lineage name: Cpappv
+hyp12,P12.pa,Preanal hypodermis,,,,,,,,1,,,,,,,,,WBbt:0004376,lineage name: P12.pa
+hyp2,AB.alpaapppp,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp2,WBbt:0004692,"lineage name: ABalpaapppp,lineage name: ABalpapaaap"
+hyp2,AB.alpapaaap,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp2,WBbt:0004692,"lineage name: ABalpaapppp,lineage name: ABalpapaaap"
+hyp3,AB.plaapaaaa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp3,WBbt:0004690,"lineage name: ABplaapaaaa,lineage name: ABpraapaaaa"
+hyp3,AB.praapaaaa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp3,WBbt:0004690,"lineage name: ABplaapaaaa,lineage name: ABpraapaaaa"
+hyp4,AB.arpapapa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp4,WBbt:0004687,"lineage name: ABarpapapa,lineage name: ABplaappaa,lineage name: ABpraappaa"
+hyp4,AB.plaappaa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp4,WBbt:0004687,"lineage name: ABarpapapa,lineage name: ABplaappaa,lineage name: ABpraappaa"
+hyp4,AB.praappaa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp4,WBbt:0004687,"lineage name: ABarpapapa,lineage name: ABplaappaa,lineage name: ABpraappaa"
+hyp5,AB.arpappap,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp5,WBbt:0004685,"lineage name: ABarpappap,lineage name: ABplaaapap"
+hyp5,AB.plaaapap,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,hyp5,WBbt:0004685,"lineage name: ABarpappap,lineage name: ABplaaapap"
+hyp6,AB.arpaapaa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp6,AB.arpapapp,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp6,AB.plaaaapa,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp6,AB.plaaaapp,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp6,AB.plaappap,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp6,AB.praappap,Cylindrical hypodermal syncytium in head,,,,,,,,1,,,,,,1,,?,WBbt:0004679,"lineage name: ABarpaapaa,lineage name: ABarpapapp,lineage name: ABplaaaapa,lineage name: ABplaaaapp,lineage name: ABplaappap,lineage name: ABpraappap"
+hyp7,AB.arpaapap,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004678,lineage name: ABarpaapap
+hyp7,AB.arpaappa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004677,lineage name: ABarpaappa
+hyp7,AB.arpaappp,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004676,lineage name: ABarpaappp
+hyp7,AB.arppaapa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004675,lineage name: ABarppaapa
+hyp7,AB.arpppapa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004674,lineage name: ABarpppapa
+hyp7,AB.plaapppa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004673,"hyp7,lineage name: ABplaapppa"
+hyp7,AB.plaapppp,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004672,"hyp7,lineage name: ABplaapppp"
+hyp7,AB.plappppa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004671,"ABplappppa,lineage name: ABplappppa"
+hyp7,AB.praapppa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004670,lineage name: ABpraapppa
+hyp7,AB.praapppp,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004669,lineage name: ABpraapppp
+hyp7,AB.prappppa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004668,lineage name: ABprappppa
+hyp7,C.aaaaa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004667,lineage name: Caaaaa
+hyp7,C.aaaap,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004666,lineage name: Caaaap
+hyp7,C.aaapa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004665,lineage name: Caaapa
+hyp7,C.aaapp,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004664,lineage name: Caaapp
+hyp7,C.aappd,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004663,lineage name: Caappd
+hyp7,C.paaaa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004662,lineage name: Cpaaaa
+hyp7,C.paaap,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004661,lineage name: Cpaaap
+hyp7,C.paapa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004660,lineage name: Cpaapa
+hyp7,C.paapp,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004659,lineage name: Cpaapp
+hyp7,C.papaa,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004658,lineage name: Cpapaa
+hyp7,C.papap,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004657,lineage name: Cpapap
+hyp7,C.pappd,Embryonic large hypodermal syncytium,,,,,,,,,,,1,,,1,,,WBbt:0004656,lineage name: Cpappd
+hyp7,H1L.apa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004655,lineage name: H1L.apa
+hyp7,H1L.appa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004654,lineage name: H1L.appa
+hyp7,H1L.p,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004652,lineage name: H1L.p
+hyp7,H1R.apa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004650,lineage name: H1R.apa
+hyp7,H1R.appa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004648,lineage name: H1R.appa
+hyp7,H1R.p,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004646,lineage name: H1R.p
+hyp7,H2L.ap,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004644,lineage name: H2L.ap
+hyp7,H2L.pa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004642,lineage name: H2L.pa
+hyp7,H2L.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004640,lineage name: H2L.ppa
+hyp7,H2L.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004636,lineage name: H2L.pppa
+hyp7,H2R.ap,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004635,lineage name: H2R.ap
+hyp7,H2R.pa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004634,lineage name: H2R.pa
+hyp7,H2R.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004632,lineage name: H2R.ppa
+hyp7,H2R.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004630,lineage name: H2R.pppa
+hyp7,V1L.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004628,lineage name: V1L.a
+hyp7,V1L.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004626,lineage name: V1L.paa
+hyp7,V1L.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004624,lineage name: V1L.papa
+hyp7,V1L.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004622,lineage name: V1L.pappa
+hyp7,V1L.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004620,lineage name: V1L.ppa
+hyp7,V1L.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004616,lineage name: V1L.pppa
+hyp7,V1L.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004615,lineage name: V1L.ppppa
+hyp7,V1R.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004614,lineage name: V1R.a
+hyp7,V1R.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004612,lineage name: V1R.paa
+hyp7,V1R.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004610,lineage name: V1R.papa
+hyp7,V1R.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004608,lineage name: V1R.pappa
+hyp7,V1R.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004606,lineage name: V1R.ppa
+hyp7,V1R.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004604,lineage name: V1R.pppa
+hyp7,V1R.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004602,lineage name: V1R.ppppa
+hyp7,V2L.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004600,lineage name: V2L.a
+hyp7,V2L.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004596,lineage name: V2L.paa
+hyp7,V2L.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004595,lineage name: V2L.papa
+hyp7,V2L.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004594,lineage name: V2L.pappa
+hyp7,V2L.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004592,lineage name: V2L.ppa
+hyp7,V2L.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004590,lineage name: V2L.pppa
+hyp7,V2L.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004588,lineage name: V2L.ppppa
+hyp7,V2R.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004586,lineage name: V2R.a
+hyp7,V2R.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004584,lineage name: V2R.paa
+hyp7,V2R.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004582,lineage name: V2R.papa
+hyp7,V2R.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004580,lineage name: V2R.pappa
+hyp7,V2R.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004281,lineage name: V2R.ppa
+hyp7,V2R.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004280,lineage name: V2R.pppa
+hyp7,V2R.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004279,lineage name: V2R.ppppa
+hyp7,V3L.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004278,lineage name: V3L.a
+hyp7,V3L.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004277,lineage name: V3L.paa
+hyp7,V3L.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004276,lineage name: V3L.papa
+hyp7,V3L.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004275,lineage name: V3L.pappa
+hyp7,V3L.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004274,lineage name: V3L.ppa
+hyp7,V3L.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004273,lineage name: V3L.pppa
+hyp7,V3L.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004272,lineage name: V3L.ppppa
+hyp7,V3R.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004271,lineage name: V3R.a
+hyp7,V3R.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004270,lineage name: V3R.paa
+hyp7,V3R.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004269,lineage name: V3R.papa
+hyp7,V3R.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004268,lineage name: V3R.pappa
+hyp7,V3R.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004267,lineage name: V3R.ppa
+hyp7,V3R.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004266,lineage name: V3R.pppa
+hyp7,V3R.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004265,lineage name: V3R.ppppa
+hyp7,V4L.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004264,lineage name: V4L.a
+hyp7,V4L.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004263,lineage name: V4L.paa
+hyp7,V4L.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004262,lineage name: V4L.papa
+hyp7,V4L.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004261,lineage name: V4L.pappa
+hyp7,V4L.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004260,lineage name: V4L.ppa
+hyp7,V4L.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004259,lineage name: V4L.pppa
+hyp7,V4L.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004258,lineage name: V4L.ppppa
+hyp7,V4R.a,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004257,lineage name: V4R.a
+hyp7,V4R.paa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004256,lineage name: V4R.paa
+hyp7,V4R.papa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004255,lineage name: V4R.papa
+hyp7,V4R.pappa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004254,lineage name: V4R.pappa
+hyp7,V4R.ppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004253,lineage name: V4R.ppa
+hyp7,V4R.pppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004252,lineage name: V4R.pppa
+hyp7,V4R.ppppa,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004251,lineage name: V4R.ppppa
+hyp7,V5L.a,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004250,lineage name: V5L.a
+hyp7,V5L.ppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004249,lineage name: V5L.ppa
+hyp7,V5L.pppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004248,"hyp7,lineage name: V5L.pppa"
+hyp7,V5L.ppppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004247,lineage name: V5L.ppppa
+hyp7,V5R.a,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004246,lineage name: V5R.a
+hyp7,V5R.ppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004219,lineage name: V5R.ppa
+hyp7,V5R.pppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004244,"hyp7,lineage name: V5R.pppa"
+hyp7,V5R.ppppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004213,lineage name: V5R.ppppa
+hyp7,V6L.a,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004242,lineage name: V6L.a
+hyp7,V6L.paa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004209,lineage name: V6L.paa
+hyp7,V6L.papa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004240,"hyp7,lineage name: V6L.papa"
+hyp7,V6L.pappa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004205,lineage name: V6L.pappa
+hyp7,V6L.ppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004201,lineage name: V6L.ppa
+hyp7,V6L.pppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004237,"hyp7,lineage name: V6L.pppa"
+hyp7,V6L.ppppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004236,"hyp7,lineage name: V6L.ppppa"
+hyp7,V6R.a,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004235,lineage name: V6R.a
+hyp7,V6R.paa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004234,lineage name: V6R.paa
+hyp7,V6R.papa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004233,"hyp7,lineage name: V6R.papa"
+hyp7,V6R.pappa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004191,lineage name: V6R.pappa
+hyp7,V6R.ppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004231,lineage name: V6R.ppa
+hyp7,V6R.pppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004230,"hyp7,lineage name: V6R.pppa"
+hyp7,V6R.ppppa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004229,"hyp7,lineage name: V6R.ppppa"
+hyp7,TL.aa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004181,lineage name: TL.aa
+hyp7,TL.apaa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004227,lineage name: TL.apaa
+hyp7,TL.apap,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004226,"hyp7,lineage name: TL.apap"
+hyp7,TR.aa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004171,lineage name: TR.aa
+hyp7,TR.apaa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004169,lineage name: TR.apaa
+hyp7,TR.apap,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0007029,"hyp7,lineage name: TR.apap"
+hyp7,V5L.a,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004250,lineage name: V5L.a
+hyp7,V5L.ppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004249,lineage name: V5L.ppa
+hyp7,V5L.pppaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004223,lineage name: V5L.pppaa
+hyp7,V5L.pppapa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004222,lineage name: V5L.pppapa
+hyp7,V5L.ppppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004247,lineage name: V5L.ppppa
+hyp7,V5R.a,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004246,lineage name: V5R.a
+hyp7,V5R.ppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004219,lineage name: V5R.ppa
+hyp7,V5R.pppaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004217,lineage name: V5R.pppaa
+hyp7,V5R.pppapa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004215,lineage name: V5R.pppapa
+hyp7,V5R.ppppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004213,lineage name: V5R.ppppa
+hyp7,V6L.a,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004242,lineage name: V6L.a
+hyp7,V6L.paa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004209,lineage name: V6L.paa
+hyp7,V6L.papaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004207,lineage name: V6L.papaa
+hyp7,V6L.pappa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004205,lineage name: V6L.pappa
+hyp7,V6L.ppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004201,lineage name: V6L.ppa
+hyp7,V6L.pppaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004200,lineage name: V6L.pppaa
+hyp7,V6L.ppppap,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004199,"lineage name: V6L.ppppap,set"
+hyp7,V6R.a,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004235,lineage name: V6R.a
+hyp7,V6R.paa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004234,lineage name: V6R.paa
+hyp7,V6R.papaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004193,lineage name: V6R.papaa
+hyp7,V6R.pappa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004191,lineage name: V6R.pappa
+hyp7,V6R.ppa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004231,lineage name: V6R.ppa
+hyp7,V6R.pppaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004187,lineage name: V6R.pppaa
+hyp7,V6R.ppppap,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004185,"lineage name: V6R.ppppap,set"
+hyp7,TL.aa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004181,lineage name: TL.aa
+hyp7,TL.apaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004227,lineage name: TL.apaa
+hyp7,TL.apapa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004179,lineage name: TL.apapa
+hyp7,TL.apappp,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004177,"hyp7,lineage name: TL.apappp"
+hyp7,TL.appaap,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004175,"hyp7,lineage name: TL.appaap"
+hyp7,TL.appapp,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004173,"hyp7,lineage name: TL.appapp"
+hyp7,TR.aa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004171,lineage name: TR.aa
+hyp7,TR.apaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004169,lineage name: TR.apaa
+hyp7,TR.apapa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004167,lineage name: TR.apapa
+hyp7,TR.apappp,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004165,"hyp7,lineage name: TR.apappp"
+hyp7,TR.appaap,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004161,"hyp7,lineage name: TR.appaap"
+hyp7,TR.appapp,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004160,"hyp7,lineage name: TR.appapp"
+hyp7,P1.p,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004159,lineage name: P1.p
+hyp7,P2.p,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004157,lineage name: P2.p
+hyp7,P3.pa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004155,lineage name: P3.pa
+hyp7,P3.pp,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004153,lineage name: P3.pp
+hyp7,P4.pa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004151,lineage name: P4.pa
+hyp7,P4.pp,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004149,lineage name: P4.pp
+hyp7,P8.pa,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004147,lineage name: P8.pa
+hyp7,P8.pp,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004145,lineage name: P8.pp
+hyp7,P9.p,Postembryonic large hypodermal syncytium,,,,,,,,1,,,,,,1,,,WBbt:0004392,lineage name: P9.p
+hyp7,P10.p,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004400,"hyp7,lineage name: P10.p"
+hyp7,P11.p,"Postembryonic large hypodermal syncytium, hermaphrodite",,,,,,,,1,,,,,,1,,,WBbt:0004399,"hyp7,lineage name: P11.p"
+hyp7,P3.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004398,"hyp7,lineage name: P3.p"
+hyp7,P4.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004397,"hyp7,lineage name: P4.p"
+hyp7,P5.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004396,"hyp7,lineage name: P5.p"
+hyp7,P6.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004395,"hyp7,lineage name: P6.p"
+hyp7,P7.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004394,"hyp7,lineage name: P7.p"
+hyp7,P8.p,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0004393,"hyp7,lineage name: P8.p"
+hyp7,P10.paaa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0007217,None
+hyp7,P10.paap,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0007218,None
+hyp7,P10.papa,"Postembryonic large hypodermal syncytium, male",,,,,,,,,,,,1,1,1,,,WBbt:0007220,None
+hyp8/9,AB.plpppapap,Tail ventral hypodermis,,,,,,,,1,,,,,,1,,?,WBbt:0007856,None
+hyp8/9,AB.prpppapap,Tail ventral hypodermis,,,,,,,,1,,,,,,1,,?,WBbt:0007856,None
+I1L,AB.alpapppaa,"Pharyngeal interneurons: ant sensory, input from RIP",,,1,,,,,,,,,,,,,,WBbt:0004746,lineage name: ABalpapppaa
+I1R,AB.arapappaa,"Pharyngeal interneurons: ant sensory, input from RIP",,,1,,,,,,,,,,,,,,WBbt:0004745,lineage name: ABarapappaa
+I2L,AB.alpappaapa,"Pharyngeal interneurons, ant sensory.",,,1,,,,,,,,,,,,,,WBbt:0004744,lineage name: ABalpappaapa
+I2R,AB.arapapaapa,"Pharyngeal interneurons, ant sensory.",,,1,,,,,,,,,,,,,,WBbt:0004743,lineage name: ABarapapaapa
+I3,MS.aaaaapaa,"Pharyngeal interneuron, ant sensory.",,,1,,,,,,,,,,,,,,WBbt:0004742,"I3,lineage name: MSaaaaapaa"
+I4,MS.aaaapaa,Pharyngeal interneuron.,,,1,,,,,,,,,,,,,,WBbt:0004741,"I4,lineage name: MSaaaapaa"
+I5,AB.arapapapp,"Pharyngeal interneuron, post sensory.",,,1,,,,,,,,,,,,,,WBbt:0004740,"I5,lineage name: ABarapapapp"
+I6,MS.paaapaa,"Pharyngeal interneuron, post sensory.",,,1,,,,,,,,,,,,,,WBbt:0004739,"I6,lineage name: MSpaaapaa"
+IL1DL,AB.alapappaaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004738,lineage name: ABalapappaaa
+IL1DR,AB.alappppaaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004737,lineage name: ABalappppaaa
+IL1L,AB.alapaappaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004553,lineage name: ABalapaappaa
+IL1R,AB.alaappppaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004551,lineage name: ABalaappppaa
+IL1VL,AB.alppapppaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004549,lineage name: ABalppapppaa
+IL1VR,AB.arapppppaa,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004547,lineage name: ABarapppppaa
+IL2DL,AB.alapappap,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004545,lineage name: ABalapappap
+IL2DR,AB.alappppap,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004543,lineage name: ABalappppap
+IL2L,AB.alapaappp,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004541,lineage name: ABalapaappp
+IL2R,AB.alaappppp,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004539,lineage name: ABalaappppp
+IL2VL,AB.alppapppp,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004538,lineage name: ABalppapppp
+IL2VR,AB.arapppppp,Inner labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004537,lineage name: ABarapppppp
+ILshDL,AB.alaaaparr,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004533,lineage name: ABalaaaparr
+ILshDR,AB.alaaappll,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004531,lineage name: ABalaaappll
+ILshL,AB.alaaaalpp,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004529,lineage name: ABalaaaalpp
+ILshR,AB.alaapaapp,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004527,lineage name: ABalaapaapp
+ILshVL,AB.alppapaap,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004525,lineage name: ABalppapaap
+ILshVR,AB.arapppaap,Inner labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004523,lineage name: ABarapppaap
+ILsoDL,AB.plaapaaap,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004521,lineage name: ABplaapaaap
+ILsoDR,AB.praapaaap,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004519,lineage name: ABpraapaaap
+ILsoL,AB.alaaapall,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004518,lineage name: ABalaaapall
+ILsoR,AB.alaaapprr,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004517,lineage name: ABalaaapprr
+ILsoVL,AB.alppapapp,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004503,lineage name: ABalppapapp
+ILsoVR,AB.arapppapp,Inner labial socket,,,,,,,,1,,,,,,,,,WBbt:0004501,lineage name: ABarapppapp
+int,E.alaad,Intestinal cell,,,,,,,,1,,,,,,1,,int1dl,WBbt:0004361,lineage name: Ealaad
+int,E.alaav,Intestinal cell,,,,,,,,1,,,,,,1,,int1vl,WBbt:0004360,lineage name: Ealaav
+int,E.alap,Intestinal cell,,,,,,,,1,,,,,,1,,int3v,WBbt:0004359,lineage name: Ealap
+int,E.alpa,Intestinal cell,,,,,,,,1,,,,,,1,,int2v,WBbt:0004358,lineage name: Ealpa
+int,E.alpp,Intestinal cell,,,,,,,,1,,,,,,1,,int5l,WBbt:0004357,lineage name: Ealpp
+int,E.araad,Intestinal cell,,,,,,,,1,,,,,,1,,int1dr,WBbt:0004356,lineage name: Earaad
+int,E.araav,Intestinal cell,,,,,,,,1,,,,,,1,,int1vr,WBbt:0004355,lineage name: Earaav
+int,E.arap,Intestinal cell,,,,,,,,1,,,,,,1,,int3d,WBbt:0004354,lineage name: Earap
+int,E.arpa,Intestinal cell,,,,,,,,1,,,,,,1,,int2d,WBbt:0004353,lineage name: Earpa
+int,E.arpp,Intestinal cell,,,,,,,,1,,,,,,1,,int5r,WBbt:0004352,lineage name: Earpp
+int,E.plaa,Intestinal cell,,,,,,,,1,,,,,,1,,int4v,WBbt:0004351,lineage name: Eplaa
+int,E.plap,Intestinal cell,,,,,,,,1,,,,,,1,,int6l,WBbt:0004350,lineage name: Eplap
+int,E.plpa,Intestinal cell,,,,,,,,1,,,,,,1,,int7l,WBbt:0004349,lineage name: Eplpa
+int,E.plppa,Intestinal cell,,,,,,,,1,,,,,,1,,int8l,WBbt:0004348,lineage name: Eplppa
+int,E.plppp,Intestinal cell,,,,,,,,1,,,,,,1,,int9l,WBbt:0004347,lineage name: Eplppp
+int,E.praa,Intestinal cell,,,,,,,,1,,,,,,1,,int4d,WBbt:0004346,lineage name: Epraa
+int,E.prap,Intestinal cell,,,,,,,,1,,,,,,1,,int6r,WBbt:0004345,lineage name: Eprap
+int,E.prpa,Intestinal cell,,,,,,,,1,,,,,,1,,int7r,WBbt:0004344,lineage name: Eprpa
+int,E.prppa,Intestinal cell,,,,,,,,1,,,,,,1,,int8r,WBbt:0004343,lineage name: Eprppa
+int,E.prppp,Intestinal cell,,,,,,,,1,,,,,,1,,int9r,WBbt:0004342,lineage name: Eprppp
+int,In.a,Postembryonic intestinal cell,,,,,,,,1,,,,,,1,,,WBbt:0004341,lineage name: In.a
+int,In.p,Postembryonic intestinal cell,,,,,,,,1,,,,,,1,,,WBbt:0004340,lineage name: In.p
+K,AB.plpapppaa,"Rectal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004499,"lineage name: K.a,rect_hyp"
+K.a,K.a,Rectal cell,,,,,,,,1,,,,,,,,,WBbt:0004495,"lineage name: K.a,rect_hyp"
+K\',AB.plpapppap,Rectal cell,,,,,,,,1,,,,,,,,,WBbt:0004497,"lineage name: ABplpapppap, rect_hyp"
+linker_killer,U.lp or U.rp,"One of these cells, sometimes fused with U.l/ra, phagocytoses the male linker cell",,,,,,,,,,,,1,1,,,,WBbt:0004339,lineage name: U.lp or U.rp
+LUAL,AB.plpppaapap,"Interneuron, short process in post ventral cord",,,1,,,,,,,,,,,,,,WBbt:0004493,lineage name: ABplpppaapap
+LUAR,AB.prpppaapap,"Interneuron, short process in post ventral cord",,,1,,,,,,,,,,,,,,WBbt:0004491,lineage name: ABprpppaapap
+M,MS.apaap,Postembryonic mesoblast,,,,,,,,,,,1,,,,,,WBbt:0006072,None
+M1,MS.paapaaa,Pharyngeal motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004488,"lineage name: MSpaapaaa,M1 neuron"
+M2L,AB.araapappa,Pharyngeal motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004487,lineage name: ABaraapappa
+M2R,AB.araappppa,Pharyngeal motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004473,lineage name: ABaraappppa
+M3L,AB.araapappp,Pharyngeal sensory-motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004471,lineage name: ABaraapappp
+M3R,AB.araappppp,Pharyngeal sensory-motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004469,lineage name: ABaraappppp
+M4,MS.paaaaaa,Pharyngeal motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004467,"lineage name: MSpaaaaaa,M4 neuron,MSpaaaaaa"
+M5,MS.paaapap,Pharyngeal motorneurons,,,1,,,,,,,1,,,,,,,WBbt:0004465,"lineage name: MSpaaapap,M5 neuron"
+mc1DL,AB.alpaapapa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004301,lineage name: ABalpaapapa
+mc1DR,AB.araaapapa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004300,lineage name: ABaraaapapa
+mc1V,AB.alpappppa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004299,lineage name: ABalpappppa
+mc2DL,AB.araapaapp,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004298,lineage name: ABaraapaapp
+mc2DR,AB.araappapp,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004297,lineage name: ABaraappapp
+mc2V,AB.arapapppa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004296,lineage name: ABarapapppa
+mc3DL,MS.aaapapa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004295,lineage name: MSaaapapa
+mc3DR,MS.paapapa,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004294,lineage name: MSpaapapa
+mc3V,AB.alpappapp,Pharyngeal marginal cell,,,,,,,,1,,,,,,,,,WBbt:0004293,lineage name: ABalpappapp
+MCL,AB.alpaaappp,Pharyngeal neurons that synapse onto marginal cells,,,1,,,,,,,,,,,,,,WBbt:0004463,lineage name: ABalpaaappp
+MCR,AB.arapaappp,Pharyngeal neurons that synapse onto marginal cells,,,1,,,,,,,,,,,,,,WBbt:0004461,lineage name: ABarapaappp
+MI,AB.araappaaa,Pharyngeal motor neuron/interneuron,,,1,,,,,,,1,,,,,,,WBbt:0003664,None
+MS,P0.paa,Embryonic founder cell,,,,,,,,,,,1,,,,,,WBbt:0004458,lineage name: P0.paa
+mu_anal,AB.plpppppap,Anal depressor muscle,,,,,,,1,,,,,,,,,,WBbt:0004292,"dilator muscle, lineage name: ABplpppppap, mu anal"
+mu_int_L,AB.plpppppaa,"Intestinal muscles, attach to intestine and body wall anterior to anus",,,,,,,1,,,,,,,,,,WBbt:0003833,lineage name: ABplpppppaa
+mu_int_R,MS.ppaapp,"Intestinal muscles, attach to intestine and body wall anterior to anus",,,,,,,1,,,,,,,,,,WBbt:0003822,lineage name: MSppaapp
+mu_male_diag,M.dlpaaaap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003821,lineage name: M.dlpaaaap
+mu_male_diag,M.dlpaaapa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003820,lineage name: M.dlpaaapa
+mu_male_diag,M.dlpaaapp,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003819,lineage name: M.dlpaaapp
+mu_male_diag,M.dlpaapaa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003818,lineage name: M.dlpaapaa
+mu_male_diag,M.dlpaapap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003817,lineage name: M.dlpaapap
+mu_male_diag,M.dlpapaaa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003816,lineage name: M.dlpapaaa
+mu_male_diag,M.dlpapaap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003815,lineage name: M.dlpapaap
+mu_male_diag,M.drpaaaap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003814,lineage name: M.drpaaaap
+mu_male_diag,M.drpaaapa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003813,lineage name: M.drpaaapa
+mu_male_diag,M.drpaaapp,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003802,lineage name: M.drpaaapp
+mu_male_diag,M.drpaapaa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003801,lineage name: M.drpaapaa
+mu_male_diag,M.drpaappa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003800,lineage name: M.drpaappa
+mu_male_diag,M.drpaapap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003799,lineage name: M.drpaapap
+mu_male_diag,M.drpapaaa,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003798,lineage name: M.drpapaaa
+mu_male_diag,M.drpapaap,Diagonal tail muscles in male body wall,,,,,,,,,,,,1,1,1,,,WBbt:0003797,lineage name: M.drpapaap
+mu_male_gub,M.dlpappap,Gubernaculum erector,,,,,,,,,,,,1,1,1,,,WBbt:0003796,"gecL,lineage name: M.dlpappap,mu_male_gub"
+mu_male_gub,M.drpappap,Gubernaculum erector,,,,,,,,,,,,1,1,1,,,WBbt:0003795,"gecR,lineage name: M.drpappap,mu_male_gub"
+mu_male_gub,M.dlpapapa,Gubernaculum retractor,,,,,,,,,,,,1,1,1,,,WBbt:0003794,"grtL,lineage name: M.dlpapapa,mu_male_gub"
+mu_male_gub,M.drpapapa,Gubernaculum retractor,,,,,,,,,,,,1,1,1,,,WBbt:0003793,"grtR,lineage name: M.drpapapa,mu_male_gub"
+mu_male_long,M.vlpaaaaa,Anterior outer longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003792,"aolL,lineage name: M.vlpaaaaa,mu_male_long"
+mu_male_long,M.vlpaaaap,Posterior outer longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003791,"lineage name: M.vlpaaaap,mu_male_long,polL"
+mu_male_long,M.vlpaaapa,Anterior inner longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003790,"ailL,lineage name: M.vlpaaapa,mu_male_long"
+mu_male_long,M.vlpaaapp,Posterior inner longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003789,"lineage name: M.vlpaaapp,mu_male_long,pilL"
+mu_male_long,M.vlpaapp,Caudal longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003788,"cdlL,lineage name: M.vlpaapp,mu_male_long"
+mu_male_long,M.vrpaaaaa,Anterior outer longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003787,"aolR,lineage name: M.vrpaaaaa,mu_male_long"
+mu_male_long,M.vrpaaaap,Posterior outer longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003786,"lineage name: M.vrpaaaap,mu_male_long,polR"
+mu_male_long,M.vrpaaapa,Anterior inner longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003785,"ailR,lineage name: M.vrpaaapa,mu_male_long"
+mu_male_long,M.vrpaaapp,Posterior inner longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003784,"lineage name: M.vrpaaapp,mu_male_long,pilR"
+mu_male_long,M.vrpaapp,Caudal longitudinal male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0003783,"cdlR,lineage name: M.vrpaapp,mu_male_long"
+mu_male_obliq,M.dlpapapp,Anterior oblique male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0004916,"aobL,lineage name: M.dlpapapp,mu_male_obliq"
+mu_male_obliq,M.dlpappaa,Posterior oblique male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0004915,"lineage name: M.dlpappaa,mu_male_obliq,pobL"
+mu_male_obliq,M.drpapapp,Anterior oblique male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0004914,"aobR,lineage name: M.drpapapp,mu_male_obliq"
+mu_male_obliq,M.drpappap,Posterior oblique male muscle,,,,,,,,,,,,1,1,1,,,WBbt:0004913,"lineage name: M.drpappap,mu_male_obliq,pobR"
+mu_male_spic,M.dlpaaaaa,"Ventral spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004912,"lineage name: M.dlpaaaaa,mu_male_spic,vspL"
+mu_male_spic,M.dlpaappa,"Ventral spicule retractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004911,"lineage name: M.dlpaappa,mu_male_spic,vsrL"
+mu_male_spic,M.dlpaappp,"Dorsal spicule retractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004910,"dsrL,lineage name: M.dlpaappp,mu_male_spic"
+mu_male_spic,M.prpaaaaa,"Ventral spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004909,"lineage name: M.drpaaaaa,mu_male_spic,vspR"
+mu_male_spic,M.drpaappp,"Ventral spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004908,"lineage name: M.drpaappp,mu_male_spic,vsrR"
+mu_male_spic,M.drpappaa,"Dorsal spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004907,"dsrR,lineage name: M.drpappaa,mu_male_spic"
+mu_male_spic,M.vlpaapa,"Dorsal spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004886,"dspL,lineage name: M.vlpaapa,mu_male_spic"
+mu_male_spic,M.vrpaapa,"Dorsal spicule protractor, male",,,,,,,,,,,,1,1,1,,,WBbt:0004885,"dspR,lineage name: M.vrpaapa,mu_male_spic"
+mu_sph,AB.prpppppap,Sphincter muscle of intestino-rectal valve,,,,,,,1,,,,,,,,,,WBbt:0005798,"lineage name: ABprpppppap, mu sph"
+NSML,AB.araapapaav,"Pharyngeal neurosecretory motorneuron, contain serotonin",,,1,,,,,,,1,,,,,,,WBbt:0004457,lineage name: ABaraapapaav
+NSMR,AB.araapppaav,"Pharyngeal neurosecretory motorneuron, contain serotonin",,,1,,,,,,,1,,,,,,,WBbt:0004446,lineage name: ABaraapppaav
+OLLL,AB.alppppapaa,Lateral outer labial neurons,,,1,,,,,,,,,,,,,,WBbt:0004445,lineage name: ABalppppapaa
+OLLR,AB.praaapapaa,Lateral outer labial neurons,,,1,,,,,,,,,,,,,,WBbt:0004444,lineage name: ABpraaapapaa
+OLLshL,AB.alpppaapd,Lateral outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004443,lineage name: ABalpppaapd
+OLLshR,AB.praaaaapd,Lateral outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004442,lineage name: ABpraaaaapd
+OLLsoL,AB.alapaaapp,Lateral outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004441,lineage name: ABalapaaapp
+OLLsoR,AB.alappappp,Lateral outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004440,lineage name: ABalappappp
+OLQDL,AB.alapapapaa,Quadrant outer labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004439,lineage name: ABalapapapaa
+OLQDR,AB.alapppapaa,Quadrant outer labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004438,lineage name: ABalapppapaa
+OLQshDL,AB.arpaaaapa,Quadrant outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004430,lineage name: ABarpaaaapa
+OLQshSR,AB.arpaaapaa,Quadrant outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004429,lineage name: ABarpaaapaa
+OLQshVL,AB.alpppaaap,Quadrant outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004428,lineage name: ABalpppaaap
+OLQshVR,AB.praaaaaap,Quadrant outer labial sheath,,,,,,,,1,,,,,,,,,WBbt:0004427,lineage name: ABpraaaaaap
+OLQsoDL,AB.arpaaaaal,Quadrant outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004426,lineage name: ABarpaaaaal
+OLQsoDR,AB.arpaaaaar,Quadrant outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004425,lineage name: ABarpaaaaar
+OLQsoVL,AB.alppaaapp,Quadrant outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004424,lineage name: ABalppaaapp
+OLQsoVR,AB.alaappapp,Quadrant outer labial socket,,,,,,,,1,,,,,,,,,WBbt:0004423,lineage name: ABalaappapp
+OLQVL,AB.plpaaappaa,Quadrant outer labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004437,lineage name: ABplpaaappaa
+OLQVR,AB.prpaaappaa,Quadrant outer labial neuron,,,1,,,,,,,,,,,,,,WBbt:0004431,lineage name: ABprpaaappaa
+om5L,AB.araapapap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004312,"lineage name: ABaraapapap,m5L"
+P0,Z,Single cell zygote,,,,,,,,,,,1,,,,,,WBbt:0004422,lineage name: Z
+P1/2L,AB.plapaapp,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0006175,None
+P1/2R,AB.prapaapp,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0006379,None
+P11,AB.plapappa,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004410,lineage name: ABplapappa
+P12,AB.prapappa,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004409,lineage name: ABprapappa
+P3/4L,AB.plappaaa,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004418,lineage name: ABplappaaa
+P3/4R,AB.prappaaa,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004417,lineage name: ABprappaaa
+P4,P0.pppp,Embryonic founder cell of germ line,,,,,,,,,,,1,,,,,,WBbt:0004421,"lineage name: P0.pppp,P4,P4'"
+P5/6L,AB.plappaap,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004416,lineage name: ABplappaap
+P5/6R,AB.prappaap,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004415,lineage name: ABprappaap
+P7/8L,AB.plappapp,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004414,lineage name: ABplappapp
+P7/8R,AB.prappapp,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004413,lineage name: ABprappapp
+P9/10L,AB.plapapap,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004412,"ABplapapap,lineage name: ABplapapap"
+P9/10R,AB.prapapap,"Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1",,,,,,,,,,,1,1,,,,,WBbt:0004411,"ABprapapap,lineage name: ABprapapap"
+PCAL,Y.plppd,Sensory neuron of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004408,lineage name: Y.plppd
+PCAR,Y.prppd,Sensory neuron of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004407,lineage name: Y.prppd
+PCBL,Y.plpa,"Neuron, ending is sheath of postcloacal sensilla in male",,,,1,,,,,,,,1,1,,,,WBbt:0004406,lineage name: Y.plpa
+PCBR,Y.prpa,"Neuron, ending is sheath of postcloacal sensilla in male",,,,1,,,,,,,,1,1,,,,WBbt:0004405,lineage name: Y.prpa
+PCCL,B.arpaaa,Sensory neuron of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004404,lineage name: B.arpaaa
+PCCR,B.alpaaa,Sensory neuron of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004403,lineage name: B.alpaaa
+PChL,Y.plaa,Hypodermal cell of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004402,lineage name: Y.plaa
+PChR,Y.praa,Hypodermal cell of postcloacal sensilla in male,,,,1,,,,,,,,1,1,,,,WBbt:0004391,lineage name: Y.praa
+PCshL,Y.plppv,Sheath of postcloacal sensilla in male,,,,,,,,,,,,1,1,,,,WBbt:0004390,lineage name: Y.plppv
+PCshR,Y.prppv,Sheath of postcloacal sensilla in male,,,,,,,,,,,,1,1,,,,WBbt:0004389,lineage name: Y.prppv
+PCsoL,Y.plap,Socket of postcloacal sensilla in male,,,,,,,,,,,,1,1,,,,WBbt:0004388,lineage name: Y.plap
+PCsoR,Y.prap,Socket of postcloacal sensilla in male,,,,,,,,,,,,1,1,,,,WBbt:0004387,lineage name: Y.prap
+PDA,AB.prpppaaaa,"Motor neuron, process in dorsal cord, same as Y cell in hermaphrodite, Y.a in male",,,1,,,,,,,1,,,,,,,WBbt:0004386,None
+PDB,P12.apa,"Motor neuron, process in dorsal cord, cell body in pre-anal ganglion",,,1,,,,,,,1,,,,,,,WBbt:0004385,lineage name: P12.apa
+PDC,P11.papa,"Male specific interneuron, preanal ganglion",,,,1,,,,,,,,1,1,,,,WBbt:0004384,lineage name: P11.papa
+PDEL,V5L.paaa,"Neuron, dopaminergic of postderid sensillum",,,1,,,,,,,,,,,,,,WBbt:0004383,lineage name: V5L.paaa
+PDER,V5R.paaa,"Neuron, dopaminergic of postderid sensillum",,,1,,,,,,,,,,,,,,WBbt:0004382,lineage name: V5R.paaa
+PDEshL,V5L.papp,Sheath of PDE,,,,,,,,1,,,,,,,,,WBbt:0004371,lineage name: V5L.papp
+PDEshR,V5R.papp,Sheath of PDE,,,,,,,,1,,,,,,,,,WBbt:0004370,lineage name: V5R.papp
+PdEsoL,V5L.papa,Socket of PDE,,,,,,,,1,,,,,,,,,WBbt:0004369,lineage name: V5L.papa
+PdEsoR,V5R.papa,Socket of PDE,,,,,,,,1,,,,,,,,,WBbt:0004368,lineage name: V5R.papa
+PGA,P11.papp,"Male specific interneuron, preanal ganglion",,,,1,,,,,,,,1,1,,,,WBbt:0004367,lineage name: P11.papp
+PHAL,AB.plpppaapp,"Phasmid neurons, probably chemosensory",,,1,,,,,,,,,,,,,,WBbt:0004366,lineage name: ABplpppaapp
+PHAR,AB.prpppaapp,"Phasmid neurons, probably chemosensory",,,1,,,,,,,,,,,,,,WBbt:0004365,lineage name: ABprpppaapp
+PHBL,AB.plapppappp,"Phasmid neurons, probably chemosensory",,,1,,,,,,,,,,,,,,WBbt:0004364,lineage name: ABplapppappp
+PHBR,AB.prapppappp,"Phasmid neurons, probably chemosensory",,,1,,,,,,,,,,,,,,WBbt:0005659,"lineage name: ABprapppappp,PHRB"
+PHCL,TL.pppaa,"Neuron, striated rootlet in male, possibly sensory in tail spike",,,1,,,,,,,,,1,1,,,,WBbt:0004362,lineage name: TL.pppaa
+PHCR,TR.pppaa,"Neuron, striated rootlet in male, possibly sensory in tail spike",,,1,,,,,,,,,1,1,,,,WBbt:0004118,lineage name: TR.pppaa
+PHshL,AB.plpppapaa,Phasmid sheath,,,,,,,,1,,,,,,,,,WBbt:0004116,lineage name: ABplpppapaa
+PHshR,AB.prpppapaa,Phasmid sheath,,,,,,,,1,,,,,,,,,WBbt:0004114,lineage name: ABprpppapaa
+PHso1L,TL.paa,Phasmid sockets,,,,,,,,1,,,,,,,,,WBbt:0004112,"lineage name: TL.paa,TL.paa"
+PHso1R,TR.paa,Phasmid sockets,,,,,,,,1,,,,,,,,,WBbt:0004110,"lineage name: TR.paa,TR.paa"
+PHso2L,TL.pap,Phasmid sockets,,,,,,,,1,,,,,,,,,WBbt:0004108,"lineage name: TL.pap,TL.pap"
+PHso2R,TR.pap,Phasmid sockets,,,,,,,,1,,,,,,,,,WBbt:0004106,"lineage name: TR.pap,TR.pap"
+PLML,AB.plapappppaa,"Posterior lateral microtubule cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0004104,lineage name: ABplapappppaa
+PLMR,AB.prapappppaa,"Posterior lateral microtubule cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0004103,lineage name: ABprapappppaa
+PLNL,TL.pppap,"Interneuron, associated with PLM",,,1,,,,,,,,,,,,,,WBbt:0004102,lineage name: TL.pppap
+PLNR,TR.pppap,"Interneuron, associated with PLM",,,1,,,,,,,,,,,,,,WBbt:0004098,lineage name: TR.pppap
+pm1DL,AB.araapaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004338,"lineage name: ABaraapaaap,m1DL"
+pm1DR,AB.araappaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004337,"lineage name: ABaraappaap,m1DR"
+pm1L,AB.araaaaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004336,"lineage name: ABaraaaaaap,m1L"
+pm1R,AB.araaaaapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004335,"lineage name: ABaraaaaapp,m1R"
+pm1VL,AB.alpaaaapa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004334,"lineage name: ABalpaaaapa,m1VL"
+pm1VR,AB.araaaaapa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004555,"ABarapaaapa,lineage name: ABarapaaapa,m1VR"
+pm2DL,AB.araapaapa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004332,"lineage name: ABaraapaapa,m2DL"
+pm2DR,AB.araappapa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004331,"lineage name: ABaraappapa,m2DR"
+pm2L,AB.alpaaapaa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004487,lineage name: ABaraapappa
+pm2R,AB.arapaapaa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004473,lineage name: ABaraappppa
+pm2VL,AB.alpaaaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004328,"lineage name: ABalpaaaaap,m2VL"
+pm2VR,AB.arapaaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004327,"lineage name: ABarapaaaap,m2VR"
+pm3DL,MS.aaapaaa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004326,"lineage name: MSaaapaaa,m3DL"
+pm3DR,MS.paaaapa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004325,"lineage name: MSpaaaapa,m3DR"
+pm3L,AB.alpaapapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004471,lineage name: ABaraapappp
+pm3R,AB.arapaappa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004469,lineage name: ABaraappppp
+pm3VL,AB.alpappppp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004322,"lineage name: ABalpappppp,m3VL"
+pm3VR,AB.arapapppp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004321,"lineage name: ABarapapppp,m3VR"
+pm4DL,MS.aaaaapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004320,"lineage name: MSaaaaapp,m4DL"
+pm4DR,MS.paaaapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004319,"lineage name: MSpaaaapp,m4DR"
+pm4L,MS.aaapaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004318,"lineage name: MSaaapaap,m4L"
+pm4R,AB.araaapapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004317,"lineage name: ABaraaapapp,m4R"
+pm4VL,MS.aapaaaa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004316,"lineage name: MSaapaaaa,m4VL"
+pm4VR,MS.papappp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004507,"lineage name: MSpapaaaa,m4VR"
+pm5DL,MS.aaaapap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004314,"lineage name: MSaaaapap,m5DL"
+pm5DR,MS.paaappa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004313,"lineage name: MSpaaappa,m5DR"
+pm5R,AB.araapppap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004311,"lineage name: ABaraapppap,m5R"
+pm5VL,MS.aapaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004310,"lineage name: MSaapaaap,m5VL"
+pm5VR,MS.papaaap,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004309,"lineage name: MSpapaaap,m5VR"
+pm6D,MS.paaappp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004308,"lineage name: MSpaaappp,m6D"
+pm6VL,MS.aapappa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004307,"lineage name: MSaapappa,m6VL"
+pm6VR,MS.papappa,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004306,"lineage name: MSpapappa,m6VR"
+pm7D,MS.aaaappp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004305,"lineage name: MSaaaappp,m7D"
+pm7VL,MS.aapaapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004304,"lineage name: MSaapaapp,m7VL"
+pm7VR,MS.papaapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004303,"lineage name: MSpapaapp,m7VR"
+pm8,MS.aaapapp,Pharyngeal muscle cell,,,,,,1,,,,,,,,,,,WBbt:0004302,"lineage name: MSaaapapp,m8"
+PQR,QL.ap,"Neuron, basal body, not part of a sensillum, projects into preanal gangion",,,1,,,,,,,,,,,,,,WBbt:0004096,lineage name: QL.ap
+proct,B.alaalv/B.araalv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004847,"B_alpha.lv,lineage name: B.alaalv/B.araalv,lineage name: B_alpha.lv"
+proct,B.alaarv/B.araarv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004836,"B_alpha.rv,lineage name: B.alaarv/B.araarv,lineage name: B_alpha.rv"
+proct,B.alapaad,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004835,lineage name: B.alapaad
+proct,B.alapapa,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004834,lineage name: B.alapapa
+proct,B.alapapp,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004833,lineage name: B.alapapp
+proct,B.alappv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004832,lineage name: B.alappv
+proct,B.alppalv/B.arppalv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004831,"B_gamma.alv,lineage name: B.alppalv/B.arppalv,lineage name: B_gamma.alv"
+proct,B.alppald/B.arppald,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004830,"B_gamma.ald,lineage name: B.alppald/B.arppald,lineage name: B_gamma.ald"
+proct,B.alpparv/B.arpparv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004829,"B_gamma.arv,lineage name: B.alpparv/B.arpparv,lineage name: B_gamma.arv"
+proct,B.alppl/B.arppl,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004828,"B_delta.l,lineage name: B.alppl/B.arppl,lineage name: B_delta.l"
+proct,B.alppr/B.arppr,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004827,"B_delta.r,lineage name: B.alppr/B.arppr,lineage name: B_delta.r"
+proct,B.arapaad,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004816,lineage name: B.arapaad
+proct,B.arapapa,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004815,lineage name: B.arapapa
+proct,B.arapapp,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004814,lineage name: B.arapapp
+proct,B.arappv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004813,lineage name: B.arappv
+proct,B.paa,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004812,lineage name: B.paa
+proct,B.pap,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004811,lineage name: B.pap
+proct,B.pppa,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004810,lineage name: B.pppa
+proct,F.lvv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004809,lineage name: F.lvv
+proct,F.rvv,"Male proctodeum, union of intestine and vas deferens, contains copulatory spicules",,,,,,,,,,,,1,1,1,,,WBbt:0004808,lineage name: F.rvv
+PVCL,AB.plpppaapaa,"Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta.",,,1,,,,,,,,,,,,,,WBbt:0004094,lineage name: ABplpppaapaa
+PVCR,AB.prpppaapaa,"Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta.",,,1,,,,,,,,,,,,,,WBbt:0004092,lineage name: ABprpppaapaa
+PVDL,V5L.paapa,"Neuron, lateral process adjacent to excretory canal",,,1,,,,,,,,,,,,,,WBbt:0004090,lineage name: V5L.paapa
+PVDR,V5R.paapa,"Neuron, lateral process adjacent to excretory canal",,,1,,,,,,,,,,,,,,WBbt:0004088,lineage name: V5R.paapa
+PVM,QL.paa,"Posterior ventral microtuble cell, touch receptor",,,1,,,,,,,,,,,,,,WBbt:0004086,lineage name: QL.paa
+PVNL,TL.appp,"Interneuron/motor neuron, post. vent. cord, few synapses",,,1,,,,,,,1,,,,,,,WBbt:0004084,lineage name: TL.appp
+PVNR,TR.appp,"Interneuron/motor neuron, post. vent. cord, few synapses",,,1,,,,,,,1,,,,,,,WBbt:0004083,lineage name: TR.appp
+PVPL,AB.plppppaaa,"Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring",,,1,,,,,,,,,,,,,,WBbt:0004082,lineage name: ABplppppaaa
+PVPR,AB.prppppaaa,"Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring",,,1,,,,,,,,,,,,,,WBbt:0004078,lineage name: ABprppppaaa
+PVQL,AB.plapppaaa,"Interneuron, projects along ventral cord to ring",,,1,,,,,,,,,,,,,,WBbt:0004076,lineage name: ABplapppaaa
+PVQR,AB.prapppaaa,"Interneuron, projects along ventral cord to ring",,,1,,,,,,,,,,,,,,WBbt:0004074,lineage name: ABprapppaaa
+PVR,C.aappa,"Interneuron, projects along ventral cord to ring",,,1,,,,,,,,,,,,,,WBbt:0004072,lineage name: Caappv
+PVT,AB.plpappppa,"Interneuron, projects along ventral cord to ring",,,1,,,,,,,,,,,,,,WBbt:0004070,lineage name: ABplpappppa
+PVV,P11.paaa,"Male specific motor neuron, ventral cord",,,,,,,,,,,,1,1,,,,WBbt:0004068,lineage name: P11.paaa
+PVWL,TL.ppa,"Interneuron, posterior ventral cord, few synapses",,,1,,,,,,,,,,,,,,WBbt:0004066,"lineage name: TL.ppa,TL.ppa"
+PVWR,TR.ppa,"Interneuron, posterior ventral cord, few synapses",,,1,,,,,,,,,,,,,,WBbt:0004064,"lineage name: TR.ppa,TR.ppa"
+PVX,P12.aap,"Male specific interneuron, postsynaptic in ring and ventral cord",,,,1,,,,,,,,1,1,,,,WBbt:0004063,lineage name: P12.aap
+PVY,P11.paap,Neuron class of one male-specific interneuron,,,,1,,,,,,,,1,1,,,,WBbt:0004062,lineage name: P11.paap
+PVZ,P10.ppppa,"Male specific motor neuron, ventral cord",,,,1,,,,,,,,1,1,,,,WBbt:0004058,lineage name: P10.ppppa
+QL,AB.plapapaaa,"Postembryonic neuroblast, migrates anteriorly",,,,,,,,,,,1,,,,,,WBbt:0004056,lineage name: ABplapapaaa
+QR,AB.prapapaaa,"Postembryonic neuroblast, migrates posteriorly",,,,,,,,,,,1,,,,,,WBbt:0004054,lineage name: ABprapapaaa
+R1_hyp,"V5.pppppp, R1.p","Ray 1 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam",,,,,,,,1,,,,,,,,,WBbt:0004807,"lineage name: V5.pppppp, R1.p"
+R1AL,"V5L.pppppaaa, R1.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004052,"lineage name: R1L.aaa,lineage name: V5L.pppppaaa,V5L.pppppaaa"
+R1AR,"V5R.pppppaaa, R1.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004050,"lineage name: R1R.aaa,lineage name: V5R.pppppaaa,V5R.pppppaaa"
+R1BL,"V5L.pppppapa, R1.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004048,"lineage name: V5L.pppppapa,R1L.apa,V5L.pppppapa"
+R1BR,"V5R.pppppapa, R1.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004046,"lineage name: V5R.pppppapa,R1R.apa,V5R.pppppapa"
+R1stL,"V5L.pppppapp, R1.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004044,"lineage name: V5L.pppppapp,R1L.app,V5L.pppppapp"
+R1stR,"V5R.pppppapp, R1.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004043,"lineage name: V5R.pppppapp,R1R.app,V5R.pppppapp"
+R2_hyp,"V6.papapp, R2.p","Ray 2 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam",,,,,,,,1,,,,,,,,,WBbt:0004796,"lineage name: V6.papapp, R2.p"
+R2AL,"V6L.papapaaa, R2.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004042,"lineage name: R2L.aaa,lineage name: V6L.papapaaa,V6L.papapaaa"
+R2AR,"V6R.papapaaa, R2.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004041,"lineage name: R2R.aaa,lineage name: V6R.papapaaa,V6R.papapaaa"
+R2BL,"V6L.papapapa, R2.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004040,"lineage name: V6L.papapapa,R2L.apa,V6L.papapapa"
+R2BR,"V6R.papapapa, R2.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004039,"lineage name: V6R.papapapa,R2R.apa,V6R.papapapa"
+R2stL,"V6L.papapapp, R2.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004038,"lineage name: V6L.papapapp,R2L.app,V6L.papapapp"
+R2stR,"V6R.papapapp, R2.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004037,"lineage name: V6R.papapapp,R2R.app,V6R.papapapp"
+R3_hyp,"V6.papppp, R3.p","Male sensory ray 3 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam",,,,,,,,,,,,1,1,,,,WBbt:0004795,"lineage name: V6.papppp, R3.p"
+R3AL,"V6L.papppaaa, R3.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004036,"lineage name: R3L.aaa,lineage name: V6L.papppaaa,V6L.papppaaa"
+R3AR,"V6R.papppaaa, R3.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004035,"lineage name: V6R.papppaaa,R3R.aaa,V6R.papppaaa"
+R3BL,"V6L.papppapa, R3.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004034,"lineage name: V6L.papppapa,R3L.apa,V6L.papppapa"
+R3BR,"V6R.papppapa, R3.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004033,"lineage name: V6R.papppapa,R3R.apa,V6R.papppapa"
+R3stL,"V6L.papppapp, R3.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004032,"lineage name: V6L.papppapp,R3L.app,V6L.papppapp"
+R3stR,"V6R.papppapp, R3.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004031,"lineage name: V6R.papppapp,R3R.app,V6R.papppapp"
+R4_hyp,"V6.pppapp, R4.p","Male sensory ray 4 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam",,,,,,,,,,,,1,1,,,,WBbt:0004794,"lineage name: V6.pppapp, R4.p"
+R4AL,"V6L.pppapaaa, R4.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004030,"lineage name: V6L.pppapaaa,R4L.aaa,V6L.pppapaaa"
+R4AR,"V6R.pppapaaa, R4.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004029,"lineage name: V6R.pppapaaa,R4R.aaa,V6R.pppapaaa"
+R4BL,"V6L.pppapapa, R4.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004028,"lineage name: V6L.pppapapa,R4L.apa,V6L.pppapapa"
+R4BR,"V6R.pppapapa, R4.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004027,"lineage name: V6R.pppapapa,R4R.apa,V6R.pppapapa"
+R4stL,"V6L.pppapapp, R4.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004026,"lineage name: V6L.pppapapp,R4L.app,V6L.pppapapp"
+R4stR,"V6R.pppapapp, R4.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004025,"lineage name: V6R.pppapapp,R4R.app,V6R.pppapapp"
+R5_hyp,"V6.ppppap, R5.p","Male sensory ray 5 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam",,,,,,,,,,,,1,1,,,,WBbt:0004793,"lineage name: V6.ppppap, R5.p"
+R5AL,"V6L.pppppaaa, R5.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004024,"R5L.aaa,V6L.ppppaaaa"
+R5AR,"V6R.pppppaaa, R5.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004023,"lineage name: V6R.ppppaaaa,R5R.aaa"
+R5BL,"V6L.pppppapa, R5.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004022,"lineage name: V6L.ppppaapa,R5L.apa,V6L.ppppaapa"
+R5BR,"V6R.pppppapa, R5.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004021,"lineage name: V6R.ppppaapa,R5R.apa,V6R.ppppaapa"
+R5stL,"V6L.pppppapp, R5.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004020,"lineage name: V6L.ppppaapp,R5L.app,V6L.ppppaapp"
+R5stR,"V6R.pppppapp, R5.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004019,"lineage name: V6R.ppppaapp,R5R.app,V6R.ppppaapp"
+R6_hyp,"V6.pppppp, R6.p","Male sensory ray 6 hypodermal cell, fuses with hypodermal syncytium",,,,,,,,,,,,1,1,,,,WBbt:0004792,"lineage name: V6.pppppp, R6.p"
+R6AL,"V6L.ppppaaaa, R6.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004018,"lineage name: V6L.pppppaaa,R6L.aaa,V6L.pppppaaa"
+R6AR,"V6R.ppppaaaa, R6.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004016,"lineage name: V6R.pppppaaa,R6R.aaa,V6R.pppppaaa"
+R6BL,"V6L.ppppaapa, R6.apa","Male sensory rays, neuron, not darkly staining nor open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004014,"lineage name: V6L.pppppapa,R6L.apa,V6L.pppppapa"
+R6BR,"V6R.ppppaapa, R6.apa","Male sensory rays, neuron, not darkly staining nor open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004012,"lineage name: V6R.pppppapa,R6R.apa,V6R.pppppapa"
+R6stL,"V6L.ppppaapp, R6.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004010,"lineage name: V6L.pppppapp,R6L.app,V6L.pppppapp"
+R6stR,"V6R.ppppaapp, R6.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0004008,"lineage name: V6R.pppppapp,R6R.app,V6R.pppppapp"
+R7_hyp,"T.apappp, R7.p","Male sensory ray 7 hypodermal cell, fuses with hypodermal syncytium",,,,,,,,,,,,1,1,,,,WBbt:0004791,"lineage name: T.apappp, R7.p"
+R7AL,"TL.apappaaa, R7.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004006,"lineage name: TL.apappaaa,R7L.aaa,TL.apappaaa"
+R7AR,"TR.apappaaa, R7.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0004002,"lineage name: TR.apappaaa,R7R.aaa"
+R7BL,"TL.apappapa, R7.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004001,"lineage name: TL.apappapa,R7L.apa,TL.apappapa"
+R7BR,"TR.apappapa, R7.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0004000,"lineage name: TR.apappapa,R7R.apa"
+R7stL,"TL.apappapp, R7.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003998,"lineage name: TL.apappapp,R7L.app,TL.apappapp"
+R7stR,"TR.apappapp, R7.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003996,"lineage name: TR.apappapp,R7R.app"
+R8_hyp,"T.appaap, R8.p","Male sensory ray 8 hypodermal cell, fuses with hypodermal syncytium",,,,,,,,,,,,1,1,,,,WBbt:0004790,"lineage name: T.appaap, R8.p"
+R8AL,"TL.appaaaaa, R8.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0003994,"lineage name: TL.appaaaaa,R8L.aaa,TL.appaaaaa"
+R8AR,"TR.appaaaaa, R8.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0003992,"lineage name: TR.appaaaaa,R8R.aaa"
+R8BL,"TL.appaaapa, R8.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0003990,"lineage name: TL.appaaapa,R8L.apa,TL.appaaapa"
+R8BR,"TR.appaaapa, R8.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0003988,"lineage name: TR.appaaapa,R8R.apa"
+R8stL,"TL.appaaapp, R8.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003986,"lineage name: TL.appaaapp,R8L.app,TL.appaaapp"
+R8stR,"TR.appaaapp, R8.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003972,"lineage name: TR.appaaapp,R8R.app"
+R9_hyp,"T.appapp, R9.p","Male sensory ray 9 hypodermal cell, fuses with hypodermal syncytium",,,,,,,,,,,,1,1,,,,WBbt:0004789,"lineage name: T.appapp, R9.p"
+R9AL,"TL.appapaaa, R9.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0003971,"lineage name: TL.appapaaa,R9L.aaa"
+R9AR,"TR.appapaaa, R9.aaa","Male sensory rays, neuron, striated rootlet",,,,1,,,,,,,,1,1,,,,WBbt:0003970,"lineage name: TR.appapaaa,R9R.aaa"
+R9BL,"TL.appapapa, R9.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0003968,"lineage name: TL.appapapa,R9L.apa,TL.appapapa"
+R9BR,"TR.appapapa, R9.apa","Male sensory rays, neuron, darkly staining tip, open to outside",,,,1,,,,,,,,1,1,,,,WBbt:0003966,"lineage name: TR.appapapa,R9R.apa"
+R9stL,"TL.appapapp, R9.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003964,"lineage name: TL.appapapp,R9L.app,TL.appapapp"
+R9stR,"TR.appapapp, R9.app","Male sensory rays, structural cell",,,,,,,,,,,,1,1,,,,WBbt:0003962,"lineage name: TR.appapapp,R9R.app"
+rect_D,AB.plpappppp,"Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli",,,,,,,,1,,,,,,,,,WBbt:0004788,lineage name: ABplpappppp
+rect_VL,AB.plppppaap,"Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli",,,,,,,,1,,,,,,,,,WBbt:0004787,lineage name: ABplppppaap
+rect_VR,AB.prppppaap,"Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli",,,,,,,,1,,,,,,,,,WBbt:0004776,lineage name: ABprppppaap
+RIAL,AB.alapaapaa,"Ring interneuron, many synapses",,,1,,,,,,,,,,,,,,WBbt:0003960,lineage name: ABalapaapaa
+RIAR,AB.alaapppaa,"Ring interneuron, many synapses",,,1,,,,,,,,,,,,,,WBbt:0003958,lineage name: ABalaapppaa
+RIBL,AB.plpaappap,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003956,lineage name: ABplpaappap
+RIBR,AB.prpaappap,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003942,lineage name: ABprpaappap
+RICL,AB.plppaaaapp,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003941,lineage name: ABplppaaaapp
+RICR,AB.prppaaaapp,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003940,lineage name: ABprppaaaapp
+RID,AB.alappaapa,"Ring interneuron, projects along dorsal cord",,,1,,,,,,,,,,,,,,WBbt:0003938,lineage name: ABalappaapa
+RIFL,AB.plppapaaap,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003936,lineage name: ABplppapaaap
+RIFR,AB.prppapaaap,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003934,lineage name: ABprppapaaap
+RIGL,AB.plppappaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003932,lineage name: ABplppappaa
+RIGR,AB.prppappaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003930,lineage name: ABprppappaa
+RIH,AB.prpappaaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0003928,lineage name: ABprpappaaa
+RIML,AB.plppaapap,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0003926,lineage name: ABplppaapap
+RIMR,AB.prppaapap,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0005053,lineage name: ABprppaapap
+RIPL,AB.alpapaaaa,"Ring/pharynx interneuron, only direct connection between pharynx and ring",,,1,,,,,,,,,,,,,,WBbt:0005051,lineage name: ABalpapaaaa
+RIPR,AB.prappaaaa,"Ring/pharynx interneuron, only direct connection between pharynx and ring",,,1,,,,,,,,,,,,,,WBbt:0005049,"ABarappaaaa,lineage name: ABarappaaaa"
+RIR,AB.prpapppaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005047,lineage name: ABprpapppaa
+RIS,AB.prpappapa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005045,lineage name: ABprpappapa
+RIVL,AB.plpaapaaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005043,lineage name: ABplpaapaaa
+RIVR,AB.prpaapaaa,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005041,lineage name: ABprpaapaaa
+RMDDL,AB.alpapapaa,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005039,lineage name: ABalpapapaa
+RMDDR,AB.arappapaa,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005038,lineage name: ABarappapaa
+RMDL,AB.alpppapad,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005037,lineage name: ABalpppapad
+RMDR,AB.praaaapad,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005033,lineage name: ABpraaaapad
+RMDVL,AB.alppapaaa,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005031,lineage name: ABalppapaaa
+RMDVR,AB.arapppaaa,"Ring motor neuron/interneuron, many synapses",,,1,,,,,,,1,,,,,,,WBbt:0005029,lineage name: ABarapppaaa
+RMED,AB.alapppaap,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0005027,lineage name: ABalapppaap
+RMEL,AB.alaaaarlp,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0005025,lineage name: ABalaaaarlp
+RMER,AB.alaaaarrp,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0005023,lineage name: ABalaaaarrp
+RMEV,AB.plpappaaa,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0005021,lineage name: ABplpappaaa
+RMFL,G2.al,Ring motor neuron/interneuron,,,1,,,,,,,1,,,,,,,WBbt:0005019,lineage name: G2.al
+RMFR,G2.ar,Ring motor neuron/interneuron,,,1,,,,,,,1,,,,,,,WBbt:0005018,lineage name: G2.ar
+RMGL,AB.plapaaapp,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005017,lineage name: ABplapaaapp
+RMGR,AB.prapaaapp,Ring interneuron,,,1,,,,,,,,,,,,,,WBbt:0005013,lineage name: ABprapaaapp
+RMHL,G1.l,Ring motor neuron/interneuron,,,1,,,,,,,1,,,,,,,WBbt:0005011,lineage name: G1.l
+RMHR,G1.r,Ring motor neuron/interneuron,,,1,,,,,,,1,,,,,,,WBbt:0005009,lineage name: G1.r
+SAADL,AB.alppapapa,"Ring interneuron, anteriorly projecting process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0005007,lineage name: ABalppapapa
+SAADR,AB.arapppapa,"Ring interneuron, anteriorly projecting process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0005005,lineage name: ABarapppapa
+SAAVL,AB.plpaaaaaa,"Ring interneuron, anteriorly projecting process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0005003,lineage name: ABplpaaaaaa
+SAAVR,AB.prpaaaaaa,"Ring interneuron, anteriorly projecting process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0005001,lineage name: ABprpaaaaaa
+SABD,AB.plppapaap,"Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1",,,1,,,,,,,,,,,,,,WBbt:0004999,lineage name: ABplppapaap
+SABVL,AB.plppapaaaa,"Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1",,,1,,,,,,,,,,,,,,WBbt:0004998,lineage name: ABplppapaaaa
+SABVR,AB.prppapaaaa,"Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1",,,1,,,,,,,,,,,,,,WBbt:0004997,lineage name: ABprppapaaaa
+SDQL,QL.pap,"Post. lateral interneuron, process projects into ring",,,1,,,,,,,,,,,,,,WBbt:0004993,lineage name: QL.pap
+SDQR,QR.pap,"Ant. lateral interneuron, process projects into ring",,,1,,,,,,,,,,,,,,WBbt:0004991,lineage name: QR.pap
+se,H1L.aa,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004775,"lineage name: H1L.aa,se"
+se,H1L.appp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004774,"lineage name: H1L.appp,se"
+se,H1R.aa,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004773,"lineage name: H1R.aa,se"
+se,H1R.appp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004772,"lineage name: H1R.appp,se"
+se,H2L.pppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004771,"lineage name: H2L.pppp,se"
+se,H2R.pppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004770,"lineage name: H2R.pppp,se"
+se,V1L.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004769,"lineage name: V1L.pappp,se"
+se,V1L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004768,"lineage name: V1L.ppppp,se"
+se,V1R.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004767,"lineage name: V1R.pappp,V1R.pappp"
+se,V1R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004756,"lineage name: V1R.ppppp,se"
+se,V2L.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004755,"lineage name: V2L.pappp,se"
+se,V2L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004754,"lineage name: V2L.ppppp,se"
+se,V2R.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004753,"lineage name: V2R.pappp,se"
+se,V2R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004752,"lineage name: V2R.ppppp,se"
+se,V3L.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004751,"lineage name: V3L.pappp,se"
+se,V3L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004750,"lineage name: V3L.ppppp,se"
+se,V3R.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004749,"lineage name: V3R.pappp,se"
+se,V3R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004748,"lineage name: V3R.ppppp,se"
+se,V4L.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004747,"lineage name: V4L.pappp,se"
+se,V4L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004736,"lineage name: V4L.ppppp,se"
+se,V4R.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004735,"lineage name: V4R.pappp,se"
+se,V4R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004734,"lineage name: V4R.ppppp,se"
+se_herm,V5L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004733,"lineage name: V5L.ppppp,se_herm"
+se_herm,V5R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004732,"lineage name: V5R.ppppp,se_herm"
+se_herm,V6L.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004731,"lineage name: V6L.pappp,se_herm"
+se_herm,V6L.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004730,"lineage name: V6L.ppppp,se_herm"
+se_herm,V6R.pappp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004729,"lineage name: V6R.pappp,se_herm"
+se_herm,V6R.ppppp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004728,"lineage name: V6R.ppppp,se_herm"
+se_herm,TL.appa,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004727,"lineage name: TL.appa,se_herm"
+se_herm,TR.appa,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004726,"lineage name: TR.appa,se_herm"
+se_male,V5L.pppapp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004725,lineage name: V5L.pppapp
+se_male,V5R.pppapp,"Postembryonic seam hypodermal cells, make alae",,,,,,,,1,,,,,,1,,,WBbt:0004724,lineage name: V5R.pppapp
+set,V5L.pppppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004723,"AVFL/R nucleus,lineage name: V5L.pppppp,set"
+set,V5R.pppppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004722,"lineage name: V5R.pppppp,set"
+set,V6L.papapp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004721,"lineage name: V6L.papapp,set"
+set,V6L.papppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004720,"lineage name: V6L.papppp,set"
+set,V6L.pppapp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004719,"lineage name: V6L.pppapp,set"
+set,V6L.pppppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004718,"hyp7,lineage name: V6L.pppppp"
+set,V6R.papapp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004717,"lineage name: V6R.papapp,set"
+set,V6R.papppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004516,"lineage name: V6R.papppp,set"
+set,V6R.pppapp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004515,"lineage name: V6R.pppapp,set"
+set,V6R.pppppp,"Male tail seam, does not fuse with main seam, does not make alae",,,,,,,,,,,,1,1,1,,,WBbt:0004514,"hyp7,lineage name: V6R.pppppp"
+SIADL,AB.plpapaapa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004989,lineage name: ABplpapaapa
+SIADR,AB.prpapaapa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004987,lineage name: ABprpapaapa
+SIAVL,AB.plpapappa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004985,lineage name: ABplpapappa
+SIAVR,AB.prpapappa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004983,lineage name: ABprpapappa
+SIBDL,AB.plppaaaaa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004981,lineage name: ABplppaaaaa
+SIBDR,AB.prppaaaaa,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004979,lineage name: ABprppaaaaa
+SIBVL,AB.plpapaapp,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004978,lineage name: ABplpapaapp
+SIBVR,AB.prpapaapp,"Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally",,,1,,,,,,,,,,,,,,WBbt:0004977,lineage name: ABprpapaapp
+SMBDL,AB.alpapapapp,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004976,lineage name: ABalpapapapp
+SMBDR,AB.arappapapp,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004975,lineage name: ABarappapapp
+SMBVL,AB.alpapappp,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004974,lineage name: ABalpapappp
+SMBVR,AB.arappappp,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004973,lineage name: ABarappappp
+SMDDL,AB.plpapaaaa,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004972,lineage name: ABplpapaaaa
+SMDDR,AB.prpapaaaa,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004971,lineage name: ABprpapaaaa
+SMDVL,AB.alppappaa,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004970,lineage name: ABalppappaa
+SMDVR,AB.arappppaa,"Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally",,,1,,,,,,,1,,,,,,,WBbt:0004969,lineage name: ABarappppaa
+socket exc_socket,G2.p,"Excretory socket, links duct to hypodermis",,,,,,,,1,,,,,,,,,WBbt:0004534,"excretory canal cell,exc_cell,lineage name: ABplpappaap"
+SPCL,B.alpaap,"Male specific sensory /motor neuron, innervates spicule protractor muscle",,,,,,,,,,,,1,1,,,,WBbt:0004968,lineage name: B.alpaap
+SPCR,B.arpaap,"Male specific sensory /motor neuron, innervates spicule protractor muscle",,,,,,,,,,,,1,1,,,,WBbt:0004967,lineage name: B.arpaap
+SPDL,B.alpapaa,"Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule",,,,,,,,,,,,1,1,,,,WBbt:0004966,lineage name: B.alpapaa
+SPDR,B.arpapaa,"Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule",,,,,,,,,,,,1,1,,,,WBbt:0004965,lineage name: B.arpapaa
+spike,AB.plppppppa,"Used during embryogenesis to make tail spike, then die",,,,,,,,,,,1,,,1,,,WBbt:0004513,lineage name: ABplppppppa
+spike,AB.prppppppa,"Used during embryogenesis to make tail spike, then die",,,,,,,,,,,1,,,1,,,WBbt:0004512,lineage name: ABprppppppa
+SPshDL,B.alpapap,Sheath of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004962,lineage name: B.alpapap
+SPshDR,B.arpapap,Sheath of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004961,lineage name: B.arpapap
+SPshVL,B.al/raaldp,Sheath of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004960,lineage name: B.al/raaldp
+SpshVR,B.al/raarda,Sheath of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004959,lineage name: B.al/raarda
+SPso1L,B.al/rpppl,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004958,"B_gamma.pl,lineage name: B.al/rpppl"
+SPso1R,B.al/rpppr,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004957,"B_gamma.pr,lineage name: B.al/rpppr"
+SPso2L,B.al/raald,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004956,lineage name: B.al/raald
+SPso2R,B.al/raard,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004955,lineage name: B.al/raard
+SPso3L,B.al/raalv,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004954,"lineage name: B.al/raalv,lineage name: P10.aapa"
+SPso3R,B.al/raarv,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004952,"lineage name: B.al/raarv,lineage name: P11.aapa"
+SPso4L,B.alpapp,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004950,lineage name: B.alpapp
+SPso4r,B.arpapp,Socket of male copulatory spicule,,,,,,,,,,,,1,1,,,,WBbt:0004948,lineage name: B.arpapp
+SPVL,B.al/raalda,"Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule",,,,,,,,,,,,1,1,,,,WBbt:0004964,"lineage name: B.al/raalda,lineage name: B_beta.lda"
+SPVR,B.al/raarda,"Sensory neuron of copulatory spicle in male, cilliated, open to outside at tip of spicule",,,,,,,,,,,,1,1,,,,WBbt:0004963,"B_beta.rda,lineage name: B.al/raarda,lineage name: B_beta.rda"
+TL,AB.plappppp,"Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1",,,,,,,,,,,1,,,,,,WBbt:0004946,lineage name: ABplappppp
+TR,AB.prappppp,"Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1",,,,,,,,,,,1,,,,,,WBbt:0004944,lineage name: ABprappppp
+U,AB.plppppapa,"Rectal cell, postembryonic blast cell in male",,,,,,,,,,,1,1,,,,,WBbt:0004942,None
+um1AL,M.vlpaaaap,Uterine muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004882,lineage name: M.vlpaaaap
+um1PL,M.vlpaappa,Uterine muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004881,lineage name: M.vlpaappa
+um1AR,M.vrpaaaap,Uterine muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004878,lineage name: M.vrpaaaap
+um1PR,M.vrpaappa,Uterine muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004877,lineage name: M.vrpaappa
+um2AL,M.vlpaaaaa,Uterine muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004883,lineage name: M.vlpaaaaa
+um2PL,M.vlpaappp,Uterine muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004880,lineage name: M.vlpaappp
+um2AR,M.vrpaaaaa,Uterine muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004879,lineage name: M.vrpaaaaa
+um2PR,M.vrpaappp,Uterine muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004856,lineage name: M.vrpaappp
+URADL,AB.plaaaaaaa,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0004940,lineage name: ABplaaaaaaa
+URADR,AB.arpapaaaa,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0004936,lineage name: ABarpapaaaa
+URAVL,AB.plpaaapaa,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0004935,lineage name: ABplpaaapaa
+URAVR,AB.prpaaapaa,Ring motor neuron,,,1,,,,,,,1,,,,,,,WBbt:0004934,lineage name: ABprpaaapaa
+URBL,AB.plaapaapa,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004932,lineage name: ABplaapaapa
+URBR,AB.praapaapa,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004930,lineage name: ABpraapaapa
+URXL,AB.plaaaaappp,Ring interneuron,,,1,,,,,,,1,,,,,,,WBbt:0004928,lineage name: ABplaaaaappp
+URXR,AB.arpapaappp,Ring interneuron,,,1,,,,,,,1,,,,,,,WBbt:0004926,lineage name: ABarpapaappp
+URYDL,AB.alapapapp,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004924,lineage name: ABalapapapp
+URYDR,AB.alapppapp,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004922,lineage name: ABalapppapp
+URYVL,AB.plpaaappp,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004920,lineage name: ABplpaaappp
+URYVR,AB.prpaaappp,"Neuron, presynaptic in ring, ending in head",,,1,,,,,,,1,,,,,,,WBbt:0004906,lineage name: ABprpaaappp
+V1L,AB.arppapaa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004905,lineage name: ABarppapaa
+V1R,AB.arppppaa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004904,lineage name: ABarppppaa
+V2L,AB.arppapap,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004902,lineage name: ABarppapap
+V2R,AB.arppppap,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004900,lineage name: ABarppppap
+V3L,AB.plappapa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004898,lineage name: ABplappapa
+V3R,AB.prappapa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004896,lineage name: ABprappapa
+V4L,AB.arppappa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004894,lineage name: ABarppappa
+V4R,AB.arpppppa,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004892,lineage name: ABarpppppa
+V5L,AB.plapapaap,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004890,lineage name: ABplapapaap
+V5R,AB.prapapaap,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004876,lineage name: ABprapapaap
+V6L,AB.arppappp,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004875,lineage name: ABarppappp
+V6R,AB.arpppppp,"Seam hypodermal cell, postembryonic blast cell",,,,,,,,,,,1,,,,,,WBbt:0004874,lineage name: ABarpppppp
+VA1,W.pa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004872,lineage name: W.pa
+VA10,P10.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004649,lineage name: P10.aaaa
+VA11,P11.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004647,lineage name: P11.aaaa
+VA12,P12.aaaa,"Vent. cord motor neuron, innervates vent. body muscles, but also interneuron in preanal ganglion",,,1,,,,,,,1,,,,,,,WBbt:0004645,lineage name: P12.aaaa
+VA2,P2.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004870,lineage name: P2.aaaa
+VA3,P3.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004868,lineage name: P3.aaaa
+VA4,P4.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004866,lineage name: P4.aaaa
+VA5,P5.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004864,lineage name: P5.aaaa
+VA6,P6.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004862,lineage name: P6.aaaa
+VA7,P7.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004860,lineage name: P7.aaaa
+VA8,P8.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004653,lineage name: P8.aaaa
+VA9,P9.aaaa,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004651,lineage name: P9.aaaa
+VB1,P1.aaap,"Vent. cord motor neuron, innervates vent. body muscles, also interneuron in ring",,,1,,,,,,,1,,,,,,,WBbt:0004643,lineage name: P1.aaap
+VB10,P9.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004625,lineage name: P9.aaap
+VB11,P10.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004623,lineage name: P10.aaap
+VB2,W.aap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004641,lineage name: W.aap
+VB3,P2.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004639,lineage name: P2.aaap
+VB4,P3.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004638,lineage name: P3.aaap
+VB5,P4.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004637,lineage name: P4.aaap
+VB6,P5.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004633,lineage name: P5.aaap
+VB7,P6.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004631,lineage name: P6.aaap
+VB8,P7.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004629,lineage name: P7.aaap
+VB9,P8.aaap,"Vent. cord motor neuron, innervates vent. body muscles",,,1,,,,,,,1,,,,,,,WBbt:0004627,lineage name: P8.aaap
+VC1,P3.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004621,lineage name: P3.aap
+VC2,P4.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004619,lineage name: P4.aap
+VC3,P5.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004618,lineage name: P5.aap
+VC4,P6.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004617,lineage name: P6.aap
+VC5,P7.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004613,lineage name: P7.aap
+VC6,P8.aap,Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles,,,1,,,,,,,1,,,,,,,WBbt:0004611,lineage name: P8.aap
+VD1,W.pp,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004609,lineage name: W.pp
+VD10,P9.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004591,lineage name: P9.app
+VD11,P10.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004589,lineage name: P10.app
+VD12,P11.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004587,lineage name: P11.app
+VD13,P12.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004585,lineage name: P12.app
+VD2,P1.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004607,lineage name: P1.app
+VD3,P2.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004605,lineage name: P2.app
+VD4,P3.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004603,lineage name: P3.app
+VD5,P4.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004601,lineage name: P4.app
+VD6,P5.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004599,lineage name: P5.app
+VD7,P6.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004598,lineage name: P6.app
+VD8,P7.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004597,lineage name: P7.app
+VD9,P8.app,"Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor",,,1,,,,,,,1,,,,,,,WBbt:0004593,lineage name: P8.app
+virL,AB.prpappppp,Intestino-rectal valve,,,,,,,,1,,,,,,,,,WBbt:0004511,lineage name: ABprpappppp
+virR,AB.prpappppa,Intestino-rectal valve,,,,,,,,1,,,,,,,,,WBbt:0004510,lineage name: ABprpappppa
+VL1,MS.appapp,,,,,,1,,,,,,,,,,,mu_bod_vl2,WBbt:0003873,"lineage name: MSappapp,mu_bod"
+VL10,C.apaaaa,,,,,,1,,,,,,,,,,,mu_bod_vl9,WBbt:0004290,"lineage name: Capaaaa,mu_bod"
+VL11,MS.aappppa,,,,,,1,,,,,,,,,,,mu_bod_vl12,WBbt:0003879,"lineage name: MSaappppa,mu_bod"
+VL12,C.apaaap,,,,,,1,,,,,,,,,,,mu_bod_vl11,WBbt:0004289,"lineage name: Capaaap,mu_bod"
+VL13,MS.aappppp,,,,,,1,,,,,,,,,,,mu_bod_vl14,WBbt:0003878,"lineage name: MSaappppp,mu_bod"
+VL14,C.apaapa,,,,,,1,,,,,,,,,,,mu_bod_vl13,WBbt:0004288,"lineage name: Capaapa,mu_bod"
+VL15,MS.pappaa,,,,,,1,,,,,,,,,,,mu_bod_vl16,WBbt:0003858,"lineage name: MSpappaa,MSpappal,mu_bod"
+VL16,C.apaapp,,,,,,1,,,,,,,,,,,mu_bod_vl15,WBbt:0004287,"lineage name: Capaapp,mu_bod"
+VL17,M.vlaa,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007180,VL17
+VL18,M.vlap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007181,VL18
+VL19,C.apappa,,,,,,1,,,,,,,,,,,mu_bod_vl20,WBbt:0004284,"lineage name: Capappa,mu_bod"
+VL2,MS.apapap,,,,,,1,,,,,,,,,,,mu_bod_vl1,WBbt:0003876,"lineage name: MSapapap,mu_bod"
+VL20,M.vlpap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007189,VL20
+VL21,M.vlpp,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007190,VL21
+VL22,C.apappp,,,,,,1,,,,,,,,,,,mu_bod_vl22,WBbt:0004283,"lineage name: Capappp,mu_bod"
+VL23,C.appppv,,,,,,1,,,,,,,,,,,mu_bod_vl23,WBbt:0003976,"lineage name: Cappppv,mu_bod"
+VL3,D.aapa,,,,,,1,,,,,,,,,,,mu_bod_vl4,WBbt:0003917,"lineage name: Daapa,mu_bod"
+VL4,MS.apppaa,,,,,,1,,,,,,,,,,,mu_bod_vl3,WBbt:0003862,"lineage name: MSapppaa,mu_bod"
+VL5,D.aapp,,,,,,1,,,,,,,,,,,mu_bod_vl6,WBbt:0003916,"lineage name: Daapp,mu_bod"
+VL6,D.aaaa,,,,,,1,,,,,,,,,,,mu_bod_vl5,WBbt:0003919,"lineage name: Daaaa,mu_bod"
+VL7,MS.aapppaa,,,,,,1,,,,,,,,,,,mu_bod_vl8,WBbt:0003881,"lineage name: MSaapppaa,mu_bod"
+VL8,D.apaa,Embryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0006344,"lineage name: Dapaa, mu_bod"
+VL9,MS.aapppap,,,,,,1,,,,,,,,,,,mu_bod_vl10,WBbt:0003880,"lineage name: MSaapppap,mu_bod"
+vm1PL,M.vlpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004854,lineage name: M.vlpaaapp
+vm1AL,M.vlpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004853,lineage name: M.vlpaapaa
+vm1PR,M.vrpaaapp,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004850,lineage name: M.vrpaaapp
+vm1AR,M.vrpaapaa,Vulval muscle 1,,,,,,,1,,1,,,,,,,?,WBbt:0004849,lineage name: M.vrpaapaa
+vm2AL,M.vlpaaapa,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004855,lineage name: M.vlpaaapa
+vm2PL,M.vlpaapap,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004852,lineage name: M.vlpaapap
+vm2AR,M.vrpaaapa,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004851,lineage name: M.vrpaaapa
+vm2PR,M.vrpaapap,Vulval muscle 2,,,,,,,1,,1,,,,,,,?,WBbt:0004848,lineage name: M.vrpaapap
+vpi1,MS.paapapp,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004509,lineage name: MSpaapapp
+vpi2DL,MS.aapappp,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004508,lineage name: MSaapappp
+vpi2DR,MS.papappp,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004507,lineage name: MSpapappp
+vpi2V,MS.aappaa,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004486,lineage name: MSaappaa
+vpi3D,MS.aaappp,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004485,lineage name: MSaaappp
+vpi3V,MS.aappap,Pharyngo-intestinal valve,,,,,,,,1,,,,,,,,,WBbt:0004484,lineage name: MSaappap
+VR1,MS.pppapp,,,,,,1,,,,,,,,,,,mu_bod_vr2,WBbt:0003838,"lineage name: MSpppapp,mu_bod"
+VR10,C.ppaaaa,,,,,,1,,,,,,,,,,,mu_bod_vr9,WBbt:0003975,"lineage name: Cppaaaa,mu_bod"
+VR11,MS.pappppa,,,,,,1,,,,,,,,,,,mu_bod_vr12,WBbt:0003854,"lineage name: MSpappppa,mu_bod"
+VR12,C.ppaaap,,,,,,1,,,,,,,,,,,mu_bod_vr11,WBbt:0003974,"lineage name: Cppaaap,mu_bod"
+VR13,MS.pappppp,,,,,,1,,,,,,,,,,,mu_bod_vr14,WBbt:0003853,"lineage name: MSpappppp,mu_bod"
+VR14,C.ppaapa,,,,,,1,,,,,,,,,,,mu_bod_vr13,WBbt:0003973,"lineage name: Cppaapa,mu_bod"
+VR15,MS.pappap,,,,,,1,,,,,,,,,,,mu_bod_vr16,WBbt:0003857,"lineage name: MSpappap,mu_bod"
+VR16,C.ppaapp,,,,,,1,,,,,,,,,,,mu_bod_vr15,WBbt:0003952,"lineage name: Cppaapp,mu_bod"
+VR17,M.vraa,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007193,VR17
+VR18,M.vrap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007194,VR18
+VR19,AB.prpppppaa,,,,,,1,,,,,,,,,,,mu_bod_vr20,WBbt:0004291,"lineage name: ABprpppppaa,mu_bod"
+VR2,MS.ppapap,,,,,,1,,,,,,,,,,,mu_bod_vr1,WBbt:0003841,"lineage name: MSppapap,mu_bod"
+VR20,C.ppappa,,,,,,1,,,,,,,,,,,mu_bod_vr19,WBbt:0003949,"lineage name: Cppappa,mu_bod"
+VR21,C.ppappp,,,,,,1,,,,,,,,,,,mu_bod_vr22,WBbt:0003948,"lineage name: Cppappp,mu_bod"
+VR22,M.vrpap,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007202,VR22
+VR23,M.vrpp,Postembryonic body wall muscle,,,,,1,,,,,,,,,,,,WBbt:0007203,VR23
+VR24,C.pppppv,,,,,,1,,,,,,,,,,,mu_bod_vr24,WBbt:0003920,"lineage name: Cpppppv,mu_bod"
+VR3,D.papa,,,,,,1,,,,,,,,,,,mu_bod_vr4,WBbt:0003899,"lineage name: Dpapa,mu_bod"
+VR4,MS.ppppaa,,,,,,1,,,,,,,,,,,mu_bod_vr3,WBbt:0003837,"lineage name: MSppppaa,mu_bod"
+VR5,D.papp,,,,,,1,,,,,,,,,,,mu_bod_vr6,WBbt:0003898,"lineage name: Dpapp,mu_bod"
+VR6,D.paaa,,,,,,1,,,,,,,,,,,mu_bod_vr5,WBbt:0003901,"lineage name: Dpaaa,mu_bod"
+VR7,MS.papppaa,,,,,,1,,,,,,,,,,,mu_bod_vr8,WBbt:0003856,"lineage name: MSpapppaa,mu_bod"
+VR8,D.ppaa,,,,,,1,,,,,,,,,,,mu_bod_vr7,WBbt:0003897,"lineage name: Dppaa,mu_bod"
+VR9,MS.papppap,,,,,,1,,,,,,,,,,,mu_bod_vr10,WBbt:0003855,"lineage name: MSpapppap,mu_bod"
+vulva,P5.paaa,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004483,lineage name: P5.paaa
+vulva,P5.paap,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004482,lineage name: P5.paap
+vulva,P5.papa,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,vulb1,WBbt:0004481,lineage name: P5.papa
+vulva,P5.papp,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,vulb2,WBbt:0004480,lineage name: P5.papp
+vulva,P5.ppal,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004479,lineage name: P5.ppal
+vulva,P5.ppar,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004478,lineage name: P5.ppar
+vulva,P5.ppp,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004477,lineage name: P5.ppp
+vulva,P6.paal,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004456,lineage name: P6.paal
+vulva,P6.paar,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004455,lineage name: P6.paar
+vulva,P6.papl,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004454,lineage name: P6.papl
+vulva,P6.papr,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004453,lineage name: P6.papr
+vulva,P6.ppal,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004452,lineage name: P6.ppal
+vulva,P6.ppar,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004451,lineage name: P6.ppar
+vulva,P6.pppl,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004450,lineage name: P6.pppl
+vulva,P6.pppr,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004449,lineage name: P6.pppr
+vulva,P7.paa,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004448,lineage name: P7.paa
+vulva,P7.papl,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004447,lineage name: P7.papl
+vulva,P7.papr,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004436,lineage name: P7.papr
+vulva,P7.ppaa,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,vulb2,WBbt:0004435,lineage name: P7.ppaa
+vulva,P7.ppap,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,vulb1,WBbt:0004434,lineage name: P7.ppap
+vulva,P7.pppa,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004433,lineage name: P7.pppa
+vulva,P7.pppp,Hermaphrodite vulva,,,,,,,,1,1,,,,,1,,?,WBbt:0004432,lineage name: P7.pppp
+W,AB.prapaapa,"Postembryonic neuroblast, analogous to Pn.a cells",,,,,,,,,,,1,,,,,,WBbt:0004583,None
+XXXL,AB.plaaapaa,Embryonic head hypodermal cell,,,,,,,,,,,1,,,,,,WBbt:0004581,lineage name: ABplaaapaa
+XXXR,AB.arpappaa,Embryonic head hypodermal cell,,,,,,,,,,,1,,,,,,WBbt:0004579,lineage name: ABarpappaa
+Y,AB.prpppaaaa,"Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male",,,,,,,,,,,1,1,,,,,WBbt:0003623,None
+Z1,MS.pppaap,Somatic gonad precursor cell,,,,,,,,,,,1,,,,,,WBbt:0004577,lineage name: MSpppaap
+Z2,P4.p,Germ line precursor cell,,,,,,,,,,,1,,,,,,WBbt:0004576,lineage name: P4.p
+Z3,P4.a,Germ line precursor cell,,,,,,,,,,,1,,,,,,WBbt:0004575,lineage name: P4.a
+Z4,MS.appaap,Somatic gonad precursor cell,,,,,,,,,,,1,,,,,,WBbt:0004574,lineage name: MSappaap

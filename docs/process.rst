@@ -173,6 +173,18 @@ Aside from the time it saves in coding, FuXi may allow for a smaller footprint
 in the cloud, as many relationships within the database could be inferred
 *after* download.
 
+A rule might be:
+
+* { x is "Neuron" } => { x is "Cell" }
+
+And a fact might be:
+
+* { "ADLR" is "Neuron" }
+
+Given the above rule and fact, FuXi could infer the new fact:
+
+* { "ADLR" is "Cell" }
+
 
 .. XXX: Copy edit and transition
 

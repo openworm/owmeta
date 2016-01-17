@@ -1,7 +1,6 @@
-[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=master)](https://travis-ci.org/openworm/PyOpenWorm/builds)
+[![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=dev)](https://travis-ci.org/openworm/PyOpenWorm/builds)
 [![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.org/en/latest)
-[![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)
-
+[![Join the chat at https://gitter.im/openworm/pyopenworm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/openworm/pyopenworm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)  [![Coverage Status](https://coveralls.io/repos/openworm/PyOpenWorm/badge.svg?branch=dev&service=github)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)  [![Code Climate](https://codeclimate.com/github/openworm/PyOpenWorm/badges/gpa.svg)](https://codeclimate.com/github/openworm/PyOpenWorm)
 
 PyOpenWorm
 ===========
@@ -53,7 +52,7 @@ set([u'interneuron'])
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
-77
+86
 
 ```
 
@@ -115,7 +114,7 @@ u'AVAL'
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
-90
+105
 
 ```
 
@@ -123,9 +122,9 @@ Returns the list of all neurons::
 
 ```python
 #NOTE: This is a VERY slow operation right now
->>> len(set(net.neurons()))
+>>> len(set(net.neuron_names()))
 302
->>> sorted(list(net.neurons())) # doctest:+ELLIPSIS
+>>> sorted(list(net.neuron_names())) # doctest:+ELLIPSIS
 [u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```
@@ -135,14 +134,14 @@ Returns a set of all muscles::
 ```python
 >>> muscles = P.Worm().muscles()
 >>> len(muscles)
-96
+158
 
 ```
 
 Add some evidence::
 
 ```python
->>> e = P.Evidence(author='Sulston et al.', date='1983')
+>>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
 lineageName=`AB alaaapalr'
@@ -182,21 +181,12 @@ object of that type and calling `load()`::
 See what neurons express some neuropeptide::
 ```python
 >>> n = P.Neuron()
->>> n.neuropeptide("TH")
-neuropeptide=`TH'
+>>> n.neuropeptide("INS-26")
+neuropeptide=`INS-26'
 
 >>> s = set(x.name() for x in n.load())
->>> s == set(['CEPDR', 'PDER', 'CEPDL', 'PDEL', 'CEPVR', 'CEPVL'])
+>>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
 True
-
-```
-
-See what neurons innervate a muscle::
-```python
->>> mdr21 = P.Muscle('MDR21')
->>> innervates_mdr21 = mdr21.innervatedBy()
->>> len(innervates_mdr21)
-4
 
 ```
 
@@ -212,6 +202,30 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 ```python
 >>> net.as_networkx() # doctest:+ELLIPSIS
 <networkx.classes.digraph.DiGraph object at ...>
+
+```
+
+Modelling data
+--------------
+
+PyOpenWorm also provides access to store and retrieve data about models.
+Following are some examples of these types of operations.
+
+Retrieve an ion channel's models from the database::
+
+```python
+# Get data for a subtype of voltage-gated potassium channels
+>> kv1 = P.IonChannel('Kv1')
+>> mods = list(kv1.models.get())
+
+```
+
+The same type of operation can be used for the experiment data model.
+
+```python
+# Get experiment(s) that back up the data model
+>> some_model = mods[0]
+>> some_model.references.get()
 
 ```
 
