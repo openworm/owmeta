@@ -78,6 +78,22 @@ class RealSimpleProperty(object):
         self._v.remove(v)
         v.owner_properties.remove(self)
 
+    def __call__(self, *args, **kwargs):
+        # XXX: Copy-pasted from SimpleProperty. I'm a bad person.
+        if len(args) > 0 or len(kwargs) > 0:
+            self.set(*args, **kwargs)
+            return self
+        else:
+            r = self.get(*args, **kwargs)
+            if self.multiple:
+                return set(r)
+            else:
+                try:
+                    return next(iter(r))
+                except StopIteration:
+                    return None
+
+
 
 class _ValueProperty(RealSimpleProperty):
 
