@@ -7,7 +7,7 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from .configure import BadConf
-from .simpleProperty import DatatypeProperty, SimpleProperty
+from .simpleProperty import ObjectProperty, DatatypeProperty
 from .data import DataUser
 from .fakeProperty import FakeProperty
 
@@ -205,13 +205,19 @@ class DataObject(GraphObject, DataUser):
         if property_class_name in PropertyTypes:
             c = PropertyTypes[property_class_name]
         else:
+            klass = None
             if property_type == 'ObjectProperty':
                 value_rdf_type = value_type.rdf_type
+                klass = ObjectProperty
+            elif property_type == 'DatatypeProperty':
+                value_rdf_type = False
+                klass = DatatypeProperty
             else:
                 value_rdf_type = False
+
             link = owner_class.rdf_namespace[linkName]
             c = type(property_class_name,
-                     (SimpleProperty,),
+                     (klass,),
                      dict(linkName=linkName,
                           link=link,
                           property_type=property_type,
@@ -220,8 +226,8 @@ class DataObject(GraphObject, DataUser):
                           owner_type=owner_class,
                           multiple=multiple))
             PropertyTypes[property_class_name] = c
-            c.register()
-        return cls.attach_property(owner, c)
+            #c.register()
+        return cls.attach_property_ex(owner, c)
 
     @classmethod
     def register(cls):
