@@ -68,6 +68,9 @@ class RealSimpleProperty(object):
     def rdf(self):
         return self.conf['rdf.graph']
 
+    def identifier(self):
+        return self.link
+
     def get(self):
         v = Variable("var" + str(id(self)))
         self._v.add(v)
@@ -97,6 +100,16 @@ class RealSimpleProperty(object):
                 except StopIteration:
                     return None
 
+    def __repr__(self):
+        s = str(self.linkName) + "=`" + \
+            ";".join(str(s) for s in self.defined_values) + "'"
+        return s
+
+    def one(self):
+        try:
+            return next(iter(self.get()))
+        except:
+            return None
 
 
 class _ValueProperty(RealSimpleProperty):
