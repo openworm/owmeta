@@ -147,11 +147,16 @@ class Neighbor(P.Property):
         """
         if len(self._conns) > 0:
             for c in self._conns:
-                yield c.post_cell()
+                for post in c.post_cell.get():
+                    yield post
         else:
             c = P.Connection(pre_cell=self.owner,**kwargs)
             for r in c.load():
                 yield r.post_cell()
+
+    @property
+    def defined_values(self):
+        return []
 
     @property
     def values(self):
@@ -222,19 +227,20 @@ class Connection(P.Property):
         """
         options = dict()
         options["pre"] = """
-                     ?x c:pre_cell ?z .
-                     ?z sp:value <%s> .
+                     ?x c:pre_cell <%s> .
                      """ % self.owner.identifier()
         options["post"] = """
-                      ?x c:post_cell ?z .
-                      ?z sp:value <%s> .
+                      ?x c:post_cell <%s> .
                       """ % self.owner.identifier()
         options["either"] = " { %s } UNION { %s } . " % (options['post'], options['pre'])
 
         if syntype is not None:
             if syntype.lower() == 'gapjunction':
-                syntype='gapJunction'
-            syntype_pattern = "FILTER( EXISTS { ?x c:syntype ?v . ?v sp:value \"%s\" . }) ." % syntype
+                syntype = 'gapJunction'
+            syntype_pattern = \
+                "FILTER( EXISTS {" \
+                "?x c:syntype  \"" + syntype + \
+                "\" . }) ."
         else:
             syntype_pattern = ''
 
