@@ -12,6 +12,7 @@ from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
 from yarom.propertyMixins import (ObjectPropertyMixin, DatatypePropertyMixin)
 from PyOpenWorm.data import DataUser
+import itertools
 import hashlib
 
 L = logging.getLogger(__name__)
@@ -69,10 +70,13 @@ class RealSimpleProperty(object):
 
     def get(self):
         v = Variable("var" + str(id(self)))
-        self.set(v)
+        self._v.add(v)
+        if self not in v.owner_properties:
+            v.owner_properties.append(self)
         results = GraphObjectQuerier(v, self.rdf)()
-        self.unset(v)
-        return results
+        v.owner_properties.remove(self)
+        self._v.remove(v)
+        return itertools.chain(results, self.defined_values)
 
     def unset(self, v):
         self._v.remove(v)
