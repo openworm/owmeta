@@ -79,7 +79,7 @@ class RealSimpleProperty(object):
         results = GraphObjectQuerier(v, self.rdf)()
         v.owner_properties.remove(self)
         self._v.remove(v)
-        return itertools.chain(results, self.defined_values)
+        return itertools.chain(results, (x.idl for x in self.defined_values))
 
     def unset(self, v):
         self._v.remove(v)
