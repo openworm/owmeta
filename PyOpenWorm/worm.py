@@ -20,7 +20,7 @@ class NeuronNetworkProperty(ObjectProperty):
 
     def set(self, v):
         super(NeuronNetworkProperty, self).set(v)
-        if isinstance(v, Network) and isinstance(v, Worm):
+        if isinstance(v, Network) and isinstance(self.owner, Worm):
             v.worm(self.owner)
 
 
@@ -41,7 +41,7 @@ class Worm(DataObject):
     """
 
     def __init__(self, scientific_name=False, **kwargs):
-        super(Worm,self).__init__(**kwargs)
+        super(Worm, self).__init__(**kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
         Worm.ObjectProperty(
             "muscle",
