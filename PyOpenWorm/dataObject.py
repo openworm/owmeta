@@ -224,9 +224,9 @@ class DataObject(GraphObject, DataUser):
                           value_rdf_type=value_rdf_type,
                           value_type=value_type,
                           owner_type=owner_class,
+                          rdf_object=PropertyDataObject(ident=link),
                           multiple=multiple))
             PropertyTypes[property_class_name] = c
-            #c.register()
         return cls.attach_property_ex(owner, c)
 
     @classmethod
@@ -240,11 +240,9 @@ class DataObject(GraphObject, DataUser):
         # database is available
         assert(issubclass(cls, DataObject))
         DataObjectTypes[cls.__name__] = cls
-        DataObjectsParents[
-            cls.__name__] = [
-            x for x in cls.__bases__ if issubclass(
-                x,
-                DataObject)]
+        DataObjectsParents[cls.__name__] = [
+            x for x in cls.__bases__
+            if issubclass(x, DataObject)]
         cls.parents = DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         RDFTypeTable[cls.rdf_type] = cls
@@ -280,9 +278,6 @@ class DataObject(GraphObject, DataUser):
 
         Parameters
         ----------
-        query : bool
-            Indicates whether or not the graph_pattern is to be used for querying
-            (as in a SPARQL query) or for storage
         shorten : bool
             Indicates whether to shorten the URLs with the namespace manager
             attached to the ``self``
@@ -442,6 +437,13 @@ def get_most_specific_rdf_type(types):
             annotations in order to resolve your objects to a more precise type.""".format(x))
     return most_specific_type.rdf_type
 
+
+class PropertyDataObject(DataObject):
+
+    """ A PropertyDataObject represents the property-as-object.
+
+    Try not to confuse this with the Property class
+    """
 
 class _Resolver(RDFTypeResolver):
     instance = None
