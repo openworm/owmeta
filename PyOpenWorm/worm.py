@@ -16,12 +16,15 @@ class NeuronNetworkProperty(ObjectProperty):
     def __init__(self, **kwargs):
         super(NeuronNetworkProperty, self).__init__(**kwargs)
         self.link = self.owner.rdf_namespace[self.linkName]
-        self.value_rdf_type = Network.rdf_type
 
     def set(self, v):
         super(NeuronNetworkProperty, self).set(v)
         if isinstance(v, Network) and isinstance(self.owner, Worm):
             v.worm(self.owner)
+
+    @property
+    def value_rdf_type(self):
+        return Network.rdf_type
 
 
 class Worm(DataObject):
