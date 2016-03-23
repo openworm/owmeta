@@ -17,9 +17,8 @@ class DataIntegrityTest(unittest.TestCase):
     def setUpClass(cls):
         import csv
         PyOpenWorm.connect(
-            conf=Configure(
-                **{'rdf.store_conf': 'tests/worm.db', 'rdf.source': 'ZODB'}))
-        #PyOpenWorm.loadData(skipIfNewer=False)
+            conf=Configure(**{'rdf.store_conf': 'PyOpenWorm/worm.db',
+                              'rdf.source': 'ZODB'}))
         PyOpenWorm.disconnect()
         # grab the list of the names of the 302 neurons
 
@@ -34,8 +33,8 @@ class DataIntegrityTest(unittest.TestCase):
 
     def setUp(self):
         PyOpenWorm.connect(
-            conf=Configure(
-                **{'rdf.store_conf': 'tests/worm.db', 'rdf.source': 'ZODB'}))
+            conf=Configure(**{'rdf.store_conf': 'PyOpenWorm/worm.db',
+                              'rdf.source': 'ZODB'}))
         self.g = PyOpenWorm.config("rdf.graph")
 
     def tearDown(self):
@@ -139,10 +138,11 @@ class DataIntegrityTest(unittest.TestCase):
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
-        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                            + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                            '?o ?p ?s} '  # for that type ?o, get its value ?v
-                            + 'LIMIT 10')
+        qres = self.g.query("""SELECT ?o ?p ?s WHERE {{
+                            ?o <http://openworm.org/entities/SimpleProperty/value> "motor".
+                            ?o ?p ?s # for that type ?o, get its value ?v
+                            }} LIMIT 10
+                            """)
         for row in qres.result:
             print(row)
 
