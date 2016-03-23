@@ -318,6 +318,7 @@ class DataIntegrityTest(unittest.TestCase):
     def test_correct_connections_number(self):
         """ This test verifies that there are exactly 6916 connections. """
         net = PyOpenWorm.Worm().get_neuron_network()
+        # XXX: The synapses contain some cells that aren't neurons
         self.assertEqual(6916, len(net.synapses()))
 
     def test_connection_content_matches(self):
@@ -394,6 +395,7 @@ class DataIntegrityTest(unittest.TestCase):
         synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
         unique_neurons = set()    # set of unique neurons
 
+        # XXX: The synapses contain some cells that aren't neurons
         for synapse in synapses:
             unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
 
