@@ -213,7 +213,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
     i = 0
 
-    neurons = set()
+    neurons = list()
     uris = dict()
 
     for row in reader:
