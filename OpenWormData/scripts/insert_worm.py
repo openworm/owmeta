@@ -327,7 +327,13 @@ def upload_connections():
             'SPH': 'MU_SPH'
         }[x]
 
-    # cells that are neither neurons or muscles. These are marked as 'Other Cells' in the wormbase cell list but are still part of the new connectome. In future work these should be uploaded seperately to PyOpenWorm in a new upload function and should be referred from there instead of this list.
+    # cells that are neither neurons or muscles. These are marked as
+    # 'Other Cells' in the wormbase cell list but are still part of the new
+    # connectome.
+    #
+    # TODO: In future work these should be uploaded seperately to
+    # PyOpenWorm in a new upload function and should be referred from there
+    # instead of this list.
     other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
 
     # counters for terminal printing
