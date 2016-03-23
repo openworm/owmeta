@@ -217,76 +217,76 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     uris = dict()
 
     for row in reader:
-      neuron_name = row[0]
-      relation = row[1].lower()
-      data = row[2]
-      evidence = row[3]
-      evidenceURL = row[4]
+        neuron_name = row[0]
+        relation = row[1].lower()
+        data = row[2]
+        evidence = row[3]
+        evidenceURL = row[4]
 
-      #prepare evidence
-      e = P.Evidence()
+        #prepare evidence
+        e = P.Evidence()
 
-      #pick correct evidence given the row
-      if 'altun' in evidence.lower():
-          e = altun_ev
+        #pick correct evidence given the row
+        if 'altun' in evidence.lower():
+            e = altun_ev
 
-      elif 'wormatlas' in evidence.lower():
-          e = wormatlas_ev
+        elif 'wormatlas' in evidence.lower():
+            e = wormatlas_ev
 
-      e2 = []
-      try:
-          e2 = uris[evidenceURL]
-      except KeyError:
-          e2 = P.Evidence(uri=evidenceURL)
-          uris[evidenceURL] = e2
+        e2 = []
+        try:
+            e2 = uris[evidenceURL]
+        except KeyError:
+            e2 = P.Evidence(uri=evidenceURL)
+            uris[evidenceURL] = e2
 
-      #grab the neuron object
-      n = NETWORK.aneuron(neuron_name)
-      neurons.add(n)
+        #grab the neuron object
+        n = NETWORK.aneuron(neuron_name)
+        neurons.append(n)
 
-      if relation == 'neurotransmitter':
-          # assign the data, grab the relation into r
-          r = n.neurotransmitter(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'innexin':
-          # assign the data, grab the relation into r
-          r = n.innexin(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'neuropeptide':
-          # assign the data, grab the relation into r
-          r = n.neuropeptide(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'receptor':
-          # assign the data, grab the relation into r
-          r = n.receptor(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
+        if relation == 'neurotransmitter':
+            # assign the data, grab the relation into r
+            r = n.neurotransmitter(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'innexin':
+            # assign the data, grab the relation into r
+            r = n.innexin(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'neuropeptide':
+            # assign the data, grab the relation into r
+            r = n.neuropeptide(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'receptor':
+            # assign the data, grab the relation into r
+            r = n.receptor(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
 
-      if relation == 'type':
-          types = []
-          if 'sensory' in (data.lower()):
-              types.append('sensory')
-          if 'interneuron' in (data.lower()):
-              types.append('interneuron')
-          if 'motor' in (data.lower()):
-              types.append('motor')
-          if 'unknown' in (data.lower()):
-              types.append('unknown')
-          # assign the data, grab the relation into r
-          for t in types:
-              r = n.type(t)
-              #assert the evidence on the relationship
-              e.asserts(r)
-              e2.asserts(r)
+        if relation == 'type':
+            types = []
+            if 'sensory' in (data.lower()):
+                types.append('sensory')
+            if 'interneuron' in (data.lower()):
+                types.append('interneuron')
+            if 'motor' in (data.lower()):
+                types.append('motor')
+            if 'unknown' in (data.lower()):
+                types.append('unknown')
+            # assign the data, grab the relation into r
+            for t in types:
+                r = n.type(t)
+                #assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      i = i + 1
+        i = i + 1
 
     for neur in neurons:
         n = NETWORK.neuron(neur)
