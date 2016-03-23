@@ -139,10 +139,11 @@ class DataIntegrityTest(unittest.TestCase):
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
-        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                            + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                            '?o ?p ?s} '  # for that type ?o, get its value ?v
-                            + 'LIMIT 10')
+        qres = self.g.query("""SELECT ?o ?p ?s WHERE {{
+                            ?o <http://openworm.org/entities/SimpleProperty/value> "motor".
+                            ?o ?p ?s # for that type ?o, get its value ?v
+                            }} LIMIT 10
+                            """)
         for row in qres.result:
             print(row)
 
