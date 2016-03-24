@@ -313,25 +313,22 @@ def upload_connections():
     print ("uploading statements about connections.  Buckle up; this will take a while!")
 
     # to normalize certian body wall muscle cell names
-    search_string_muscle = re.compile(r'\w+[BWM]+\w+')
-    replace_string_muscle = re.compile(r'[BWM]+')
+    SEARCH_STRING_MUSCLE = re.compile(r'\w+[BWM]+\w+')
+    REPLACE_STRING_MUSCLE = re.compile(r'[BWM]+')
 
     def normalize_muscle(name):
         # normalize names of Body Wall Muscles
         # if there is 'BWM' in the name, remove it
-        if re.match(search_string_muscle, name):
-            name = replace_string_muscle.sub('', name)
+        if re.match(SEARCH_STRING_MUSCLE, name):
+            name = REPLACE_STRING_MUSCLE.sub('', name)
         return name
 
-    # connectome specific definitions
-
-    # cells that are generically definited in source. These will not be added to PyOpenWorm
-    #unwanted = ['HYP', 'INTESTINE']
-
-    # muscle cells that are generically defined in source and need to be broken into pair of L and R before being added to PyOpenWorm
+    # muscle cells that are generically defined in source and need to be broken
+    # into pair of L and R before being added to PyOpenWorm
     to_expand_muscles = ['PM1D', 'PM2D', 'PM3D', 'PM4D', 'PM5D']
 
-    # muscle cells that have different names in connectome source and cell list. Their wormbase cell list names will be used in PyOpenWorm
+    # muscle cells that have different names in connectome source and cell list.
+    # Their wormbase cell list names will be used in PyOpenWorm
     changed_muscles = ['ANAL', 'INTR', 'INTL', 'SPH']
 
     def changed_muscle(x):
@@ -342,14 +339,17 @@ def upload_connections():
             'SPH': 'MU_SPH'
         }[x]
 
-    # cells that are neither neurons or muscles. These are marked as 'Other Cells' in the wormbase cell list but are still part of the new connectome. In future work these should be uploaded seperately to PyOpenWorm in a new upload function and should be referred from there instead of this list.
+    # cells that are neither neurons or muscles. These are marked as
+    # 'Other Cells' in the wormbase cell list but are still part of the new
+    # connectome. In future work these should be uploaded seperately to
+    # PyOpenWorm in a new upload function and should be referred from there
+    # instead of this list.
     other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
 
     # counters for terminal printing
-    neuron_connections = [0]
-    muscle_connections = [0]
-    other_connections = [0]
-    #unwanted_connections = 0
+    neuron_connections = 0
+    muscle_connections = 0
+    other_connections = 0
 
     try:
         w = WORM
@@ -428,15 +428,10 @@ def upload_connections():
 
                     if isinstance(source, P.Neuron) and isinstance(target, P.Neuron):
                         c.termination('neuron')
-                        neuron_connections[0] += 1
                     elif isinstance(source, P.Neuron) and isinstance(target, P.Muscle):
                         c.termination('muscle')
-                        muscle_connections[0] += 1
                     elif isinstance(source, P.Muscle) and isinstance(target, P.Neuron):
                         c.termination('muscle')
-                        muscle_connections[0] += 1
-                    else:
-                        other_connections[0] += 1
 
                     return c
 
@@ -445,13 +440,19 @@ def upload_connections():
 
                 for s in sources:
                     for t in targets:
-                        add_synapse(s, t)
+                        conn = add_synapse(s, t)
+                        kind = conn.termination()
+                        if kind == 'muscle':
+                            muscle_connections += 1
+                        elif kind == 'neuron':
+                            neuron_connections += 1
+                        else:
+                            other_connections += 1
 
         e.asserts(n)  # assert the whole connectome too
-        print('Total neuron to neuron connections added = %i' %neuron_connections[0])
-        print('Total neuron to muscle connections added = %i' %muscle_connections[0])
-        print('Total other connections added = %i' %other_connections[0])
-        #print('Total connections discarded = %i' %unwanted_connections)
+        print('Total neuron to neuron connections added = %i' %neuron_connections)
+        print('Total neuron to muscle connections added = %i' %muscle_connections)
+        print('Total other connections added = %i' %other_connections)
         print('uploaded connections')
 
     except Exception:
