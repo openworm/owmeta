@@ -16,10 +16,6 @@ class DataIntegrityTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         import csv
-        PyOpenWorm.connect(
-            conf=Configure(**{'rdf.store_conf': 'PyOpenWorm/worm.db',
-                              'rdf.source': 'ZODB'}))
-        PyOpenWorm.disconnect()
         # grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
@@ -32,9 +28,7 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        PyOpenWorm.connect(
-            conf=Configure(**{'rdf.store_conf': 'PyOpenWorm/worm.db',
-                              'rdf.source': 'ZODB'}))
+        PyOpenWorm.connect()
         self.g = PyOpenWorm.config("rdf.graph")
 
     def tearDown(self):
