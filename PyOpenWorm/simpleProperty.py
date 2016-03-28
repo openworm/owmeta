@@ -73,13 +73,29 @@ class RealSimpleProperty(object):
         return self.link
 
     def get(self):
-        v = Variable("var" + str(id(self)))
-        self._v.add(v)
-        if self not in v.owner_properties:
-            v.owner_properties.append(self)
-        results = GraphObjectQuerier(v, self.rdf)()
-        v.owner_properties.remove(self)
-        self._v.remove(v)
+        results = None
+        owner = self.owner
+        if owner.defined:
+            ident = owner.identifier()
+            results = set()
+
+            if (owner.po_cache is None or owner.po_cache.cache_index !=
+                    self.conf['rdf.graph.change_counter']):
+                owner.po_cache = POCache(
+                    self.conf['rdf.graph.change_counter'], frozenset(
+                        self.rdf.predicate_objects(ident)))
+
+            for pred, obj in owner.po_cache.cache:
+                if pred == self.link:
+                    results.add(obj)
+        else:
+            v = Variable("var" + str(id(self)))
+            self._v.add(v)
+            if self not in v.owner_properties:
+                v.owner_properties.append(self)
+            results = GraphObjectQuerier(v, self.rdf)()
+            v.owner_properties.remove(self)
+            self._v.remove(v)
         return results
 
     def unset(self, v):
@@ -94,6 +110,19 @@ class RealSimpleProperty(object):
 
     def one(self):
         return _next_or_none(self.get())
+
+
+class POCache(tuple):
+
+    """ The predicate-object cache object """
+
+    _map = dict(cache_index=0, cache=1)
+
+    def __new__(cls, cache_index, cache):
+        return super(POCache, cls).__new__(cls, (cache_index, cache))
+
+    def __getattr__(self, n):
+        return self[POCache._map[n]]
 
 
 class _ValueProperty(RealSimpleProperty):
@@ -142,6 +171,7 @@ class _DatatypeValueProperty (DatatypePropertyMixin, _ValueProperty):
 
 
 class ObjectProperty (_ObjectPropertyMixin, RealSimpleProperty):
+
     def get(self):
         r = super(ObjectProperty, self).get()
         return itertools.chain(self.defined_values, r)
@@ -259,6 +289,7 @@ class SimpleProperty(GraphObject, DataUser):
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
+
 def _get_or_set(self, *args, **kwargs):
     """ If arguments are given ``set`` method is called. Otherwise, the ``get``
     method is called. If the ``multiple`` member is set to ``True``, then a
@@ -279,11 +310,13 @@ def _get_or_set(self, *args, **kwargs):
         else:
             return _next_or_none(r)
 
+
 def _next_or_none(r):
     try:
         return next(iter(r))
     except StopIteration:
         return None
+
 
 def _property_to_string(self):
     assert hasattr(self, 'linkName')
@@ -291,6 +324,7 @@ def _property_to_string(self):
     s = str(self.linkName) + "=`" + \
         ";".join(str(s) for s in self.defined_values) + "'"
     return s
+
 
 class Rel(tuple):
 

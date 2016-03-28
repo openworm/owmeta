@@ -51,6 +51,8 @@ class DataObject(GraphObject, DataUser):
 
         self.properties = []
         self.owner_properties = []
+        self.po_cache = None
+        """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         if ident is not None:
             self._id = R.URIRef(ident)
@@ -66,6 +68,9 @@ class DataObject(GraphObject, DataUser):
         self._variable = R.Variable("V" + str(RND.random()))
         DataObject.attach_property_ex(self, RDFTypeProperty)
         self.rdf_type_property.set(self.rdf_type)
+
+    def _clear_po_cache(self):
+        self.po_cache = None
 
     def __repr__(self):
         return DataObject.__str__(self)
@@ -444,6 +449,7 @@ class PropertyDataObject(DataObject):
 
     Try not to confuse this with the Property class
     """
+
 
 class _Resolver(RDFTypeResolver):
     instance = None
