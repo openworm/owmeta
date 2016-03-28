@@ -16,6 +16,7 @@ import hashlib
 import csv
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
+from rdflib.store import TripleRemovedEvent, TripleAddedEvent
 from datetime import datetime as DT
 import datetime
 import transaction
@@ -283,8 +284,15 @@ class Data(Configure, Configureable):
         nm = NamespaceManager(self['rdf.graph'])
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
+        self['rdf.graph.change_counter'] = 0
 
+        dispatcher = self['rdf.graph'].store.dispatcher
+        dispatcher.subscribe(TripleAddedEvent, self.handle_graph_modification)
+        dispatcher.subscribe(TripleRemovedEvent, self.handle_graph_modification)
         nm.bind("", self['rdf.namespace'])
+
+    def handle_graph_modification(self, evt):
+        self['rdf.graph.change_counter'] += 1
 
     def closeDatabase(self):
         """ Close a the configured database """
