@@ -111,7 +111,12 @@ class DataObject(GraphObject, DataUser):
 
     def __eq__(self, other):
         return (isinstance(other, DataObject) and
+                self.defined and
+                other.defined and
                 (self.identifier() == other.identifier()))
+
+    def count(self):
+        return len(GraphObjectQuerier(self, self.rdf)())
 
     def load(self):
         for ident in GraphObjectQuerier(self, self.rdf)():
