@@ -371,31 +371,23 @@ class DataIntegrityTest(unittest.TestCase):
         This test verifies that the worm model has exactly 1111 neuron to muscle
         connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        count = 0
+        synapse = PyOpenWorm.Connection()
+        synapse.termination('muscle')
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            if synapse.termination() == 'muscle':
-                count += 1
-
-        self.assertEqual(1111, count)
+        self.assertEqual(1111, synapse.count())
 
     def test_correct_number_unique_neurons(self):
         """
         This test verifies that the worm model has exactly 300 unique neurons
         making connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        unique_neurons = set()    # set of unique neurons
+        synapse = PyOpenWorm.Connection()
+        pre = PyOpenWorm.Neuron()
+        synapse.pre_cell(pre)
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
-
-        # XXX: The synapses contain some cells that aren't neurons
-        for n in unique_neurons:
-            print(n)
-
-        self.assertEqual(300, len(unique_neurons))
+        self.assertEqual(300, pre.count())
 
     def test_unconnected_neurons(self):
         """
@@ -407,11 +399,12 @@ class DataIntegrityTest(unittest.TestCase):
         # That means it should be enough to check that the set {CANL, CANR} and
         # the set of neurons making connections are disjoint.
 
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        neuron = PyOpenWorm.Neuron()
+        synapse = PyOpenWorm.Connection()
+        synapse.pre_cell(neuron)
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
         connected_neurons = set()
         unconnected_neurons = {'CANL', 'CANR'}
-
-        for synapse in synapses:
-            connected_neurons.add(synapse.pre_cell())
-
+        for name in neuron.name.get():
+            connected_neurons.add(name)
         self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))
