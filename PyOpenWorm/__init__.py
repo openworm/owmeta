@@ -57,7 +57,7 @@ Classes
 """
 
 from __future__ import print_function
-__version__ = '0.5.3'
+__version__ = '0.6.0'
 __author__ = 'Stephen Larson'
 
 import traceback
