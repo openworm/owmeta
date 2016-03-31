@@ -68,7 +68,8 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-        'FuXi'
+        'FuXi',
+        'lazy_object_proxy==1.2.1'
     ],
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',

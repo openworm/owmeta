@@ -14,6 +14,7 @@ from yarom.propertyMixins import (ObjectPropertyMixin, DatatypePropertyMixin)
 from PyOpenWorm.data import DataUser
 import itertools
 import hashlib
+from lazy_object_proxy import Proxy
 
 L = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class RealSimpleProperty(object):
         else:
             self._v = _values()
             self._v.add(v)
-        return Rel(self.owner, self, v)
+        return RelationshipProxy(Rel(self.owner, self, v))
 
     @property
     def defined_values(self):
@@ -154,7 +155,7 @@ class _ObjectPropertyMixin(ObjectPropertyMixin):
 
     def set(self, v):
         from .dataObject import DataObject
-        if not isinstance(v, (SimpleProperty, DataObject, Variable, Rel)):
+        if not isinstance(v, (SimpleProperty, DataObject, Variable)):
             raise Exception(
                 "An ObjectProperty only accepts DataObject, SimpleProperty"
                 " or Variable instances. Got a " + str(type(v)) + " aka " +
@@ -325,6 +326,9 @@ def _property_to_string(self):
         ";".join(str(s) for s in self.defined_values) + "'"
     return s
 
+class RelationshipProxy(Proxy):
+    def __repr__(self):
+        return repr(self.__wrapped__)
 
 class Rel(tuple):
 
@@ -337,9 +341,12 @@ class Rel(tuple):
     def __getattr__(self, n):
         return self[Rel._map[n]]
 
+    def __call__(self):
+        return self.rel()
+
     def rel(self):
         from .yRelationship import Relationship
         return Relationship(
-            subject=self.s,
-            property=self.p.rdf_object,
-            object=self.o)
+            s=self.s.idl,
+            p=self.p.link,
+            o=self.o.idl)
