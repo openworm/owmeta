@@ -9,7 +9,8 @@ class Relationship(DataObject):
         For SimpleProperty objects, this acts like a RDF Reified triple.
         """
 
-    def __init__(self, s=None, p=None, o=None):
+    def __init__(self, s=None, p=None, o=None, **kwargs):
+        super(Relationship, self).__init__(**kwargs)
         Relationship.DatatypeProperty('subject', owner=self, multiple=False)
         Relationship.DatatypeProperty('property', owner=self, multiple=False)
         Relationship.DatatypeProperty('object', owner=self, multiple=False)
