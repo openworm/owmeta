@@ -350,21 +350,18 @@ class DataIntegrityTest(unittest.TestCase):
                 csv_tuple = (source, target, int(weight), syn_type)
                 csv_tuples.add(csv_tuple)
 
-        self.assertEquals(synapse_tuples, csv_tuples)
+        self.assertEqual(set(), csv_tuples - synapse_tuples)
 
     def test_number_neuron_to_neuron(self):
         """
         This test verifies that the worm model has exactly 5805 neuron to neuron
         connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        count = 0
+        synapse = PyOpenWorm.Connection()
+        synapse.termination('neuron')
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            if synapse.termination() == 'neuron':
-                count += 1
-
-        self.assertEqual(5805, count)
+        self.assertEqual(5805, synapse.count())
 
     def test_number_neuron_to_muscle(self):
         """
@@ -373,7 +370,7 @@ class DataIntegrityTest(unittest.TestCase):
         """
         synapse = PyOpenWorm.Connection()
         synapse.termination('muscle')
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
         self.assertEqual(1111, synapse.count())
 
