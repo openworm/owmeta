@@ -327,6 +327,9 @@ def upload_connections():
             'SPH': 'MU_SPH'
         }[x]
 
+    def expand_muscle(name):
+        return P.Muscle(name + 'L'), P.Muscle(name + 'R')
+
     # cells that are neither neurons or muscles. These are marked as
     # 'Other Cells' in the wormbase cell list but are still part of the new
     # connectome.
@@ -397,10 +400,7 @@ def upload_connections():
                     elif name in muscles:
                         res = P.Muscle(name)
                     elif name in to_expand_muscles:
-                        name_l = name + 'L'
-                        name_r = name + 'R'
-                        res = P.Muscle(name_l)
-                        res2 = P.Muscle(name_r)
+                        res, res2 = expand_muscle(name)
                     elif name in other_cells:
                         res = P.Cell(name)
 
