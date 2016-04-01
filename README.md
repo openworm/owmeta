@@ -144,11 +144,11 @@ Add some evidence::
 >>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-lineageName=`AB alaaapalr'
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal(u'AB alaaapalr'))
 >>> e.asserts(avdl)
-asserts=`AVDL'
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'))
 >>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
-asserts=...
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/DataObject/ad1bb78ba8307e126ff62a44d9999104e'))
 >>> e.save()
 
 ```
@@ -182,7 +182,7 @@ See what neurons express some neuropeptide::
 ```python
 >>> n = P.Neuron()
 >>> n.neuropeptide("INS-26")
-neuropeptide=`INS-26'
+Relationship(p=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/neuropeptide'), o=rdflib.term.Literal(u'INS-26'))
 
 >>> sorted(x.name() for x in n.load())
 [u'ASEL', u'ASER', u'ASIL', u'ASIR']

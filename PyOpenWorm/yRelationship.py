@@ -38,3 +38,15 @@ class Relationship(DataObject):
             data = tuple(x.defined_values[0].identifier().n3() for x in data)
             data = "".join(data)
             return self.make_identifier(data)
+
+    def __repr__(self):
+        s = "Relationship("
+        flip = False
+        for x in ('subject', 'property', 'object'):
+            if getattr(self, x).has_defined_value():
+                if flip:
+                    s += ", "
+                s += x[0] + "=" + repr(getattr(self, x).defined_values[0].idl)
+                flip = True
+        s += ")"
+        return s

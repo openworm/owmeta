@@ -347,6 +347,6 @@ class Rel(tuple):
     def rel(self):
         from .yRelationship import Relationship
         return Relationship(
-            s=self.s.idl,
+            s=(self.s.idl if self.s.defined else None),
             p=self.p.link,
-            o=self.o.idl)
+            o=(self.o.idl if self.o.defined else None))
