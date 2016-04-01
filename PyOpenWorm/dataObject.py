@@ -340,12 +340,12 @@ def oid(identifier_or_rdf_type, rdf_type=None):
         rdf_type = identifier_or_rdf_type
         identifier = None
 
-    L.debug("oid making a {} with ident {}".format(rdf_type, identifier))
     c = None
     try:
         c = RDFTypeTable[rdf_type]
     except KeyError:
         c = DataObject
+    L.debug("oid: making a {} with ident {}".format(c, identifier))
 
     # if its our class name, then make our own object
     # if there's a part after that, that's the property name
