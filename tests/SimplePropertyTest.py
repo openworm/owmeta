@@ -110,3 +110,51 @@ class SimplePropertyTest(_DataTest):
         sp = DataObject.attach_property(do, T)
         self.assertEqual(len(list(sp.triples())), 0)
         self.assertEqual(len(list(sp.triples(query=True))), 0)
+
+
+class POCacheTest(_DataTest):
+
+    def setUp(self):
+        super(POCacheTest, self).setUp()
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots('h')
+        o.save()
+
+    def test_cache_refresh_after_triple_add(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        o.rdf.add((R.URIRef('http://example.org/a'),
+                   R.URIRef('http://bluhbluh.com'),
+                   R.URIRef('http://bluhah.com')))
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)
+
+    def test_cache_refresh_after_triple_remove(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        # XXX: Note that it doesn't matter if the triple was
+        # actually in the graph
+        o.rdf.remove((R.URIRef('/not/in'),
+                      R.URIRef('/the'),
+                      R.URIRef('/graph')))
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)
+
+    def test_cache_refresh_clear(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        # XXX: Note that it doesn't matter if the triple was
+        # actually in the graph
+        o.clear_po_cache()
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)

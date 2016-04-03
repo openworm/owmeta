@@ -69,7 +69,14 @@ class DataObject(GraphObject, DataUser):
         DataObject.attach_property_ex(self, RDFTypeProperty)
         self.rdf_type_property.set(self.rdf_type)
 
-    def _clear_po_cache(self):
+    def clear_po_cache(self):
+        """ Clear the property-object cache for this object.
+
+        This cache is maintained by and shared by the properties of this
+        object. It isn't necessary to clear this cache manually unless you
+        modify the RDFLib graph indirectly (e.g., through the store) at
+        runtime.
+        """
         self.po_cache = None
 
     def __repr__(self):
@@ -161,15 +168,15 @@ class DataObject(GraphObject, DataUser):
     # the triples might be stored in memory.
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
-        """ Create a SimpleProperty that has a simple type (string,number,etc)
-        as its value
+        """ Attach a, possibly new, property to this class that has a simple
+        type (string,number,etc) for its values
 
         Parameters
         ----------
         linkName : string
-            The name of this Property.
+            The name of this property.
         owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
+            The name of this property.
         """
         return cls._create_property(
             *args,
@@ -178,14 +185,15 @@ class DataObject(GraphObject, DataUser):
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
-        """ Create a SimpleProperty that has a complex DataObject as its value
+        """ Attach a, possibly new, property to this class that has a complex
+        DataObject for its values
 
         Parameters
         ----------
         linkName : string
-            The name of this Property.
+            The name of this property.
         owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
+            The name of this property.
         value_type : type
             The type of DataObject for values of this property
         """
