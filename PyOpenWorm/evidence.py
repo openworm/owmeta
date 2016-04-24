@@ -1,5 +1,6 @@
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.dataObject import DataObject
+import re
 
 
 class EvidenceError(Exception):
@@ -28,6 +29,11 @@ def _url_request(url, headers={}):
     try:
         r = U.Request(url, headers=headers)
         s = U.urlopen(r, timeout=1)
+        content_type = dict(s.info())['content-type']
+        md = re.search("charset *= *([^ ]+)", content_type)
+        if md:
+            s.charset = md.group(1)
+
         return s
     except U.HTTPError:
         return ""
@@ -39,7 +45,11 @@ def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        return json.load(_url_request(url, headers))
+        data = _url_request(url, headers)
+        if hasattr(data, 'charset'):
+            return json.load(data, encoding=data.charset)
+        else:
+            return json.load(data)
     except BaseException:
         return {}
 
@@ -426,7 +436,13 @@ class Evidence(DataObject):
             # XXX: There's more data in esummary.fcgi?, but I don't know how to
             # parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
-            return ET.parse(_url_request(url))
+            s = _url_request(url)
+            if hasattr(s, 'charset'):
+                parser = ET.XMLParser(encoding=s.charset)
+            else:
+                parser = None
+
+            return ET.parse(s, parser)
 
         pmid = self._fields['pmid']
         if pmid[:4] == 'http':
