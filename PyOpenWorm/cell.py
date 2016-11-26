@@ -145,8 +145,8 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
-    def __eq__(self,other):
-        return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
+    def __eq__(self, other):
+        return DataObject.__eq__(self, other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
 
     def blast(self):
         """
@@ -205,7 +205,7 @@ class Cell(DataObject):
             return str(self.name.defined_values[0])
             #return self.__class__.__name__ + "(name="+str(self.name.defined_values[0])+")"
         else:
-            return super(Cell,self).__str__()
+            return super(Cell, self).__str__()
 
     @property
     def defined(self):
@@ -214,12 +214,11 @@ class Cell(DataObject):
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific
         # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
+        # attribute is _already_ set, then we can get the identifier from it
+        # and return that. Otherwise, there's no telling from here what our
+        # identifier should be, so the variable identifier (from DataObject.
+        # identifier()) must be returned
         if super(Cell, self).defined:
             return super(Cell, self).identifier()
         else:
             return self.make_identifier_direct(str(self.name.defined_values[0].identifier()))
-

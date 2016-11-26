@@ -12,9 +12,6 @@ class SimplePropertyTest(_DataTest):
 
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
-        """
-        Test that two SimpleProperty objects with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
@@ -22,9 +19,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_same_value_same_id_not_empty(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
@@ -34,9 +28,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_same_value_same_id_not_empty_object_property(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         dz = DataObject(ident=R.URIRef("http://example.org/vip"))
@@ -47,23 +38,16 @@ class SimplePropertyTest(_DataTest):
         do1.boots(dz1)
         self.assertEqual(c.identifier(), c1.identifier())
 
-    def test_diff_value_diff_id_not_equal(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
+    def test_diff_value_diff_id_equal(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('join')
         do1.boots('partition')
-        self.assertNotEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier(), c1.identifier())
 
     def test_diff_prop_same_name_same_object_same_value_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier
-        """
-        # why would you ever do this?
         do = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do)
@@ -71,23 +55,15 @@ class SimplePropertyTest(_DataTest):
         c1('join')
         self.assertEqual(c.identifier(), c1.identifier())
 
-    def test_diff_prop_same_name_same_object_diff_value_diff_id(self):
-        """
-        Test that two SimpleProperty with the same name, but different values
-        have distinct identifiers
-        """
-        # why would you ever do this?
+    def test_diff_prop_same_name_same_object_diff_value_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do)
         c('partition')
         c1('join')
-        self.assertNotEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier(), c1.identifier())
 
     def test_diff_value_insert_order_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
 
@@ -102,9 +78,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_object_property_diff_value_insert_order_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
 

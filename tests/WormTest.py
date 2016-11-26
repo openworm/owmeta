@@ -2,13 +2,12 @@ import sys
 import rdflib as R
 
 sys.path.insert(0,".")
-#from PyOpenWorm import *
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.muscle import Muscle
 
-
 from DataTestTemplate import _DataTest
+
 
 class WormTest(_DataTest):
     """Test for Worm."""

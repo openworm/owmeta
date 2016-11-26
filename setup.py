@@ -62,18 +62,20 @@ setup(
         'transaction==1.4.4',
         'wsgiref==0.1.2',
         'xlrd',
-        'yarom==0.7.2',
+        'yarom',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-        'FuXi'
+        'FuXi',
+        'lazy_object_proxy==1.2.1'
     ],
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
+        'git://github.com/mwatts15/YAROM@dev#egg=yarom',
         'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
     ],
     version = '0.5.3',

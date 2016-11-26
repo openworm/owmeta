@@ -12,7 +12,9 @@ from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
 from yarom.propertyMixins import (ObjectPropertyMixin, DatatypePropertyMixin)
 from PyOpenWorm.data import DataUser
+import itertools
 import hashlib
+from lazy_object_proxy import Proxy
 
 L = logging.getLogger(__name__)
 
@@ -54,6 +56,7 @@ class RealSimpleProperty(object):
         else:
             self._v = _values()
             self._v.add(v)
+        return RelationshipProxy(Rel(self.owner, self, v))
 
     @property
     def defined_values(self):
@@ -67,16 +70,60 @@ class RealSimpleProperty(object):
     def rdf(self):
         return self.conf['rdf.graph']
 
+    def identifier(self):
+        return self.link
+
     def get(self):
-        v = Variable("var" + str(id(self)))
-        self.set(v)
-        results = GraphObjectQuerier(v, self.rdf)()
-        self.unset(v)
+        results = None
+        owner = self.owner
+        if owner.defined:
+            ident = owner.identifier()
+            results = set()
+
+            if (owner.po_cache is None or owner.po_cache.cache_index !=
+                    self.conf['rdf.graph.change_counter']):
+                owner.po_cache = POCache(
+                    self.conf['rdf.graph.change_counter'], frozenset(
+                        self.rdf.predicate_objects(ident)))
+
+            for pred, obj in owner.po_cache.cache:
+                if pred == self.link:
+                    results.add(obj)
+        else:
+            v = Variable("var" + str(id(self)))
+            self._v.add(v)
+            if self not in v.owner_properties:
+                v.owner_properties.append(self)
+            results = GraphObjectQuerier(v, self.rdf)()
+            v.owner_properties.remove(self)
+            self._v.remove(v)
         return results
 
     def unset(self, v):
         self._v.remove(v)
         v.owner_properties.remove(self)
+
+    def __call__(self, *args, **kwargs):
+        return _get_or_set(self, *args, **kwargs)
+
+    def __repr__(self):
+        return _property_to_string(self)
+
+    def one(self):
+        return _next_or_none(self.get())
+
+
+class POCache(tuple):
+
+    """ The predicate-object cache object """
+
+    _map = dict(cache_index=0, cache=1)
+
+    def __new__(cls, cache_index, cache):
+        return super(POCache, cls).__new__(cls, (cache_index, cache))
+
+    def __getattr__(self, n):
+        return self[POCache._map[n]]
 
 
 class _ValueProperty(RealSimpleProperty):
@@ -111,12 +158,12 @@ class _ObjectPropertyMixin(ObjectPropertyMixin):
         if not isinstance(v, (SimpleProperty, DataObject, Variable)):
             raise Exception(
                 "An ObjectProperty only accepts DataObject, SimpleProperty"
-                "or Variable instances. Got a " + str(type(v)) + " aka " +
+                " or Variable instances. Got a " + str(type(v)) + " aka " +
                 str(type(v).__bases__))
         return super(ObjectPropertyMixin, self).set(v)
 
 
-class _ObjectVaulueProperty (_ObjectPropertyMixin, _ValueProperty):
+class _ObjectValueProperty (_ObjectPropertyMixin, _ValueProperty):
     pass
 
 
@@ -125,11 +172,20 @@ class _DatatypeValueProperty (DatatypePropertyMixin, _ValueProperty):
 
 
 class ObjectProperty (_ObjectPropertyMixin, RealSimpleProperty):
-    pass
+
+    def get(self):
+        r = super(ObjectProperty, self).get()
+        return itertools.chain(self.defined_values, r)
 
 
 class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
-    pass
+
+    def get(self):
+        r = super(DatatypeProperty, self).get()
+        s = set()
+        for x in self.defined_values:
+            s.add(self._resolver.deserializer(x.idl))
+        return itertools.chain(r, s)
 
 
 class SimpleProperty(GraphObject, DataUser):
@@ -142,7 +198,7 @@ class SimpleProperty(GraphObject, DataUser):
         self._id = None
         self._variable = R.Variable("V" + str(RND.random()))
         if self.property_type == "ObjectProperty":
-            self._pp = _ObjectVaulueProperty(
+            self._pp = _ObjectValueProperty(
                 conf=self.conf,
                 owner_property=self,
                 resolver=resolver)
@@ -157,8 +213,7 @@ class SimpleProperty(GraphObject, DataUser):
         self._defined_values_string_cache = None
 
     def __repr__(self):
-        return str(self.linkName) + "=`" \
-            + ";".join(str(s) for s in self.defined_values) + "'"
+        return _property_to_string(self)
 
     def __str__(self):
         return str(self.__class__.__name__) + "(" + str(self.idl.n3()) + ")"
@@ -174,8 +229,9 @@ class SimpleProperty(GraphObject, DataUser):
                         .hexdigest()])
 
     def set(self, v):
-        self._pp.set(v)
         self._defined_values_cache = None
+        self._defined_values_string_cache = None
+        return self._pp.set(v)
 
     def unset(self, v):
         self._pp.unset(v)
@@ -223,34 +279,74 @@ class SimpleProperty(GraphObject, DataUser):
         return self._pp.has_defined_value()
 
     def __call__(self, *args, **kwargs):
-        """ If arguments are passed to the ``Property``, its ``set`` method
-        is called. Otherwise, the ``get`` method is called. If the ``multiple``
-        member for the ``Property`` is set to ``True``, then a Python set containing
-        the associated values is returned. Otherwise, a single bare value is returned.
-        """
-
-        if len(args) > 0 or len(kwargs) > 0:
-            self.set(*args, **kwargs)
-            return self
-        else:
-            r = self.get(*args, **kwargs)
-            if self.multiple:
-                return set(r)
-            else:
-                try:
-                    return next(iter(r))
-                except StopIteration:
-                    return None
+        return _get_or_set(self, *args, **kwargs)
 
     def one(self):
-        l = list(self.get())
-        if len(l) > 0:
-            return l[0]
-        else:
-            return None
+        return _next_or_none(self.get())
 
     @classmethod
     def register(cls):
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
+
+
+def _get_or_set(self, *args, **kwargs):
+    """ If arguments are given ``set`` method is called. Otherwise, the ``get``
+    method is called. If the ``multiple`` member is set to ``True``, then a
+    Python set containing the associated values is returned. Otherwise, a
+    single bare value is returned.
+    """
+    # XXX: checking this in advance because I'm paranoid, I guess
+    assert hasattr(self, 'set') and hasattr(self.set, '__call__')
+    assert hasattr(self, 'get') and hasattr(self.get, '__call__')
+    assert hasattr(self, 'multiple')
+
+    if len(args) > 0 or len(kwargs) > 0:
+        return self.set(*args, **kwargs)
+    else:
+        r = self.get(*args, **kwargs)
+        if self.multiple:
+            return set(r)
+        else:
+            return _next_or_none(r)
+
+
+def _next_or_none(r):
+    try:
+        return next(iter(r))
+    except StopIteration:
+        return None
+
+
+def _property_to_string(self):
+    assert hasattr(self, 'linkName')
+    assert hasattr(self, 'defined_values')
+    s = str(self.linkName) + "=`" + \
+        ";".join(str(s) for s in self.defined_values) + "'"
+    return s
+
+class RelationshipProxy(Proxy):
+    def __repr__(self):
+        return repr(self.__wrapped__)
+
+class Rel(tuple):
+
+    """ A container for a relationship-assignment """
+    _map = dict(s=0, p=1, o=2)
+
+    def __new__(cls, s, p, o):
+        return super(Rel, cls).__new__(cls, (s, p, o))
+
+    def __getattr__(self, n):
+        return self[Rel._map[n]]
+
+    def __call__(self):
+        return self.rel()
+
+    def rel(self):
+        from .yRelationship import Relationship
+        return Relationship(
+            s=self.s.idl,
+            p=self.p.link,
+            o=self.o.idl)

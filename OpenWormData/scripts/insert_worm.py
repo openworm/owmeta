@@ -1,12 +1,10 @@
 from __future__ import print_function
 import PyOpenWorm as P
+from PyOpenWorm.utils import normalize_cell_name
 import traceback
 import csv
-import sqlite3
 import re
 
-import xlrd
-import csv
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
@@ -28,19 +26,6 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-# to normalize certain neuron and muscle names
-search_string = re.compile(r'\w+[0]+[1-9]+')
-replace_string = re.compile(r'[0]+')
-
-def normalize(name):
-    # normalize neuron and muscle names to match those used at other points
-    # see #137 for elaboration
-    # if there are zeroes in the middle of a name, remove them
-    if re.match(search_string, name):
-        name = replace_string.sub('', name)
-    return name
-
-
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
@@ -55,7 +40,7 @@ def upload_muscles():
                     continue
 
                 if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
-                    muscle_name = normalize(line[0]).upper()
+                    muscle_name = normalize_cell_name(line[0]).upper()
                     m = P.Muscle(name=muscle_name)
                     w.muscle(m)
             ev.asserts(w)
@@ -159,7 +144,7 @@ def upload_neurons():
                     continue
 
                 if line[5] == '1':  # neurons marked in this column
-                    neuron_name = normalize(line[0]).upper()
+                    neuron_name = normalize_cell_name(line[0]).upper()
                     n.neuron(P.Neuron(name=neuron_name))
                     i = i + 1
 
@@ -228,80 +213,80 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
 
     i = 0
 
-    neurons = set()
+    neurons = list()
     uris = dict()
 
     for row in reader:
-      neuron_name = row[0]
-      relation = row[1].lower()
-      data = row[2]
-      evidence = row[3]
-      evidenceURL = row[4]
+        neuron_name = row[0]
+        relation = row[1].lower()
+        data = row[2]
+        evidence = row[3]
+        evidenceURL = row[4]
 
-      #prepare evidence
-      e = P.Evidence()
+        #prepare evidence
+        e = P.Evidence()
 
-      #pick correct evidence given the row
-      if 'altun' in evidence.lower():
-          e = altun_ev
+        #pick correct evidence given the row
+        if 'altun' in evidence.lower():
+            e = altun_ev
 
-      elif 'wormatlas' in evidence.lower():
-          e = wormatlas_ev
+        elif 'wormatlas' in evidence.lower():
+            e = wormatlas_ev
 
-      e2 = []
-      try:
-          e2 = uris[evidenceURL]
-      except KeyError:
-          e2 = P.Evidence(uri=evidenceURL)
-          uris[evidenceURL] = e2
+        e2 = []
+        try:
+            e2 = uris[evidenceURL]
+        except KeyError:
+            e2 = P.Evidence(uri=evidenceURL)
+            uris[evidenceURL] = e2
 
-      #grab the neuron object
-      n = NETWORK.aneuron(neuron_name)
-      neurons.add(n)
+        #grab the neuron object
+        n = NETWORK.aneuron(neuron_name)
+        neurons.append(n)
 
-      if relation == 'neurotransmitter':
-          # assign the data, grab the relation into r
-          r = n.neurotransmitter(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'innexin':
-          # assign the data, grab the relation into r
-          r = n.innexin(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'neuropeptide':
-          # assign the data, grab the relation into r
-          r = n.neuropeptide(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'receptor':
-          # assign the data, grab the relation into r
-          r = n.receptor(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
+        if relation == 'neurotransmitter':
+            # assign the data, grab the relation into r
+            r = n.neurotransmitter(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'innexin':
+            # assign the data, grab the relation into r
+            r = n.innexin(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'neuropeptide':
+            # assign the data, grab the relation into r
+            r = n.neuropeptide(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
+        elif relation == 'receptor':
+            # assign the data, grab the relation into r
+            r = n.receptor(data)
+            #assert the evidence on the relationship
+            e.asserts(r)
+            e2.asserts(r)
 
-      if relation == 'type':
-          types = []
-          if 'sensory' in (data.lower()):
-              types.append('sensory')
-          if 'interneuron' in (data.lower()):
-              types.append('interneuron')
-          if 'motor' in (data.lower()):
-              types.append('motor')
-          if 'unknown' in (data.lower()):
-              types.append('unknown')
-          # assign the data, grab the relation into r
-          for t in types:
-              r = n.type(t)
-              #assert the evidence on the relationship
-              e.asserts(r)
-              e2.asserts(r)
+        if relation == 'type':
+            types = []
+            if 'sensory' in (data.lower()):
+                types.append('sensory')
+            if 'interneuron' in (data.lower()):
+                types.append('interneuron')
+            if 'motor' in (data.lower()):
+                types.append('motor')
+            if 'unknown' in (data.lower()):
+                types.append('unknown')
+            # assign the data, grab the relation into r
+            for t in types:
+                r = n.type(t)
+                #assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      i = i + 1
+        i = i + 1
 
     for neur in neurons:
         n = NETWORK.neuron(neur)
@@ -342,7 +327,16 @@ def upload_connections():
             'SPH': 'MU_SPH'
         }[x]
 
-    # cells that are neither neurons or muscles. These are marked as 'Other Cells' in the wormbase cell list but are still part of the new connectome. In future work these should be uploaded seperately to PyOpenWorm in a new upload function and should be referred from there instead of this list.
+    def expand_muscle(name):
+        return P.Muscle(name + 'L'), P.Muscle(name + 'R')
+
+    # cells that are neither neurons or muscles. These are marked as
+    # 'Other Cells' in the wormbase cell list but are still part of the new
+    # connectome.
+    #
+    # TODO: In future work these should be uploaded seperately to
+    # PyOpenWorm in a new upload function and should be referred from there
+    # instead of this list.
     other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
 
     # counters for terminal printing
@@ -380,8 +374,8 @@ def upload_connections():
                 elif syn_type == 'chemical':
                     syn_type = 'send'
 
-                source = normalize(source).upper()
-                target = normalize(target).upper()
+                source = normalize_cell_name(source).upper()
+                target = normalize_cell_name(target).upper()
 
                 weight = int(weight)
 
@@ -406,10 +400,7 @@ def upload_connections():
                     elif name in muscles:
                         res = P.Muscle(name)
                     elif name in to_expand_muscles:
-                        name_l = name + 'L'
-                        name_r = name + 'R'
-                        res = P.Muscle(name_l)
-                        res2 = P.Muscle(name_r)
+                        res, res2 = expand_muscle(name)
                     elif name in other_cells:
                         res = P.Cell(name)
 

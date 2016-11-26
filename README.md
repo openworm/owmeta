@@ -124,7 +124,7 @@ Returns the list of all neurons::
 #NOTE: This is a VERY slow operation right now
 >>> len(set(net.neuron_names()))
 302
->>> sorted(list(net.neuron_names())) # doctest:+ELLIPSIS
+>>> sorted(net.neuron_names()) # doctest:+ELLIPSIS
 [u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```
@@ -147,7 +147,7 @@ Add some evidence::
 lineageName=`AB alaaapalr'
 >>> e.asserts(avdl)
 asserts=`AVDL'
->>> e.asserts(avdl.lineageName) # doctest:+ELLIPSIS
+>>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
 asserts=...
 >>> e.save()
 
@@ -163,7 +163,7 @@ See what some evidence stated::
 True
 
 # is the lineageName of the neuron asserted?
->>> avdl.lineageName in list(e0.asserts())
+>>> avdl.lineageName("AB alaaapalr") in list(e0.asserts())
 True
 
 ```
@@ -184,9 +184,8 @@ See what neurons express some neuropeptide::
 >>> n.neuropeptide("INS-26")
 neuropeptide=`INS-26'
 
->>> s = set(x.name() for x in n.load())
->>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
-True
+>>> sorted(x.name() for x in n.load())
+[u'ASEL', u'ASER', u'ASIL', u'ASIR']
 
 ```
 
