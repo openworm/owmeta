@@ -34,6 +34,10 @@ inferred information are distinguished through the use of explicit Evidence
 references.
 """
 
+
+for line in open('PyOpenWorm/__init__.py'):
+    if line.startswith("__version__"):
+        version = line.split("=")[1].strip()[1:-1]
 setup(
     name = 'PyOpenWorm',
     cmdclass = {'install': install},
@@ -78,7 +82,7 @@ setup(
         'git://github.com/mwatts15/YAROM@dev#egg=yarom',
         'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
     ],
-    version = '0.5.3',
+    version = version,
     packages = ['PyOpenWorm'],
     package_data = {
         'PyOpenWorm': ['default.conf']

@@ -253,7 +253,7 @@ class SimpleProperty(GraphObject, DataUser):
     def _defined_values_string(self):
         if self._defined_values_string_cache is None:
             self._defined_values_string_cache = "".join(
-                x.identifier().n3() for x in self.defined_values)
+                x.identifier().n3().encode('UTF-8') for x in self.defined_values)
         return self._defined_values_string_cache
 
     @property
