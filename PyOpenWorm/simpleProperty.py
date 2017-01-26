@@ -48,14 +48,11 @@ class RealSimpleProperty(object):
         if not hasattr(v, "idl"):
             v = PropertyValue(v)
 
-        if self not in v.owner_properties:
-            v.owner_properties.append(self)
-
-        if self.multiple:
-            self._v.add(v)
-        else:
+        if not self.multiple:
             self._v = _values()
-            self._v.add(v)
+
+        self._insert_value(v)
+
         return RelationshipProxy(Rel(self.owner, self, v))
 
     @property
@@ -77,31 +74,39 @@ class RealSimpleProperty(object):
         results = None
         owner = self.owner
         if owner.defined:
-            ident = owner.identifier()
+            self._ensure_fresh_po_cache()
             results = set()
-
-            if (owner.po_cache is None or owner.po_cache.cache_index !=
-                    self.conf['rdf.graph.change_counter']):
-                owner.po_cache = POCache(
-                    self.conf['rdf.graph.change_counter'], frozenset(
-                        self.rdf.predicate_objects(ident)))
-
             for pred, obj in owner.po_cache.cache:
                 if pred == self.link:
                     results.add(obj)
         else:
             v = Variable("var" + str(id(self)))
-            self._v.add(v)
-            if self not in v.owner_properties:
-                v.owner_properties.append(self)
+            self._insert_value(v)
             results = GraphObjectQuerier(v, self.rdf)()
-            v.owner_properties.remove(self)
-            self._v.remove(v)
+            self._remove_value(v)
         return results
 
-    def unset(self, v):
-        self._v.remove(v)
+    def _insert_value(self, v):
+        self._v.add(v)
+        if self not in v.owner_properties:
+            v.owner_properties.append(self)
+
+    def _remove_value(self, v):
+        assert self in v.owner_properties
         v.owner_properties.remove(self)
+        self._v.remove(v)
+
+    def _ensure_fresh_po_cache(self):
+        owner = self.owner
+        ident = owner.identifier()
+        if (owner.po_cache is None or owner.po_cache.cache_index !=
+                self.conf['rdf.graph.change_counter']):
+            owner.po_cache = POCache(
+                self.conf['rdf.graph.change_counter'], frozenset(
+                    self.rdf.predicate_objects(ident)))
+
+    def unset(self, v):
+        self._remove_value(v)
 
     def __call__(self, *args, **kwargs):
         return _get_or_set(self, *args, **kwargs)
