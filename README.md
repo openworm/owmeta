@@ -148,7 +148,7 @@ Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'), 
 >>> e.asserts(avdl)
 Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'))
 >>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
-Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/DataObject/ad1bb78ba8307e126ff62a44d9999104e'))
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
 >>> e.save()
 
 ```
