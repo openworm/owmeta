@@ -350,7 +350,7 @@ class Rel(tuple):
         return self.rel()
 
     def rel(self):
-        from .yRelationship import Relationship
+        from .relationship import Relationship
         return Relationship(
             s=(self.s.idl if self.s.defined else None),
             p=self.p.link,
