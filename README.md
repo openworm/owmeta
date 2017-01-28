@@ -124,7 +124,7 @@ Returns the list of all neurons::
 #NOTE: This is a VERY slow operation right now
 >>> len(set(net.neuron_names()))
 302
->>> sorted(list(net.neuron_names())) # doctest:+ELLIPSIS
+>>> sorted(net.neuron_names()) # doctest:+ELLIPSIS
 [u'ADAL', u'ADAR', ... u'VD8', u'VD9']
 
 ```
@@ -144,11 +144,11 @@ Add some evidence::
 >>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-lineageName=`AB alaaapalr'
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal(u'AB alaaapalr'))
 >>> e.asserts(avdl)
-asserts=`AVDL'
->>> e.asserts(avdl.lineageName) # doctest:+ELLIPSIS
-asserts=...
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'))
+>>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
+Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
 >>> e.save()
 
 ```
@@ -163,7 +163,7 @@ See what some evidence stated::
 True
 
 # is the lineageName of the neuron asserted?
->>> avdl.lineageName in list(e0.asserts())
+>>> avdl.lineageName("AB alaaapalr") in list(e0.asserts())
 True
 
 ```
@@ -182,11 +182,10 @@ See what neurons express some neuropeptide::
 ```python
 >>> n = P.Neuron()
 >>> n.neuropeptide("INS-26")
-neuropeptide=`INS-26'
+Relationship(p=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/neuropeptide'), o=rdflib.term.Literal(u'INS-26'))
 
->>> s = set(x.name() for x in n.load())
->>> s == set(['ASEL', 'ASER', 'ASIL', 'ASIR'])
-True
+>>> sorted(x.name() for x in n.load())
+[u'ASEL', u'ASER', u'ASIL', u'ASIR']
 
 ```
 

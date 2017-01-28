@@ -73,6 +73,19 @@ class NeuronTest(_DataTest):
         n.save()
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 
+    @unittest.expectedFailure
+    def test_neighbor_count(self):
+        n = self.neur('AVAL')
+        n.neighbor(self.neur('PVCL'), syntype='send')
+        n.save()
+        self.assertEqual(1, self.neur('AVAL').neighbor.count())
+
+    def test_connection_count(self):
+        n = self.neur('AVAL')
+        n.connection(Connection(n, self.neur('PVCL'), syntype='send'))
+        n.save()
+        self.assertEqual(1, self.neur('AVAL').connection.count())
+
     def test_init_from_lineage_name(self):
         c = Neuron(lineageName="AB plapaaaap",name="ADAL")
         c.save()

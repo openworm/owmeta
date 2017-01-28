@@ -284,7 +284,28 @@ class Data(Configure, Configureable):
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
 
+        # A version number for the graph should update for all changes to the graph
+        self['rdf.graph.change_counter'] = 0
+
+        self['rdf.graph']._add = self['rdf.graph'].add
+        self['rdf.graph']._remove = self['rdf.graph'].remove
+        self['rdf.graph'].add = self._my_graph_add
+        self['rdf.graph'].remove = self._my_graph_remove
         nm.bind("", self['rdf.namespace'])
+
+    def _my_graph_add(self, triple):
+        self['rdf.graph']._add(triple)
+
+        # It's important that this happens _after_ the update otherwise anyone
+        # checking could think they have the lastest version when they don't
+        self['rdf.graph.change_counter'] += 1
+
+    def _my_graph_remove(self, triple_or_quad):
+        self['rdf.graph']._remove(triple_or_quad)
+
+        # It's important that this happens _after_ the update otherwise anyone
+        # checking could think they have the lastest version when they don't
+        self['rdf.graph.change_counter'] += 1
 
     def closeDatabase(self):
         """ Close a the configured database """
@@ -351,7 +372,6 @@ class Data(Configure, Configureable):
             g[row[0]][row[1]]['synapse'] = row[2]
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
         return g
-
 
 def modification_date(filename):
     t = os.path.getmtime(filename)

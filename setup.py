@@ -66,13 +66,14 @@ setup(
         'transaction==1.4.4',
         'wsgiref==0.1.2',
         'xlrd',
-        'yarom==0.7.2',
+        'yarom==0.8.2',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-        'FuXi'
+        'FuXi',
+        'lazy-object-proxy==1.2.1'
     ],
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
