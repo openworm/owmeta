@@ -52,7 +52,7 @@ class Worm(DataObject):
             value_type=Muscle,
             multiple=True)
         Worm.ObjectProperty("cell", owner=self, value_type=Cell)
-        self.attach_property_ex(self, NeuronNetworkProperty)
+        self.attach_property(self, NeuronNetworkProperty)
 
         if scientific_name:
             self.scientific_name(scientific_name)
