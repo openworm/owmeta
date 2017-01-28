@@ -9,7 +9,6 @@ from yarom.rdfTypeResolver import RDFTypeResolver
 from .configure import BadConf
 from .simpleProperty import ObjectProperty, DatatypeProperty
 from .data import DataUser
-from .fakeProperty import FakeProperty
 
 __all__ = [
     "DataObject",
@@ -66,7 +65,7 @@ class DataObject(GraphObject, DataUser):
             self.setKey(key)
 
         self._variable = R.Variable("V" + str(RND.random()))
-        DataObject.attach_property_ex(self, RDFTypeProperty)
+        DataObject.attach_property(self, RDFTypeProperty)
         self.rdf_type_property.set(self.rdf_type)
 
     def clear_po_cache(self):
@@ -245,7 +244,7 @@ class DataObject(GraphObject, DataUser):
                           rdf_object=PropertyDataObject(ident=link),
                           multiple=multiple))
             PropertyTypes[property_class_name] = c
-        return cls.attach_property_ex(owner, c)
+        return cls.attach_property(owner, c)
 
     @classmethod
     def register(cls):
@@ -268,23 +267,9 @@ class DataObject(GraphObject, DataUser):
         cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
     @classmethod
-    def attach_property_ex(cls, owner, c):
+    def attach_property(cls, owner, c):
         res = c(owner=owner, conf=owner.conf, resolver=_Resolver.get_instance())
         owner.properties.append(res)
-        setattr(owner, c.linkName, res)
-
-        return res
-
-    @classmethod
-    def attach_property(self, owner, c):
-        # The fake property has the object as owner and the property as value
-        res = c(owner=owner, resolver=_Resolver.get_instance())
-        # XXX: Hack for graph object traversal of properties while still
-        #      allowing to refer to the PyOpenWorm properties.
-
-        fp = FakeProperty(res)
-        # ... and the properties of the owner only list the FakeProperty
-        owner.properties.append(fp)
         setattr(owner, c.linkName, res)
 
         return res
