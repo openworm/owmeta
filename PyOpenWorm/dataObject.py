@@ -79,7 +79,10 @@ class DataObject(GraphObject, DataUser):
         self.po_cache = None
 
     def __repr__(self):
-        return DataObject.__str__(self)
+        s = self.__class__.__name__ + "("
+        s += repr(self.idl)
+        s += ")"
+        return s
 
     def setKey(self, key):
         if isinstance(key, str):

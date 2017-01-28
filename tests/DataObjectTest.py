@@ -45,3 +45,6 @@ class DataObjectTest(_DataTest):
         r.save()
         u = r.upload_date()
         self.assertIsNotNone(u)
+
+    def test_repr(self):
+        self.assertRegexpMatches(repr(DataObject(ident="http://example.com")), r"DataObject\(rdflib\.term\.URIRef\(u?[\"']http://example.com[\"']\)\)")
