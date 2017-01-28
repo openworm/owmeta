@@ -7,9 +7,11 @@ import cProfile
 import json
 import timeit
 import os
-import urllib, urllib2
 import pytest
 import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.error import HTTPError
 
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
@@ -107,10 +109,9 @@ def pytest_unconfigure(config):
     data = data_int + data_flt
 
     try:
-        f = urllib2.urlopen(submit_url + 'result/add/json/',
-                            urllib.urlencode({'json': json.dumps(data)}))
+        f = urlopen(submit_url + 'result/add/json/', urlencode({'json': json.dumps(data)}))
         response = f.read()
-    except urllib2.HTTPError as e:
+    except HTTPError as e:
         print('Error while connecting to Codespeed:')
         print('Exception: {}'.format(str(e)))
         print('HTTP Response: {}'.format(e.read()))
