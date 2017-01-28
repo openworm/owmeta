@@ -1,5 +1,7 @@
 # This file specified pytest plugins
 
+from __future__ import absolute_import
+from __future__ import print_function
 import pstats
 import cProfile
 import json
@@ -7,6 +9,7 @@ import timeit
 import os
 import urllib, urllib2
 import pytest
+import six
 
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
@@ -82,16 +85,14 @@ def pytest_unconfigure(config):
     if not enabled:
         return
 
-    data_int = map(lambda x: x.to_codespeed_dict(commit=commit,
+    data_int = [x.to_codespeed_dict(commit=commit,
                                                  branch=branch,
                                                  environment=environment,
-                                                 benchmark="int"),
-                   function_profile_list)
-    data_flt = map(lambda x: x.to_codespeed_dict(commit=commit,
+                                                 benchmark="int") for x in function_profile_list]
+    data_flt = [x.to_codespeed_dict(commit=commit,
                                                  branch=branch,
                                                  environment=environment,
-                                                 benchmark="float"),
-                   function_profile_list)
+                                                 benchmark="float") for x in function_profile_list]
 
     int_time = timeit.timeit('100 * 99', number=500)
     float_time = timeit.timeit('100.5 * 99.2', number=500)
@@ -110,16 +111,16 @@ def pytest_unconfigure(config):
                             urllib.urlencode({'json': json.dumps(data)}))
         response = f.read()
     except urllib2.HTTPError as e:
-        print 'Error while connecting to Codespeed:'
-        print 'Exception: {}'.format(str(e))
-        print 'HTTP Response: {}'.format(e.read())
+        print('Error while connecting to Codespeed:')
+        print('Exception: {}'.format(str(e)))
+        print('HTTP Response: {}'.format(e.read()))
         raise e
 
     if not response.startswith('All result data saved successfully'):
-        print "Unexpected response while connecting to Codespeed:"
+        print("Unexpected response while connecting to Codespeed:")
         raise ValueError('Unexpected response from Codespeed server: {}'.format(response))
     else:
-        print "{} test benchmarks sumbitted.".format(len(function_profile_list))
+        print("{} test benchmarks sumbitted.".format(len(function_profile_list)))
 
 
 class FunctionProfile(object):
@@ -197,7 +198,7 @@ class FunctionProfile(object):
         except ValueError as e:
             raise AssertionError("Invalid JSON encountered while initializing FunctionProfile: {}".format(json_str) + str(e))
 
-        keys = json_dict.keys()
+        keys = list(json_dict.keys())
 
         error_str = "FunctionProfile received Malformed JSON."
 
@@ -211,7 +212,7 @@ class FunctionProfile(object):
         assert type(json_dict["callers"]) == dict, error_str
         assert type(json_dict["calls"]) == int, error_str
         assert type(json_dict["cumulative_time"]) == float, error_str
-        assert type(json_dict["function_name"]) == unicode, error_str
+        assert type(json_dict["function_name"]) == six.text_type, error_str
         assert type(json_dict["primitive_calls"]) == int, error_str
         assert type(json_dict["total_time"]) == float, error_str
 

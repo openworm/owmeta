@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 import sys
+from six.moves import range
 sys.path.insert(0, ".")
 import rdflib
 import rdflib as R

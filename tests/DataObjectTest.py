@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
 sys.path.insert(0, ".")
 import unittest
@@ -5,9 +7,9 @@ import PyOpenWorm
 from PyOpenWorm.dataObject import RDFTypeTable
 from PyOpenWorm import DataObject, Neuron, Connection
 import rdflib as R
-from GraphDBInit import make_graph
+from .GraphDBInit import make_graph
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 
 class DataObjectTest(_DataTest):

@@ -1,10 +1,12 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import unittest
 import csv
 import PyOpenWorm
-from PyOpenWorm import Configure
 from PyOpenWorm.utils import normalize_cell_name
 import rdflib as R
+from six.moves import map
+from six.moves import range
 
 
 class DataIntegrityTest(unittest.TestCase):
@@ -15,7 +17,6 @@ class DataIntegrityTest(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        import csv
         # grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
@@ -343,7 +344,7 @@ class DataIntegrityTest(unittest.TestCase):
         # read csv file row by row
         with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
             edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
+            next(edge_reader)    # skip header row
 
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)

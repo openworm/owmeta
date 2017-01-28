@@ -1,131 +1,120 @@
 from __future__ import print_function
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
 from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
 import logging
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
 
 from glob import glob
 
 # Common configurations for tests
-from GraphDBInit import *
+from .GraphDBInit import *
 
 # Tests for the Configure class, which provides functionality to modules to
 # allow outside objects to parameterize their behavior
-from ConfigureTest import ConfigureTest
+from .ConfigureTest import ConfigureTest
 
 # Integration tests that read from the database and ensure that basic queries
 # have expected answers, as a way to keep data quality high.
-from DataIntegrityTest import DataIntegrityTest
+from .DataIntegrityTest import DataIntegrityTest
 
 # Integration tests that ensure basic functioning of the database backend and
 # connection
-from DatabaseBackendTest import DatabaseBackendTest
+from .DatabaseBackendTest import DatabaseBackendTest
 
 # Runs the examples to make sure we didn't break the API for them.
-from ExampleRunnerTest import ExampleRunnerTest
+from .ExampleRunnerTest import ExampleRunnerTest
 
 # Tests our Quantity class, which is used for defining things with measurement
 # units
-from QuantityTest import QuantityTest
+from .QuantityTest import QuantityTest
 
 # Tests RDFLib, our backend library that interfaces with the database as an
 # RDF graph.
-from RDFLibTest import RDFLibTest
+from .RDFLibTest import RDFLibTest
 
 # Import _DataTest
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 # Test for Worm
-from WormTest import WormTest
+from .WormTest import WormTest
 
 # CellTest
 # Test various properties of Cell objects. For example, that we can get
 # the parent of a cell, or the children, etc.
-from CellTest import CellTest
+from .CellTest import CellTest
 
 # DataObjectTest
 # Tests for DataObjects specifically
-from DataObjectTest import DataObjectTest
+from .DataObjectTest import DataObjectTest
 
 # DataUserTest
 # Test basic operations on DataObjects
-from DataUserTest import DataUserTest
+from .DataUserTest import DataUserTest
 
 # ChannelTest
 # Test basic operations on Channel objects.
-from ChannelTest import ChannelTest
+from .ChannelTest import ChannelTest
 
 # ExperimentTest
 # Test basic operations on Experiment objects.
-from ExperimentTest import ExperimentTest
+from .ExperimentTest import ExperimentTest
 
 # NeuronTest
 # Test basic operations on Neuron objects. For example, that that two Neuron
 # objects with the same name have the same identifier.
-from NeuronTest import NeuronTest
+from .NeuronTest import NeuronTest
 
 # NetworkTest
 # Basic tests for neuron network
-from NetworkTest import NetworkTest
+from .NetworkTest import NetworkTest
 
 # EvidenceTest
 # Tests for the Evidence object capabilities/functions
-from EvidenceTest import EvidenceTest
+from .EvidenceTest import EvidenceTest
 
 # EvidenceCoverageTest
 # Tests for evidence for objects in the PyOpenWorm database
-from EvidenceCoverageTest import EvidenceCoverageTest
+from .EvidenceCoverageTest import EvidenceCoverageTest
 
 # ConnectionTest
 # TODO: Add description for this set of tests
-from ConnectionTest import ConnectionTest
+from .ConnectionTest import ConnectionTest
 
 # Muscle Test
 # Tests for various properties of Muscle objects.
-from MuscleTest import MuscleTest
+from .MuscleTest import MuscleTest
 
 # PlotTest
 # Tests for the Plot data object
-from PlotTest import PlotTest
+from .PlotTest import PlotTest
 
 # Property Test
 # TODO: Add description for this set of tests
-from PropertyTest import PropertyTest
+from .PropertyTest import PropertyTest
 
 # SimplePropertyTest
 # Sanity checks for DataObjects.  For example, that two objects with the same
 # name have the same identifier.
-from SimplePropertyTest import SimplePropertyTest
+from .SimplePropertyTest import SimplePropertyTest
 
 # NeuroMLTest
 # TODO: Add description for this set of tests
 # TODO: This test is empty!
-from NeuroMLTest import NeuroMLTest
+from .NeuroMLTest import NeuroMLTest
 
 # InferenceTest
-from InferenceTest import InferenceTest
+from .InferenceTest import InferenceTest
 
 # Miscellaneous Tests
 # These are tests for miscellaneous bugs that have come up.
-from MiscTest import MiscTest
+from .MiscTest import MiscTest
 
 # Tests from README.md
-from DocumentationTest import DocumentationTest
+from .DocumentationTest import DocumentationTest
 
 if __name__ == '__main__':
     from optparse import OptionParser
@@ -162,7 +151,7 @@ if __name__ == '__main__':
         all_tests.append(suite)
 
     suite = unittest.TestSuite()
-    classes = filter(lambda x : isinstance(x, type), globals().values())
+    classes = [x for x in globals().values() if isinstance(x, type)]
     non_DataTestTests = (x for x in classes if (issubclass(x, unittest.TestCase) and not issubclass(x,  _DataTest)))
     suite.addTests(getTests(x) for x in non_DataTestTests)
     all_tests.append(suite)
@@ -176,7 +165,7 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     if len(args) == 1:
-        suite.addTests(filter(lambda x: x.id().startswith(args[0]), all_tests_flattened))
+        suite.addTests([x for x in all_tests_flattened if x.id().startswith(args[0])])
     else:
         suite.addTests(all_tests)
 

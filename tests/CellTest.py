@@ -1,4 +1,7 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
+from six.moves import zip
 sys.path.insert(0,".")
 import unittest
 import neuroml
@@ -7,7 +10,7 @@ import PyOpenWorm
 from PyOpenWorm import Neuron, Muscle, Cell, DataUser
 import os
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class CellTest(_DataTest):
 
@@ -126,8 +129,8 @@ class CellTest(_DataTest):
 
         try:
             validate_neuroml2("temp.nml")
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             self.fail("Should validate")
         sys.stdout = f
 
