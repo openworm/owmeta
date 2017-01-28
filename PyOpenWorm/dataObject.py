@@ -217,7 +217,8 @@ class DataObject(GraphObject, DataUser):
         #     must happen with the owner object's creation
         owner_class = cls
         owner_class_name = owner_class.__name__
-        property_class_name = owner_class_name + "_" + linkName
+        property_class_name = str(owner_class_name + "_" + linkName)
+
         if not value_type:
             value_type = DataObject
 

@@ -209,7 +209,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     import csv
     f = open(RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE)
     reader = csv.reader(f)
-    reader.next() #skip the header row
+    next(reader) #skip the header row
 
     i = 0
 
@@ -359,7 +359,7 @@ def upload_connections():
 
         with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
+            next(edge_reader)    # skip header row
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
 
