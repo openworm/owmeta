@@ -31,7 +31,6 @@ if pid == 0:
     try:
         os.seteuid(user_id)
         process = call([sys.executable, user_script], cwd = script_location)
-        process = call([sys.executable, user_script], cwd = script_location)
     finally:
         os._exit(0)
 os.waitpid(pid, 0)
