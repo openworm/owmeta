@@ -1,7 +1,10 @@
 from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import PyOpenWorm as P
 from .dataObject import DataObject
 from .cell import Cell
+import six
 
 __all__ = ['Connection']
 
@@ -70,7 +73,7 @@ class Connection(DataObject):
             # TODO: don't assume that the post_cell is a neuron
             self.post_cell(P.Neuron(name=post_cell, conf=self.conf))
 
-        if isinstance(termination, basestring):
+        if isinstance(termination, six.string_types):
             termination = termination.lower()
             if termination in ('neuron', Termination.Neuron):
                 self.termination(Termination.Neuron)
@@ -84,14 +87,14 @@ class Connection(DataObject):
                 "Connection number must be an int, given %s" %
                 number)
 
-        if isinstance(syntype, basestring):
+        if isinstance(syntype, six.string_types):
             syntype = syntype.lower()
             if syntype in ('send', SynapseType.Chemical):
                 self.syntype(SynapseType.Chemical)
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
 
-        if isinstance(synclass, basestring):
+        if isinstance(synclass, six.string_types):
             self.synclass(synclass)
 
     @property

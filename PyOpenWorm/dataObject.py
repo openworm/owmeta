@@ -96,7 +96,7 @@ class DataObject(GraphObject, DataUser):
             self.rdf_namespace[
                 "a" +
                 hashlib.md5(
-                    str(data)).hexdigest()])
+                    str(data).encode()).hexdigest()])
 
     def id_is_variable(self):
         """ Is the identifier a variable? """
@@ -106,7 +106,7 @@ class DataObject(GraphObject, DataUser):
     def make_identifier_direct(cls, string):
         if not isinstance(string, str):
             raise Exception("make_identifier_direct only accepts strings")
-        from urllib import quote
+        from six.moves.urllib.parse import quote
         return R.URIRef(cls.rdf_namespace[quote(string)])
 
     def triples(self, *args, **kwargs):

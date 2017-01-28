@@ -126,7 +126,7 @@ def get_data(path):
     from glob import glob
     package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = package_paths + sys.path
-    installed_package_root = get_loader('PyOpenWorm').filename
+    installed_package_root = os.path.dirname(get_loader('PyOpenWorm').get_filename())
     sys.path = sys.path[len(package_paths):]
     filename = os.path.join(installed_package_root, path)
     return filename
@@ -260,8 +260,8 @@ def connect(configFile=False,
     #  and lets our data handling system know about them.
     #  Should add new classes here if they need to be tracked!
     DataObject.register()
-    Cell.register()
     Network.register()
+    Cell.register()
     Neuron.register()
     Worm.register()
     Evidence.register()

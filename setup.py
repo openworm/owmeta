@@ -64,7 +64,6 @@ setup(
         'six==1.9.0',
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
-        'wsgiref==0.1.2',
         'xlrd',
         'yarom==0.8.2',
         'zc.lockfile==1.1.0',

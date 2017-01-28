@@ -145,9 +145,6 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
-    def __eq__(self, other):
-        return DataObject.__eq__(self, other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
-
     def blast(self):
         """
         Return the blast name.
@@ -165,7 +162,7 @@ class Cell(DataObject):
             ln = self.lineageName()
             x = re.split("[. ]", ln)
             return x[0]
-        except:
+        except Exception:
             return ""
 
     def daughterOf(self):
@@ -203,7 +200,6 @@ class Cell(DataObject):
     def __str__(self):
         if self.name.has_defined_value():
             return str(self.name.defined_values[0])
-            #return self.__class__.__name__ + "(name="+str(self.name.defined_values[0])+")"
         else:
             return super(Cell, self).__str__()
 
