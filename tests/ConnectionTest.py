@@ -1,21 +1,7 @@
 import sys
 sys.path.insert(0,".")
-import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
+from PyOpenWorm import Connection, Neuron
 import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
-
-from glob import glob
 
 from GraphDBInit import *
 
@@ -60,7 +46,7 @@ class ConnectionTest(_DataTest):
         n2 = Neuron(name="PVCR")
         try:
             Connection(n1,n2)
-        except:
+        except Exception:
             self.fail("Shouldn't fail on Connection init")
 
     def test_load1(self):

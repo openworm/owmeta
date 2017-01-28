@@ -21,8 +21,7 @@ import doctest
 
 from glob import glob
 
-# Import configuration files for tests and create worm graph
-# TODO: Please update this description!
+# Common configurations for tests
 from GraphDBInit import *
 
 # Tests for the Configure class, which provides functionality to modules to
@@ -49,11 +48,9 @@ from QuantityTest import QuantityTest
 from RDFLibTest import RDFLibTest
 
 # Import _DataTest
-# TODO: Add description for this set of tests
 from DataTestTemplate import _DataTest
 
 # Test for Worm
-# TODO: Add description for this set of tests
 from WormTest import WormTest
 
 # CellTest
@@ -62,7 +59,7 @@ from WormTest import WormTest
 from CellTest import CellTest
 
 # DataObjectTest
-# TODO: Add description for this set of tests
+# Tests for DataObjects specifically
 from DataObjectTest import DataObjectTest
 
 # DataUserTest
