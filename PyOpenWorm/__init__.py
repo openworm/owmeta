@@ -57,11 +57,13 @@ Classes
 """
 
 from __future__ import print_function
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 __author__ = 'Stephen Larson'
 
 import sys
 import os
+
+# For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
 from .data import Data, DataUser, propertyTypes
 from .dataObject import DataObject
@@ -95,6 +97,7 @@ __all__ = [
     "ConfigValue",
     "BadConf",
     "Data",
+    "DataObject",
     "DataUser",
     "propertyTypes",
     "Property",
