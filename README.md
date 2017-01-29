@@ -47,8 +47,8 @@ Then you can try out a few things:
 # Grab a specific neuron
 >>> aval = net.aneuron('AVAL')
 
->>> aval.type()
-set([u'interneuron'])
+>>> list(aval.type())[0]
+'interneuron'
 
 #show how many connections go out of AVAL
 >>> aval.connection.count('pre')
@@ -106,11 +106,11 @@ Returns information about individual neurons::
 
 ```python
 >>> aval.name()
-u'AVAL'
+'AVAL'
 
 #list all known receptors
 >>> sorted(aval.receptors())
-[u'GGR-3', u'GLR-1', u'GLR-2', u'GLR-4', u'GLR-5', u'NMR-1', u'NMR-2', u'UNC-8']
+['GGR-3', 'GLR-1', 'GLR-2', 'GLR-4', 'GLR-5', 'NMR-1', 'NMR-2', 'UNC-8']
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
@@ -125,7 +125,7 @@ Returns the list of all neurons::
 >>> len(set(net.neuron_names()))
 302
 >>> sorted(net.neuron_names()) # doctest:+ELLIPSIS
-[u'ADAL', u'ADAR', ... u'VD8', u'VD9']
+['ADAL', 'ADAR', ... 'VD8', 'VD9']
 
 ```
 
@@ -144,11 +144,11 @@ Add some evidence::
 >>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
 >>> avdl = P.Neuron(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal(u'AB alaaapalr'))
+Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef('http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal('AB alaaapalr'))
 >>> e.asserts(avdl)
-Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/AVDL'))
+Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))
 >>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
-Relationship(s=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef(u'http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef(u'http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
+Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
 >>> e.save()
 
 ```
@@ -182,10 +182,10 @@ See what neurons express some neuropeptide::
 ```python
 >>> n = P.Neuron()
 >>> n.neuropeptide("INS-26")
-Relationship(p=rdflib.term.URIRef(u'http://openworm.org/entities/Neuron/neuropeptide'), o=rdflib.term.Literal(u'INS-26'))
+Relationship(p=rdflib.term.URIRef('http://openworm.org/entities/Neuron/neuropeptide'), o=rdflib.term.Literal('INS-26'))
 
 >>> sorted(x.name() for x in n.load())
-[u'ASEL', u'ASER', u'ASIL', u'ASIR']
+['ASEL', 'ASER', 'ASIL', 'ASIR']
 
 ```
 

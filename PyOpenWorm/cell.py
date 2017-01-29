@@ -199,7 +199,7 @@ class Cell(DataObject):
 
     def __str__(self):
         if self.name.has_defined_value():
-            return str(self.name.defined_values[0])
+            return str(self.name.defined_values[0].idl)
         else:
             return super(Cell, self).__str__()
 

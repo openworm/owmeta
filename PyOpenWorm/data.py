@@ -345,7 +345,7 @@ class Data(Configure, Configureable):
         g = nx.DiGraph()
 
         # Neuron table
-        csvfile = file(self.conf['neuronscsv'])
+        csvfile = open(self.conf['neuronscsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
@@ -364,7 +364,7 @@ class Data(Configure, Configureable):
                 g.add_node(row[0], ntype=neurontype)
 
         # Connectome table
-        csvfile = file(self.conf['connectomecsv'])
+        csvfile = open(self.conf['connectomecsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:

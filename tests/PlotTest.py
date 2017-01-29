@@ -1,24 +1,7 @@
 from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
-import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
-
-from glob import glob
-
-from .GraphDBInit import * 
+from PyOpenWorm import Plot, DataUser
 
 from .DataTestTemplate import _DataTest
 
@@ -46,7 +29,7 @@ class PlotTest(_DataTest):
         with non-2D-list data?
         """
         with self.assertRaises(ValueError):
-            pl = Plot(data=['a', 'b'])
+            Plot(data=['a', 'b'])
 
     def test_successful_get_data(self):
         """

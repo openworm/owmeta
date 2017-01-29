@@ -331,6 +331,9 @@ class Evidence(DataObject):
         if author is not None:
             self.author(author)
 
+        if uri is not None:
+            self.uri(uri)
+
     def add_data(self, k, v):
         """ Add a field
 
