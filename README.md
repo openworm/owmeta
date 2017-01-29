@@ -33,7 +33,7 @@ subdirectory. You can read it in by doing:
 
 ```python
 >>> import PyOpenWorm as P
->>> P.connect()
+>>> P.connect('PyOpenWorm/default.conf')
 
 ```
 
@@ -124,7 +124,7 @@ Returns the list of all neurons::
 #NOTE: This is a VERY slow operation right now
 >>> len(set(net.neuron_names()))
 302
->>> sorted(net.neuron_names()) # doctest:+ELLIPSIS
+>>> sorted(net.neuron_names())
 ['ADAL', 'ADAR', ... 'VD8', 'VD9']
 
 ```
@@ -147,7 +147,7 @@ Add some evidence::
 Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef('http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal('AB alaaapalr'))
 >>> e.asserts(avdl)
 Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))
->>> e.asserts(avdl.lineageName("AB alaaapalr")) # doctest:+ELLIPSIS
+>>> e.asserts(avdl.lineageName("AB alaaapalr"))
 Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
 >>> e.save()
 
@@ -191,7 +191,7 @@ Relationship(p=rdflib.term.URIRef('http://openworm.org/entities/Neuron/neuropept
 
 Get direct access to the RDFLib graph::
 ```python
->>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }") # doctest:+ELLIPSIS
+>>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }")
 <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
 
 ```
@@ -199,7 +199,7 @@ Get direct access to the RDFLib graph::
 Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
 
 ```python
->>> net.as_networkx() # doctest:+ELLIPSIS
+>>> net.as_networkx()
 <networkx.classes.digraph.DiGraph object at ...>
 
 ```
