@@ -517,7 +517,7 @@ def do_insert(config="default.conf", logging=False):
         print("Serializing...")
         serialize_as_n3()
 
-    except:
+    except Exception:
         traceback.print_exc()
     finally:
         P.disconnect()
@@ -533,12 +533,14 @@ if __name__ == '__main__':
     parser.add_option("-l", "--do-logging", dest="do_logging",
                       action="store_true", default=False,
                       help="Enable log output")
+    parser.add_option("-c", "--config", dest="config", default='default.conf',
+                      help="Config file")
 
     (options, _) = parser.parse_args()
     OPTIONS = options
 
     try:
-        do_insert(logging=options.do_logging)
+        do_insert(config=options.config, logging=options.do_logging)
     except IOError as e:
         if e.errno == 2 and 'default.conf' in e.filename:
             print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")

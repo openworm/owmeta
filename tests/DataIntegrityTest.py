@@ -29,7 +29,7 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        PyOpenWorm.connect()
+        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")
 
     def tearDown(self):
