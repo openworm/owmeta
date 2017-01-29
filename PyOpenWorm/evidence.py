@@ -3,6 +3,7 @@ from PyOpenWorm.dataObject import DataObject
 from six.moves.urllib.parse import urlparse, unquote, urlencode
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
+import traceback
 import re
 
 
@@ -45,12 +46,13 @@ def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        data = _url_request(url, headers)
+        data = _url_request(url, headers).read().decode('UTF-8')
         if hasattr(data, 'charset'):
-            return json.load(data, encoding=data.charset)
+            return json.loads(data, encoding=data.charset)
         else:
-            return json.load(data)
+            return json.loads(data)
     except BaseException:
+        traceback.print_exc()
         return {}
 
 
