@@ -5,6 +5,8 @@ See: "Metadata in PyOpenWorm" for discussion on semantics of what giving
 evidence for an object means.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
 import PyOpenWorm as P
 
@@ -32,7 +34,7 @@ n.save()
 e.save()
 
 #What does my evidence object contain?
-print e
+print(e)
 
 #Disconnect from the database.
 P.disconnect()
