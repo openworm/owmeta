@@ -33,7 +33,7 @@ def upload_muscles():
         with open(CELL_NAMES_SOURCE) as csvfile:
             csvreader = csv.reader(csvfile)
 
-            ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+            ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
             w = WORM
             for num, line in enumerate(csvreader):
                 if num < 4:  # skip rows with no data
@@ -130,7 +130,7 @@ def norn(x):
 def upload_neurons():
     try:
         #TODO: Improve this evidence marker
-        ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+        ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
         w = WORM
         n = NETWORK
         w.neuron_network(n)
@@ -163,11 +163,12 @@ def get_wormatlas_evidence():
 
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
-    e = P.Evidence()
+    e = None
     with open(file_name) as bibtex_file:
         bib_database = bibtexparser.load(bibtex_file)
         key = bib_database.entries[0]['ID']
-        e.setKey(key)
+        e = P.Evidence(key=key)
+
         try:
             doi = bib_database.entries[0]['doi']
             if doi:
@@ -355,7 +356,7 @@ def upload_connections():
         muscles = [muscle.name() for muscle in muscle_objs]
 
         # Evidence object to assert each connection
-        e = P.Evidence(title='herm_full_edgelist.csv')
+        e = P.Evidence(key="emmons2015", title='herm_full_edgelist.csv')
 
         with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
