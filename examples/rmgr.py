@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
 
-P.connect()
+P.connect('default.conf')
 
 class NC_neighbor(P.Property):
     def __init__(self, *args, **kwargs):

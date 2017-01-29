@@ -8,7 +8,7 @@ import PyOpenWorm as P
 import cStringIO as io
 
 #Connect to database.
-P.connect()
+P.connect('default.conf')
 
 #Create a new Cell object to work with.
 aval = P.Worm().get_neuron_network().aneuron('AVAL')

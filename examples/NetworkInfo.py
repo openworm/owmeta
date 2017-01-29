@@ -17,7 +17,7 @@ neuron names in the arbitrary list declared further below.
 """
 
 print("Connecting to the database...")
-P.connect()
+P.connect('default.conf')
 
 #Get the worm object.
 worm = P.Worm()

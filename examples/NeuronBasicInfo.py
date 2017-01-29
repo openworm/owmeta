@@ -17,7 +17,7 @@ from __future__ import absolute_import
 import PyOpenWorm as P
 import os
 print(os.getcwd())
-P.connect()
+P.connect('default.conf')
 def get_names(it):
     res = []
     for x in it:

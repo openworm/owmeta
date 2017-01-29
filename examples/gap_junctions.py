@@ -6,7 +6,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
 #Connect to existing database.
-P.connect()
+P.connect('default.conf')
 #Put the Worm's Network object in a variable.
 net = P.Worm().get_neuron_network()
 

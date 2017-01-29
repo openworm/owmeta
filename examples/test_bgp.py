@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
 
-P.connect()
+P.connect('default.conf')
 def pp_connection(conn):
     print(conn.pre_cell(), conn.post_cell(), conn.syntype(), conn.synclass(), conn.number())
 
