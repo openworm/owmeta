@@ -35,8 +35,7 @@ class Relationship(DataObject):
             data = (self.subject,
                     self.property,
                     self.object)
-            data = tuple(x.defined_values[0].identifier().n3() for x in data)
-            data = "".join(data)
+            data = "".join(x.defined_values[0].identifier().n3() for x in data)
             return self.make_identifier(data)
 
     def __repr__(self):
