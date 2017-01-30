@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 sys.path.insert(0, ".")
 import PyOpenWorm
@@ -6,7 +7,7 @@ import subprocess
 import tempfile
 
 from PyOpenWorm import Configure
-from GraphDBInit import delete_zodb_data_store, TEST_CONFIG
+from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
 class _DataTest(unittest.TestCase):

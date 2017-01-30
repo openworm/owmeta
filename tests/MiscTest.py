@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -18,9 +19,9 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import *
+from .GraphDBInit import *
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class MiscTest(_DataTest):
     """Miscellaneous tests that have cropped up"""

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 import rdflib as R
 
@@ -6,7 +7,7 @@ from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.muscle import Muscle
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 
 class WormTest(_DataTest):

@@ -1,11 +1,12 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import sys
 sys.path.insert(0, ".")
 from PyOpenWorm import DataObject
 from PyOpenWorm.simpleProperty import SimpleProperty
 import rdflib as R
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 
 class SimplePropertyTest(_DataTest):

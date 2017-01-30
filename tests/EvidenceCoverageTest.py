@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -16,9 +18,9 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import *
+from .GraphDBInit import *
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class EvidenceCoverageTest(_DataTest):
 
@@ -32,7 +34,7 @@ class EvidenceCoverageTest(_DataTest):
 
             hasEvidence = len(get_supporting_evidence(n)) + len(get_supporting_evidence(n.neurotransmitter)) + len(get_supporting_evidence(n.type)) + len(get_supporting_evidence(n.innexin)) + len(get_supporting_evidence(n.neuropeptide)) + len(get_supporting_evidence(n.receptor))
 
-            print get_supporting_evidence(n.neurotransmitter)
+            print(get_supporting_evidence(n.neurotransmitter))
 
             evcheck.append(hasEvidence)
 

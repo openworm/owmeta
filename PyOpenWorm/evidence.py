@@ -1,5 +1,9 @@
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.dataObject import DataObject
+from six.moves.urllib.parse import urlparse, unquote, urlencode
+from six.moves.urllib.request import Request, urlopen
+from six.moves.urllib.error import HTTPError, URLError
+import traceback
 import re
 
 
@@ -8,15 +12,12 @@ class EvidenceError(Exception):
 
 
 def _pubmed_uri_to_pmid(uri):
-    from urlparse import urlparse
     parsed = urlparse(uri)
     pmid = int(parsed.path.split("/")[2])
     return pmid
 
 
 def _doi_uri_to_doi(uri):
-    from urlparse import urlparse
-    from urllib2 import unquote
     parsed = urlparse(uri)
     doi = parsed.path.split("/")[1]
     # the doi from a url needs to be decoded
@@ -25,19 +26,19 @@ def _doi_uri_to_doi(uri):
 
 
 def _url_request(url, headers={}):
-    import urllib2 as U
     try:
-        r = U.Request(url, headers=headers)
-        s = U.urlopen(r, timeout=1)
-        content_type = dict(s.info())['content-type']
+        r = Request(url, headers=headers)
+        s = urlopen(r, timeout=1)
+        info = dict(s.info())
+        content_type = {k.lower() : info[k] for k in info} ['content-type']
         md = re.search("charset *= *([^ ]+)", content_type)
         if md:
             s.charset = md.group(1)
 
         return s
-    except U.HTTPError:
+    except HTTPError:
         return ""
-    except U.URLError:
+    except URLError:
         return ""
 
 
@@ -45,12 +46,13 @@ def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        data = _url_request(url, headers)
+        data = _url_request(url, headers).read().decode('UTF-8')
         if hasattr(data, 'charset'):
-            return json.load(data, encoding=data.charset)
+            return json.loads(data, encoding=data.charset)
         else:
-            return json.load(data)
+            return json.loads(data)
     except BaseException:
+        traceback.print_exc()
         return {}
 
 
@@ -331,6 +333,9 @@ class Evidence(DataObject):
         if author is not None:
             self.author(author)
 
+        if uri is not None:
+            self.uri(uri)
+
     def add_data(self, k, v):
         """ Add a field
 
@@ -399,9 +404,8 @@ class Evidence(DataObject):
     def _crossref_doi_extract(self):
         # Extract data from crossref
         def crRequest(doi):
-            import urllib as U
             data = {'q': doi}
-            data_encoded = U.urlencode(data)
+            data_encoded = urlencode(data)
             return _json_request(
                 'http://search.labs.crossref.org/dois?%s' %
                 data_encoded)
