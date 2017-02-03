@@ -31,6 +31,10 @@ Neurons
 - Receptors [1]_: Extracted from WormAtlas.org.  Dynamic version on `this google spreadsheet <https://docs.google.com/spreadsheets/d/1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit>`_.  Staged in `this csv file <https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv>`_.  Parsed by `this method <https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L280>`_.
 - Innexins [1]_: Extracted from WormAtlas.org.  Dynamic version on `this google spreadsheet <https://docs.google.com/spreadsheets/d/1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit>`_.  Staged in `this csv file <https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv>`_.  Parsed by `this method <https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L268>`_.
 
+Gene expression data below, additional to that extracted from WormAtlas concerning receptors, neuropeptides, neurotransmitters and innexins are parsed by `this method <https://github.com/openworm/PyOpenWorm/blob/4eb25df267ce385053f746ceb66e74d9c616403f/OpenWormData/scripts/insert_worm.py#L217>`_:
+
+- Monoamine secretors and receptors, neuropeptide secretors and receptors [4]_: Dynamic version on `this google spreadsheet <https://docs.google.com/spreadsheets/d/1kCxOOKu1wAREa9VbBiWVVHh-GEC3kJk0A3YVEipPKcc/edit#gid=0>`_. Staged in `this csv file <https://github.com/openworm/PyOpenWorm/blob/27647748981fe0fe135b8aa39191c0e32579c923/OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv>`_.
+
 Muscle cells
 ------------
 
@@ -65,3 +69,4 @@ Data Source References
 .. [2] - Harris, T. W., Antoshechkin, I., Bieri, T., Blasiar, D., Chan, J., Chen, W. J., … Sternberg, P. W. (2010). WormBase: a comprehensive resource for nematode research. Nucleic Acids Research, 38(Database issue), D463–7. http://doi.org/10.1093/nar/gkp952
         - Lee, R. Y. N., & Sternberg, P. W. (2003). Building a cell and anatomy ontology of Caenorhabditis elegans. Comparative and Functional Genomics, 4(1), 121–6. http://doi.org/10.1002/cfg.248
 .. [3] Emmons, S., Cook, S., Jarrell, T., Wang, Y., Yakolev, M., Nguyen, K., Hall, D. Whole-animal C. elegans connectomes.  C. Elegans Meeting 2015 http://abstracts.genetics-gsa.org/cgi-bin/celegans15s/wsrch15.pl?author=emmons&sort=ptimes&sbutton=Detail&absno=155110844&sid=668862
+.. [4] Bentley B., Branicky R., Barnes C. L., Chew Y. L., Yemini E., Bullmore E. T., Vertes P. E., Schafer W. R. (2016) The Multilayer Connectome of Caenorhabditis elegans. PLoS Comput Biol 12(12): e1005283. http://doi.org/10.1371/journal.pcbi.1005283
