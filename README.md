@@ -110,7 +110,7 @@ Returns information about individual neurons::
 
 #list all known receptors
 >>> sorted(aval.receptors())
-['GGR-3', 'GLR-1', 'GLR-2', 'GLR-4', 'GLR-5', 'NMR-1', 'NMR-2', 'UNC-8']
+['GGR-3', 'GLR-1', ... 'NPR-4', 'UNC-8']
 
 #show how many chemical synapses go in and out of AVAL
 >>> aval.Syn_degree()
