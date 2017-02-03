@@ -4,6 +4,7 @@ from PyOpenWorm.utils import normalize_cell_name
 import traceback
 import csv
 import re
+import os
 
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
@@ -16,6 +17,7 @@ CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
 CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
 RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
+ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
 
 def serialize_as_n3():
@@ -25,6 +27,7 @@ def serialize_as_n3():
 
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
+
 
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
@@ -158,8 +161,10 @@ def upload_neurons():
 def get_altun_evidence():
     return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
 
+
 def get_wormatlas_evidence():
     return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
+
 
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
@@ -197,101 +202,135 @@ def parse_bibtex_into_evidence(file_name):
             pass
     return e
 
+
 def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     """ Augment the metadata about neurons with information about receptors,
         neuron types, neurotransmitters, neuropeptides and innexins.
         As we go, add evidence objects to each statement."""
     print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
-    #set up evidence objects in advance
-    altun_ev  = get_altun_evidence()
-    wormatlas_ev = get_wormatlas_evidence()
+    _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(
+        RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE
+    )
 
-    import csv
-    f = open(RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE)
-    reader = csv.reader(f)
-    next(reader) #skip the header row
+
+def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
+    """ Augment the metadata about neurons with information about receptor, neurotransmitter, and neuropeptide
+    expression from additional sources.
+    """
+    print ("uploading additional statements about receptors, neurotransmitters and neuropeptides")
+
+    for root, _, filenames in sorted(os.walk(ADDITIONAL_EXPR_DATA_DIR)):
+        for filename in sorted(filenames):
+            if filename.lower().endswith('.csv'):
+                _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
+
+
+def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(file_path):
+    # set up evidence objects in advance
+    altun_ev = get_altun_evidence()
+    wormatlas_ev = get_wormatlas_evidence()
 
     i = 0
 
-    neurons = list()
+    neurons = []
     uris = dict()
 
-    for row in reader:
-      neuron_name = row[0]
-      relation = row[1].lower()
-      data = row[2]
-      evidence = row[3]
-      evidenceURL = row[4]
+    with open(file_path) as f:
+        reader = csv.reader(f)
+        next(reader)  # skip the header row
 
-      #prepare evidence
-      e = P.Evidence()
+        for row in reader:
+            neuron_name = row[0]
+            relation = row[1].lower()
+            data = row[2]
+            evidence = row[3]
+            evidenceURL = row[4]
 
-      #pick correct evidence given the row
-      if 'altun' in evidence.lower():
-          e = altun_ev
+            # prepare evidence
+            e = P.Evidence()
 
-      elif 'wormatlas' in evidence.lower():
-          e = wormatlas_ev
+            # pick correct evidence given the row
+            if 'altun' in evidence.lower():
+                e = altun_ev
+            elif 'wormatlas' in evidence.lower():
+                e = wormatlas_ev
 
-      e2 = []
-      try:
-          e2 = uris[evidenceURL]
-      except KeyError:
-          e2 = P.Evidence(uri=evidenceURL)
-          uris[evidenceURL] = e2
+            e2 = []
+            try:
+                e2 = uris[evidenceURL]
+            except KeyError:
+                e2 = P.Evidence(uri=evidenceURL)
+                uris[evidenceURL] = e2
 
-      #grab the neuron object
-      n = NETWORK.aneuron(neuron_name)
-      neurons.append(n)
+            # grab the neuron object
+            n = NETWORK.aneuron(neuron_name)
+            neurons.append(n)
 
-      if relation == 'neurotransmitter':
-          # assign the data, grab the relation into r
-          r = n.neurotransmitter(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'innexin':
-          # assign the data, grab the relation into r
-          r = n.innexin(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'neuropeptide':
-          # assign the data, grab the relation into r
-          r = n.neuropeptide(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'receptor':
-          # assign the data, grab the relation into r
-          r = n.receptor(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
+            if relation == 'neurotransmitter':
+                if data in n.neurotransmitter():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.neurotransmitter(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      if relation == 'type':
-          types = []
-          if 'sensory' in (data.lower()):
-              types.append('sensory')
-          if 'interneuron' in (data.lower()):
-              types.append('interneuron')
-          if 'motor' in (data.lower()):
-              types.append('motor')
-          if 'unknown' in (data.lower()):
-              types.append('unknown')
-          # assign the data, grab the relation into r
-          for t in types:
-              r = n.type(t)
-              #assert the evidence on the relationship
-              e.asserts(r)
-              e2.asserts(r)
+            elif relation == 'innexin':
+                if data in n.innexin():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.innexin(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      i = i + 1
+            elif relation == 'neuropeptide':
+                if data in n.neuropeptide():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.neuropeptide(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'receptor':
+                if data in n.receptor():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.receptor(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'type':
+                if data.lower() in n.type():
+                    continue
+                types = []
+                if 'sensory' in (data.lower()):
+                    types.append('sensory')
+                if 'interneuron' in (data.lower()):
+                    types.append('interneuron')
+                if 'motor' in (data.lower()):
+                    types.append('motor')
+                if 'unknown' in (data.lower()):
+                    types.append('unknown')
+                # assign the data, grab the relation into r
+                for t in types:
+                    r = n.type(t)
+                    # assert the evidence on the relationship
+                    e.asserts(r)
+                    e2.asserts(r)
+
+            i += 1
 
     for neur in neurons:
-        n = NETWORK.neuron(neur)
-    print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+        NETWORK.neuron(neur)
+    print(
+        'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
+            i, file_path
+        )
+    )
 
 
 def upload_connections():
@@ -510,6 +549,7 @@ def do_insert(config="default.conf", logging=False):
         upload_lineage_and_descriptions()
         upload_connections()
         upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
         print("Saving...")
         WORM.save()
