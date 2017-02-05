@@ -85,9 +85,7 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all Muscle objects attached to the Worm
-
-        Returns a set of all muscles::
+        Get all Muscle objects attached to the Worm.
 
         Example::
 
