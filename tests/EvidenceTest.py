@@ -182,6 +182,9 @@ class EvidenceTest(_DataTest):
     def test_multiple_evidence_for_single_fact(self):
         """
         Can we assert the same fact with two distinct pieces of Evidence?
+
+        issue: openworm/PyOpenWorm#211
+
         """
 
         e1 = Evidence()
