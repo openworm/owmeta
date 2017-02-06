@@ -7,7 +7,6 @@ sys.path.insert(0, ".")
 import unittest
 from PyOpenWorm.evidence import Evidence, EvidenceError
 from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.channel import Channel
 
 from .DataTestTemplate import _DataTest
 
@@ -179,31 +178,43 @@ class EvidenceTest(_DataTest):
         facts = list(e1.asserts())
         self.assertIn(r, facts)
 
-    def test_multiple_evidence_for_single_fact(self):
-        """
-        Can we assert the same fact with two distinct pieces of Evidence?
+class Issue211EvidenceTest(_DataTest):
+    """
+    Can we assert the same fact with two distinct pieces of Evidence?
 
-        issue: openworm/PyOpenWorm#211
+    issue: openworm/PyOpenWorm#211
 
-        """
+    """
 
-        e1 = Evidence()
-        e1.pmid('777')
-
-        e2 = Evidence()
-        e2.pmid('888')
+    def setUp(self):
+        super(Issue211EvidenceTest, self).setUp()
+        self.e1 = Evidence()
+        self.e2 = Evidence()
 
         c = DataObject(key=23)
-        e1.asserts(c)
-        e2.asserts(c)
+        self.e1.asserts(c)
+        self.e2.asserts(c)
+        self.evs = Evidence()
+        self.evs.asserts(c)
 
-        e1.save()
-        e2.save()
+        self.expected_ids = set(['777', '888'])
 
-        evs = Evidence()
-        evs.asserts(c)
+    def assertEvidences(self, prop):
+        getattr(self.e1, prop)('777')
+        getattr(self.e2, prop)('888')
+        self.e1.save()
+        self.e2.save()
+        loaded_ids = set(getattr(self.evs, prop).get())
+        self.assertTrue(self.expected_ids.issubset(loaded_ids))
 
-        saved_pmids = set(['777', '888'])
-        loaded_pmids = set([x.pmid() for x in evs.load()])
+    def test_multiple_pmid_evidence_for_single_fact(self):
+        self.assertEvidences('pmid')
 
-        self.assertTrue(saved_pmids.issubset(loaded_pmids))
+    def test_multiple_doi_evidence_for_single(self):
+        self.assertEvidences('doi')
+
+    def test_multiple_wbid_evidence_for_single(self):
+        self.assertEvidences('wbid')
+
+    def test_multiple_uri_evidence_for_single(self):
+        self.assertEvidences('uri')
