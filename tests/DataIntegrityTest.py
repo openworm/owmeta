@@ -62,7 +62,15 @@ class DataIntegrityTest(unittest.TestCase):
         neuronlist = PyOpenWorm.Neuron()
         neuronlist.neuropeptide("INS-26")
         thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(set(['ASEL', 'ASER', 'ASIL', 'ASIR']), thlist)
+        self.assertEqual({'ASEL', 'ASER', 'ASIL', 'ASIR'}, thlist)
+
+    def test_bentley_expr_data(self):
+        """
+        This verifies that the data in OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv has
+        been incorporated, by checking that one of the novel receptor expression patterns is in the worm.
+        """
+        va9 = PyOpenWorm.Neuron('VA9')
+        self.assertIn('LGC-53', va9.receptors())
 
     def test_unique_neuron_node(self):
         """
