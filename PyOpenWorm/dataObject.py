@@ -119,6 +119,7 @@ class DataObject(GraphObject, DataUser):
         return s
 
     def __eq__(self, other):
+        """ This method should not be overridden by subclasses """
         return (isinstance(other, DataObject) and
                 self.defined and
                 other.defined and
@@ -146,6 +147,7 @@ class DataObject(GraphObject, DataUser):
         return self._variable
 
     def __hash__(self):
+        """ This method should not be overridden by subclasses """
         return hash(self.idl)
 
     def __getitem__(self, x):
