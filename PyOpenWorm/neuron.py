@@ -93,7 +93,7 @@ class Neuron(Cell):
         return count
 
     def Syn_degree(self):
-        """Get the degree of a this neuron for chemical synapse edges only
+        """Get the degree of this neuron for chemical synapse edges only
 
         :returns: total number of incoming and outgoing chemical synapses
         :rtype: int
