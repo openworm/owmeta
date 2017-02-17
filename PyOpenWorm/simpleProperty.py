@@ -331,9 +331,11 @@ def _property_to_string(self):
         ";".join(str(s) for s in self.defined_values) + "'"
     return s
 
+
 class RelationshipProxy(Proxy):
     def __repr__(self):
         return repr(self.__wrapped__)
+
 
 class Rel(tuple):
 

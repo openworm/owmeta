@@ -50,6 +50,7 @@ class _B(ConfigValue):
     def invalidate(self):
         self.v = False
 
+
 ZERO = datetime.timedelta(0)
 
 
@@ -65,6 +66,8 @@ class _UTC(datetime.tzinfo):
 
     def dst(self, dt):
         return ZERO
+
+
 utc = _UTC()
 
 propertyTypes = {"send": 'http://openworm.org/entities/356',
@@ -86,7 +89,7 @@ def grouper(iterable, n, fillvalue=None):
         try:
             for x in args:
                 l.append(next(x))
-        except:
+        except Exception:
             pass
         yield l
         if len(l) < n:
@@ -147,7 +150,7 @@ class DataUser(Configureable):
 
             try:
                 gs = g.serialize(format="nt")
-            except:
+            except Exception:
                 gs = _triples_to_bgp(g)
 
             if graph_name:
@@ -158,14 +161,12 @@ class DataUser(Configureable):
                 self.conf['rdf.graph'].update(s)
         else:
             gr = self.conf['rdf.graph']
+            if self.conf['rdf.source'] == 'ZODB':
+                transaction.begin()
             for x in g:
                 gr.add(x)
-
-        if self.conf['rdf.source'] == 'ZODB':
-            # Commit the current transaction
-            transaction.commit()
-            # Fire off a new one
-            transaction.begin()
+            if self.conf['rdf.source'] == 'ZODB':
+                transaction.commit()
 
         # infer from the added statements
         # self.infer()
@@ -206,9 +207,6 @@ class DataUser(Configureable):
                     statement_node))
 
         self.add_statements(g + new_statements)
-
-    # def _add_unannotated_statements(self, graph):
-    # A UTC class.
 
     def retract_statements(self, graph):
         """
@@ -284,7 +282,8 @@ class Data(Configure, Configureable):
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
 
-        # A version number for the graph should update for all changes to the graph
+        # A runtime version number for the graph should update for all changes
+        # to the graph
         self['rdf.graph.change_counter'] = 0
 
         self['rdf.graph']._add = self['rdf.graph'].add
@@ -329,11 +328,11 @@ class Data(Configure, Configureable):
                         'serialization': SerializationSource,
                         'zodb': ZODBSource
                         }
-        i = self.sources[self['rdf.source'].lower()]()
-        self.source = i
+        source = self.sources[self['rdf.source'].lower()]()
+        self.source = source
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
-        self['rdf.graph'] = i
-        return i
+        self['rdf.graph'] = source
+        return source
 
     def _molecule_hash(self, data):
         return URIRef(
@@ -373,6 +372,7 @@ class Data(Configure, Configureable):
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
         return g
 
+
 def modification_date(filename):
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t)
@@ -394,13 +394,13 @@ class RDFSource(Configureable, PyOpenWorm.ConfigValue):
         self.graph = False
 
     def get(self):
-        if self.graph == False:
+        if self.graph is False:
             raise Exception(
                 "Must call openDatabase on Data object before using the database")
         return self.graph
 
     def close(self):
-        if self.graph == False:
+        if self.graph is False:
             return
         self.graph.close()
         self.graph = False
@@ -414,14 +414,15 @@ class RDFSource(Configureable, PyOpenWorm.ConfigValue):
 
 class SerializationSource(RDFSource):
 
-    """ Reads from an RDF serialization or, if the configured database is more recent, then from that.
+    """ Reads from an RDF serialization or, if the configured database is more
+        recent, then from that.
 
         The database store is configured with::
 
             "rdf.source" = "serialization"
             "rdf.store" = <your rdflib store name here>
             "rdf.serialization" = <your RDF serialization>
-            "rdf.serialization_format" = <your rdflib serialization format used>
+            "rdf.serialization_format" = <rdflib serialization format>
             "rdf.store_conf" = <your rdflib store configuration here>
 
     """
@@ -445,7 +446,7 @@ class SerializationSource(RDFSource):
                     mod = modification_date(x)
                     if store_time < mod:
                         store_time = mod
-            except:
+            except Exception:
                 store_time = DT.min
 
             trix_time = modification_date(source_file)
@@ -658,26 +659,17 @@ class ZODBSource(RDFSource):
         if 'rdflib' not in root:
             root['rdflib'] = ConjunctiveGraph('ZODB')
         self.graph = root['rdflib']
-        try:
-            transaction.commit()
-        except Exception:
-            # catch commit exception and close db.
-            # otherwise db would stay open and follow up tests
-            # will detect the db in error state
-            L.warning('Forced to abort transaction on ZODB store opening')
-            traceback.print_exc()
-            transaction.abort()
-        transaction.begin()
         self.graph.open(self.path)
 
     def close(self):
-        if self.graph == False:
+        if self.graph is False:
             return
 
         self.graph.close()
 
         try:
             transaction.commit()
+            transaction.doom()
         except Exception:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
