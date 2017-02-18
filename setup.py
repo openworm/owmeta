@@ -78,7 +78,7 @@ setup(
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
-        'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
+        'git://github.com/mwatts15/rdflib-zodb.git@pow-90#egg=rdflib-zodb-1.1-dev'
     ],
     version = version,
     packages = ['PyOpenWorm'],
