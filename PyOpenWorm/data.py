@@ -22,6 +22,7 @@ import transaction
 import os
 import traceback
 import logging as L
+from .zodb_store import ConcurrentZODBStore
 
 __all__ = [
     "Data",
@@ -326,10 +327,10 @@ class Data(Configure, Configureable):
                         'default': DefaultSource,
                         'trix': TrixSource,
                         'serialization': SerializationSource,
-                        'zodb': ZODBSource
-                        }
+                        'zodb': ZODBSource}
         source = self.sources[self['rdf.source'].lower()]()
         self.source = source
+
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
         self['rdf.graph'] = source
         return source
@@ -384,13 +385,9 @@ class RDFSource(Configureable, PyOpenWorm.ConfigValue):
 
     Alternative sources should dervie from this class
     """
-    i = 0
 
     def __init__(self, **kwargs):
-        if self.i == 1:
-            raise Exception(self.i)
-        self.i += 1
-        Configureable.__init__(self, **kwargs)
+        super(RDFSource, self).__init__(**kwargs)
         self.graph = False
 
     def get(self):
@@ -643,7 +640,7 @@ class ZODBSource(RDFSource):
     """
 
     def __init__(self, *args, **kwargs):
-        RDFSource.__init__(self, *args, **kwargs)
+        super(ZODBSource, self).__init__(*args, **kwargs)
         self.conf['rdf.store'] = "ZODB"
 
     def open(self):
@@ -659,6 +656,16 @@ class ZODBSource(RDFSource):
         if 'rdflib' not in root:
             root['rdflib'] = ConjunctiveGraph('ZODB')
         self.graph = root['rdflib']
+        try:
+            transaction.commit()
+        except Exception:
+            # catch commit exception and close db.
+            # otherwise db would stay open and follow up tests
+            # will detect the db in error state
+            L.warning('Forced to abort transaction on ZODB store opening')
+            traceback.print_exc()
+            transaction.abort()
+        transaction.begin()
         self.graph.open(self.path)
 
     def close(self):
@@ -669,7 +676,6 @@ class ZODBSource(RDFSource):
 
         try:
             transaction.commit()
-            transaction.doom()
         except Exception:
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
