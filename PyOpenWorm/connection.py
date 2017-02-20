@@ -5,6 +5,7 @@ import PyOpenWorm as P
 from .dataObject import DataObject
 from .cell import Cell
 import six
+import warnings
 
 __all__ = ['Connection']
 
@@ -35,7 +36,8 @@ class Connection(DataObject):
         The kind of synaptic connection. 'gapJunction' indicates
         a gap junction and 'send' a chemical synapse
     synclass : string, optional
-        The kind of Neurotransmitter (if any) sent between `pre_cell` and `post_cell`
+        The kind of Neurotransmitter (if any) sent between `pre_cell` and
+        `post_cell`
 
     Attributes
     ----------
@@ -64,13 +66,21 @@ class Connection(DataObject):
         if isinstance(pre_cell, P.Cell):
             self.pre_cell(pre_cell)
         elif pre_cell is not None:
-            # TODO: don't assume that the pre_cell is a neuron
+            warnings.warn(
+                'Passing bare strings for PyOpenWorm.Connection cells is' +
+                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
+                ' instead.',
+                DeprecationWarning)
             self.pre_cell(P.Neuron(name=pre_cell, conf=self.conf))
 
         if (isinstance(post_cell, P.Cell)):
             self.post_cell(post_cell)
         elif post_cell is not None:
-            # TODO: don't assume that the post_cell is a neuron
+            warnings.warn(
+                'Passing bare strings for PyOpenWorm.Connection cells is' +
+                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
+                ' instead.',
+                DeprecationWarning)
             self.post_cell(P.Neuron(name=post_cell, conf=self.conf))
 
         if isinstance(termination, six.string_types):
