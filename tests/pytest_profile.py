@@ -224,8 +224,6 @@ class FunctionProfile(object):
         :return: Codespeed formatted dictionary.
         """
         # Currently, Codespeed breaks if a branch named anything other than 'default' is submitted.
-        print("cumtime", self.cumulative_time)
-        print("ncalls", self.calls)
         return {
             "commitid": commit,
             "project": "PyOpenWorm",
