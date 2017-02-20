@@ -67,12 +67,13 @@ def pytest_runtest_call(item):
     item.profiler = cProfile.Profile()
 
     item.profiler.enable() if item.enabled else None
-    yield
+    outcome = yield
     item.profiler.disable() if item.enabled else None
 
     # Item's excinfo will indicate any exceptions thrown
-    if item.enabled and item._excinfo is None:
+    if item.enabled and outcome.excinfo is None:
         # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
+        print('names', item.listnames())
         fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
         function_profile_list.append(fp)
 
