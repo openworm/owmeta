@@ -73,7 +73,6 @@ def pytest_runtest_call(item):
     # Item's excinfo will indicate any exceptions thrown
     if item.enabled and outcome.excinfo is None:
         # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
-        print('names', item.listnames())
         fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
         function_profile_list.append(fp)
 
@@ -93,7 +92,6 @@ def pytest_unconfigure(config):
                                 executable=platform.python_implementation())
             for x in function_profile_list]
 
-    print(data)
     try:
         f = urlopen(submit_url + 'result/add/json/', urlencode({'json': json.dumps(data)}).encode('UTF-8'))
         response = f.read()
@@ -101,9 +99,10 @@ def pytest_unconfigure(config):
         print('Error while connecting to Codespeed:')
         print('Exception: {}'.format(str(e)))
         fd, name = tempfile.mkstemp(suffix='.html')
-        print('HTTP Response written to {}'.format(name))
+        os.close(fd)
         with open(name, 'wb') as f:
             f.write(e.read())
+        print('HTTP Response written to {}'.format(name))
         raise e
 
     if not response.startswith('All result data saved successfully'.encode('UTF-8')):
