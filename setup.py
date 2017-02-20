@@ -65,7 +65,7 @@ setup(
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
         'xlrd',
-        'yarom==0.8.2',
+        'yarom==0.9.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
@@ -78,7 +78,7 @@ setup(
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
-        'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
+        'git://github.com/mwatts15/rdflib-zodb.git@pow-90#egg=rdflib-zodb-1.1-dev'
     ],
     version = version,
     packages = ['PyOpenWorm'],

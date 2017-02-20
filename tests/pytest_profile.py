@@ -5,10 +5,11 @@ from __future__ import print_function
 import pstats
 import cProfile
 import json
-import timeit
 import os
 import pytest
 import six
+import tempfile
+import platform
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import urlencode
 from six.moves.urllib.error import HTTPError
@@ -69,10 +70,8 @@ def pytest_runtest_call(item):
     outcome = yield
     item.profiler.disable() if item.enabled else None
 
-    result = None if outcome is None else outcome.get_result()
-
     # Item's excinfo will indicate any exceptions thrown
-    if item.enabled and item._excinfo is None:
+    if item.enabled and outcome.excinfo is None:
         # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
         fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
         function_profile_list.append(fp)
@@ -87,37 +86,26 @@ def pytest_unconfigure(config):
     if not enabled:
         return
 
-    data_int = [x.to_codespeed_dict(commit=commit,
-                                                 branch=branch,
-                                                 environment=environment,
-                                                 benchmark="int") for x in function_profile_list]
-    data_flt = [x.to_codespeed_dict(commit=commit,
-                                                 branch=branch,
-                                                 environment=environment,
-                                                 benchmark="float") for x in function_profile_list]
-
-    int_time = timeit.timeit('100 * 99', number=500)
-    float_time = timeit.timeit('100.5 * 99.2', number=500)
-
-    for elt in data_int:
-        # Result should be factor of int operation time
-        elt["result_value"] = elt["result_value"] / int_time
-    for elt in data_flt:
-        # Result should be factor of int operation time
-        elt["result_value"] = elt["result_value"] / float_time
-
-    data = data_int + data_flt
+    data = [x.to_codespeed_dict(commit=commit,
+                                branch=branch,
+                                environment=environment,
+                                executable=platform.python_implementation())
+            for x in function_profile_list]
 
     try:
-        f = urlopen(submit_url + 'result/add/json/', urlencode({'json': json.dumps(data)}))
+        f = urlopen(submit_url + 'result/add/json/', urlencode({'json': json.dumps(data)}).encode('UTF-8'))
         response = f.read()
     except HTTPError as e:
         print('Error while connecting to Codespeed:')
         print('Exception: {}'.format(str(e)))
-        print('HTTP Response: {}'.format(e.read()))
+        fd, name = tempfile.mkstemp(suffix='.html')
+        os.close(fd)
+        with open(name, 'wb') as f:
+            f.write(e.read())
+        print('HTTP Response written to {}'.format(name))
         raise e
 
-    if not response.startswith('All result data saved successfully'):
+    if not response.startswith('All result data saved successfully'.encode('UTF-8')):
         print("Unexpected response while connecting to Codespeed:")
         raise ValueError('Unexpected response from Codespeed server: {}'.format(response))
     else:
@@ -152,14 +140,17 @@ class FunctionProfile(object):
 
             width, lst = stats.get_print_list("")
 
-            try:
-                # function_tuple = filter(lambda func_tuple: function_name == func_tuple[2], lst)[0]
-                function_tuple = filter(lambda func_tuple: function_name in func_tuple[2], lst)[0]
-            except IndexError:
+            # function_tuple = filter(lambda func_tuple: function_name == func_tuple[2], lst)[0]
+            function_tuple = None
+            for func_tuple in lst:
+                if function_name in func_tuple[2]:
+                    function_tuple = func_tuple
+                    break
+            if function_tuple is None:
                 # Could not find function_name in lst
                 possible_methods = ", ".join(x[2] for x in lst)
                 raise ValueError("Function Profile received invalid function name " + \
-                                 "<{}>.  Options are: {}".format(function_name, str(possible_methods)))
+                             "<{}>.  Options are: {}".format(function_name, str(possible_methods)))
 
             # stats.stats[func_tuple] returns tuple of the form:
             #  (# primitive (non-recursive) calls , # calls, total_time, cumulative_time, dictionary of callers)
@@ -224,7 +215,7 @@ class FunctionProfile(object):
         self.primitive_calls = json_dict["primitive_calls"]
         self.total_time = json_dict["total_time"]
 
-    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", benchmark="int"):
+    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", executable="Python"):
         """
         :param commit: Codespeed current commit argument.
         :param branch: Codespeed current branch argument.
@@ -237,8 +228,8 @@ class FunctionProfile(object):
             "commitid": commit,
             "project": "PyOpenWorm",
             "branch": "default",
-            "executable": self.function_name,
-            "benchmark": benchmark,
+            "executable": executable,
+            "benchmark": self.function_name,
             "environment": environment,
             "result_value": self.cumulative_time / self.calls
         }
