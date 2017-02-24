@@ -10,9 +10,9 @@ import pytest
 import six
 import tempfile
 import platform
-from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import urlencode
 from six.moves.urllib.error import HTTPError
+import six.moves.urllib.request as urllib_request
 
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
@@ -22,6 +22,8 @@ submit_url = None
 commit = None
 branch = None
 environment = None
+username = None
+password = None
 
 
 def pytest_addoption(parser):
@@ -35,17 +37,23 @@ def pytest_addoption(parser):
                      default=None, help='Specify Codespeed "Commit ID" setting.')
     profile_group.addoption('--environment', dest='env', action='store',
                      default=None, help='Specify Codespeed "Environment" setting.')
+    profile_group.addoption('--username', dest='cs_user', action='store',
+                     default=None, help='Specify Codespeed HTTP user name setting.')
+    profile_group.addoption('--password', dest='cs_pass', action='store',
+                     default=None, help='Specify Codespeed HTTP password setting.')
 
 
 def pytest_configure(config):
     """
     Called before tests are collected.
     """
-    global enabled, submit_url, commit, branch, environment
+    global enabled, submit_url, commit, branch, environment, username, password
 
     # enabled = config.getoption('profile') or config.getoption('cs_submit_url') is not None
     enabled = config.getoption('cs_url') is not None
     submit_url = config.getoption('cs_url')
+    username = config.getoption('cs_user')
+    password = config.getoption('cs_pass')
     commit = config.getoption('commit')
     branch = config.getoption('branch')
     environment = config.getoption('env')
@@ -81,7 +89,7 @@ def pytest_unconfigure(config):
     """
     Called after all tests are completed.
     """
-    global enabled, submit_url, commit, branch, environment
+    global enabled, submit_url, commit, branch, environment, username, password
 
     if not enabled:
         return
@@ -93,7 +101,18 @@ def pytest_unconfigure(config):
             for x in function_profile_list]
 
     try:
-        f = urlopen(submit_url + 'result/add/json/', urlencode({'json': json.dumps(data)}).encode('UTF-8'))
+        json_submit_url = submit_url + 'result/add/json/'
+
+        if username:
+            password_mgr = urllib_request.HTTPPasswordMgrWithDefaultRealm()
+            password_mgr.add_password(None, json_submit_url, username, password)
+            handler = urllib_request.HTTPBasicAuthHandler(password_mgr)
+            opener = urllib_request.build_opener(handler)
+        else:
+            opener = urllib_request.build_opener()
+
+        # use the opener to fetch a URL
+        f = opener.open(json_submit_url, urlencode({'json': json.dumps(data)}).encode('UTF-8'))
         response = f.read()
     except HTTPError as e:
         print('Error while connecting to Codespeed:')
