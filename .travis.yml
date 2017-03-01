@@ -1,31 +1,15 @@
 language: python
-
 python:
-  - "2.7"
-  - "3.4"
-
-# command to install dependencies
-# had to split requirements.txt into
-#  TWO files because they install all or none
-#  and dependencies installed later don't know
-#  about dependencies installed earlier in the process
+- '2.7'
+- '3.4'
 install:
-  - "pip install coveralls"
-  - "python setup.py install"
-
-
+- pip install coveralls
+- python setup.py install
 script:
-# Old, pre-pytest technique.
-# - "coverage run --source=PyOpenWorm tests/test.py"
-
-# Codespeed, default values for variables that break server
-# - "py.test --cov=PyOpenWorm --code-speed-submit=\"http://pyopenworm.pythonanywhere.com/\" ----environment=\"Dual Core\" --branch=\"default\" -commit=\"0\""
-
-# Codespeed, how it will work once Codespeed is fixed.
-# - "py.test --cov=PyOpenWorm --code-speed-submit=\"http://pyopenworm.pythonanywhere.com/\" ----environment=\"Dual Core\" --branch=\"`git symbolic-ref HEAD | sed -e 's,refs/heads/,,'`\" -commit=\"t rev-parse HEAD`\""
-
-  - "py.test --cov=PyOpenWorm"
-  
-
+- ./codespeed-submit.sh
+- py.test --cov=PyOpenWorm
 after_success:
-  - "coveralls"
+- coveralls
+env:
+  global:
+    secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
