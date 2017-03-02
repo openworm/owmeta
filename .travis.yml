@@ -3,7 +3,7 @@ python:
 - '2.7'
 - '3.4'
 install:
-- pip install coveralls
+- pip install coveralls pytest>=3.0.6
 - python setup.py install
 script:
 - ./codespeed-submit.sh
