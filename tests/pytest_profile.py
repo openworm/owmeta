@@ -93,11 +93,13 @@ def pytest_unconfigure(config):
 
     if not enabled:
         return
-
+    executable = "{}-{}-{}".format(platform.python_implementation(),
+                                   platform.python_version(),
+                                   platform.system())
     data = [x.to_codespeed_dict(commit=commit,
                                 branch=branch,
                                 environment=environment,
-                                executable=platform.python_implementation())
+                                executable=executable)
             for x in function_profile_list]
 
     try:
