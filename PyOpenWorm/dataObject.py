@@ -126,7 +126,7 @@ class DataObject(GraphObject, DataUser):
                 (self.identifier() == other.identifier()))
 
     def count(self):
-        return len(GraphObjectQuerier(self, self.rdf, parallel=True)())
+        return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
     def load(self):
         for ident in GraphObjectQuerier(self, self.rdf)():
