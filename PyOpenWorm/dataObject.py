@@ -129,7 +129,7 @@ class DataObject(GraphObject, DataUser):
         return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
     def load(self):
-        for ident in GraphObjectQuerier(self, self.rdf)():
+        for ident in GraphObjectQuerier(self, self.rdf, parallel=False)():
             types = set()
             for rdf_type in self.rdf.objects(ident, R.RDF['type']):
                 types.add(rdf_type)

@@ -82,7 +82,7 @@ class RealSimpleProperty(object):
         else:
             v = Variable("var" + str(id(self)))
             self._insert_value(v)
-            results = GraphObjectQuerier(v, self.rdf)()
+            results = GraphObjectQuerier(v, self.rdf, parallel=False)()
             self._remove_value(v)
         return results
 
