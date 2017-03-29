@@ -276,7 +276,6 @@ class Data(Configure, Configureable):
         self['rdf.graph']._remove = self['rdf.graph'].remove
         self['rdf.graph'].add = self._my_graph_add
         self['rdf.graph'].remove = self._my_graph_remove
-        #self['rdf.graph'] = CachingGraph(self['rdf.graph']
         nm.bind("", self['rdf.namespace'])
 
     def _my_graph_add(self, triple):

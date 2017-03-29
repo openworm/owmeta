@@ -2,6 +2,7 @@ from __future__ import print_function
 import rdflib as R
 import random as RND
 import logging
+from itertools import groupby
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
@@ -129,9 +130,14 @@ class DataObject(GraphObject, DataUser):
         return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
     def load(self):
-        for ident in GraphObjectQuerier(self, self.rdf, parallel=False)():
+        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
+        grouped_type_triples = groupby(self.rdf.triples_choices((list(idents),
+                                                                 R.RDF['type'],
+                                                                 None)),
+                                       lambda x: x[0])
+        for ident, type_triples in grouped_type_triples:
             types = set()
-            for rdf_type in self.rdf.objects(ident, R.RDF['type']):
+            for __, __, rdf_type in type_triples:
                 types.add(rdf_type)
             the_type = get_most_specific_rdf_type(types)
             yield oid(ident, the_type)
