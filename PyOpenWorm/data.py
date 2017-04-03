@@ -23,6 +23,7 @@ import os
 import traceback
 import logging as L
 from .zodb_store import ConcurrentZODBStore
+from .utils import grouper
 
 __all__ = [
     "Data",
@@ -79,22 +80,6 @@ propertyTypes = {"send": 'http://openworm.org/entities/356',
                  "Innexin": 'http://openworm.org/entities/355',
                  "Neurotransmitter": 'http://openworm.org/entities/313',
                  "gap junction": 'http://openworm.org/entities/357'}
-
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    while True:
-        l = []
-        try:
-            for x in args:
-                l.append(next(x))
-        except Exception:
-            pass
-        yield l
-        if len(l) < n:
-            break
 
 
 class DataUser(Configureable):
@@ -291,6 +276,7 @@ class Data(Configure, Configureable):
         self['rdf.graph']._remove = self['rdf.graph'].remove
         self['rdf.graph'].add = self._my_graph_add
         self['rdf.graph'].remove = self._my_graph_remove
+        #self['rdf.graph'] = CachingGraph(self['rdf.graph']
         nm.bind("", self['rdf.namespace'])
 
     def _my_graph_add(self, triple):
@@ -650,7 +636,7 @@ class ZODBSource(RDFSource):
         openstr = os.path.abspath(self.path)
 
         fs = FileStorage(openstr)
-        self.zdb = ZODB.DB(fs)
+        self.zdb = ZODB.DB(fs, cache_size=1600)
         self.conn = self.zdb.open()
         root = self.conn.root()
         if 'rdflib' not in root:

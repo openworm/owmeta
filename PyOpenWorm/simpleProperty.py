@@ -49,11 +49,15 @@ class RealSimpleProperty(object):
             v = PropertyValue(v)
 
         if not self.multiple:
-            self._v = _values()
+            self.clear()
 
         self._insert_value(v)
 
         return RelationshipProxy(Rel(self.owner, self, v))
+
+    def clear(self):
+        for x in self._v:
+            self._remove_value(x)
 
     @property
     def defined_values(self):
@@ -246,7 +250,8 @@ class SimpleProperty(GraphObject, DataUser):
             if self.property_type == 'ObjectProperty':
                 return self._pp.values
             else:
-                return [deserialize_rdflib_term(x.idl) for x in self._pp.values]
+                return [deserialize_rdflib_term(x.idl)
+                        for x in self._pp.values]
         else:
             return self._pp.get()
 
@@ -258,7 +263,8 @@ class SimpleProperty(GraphObject, DataUser):
     def _defined_values_string(self):
         if self._defined_values_string_cache is None:
             self._defined_values_string_cache = "".join(
-                x.identifier().n3().encode('UTF-8') for x in self.defined_values)
+                x.identifier().n3().encode('UTF-8')
+                for x in self.defined_values)
         return self._defined_values_string_cache
 
     @property
