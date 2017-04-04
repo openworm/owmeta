@@ -65,7 +65,7 @@ setup(
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
         'xlrd',
-        'yarom==0.9.0',
+        'yarom==0.10.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
