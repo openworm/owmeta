@@ -124,3 +124,21 @@ class Connection(DataObject):
             data = tuple(x.defined_values[0].identifier().n3() for x in data)
             data = "".join(data)
             return self.make_identifier(data)
+
+    def __str__(self):
+        nom = []
+        if self.pre_cell.has_defined_value():
+            nom.append(('pre_cell', self.pre_cell.values[0]))
+        if self.post_cell.has_defined_value():
+            nom.append(('post_cell', self.post_cell.values[0]))
+        if self.syntype.has_defined_value():
+            nom.append(('syntype', self.syntype.values[0]))
+        if self.termination.has_defined_value():
+            nom.append(('termination', self.termination.values[0]))
+        if self.number.has_defined_value():
+            nom.append(('number', self.number.values[0]))
+        if self.synclass.has_defined_value():
+            nom.append(('synclass', self.synclass.values[0]))
+        return 'Connection(' + \
+               ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
+               ')'

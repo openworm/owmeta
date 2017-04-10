@@ -80,7 +80,7 @@ class DataObject(GraphObject, DataUser):
 
     def __repr__(self):
         s = self.__class__.__name__ + "("
-        s += repr(self.idl)
+        s += 'ident=' + repr(self.idl)
         s += ")"
         return s
 

@@ -49,4 +49,6 @@ class DataObjectTest(_DataTest):
         self.assertIsNotNone(u)
 
     def test_repr(self):
-        self.assertRegexpMatches(repr(DataObject(ident="http://example.com")), r"DataObject\(rdflib\.term\.URIRef\(u?[\"']http://example.com[\"']\)\)")
+        self.assertRegexpMatches(repr(DataObject(ident="http://example.com")),
+                                 r"DataObject\(ident=rdflib\.term\.URIRef\("
+                                 r"u?[\"']http://example.com[\"']\)\)")
