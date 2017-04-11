@@ -23,6 +23,7 @@ def test_adal_connections():
         Connection(pre_cell=adal, post_cell=post)
         tuple(post.load())
 
+
 def test_adal_connections_property():
     """
     See github issue openworm/PyOpenWorm#90
@@ -36,3 +37,7 @@ def test_neuron_receptors():
     for x in range(30):
         post = Neuron()
         list(post.receptor())
+
+
+def test_neuron_load():
+    list(Neuron().load())
