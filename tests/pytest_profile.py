@@ -248,7 +248,7 @@ class FunctionProfile(object):
         return {
             "commitid": commit,
             "project": "PyOpenWorm",
-            "branch": "default",
+            "branch": branch,
             "executable": executable,
             "benchmark": self.function_name,
             "environment": environment,
