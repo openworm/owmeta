@@ -3,9 +3,11 @@ from PyOpenWorm.dataObject import DataObject
 from six.moves.urllib.parse import urlparse, unquote, urlencode
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
+import logging
 import traceback
 import re
 
+logger = logging.getLogger(__file__)
 
 class EvidenceError(Exception):
     pass
@@ -384,7 +386,12 @@ class Evidence(DataObject):
                 "/" +
                 field)
         # get the author
-        j = wbRequest(wbid, 'authors')
+        try:
+            j = wbRequest(wbid, 'authors')
+        except Exception:
+            logger.warning("Couldn't retrieve Wormbase authors", exc_info=True)
+            return
+
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
@@ -393,7 +400,12 @@ class Evidence(DataObject):
                 self.author(f['name']['data']['label'])
 
         # get the publication date
-        j = wbRequest(wbid, 'publication_date')
+        try:
+            j = wbRequest(wbid, 'publication_date')
+        except Exception:
+            logger.warning("Couldn't retrieve Wormbase publication date",
+                           exc_info=True)
+            return
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
@@ -413,7 +425,11 @@ class Evidence(DataObject):
         doi = self._fields['doi']
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
-        r = crRequest(doi)
+        try:
+            r = crRequest(doi)
+        except Exception:
+            logger.warning("Couldn't retrieve Crossref info", exc_info=True)
+            return
         # XXX: I don't think coins is meant to be used, but it has structured
         # data...
         if len(r) > 0:
@@ -453,7 +469,12 @@ class Evidence(DataObject):
             # Probably a uri, right?
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
-        tree = pmRequest(pmid)
+
+        try:
+            tree = pmRequest(pmid)
+        except Exception:
+            logger.warning("Couldn't retrieve Pubmed info", exc_info=True)
+            return
 
         for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
             self.author(x.text)
