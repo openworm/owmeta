@@ -2,7 +2,7 @@
 Not actually tests, but benchmarks.
 """
 from __future__ import print_function
-from PyOpenWorm import Neuron, Connection, connect, disconnect
+from PyOpenWorm import Neuron, Connection, connect, disconnect, config
 
 
 def setup():
@@ -11,6 +11,10 @@ def setup():
 
 def teardown():
     disconnect()
+
+
+def baseline():
+    list(zip(range(1000), config('rdf.graph').triples((None, None, None))))
 
 
 def test_adal_connections():
