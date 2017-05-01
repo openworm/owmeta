@@ -14,7 +14,7 @@ from six.moves.urllib.parse import urlencode
 from six.moves.urllib.error import HTTPError
 import six.moves.urllib.request as urllib_request
 
-from tests.ProfileTest import baseline
+from tests.ProfileTest import baseline, setup, teardown
 
 
 
@@ -74,7 +74,9 @@ def pytest_configure(config):
     if enabled:
         profiler = cProfile.Profile()
         profiler.enable()
+        setup()
         baseline()
+        teardown()
         profiler.disable()
         fp = FunctionProfile(cprofile=profiler, function_name='baseline')
         baseline_profile = fp
