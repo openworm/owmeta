@@ -14,7 +14,7 @@ from six.moves.urllib.parse import urlencode
 from six.moves.urllib.error import HTTPError
 import six.moves.urllib.request as urllib_request
 
-from pytest_profile import baseline
+from tests.ProfileTest import baseline
 
 
 
