@@ -1,5 +1,4 @@
 # This file specified pytest plugins
-
 from __future__ import absolute_import
 from __future__ import print_function
 import pstats
@@ -14,9 +13,13 @@ from six.moves.urllib.parse import urlencode
 from six.moves.urllib.error import HTTPError
 import six.moves.urllib.request as urllib_request
 
-from tests.ProfileTest import baseline, setup, teardown
+from tests.ProfileTest import (
+    baseline,
+    initialize_baseline_graph,
+    destroy_baseline_graph,
+    reinitialize)
 
-
+from time import perf_timer
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
 function_profile_list = []
@@ -68,15 +71,17 @@ def pytest_configure(config):
 
     missing_argument = not commit or not branch or not environment
     if submit_url and missing_argument:
-        raise ValueError("If calling with --code-speed-submit, user must supply " + \
+        raise ValueError("If calling with --code-speed-submit, user must supply " +
                          "--commit, --branch, and --environment arguments.")
 
     if enabled:
-        profiler = cProfile.Profile()
+        initialize_baseline_graph()
+        reinitialize()
+
+        profiler = cProfile.Profile(perf_timer)
+
         profiler.enable()
-        setup()
         baseline()
-        teardown()
         profiler.disable()
         fp = FunctionProfile(cprofile=profiler, function_name='baseline')
         baseline_profile = fp
@@ -150,6 +155,8 @@ def pytest_unconfigure(config):
         raise ValueError('Unexpected response from Codespeed server: {}'.format(response))
     else:
         print("{} test benchmarks sumbitted.".format(len(function_profile_list)))
+
+    destroy_baseline_graph()
 
 
 class FunctionProfile(object):
