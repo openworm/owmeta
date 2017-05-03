@@ -19,11 +19,6 @@ from tests.ProfileTest import (
     destroy_baseline_graph,
     reinitialize)
 
-if six.PY2:
-    TIMER = None
-else:
-    from time import perf_counter
-    TIMER = perf_counter
 
 # Module level, to pass state across tests.  This is not multiprocessing-safe.
 function_profile_list = []
@@ -82,7 +77,7 @@ def pytest_configure(config):
         initialize_baseline_graph()
         reinitialize()
 
-        profiler = cProfile.Profile(TIMER)
+        profiler = cProfile.Profile()
 
         profiler.enable()
         baseline()
