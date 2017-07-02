@@ -61,7 +61,7 @@ setup(
         'rdflib-zodb>=1.0.0',
         'requirements==0.1',
         'requests',
-        'six==1.9.0',
+        'six==1.10.0',
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
         'wsgiref==0.1.2',
@@ -77,7 +77,6 @@ setup(
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-        'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
         'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
     ],
     version = version,
