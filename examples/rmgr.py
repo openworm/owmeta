@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import PyOpenWorm as P
 
-P.connect()
+P.connect('default.conf')
 
 class NC_neighbor(P.Property):
     def __init__(self, *args, **kwargs):
@@ -34,7 +36,7 @@ class NC_neighbor(P.Property):
                     this_neuron.neighbor(x,**kwargs)
                 except ValueError:
                     # XXX: could default to all-to-all semantics
-                    print 'Do not recoginze the membership of this neuron/neuron class', ob
+                    print('Do not recoginze the membership of this neuron/neuron class', ob)
         elif isinstance(ob, Neuron):
             for x in self.owner.member:
                 x.neighbor(ob)
@@ -136,11 +138,11 @@ ev.save()
 nc = NeuronClass()
 nc.type('sensory')
 
-print 'Sensory neuron classes in the circuit and their neurons'
+print('Sensory neuron classes in the circuit and their neurons')
 # XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
 for x in nc.load():
-    print x.name(), "has:"
+    print(x.name(), "has:")
     for y in x.member():
-        print " ", y.name(), "of type", ",".join(y.type())
+        print(" ", y.name(), "of type", ",".join(y.type()))
 
 P.disconnect()

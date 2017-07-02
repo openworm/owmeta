@@ -2,9 +2,11 @@ from .pProperty import Property
 from .channelworm import ChannelModel
 from .dataObject import DataObject
 
+
 # XXX: Why is this not an ObjectProperty?
 class Models(Property):
-    multiple=True
+    multiple = True
+
     def __init__(self, **kwargs):
         Property.__init__(self, 'models', **kwargs)
         self._models = []
@@ -26,11 +28,11 @@ class Models(Property):
             for m in self._models:
                 yield m
         else:
-            #make a dummy ChannelModel so we can load from db to memory
+            # make a dummy ChannelModel so we can load from db to memory
             c = ChannelModel()
             for m in c.load():
                 self._models.append(m)
-            #call `get()` again to yield ChannelModels the user asked for
+            # call `get()` again to yield ChannelModels the user asked for
             if len(self._models) > 0:
                 self.get()
 
@@ -55,10 +57,11 @@ class Models(Property):
         self._models.append(m)
         return m
 
-    def triples(self,**kwargs):
+    def triples(self, **kwargs):
         for c in self._models:
             for x in c.triples(**kwargs):
                 yield x
+
 
 class Channel(DataObject):
     """
@@ -92,16 +95,16 @@ class Channel(DataObject):
         Models(owner=self)
         Channel.DatatypeProperty('subfamily', owner=self)
         Channel.DatatypeProperty('description', owner=self)
-        Channel.DatatypeProperty('name', self) #channel_name
-        Channel.DatatypeProperty('description',self) #description
-        Channel.DatatypeProperty('gene_name', self) #gene_name
-        Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
-        Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
-        Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('description_evidences', self)
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('expression_evidences', self)
+        Channel.DatatypeProperty('name', self)
+        Channel.DatatypeProperty('description', self)
+        Channel.DatatypeProperty('gene_name', self)
+        Channel.DatatypeProperty('gene_WB_ID', self)
+        Channel.DatatypeProperty('expression_pattern', self)
+        Channel.DatatypeProperty('proteins', self, multiple=True)
+        # TODO: assert this in the adapter instead
+        # Channel.DatatypeProperty('description_evidences', self)
+        # TODO: assert this in the adapter instead
+        # Channel.DatatypeProperty('expression_evidences', self)
 
         if name:
             self.name(name)
@@ -118,17 +121,8 @@ class Channel(DataObject):
         return super(Channel, self).defined or self.name.has_defined_value()
 
     def identifier(self):
-        # Copied from cell.py
-
-        # If the DataObject identifier isn't variable, then self is a specific
-        # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
         if super(Channel, self).defined:
             return super(Channel, self).identifier()
         else:
             # name is already set, so we can make an identifier from it
             return self.make_identifier(self.name.defined_values[0])
-

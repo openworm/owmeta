@@ -1,21 +1,25 @@
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.dataObject import DataObject
+from six.moves.urllib.parse import urlparse, unquote, urlencode
+from six.moves.urllib.request import Request, urlopen
+from six.moves.urllib.error import HTTPError, URLError
+import logging
+import traceback
+import re
 
+logger = logging.getLogger(__file__)
 
 class EvidenceError(Exception):
     pass
 
 
 def _pubmed_uri_to_pmid(uri):
-    from urlparse import urlparse
     parsed = urlparse(uri)
     pmid = int(parsed.path.split("/")[2])
     return pmid
 
 
 def _doi_uri_to_doi(uri):
-    from urlparse import urlparse
-    from urllib2 import unquote
     parsed = urlparse(uri)
     doi = parsed.path.split("/")[1]
     # the doi from a url needs to be decoded
@@ -24,14 +28,19 @@ def _doi_uri_to_doi(uri):
 
 
 def _url_request(url, headers={}):
-    import urllib2 as U
     try:
-        r = U.Request(url, headers=headers)
-        s = U.urlopen(r, timeout=1)
+        r = Request(url, headers=headers)
+        s = urlopen(r, timeout=1)
+        info = dict(s.info())
+        content_type = {k.lower() : info[k] for k in info} ['content-type']
+        md = re.search("charset *= *([^ ]+)", content_type)
+        if md:
+            s.charset = md.group(1)
+
         return s
-    except U.HTTPError:
+    except HTTPError:
         return ""
-    except U.URLError:
+    except URLError:
         return ""
 
 
@@ -39,8 +48,13 @@ def _json_request(url):
     import json
     headers = {'Content-Type': 'application/json'}
     try:
-        return json.load(_url_request(url, headers))
+        data = _url_request(url, headers).read().decode('UTF-8')
+        if hasattr(data, 'charset'):
+            return json.loads(data, encoding=data.charset)
+        else:
+            return json.loads(data)
     except BaseException:
+        traceback.print_exc()
         return {}
 
 
@@ -321,6 +335,9 @@ class Evidence(DataObject):
         if author is not None:
             self.author(author)
 
+        if uri is not None:
+            self.uri(uri)
+
     def add_data(self, k, v):
         """ Add a field
 
@@ -369,7 +386,12 @@ class Evidence(DataObject):
                 "/" +
                 field)
         # get the author
-        j = wbRequest(wbid, 'authors')
+        try:
+            j = wbRequest(wbid, 'authors')
+        except Exception:
+            logger.warning("Couldn't retrieve Wormbase authors", exc_info=True)
+            return
+
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
@@ -378,7 +400,12 @@ class Evidence(DataObject):
                 self.author(f['name']['data']['label'])
 
         # get the publication date
-        j = wbRequest(wbid, 'publication_date')
+        try:
+            j = wbRequest(wbid, 'publication_date')
+        except Exception:
+            logger.warning("Couldn't retrieve Wormbase publication date",
+                           exc_info=True)
+            return
         if 'fields' in j:
             f = j['fields']
             if 'data' in f:
@@ -389,9 +416,8 @@ class Evidence(DataObject):
     def _crossref_doi_extract(self):
         # Extract data from crossref
         def crRequest(doi):
-            import urllib as U
             data = {'q': doi}
-            data_encoded = U.urlencode(data)
+            data_encoded = urlencode(data)
             return _json_request(
                 'http://search.labs.crossref.org/dois?%s' %
                 data_encoded)
@@ -399,7 +425,11 @@ class Evidence(DataObject):
         doi = self._fields['doi']
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
-        r = crRequest(doi)
+        try:
+            r = crRequest(doi)
+        except Exception:
+            logger.warning("Couldn't retrieve Crossref info", exc_info=True)
+            return
         # XXX: I don't think coins is meant to be used, but it has structured
         # data...
         if len(r) > 0:
@@ -426,14 +456,25 @@ class Evidence(DataObject):
             # XXX: There's more data in esummary.fcgi?, but I don't know how to
             # parse it
             url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
-            return ET.parse(_url_request(url))
+            s = _url_request(url)
+            if hasattr(s, 'charset'):
+                parser = ET.XMLParser(encoding=s.charset)
+            else:
+                parser = None
+
+            return ET.parse(s, parser)
 
         pmid = self._fields['pmid']
         if pmid[:4] == 'http':
             # Probably a uri, right?
             pmid = _pubmed_uri_to_pmid(pmid)
         pmid = int(pmid)
-        tree = pmRequest(pmid)
+
+        try:
+            tree = pmRequest(pmid)
+        except Exception:
+            logger.warning("Couldn't retrieve Pubmed info", exc_info=True)
+            return
 
         for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
             self.author(x.text)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -88,3 +89,7 @@ class ConfigureTest(unittest.TestCase):
         """Ensure Configureable gets init'd with the defalut if False is given"""
         i = Configureable(conf=False)
         self.assertEqual(Configureable.conf, i.conf)
+
+    def test_dict_init(self):
+        c = Configure(x=4, y=3)
+        self.assertEqual(4, c['x'])

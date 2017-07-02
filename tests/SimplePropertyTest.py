@@ -1,20 +1,18 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import sys
 sys.path.insert(0, ".")
 from PyOpenWorm import DataObject
 from PyOpenWorm.simpleProperty import SimpleProperty
 import rdflib as R
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 
 class SimplePropertyTest(_DataTest):
 
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
-        """
-        Test that two SimpleProperty objects with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
@@ -22,9 +20,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_same_value_same_id_not_empty(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
@@ -34,9 +29,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_same_value_same_id_not_empty_object_property(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         dz = DataObject(ident=R.URIRef("http://example.org/vip"))
@@ -47,23 +39,16 @@ class SimplePropertyTest(_DataTest):
         do1.boots(dz1)
         self.assertEqual(c.identifier(), c1.identifier())
 
-    def test_diff_value_diff_id_not_equal(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
+    def test_diff_value_diff_id_equal(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('join')
         do1.boots('partition')
-        self.assertNotEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier(), c1.identifier())
 
     def test_diff_prop_same_name_same_object_same_value_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier
-        """
-        # why would you ever do this?
         do = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do)
@@ -71,23 +56,15 @@ class SimplePropertyTest(_DataTest):
         c1('join')
         self.assertEqual(c.identifier(), c1.identifier())
 
-    def test_diff_prop_same_name_same_object_diff_value_diff_id(self):
-        """
-        Test that two SimpleProperty with the same name, but different values
-        have distinct identifiers
-        """
-        # why would you ever do this?
+    def test_diff_prop_same_name_same_object_diff_value_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do)
         c('partition')
         c1('join')
-        self.assertNotEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier(), c1.identifier())
 
     def test_diff_value_insert_order_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
 
@@ -102,9 +79,6 @@ class SimplePropertyTest(_DataTest):
         self.assertEqual(c.identifier(), c1.identifier())
 
     def test_object_property_diff_value_insert_order_same_id(self):
-        """
-        Test that two SimpleProperty with the same name have the same identifier()
-        """
         do = DataObject(ident=R.URIRef("http://example.org"))
         do1 = DataObject(ident=R.URIRef("http://example.org"))
 
@@ -137,3 +111,51 @@ class SimplePropertyTest(_DataTest):
         sp = DataObject.attach_property(do, T)
         self.assertEqual(len(list(sp.triples())), 0)
         self.assertEqual(len(list(sp.triples(query=True))), 0)
+
+
+class POCacheTest(_DataTest):
+
+    def setUp(self):
+        super(POCacheTest, self).setUp()
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots('h')
+        o.save()
+
+    def test_cache_refresh_after_triple_add(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        o.rdf.add((R.URIRef('http://example.org/a'),
+                   R.URIRef('http://bluhbluh.com'),
+                   R.URIRef('http://bluhah.com')))
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)
+
+    def test_cache_refresh_after_triple_remove(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        # XXX: Note that it doesn't matter if the triple was
+        # actually in the graph
+        o.rdf.remove((R.URIRef('/not/in'),
+                      R.URIRef('/the'),
+                      R.URIRef('/graph')))
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)
+
+    def test_cache_refresh_clear(self):
+        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        DataObject.DatatypeProperty("boots", o)
+        o.boots()
+        c1 = o.po_cache
+        self.assertIsNotNone(c1)
+        # XXX: Note that it doesn't matter if the triple was
+        # actually in the graph
+        o.clear_po_cache()
+        o.boots()
+        self.assertIsNot(c1, o.po_cache)
