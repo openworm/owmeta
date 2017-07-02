@@ -460,28 +460,28 @@ def upload_connections():
 
 
 def infer():
-    from rdflib import Graph
-    from FuXi.Rete.RuleStore import SetupRuleStore
-    from FuXi.Rete.Util import generateTokenSet
-    from FuXi.Horn.HornRules import HornFromN3
+#    from rdflib import Graph
+#    from FuXi.Rete.RuleStore import SetupRuleStore
+#    from FuXi.Rete.Util import generateTokenSet
+#    from FuXi.Horn.HornRules import HornFromN3
 
-    try:
-        w = WORM
-        semnet = w.rdf #fetches the entire worm.db graph
+#    try:
+#        w = WORM
+#        semnet = w.rdf #fetches the entire worm.db graph
 
-        rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
-        closureDeltaGraph = Graph()
-        network.inferredFacts = closureDeltaGraph
+#        rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
+#        closureDeltaGraph = Graph()
+#        network.inferredFacts = closureDeltaGraph
 
         #build a network of rules
-        for rule in HornFromN3('inference_rules.n3'):
-            network.buildNetworkFromClause(rule)
+#        for rule in HornFromN3('inference_rules.n3'):
+#            network.buildNetworkFromClause(rule)
 
-        network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
+#        network.feedFactsToAdd(generateTokenSet(semnet)) # apply rules to original facts to infer new facts
 
         # combine original facts with inferred facts
-        for x in closureDeltaGraph:
-            w.rdf.add(x)
+#        for x in closureDeltaGraph:
+#            w.rdf.add(x)
 
         ###uncomment next 4 lines to print inferred facts to human-readable file (demo purposes)
         #inferred_facts = closureDeltaGraph.serialize(format='n3') #format inferred facts to notation 3
@@ -489,9 +489,9 @@ def infer():
         #inferred.write(inferred_facts)
         #inferred.close()
 
-    except Exception:
-        traceback.print_exc()
-    print ("filled in with inferred data")
+#    except Exception:
+#        traceback.print_exc()
+#    print ("filled in with inferred data")
 
 
 def do_insert(config="default.conf", logging=False):

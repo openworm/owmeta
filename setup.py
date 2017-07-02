@@ -54,7 +54,7 @@ setup(
         'numpydoc==0.5',
         'persistent==4.0.8',
         'Pint',
-        'pyparsing==2.0.2',
+        'pyparsing==2.2.0',
         'pytest==2.6.4',
         'pytest-cov==2.0.0',
         'rdflib==4.1.2',
