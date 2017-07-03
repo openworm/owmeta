@@ -22,7 +22,6 @@ import transaction
 import os
 import traceback
 import logging as L
-from .zodb_store import ConcurrentZODBStore
 from .utils import grouper
 
 __all__ = [

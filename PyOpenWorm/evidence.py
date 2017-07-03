@@ -54,7 +54,8 @@ def _json_request(url):
         else:
             return json.loads(data)
     except BaseException:
-        traceback.print_exc()
+        logger.warning("Couldn't retrieve JSON data from " + url,
+                       exc_info=True)
         return {}
 
 

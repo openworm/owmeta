@@ -132,7 +132,7 @@ class Neighbor(P.Property):
     multiple = True
 
     def __init__(self, **kwargs):
-        P.Property.__init__(self, 'neighbor', **kwargs)
+        super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
 
     def get(self, **kwargs):
@@ -186,7 +186,7 @@ class Connection(P.Property):
     multiple = True
 
     def __init__(self, **kwargs):
-        P.Property.__init__(self, 'connection', **kwargs)
+        super(Connection, self).__init__('connection', **kwargs)
         self._conns = []
 
     def get(self, pre_post_or_either='pre', **kwargs):
@@ -278,7 +278,6 @@ class Connection(P.Property):
            -------
            A PyOpenWorm.neuron.Connection
         """
-        # XXX: Should this create a Connection here instead?
         assert(isinstance(conn, P.Connection))
         self._conns.append(conn)
 
