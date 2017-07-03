@@ -1,7 +1,9 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import unittest
 import traceback
 from PyOpenWorm import *
+from six.moves import range
 
 
 class IntegrationTest(unittest.TestCase):

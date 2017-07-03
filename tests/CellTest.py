@@ -1,25 +1,16 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import sys
+from six.moves import zip
 sys.path.insert(0,".")
 import unittest
 import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
+from PyOpenWorm import Neuron, Muscle, Cell, DataUser
 import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
 
-from glob import glob
-
-from GraphDBInit import *
-
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class CellTest(_DataTest):
 
@@ -133,13 +124,13 @@ class CellTest(_DataTest):
         f = sys.stdout
         try:
             sys.stdout = open(os.devnull, 'w')
-        except:
+        except Exception:
             sys.stdout = f
 
         try:
             validate_neuroml2("temp.nml")
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             self.fail("Should validate")
         sys.stdout = f
 
@@ -158,3 +149,6 @@ class CellTest(_DataTest):
         sum_cells = num_neurons + num_muscles
 
         self.assertEqual(sum_cells, num_cells)
+
+    def test_str(self):
+        self.assertEqual('cell_name', str(Cell('cell_name')))

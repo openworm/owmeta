@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -7,7 +8,7 @@ import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
 from PyOpenWorm import *
-import test_data as TD
+from . import test_data as TD
 import networkx
 import rdflib
 import rdflib as R
@@ -20,7 +21,7 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import * 
+from .GraphDBInit import * 
 
 class DatabaseBackendTest(unittest.TestCase):
     """Integration tests that ensure basic functioning of the database

@@ -57,12 +57,13 @@ Classes
 """
 
 from __future__ import print_function
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 __author__ = 'Stephen Larson'
 
-import traceback
 import sys
 import os
+
+# For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
 from .data import Data, DataUser, propertyTypes
 from .dataObject import DataObject
@@ -84,7 +85,38 @@ from .channelworm import ChannelModel, PatchClampExperiment
 from .plot import Plot
 
 __import__('__main__').connected = False
-
+__all__ = [
+    "get_data",
+    "loadConfig",
+    "loadData",
+    "disconnect",
+    "connect",
+    "config",
+    "Configure",
+    "Configureable",
+    "ConfigValue",
+    "BadConf",
+    "Data",
+    "DataObject",
+    "DataUser",
+    "propertyTypes",
+    "Property",
+    "SimpleProperty",
+    "Cell",
+    "Network",
+    "Neuron",
+    "Worm",
+    "Relationship",
+    "EvidenceError",
+    "Muscle",
+    "Quantity",
+    "NeuroML",
+    "Connection",
+    "Experiment",
+    "Channel",
+    "ChannelModel",
+    "PatchClampExperiment",
+    "Plot"]
 
 def get_data(path):
     # get a resource from the installed package location
@@ -94,7 +126,7 @@ def get_data(path):
     from glob import glob
     package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = package_paths + sys.path
-    installed_package_root = get_loader('PyOpenWorm').filename
+    installed_package_root = os.path.dirname(get_loader('PyOpenWorm').get_filename())
     sys.path = sys.path[len(package_paths):]
     filename = os.path.join(installed_package_root, path)
     return filename
@@ -154,8 +186,9 @@ def loadData(
                         than the data to be loaded in. This is determined by the modified time on the main
                         database file compared to the modified time on the data file.
     """
+    import logging
     if not os.path.isfile(data):
-        raise Exception("No such data file: "+data)
+        raise Exception("No such data file: " + data)
 
     if skipIfNewer:
         try:
@@ -165,8 +198,9 @@ def loadData(
                 db_file_time = os.path.getmtime(config('rdf.store_conf'))
                 if data_file_time < db_file_time:
                     return
-        except:
-            pass
+        except Exception as e:
+            logging.exception("Failed to determine if the serialized data file is older than the binary database. The data"
+                            " file will be reloaded. Reason: {}".format(e.message))
     sys.stderr.write(
         "[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
@@ -226,8 +260,8 @@ def connect(configFile=False,
     #  and lets our data handling system know about them.
     #  Should add new classes here if they need to be tracked!
     DataObject.register()
-    Cell.register()
     Network.register()
+    Cell.register()
     Neuron.register()
     Worm.register()
     Evidence.register()

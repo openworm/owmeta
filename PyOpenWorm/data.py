@@ -22,6 +22,7 @@ import transaction
 import os
 import traceback
 import logging as L
+from .utils import grouper
 
 __all__ = [
     "Data",
@@ -50,6 +51,7 @@ class _B(ConfigValue):
     def invalidate(self):
         self.v = False
 
+
 ZERO = datetime.timedelta(0)
 
 
@@ -65,6 +67,8 @@ class _UTC(datetime.tzinfo):
 
     def dst(self, dt):
         return ZERO
+
+
 utc = _UTC()
 
 propertyTypes = {"send": 'http://openworm.org/entities/356',
@@ -75,22 +79,6 @@ propertyTypes = {"send": 'http://openworm.org/entities/356',
                  "Innexin": 'http://openworm.org/entities/355',
                  "Neurotransmitter": 'http://openworm.org/entities/313',
                  "gap junction": 'http://openworm.org/entities/357'}
-
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    while True:
-        l = []
-        try:
-            for x in args:
-                l.append(next(x))
-        except:
-            pass
-        yield l
-        if len(l) < n:
-            break
 
 
 class DataUser(Configureable):
@@ -147,7 +135,7 @@ class DataUser(Configureable):
 
             try:
                 gs = g.serialize(format="nt")
-            except:
+            except Exception:
                 gs = _triples_to_bgp(g)
 
             if graph_name:
@@ -158,14 +146,12 @@ class DataUser(Configureable):
                 self.conf['rdf.graph'].update(s)
         else:
             gr = self.conf['rdf.graph']
+            if self.conf['rdf.source'] == 'ZODB':
+                transaction.begin()
             for x in g:
                 gr.add(x)
-
-        if self.conf['rdf.source'] == 'ZODB':
-            # Commit the current transaction
-            transaction.commit()
-            # Fire off a new one
-            transaction.begin()
+            if self.conf['rdf.source'] == 'ZODB':
+                transaction.commit()
 
         # infer from the added statements
         # self.infer()
@@ -206,9 +192,6 @@ class DataUser(Configureable):
                     statement_node))
 
         self.add_statements(g + new_statements)
-
-    # def _add_unannotated_statements(self, graph):
-    # A UTC class.
 
     def retract_statements(self, graph):
         """
@@ -284,7 +267,29 @@ class Data(Configure, Configureable):
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
 
+        # A runtime version number for the graph should update for all changes
+        # to the graph
+        self['rdf.graph.change_counter'] = 0
+
+        self['rdf.graph']._add = self['rdf.graph'].add
+        self['rdf.graph']._remove = self['rdf.graph'].remove
+        self['rdf.graph'].add = self._my_graph_add
+        self['rdf.graph'].remove = self._my_graph_remove
         nm.bind("", self['rdf.namespace'])
+
+    def _my_graph_add(self, triple):
+        self['rdf.graph']._add(triple)
+
+        # It's important that this happens _after_ the update otherwise anyone
+        # checking could think they have the lastest version when they don't
+        self['rdf.graph.change_counter'] += 1
+
+    def _my_graph_remove(self, triple_or_quad):
+        self['rdf.graph']._remove(triple_or_quad)
+
+        # It's important that this happens _after_ the update otherwise anyone
+        # checking could think they have the lastest version when they don't
+        self['rdf.graph.change_counter'] += 1
 
     def closeDatabase(self):
         """ Close a the configured database """
@@ -306,13 +311,13 @@ class Data(Configure, Configureable):
                         'default': DefaultSource,
                         'trix': TrixSource,
                         'serialization': SerializationSource,
-                        'zodb': ZODBSource
-                        }
-        i = self.sources[self['rdf.source'].lower()]()
-        self.source = i
+                        'zodb': ZODBSource}
+        source = self.sources[self['rdf.source'].lower()]()
+        self.source = source
+
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
-        self['rdf.graph'] = i
-        return i
+        self['rdf.graph'] = source
+        return source
 
     def _molecule_hash(self, data):
         return URIRef(
@@ -324,7 +329,7 @@ class Data(Configure, Configureable):
         g = nx.DiGraph()
 
         # Neuron table
-        csvfile = file(self.conf['neuronscsv'])
+        csvfile = open(self.conf['neuronscsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
@@ -343,7 +348,7 @@ class Data(Configure, Configureable):
                 g.add_node(row[0], ntype=neurontype)
 
         # Connectome table
-        csvfile = file(self.conf['connectomecsv'])
+        csvfile = open(self.conf['connectomecsv'])
 
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in reader:
@@ -364,23 +369,19 @@ class RDFSource(Configureable, PyOpenWorm.ConfigValue):
 
     Alternative sources should dervie from this class
     """
-    i = 0
 
     def __init__(self, **kwargs):
-        if self.i == 1:
-            raise Exception(self.i)
-        self.i += 1
-        Configureable.__init__(self, **kwargs)
+        super(RDFSource, self).__init__(**kwargs)
         self.graph = False
 
     def get(self):
-        if self.graph == False:
+        if self.graph is False:
             raise Exception(
                 "Must call openDatabase on Data object before using the database")
         return self.graph
 
     def close(self):
-        if self.graph == False:
+        if self.graph is False:
             return
         self.graph.close()
         self.graph = False
@@ -394,14 +395,15 @@ class RDFSource(Configureable, PyOpenWorm.ConfigValue):
 
 class SerializationSource(RDFSource):
 
-    """ Reads from an RDF serialization or, if the configured database is more recent, then from that.
+    """ Reads from an RDF serialization or, if the configured database is more
+        recent, then from that.
 
         The database store is configured with::
 
             "rdf.source" = "serialization"
             "rdf.store" = <your rdflib store name here>
             "rdf.serialization" = <your RDF serialization>
-            "rdf.serialization_format" = <your rdflib serialization format used>
+            "rdf.serialization_format" = <rdflib serialization format>
             "rdf.store_conf" = <your rdflib store configuration here>
 
     """
@@ -425,7 +427,7 @@ class SerializationSource(RDFSource):
                     mod = modification_date(x)
                     if store_time < mod:
                         store_time = mod
-            except:
+            except Exception:
                 store_time = DT.min
 
             trix_time = modification_date(source_file)
@@ -622,7 +624,7 @@ class ZODBSource(RDFSource):
     """
 
     def __init__(self, *args, **kwargs):
-        RDFSource.__init__(self, *args, **kwargs)
+        super(ZODBSource, self).__init__(*args, **kwargs)
         self.conf['rdf.store'] = "ZODB"
 
     def open(self):
@@ -632,7 +634,7 @@ class ZODBSource(RDFSource):
         openstr = os.path.abspath(self.path)
 
         fs = FileStorage(openstr)
-        self.zdb = ZODB.DB(fs)
+        self.zdb = ZODB.DB(fs, cache_size=1600)
         self.conn = self.zdb.open()
         root = self.conn.root()
         if 'rdflib' not in root:
@@ -651,7 +653,7 @@ class ZODBSource(RDFSource):
         self.graph.open(self.path)
 
     def close(self):
-        if self.graph == False:
+        if self.graph is False:
             return
 
         self.graph.close()

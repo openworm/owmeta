@@ -1,11 +1,13 @@
+from __future__ import absolute_import
 import sys
+from six.moves import range
 sys.path.insert(0, ".")
 import unittest
 from PyOpenWorm import (DataUser, Configureable, BadConf, Configure)
 import rdflib
 import rdflib as R
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 
 class DataUserTest(_DataTest):

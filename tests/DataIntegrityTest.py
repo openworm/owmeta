@@ -1,12 +1,13 @@
 from __future__ import print_function
-import sys
-sys.path.insert(0, ".")
-import unittest, csv
+from __future__ import absolute_import
+import unittest
+import csv
 import PyOpenWorm
-from PyOpenWorm import Configure
+from PyOpenWorm.utils import normalize_cell_name
 import rdflib as R
+from six.moves import map
+from six.moves import range
 
-from GraphDBInit import delete_zodb_data_store
 
 class DataIntegrityTest(unittest.TestCase):
 
@@ -16,12 +17,6 @@ class DataIntegrityTest(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        import csv
-        PyOpenWorm.connect(
-            conf=Configure(
-                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
-        PyOpenWorm.loadData(skipIfNewer=False)
-        PyOpenWorm.disconnect()
         # grab the list of the names of the 302 neurons
 
         csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
@@ -34,18 +29,11 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        PyOpenWorm.connect(
-            conf=Configure(
-                **{'rdf.store_conf': 'tests/test.db', 'rdf.source': 'ZODB'}))
+        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")
 
     def tearDown(self):
         PyOpenWorm.disconnect()
-
-
-    @classmethod
-    def tearDownClass(cls):
-        delete_zodb_data_store("tests/test.db")
 
     def test_correct_neuron_number(self):
         """
@@ -56,7 +44,6 @@ class DataIntegrityTest(unittest.TestCase):
         #        it to pass
         net = PyOpenWorm.Worm().get_neuron_network()
         self.assertEqual(302, len(set(net.neuron_names())))
-
 
     def test_correct_muscle_number(self):
         """
@@ -75,22 +62,35 @@ class DataIntegrityTest(unittest.TestCase):
         neuronlist = PyOpenWorm.Neuron()
         neuronlist.neuropeptide("INS-26")
         thlist = set(x.name() for x in neuronlist.load())
-        self.assertEqual(set(['ASEL', 'ASER', 'ASIL', 'ASIR']), thlist)
+        self.assertEqual({'ASEL', 'ASER', 'ASIL', 'ASIR'}, thlist)
+
+    def test_bentley_expr_data(self):
+        """
+        This verifies that the data in OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv has
+        been incorporated, by checking that one of the novel receptor expression patterns is in the worm.
+        """
+        va9 = PyOpenWorm.Neuron('VA9')
+        self.assertIn('LGC-53', va9.receptors())
 
     def test_unique_neuron_node(self):
         """
-        There should one and only one unique RDF node for every neuron.  If more than one is present for a given cell name,
-        then our data is inconsistent.  If there is not at least one present, then we are missing neurons.
+        There should one and only one unique RDF node for every neuron.  If
+        more than one is present for a given cell name, then our data is
+        inconsistent.  If there is not at least one present, then we are
+        missing neurons.
         """
 
         results = {}
         for n in self.neurons:
-            # Create a SPARQL query per neuron that looks for all RDF nodes that
-            # have text matching the name of the neuron
+            # Create a SPARQL query per neuron that looks for all RDF nodes
+            # that have text matching the name of the neuron
             qres = self.g.query(
-                'SELECT distinct ?n WHERE {?n ?t ?s . ?s ?p \"' +
-                n +
-                '\" } LIMIT 5')
+                """
+                SELECT distinct ?n WHERE
+                {{
+                    ?n <http://openworm.org/entities/Cell/name> {name}
+                }} LIMIT 5
+                """.format(name=R.Literal(n).n3()))
             results[n] = (len(qres.result), [x[0] for x in qres.result])
 
         # If there is not only one result back, then there is more than one RDF
@@ -116,14 +116,12 @@ class DataIntegrityTest(unittest.TestCase):
         """
         results = set()
         for n in self.neurons:
-            qres = self.g.query('SELECT ?v WHERE { ?s <http://openworm.org/entities/SimpleProperty/value> \"' + n + '\". '  # per node ?s that has the name of a neuron associated
-                                + '?k <http://openworm.org/entities/Cell/name> ?s .'
-                                # look up its listed type ?o
-                                + '?k <http://openworm.org/entities/Neuron/type> ?o .'
-                                # for that type ?o, get its property ?tp and its
-                                # value ?v
-                                + '?o <http://openworm.org/entities/SimpleProperty/value> ?v } '
-                                )
+            s = '''SELECT ?v WHERE {{
+                       ?k <http://openworm.org/entities/Cell/name> {name} .
+                       ?k <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+                       ?k <http://openworm.org/entities/Neuron/type> ?v .
+                    }}'''.format(name=R.Literal(n).n3())
+            qres = self.g.query(s)
             for x in qres:
                 v = x[0]
                 if isinstance(v, R.Literal):
@@ -143,10 +141,11 @@ class DataIntegrityTest(unittest.TestCase):
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
-        qres = self.g.query('SELECT ?o ?p ?s WHERE {'
-                            + '?o <http://openworm.org/entities/SimpleProperty/value> "motor". '
-                            '?o ?p ?s} '  # for that type ?o, get its value ?v
-                            + 'LIMIT 10')
+        qres = self.g.query("""SELECT ?o ?p ?s WHERE {{
+                            ?o <http://openworm.org/entities/SimpleProperty/value> "motor".
+                            ?o ?p ?s # for that type ?o, get its value ?v
+                            }} LIMIT 10
+                            """)
         for row in qres.result:
             print(row)
 
@@ -159,42 +158,35 @@ class DataIntegrityTest(unittest.TestCase):
         pow_conns = set([])
 
         # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {
+        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {{
                                #############################################################
                                # Find connections that have the ?pre_name as our passed in value
                                #############################################################
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                            + SAMPLE_CELL +
-                            """\'.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
+                               ?pre_cell <http://openworm.org/entities/Cell/name> {name}.
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre_cell.
 
                                #############################################################
                                # Find all the cells that are on the post side of those
                                #  connections and bind their names to ?post_name
                                #############################################################
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> ?post_name.
+                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post_cell.
+                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_name.
 
                                ############################################################
                                # Go find the type of the connection and bind to ?type
                                #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+                               ?conn <http://openworm.org/entities/Connection/syntype> ?type.
 
                                ############################################################
                                # Go find the number of the connection and bind to ?num
                                ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+                               ?conn <http://openworm.org/entities/Connection/number> ?num.
 
                                ############################################################
                                # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
-                               FILTER(isLiteral(?post_name))}""")
+                               FILTER(isLiteral(?post_name))
+                               }}""".format(name=R.Literal(SAMPLE_CELL).n3()))
 
         def ff(x):
             return str(x.value)
@@ -209,38 +201,30 @@ class DataIntegrityTest(unittest.TestCase):
                                #############################################################
                                # Find connections that have the ?post_name as our passed in value
                                #############################################################
-                               ?post_namenode <http://openworm.org/entities/SimpleProperty/value> \'"""
-                            + SAMPLE_CELL +
-                            """\'.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_namenode.
-                               ?post <http://openworm.org/entities/SimpleProperty/value> ?post_cell.
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post.
+                               ?post_cell <http://openworm.org/entities/Cell/name> {name}.
+                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post_cell.
 
                                #############################################################
                                # Find all the cells that are on the pre side of those
                                #  connections and bind their names to ?pre_name
                                #############################################################
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre.
-                               ?pre <http://openworm.org/entities/SimpleProperty/value> ?pre_cell.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_namenode.
-                               ?pre_namenode <http://openworm.org/entities/SimpleProperty/value> ?pre_name.
+                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre_cell.
+                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_name.
 
                                ############################################################
                                # Go find the type of the connection and bind to ?type
                                #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?syntype_node.
-                               ?syntype_node <http://openworm.org/entities/SimpleProperty/value> ?type.
+                               ?conn <http://openworm.org/entities/Connection/syntype> ?type.
 
                                ############################################################
                                # Go find the number of the connection and bind to ?num
                                ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?number_node.
-                               ?number_node <http://openworm.org/entities/SimpleProperty/value> ?num.
+                               ?conn <http://openworm.org/entities/Connection/number> ?num.
 
                                ############################################################
                                # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
-                               FILTER(isLiteral(?pre_name))}""")
+                               FILTER(isLiteral(?pre_name))}""".format(name=R.Literal(SAMPLE_CELL).n3()))
         for line in qres.result:
             t = list(map(ff, line))
             # Insert sample cell name into the result set after the fact
@@ -302,28 +286,24 @@ class DataIntegrityTest(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(sorted(pow_conns), sorted(xls_conns))
 
-    @unittest.skip("deprecated due to performance")
     def test_all_cells_have_wormbaseID(self):
         """ This test verifies that every cell has a Wormbase ID. """
         cells = set(PyOpenWorm.Cell().load())
         for cell in cells:
             self.assertNotEqual(cell.wormbaseID(), '')
 
-    @unittest.skip("deprecated due to performance")
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = PyOpenWorm.Worm().get_neuron_network()
         for neuron_object in net.neurons():
             self.assertNotEqual(neuron_object.wormbaseID(), '')
 
-    @unittest.skip("deprecated due to performance")
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             self.assertNotEqual(muscle_object.wormbaseID(), '')
 
-    @unittest.skip("deprecated due to performance")
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
         net = PyOpenWorm.Worm().get_neuron_network()
@@ -331,96 +311,95 @@ class DataIntegrityTest(unittest.TestCase):
         for neuron_object in net.neurons():
             self.assertIsInstance(neuron_object, PyOpenWorm.Cell)
 
-    @unittest.skip("deprecated due to performance")
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
         muscles = PyOpenWorm.Worm().muscles()
         for muscle_object in muscles:
             self.assertIsInstance(muscle_object, PyOpenWorm.Cell)
 
-    @unittest.skip("deprecated due to performance")
+    @unittest.expectedFailure
     def test_correct_connections_number(self):
         """ This test verifies that there are exactly 6916 connections. """
         net = PyOpenWorm.Worm().get_neuron_network()
+        # XXX: The synapses contain some cells that aren't neurons
         self.assertEqual(6916, len(net.synapses()))
 
-    @unittest.skip("deprecated due to performance")
+    @unittest.expectedFailure
     def test_connection_content_matches(self):
         """ This test verifies that the content of each connection matches the
-        content in the source. """
+        content in the source.
+
+        """
+        # XXX: Needs updates to match the name translations in insert_worm.py
         ignored_cells = ['hyp', 'intestine']
         synapse_tuples = set()   # set of tuple representation of synapses
         csv_tuples = set()       # set of tuple representation of csv file
 
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        synapses = PyOpenWorm.Worm().get_neuron_network().synapses.get()
         for synapse in synapses:
-            if synapse.syntype() == 'gapJunction':
+            if synapse.syntype() == 'send':
                 syn_type = 'chemical'
             else:
                 syn_type = 'electrical'
-            syn_tuple = (synapse.pre_cell(), synapse.post_cell(), synapse.number(), syn_type)
+            pre = str(synapse.pre_cell().name())
+            post = str(synapse.post_cell().name())
+            syn_tuple = (pre,
+                         post,
+                         synapse.number(),
+                         syn_type)
             synapse_tuples.add(syn_tuple)
 
         # read csv file row by row
         with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
             edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
+            next(edge_reader)    # skip header row
 
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
                 # ignore rows where source or target is 'hyp' or 'intestine'
                 if source in ignored_cells or target in ignored_cells:
                     continue
-                csv_tuple = (source, target, weight, syn_type)
+                source = normalize_cell_name(source)
+                target = normalize_cell_name(target)
+                csv_tuple = (source, target, int(weight), syn_type)
                 csv_tuples.add(csv_tuple)
 
-        self.assertTrue(csv_tuples.issubset(synapse_tuples))
+        self.assertEqual(set(), csv_tuples - synapse_tuples)
 
-    @unittest.skip("deprecated due to performance")
     def test_number_neuron_to_neuron(self):
         """
         This test verifies that the worm model has exactly 5805 neuron to neuron
         connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        count = 0
+        synapse = PyOpenWorm.Connection()
+        synapse.termination('neuron')
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            if synapse.termination() == 'neuron':
-                count += 1
+        self.assertEqual(5805, synapse.count())
 
-        self.assertEqual(5805, count)
-
-    @unittest.skip("deprecated due to performance")
     def test_number_neuron_to_muscle(self):
         """
         This test verifies that the worm model has exactly 1111 neuron to muscle
         connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        count = 0
+        synapse = PyOpenWorm.Connection()
+        synapse.termination('muscle')
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            if synapse.termination() == 'muscle':
-                count += 1
+        self.assertEqual(1111, synapse.count())
 
-        self.assertEqual(1111, count)
-
-    @unittest.skip("deprecated due to performance")
     def test_correct_number_unique_neurons(self):
         """
         This test verifies that the worm model has exactly 300 unique neurons
         making connections.
         """
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
-        unique_neurons = set()    # set of unique neurons
+        synapse = PyOpenWorm.Connection()
+        pre = PyOpenWorm.Neuron()
+        synapse.pre_cell(pre)
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
 
-        for synapse in synapses:
-            unique_neurons.add(synapse.pre_cell())    # set won't count duplicates
+        self.assertEqual(300, pre.count())
 
-        self.assertEqual(300, len(unique_neurons))
-
-    @unittest.skip("deprecated due to performance")
     def test_unconnected_neurons(self):
         """
         This test verifies that there are exactly 2 unconnected neurons,
@@ -431,11 +410,12 @@ class DataIntegrityTest(unittest.TestCase):
         # That means it should be enough to check that the set {CANL, CANR} and
         # the set of neurons making connections are disjoint.
 
-        synapses = PyOpenWorm.Worm().get_neuron_network().synapses()
+        neuron = PyOpenWorm.Neuron()
+        synapse = PyOpenWorm.Connection()
+        synapse.pre_cell(neuron)
+        PyOpenWorm.Worm().get_neuron_network().synapse(synapse)
         connected_neurons = set()
         unconnected_neurons = {'CANL', 'CANR'}
-
-        for synapse in synapses:
-            connected_neurons.add(synapse.pre_cell())
-
+        for name in neuron.name.get():
+            connected_neurons.add(name)
         self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))

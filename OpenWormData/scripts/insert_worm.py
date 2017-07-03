@@ -1,12 +1,11 @@
 from __future__ import print_function
 import PyOpenWorm as P
+from PyOpenWorm.utils import normalize_cell_name
 import traceback
 import csv
-import sqlite3
 import re
+import os
 
-import xlrd
-import csv
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
@@ -18,6 +17,7 @@ CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
 CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
 RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
+ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
 
 def serialize_as_n3():
@@ -28,18 +28,6 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-# to normalize certain neuron and muscle names
-search_string = re.compile(r'\w+[0]+[1-9]+')
-replace_string = re.compile(r'[0]+')
-
-def normalize(name):
-    # normalize neuron and muscle names to match those used at other points
-    # see #137 for elaboration
-    # if there are zeroes in the middle of a name, remove them
-    if re.match(search_string, name):
-        name = replace_string.sub('', name)
-    return name
-
 
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
@@ -48,14 +36,14 @@ def upload_muscles():
         with open(CELL_NAMES_SOURCE) as csvfile:
             csvreader = csv.reader(csvfile)
 
-            ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+            ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
             w = WORM
             for num, line in enumerate(csvreader):
                 if num < 4:  # skip rows with no data
                     continue
 
                 if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
-                    muscle_name = normalize(line[0]).upper()
+                    muscle_name = normalize_cell_name(line[0]).upper()
                     m = P.Muscle(name=muscle_name)
                     w.muscle(m)
             ev.asserts(w)
@@ -145,7 +133,7 @@ def norn(x):
 def upload_neurons():
     try:
         #TODO: Improve this evidence marker
-        ev = P.Evidence(title="C. elegans Cell List - WormBase.csv")
+        ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
         w = WORM
         n = NETWORK
         w.neuron_network(n)
@@ -159,7 +147,7 @@ def upload_neurons():
                     continue
 
                 if line[5] == '1':  # neurons marked in this column
-                    neuron_name = normalize(line[0]).upper()
+                    neuron_name = normalize_cell_name(line[0]).upper()
                     n.neuron(P.Neuron(name=neuron_name))
                     i = i + 1
 
@@ -173,16 +161,19 @@ def upload_neurons():
 def get_altun_evidence():
     return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
 
+
 def get_wormatlas_evidence():
     return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
 
+
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
-    e = P.Evidence()
+    e = None
     with open(file_name) as bibtex_file:
         bib_database = bibtexparser.load(bibtex_file)
         key = bib_database.entries[0]['ID']
-        e.setKey(key)
+        e = P.Evidence(key=key)
+
         try:
             doi = bib_database.entries[0]['doi']
             if doi:
@@ -211,101 +202,135 @@ def parse_bibtex_into_evidence(file_name):
             pass
     return e
 
+
 def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     """ Augment the metadata about neurons with information about receptors,
         neuron types, neurotransmitters, neuropeptides and innexins.
         As we go, add evidence objects to each statement."""
     print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
-    #set up evidence objects in advance
-    altun_ev  = get_altun_evidence()
-    wormatlas_ev = get_wormatlas_evidence()
+    _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(
+        RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE
+    )
 
-    import csv
-    f = open(RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE)
-    reader = csv.reader(f)
-    reader.next() #skip the header row
+
+def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
+    """ Augment the metadata about neurons with information about receptor, neurotransmitter, and neuropeptide
+    expression from additional sources.
+    """
+    print ("uploading additional statements about receptors, neurotransmitters and neuropeptides")
+
+    for root, _, filenames in sorted(os.walk(ADDITIONAL_EXPR_DATA_DIR)):
+        for filename in sorted(filenames):
+            if filename.lower().endswith('.csv'):
+                _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
+
+
+def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(file_path):
+    # set up evidence objects in advance
+    altun_ev = get_altun_evidence()
+    wormatlas_ev = get_wormatlas_evidence()
 
     i = 0
 
-    neurons = set()
+    neurons = []
     uris = dict()
 
-    for row in reader:
-      neuron_name = row[0]
-      relation = row[1].lower()
-      data = row[2]
-      evidence = row[3]
-      evidenceURL = row[4]
+    with open(file_path) as f:
+        reader = csv.reader(f)
+        next(reader)  # skip the header row
 
-      #prepare evidence
-      e = P.Evidence()
+        for row in reader:
+            neuron_name = row[0]
+            relation = row[1].lower()
+            data = row[2]
+            evidence = row[3]
+            evidenceURL = row[4]
 
-      #pick correct evidence given the row
-      if 'altun' in evidence.lower():
-          e = altun_ev
+            # prepare evidence
+            e = P.Evidence()
 
-      elif 'wormatlas' in evidence.lower():
-          e = wormatlas_ev
+            # pick correct evidence given the row
+            if 'altun' in evidence.lower():
+                e = altun_ev
+            elif 'wormatlas' in evidence.lower():
+                e = wormatlas_ev
 
-      e2 = []
-      try:
-          e2 = uris[evidenceURL]
-      except KeyError:
-          e2 = P.Evidence(uri=evidenceURL)
-          uris[evidenceURL] = e2
+            e2 = []
+            try:
+                e2 = uris[evidenceURL]
+            except KeyError:
+                e2 = P.Evidence(uri=evidenceURL)
+                uris[evidenceURL] = e2
 
-      #grab the neuron object
-      n = NETWORK.aneuron(neuron_name)
-      neurons.add(n)
+            # grab the neuron object
+            n = NETWORK.aneuron(neuron_name)
+            neurons.append(n)
 
-      if relation == 'neurotransmitter':
-          # assign the data, grab the relation into r
-          r = n.neurotransmitter(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'innexin':
-          # assign the data, grab the relation into r
-          r = n.innexin(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'neuropeptide':
-          # assign the data, grab the relation into r
-          r = n.neuropeptide(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
-      elif relation == 'receptor':
-          # assign the data, grab the relation into r
-          r = n.receptor(data)
-          #assert the evidence on the relationship
-          e.asserts(r)
-          e2.asserts(r)
+            if relation == 'neurotransmitter':
+                if data in n.neurotransmitter():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.neurotransmitter(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      if relation == 'type':
-          types = []
-          if 'sensory' in (data.lower()):
-              types.append('sensory')
-          if 'interneuron' in (data.lower()):
-              types.append('interneuron')
-          if 'motor' in (data.lower()):
-              types.append('motor')
-          if 'unknown' in (data.lower()):
-              types.append('unknown')
-          # assign the data, grab the relation into r
-          for t in types:
-              r = n.type(t)
-              #assert the evidence on the relationship
-              e.asserts(r)
-              e2.asserts(r)
+            elif relation == 'innexin':
+                if data in n.innexin():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.innexin(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
 
-      i = i + 1
+            elif relation == 'neuropeptide':
+                if data in n.neuropeptide():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.neuropeptide(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'receptor':
+                if data in n.receptor():
+                    continue
+                # assign the data, grab the relation into r
+                r = n.receptor(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'type':
+                if data.lower() in n.type():
+                    continue
+                types = []
+                if 'sensory' in (data.lower()):
+                    types.append('sensory')
+                if 'interneuron' in (data.lower()):
+                    types.append('interneuron')
+                if 'motor' in (data.lower()):
+                    types.append('motor')
+                if 'unknown' in (data.lower()):
+                    types.append('unknown')
+                # assign the data, grab the relation into r
+                for t in types:
+                    r = n.type(t)
+                    # assert the evidence on the relationship
+                    e.asserts(r)
+                    e2.asserts(r)
+
+            i += 1
 
     for neur in neurons:
-        n = NETWORK.neuron(neur)
-    print ("uploaded " + str(i) + " statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+        NETWORK.neuron(neur)
+    print(
+        'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
+            i, file_path
+        )
+    )
 
 
 def upload_connections():
@@ -339,9 +364,14 @@ def upload_connections():
             'SPH': 'MU_SPH'
         }[x]
 
+    def expand_muscle(name):
+        return P.Muscle(name + 'L'), P.Muscle(name + 'R')
+
     # cells that are neither neurons or muscles. These are marked as
     # 'Other Cells' in the wormbase cell list but are still part of the new
-    # connectome. In future work these should be uploaded seperately to
+    # connectome.
+    #
+    # TODO: In future work these should be uploaded seperately to
     # PyOpenWorm in a new upload function and should be referred from there
     # instead of this list.
     other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
@@ -365,11 +395,11 @@ def upload_connections():
         muscles = [muscle.name() for muscle in muscle_objs]
 
         # Evidence object to assert each connection
-        e = P.Evidence(title='herm_full_edgelist.csv')
+        e = P.Evidence(key="emmons2015", title='herm_full_edgelist.csv')
 
         with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
+            next(edge_reader)    # skip header row
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
 
@@ -380,8 +410,8 @@ def upload_connections():
                 elif syn_type == 'chemical':
                     syn_type = 'send'
 
-                source = normalize(source).upper()
-                target = normalize(target).upper()
+                source = normalize_cell_name(source).upper()
+                target = normalize_cell_name(target).upper()
 
                 weight = int(weight)
 
@@ -406,10 +436,7 @@ def upload_connections():
                     elif name in muscles:
                         res = P.Muscle(name)
                     elif name in to_expand_muscles:
-                        name_l = name + 'L'
-                        name_r = name + 'R'
-                        res = P.Muscle(name_l)
-                        res2 = P.Muscle(name_r)
+                        res, res2 = expand_muscle(name)
                     elif name in other_cells:
                         res = P.Cell(name)
 
@@ -522,15 +549,16 @@ def do_insert(config="default.conf", logging=False):
         upload_lineage_and_descriptions()
         upload_connections()
         upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
         print("Saving...")
         WORM.save()
 
-        infer()
+        #infer()
         print("Serializing...")
         serialize_as_n3()
 
-    except:
+    except Exception:
         traceback.print_exc()
     finally:
         P.disconnect()
@@ -546,12 +574,14 @@ if __name__ == '__main__':
     parser.add_option("-l", "--do-logging", dest="do_logging",
                       action="store_true", default=False,
                       help="Enable log output")
+    parser.add_option("-c", "--config", dest="config", default='default.conf',
+                      help="Config file")
 
     (options, _) = parser.parse_args()
     OPTIONS = options
 
     try:
-        do_insert(logging=options.do_logging)
+        do_insert(config=options.config, logging=options.do_logging)
     except IOError as e:
         if e.errno == 2 and 'default.conf' in e.filename:
             print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")

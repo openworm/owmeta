@@ -2,14 +2,14 @@ from __future__ import print_function
 import rdflib as R
 import random as RND
 import logging
+from itertools import groupby
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from .configure import BadConf
-from .simpleProperty import DatatypeProperty, SimpleProperty
+from .simpleProperty import ObjectProperty, DatatypeProperty
 from .data import DataUser
-from .fakeProperty import FakeProperty
 
 __all__ = [
     "DataObject",
@@ -51,6 +51,8 @@ class DataObject(GraphObject, DataUser):
 
         self.properties = []
         self.owner_properties = []
+        self.po_cache = None
+        """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         if ident is not None:
             self._id = R.URIRef(ident)
@@ -64,11 +66,24 @@ class DataObject(GraphObject, DataUser):
             self.setKey(key)
 
         self._variable = R.Variable("V" + str(RND.random()))
-        DataObject.attach_property_ex(self, RDFTypeProperty)
+        DataObject.attach_property(self, RDFTypeProperty)
         self.rdf_type_property.set(self.rdf_type)
 
+    def clear_po_cache(self):
+        """ Clear the property-object cache for this object.
+
+        This cache is maintained by and shared by the properties of this
+        object. It isn't necessary to clear this cache manually unless you
+        modify the RDFLib graph indirectly (e.g., through the store) at
+        runtime.
+        """
+        self.po_cache = None
+
     def __repr__(self):
-        return DataObject.__str__(self)
+        s = self.__class__.__name__ + "("
+        s += 'ident=' + repr(self.idl)
+        s += ")"
+        return s
 
     def setKey(self, key):
         if isinstance(key, str):
@@ -82,7 +97,7 @@ class DataObject(GraphObject, DataUser):
             self.rdf_namespace[
                 "a" +
                 hashlib.md5(
-                    str(data)).hexdigest()])
+                    str(data).encode()).hexdigest()])
 
     def id_is_variable(self):
         """ Is the identifier a variable? """
@@ -92,7 +107,7 @@ class DataObject(GraphObject, DataUser):
     def make_identifier_direct(cls, string):
         if not isinstance(string, str):
             raise Exception("make_identifier_direct only accepts strings")
-        from urllib import quote
+        from six.moves.urllib.parse import quote
         return R.URIRef(cls.rdf_namespace[quote(string)])
 
     def triples(self, *args, **kwargs):
@@ -105,13 +120,24 @@ class DataObject(GraphObject, DataUser):
         return s
 
     def __eq__(self, other):
+        """ This method should not be overridden by subclasses """
         return (isinstance(other, DataObject) and
+                self.defined and
+                other.defined and
                 (self.identifier() == other.identifier()))
 
+    def count(self):
+        return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
+
     def load(self):
-        for ident in GraphObjectQuerier(self, self.rdf)():
+        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
+        grouped_type_triples = groupby(self.rdf.triples_choices((list(idents),
+                                                                 R.RDF['type'],
+                                                                 None)),
+                                       lambda x: x[0])
+        for ident, type_triples in grouped_type_triples:
             types = set()
-            for rdf_type in self.rdf.objects(ident, R.RDF['type']):
+            for __, __, rdf_type in type_triples:
                 types.add(rdf_type)
             the_type = get_most_specific_rdf_type(types)
             yield oid(ident, the_type)
@@ -127,6 +153,7 @@ class DataObject(GraphObject, DataUser):
         return self._variable
 
     def __hash__(self):
+        """ This method should not be overridden by subclasses """
         return hash(self.idl)
 
     def __getitem__(self, x):
@@ -151,15 +178,15 @@ class DataObject(GraphObject, DataUser):
     # the triples might be stored in memory.
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
-        """ Create a SimpleProperty that has a simple type (string,number,etc)
-        as its value
+        """ Attach a, possibly new, property to this class that has a simple
+        type (string,number,etc) for its values
 
         Parameters
         ----------
         linkName : string
-            The name of this Property.
+            The name of this property.
         owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
+            The name of this property.
         """
         return cls._create_property(
             *args,
@@ -168,14 +195,15 @@ class DataObject(GraphObject, DataUser):
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
-        """ Create a SimpleProperty that has a complex DataObject as its value
+        """ Attach a, possibly new, property to this class that has a complex
+        DataObject for its values
 
         Parameters
         ----------
         linkName : string
-            The name of this Property.
+            The name of this property.
         owner : PyOpenWorm.dataObject.DataObject
-            The name of this Property.
+            The name of this property.
         value_type : type
             The type of DataObject for values of this property
         """
@@ -197,7 +225,8 @@ class DataObject(GraphObject, DataUser):
         #     must happen with the owner object's creation
         owner_class = cls
         owner_class_name = owner_class.__name__
-        property_class_name = owner_class_name + "_" + linkName
+        property_class_name = str(owner_class_name + "_" + linkName)
+
         if not value_type:
             value_type = DataObject
 
@@ -205,22 +234,28 @@ class DataObject(GraphObject, DataUser):
         if property_class_name in PropertyTypes:
             c = PropertyTypes[property_class_name]
         else:
+            klass = None
             if property_type == 'ObjectProperty':
                 value_rdf_type = value_type.rdf_type
+                klass = ObjectProperty
+            elif property_type == 'DatatypeProperty':
+                value_rdf_type = False
+                klass = DatatypeProperty
             else:
                 value_rdf_type = False
+
             link = owner_class.rdf_namespace[linkName]
             c = type(property_class_name,
-                     (SimpleProperty,),
+                     (klass,),
                      dict(linkName=linkName,
                           link=link,
                           property_type=property_type,
                           value_rdf_type=value_rdf_type,
                           value_type=value_type,
                           owner_type=owner_class,
+                          rdf_object=PropertyDataObject(ident=link),
                           multiple=multiple))
             PropertyTypes[property_class_name] = c
-            c.register()
         return cls.attach_property(owner, c)
 
     @classmethod
@@ -234,11 +269,9 @@ class DataObject(GraphObject, DataUser):
         # database is available
         assert(issubclass(cls, DataObject))
         DataObjectTypes[cls.__name__] = cls
-        DataObjectsParents[
-            cls.__name__] = [
-            x for x in cls.__bases__ if issubclass(
-                x,
-                DataObject)]
+        DataObjectsParents[cls.__name__] = [
+            x for x in cls.__bases__
+            if issubclass(x, DataObject)]
         cls.parents = DataObjectsParents[cls.__name__]
         cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
         RDFTypeTable[cls.rdf_type] = cls
@@ -246,23 +279,9 @@ class DataObject(GraphObject, DataUser):
         cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
     @classmethod
-    def attach_property_ex(cls, owner, c):
+    def attach_property(cls, owner, c):
         res = c(owner=owner, conf=owner.conf, resolver=_Resolver.get_instance())
         owner.properties.append(res)
-        setattr(owner, c.linkName, res)
-
-        return res
-
-    @classmethod
-    def attach_property(self, owner, c):
-        # The fake property has the object as owner and the property as value
-        res = c(owner=owner, resolver=_Resolver.get_instance())
-        # XXX: Hack for graph object traversal of properties while still
-        #      allowing to refer to the PyOpenWorm properties.
-
-        fp = FakeProperty(res)
-        # ... and the properties of the owner only list the FakeProperty
-        owner.properties.append(fp)
         setattr(owner, c.linkName, res)
 
         return res
@@ -274,9 +293,6 @@ class DataObject(GraphObject, DataUser):
 
         Parameters
         ----------
-        query : bool
-            Indicates whether or not the graph_pattern is to be used for querying
-            (as in a SPARQL query) or for storage
         shorten : bool
             Indicates whether to shorten the URLs with the namespace manager
             attached to the ``self``
@@ -339,12 +355,12 @@ def oid(identifier_or_rdf_type, rdf_type=None):
         rdf_type = identifier_or_rdf_type
         identifier = None
 
-    L.debug("oid making a {} with ident {}".format(rdf_type, identifier))
     c = None
     try:
         c = RDFTypeTable[rdf_type]
     except KeyError:
         c = DataObject
+    L.debug("oid: making a {} with ident {}".format(c, identifier))
 
     # if its our class name, then make our own object
     # if there's a part after that, that's the property name
@@ -435,6 +451,14 @@ def get_most_specific_rdf_type(types):
             You may want to import the module containing the class as well as add additional type
             annotations in order to resolve your objects to a more precise type.""".format(x))
     return most_specific_type.rdf_type
+
+
+class PropertyDataObject(DataObject):
+
+    """ A PropertyDataObject represents the property-as-object.
+
+    Try not to confuse this with the Property class
+    """
 
 
 class _Resolver(RDFTypeResolver):

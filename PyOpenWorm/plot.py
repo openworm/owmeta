@@ -1,4 +1,4 @@
-from PyOpenWorm import *
+from PyOpenWorm import DataObject
 
 
 class Plot(DataObject):
@@ -23,7 +23,7 @@ class Plot(DataObject):
 
         if data:
             self.set_data(data)
-        
+
     def _to_string(self, input_list):
         """
         Converts input_list to a string
@@ -42,9 +42,7 @@ class Plot(DataObject):
                 .replace('[', '') \
                 .replace(']', '') \
                 .split(',')
-            out_list.append(
-                map(float, pair_as_list)
-            )
+            out_list.append([float(x) for x in pair_as_list])
         return out_list
 
     def set_data(self, data):

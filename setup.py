@@ -54,31 +54,30 @@ setup(
         'numpydoc==0.5',
         'persistent==4.0.8',
         'Pint',
-        'pyparsing==2.0.2',
-        'pytest==2.6.4',
+        'pyparsing==2.2.0',
+        'pytest>=3.0.6',
         'pytest-cov==2.0.0',
         'rdflib==4.1.2',
         'rdflib-zodb>=1.0.0',
         'requirements==0.1',
         'requests',
-        'six==1.9.0',
+        'six==1.10.0',
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
-        'wsgiref==0.1.2',
         'xlrd',
-        'yarom==0.7.2',
+        'yarom==0.10.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-        'FuXi'
+        'lazy-object-proxy==1.2.1',
+        'wrapt'
     ],
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-        'git://github.com/RDFLib/FuXi#egg=FuXi-1.4.dev-r0',
-        'git+https://github.com/RDFLib/rdflib-zodb#egg=rdflib-zodb-1.1-dev',
+        'git://github.com/mwatts15/rdflib-zodb.git@triples_choices_1#egg=rdflib-zodb-1.1-dev'
     ],
     version = version,
     packages = ['PyOpenWorm'],
@@ -100,6 +99,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Scientific/Engineering'
     ]
 )

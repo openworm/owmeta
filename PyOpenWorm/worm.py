@@ -4,10 +4,10 @@ from .dataObject import DataObject
 from .muscle import Muscle
 from .cell import Cell
 from .network import Network
-from .simpleProperty import SimpleProperty
+from .simpleProperty import ObjectProperty
 
 
-class NeuronNetworkProperty(SimpleProperty):
+class NeuronNetworkProperty(ObjectProperty):
     value_type = Network
     linkName = 'neuron_network'
     multiple = False
@@ -16,11 +16,15 @@ class NeuronNetworkProperty(SimpleProperty):
     def __init__(self, **kwargs):
         super(NeuronNetworkProperty, self).__init__(**kwargs)
         self.link = self.owner.rdf_namespace[self.linkName]
-        self.value_rdf_type = Network.rdf_type
 
     def set(self, v):
         super(NeuronNetworkProperty, self).set(v)
-        v.worm(self.owner)
+        if isinstance(v, Network) and isinstance(self.owner, Worm):
+            v.worm(self.owner)
+
+    @property
+    def value_rdf_type(self):
+        return Network.rdf_type
 
 
 class Worm(DataObject):
@@ -40,7 +44,7 @@ class Worm(DataObject):
     """
 
     def __init__(self, scientific_name=False, **kwargs):
-        super(Worm,self).__init__(**kwargs)
+        super(Worm, self).__init__(**kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
         Worm.ObjectProperty(
             "muscle",
@@ -81,9 +85,7 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all Muscle objects attached to the Worm
-
-        Returns a set of all muscles::
+        Get all Muscle objects attached to the Worm.
 
         Example::
 

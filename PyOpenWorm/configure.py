@@ -4,6 +4,9 @@ from __future__ import print_function
 # self['expected_configured_property']
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import six
 class ConfigValue(object):
 
     """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
@@ -115,7 +118,7 @@ class Configure(object):
         d = json.load(f)
         for k in d:
             value = d[k]
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 if value.startswith("BASE/"):
                     from pkg_resources import Requirement, resource_filename
                     value = value[4:]
