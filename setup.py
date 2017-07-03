@@ -70,7 +70,7 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
-        'zope.interface==4.1.1'
+        'zope.interface==4.1.1',
         'lazy-object-proxy==1.2.1',
         'wrapt'
     ],
