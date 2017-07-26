@@ -131,16 +131,20 @@ class DataObject(GraphObject, DataUser):
 
     def load(self):
         idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
-        grouped_type_triples = groupby(self.rdf.triples_choices((list(idents),
-                                                                 R.RDF['type'],
-                                                                 None)),
-                                       lambda x: x[0])
-        for ident, type_triples in grouped_type_triples:
-            types = set()
-            for __, __, rdf_type in type_triples:
-                types.add(rdf_type)
-            the_type = get_most_specific_rdf_type(types)
-            yield oid(ident, the_type)
+        if idents:
+            choices = self.rdf.triples_choices((list(idents),
+                                                R.RDF['type'],
+                                                None))
+            grouped_type_triples = groupby(choices,
+                                           lambda x: x[0])
+            for ident, type_triples in grouped_type_triples:
+                types = set()
+                for __, __, rdf_type in type_triples:
+                    types.add(rdf_type)
+                the_type = get_most_specific_rdf_type(types)
+                yield oid(ident, the_type)
+        else:
+            return
 
     def identifier(self, query=False):
         return self._id
