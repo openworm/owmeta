@@ -24,6 +24,7 @@ branch = None
 environment = None
 username = None
 password = None
+project = None
 
 
 def pytest_addoption(parser):
@@ -41,13 +42,15 @@ def pytest_addoption(parser):
                      default=None, help='Specify Codespeed HTTP user name setting.')
     profile_group.addoption('--password', dest='cs_pass', action='store',
                      default=None, help='Specify Codespeed HTTP password setting.')
+    profile_group.addoption('--project', dest='cs_project', action='store',
+                     default=None, help='Specify Codespeed Project.')
 
 
 def pytest_configure(config):
     """
     Called before tests are collected.
     """
-    global enabled, submit_url, commit, branch, environment, username, password
+    global enabled, submit_url, commit, branch, environment, username, password, project
 
     # enabled = config.getoption('profile') or config.getoption('cs_submit_url') is not None
     enabled = config.getoption('cs_url') is not None
@@ -57,6 +60,7 @@ def pytest_configure(config):
     commit = config.getoption('commit')
     branch = config.getoption('branch')
     environment = config.getoption('env')
+    project = config.getoption('cs_project')
 
     missing_argument = not commit or not branch or not environment
     if submit_url and missing_argument:
@@ -99,7 +103,8 @@ def pytest_unconfigure(config):
     data = [x.to_codespeed_dict(commit=commit,
                                 branch=branch,
                                 environment=environment,
-                                executable=executable)
+                                executable=executable,
+                                project=project)
             for x in function_profile_list]
 
     try:
@@ -236,7 +241,7 @@ class FunctionProfile(object):
         self.primitive_calls = json_dict["primitive_calls"]
         self.total_time = json_dict["total_time"]
 
-    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", executable="Python"):
+    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", executable="Python", project="PyOpenWorm"):
         """
         :param commit: Codespeed current commit argument.
         :param branch: Codespeed current branch argument.
@@ -247,7 +252,7 @@ class FunctionProfile(object):
         # Currently, Codespeed breaks if a branch named anything other than 'default' is submitted.
         return {
             "commitid": commit,
-            "project": "PyOpenWorm",
+            "project": project,
             "branch": branch,
             "executable": executable,
             "benchmark": self.function_name,

@@ -26,6 +26,7 @@ class _values(list):
 
 
 class RealSimpleProperty(object):
+
     multiple = False
     link = R.URIRef("property")
     linkName = "property"

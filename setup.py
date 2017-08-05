@@ -65,7 +65,7 @@ setup(
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
         'xlrd',
-        'yarom==0.10.0',
+        'yarom',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
@@ -77,6 +77,7 @@ setup(
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
+        'git://github.com/mwatts15/yarom.git@dev',
         'git://github.com/mwatts15/rdflib-zodb.git@triples_choices_1#egg=rdflib-zodb-1.1-dev'
     ],
     version = version,

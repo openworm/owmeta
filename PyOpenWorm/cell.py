@@ -1,11 +1,13 @@
 from __future__ import print_function
-from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.dataObject import DataObject, InverseProperty
+from PyOpenWorm.channel import Channel
 from string import Template
 import neuroml
-__all__ = [ "Cell" ]
+
+__all__ = ["Cell"]
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
-ns =  {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
+ns = {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
 segment_query = Template("""
 SELECT ?seg_id ?seg_name ?x ?y ?z ?d ?par_id ?x_prox ?y_prox ?z_prox ?d_prox
 WHERE {
@@ -49,6 +51,7 @@ def _dict_merge(d1,d2):
     from itertools import chain
     dict(chain(d1.items(), d2.items()))
 
+
 class Cell(DataObject):
     """
     A biological cell.
@@ -87,21 +90,22 @@ class Cell(DataObject):
             >>> c.divisionVolume(v)
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
-        super(Cell,self).__init__(**kwargs)
+        super(Cell, self).__init__(**kwargs)
 
-        Cell.DatatypeProperty('lineageName',owner=self)
-        Cell.DatatypeProperty('name',owner=self)
-        Cell.DatatypeProperty('divisionVolume',owner=self)
-        Cell.DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('lineageName', owner=self)
+        Cell.DatatypeProperty('name', owner=self)
+        Cell.DatatypeProperty('divisionVolume', owner=self)
+        Cell.DatatypeProperty('description', owner=self)
         Cell.DatatypeProperty('wormbaseID', owner=self)
         Cell.DatatypeProperty('synonym', owner=self, multiple=True)
+        Cell.ObjectProperty('channel', owner=self, multiple=True,
+                            value_type=Channel)
 
         if name:
             self.name(name)
 
         if lineageName:
             self.lineageName(lineageName)
-
 
     def _morphology(self):
         """Return the morphology of the cell. Currently this is restricted to
@@ -218,3 +222,6 @@ class Cell(DataObject):
             return super(Cell, self).identifier()
         else:
             return self.make_identifier_direct(str(self.name.defined_values[0].identifier()))
+
+
+InverseProperty(Cell, 'channel', Channel, 'appearsIn')

@@ -11,4 +11,5 @@ echo "User: $OWCS_USERNAME"
 
 py.test $@ --cov=PyOpenWorm --code-speed-submit="https://owcs.pythonanywhere.com/" \
     --environment="$ENV" --branch="$BRANCH" --commit="$COMMIT" \
-    --password=${OWCS_KEY} --username=$OWCS_USERNAME ./tests/ProfileTest.py
+    --project=PyOpenWorm --password=${OWCS_KEY} --username=$OWCS_USERNAME \
+    ./tests/ProfileTest.py
