@@ -1,6 +1,7 @@
 from .pProperty import Property
 from .channelworm import ChannelModel
 from .dataObject import DataObject
+import PyOpenWorm
 
 
 # XXX: Why is this not an ObjectProperty?
@@ -8,7 +9,7 @@ class Models(Property):
     multiple = True
 
     def __init__(self, **kwargs):
-        Property.__init__(self, 'models', **kwargs)
+        super(Models, self).__init__('models', **kwargs)
         self._models = []
 
     def get(self, **kwargs):
@@ -101,6 +102,8 @@ class Channel(DataObject):
         Channel.DatatypeProperty('gene_WB_ID', self)
         Channel.DatatypeProperty('expression_pattern', self)
         Channel.DatatypeProperty('proteins', self, multiple=True)
+        Channel.ObjectProperty('appearsIn', self, multiple=True,
+                               value_type=PyOpenWorm.cell.Cell)
         # TODO: assert this in the adapter instead
         # Channel.DatatypeProperty('description_evidences', self)
         # TODO: assert this in the adapter instead
@@ -108,13 +111,6 @@ class Channel(DataObject):
 
         if name:
             self.name(name)
-
-    def appearsIn(self):
-        """
-        TODO: Implement this method.
-        Return a list of Cells that this ion channel appears in.
-        """
-        pass
 
     @property
     def defined(self):

@@ -241,13 +241,13 @@ def connect(configFile=False,
         loadConfig(configFile)
     else:
         Configureable.conf = Data({
-            "connectomecsv" : "OpenWormData/aux_data/connectome.csv",
-            "neuronscsv" : "OpenWormData/aux_data/neurons.csv",
-            "rdf.source" : "ZODB",
-            "rdf.store" : "ZODB",
-            "rdf.store_conf" : get_data('worm.db'),
-            "user.email" : "jerry@cn.com",
-            "rdf.upload_block_statement_count" : 50
+            "connectomecsv": "OpenWormData/aux_data/connectome.csv",
+            "neuronscsv": "OpenWormData/aux_data/neurons.csv",
+            "rdf.source": "ZODB",
+            "rdf.store": "ZODB",
+            "rdf.store_conf": get_data('worm.db'),
+            "user.email": "jerry@cn.com",
+            "rdf.upload_block_statement_count": 50
         })
 
     Configureable.conf.openDatabase()
@@ -268,7 +268,6 @@ def connect(configFile=False,
     Muscle.register()
     Connection.register()
     SimpleProperty.register()
-    Property.register()
     Relationship.register()
     Channel.register()
     ChannelModel.register()
