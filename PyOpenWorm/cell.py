@@ -92,10 +92,10 @@ class Cell(DataObject):
     def __init__(self, name=False, lineageName=False, **kwargs):
         super(Cell, self).__init__(**kwargs)
 
-        Cell.DatatypeProperty('lineageName',owner=self)
-        Cell.DatatypeProperty('name',owner=self)
-        Cell.DatatypeProperty('divisionVolume',owner=self)
-        Cell.DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('lineageName', owner=self)
+        Cell.DatatypeProperty('name', owner=self)
+        Cell.DatatypeProperty('divisionVolume', owner=self)
+        Cell.DatatypeProperty('description', owner=self)
         Cell.DatatypeProperty('wormbaseID', owner=self)
         Cell.DatatypeProperty('synonym', owner=self, multiple=True)
         Cell.ObjectProperty('channel', owner=self, multiple=True,
@@ -106,7 +106,6 @@ class Cell(DataObject):
 
         if lineageName:
             self.lineageName(lineageName)
-
 
     def _morphology(self):
         """Return the morphology of the cell. Currently this is restricted to

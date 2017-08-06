@@ -310,13 +310,15 @@ class DataObject(GraphObject, DataUser):
 
     @classmethod
     def attach_property(cls, owner, c):
-        res = c(owner=owner, conf=owner.conf, resolver=_Resolver.get_instance())
+        res = c(owner=owner,
+                conf=owner.conf,
+                resolver=_Resolver.get_instance())
         owner.properties.append(res)
         setattr(owner, c.linkName, res)
 
         return res
 
-    def graph_pattern(self, shorten=False):
+    def graph_pattern(self, shorten=False, show_namespaces=True):
         """ Get the graph pattern for this object.
 
         It should be as simple as converting the result of triples() into a BGP
@@ -331,7 +333,8 @@ class DataObject(GraphObject, DataUser):
         nm = None
         if shorten:
             nm = self.namespace_manager
-        return triples_to_bgp(self.triples(), namespace_manager=nm)
+        return triples_to_bgp(self.triples(), namespace_manager=nm,
+                              show_namespaces=True)
 
     def retract(self):
         """ Remove this object from the data store. """
@@ -370,10 +373,11 @@ def oid(identifier_or_rdf_type, rdf_type=None):
     identifier_or_rdf_type : :class:`str` or :class:`rdflib.term.URIRef`
         If `rdf_type` is provided, then this value is used as the identifier
         for the newly created object. Otherwise, this value will be the
-        :attr:`rdf_type` of the object used to determine the Python type and the
-        object's identifier will be randomly generated.
+        :attr:`rdf_type` of the object used to determine the Python type and
+        the object's identifier will be randomly generated.
     rdf_type : :class:`str`, :class:`rdflib.term.URIRef`, :const:`False`
-        If provided, this will be the :attr:`rdf_type` of the newly created object.
+        If provided, this will be the :attr:`rdf_type` of the newly created
+        object.
 
     Returns
     -------
