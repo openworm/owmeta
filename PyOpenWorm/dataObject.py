@@ -265,7 +265,6 @@ class DataObject(GraphObject, DataUser):
 
             if _PropertyTypes_key in InverseProperties:
                 ip = InverseProperties[_PropertyTypes_key]
-                print(ip, cls, value_type)
                 if ip.lhs_class == cls and value_type == ip.rhs_class:
                     _class = ip.rhs_class
                     _linkName = ip.rhs_linkName
