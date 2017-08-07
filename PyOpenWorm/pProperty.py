@@ -1,15 +1,15 @@
-from .dataObject import DataObject
+from .data import DataUser
 
 
-class Property(object):
+class Property(DataUser):
     """ Store a value associated with a DataObject
 
     Properties can be be accessed like methods. A method call like::
 
         a.P()
 
-    for a property ``P`` will return values appropriate to that property for ``a``,
-    the `owner` of the property.
+    for a property ``P`` will return values appropriate to that property for
+    ``a``, the `owner` of the property.
 
     Parameters
     ----------
@@ -25,7 +25,8 @@ class Property(object):
     # Indicates whether the Property is multivalued
     multiple = False
 
-    def __init__(self, name=False, owner=False):
+    def __init__(self, name=False, owner=False, **kwargs):
+        super(Property, self).__init__(**kwargs)
         self.owner = owner
         if self.owner:
             self.owner.properties.append(self)
