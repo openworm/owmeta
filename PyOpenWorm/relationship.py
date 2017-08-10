@@ -14,6 +14,9 @@ class Relationship(DataObject):
         Relationship.DatatypeProperty('subject', owner=self, multiple=False)
         Relationship.DatatypeProperty('property', owner=self, multiple=False)
         Relationship.DatatypeProperty('object', owner=self, multiple=False)
+
+        Relationship.DatatypeProperty('certainty', owner=self, multiple=False)
+
         if s is not None:
             self.subject(s)
         if p is not None:

@@ -24,6 +24,7 @@ DataObjectTypes = dict()
 PropertyTypes = dict()
 RDFTypeTable = dict()
 DataObjectsParents = dict()
+InverseProperties = dict()
 
 
 class DataObject(GraphObject, DataUser):
@@ -223,20 +224,22 @@ class DataObject(GraphObject, DataUser):
             owner,
             property_type,
             value_type=False,
-            multiple=False):
+            multiple=False,
+            link=None):
         # XXX This should actually get called for all of the properties when
         #     their owner classes are defined. The initialization, however,
         #     must happen with the owner object's creation
         owner_class = cls
         owner_class_name = owner_class.__name__
         property_class_name = str(owner_class_name + "_" + linkName)
+        _PropertyTypes_key = (cls, linkName)
 
         if not value_type:
             value_type = DataObject
 
         c = None
-        if property_class_name in PropertyTypes:
-            c = PropertyTypes[property_class_name]
+        if _PropertyTypes_key in PropertyTypes:
+            c = PropertyTypes[_PropertyTypes_key]
         else:
             klass = None
             if property_type == 'ObjectProperty':
@@ -248,18 +251,41 @@ class DataObject(GraphObject, DataUser):
             else:
                 value_rdf_type = False
 
-            link = owner_class.rdf_namespace[linkName]
+            if link is None:
+                link = owner_class.rdf_namespace[linkName]
+            classes = [klass]
+            props = dict(linkName=linkName,
+                         link=link,
+                         property_type=property_type,
+                         value_rdf_type=value_rdf_type,
+                         value_type=value_type,
+                         owner_type=owner_class,
+                         rdf_object=PropertyDataObject(ident=link),
+                         multiple=multiple)
+
+            if _PropertyTypes_key in InverseProperties:
+                ip = InverseProperties[_PropertyTypes_key]
+                if ip.lhs_class == cls and value_type == ip.rhs_class:
+                    _class = ip.rhs_class
+                    _linkName = ip.rhs_linkName
+                elif ip.rhs_class == cls and value_type == ip.lhs_class:
+                    _class = ip.lhs_class
+                    _linkName = ip.lhs_linkName
+                else:
+                    raise Exception("value_type {} for property ({}, {}) is"
+                                    " inconsistent with InverseProperty"
+                                    " declaration {}".format(value_type,
+                                                             owner_class,
+                                                             linkName, ip))
+                classes.insert(0, _InversePropertyMixin)
+
+                props['rhs_class'] = _class
+                props['rhs_linkName'] = _linkName
+
             c = type(property_class_name,
-                     (klass,),
-                     dict(linkName=linkName,
-                          link=link,
-                          property_type=property_type,
-                          value_rdf_type=value_rdf_type,
-                          value_type=value_type,
-                          owner_type=owner_class,
-                          rdf_object=PropertyDataObject(ident=link),
-                          multiple=multiple))
-            PropertyTypes[property_class_name] = c
+                     tuple(classes),
+                     props)
+            PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
 
     @classmethod
@@ -284,13 +310,15 @@ class DataObject(GraphObject, DataUser):
 
     @classmethod
     def attach_property(cls, owner, c):
-        res = c(owner=owner, conf=owner.conf, resolver=_Resolver.get_instance())
+        res = c(owner=owner,
+                conf=owner.conf,
+                resolver=_Resolver.get_instance())
         owner.properties.append(res)
         setattr(owner, c.linkName, res)
 
         return res
 
-    def graph_pattern(self, shorten=False):
+    def graph_pattern(self, shorten=False, show_namespaces=True):
         """ Get the graph pattern for this object.
 
         It should be as simple as converting the result of triples() into a BGP
@@ -305,7 +333,8 @@ class DataObject(GraphObject, DataUser):
         nm = None
         if shorten:
             nm = self.namespace_manager
-        return triples_to_bgp(self.triples(), namespace_manager=nm)
+        return triples_to_bgp(self.triples(), namespace_manager=nm,
+                              show_namespaces=show_namespaces)
 
     def retract(self):
         """ Remove this object from the data store. """
@@ -344,10 +373,11 @@ def oid(identifier_or_rdf_type, rdf_type=None):
     identifier_or_rdf_type : :class:`str` or :class:`rdflib.term.URIRef`
         If `rdf_type` is provided, then this value is used as the identifier
         for the newly created object. Otherwise, this value will be the
-        :attr:`rdf_type` of the object used to determine the Python type and the
-        object's identifier will be randomly generated.
+        :attr:`rdf_type` of the object used to determine the Python type and
+        the object's identifier will be randomly generated.
     rdf_type : :class:`str`, :class:`rdflib.term.URIRef`, :const:`False`
-        If provided, this will be the :attr:`rdf_type` of the newly created object.
+        If provided, this will be the :attr:`rdf_type` of the newly created
+        object.
 
     Returns
     -------
@@ -477,3 +507,42 @@ class _Resolver(RDFTypeResolver):
                 oid,
                 deserialize_rdflib_term)
         return cls.instance
+
+
+class _InversePropertyMixin(object):
+    """
+    Mixin for inverse properties.
+
+    Augments RealSimpleProperty methods to update inverse properties as well
+    """
+
+    def set(self, other):
+        assert isinstance(other, self.rhs_class)
+        rhs_prop = getattr(other, self.rhs_linkName)
+        super(_InversePropertyMixin, rhs_prop).set(self.owner)
+        super(_InversePropertyMixin, self).set(other)
+
+    def unset(self, other):
+        assert isinstance(other, self.rhs_class)
+        rhs_prop = getattr(other, self.rhs_linkName)
+        super(_InversePropertyMixin, rhs_prop).unset(self.owner)
+        super(_InversePropertyMixin, self).unset(other)
+
+
+class InverseProperty(object):
+
+    def __init__(self, lhs_class, lhs_linkName,
+                 rhs_class, rhs_linkName):
+        self.lhs_class = lhs_class
+        self.rhs_class = rhs_class
+
+        self.lhs_linkName = lhs_linkName
+        self.rhs_linkName = rhs_linkName
+        InverseProperties[(lhs_class, lhs_linkName)] = self
+        InverseProperties[(rhs_class, rhs_linkName)] = self
+
+    def __repr__(self):
+        return 'InverseProperty({},{},{},{})'.format(self.lhs_class,
+                                                     self.lhs_linkName,
+                                                     self.rhs_class,
+                                                     self.rhs_linkName)
