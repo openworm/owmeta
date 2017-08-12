@@ -5,12 +5,11 @@ python:
 install:
 - python setup.py install
 script:
-
-- ./codespeed-submit.sh
 - py.test --cov=PyOpenWorm --ignore=tests/InferenceTest.py
 
 after_success:
 - coveralls
+- ./codespeed-submit.sh
 env:
   global:
     secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=

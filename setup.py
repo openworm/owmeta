@@ -77,7 +77,6 @@ setup(
     dependency_links = [
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-        'git://github.com/mwatts15/yarom.git@dev',
         'git://github.com/mwatts15/rdflib-zodb.git@triples_choices_1#egg=rdflib-zodb-1.1-dev'
     ],
     version = version,
