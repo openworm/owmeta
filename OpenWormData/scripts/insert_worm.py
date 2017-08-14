@@ -15,6 +15,9 @@ NETWORK = None
 OPTIONS = None
 CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
 CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
+IONCHANNEL_SOURCE = "../aux_data/ion_channel.csv"
+CHANNEL_MUSCLE_SOURCE = "../aux_data/Ion channels - Ion Channel To Body Muscle.tsv"
+CHANNEL_NEURON_SOURCE = "../aux_data/Ion channels - Ion Channel To Neuron.tsv"
 RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
@@ -27,6 +30,188 @@ def serialize_as_n3():
 
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
+
+def upload_ionchannels():
+    """ Upload muscles and the neurons that connect to them
+    """
+    print ("uploading the ion channels")
+    try:
+        with open(IONCHANNEL_SOURCE) as csvfile:
+            next(csvfile, None)
+            csvreader = csv.reader(csvfile, skipinitialspace=True)
+
+            w = WORM
+            for num, line in enumerate(csvreader):
+                channel_name = normalize_cell_name(line[0]).upper()
+                gene_name = line[1].upper()
+                gene_WB_ID = line[2].upper()
+                expression_pattern = line[3]
+                description = line[4]
+                c = P.Channel(name=str(channel_name))
+                c.gene_name(gene_name)
+                c.gene_WB_ID(gene_WB_ID)
+                c.description(description)
+                c.expression_pattern(expression_pattern)
+                c.save()
+        print ("uploaded ion_channel")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_neuronchannel_association():
+    print ("uploading the neuron channel association")
+    try:
+        with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
+            reader=csv.reader(f, delimiter='\t')
+            rows=0
+            neurontoion = {}
+            for row in reader:
+                if rows<3:
+                    rows+=1
+                    continue
+                elif rows==3:
+                    heading = row
+                    rows+=1
+                    continue
+                rows+=1
+
+                cols=0
+                for col in row:
+                    if cols>=0 and cols<=101:
+                        cols+=1
+                    else:
+                        if col == '1' or col == '2':
+                            if heading[cols] in neurontoion.keys():
+                                neurontoion[heading[cols]].append(row[0])
+                            else:
+                                neurontoion[heading[cols]]=[row[0]]
+                        cols+=1
+            for keys in neurontoion:
+                channellist = neurontoion[keys]
+                n = P.Neuron(name=str(keys))
+                for channel in channellist:
+                    ch = P.Channel(name=str(channel))
+                    n.channel(ch)
+                n.save()
+        print ("uploaded neuron channel 1association")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_musclechannel_association():
+    print ("uploading the muscle channel association")
+    try:
+        with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
+            reader=csv.reader(f, delimiter='\t')
+            rows=0
+            muscletoion = {}
+            for row in reader:
+                if rows<3:
+                    rows+=1
+                    continue
+                elif rows==3:
+                    heading = row
+                    rows+=1
+                    continue
+                rows+=1
+
+                cols=0
+                for col in row:
+                    if cols>=0 and cols<=6:
+                        cols+=1
+                    else:
+                        if col == '1' or col == '2':
+                            if heading[cols] in neuronstoion.keys():
+                                muscletoion[heading[cols]].append(row[0])
+                            else:
+                                muscletoion[heading[cols]]=[row[0]]
+                        cols+=1
+            for keys in muscletoion:
+                channellist = muscletoion[keys]
+                m = P.Muscle(name=str(keys))
+                for channel in channellist:
+                    ch=P.Channel(name=str(channel))
+                    m.channel(ch)
+                m.save()
+        print ("uploaded muscle channel association")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_channelneuron_association():
+    print ("uploading the channel neuron association")
+    try:
+        with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
+            reader=csv.reader(f, delimiter='\t')
+            rows=0
+            iontoneuron = {}
+            for row in reader:
+                neuronlist = []
+                if rows<3:
+                    rows+=1
+                    continue
+                elif rows==3:
+                    heading = row
+                    rows+=1
+                    continue
+                rows+=1
+
+                cols=0
+                for col in row:
+                    if cols>=0 and cols<=101:
+                        cols+=1
+                    else:
+                        if col == '1' or col == '2':
+                            neuronlist.append(heading[cols])
+                        cols+=1
+                iontoneuron[row[0]] = neuronlist
+                ch = P.Channel(name=str(row[0]))
+                for neuron in neuronlist:
+                    n = P.Neuron(name=str(neuron))
+                    ch.appearsIn(n)
+                ch.save()
+        print ("uploaded channel neuron association")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_channelmuscle_association():
+    print ("uploading the channel muscle association")
+    P.connect()
+    try:
+        with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
+            reader=csv.reader(f, delimiter='\t')
+            rows=0
+            iontomuscle = {}
+            for row in reader:
+                musclelist = []
+                if rows<3:
+                    rows+=1
+                    continue
+                elif rows==3:
+                    heading = row
+                    rows+=1
+                    continue
+                rows+=1
+
+                cols=0
+                for col in row:
+                    if cols>=0 and cols<=6:
+                        cols+=1
+                    else:
+                        if col == '1' or col == '2':
+                            musclelist.append(heading[cols])
+                        cols+=1
+                iontomuscle[row[0]] = musclelist
+                ch = P.Channel(name=str(row[0]))
+                for muscle in musclelist:
+                    m = P.Muscle(name=str(muscle))
+                    ch.appearsIn(m)
+                ch.save()
+        print ("uploaded channel neuron association")
+    except Exception:
+        traceback.print_exc()
+
 
 
 def upload_muscles():
@@ -546,6 +731,11 @@ def do_insert(config="default.conf", logging=False):
 
         upload_neurons()
         upload_muscles()
+        upload_ionchannels()
+        upload_neuronchannel_association()
+        upload_musclechannel_association()
+        upload_channelneuron_association()
+        upload_channelmuscle_association()
         upload_lineage_and_descriptions()
         upload_connections()
         upload_receptors_types_neurotransmitters_neuropeptides_innexins()
