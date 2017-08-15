@@ -147,11 +147,13 @@ class DataUser(Configureable):
         else:
             gr = self.conf['rdf.graph']
             if self.conf['rdf.source'] == 'ZODB':
+                transaction.commit()
                 transaction.begin()
             for x in g:
                 gr.add(x)
             if self.conf['rdf.source'] == 'ZODB':
                 transaction.commit()
+                transaction.begin()
 
         # infer from the added statements
         # self.infer()
