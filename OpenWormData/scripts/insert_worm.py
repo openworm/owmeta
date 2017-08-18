@@ -18,6 +18,7 @@ CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
 IONCHANNEL_SOURCE = "../aux_data/ion_channel.csv"
 CHANNEL_MUSCLE_SOURCE = "../aux_data/Ion channels - Ion Channel To Body Muscle.tsv"
 CHANNEL_NEURON_SOURCE = "../aux_data/Ion channels - Ion Channel To Neuron.tsv"
+CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
 RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
@@ -31,6 +32,21 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
+def attach_neuromlfiles_to_channel():
+    """ attach the links to the neuroml files for the ion channels
+    """
+    print("attaching links to neuroml files")
+    try:
+        with open(CHANNEL_NEUROMLFILE) as csvfile:
+            next(csvfile, None)
+            csvreader = csv.reader(csvfile, skipinitialspace=True)
+            for row in csvreader:
+                ch = P.Channel(name=str(row[0]))
+                ch.neuroML_file(str(row[1]))
+                ch.save()
+        print("neuroML file links attached")
+    except Exception:
+        traceback.print_exc()
 
 def upload_ionchannels():
     """ Upload muscles and the neurons that connect to them
@@ -635,6 +651,7 @@ def do_insert(config="default.conf", logging=False):
         upload_ionchannels()
         upload_channelneuron_association()
         upload_channelmuscle_association()
+        attach_neuromlfiles_to_channel()
         upload_lineage_and_descriptions()
         upload_connections()
         upload_receptors_types_neurotransmitters_neuropeptides_innexins()
