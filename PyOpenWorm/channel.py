@@ -101,6 +101,7 @@ class Channel(DataObject):
         Channel.DatatypeProperty('gene_name', self)
         Channel.DatatypeProperty('gene_WB_ID', self)
         Channel.DatatypeProperty('expression_pattern', self)
+        Channel.DatatypeProperty('neuroML_file', owner=self)
         Channel.DatatypeProperty('proteins', self, multiple=True)
         Channel.ObjectProperty('appearsIn', self, multiple=True,
                                value_type=PyOpenWorm.cell.Cell)
