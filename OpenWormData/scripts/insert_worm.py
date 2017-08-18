@@ -31,6 +31,7 @@ def serialize_as_n3():
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
+
 def upload_ionchannels():
     """ Upload muscles and the neurons that connect to them
     """
@@ -40,7 +41,6 @@ def upload_ionchannels():
             next(csvfile, None)
             csvreader = csv.reader(csvfile, skipinitialspace=True)
 
-            w = WORM
             for num, line in enumerate(csvreader):
                 channel_name = normalize_cell_name(line[0]).upper()
                 gene_name = line[1].upper()
@@ -58,116 +58,37 @@ def upload_ionchannels():
         traceback.print_exc()
 
 
-def upload_neuronchannel_association():
-    print ("uploading the neuron channel association")
-    try:
-        with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
-            reader=csv.reader(f, delimiter='\t')
-            rows=0
-            neurontoion = {}
-            for row in reader:
-                if rows<3:
-                    rows+=1
-                    continue
-                elif rows==3:
-                    heading = row
-                    rows+=1
-                    continue
-                rows+=1
-
-                cols=0
-                for col in row:
-                    if cols>=0 and cols<=101:
-                        cols+=1
-                    else:
-                        if col == '1' or col == '2':
-                            if heading[cols] in neurontoion.keys():
-                                neurontoion[heading[cols]].append(row[0])
-                            else:
-                                neurontoion[heading[cols]]=[row[0]]
-                        cols+=1
-            for keys in neurontoion:
-                channellist = neurontoion[keys]
-                n = P.Neuron(name=str(keys))
-                for channel in channellist:
-                    ch = P.Channel(name=str(channel))
-                    n.channel(ch)
-        print ("uploaded neuron channel association")
-    except Exception:
-        traceback.print_exc()
-
-
-def upload_musclechannel_association():
-    print ("uploading the muscle channel association")
-    try:
-        with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
-            reader=csv.reader(f, delimiter='\t')
-            rows=0
-            muscletoion = {}
-            for row in reader:
-                if rows<3:
-                    rows+=1
-                    continue
-                elif rows==3:
-                    heading = row
-                    rows+=1
-                    continue
-                rows+=1
-
-                cols=0
-                for col in row:
-                    if cols>=0 and cols<=6:
-                        cols+=1
-                    else:
-                        if col == '1' or col == '2':
-                            if heading[cols] in neuronstoion.keys():
-                                muscletoion[heading[cols]].append(row[0])
-                            else:
-                                muscletoion[heading[cols]]=[row[0]]
-                        cols+=1
-            for keys in muscletoion:
-                channellist = muscletoion[keys]
-                m = P.Muscle(name=str(keys))
-                for channel in channellist:
-                    ch=P.Channel(name=str(channel))
-                    m.channel(ch)
-        print ("uploaded muscle channel association")
-    except Exception:
-        traceback.print_exc()
-
-
 def upload_channelneuron_association():
     print ("uploading the channel neuron association")
     try:
+        net = NETWORK
         with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
-            reader=csv.reader(f, delimiter='\t')
-            rows=0
-            iontoneuron = {}
+            reader = csv.reader(f, delimiter='\t')
+            rows = 0
             for row in reader:
                 neuronlist = []
-                if rows<3:
-                    rows+=1
+                if rows < 3:
+                    rows += 1
                     continue
-                elif rows==3:
+                elif rows == 3:
                     heading = row
-                    rows+=1
+                    rows += 1
                     continue
-                rows+=1
+                rows += 1
 
-                cols=0
+                cols = 0
                 for col in row:
-                    if cols>=0 and cols<=101:
-                        cols+=1
+                    if cols >= 0 and cols <= 101:
+                        cols += 1
                     else:
                         if col == '1' or col == '2':
                             neuronlist.append(heading[cols])
-                        cols+=1
-                iontoneuron[row[0]] = neuronlist
+                        cols += 1
                 ch = P.Channel(name=str(row[0]))
                 for neuron in neuronlist:
                     n = P.Neuron(name=str(neuron))
+                    net.neuron(n)
                     ch.appearsIn(n)
-                ch.save()
         print ("uploaded channel neuron association")
     except Exception:
         traceback.print_exc()
@@ -175,41 +96,38 @@ def upload_channelneuron_association():
 
 def upload_channelmuscle_association():
     print ("uploading the channel muscle association")
-    P.connect()
     try:
+        w = WORM
         with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
-            reader=csv.reader(f, delimiter='\t')
-            rows=0
-            iontomuscle = {}
+            reader = csv.reader(f, delimiter='\t')
+            rows = 0
             for row in reader:
                 musclelist = []
-                if rows<3:
-                    rows+=1
+                if rows < 3:
+                    rows += 1
                     continue
-                elif rows==3:
+                elif rows == 3:
                     heading = row
-                    rows+=1
+                    rows += 1
                     continue
-                rows+=1
+                rows += 1
 
-                cols=0
+                cols = 0
                 for col in row:
-                    if cols>=0 and cols<=6:
-                        cols+=1
+                    if cols >= 0 and cols <= 6:
+                        cols += 1
                     else:
                         if col == '1' or col == '2':
                             musclelist.append(heading[cols])
-                        cols+=1
-                iontomuscle[row[0]] = musclelist
+                        cols += 1
                 ch = P.Channel(name=str(row[0]))
                 for muscle in musclelist:
                     m = P.Muscle(name=str(muscle))
+                    w.muscle(m)
                     ch.appearsIn(m)
-                ch.save()
         print ("uploaded channel muscle association")
     except Exception:
         traceback.print_exc()
-
 
 
 def upload_muscles():
@@ -249,7 +167,7 @@ def upload_lineage_and_descriptions():
     try:
         w = WORM
         net = NETWORK
-        #TODO: Improve this evidence marker
+        # TODO: Improve this evidence marker
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
         cell_data = open(LINEAGE_LIST_LOC, "r")
 
@@ -259,30 +177,30 @@ def upload_lineage_and_descriptions():
         cell_name_counters = dict()
         data = dict()
         for x in cell_data:
-             j = [x.strip().strip("\"") for x in x.split("\t")]
-             name = j[0]
-             lineageName = j[1]
-             desc = j[2]
+            j = [x.strip().strip("\"") for x in x.split("\t")]
+            name = j[0]
+            lineageName = j[1]
+            desc = j[2]
 
-             # XXX: These renaming choices are arbitrary and may be inappropriate
-             if name == "DB1/3":
-                 name = "DB1"
-             elif name == "DB3/1":
-                 name = "DB3"
-             elif name == "AVFL/R":
-                 if lineageName[0] == "W":
-                     name = "AVFL"
-                 elif lineageName[0] == "P":
-                     name = "AVFR"
+            # XXX: These renaming choices are arbitrary; may be inappropriate
+            if name == "DB1/3":
+                name = "DB1"
+            elif name == "DB3/1":
+                name = "DB3"
+            elif name == "AVFL/R":
+                if lineageName[0] == "W":
+                    name = "AVFL"
+                elif lineageName[0] == "P":
+                    name = "AVFR"
 
-             if name in cell_name_counters:
-                 while (name in cell_name_counters):
-                     cell_name_counters[name] += 1
-                     name = name + "("+ str(cell_name_counters[name]) +")"
-             else:
-                 cell_name_counters[name] = 0
+            if name in cell_name_counters:
+                while (name in cell_name_counters):
+                    cell_name_counters[name] += 1
+                    name = name + "(" + str(cell_name_counters[name]) + ")"
+            else:
+                cell_name_counters[name] = 0
 
-             data[name] = {"lineageName" : lineageName, "desc": desc}
+            data[name] = {"lineageName": lineageName, "desc": desc}
 
         def add_data_to_cell(n):
             name = n.name.one()
@@ -360,27 +278,27 @@ def parse_bibtex_into_evidence(file_name):
         try:
             doi = bib_database.entries[0]['doi']
             if doi:
-              e.doi(doi)
+                e.doi(doi)
         except KeyError:
             pass
 
         try:
             author = bib_database.entries[0]['author']
             if author:
-              e.author(author)
+                e.author(author)
         except KeyError:
             pass
 
         try:
             title = bib_database.entries[0]['title']
             if title:
-              e.title(title)
+                e.title(title)
         except KeyError:
             pass
         try:
             year = bib_database.entries[0]['year']
             if year:
-              e.year(year)
+                e.year(year)
         except KeyError:
             pass
     return e
@@ -416,7 +334,6 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
 
     i = 0
 
-    neurons = []
     uris = dict()
 
     with open(file_path) as f:
@@ -447,12 +364,10 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 uris[evidenceURL] = e2
 
             # grab the neuron object
-            n = NETWORK.aneuron(neuron_name)
-            neurons.append(n)
+            n = P.Neuron(neuron_name)
+            NETWORK.neuron(n)
 
             if relation == 'neurotransmitter':
-                if data in n.neurotransmitter():
-                    continue
                 # assign the data, grab the relation into r
                 r = n.neurotransmitter(data)
                 # assert the evidence on the relationship
@@ -460,8 +375,6 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 e2.asserts(r)
 
             elif relation == 'innexin':
-                if data in n.innexin():
-                    continue
                 # assign the data, grab the relation into r
                 r = n.innexin(data)
                 # assert the evidence on the relationship
@@ -469,8 +382,6 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 e2.asserts(r)
 
             elif relation == 'neuropeptide':
-                if data in n.neuropeptide():
-                    continue
                 # assign the data, grab the relation into r
                 r = n.neuropeptide(data)
                 # assert the evidence on the relationship
@@ -478,8 +389,6 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 e2.asserts(r)
 
             elif relation == 'receptor':
-                if data in n.receptor():
-                    continue
                 # assign the data, grab the relation into r
                 r = n.receptor(data)
                 # assert the evidence on the relationship
@@ -487,8 +396,6 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 e2.asserts(r)
 
             elif relation == 'type':
-                if data.lower() in n.type():
-                    continue
                 types = []
                 if 'sensory' in (data.lower()):
                     types.append('sensory')
@@ -504,11 +411,7 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                     # assert the evidence on the relationship
                     e.asserts(r)
                     e2.asserts(r)
-
             i += 1
-
-    for neur in neurons:
-        NETWORK.neuron(neur)
     print(
         'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
             i, file_path
@@ -730,8 +633,6 @@ def do_insert(config="default.conf", logging=False):
         upload_neurons()
         upload_muscles()
         upload_ionchannels()
-        upload_neuronchannel_association()
-        upload_musclechannel_association()
         upload_channelneuron_association()
         upload_channelmuscle_association()
         upload_lineage_and_descriptions()
