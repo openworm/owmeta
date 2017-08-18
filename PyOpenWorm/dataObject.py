@@ -8,7 +8,7 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from .configure import BadConf
-from .simpleProperty import ObjectProperty, DatatypeProperty
+from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
 from .data import DataUser
 
 __all__ = [
@@ -218,6 +218,23 @@ class DataObject(GraphObject, DataUser):
             **kwargs)
 
     @classmethod
+    def UnionProperty(cls, *args, **kwargs):
+        """ Attach a, possibly new, property to this class that has a simple
+        type (string,number,etc) or DataObject for its values
+
+        Parameters
+        ----------
+        linkName : string
+            The name of this property.
+        owner : PyOpenWorm.dataObject.DataObject
+            The name of this property.
+        """
+        return cls._create_property(
+            *args,
+            property_type='UnionProperty',
+            **kwargs)
+
+    @classmethod
     def _create_property(
             cls,
             linkName,
@@ -248,6 +265,9 @@ class DataObject(GraphObject, DataUser):
             elif property_type == 'DatatypeProperty':
                 value_rdf_type = False
                 klass = DatatypeProperty
+            elif property_type == 'UnionProperty':
+                value_rdf_type = False
+                klass = UnionProperty
             else:
                 value_rdf_type = False
 
@@ -493,6 +513,7 @@ class PropertyDataObject(DataObject):
 
     Try not to confuse this with the Property class
     """
+    rdf_type = R.RDF['type']
 
 
 class _Resolver(RDFTypeResolver):

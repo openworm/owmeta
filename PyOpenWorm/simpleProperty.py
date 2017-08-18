@@ -10,7 +10,9 @@ from yarom.graphObject import (GraphObject,
 from yarom.rdfUtils import deserialize_rdflib_term
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
-from yarom.propertyMixins import (ObjectPropertyMixin, DatatypePropertyMixin)
+from yarom.propertyMixins import (ObjectPropertyMixin,
+                                  DatatypePropertyMixin,
+                                  UnionPropertyMixin)
 from PyOpenWorm.data import DataUser
 import itertools
 import hashlib
@@ -165,10 +167,12 @@ class _ObjectPropertyMixin(ObjectPropertyMixin):
 
     def set(self, v):
         from .dataObject import DataObject
-        if not isinstance(v, (SimpleProperty, DataObject, Variable)):
+        if not isinstance(v, (SimpleProperty, DataObject, Variable,
+                              RelationshipProxy)):
             raise Exception(
-                "An ObjectProperty only accepts DataObject, SimpleProperty"
-                " or Variable instances. Got a " + str(type(v)) + " aka " +
+                "An ObjectProperty only accepts DataObject, SimpleProperty,"
+                " RelationshipProxy, or Variable instances. Got a "
+                + str(type(v)) + " aka " +
                 str(type(v).__bases__))
         return super(ObjectPropertyMixin, self).set(v)
 
@@ -195,6 +199,18 @@ class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
         s = set()
         for x in self.defined_values:
             s.add(self._resolver.deserializer(x.idl))
+        return itertools.chain(r, s)
+
+
+class UnionProperty(UnionPropertyMixin, RealSimpleProperty):
+
+    """ A Property that can handle either DataObjects or basic types """
+    def get(self):
+        r = super(UnionProperty, self).get()
+        s = set()
+        for x in self.defined_values:
+            if isinstance(x, R.Literal):
+                s.add(self._resolver.deserializer(x.idl))
         return itertools.chain(r, s)
 
 
@@ -361,6 +377,6 @@ class Rel(tuple):
     def rel(self):
         from .relationship import Relationship
         return Relationship(
-            s=(self.s.idl if self.s.defined else None),
-            p=self.p.link,
-            o=(self.o.idl if self.o.defined else None))
+            s=(self.s if self.s.defined else None),
+            p=self.p.rdf_object,
+            o=(self.o if self.o.defined else None))

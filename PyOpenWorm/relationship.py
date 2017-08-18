@@ -11,9 +11,9 @@ class Relationship(DataObject):
 
     def __init__(self, s=None, p=None, o=None, **kwargs):
         super(Relationship, self).__init__(**kwargs)
-        Relationship.DatatypeProperty('subject', owner=self, multiple=False)
-        Relationship.DatatypeProperty('property', owner=self, multiple=False)
-        Relationship.DatatypeProperty('object', owner=self, multiple=False)
+        Relationship.ObjectProperty('subject', owner=self, multiple=False)
+        Relationship.ObjectProperty('property', owner=self, multiple=False)
+        Relationship.UnionProperty('object', owner=self, multiple=False)
 
         Relationship.DatatypeProperty('certainty', owner=self, multiple=False)
 
@@ -28,8 +28,8 @@ class Relationship(DataObject):
     def defined(self):
         return (super(Relationship, self).defined or
                 (self.subject.has_defined_value() and
-                    self.property.has_defined_value() and
-                    self.object.has_defined_value()))
+                 self.property.has_defined_value() and
+                 self.object.has_defined_value()))
 
     def identifier(self):
         if super(Relationship, self).defined:
