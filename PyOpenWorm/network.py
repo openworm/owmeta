@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import PyOpenWorm as P
+from itertools import chain
 
 from PyOpenWorm.dataObject import DataObject
 
