@@ -541,7 +541,7 @@ class _InversePropertyMixin(object):
         assert isinstance(other, self.rhs_class)
         rhs_prop = getattr(other, self.rhs_linkName)
         super(_InversePropertyMixin, rhs_prop).set(self.owner)
-        super(_InversePropertyMixin, self).set(other)
+        return super(_InversePropertyMixin, self).set(other)
 
     def unset(self, other):
         assert isinstance(other, self.rhs_class)
