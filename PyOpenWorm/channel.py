@@ -1,3 +1,4 @@
+import rdflib as R
 from .pProperty import Property
 from .channelworm import ChannelModel
 from .dataObject import DataObject
@@ -100,7 +101,10 @@ class Channel(DataObject):
         Channel.DatatypeProperty('description', self)
         Channel.DatatypeProperty('gene_name', self)
         Channel.DatatypeProperty('gene_WB_ID', self)
-        Channel.DatatypeProperty('expression_pattern', self)
+        Channel.ObjectProperty('expression_pattern',
+                               owner=self,
+                               multiple=True,
+                               value_type=ExpressionPattern)
         Channel.DatatypeProperty('neuroML_file', owner=self)
         Channel.DatatypeProperty('proteins', self, multiple=True)
         Channel.ObjectProperty('appearsIn', self, multiple=True,
@@ -123,3 +127,29 @@ class Channel(DataObject):
         else:
             # name is already set, so we can make an identifier from it
             return self.make_identifier(self.name.defined_values[0])
+
+
+class ExpressionPattern(DataObject):
+    def __init__(self, wormbaseID=None, description=None, **kwargs):
+        super(ExpressionPattern, self).__init__(**kwargs)
+        ExpressionPattern.DatatypeProperty('wormbaseID', owner=self)
+        ExpressionPattern.DatatypeProperty('wormbaseURL', owner=self)
+        ExpressionPattern.DatatypeProperty('description', owner=self)
+
+        if wormbaseID:
+            self.wormbaseID(wormbaseID)
+            self.wormbaseURL(R.URIRef("http://www.wormbase.org/species/all/expr_pattern/"+wormbaseID))
+
+        if description:
+            self.description(description)
+
+    @property
+    def defined(self):
+        return super(ExpressionPattern, self).defined \
+                or self.wormbaseID.has_defined_value()
+
+    def identifier(self):
+        if super(ExpressionPattern, self).defined:
+            return super(ExpressionPattern, self).identifier()
+        else:
+            return self.make_identifier(self.wormbaseID.defined_values[0])

@@ -80,7 +80,7 @@ from .quantity import Quantity
 from .my_neuroml import NeuroML
 from .connection import Connection
 from .experiment import Experiment
-from .channel import Channel
+from .channel import Channel, ExpressionPattern
 from .channelworm import ChannelModel, PatchClampExperiment
 from .plot import Plot
 
@@ -114,6 +114,7 @@ __all__ = [
     "Connection",
     "Experiment",
     "Channel",
+    "ExpressionPattern",
     "ChannelModel",
     "PatchClampExperiment",
     "Plot"]
@@ -270,6 +271,7 @@ def connect(configFile=False,
     SimpleProperty.register()
     Relationship.register()
     Channel.register()
+    ExpressionPattern.register()
     ChannelModel.register()
     Experiment.register()
     PatchClampExperiment.register()

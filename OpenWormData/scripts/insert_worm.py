@@ -67,7 +67,14 @@ def upload_ionchannels():
                 c.gene_name(gene_name)
                 c.gene_WB_ID(gene_WB_ID)
                 c.description(description)
-                c.expression_pattern(expression_pattern)
+                patterns = expression_pattern.split(r' | ')
+                regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
+
+                matches = [regex.match(pat) for pat in patterns]
+                patterns = [P.ExpressionPattern(wormbaseID=m.group(1), description=m.group(2)) for m in matches if m is not None]
+                for pat in patterns:
+                    c.expression_pattern(pat)
+
                 c.save()
         print ("uploaded ion_channel")
     except Exception:
@@ -77,33 +84,15 @@ def upload_ionchannels():
 def upload_channelneuron_association():
     print ("uploading the channel neuron association")
     try:
-        net = NETWORK
         with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
             reader = csv.reader(f, delimiter='\t')
-            rows = 0
+            heading = skip_to_header(reader)
             for row in reader:
-                neuronlist = []
-                if rows < 3:
-                    rows += 1
-                    continue
-                elif rows == 3:
-                    heading = row
-                    rows += 1
-                    continue
-                rows += 1
-
-                cols = 0
-                for col in row:
-                    if cols >= 0 and cols <= 101:
-                        cols += 1
-                    else:
-                        if col == '1' or col == '2':
-                            neuronlist.append(heading[cols])
-                        cols += 1
+                neuronlist = extract_neuron_names(heading, row)
                 ch = P.Channel(name=str(row[0]))
                 for neuron in neuronlist:
                     n = P.Neuron(name=str(neuron))
-                    net.neuron(n)
+                    NETWORK.neuron(n)
                     ch.appearsIn(n)
         print ("uploaded channel neuron association")
     except Exception:
@@ -113,37 +102,56 @@ def upload_channelneuron_association():
 def upload_channelmuscle_association():
     print ("uploading the channel muscle association")
     try:
-        w = WORM
         with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
             reader = csv.reader(f, delimiter='\t')
-            rows = 0
+            heading = skip_to_header(reader)
             for row in reader:
-                musclelist = []
-                if rows < 3:
-                    rows += 1
-                    continue
-                elif rows == 3:
-                    heading = row
-                    rows += 1
-                    continue
-                rows += 1
-
-                cols = 0
-                for col in row:
-                    if cols >= 0 and cols <= 6:
-                        cols += 1
-                    else:
-                        if col == '1' or col == '2':
-                            musclelist.append(heading[cols])
-                        cols += 1
+                musclelist = extract_muscle_names(heading, row)
                 ch = P.Channel(name=str(row[0]))
                 for muscle in musclelist:
                     m = P.Muscle(name=str(muscle))
-                    w.muscle(m)
+                    WORM.muscle(m)
                     ch.appearsIn(m)
         print ("uploaded channel muscle association")
     except Exception:
         traceback.print_exc()
+
+
+def extract_neuron_names(heading, row):
+    neuronlist = []
+    cols = 0
+    for col in row:
+        if cols >= 0 and cols <= 101:
+            cols += 1
+        else:
+            if col == '1' or col == '2':
+                neuronlist.append(heading[cols])
+            cols += 1
+    return neuronlist
+
+
+def extract_muscle_names(heading, row):
+    musclelist = []
+    cols = 0
+    for col in row:
+        if cols >= 0 and cols <= 6:
+            cols += 1
+        else:
+            if col == '1' or col == '2':
+                musclelist.append(heading[cols])
+            cols += 1
+    return musclelist
+
+
+def skip_to_header(reader):
+    heading = None
+    rows = 0
+    for row in reader:
+        if rows == 3:
+            heading = row
+            break
+        rows += 1
+    return heading
 
 
 def upload_muscles():
@@ -646,16 +654,16 @@ def do_insert(config="default.conf", logging=False):
         WORM.neuron_network(NETWORK)
         NETWORK.worm(WORM)
 
-        upload_neurons()
-        upload_muscles()
+        # upload_neurons()
+        # upload_muscles()
         upload_ionchannels()
-        upload_channelneuron_association()
-        upload_channelmuscle_association()
-        attach_neuromlfiles_to_channel()
-        upload_lineage_and_descriptions()
-        upload_connections()
-        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
-        upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
+        # upload_channelneuron_association()
+        # upload_channelmuscle_association()
+        # attach_neuromlfiles_to_channel()
+        # upload_lineage_and_descriptions()
+        # upload_connections()
+        # upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        # upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
         print("Saving...")
         WORM.save()
