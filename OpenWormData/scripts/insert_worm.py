@@ -71,7 +71,9 @@ def upload_ionchannels():
                 regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                 matches = [regex.match(pat) for pat in patterns]
-                patterns = [P.ExpressionPattern(wormbaseID=m.group(1), description=m.group(2)) for m in matches if m is not None]
+                patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
+                                                description=m.group(2))
+                            for m in matches if m is not None]
                 for pat in patterns:
                     c.expression_pattern(pat)
 
