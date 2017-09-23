@@ -359,6 +359,9 @@ class RelationshipProxy(Proxy):
     def __repr__(self):
         return repr(self.__wrapped__)
 
+    def unwrapped(self):
+        return self.__wrapped__
+
 
 class Rel(tuple):
 
