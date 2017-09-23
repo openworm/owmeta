@@ -1,6 +1,7 @@
 from __future__ import print_function
 import rdflib as R
 import random as RND
+import transaction
 import logging
 from itertools import groupby
 
@@ -586,16 +587,14 @@ class Context(DataObject):
         self._contents.update(set(objects))
 
     def save_context(self):
+        if self.conf['rdf.source'] == 'ZODB':
+            transaction.commit()
+            transaction.begin()
         ctx = self.rdf.get_context(self.identifier())
-        triples = set([])
-        for t in self._contents_triples():
-            if len(triples) < self._set_buffer_size:
-                triples.add(t)
-            else:
-                ctx.addN((s, p, o, ctx) for s, p, o in triples)
-                triples.clear()
-        if triples:
-            ctx.addN((s, p, o, ctx) for s, p, o in triples)
+        ctx.addN((s, p, o, ctx) for s, p, o in self._contents_triples())
+        if self.conf['rdf.source'] == 'ZODB':
+            transaction.commit()
+            transaction.begin()
 
     def _contents_triples(self):
         ct = ComponentTripler(None, generator=True)
