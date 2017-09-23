@@ -566,7 +566,8 @@ def upload_connections():
     # TODO: In future work these should be uploaded seperately to
     # PyOpenWorm in a new upload function and should be referred from there
     # instead of this list.
-    other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
+    other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL',
+                   'MC3DR', 'MC3V']
 
     # counters for terminal printing
     neuron_connections = 0
@@ -641,7 +642,7 @@ def upload_connections():
 
                 def add_synapse(source, target):
                     c = P.Connection(pre_cell=source, post_cell=target,
-                                    number=weight, syntype=syn_type)
+                                     number=weight, syntype=syn_type)
                     n.synapse(c)
                     e.asserts(c)
 
@@ -732,6 +733,7 @@ def do_insert(config="default.conf", logging=False):
     SQLITE_EVIDENCE = P.Evidence(key="C_elegans_SQLite_DB", title="C. elegans sqlite database")
     try:
         WORM = P.Worm()
+
         NETWORK = P.Network()
         WORM.neuron_network(NETWORK)
         NETWORK.worm(WORM)
@@ -773,6 +775,7 @@ def do_insert(config="default.conf", logging=False):
         traceback.print_exc()
     finally:
         P.disconnect()
+
 
 if __name__ == '__main__':
     # NOTE: This process will NOT clear out the database if run multiple times.
