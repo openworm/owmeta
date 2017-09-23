@@ -8,7 +8,7 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from .configure import BadConf
-from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
+from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty, RelationshipProxy
 from .data import DataUser
 
 __all__ = [
@@ -567,3 +567,42 @@ class InverseProperty(object):
                                                      self.lhs_linkName,
                                                      self.rhs_class,
                                                      self.rhs_linkName)
+
+class Context(DataObject):
+    """
+    A context. Analogous to an RDF context, with some special sauce
+    """
+
+    def __init__(self, **kwargs):
+        super(Context, self).__init__(**kwargs)
+        """ A set of DataObjects """
+        self._contents = set([])
+        self._set_buffer_size = 10000
+
+    def contents(self):
+        return self._contents
+
+    def add_objects(self, objects):
+        self._contents.update(set(objects))
+
+    def save_context(self):
+        ctx = self.rdf.get_context(self.identifier())
+        triples = set([])
+        for t in self._contents_triples():
+            if len(triples) < self._set_buffer_size:
+                triples.add(t)
+            else:
+                ctx.addN((s, p, o, ctx) for s, p, o in triples)
+                triples.clear()
+        if triples:
+            ctx.addN((s, p, o, ctx) for s, p, o in triples)
+
+    def _contents_triples(self):
+        ct = ComponentTripler(None, generator=True)
+        for obj in self._contents:
+            if type(obj) == RelationshipProxy:
+                obj = obj.unwrapped()
+            if id(obj) not in ct.seen:
+                ct.start = obj
+                for t in ct():
+                    yield t

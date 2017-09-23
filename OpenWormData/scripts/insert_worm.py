@@ -1,6 +1,9 @@
 from __future__ import print_function
+from time import time
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
+from PyOpenWorm.datasource import DataTranslator, DataSource
+from PyOpenWorm.dataObject import Context
 import traceback
 import csv
 import re
@@ -21,6 +24,128 @@ RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/M
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
+
+class CSVDataSource(DataSource):
+    def __init__(self, csv_file_name, header=None, **kwargs):
+        super(CSVDataSource, self).__init__(**kwargs)
+        self.csv_file_name = csv_file_name
+        self.header = header
+
+
+class WormbaseTextMatchCSVDataSource(CSVDataSource):
+    def __init__(self, cell_type, initial_cell_column, **kwargs):
+        """
+        Parameters
+        ----------
+        cell_type : type
+            The type of cell to generate
+        initial_cell_column : int
+            The index of the first column with a cell name
+        """
+        super(WormbaseTextMatchCSVDataSource, self).__init__(**kwargs)
+        self.cell_type = cell_type
+        self.initial_cell_column = initial_cell_column
+
+
+class WormbaseIonChannelCSVDataSource(CSVDataSource):
+    def __init__(self, **kwargs):
+        super(WormbaseIonChannelCSVDataSource, self).__init__(
+                header=['channel_name',
+                        'gene_name',
+                        'gene_WB_ID',
+                        'expression_pattern',
+                        'description'],
+                **kwargs)
+
+
+class WormbaseIonChannelCSVTranslator(DataTranslator):
+    data_source_type = WormbaseIonChannelCSVDataSource
+
+    def translate(self, data_source):
+        res = set([])
+        try:
+            with open(data_source.csv_file_name) as csvfile:
+                next(csvfile, None)
+                csvreader = csv.reader(csvfile, skipinitialspace=True)
+
+                for line in csvreader:
+                    channel_name = normalize_cell_name(line[0]).upper()
+                    gene_name = line[1].upper()
+                    gene_WB_ID = line[2].upper()
+                    expression_pattern = line[3]
+                    description = line[4]
+                    c = P.Channel(name=str(channel_name))
+                    c.gene_name(gene_name)
+                    c.gene_WB_ID(gene_WB_ID)
+                    c.description(description)
+                    patterns = expression_pattern.split(r' | ')
+                    regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
+
+                    matches = [regex.match(pat) for pat in patterns]
+                    patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
+                                                    description=m.group(2))
+                                for m in matches if m is not None]
+                    for pat in patterns:
+                        c.expression_pattern(pat)
+                    res.add(c)
+        except Exception:
+            traceback.print_exc()
+        return res
+
+
+class WormbaseTextMatchCSVTranslator(DataTranslator):
+    data_source_type = WormbaseTextMatchCSVDataSource
+
+    def translate(self, data_source):
+        initcol = data_source.initial_cell_column
+        ctype = data_source.cell_type
+        res = set([])
+        try:
+            with open(data_source.csv_file_name, 'rb') as f:
+                reader = csv.reader(f, delimiter='\t')
+                header = self.skip_to_header(reader)
+                for row in reader:
+                    cells = self.extract_cell_names(header,
+                                                    initcol,
+                                                    row)
+                    ch = P.Channel(name=str(row[0]))
+                    for cell in cells:
+                        m = ctype(name=str(cell))
+                        res.add(ch.appearsIn(m))
+        except Exception:
+            traceback.print_exc()
+        return res
+
+    def skip_to_header(self, reader):
+        rows = 0
+        for row in reader:
+            if rows == 3:
+                return row
+            rows += 1
+        return None
+
+    def extract_cell_names(self, header, initial_cell_column, row):
+        res = []
+        cols = 0
+        for col in row:
+            if cols > initial_cell_column:
+                if col == '1' or col == '2':
+                    res.append(header[cols])
+            cols += 1
+        return res
+
+DATA_SOURCES = [ WormbaseTextMatchCSVDataSource( cell_type=P.Neuron
+                                               , csv_file_name=CHANNEL_NEURON_SOURCE
+                                               , initial_cell_column=101)
+               , WormbaseTextMatchCSVDataSource( cell_type=P.Muscle
+                                               , csv_file_name=CHANNEL_MUSCLE_SOURCE
+                                               , initial_cell_column=6)
+               , WormbaseIonChannelCSVDataSource(csv_file_name=IONCHANNEL_SOURCE)
+               ]
+
+TRANSLATORS = [ WormbaseTextMatchCSVTranslator()
+              , WormbaseIonChannelCSVTranslator()
+              ]
 
 def serialize_as_n3():
     dest = '../WormData.n3'
@@ -52,6 +177,7 @@ def upload_ionchannels():
     """ Upload muscles and the neurons that connect to them
     """
     print ("uploading the ion channels")
+    res = set([])
     try:
         with open(IONCHANNEL_SOURCE) as csvfile:
             next(csvfile, None)
@@ -76,47 +202,11 @@ def upload_ionchannels():
                             for m in matches if m is not None]
                 for pat in patterns:
                     c.expression_pattern(pat)
-
-                c.save()
+                res.add(c)
         print ("uploaded ion_channel")
     except Exception:
         traceback.print_exc()
-
-
-def upload_channelneuron_association():
-    print ("uploading the channel neuron association")
-    try:
-        with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
-            reader = csv.reader(f, delimiter='\t')
-            heading = skip_to_header(reader)
-            for row in reader:
-                neuronlist = extract_neuron_names(heading, row)
-                ch = P.Channel(name=str(row[0]))
-                for neuron in neuronlist:
-                    n = P.Neuron(name=str(neuron))
-                    NETWORK.neuron(n)
-                    ch.appearsIn(n)
-        print ("uploaded channel neuron association")
-    except Exception:
-        traceback.print_exc()
-
-
-def upload_channelmuscle_association():
-    print ("uploading the channel muscle association")
-    try:
-        with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
-            reader = csv.reader(f, delimiter='\t')
-            heading = skip_to_header(reader)
-            for row in reader:
-                musclelist = extract_muscle_names(heading, row)
-                ch = P.Channel(name=str(row[0]))
-                for muscle in musclelist:
-                    m = P.Muscle(name=str(muscle))
-                    WORM.muscle(m)
-                    ch.appearsIn(m)
-        print ("uploaded channel muscle association")
-    except Exception:
-        traceback.print_exc()
+    return res
 
 
 def extract_neuron_names(heading, row):
@@ -124,7 +214,7 @@ def extract_neuron_names(heading, row):
     neuronlist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= FIRST_NEURON_NAME_COL:
+        if cols <= FIRST_NEURON_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
@@ -138,24 +228,13 @@ def extract_muscle_names(heading, row):
     musclelist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= FIRST_MUSCLE_NAME_COL:
+        if cols <= FIRST_MUSCLE_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
                 musclelist.append(heading[cols])
             cols += 1
     return musclelist
-
-
-def skip_to_header(reader):
-    heading = None
-    rows = 0
-    for row in reader:
-        if rows == 3:
-            heading = row
-            break
-        rows += 1
-    return heading
 
 
 def upload_muscles():
@@ -427,7 +506,7 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
 
 def upload_connections():
 
-    print ("uploading statements about connections.  Buckle up; this will take a while!")
+    print ("uploading statements about connections")
 
     # to normalize certian body wall muscle cell names
     SEARCH_STRING_MUSCLE = re.compile(r'\w+[BWM]+\w+')
@@ -633,23 +712,39 @@ def do_insert(config="default.conf", logging=False):
         NETWORK = P.Network()
         WORM.neuron_network(NETWORK)
         NETWORK.worm(WORM)
-
+        c = Context(key="insert_worm")
+        t0 = time()
         upload_neurons()
         upload_muscles()
-        upload_ionchannels()
-        upload_channelneuron_association()
-        upload_channelmuscle_association()
-        attach_neuromlfiles_to_channel()
-        upload_lineage_and_descriptions()
-        upload_connections()
-        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
-        upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
+        for ds in DATA_SOURCES:
+            best_translator = None
+            for tr in TRANSLATORS:
+                if isinstance(ds, tr.data_source_type):
+                    if best_translator is None \
+                        or issubclass(tr.data_source_type, best_translator.data_source_type):
+                        best_translator = tr
+            if best_translator is not None:
+                c.add_objects(best_translator.translate(ds))
 
+        c.add_objects([c, NETWORK])
+        #attach_neuromlfiles_to_channel()
+        #upload_lineage_and_descriptions()
+        upload_connections()
+        #upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        #upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
+
+        #WORM.save()
+        t1 = time()
         print("Saving...")
-        WORM.save()
+        c.save_context()
+        t2 = time()
 
         print("Serializing...")
         serialize_as_n3()
+        t3 = time()
+        print("generating objects took", t1 - t0, "seconds")
+        print("saving objects took", t2 - t1, "seconds")
+        print("serializing objects took", t3 - t2, "seconds")
 
     except Exception:
         traceback.print_exc()
