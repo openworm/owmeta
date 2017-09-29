@@ -87,7 +87,7 @@ class Channel(DataObject):
         Classification of the encoding gene
     proteins : DatatypeProperty
         Proteins associated with this channel
-    expression_pattern : DatatypeProperty
+    expression_pattern : ObjectProperty
 
     """
 
