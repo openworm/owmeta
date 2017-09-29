@@ -385,6 +385,48 @@ class RDFTypeProperty(DatatypeProperty):
     owner_type = DataObject
     multiple = True
 
+class DataObjectSingleton(DataObject):
+    instance = None
+
+    def __init__(self, *args, **kwargs):
+        if type(self)._gettingInstance:
+            super(DataObjectSingleton, self).__init__(*args, **kwargs)
+        else:
+            raise Exception(
+                "You must call getInstance to get " +
+                type(self).__name__)
+
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls._gettingInstance = True
+            cls.instance = cls()
+            cls._gettingInstance = False
+
+        return cls.instance
+
+
+class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
+
+    """ The DataObject corresponding to rdfs:Class """
+    # XXX: This class may be changed from a singleton later to facilitate dumping
+    #      and reloading the object graph
+    rdf_type = R.RDFS['Class']
+    auto_mapped = True
+
+    def __init__(self):
+        super(RDFSClass, self).__init__(R.RDFS["Class"])
+
+
+class RDFProperty(DataObjectSingleton):
+
+    """ The DataObject corresponding to rdf:Property """
+    rdf_type = R.RDF['Property']
+
+    def __init__(self):
+        super(RDFProperty, self).__init__(R.RDF["Property"])
+
+
 
 def oid(identifier_or_rdf_type, rdf_type=None):
     """ Create an object from its rdf type
@@ -568,6 +610,7 @@ class InverseProperty(object):
                                                      self.lhs_linkName,
                                                      self.rhs_class,
                                                      self.rhs_linkName)
+
 
 class Context(DataObject):
     """

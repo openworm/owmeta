@@ -2,7 +2,7 @@ from __future__ import print_function
 from time import time
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
-from PyOpenWorm.datasource import DataTranslator, DataSource
+from PyOpenWorm.datasource import DataTranslator, DataSource, Informational
 from PyOpenWorm.dataObject import Context
 import traceback
 import csv
@@ -20,12 +20,14 @@ IONCHANNEL_SOURCE = "../aux_data/ion_channel.csv"
 CHANNEL_MUSCLE_SOURCE = "../aux_data/Ion channels - Ion Channel To Body Muscle.tsv"
 CHANNEL_NEURON_SOURCE = "../aux_data/Ion channels - Ion Channel To Neuron.tsv"
 CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
-RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
+NEURON_EXPRESSION_DATA_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
 
 class CSVDataSource(DataSource):
+    metadata = (Informational('csv_file_name', 'File name'),)
+
     def __init__(self, csv_file_name, header=None, **kwargs):
         super(CSVDataSource, self).__init__(**kwargs)
         self.csv_file_name = csv_file_name
@@ -134,25 +136,123 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
             cols += 1
         return res
 
-DATA_SOURCES = [ WormbaseTextMatchCSVDataSource( cell_type=P.Neuron
-                                               , csv_file_name=CHANNEL_NEURON_SOURCE
-                                               , initial_cell_column=101)
-               , WormbaseTextMatchCSVDataSource( cell_type=P.Muscle
-                                               , csv_file_name=CHANNEL_MUSCLE_SOURCE
-                                               , initial_cell_column=6)
-               , WormbaseIonChannelCSVDataSource(csv_file_name=IONCHANNEL_SOURCE)
-               ]
 
-TRANSLATORS = [ WormbaseTextMatchCSVTranslator()
-              , WormbaseIonChannelCSVTranslator()
-              ]
+class NeuronCSVDataSource(CSVDataSource):
+    def __init__(self, bibtex_files=None, **kwargs):
+        """
+        Parameters
+        ----------
+        bibtex_files : list
+            a list of bibtex files that are referenced in the csv file by entry
+            ID
+        """
+
+        """
+        A list of bibtex files that are referenced in the csv file by entry ID
+        """
+        super(NeuronCSVDataSource, self).__init__(**kwargs)
+        self.bibtex_files = bibtex_files
+
+
+class NeuronCSVDataTranslator(DataTranslator):
+    data_source_type = NeuronCSVDataSource
+
+    def translate(self, data_source):
+        evidences = dict()
+        if data_source.bibtex_files is not None:
+            for bib in data_source.bibtex_files:
+                evidences.update(parse_bibtex_into_evidence(bib))
+        res = []
+        file_path = data_source.csv_file_name
+        # set up evidence objects in advance
+
+        uris = dict()
+
+        with open(file_path) as f:
+            reader = csv.reader(f)
+            next(reader)  # skip the header row
+
+            for row in reader:
+                neuron_name = row[0]
+                relation = row[1].lower()
+                data = row[2]
+                evidence = row[3]
+                evidenceURL = row[4]
+
+                # pick correct evidence given the row
+                e = evidences.get(evidence, None)
+
+                e2 = None
+                if len(evidenceURL) > 0:
+                    try:
+                        e2 = uris[evidenceURL]
+                    except KeyError:
+                        e2 = P.Evidence(uri=evidenceURL)
+                        uris[evidenceURL] = e2
+
+                # grab the neuron object
+                n = P.Neuron(neuron_name)
+
+                if relation in ('neurotransmitter',
+                                'innexin',
+                                'neuropeptide',
+                                'receptor'):
+                    r = getattr(n, relation)(data)
+                    res.append(r)
+                    if e is not None:
+                        e.asserts(r)
+                    if e2 is not None:
+                        e2.asserts(r)
+                elif relation == 'type':
+                    types = []
+                    if 'sensory' in data.lower():
+                        types.append('sensory')
+                    if 'interneuron' in data.lower():
+                        types.append('interneuron')
+                    if 'motor' in data.lower():
+                        types.append('motor')
+                    if 'unknown' in data.lower():
+                        types.append('unknown')
+                    # assign the data, grab the relation into r
+                    for t in types:
+                        r = n.type(t)
+                        res.append(r)
+                        # assert the evidence on the relationship
+                        if e is not None:
+                            e.asserts(r)
+                        if e2 is not None:
+                            e2.asserts(r)
+        return res
+
+DATA_SOURCES = [
+    WormbaseTextMatchCSVDataSource(
+        cell_type=P.Neuron,
+        csv_file_name=CHANNEL_NEURON_SOURCE,
+        initial_cell_column=101),
+    WormbaseTextMatchCSVDataSource(
+        cell_type=P.Muscle,
+        csv_file_name=CHANNEL_MUSCLE_SOURCE,
+        initial_cell_column=6),
+    WormbaseIonChannelCSVDataSource(
+        csv_file_name=IONCHANNEL_SOURCE),
+    NeuronCSVDataSource(
+        csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
+        bibtex_files=['../aux_data/bibtex_files/altun2009.bib',
+                      '../aux_data/bibtex_files/WormAtlas.bib'])
+    ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename))
+         for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR)
+         for filename in sorted(filenames)
+         if filename.lower().endswith('.csv')]
+
+
+TRANSLATORS = [
+    WormbaseTextMatchCSVTranslator(),
+    WormbaseIonChannelCSVTranslator(),
+    NeuronCSVDataTranslator()]
+
 
 def serialize_as_n3():
-    dest = '../WormData.n3'
-    # XXX: Properties aren't initialized until the first object of a class is
-    #      created, so we create them here
-
-    P.config('rdf.graph').serialize(dest, format='n3')
+    P.config('rdf.graph').serialize('../WormData.n3', format='n3')
     print('serialized to n3 file')
 
 
@@ -171,70 +271,6 @@ def attach_neuromlfiles_to_channel():
         print("neuroML file links attached")
     except Exception:
         traceback.print_exc()
-
-
-def upload_ionchannels():
-    """ Upload muscles and the neurons that connect to them
-    """
-    print ("uploading the ion channels")
-    res = set([])
-    try:
-        with open(IONCHANNEL_SOURCE) as csvfile:
-            next(csvfile, None)
-            csvreader = csv.reader(csvfile, skipinitialspace=True)
-
-            for num, line in enumerate(csvreader):
-                channel_name = normalize_cell_name(line[0]).upper()
-                gene_name = line[1].upper()
-                gene_WB_ID = line[2].upper()
-                expression_pattern = line[3]
-                description = line[4]
-                c = P.Channel(name=str(channel_name))
-                c.gene_name(gene_name)
-                c.gene_WB_ID(gene_WB_ID)
-                c.description(description)
-                patterns = expression_pattern.split(r' | ')
-                regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
-
-                matches = [regex.match(pat) for pat in patterns]
-                patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
-                                                description=m.group(2))
-                            for m in matches if m is not None]
-                for pat in patterns:
-                    c.expression_pattern(pat)
-                res.add(c)
-        print ("uploaded ion_channel")
-    except Exception:
-        traceback.print_exc()
-    return res
-
-
-def extract_neuron_names(heading, row):
-    FIRST_NEURON_NAME_COL = 101
-    neuronlist = []
-    cols = 0
-    for col in row:
-        if cols <= FIRST_NEURON_NAME_COL:
-            cols += 1
-        else:
-            if col == '1' or col == '2':
-                neuronlist.append(heading[cols])
-            cols += 1
-    return neuronlist
-
-
-def extract_muscle_names(heading, row):
-    FIRST_MUSCLE_NAME_COL = 6
-    musclelist = []
-    cols = 0
-    for col in row:
-        if cols <= FIRST_MUSCLE_NAME_COL:
-            cols += 1
-        else:
-            if col == '1' or col == '2':
-                musclelist.append(heading[cols])
-            cols += 1
-    return musclelist
 
 
 def upload_muscles():
@@ -375,7 +411,6 @@ def customizations(record):
     """
     return doi(link(author(record)))
 
-
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
     e = None
@@ -417,7 +452,7 @@ def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
     print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
 
     _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(
-        RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE
+        NEURON_EXPRESSION_DATA_SOURCE
     )
 
 
@@ -433,75 +468,6 @@ def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
                 _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
 
 
-def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(file_path):
-    # set up evidence objects in advance
-    #
-
-    evidences = dict()
-    bibtex_files = ('../aux_data/bibtex_files/altun2009.bib',
-                    '../aux_data/bibtex_files/WormAtlas.bib')
-    for bib in bibtex_files:
-        evidences.update(parse_bibtex_into_evidence(bib))
-
-    i = 0
-
-    uris = dict()
-
-    with open(file_path) as f:
-        reader = csv.reader(f)
-        next(reader)  # skip the header row
-
-        for row in reader:
-            neuron_name = row[0]
-            relation = row[1].lower()
-            data = row[2]
-            evidence = row[3]
-            evidenceURL = row[4]
-
-            e = evidences.get(evidence, None)
-
-            e2 = uris.get(evidenceURL, None)
-            if not e2:
-                e2 = P.Evidence(uri=evidenceURL)
-                uris[evidenceURL] = e2
-
-            # grab the neuron object
-            n = P.Neuron(neuron_name)
-            NETWORK.neuron(n)
-
-            if relation in ('neurotransmitter',
-                            'innexin',
-                            'neuropeptide',
-                            'receptor'):
-                r = getattr(n, relation)(data)
-                if e:
-                    e.asserts(r)
-                if e2:
-                    e2.asserts(r)
-            elif relation == 'type':
-                types = []
-                if 'sensory' in (data.lower()):
-                    types.append('sensory')
-                if 'interneuron' in (data.lower()):
-                    types.append('interneuron')
-                if 'motor' in (data.lower()):
-                    types.append('motor')
-                if 'unknown' in (data.lower()):
-                    types.append('unknown')
-                # assign the data, grab the relation into r
-                for t in types:
-                    r = n.type(t)
-                    # assert the evidence on the relationship
-                    if e:
-                        e.asserts(r)
-                    if e2:
-                        e2.asserts(r)
-            i += 1
-    print(
-        'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
-            i, file_path
-        )
-    )
 
 
 def upload_connections():
@@ -716,8 +682,8 @@ def do_insert(config="default.conf", logging=False):
         NETWORK.worm(WORM)
         c = Context(key="insert_worm")
         t0 = time()
-        upload_neurons()
-        upload_muscles()
+        # upload_neurons()
+        # upload_muscles()
         for ds in DATA_SOURCES:
             best_translator = None
             for tr in TRANSLATORS:
@@ -726,14 +692,18 @@ def do_insert(config="default.conf", logging=False):
                         or issubclass(tr.data_source_type, best_translator.data_source_type):
                         best_translator = tr
             if best_translator is not None:
+                print(ds)
+                print('Translating with', best_translator)
                 c.add_objects(best_translator.translate(ds))
+            else:
+                print('No translator for', ds)
 
         c.add_objects([c, NETWORK])
-        #attach_neuromlfiles_to_channel()
-        #upload_lineage_and_descriptions()
-        upload_connections()
-        #upload_receptors_types_neurotransmitters_neuropeptides_innexins()
-        #upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
+        # attach_neuromlfiles_to_channel()
+        # upload_lineage_and_descriptions()
+        # upload_connections()
+        # upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        # upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
         #WORM.save()
         t1 = time()
@@ -771,8 +741,4 @@ if __name__ == '__main__':
     (options, _) = parser.parse_args()
     OPTIONS = options
 
-    try:
-        do_insert(config=options.config, logging=options.do_logging)
-    except IOError as e:
-        if e.errno == 2 and 'default.conf' in e.filename:
-            print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")
+    do_insert(config=options.config, logging=options.do_logging)

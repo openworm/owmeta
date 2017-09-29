@@ -36,7 +36,9 @@ class RealSimpleProperty(object):
     def __init__(self, conf, owner):
         self.conf = conf
         self._v = _values()
+        self._vctx = _values()
         self.owner = owner
+        self._defctx = owner.context
 
     def hasValue(self):
         return len(self._v) > 0
@@ -97,6 +99,9 @@ class RealSimpleProperty(object):
         self._v.add(v)
         if self not in v.owner_properties:
             v.owner_properties.append(self)
+
+    def _set_context(self, v, ctx):
+        self._vctx[self._v.index(v)] = ctx
 
     def _remove_value(self, v):
         assert self in v.owner_properties
@@ -358,6 +363,11 @@ def _property_to_string(self):
 class RelationshipProxy(Proxy):
     def __repr__(self):
         return repr(self.__wrapped__)
+
+    def in_context(self, context):
+        rel = self.__factory__
+        rel.p.context = context
+        return self
 
     def unwrapped(self):
         return self.__wrapped__
