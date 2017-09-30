@@ -405,11 +405,11 @@ def upload_neurons():
 
 
 def get_altun_evidence():
-    return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')[0]
+    return next(parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib').values())
 
 
 def get_wormatlas_evidence():
-    return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')[0]
+    return next(parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib').values())
 
 def customizations(record):
     from bibtexparser.customization import author, link, doi
