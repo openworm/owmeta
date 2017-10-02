@@ -8,3 +8,4 @@ For Developers
    docs
    rdf_details
    futureapi
+   coding_standards

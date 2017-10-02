@@ -1,69 +1,182 @@
 from __future__ import print_function
 import PyOpenWorm as P
+from PyOpenWorm.utils import normalize_cell_name
 import traceback
-import sqlite3
+import csv
+import re
+import os
+
 
 SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
+SQLITE_EVIDENCE = None
+WORM = None
+NETWORK = None
+OPTIONS = None
+CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
+CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
+IONCHANNEL_SOURCE = "../aux_data/ion_channel.csv"
+CHANNEL_MUSCLE_SOURCE = "../aux_data/Ion channels - Ion Channel To Body Muscle.tsv"
+CHANNEL_NEURON_SOURCE = "../aux_data/Ion channels - Ion Channel To Neuron.tsv"
+CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
+RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE = "../aux_data/Modified celegans db dump.csv"
+
+ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
+
 
 def serialize_as_n3():
     dest = '../WormData.n3'
     # XXX: Properties aren't initialized until the first object of a class is created,
     #      so we create them here
 
-    for x in dir(P):
-        if isinstance(getattr(P, x), type) and issubclass(getattr(P, x), P.DataObject):
-            c = getattr(P, x)
-            if x == 'values':
-                c("dummy")
-            else:
-                c()
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
 
-
-def print_evidence():
+def attach_neuromlfiles_to_channel():
+    """ attach the links to the neuroml files for the ion channels
+    """
+    print("attaching links to neuroml files")
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        cur.execute("SELECT DISTINCT a.Entity, b.Entity, Citations FROM tblrelationship, tblentity a, tblentity b where EnID1=a.id and EnID2=b.id and Citations!='' ")
-        for r in cur.fetchall():
-            print(r)
+        with open(CHANNEL_NEUROMLFILE) as csvfile:
+            next(csvfile, None)
+            csvreader = csv.reader(csvfile, skipinitialspace=True)
+            for row in csvreader:
+                ch = P.Channel(name=str(row[0]))
+                ch.neuroML_file(str(row[1]))
+                ch.save()
+        print("neuroML file links attached")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
+def upload_ionchannels():
+    """ Upload muscles and the neurons that connect to them
+    """
+    print ("uploading the ion channels")
+    try:
+        with open(IONCHANNEL_SOURCE) as csvfile:
+            next(csvfile, None)
+            csvreader = csv.reader(csvfile, skipinitialspace=True)
+
+            for num, line in enumerate(csvreader):
+                channel_name = normalize_cell_name(line[0]).upper()
+                gene_name = line[1].upper()
+                gene_WB_ID = line[2].upper()
+                expression_pattern = line[3]
+                description = line[4]
+                c = P.Channel(name=str(channel_name))
+                c.gene_name(gene_name)
+                c.gene_WB_ID(gene_WB_ID)
+                c.description(description)
+                patterns = expression_pattern.split(r' | ')
+                regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
+
+                matches = [regex.match(pat) for pat in patterns]
+                patterns = [P.ExpressionPattern(wormbaseID=m.group(1), description=m.group(2)) for m in matches if m is not None]
+                for pat in patterns:
+                    c.expression_pattern(pat)
+
+                c.save()
+        print ("uploaded ion_channel")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_channelneuron_association():
+    print ("uploading the channel neuron association")
+    try:
+        with open(CHANNEL_NEURON_SOURCE, 'rb') as f:
+            reader = csv.reader(f, delimiter='\t')
+            heading = skip_to_header(reader)
+            for row in reader:
+                neuronlist = extract_neuron_names(heading, row)
+                ch = P.Channel(name=str(row[0]))
+                for neuron in neuronlist:
+                    n = P.Neuron(name=str(neuron))
+                    NETWORK.neuron(n)
+                    ch.appearsIn(n)
+        print ("uploaded channel neuron association")
+    except Exception:
+        traceback.print_exc()
+
+
+def upload_channelmuscle_association():
+    print ("uploading the channel muscle association")
+    try:
+        with open(CHANNEL_MUSCLE_SOURCE, 'rb') as f:
+            reader = csv.reader(f, delimiter='\t')
+            heading = skip_to_header(reader)
+            for row in reader:
+                musclelist = extract_muscle_names(heading, row)
+                ch = P.Channel(name=str(row[0]))
+                for muscle in musclelist:
+                    m = P.Muscle(name=str(muscle))
+                    WORM.muscle(m)
+                    ch.appearsIn(m)
+        print ("uploaded channel muscle association")
+    except Exception:
+        traceback.print_exc()
+
+
+def extract_neuron_names(heading, row):
+    neuronlist = []
+    cols = 0
+    for col in row:
+        if cols >= 0 and cols <= 101:
+            cols += 1
+        else:
+            if col == '1' or col == '2':
+                neuronlist.append(heading[cols])
+            cols += 1
+    return neuronlist
+
+
+def extract_muscle_names(heading, row):
+    musclelist = []
+    cols = 0
+    for col in row:
+        if cols >= 0 and cols <= 6:
+            cols += 1
+        else:
+            if col == '1' or col == '2':
+                musclelist.append(heading[cols])
+            cols += 1
+    return musclelist
+
+
+def skip_to_header(reader):
+    heading = None
+    rows = 0
+    for row in reader:
+        if rows == 3:
+            heading = row
+            break
+        rows += 1
+    return heading
+
 
 def upload_muscles():
     """ Upload muscles and the neurons that connect to them
     """
     try:
-        ev = P.Evidence(title="C. elegans sqlite database")
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        w = P.Worm()
-        cur.execute("""
-        SELECT DISTINCT a.Entity, b.Entity
-        FROM tblrelationship innervatedBy, tblentity b, tblentity a, tblrelationship type_b
-        WHERE innervatedBy.EnID1=a.id and innervatedBy.Relation = '1516' and innervatedBy.EnID2=b.id
-        and type_b.EnID1 = b.id and type_b.Relation='1515' and type_b.EnID2='1519'
-        """) # 1519 is the
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            muscle_name = str(r[1])
-            m = P.Muscle(muscle_name)
-            n = P.Neuron(neuron_name)
-            w.muscle(m)
-            m.innervatedBy(n)
+        with open(CELL_NAMES_SOURCE) as csvfile:
+            csvreader = csv.reader(csvfile)
 
-        ev.asserts(w)
-        ev.save()
+            ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+            w = WORM
+            for num, line in enumerate(csvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
+                    muscle_name = normalize_cell_name(line[0]).upper()
+                    m = P.Muscle(name=muscle_name)
+                    w.muscle(m)
+            ev.asserts(w)
         #second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
+
 
 def upload_lineage_and_descriptions():
     """ Upload lineage names and descriptions pulled from the WormAtlas master cell list
@@ -75,13 +188,11 @@ def upload_lineage_and_descriptions():
     # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
     # at the sub-class insert and have a reasoner relate
     # the two sets of inserts.
-    cells = dict()
     try:
-        w = P.Worm()
-        net = w.neuron_network.one()
+        w = WORM
+        net = NETWORK
+        # TODO: Improve this evidence marker
         ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
-        # insert neurons.
-        # save
         cell_data = open(LINEAGE_LIST_LOC, "r")
 
         # Skip headers
@@ -90,30 +201,30 @@ def upload_lineage_and_descriptions():
         cell_name_counters = dict()
         data = dict()
         for x in cell_data:
-             j = [x.strip().strip("\"") for x in x.split("\t")]
-             name = j[0]
-             lineageName = j[1]
-             desc = j[2]
+            j = [x.strip().strip("\"") for x in x.split("\t")]
+            name = j[0]
+            lineageName = j[1]
+            desc = j[2]
 
-             # XXX: These renaming choices are arbitrary and may be inappropriate
-             if name == "DB1/3":
-                 name = "DB1"
-             elif name == "DB3/1":
-                 name = "DB3"
-             elif name == "AVFL/R":
-                 if lineageName[0] == "W":
-                     name = "AVFL"
-                 elif lineageName[0] == "P":
-                     name = "AVFR"
+            # XXX: These renaming choices are arbitrary; may be inappropriate
+            if name == "DB1/3":
+                name = "DB1"
+            elif name == "DB3/1":
+                name = "DB3"
+            elif name == "AVFL/R":
+                if lineageName[0] == "W":
+                    name = "AVFL"
+                elif lineageName[0] == "P":
+                    name = "AVFR"
 
-             if name in cell_name_counters:
-                 while (name in cell_name_counters):
-                     cell_name_counters[name] += 1
-                     name = name + "("+ str(cell_name_counters[name]) +")"
-             else:
-                 cell_name_counters[name] = 0
+            if name in cell_name_counters:
+                while (name in cell_name_counters):
+                    cell_name_counters[name] += 1
+                    name = name + "(" + str(cell_name_counters[name]) + ")"
+            else:
+                cell_name_counters[name] = 0
 
-             data[name] = {"lineageName" : lineageName, "desc": desc}
+            data[name] = {"lineageName": lineageName, "desc": desc}
 
         def add_data_to_cell(n):
             name = n.name.one()
@@ -122,7 +233,7 @@ def upload_lineage_and_descriptions():
             n.description(cell_data['desc'])
             w.cell(n)
 
-        for n in net.neuron():
+        for n in net.neurons():
             add_data_to_cell(n)
 
         # TODO: Add data for other cells here. Requires relating named
@@ -131,10 +242,10 @@ def upload_lineage_and_descriptions():
         # they've been identified so they aren't stored twice
 
         ev.asserts(w)
-        ev.save()
         print ("uploaded lineage and descriptions")
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
+
 
 def norn(x):
     """ return the next or None of an iterator """
@@ -143,107 +254,262 @@ def norn(x):
     except StopIteration:
         return None
 
+
 def upload_neurons():
     try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        ev = P.Evidence(title="C. elegans sqlite database")
-        w = P.Worm()
-        n = P.Network()
+        #TODO: Improve this evidence marker
+        ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+        w = WORM
+        n = NETWORK
         w.neuron_network(n)
         # insert neurons.
-        # save
-        cur.execute("""
-        SELECT DISTINCT a.Entity FROM tblrelationship, tblentity a, tblentity b
-        where EnID1=a.id and Relation = '1515' and EnID2='1'
-        """)
-        for r in cur.fetchall():
-            neuron_name = str(r[0])
-            n.neuron(P.Neuron(name=neuron_name))
+        i = 0
+        with open(CELL_NAMES_SOURCE) as csvfile:
+            csvreader = csv.reader(csvfile)
+
+            for num, line in enumerate(csvreader):
+                if num < 4:  # skip rows with no data
+                    continue
+
+                if line[5] == '1':  # neurons marked in this column
+                    neuron_name = normalize_cell_name(line[0]).upper()
+                    n.neuron(P.Neuron(name=neuron_name))
+                    i = i + 1
+
         ev.asserts(n)
-        ev.save()
         #second step, get the relationships between them and add them to the graph
-        print ("uploaded neurons")
+        print ("uploaded " + str(i) + " neurons")
     except Exception:
         traceback.print_exc()
-    finally:
-        conn.close()
 
-def upload_receptors_and_innexins():
-    try:
-        conn = sqlite3.connect(SQLITE_DB_LOC)
-        cur = conn.cursor()
-        w = P.Worm()
-        n = w.neuron_network()
-        # insert neurons.
-        # save
-        # get the receptor (361), neurotransmitters (313), neuropeptides (354) and innexins (355)
-        neurons = dict()
 
-        def add_data_to_neuron(data_kind, relation_code):
-            cur.execute("""
-                SELECT DISTINCT a.Entity, b.Entity
-                FROM
-                tblrelationship q,
-                tblrelationship r,
-                tblentity a,
-                tblentity b
-                where q.EnID1=a.id and q.Relation = '1515' and q.EnID2='1'
-                and   r.EnID1=a.id and r.Relation = '{}'  and r.EnID2=b.id
-                """.format(relation_code))
-            for r in cur.fetchall():
-                name = str(r[0])
-                data = str(r[1])
+def get_altun_evidence():
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
 
-                if not (name in neurons):
-                    neurons[name] = P.Neuron(name=name)
 
-                getattr(neurons[name],data_kind)(data)
+def get_wormatlas_evidence():
+    return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
 
-        add_data_to_neuron('receptor', 361)
-        add_data_to_neuron('innexin', 355)
-        add_data_to_neuron('neurotransmitter', 313)
-        add_data_to_neuron('neuropeptide', 354)
 
-        for neur in neurons:
-            n.neuron(neurons[neur])
-        n.save()
-        #second step, get the relationships between them and add them to the graph
-        print ("uploaded receptors, innexins, neurotransmitters and neuropeptides")
-    except Exception:
-        traceback.print_exc()
-    finally:
-        conn.close()
+def parse_bibtex_into_evidence(file_name):
+    import bibtexparser
+    e = None
+    with open(file_name) as bibtex_file:
+        bib_database = bibtexparser.load(bibtex_file)
+        key = bib_database.entries[0]['ID']
+        e = P.Evidence(key=key)
 
-def new_connections():
-    """we can replace the old function (upload_connections) with this
-    once it is ready to go"""
+        try:
+            doi = bib_database.entries[0]['doi']
+            if doi:
+                e.doi(doi)
+        except KeyError:
+            pass
 
-    import re
-    search_string = re.compile(r'\w+[0]+[1-9]+')
-    replace_string = re.compile(r'[0]+')
+        try:
+            author = bib_database.entries[0]['author']
+            if author:
+                e.author(author)
+        except KeyError:
+            pass
 
-    def normalize(name):
-        # normalize neuron names to match those used at other points
-        # see #137 for elaboration
-        # if there are zeroes in the middle of a name, remove them
-        if re.match(search_string, name):
-            name = replace_string.sub('', name)
+        try:
+            title = bib_database.entries[0]['title']
+            if title:
+                e.title(title)
+        except KeyError:
+            pass
+        try:
+            year = bib_database.entries[0]['year']
+            if year:
+                e.year(year)
+        except KeyError:
+            pass
+    return e
+
+
+def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
+    """ Augment the metadata about neurons with information about receptors,
+        neuron types, neurotransmitters, neuropeptides and innexins.
+        As we go, add evidence objects to each statement."""
+    print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
+
+    _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(
+        RECEPTORS_TYPES_NEUROPEPTIDES_NEUROTRANSMITTERS_INNEXINS_SOURCE
+    )
+
+
+def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
+    """ Augment the metadata about neurons with information about receptor, neurotransmitter, and neuropeptide
+    expression from additional sources.
+    """
+    print ("uploading additional statements about receptors, neurotransmitters and neuropeptides")
+
+    for root, _, filenames in sorted(os.walk(ADDITIONAL_EXPR_DATA_DIR)):
+        for filename in sorted(filenames):
+            if filename.lower().endswith('.csv'):
+                _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
+
+
+def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(file_path):
+    # set up evidence objects in advance
+    altun_ev = get_altun_evidence()
+    wormatlas_ev = get_wormatlas_evidence()
+
+    i = 0
+
+    uris = dict()
+
+    with open(file_path) as f:
+        reader = csv.reader(f)
+        next(reader)  # skip the header row
+
+        for row in reader:
+            neuron_name = row[0]
+            relation = row[1].lower()
+            data = row[2]
+            evidence = row[3]
+            evidenceURL = row[4]
+
+            # prepare evidence
+            e = P.Evidence()
+
+            # pick correct evidence given the row
+            if 'altun' in evidence.lower():
+                e = altun_ev
+            elif 'wormatlas' in evidence.lower():
+                e = wormatlas_ev
+
+            e2 = []
+            try:
+                e2 = uris[evidenceURL]
+            except KeyError:
+                e2 = P.Evidence(uri=evidenceURL)
+                uris[evidenceURL] = e2
+
+            # grab the neuron object
+            n = P.Neuron(neuron_name)
+            NETWORK.neuron(n)
+
+            if relation == 'neurotransmitter':
+                # assign the data, grab the relation into r
+                r = n.neurotransmitter(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'innexin':
+                # assign the data, grab the relation into r
+                r = n.innexin(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'neuropeptide':
+                # assign the data, grab the relation into r
+                r = n.neuropeptide(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'receptor':
+                # assign the data, grab the relation into r
+                r = n.receptor(data)
+                # assert the evidence on the relationship
+                e.asserts(r)
+                e2.asserts(r)
+
+            elif relation == 'type':
+                types = []
+                if 'sensory' in (data.lower()):
+                    types.append('sensory')
+                if 'interneuron' in (data.lower()):
+                    types.append('interneuron')
+                if 'motor' in (data.lower()):
+                    types.append('motor')
+                if 'unknown' in (data.lower()):
+                    types.append('unknown')
+                # assign the data, grab the relation into r
+                for t in types:
+                    r = n.type(t)
+                    # assert the evidence on the relationship
+                    e.asserts(r)
+                    e2.asserts(r)
+            i += 1
+    print(
+        'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
+            i, file_path
+        )
+    )
+
+
+def upload_connections():
+
+    print ("uploading statements about connections.  Buckle up; this will take a while!")
+
+    # to normalize certian body wall muscle cell names
+    SEARCH_STRING_MUSCLE = re.compile(r'\w+[BWM]+\w+')
+    REPLACE_STRING_MUSCLE = re.compile(r'[BWM]+')
+
+    def normalize_muscle(name):
+        # normalize names of Body Wall Muscles
+        # if there is 'BWM' in the name, remove it
+        if re.match(SEARCH_STRING_MUSCLE, name):
+            name = REPLACE_STRING_MUSCLE.sub('', name)
         return name
 
+    # muscle cells that are generically defined in source and need to be broken
+    # into pair of L and R before being added to PyOpenWorm
+    to_expand_muscles = ['PM1D', 'PM2D', 'PM3D', 'PM4D', 'PM5D']
+
+    # muscle cells that have different names in connectome source and cell list.
+    # Their wormbase cell list names will be used in PyOpenWorm
+    changed_muscles = ['ANAL', 'INTR', 'INTL', 'SPH']
+
+    def changed_muscle(x):
+        return {
+            'ANAL': 'MU_ANAL',
+            'INTR': 'MU_INT_R',
+            'INTL': 'MU_INT_L',
+            'SPH': 'MU_SPH'
+        }[x]
+
+    def expand_muscle(name):
+        return P.Muscle(name + 'L'), P.Muscle(name + 'R')
+
+    # cells that are neither neurons or muscles. These are marked as
+    # 'Other Cells' in the wormbase cell list but are still part of the new
+    # connectome.
+    #
+    # TODO: In future work these should be uploaded seperately to
+    # PyOpenWorm in a new upload function and should be referred from there
+    # instead of this list.
+    other_cells = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL', 'MC3DR','MC3V']
+
+    # counters for terminal printing
+    neuron_connections = 0
+    muscle_connections = 0
+    other_connections = 0
 
     try:
-        w = P.Worm()
-        n = P.Network()
-        neurons = set(n.neurons())
+        w = WORM
+        n = NETWORK
+
+        neuron_objs = list(set(n.neurons()))
+        muscle_objs = list(w.muscles())
+
         w.neuron_network(n)
 
-        # Evidence object to assert each connection
-        e  = P.Evidence(uri='http://www.wormwiring.org')
+        # get lists of neuron and muscles names
+        neurons = [neuron.name() for neuron in neuron_objs]
+        muscles = [muscle.name() for muscle in muscle_objs]
 
-        with open('../aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
+        # Evidence object to assert each connection
+        e = P.Evidence(key="emmons2015", title='herm_full_edgelist.csv')
+
+        with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
-            edge_reader.next()    # skip header row
+            next(edge_reader)    # skip header row
             for row in edge_reader:
                 source, target, weight, syn_type = map(str.strip, row)
 
@@ -253,109 +519,82 @@ def new_connections():
                     syn_type = 'gapJunction'
                 elif syn_type == 'chemical':
                     syn_type = 'send'
-                source = normalize(source)
-                target = normalize(target)
-                if source in neurons and target in neurons:
-                    c = P.connection(
-                        pre_cell=source, post_cell=target,
-                        number=weight, syntype=syn_type
-                    )
 
+                source = normalize_cell_name(source).upper()
+                target = normalize_cell_name(target).upper()
+
+                weight = int(weight)
+
+                # remove BMW from Body Wall Muscle cells
+                if 'BWM' in source:
+                    source = normalize_muscle(source)
+                if 'BWM' in target:
+                    target = normalize_muscle(target)
+
+                # change certain muscle names to names in wormbase
+                if source in changed_muscles:
+                    source = changed_muscle(source)
+                if target in changed_muscles:
+                    target = changed_muscle(target)
+
+                def marshall(name):
+                    ret = []
+                    res = None
+                    res2 = None
+                    if name in neurons:
+                        res = P.Neuron(name)
+                    elif name in muscles:
+                        res = P.Muscle(name)
+                    elif name in to_expand_muscles:
+                        res, res2 = expand_muscle(name)
+                    elif name in other_cells:
+                        res = P.Cell(name)
+
+                    if res is not None:
+                        ret.append(res)
+                    if res2 is not None:
+                        ret.append(res2)
+
+                    return ret
+
+                def add_synapse(source, target):
+                    c = P.Connection(pre_cell=source, post_cell=target,
+                                    number=weight, syntype=syn_type)
                     n.synapse(c)
                     e.asserts(c)
 
-        e.asserts(n) # assert the whole connectome too
-        e.save()
+                    if isinstance(source, P.Neuron) and isinstance(target, P.Neuron):
+                        c.termination('neuron')
+                    elif isinstance(source, P.Neuron) and isinstance(target, P.Muscle):
+                        c.termination('muscle')
+                    elif isinstance(source, P.Muscle) and isinstance(target, P.Neuron):
+                        c.termination('muscle')
+
+                    return c
+
+                sources = marshall(source)
+                targets = marshall(target)
+
+                for s in sources:
+                    for t in targets:
+                        conn = add_synapse(s, t)
+                        kind = conn.termination()
+                        if kind == 'muscle':
+                            muscle_connections += 1
+                        elif kind == 'neuron':
+                            neuron_connections += 1
+                        else:
+                            other_connections += 1
+
+        e.asserts(n)  # assert the whole connectome too
+        print('Total neuron to neuron connections added = %i' %neuron_connections)
+        print('Total neuron to muscle connections added = %i' %muscle_connections)
+        print('Total other connections added = %i' %other_connections)
         print('uploaded connections')
 
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
 
-
-def upload_connections():
-    import re
-    search_string = re.compile(r'\w+[0]+[1-9]+')
-    replace_string = re.compile(r'[0]+')
-
-    def normalize(name):
-        # normalize neuron names to match those used at other points
-        # see #137 for elaboration
-        # if there are zeroes in the middle of a name, remove them
-        if re.match(search_string, name):
-            name = replace_string.sub('', name)
-        return name
-
-    import xlrd
-
-    try:
-        w = P.Worm()
-        n = P.Network()
-        w.neuron_network(n)
-        combining_dict = {}
-        # Get synapses and gap junctions and add them to the graph
-        s = xlrd.open_workbook('../aux_data/NeuronConnect.xls').sheets()[0]
-        for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ'):
-                #We're not going to include 'receives' ('R', 'Rp') since they're just the inverse of 'sends'
-                #Also omitting 'NMJ' for the time being (no model in db)
-                pre = normalize(s.cell(row, 0).value)
-                post = normalize(s.cell(row, 1).value)
-                num = int(s.cell(row, 3).value)
-                if s.cell(row, 2).value == 'EJ':
-                    syntype = 'gapJunction'
-                elif s.cell(row, 2).value in ('S', 'Sp'):
-                    syntype = 'send'
-
-                # Add them to a dict to make sure Sends ('S') and Send-polys ('Sp') are summed.
-                # keying by connection pairs as a string (e.g. 'SDQL,AVAL,send').
-                # values are lists of the form [pre, post, number, syntype].
-                string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in combining_dict.keys():
-                    # if key already there, add to number
-                    num += combining_dict[string_key][2]
-
-                combining_dict[string_key] = [pre, post, num, syntype]
-
-        for entry in combining_dict:
-            pre, post, num, syntype = combining_dict[entry]
-            c = P.Connection(pre_cell=pre, post_cell=post, number=num, syntype=syntype)
-            n.synapse(c)
-
-        e = P.Evidence(uri='http://www.wormatlas.org/neuronalwiring.html#Connectivitydata')
-        e.asserts(n)
-        e.save()
-        print('uploaded connections')
-    except Exception, e:
-        traceback.print_exc()
-
-def upload_types():
-    import csv
-    ev = P.Evidence(title="neurons.csv")
-    w = P.Worm()
-    net = w.neuron_network.one()
-
-    data = dict()
-    for x in csv.reader(open('../aux_data/neurons.csv'), delimiter=';'):
-        types = []
-        name = x[0]
-        types_string = x[1]
-        if 'sensory' in (types_string.lower()):
-            types.append('sensory')
-        if 'interneuron' in (types_string.lower()):
-            types.append('interneuron')
-        if 'motor' in (types_string.lower()):
-            types.append('motor')
-        data[name] = types
-
-    for name in data:
-        n = P.Neuron(name=name)
-        types = data[name]
-        for t in types:
-            n.type(t)
-        net.neuron(n)
-    ev.asserts(net)
-    ev.save()
-    print ("uploaded types")
 
 def infer():
     from rdflib import Graph
@@ -364,7 +603,7 @@ def infer():
     from FuXi.Horn.HornRules import HornFromN3
 
     try:
-        w = P.Worm()
+        w = WORM
         semnet = w.rdf #fetches the entire worm.db graph
 
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
@@ -387,11 +626,16 @@ def infer():
         #inferred.write(inferred_facts)
         #inferred.close()
 
-    except Exception, e:
+    except Exception:
         traceback.print_exc()
     print ("filled in with inferred data")
 
+
 def do_insert(config="default.conf", logging=False):
+    global SQLITE_EVIDENCE
+    global WORM
+    global NETWORK
+
     if config:
         if isinstance(config, P.Configure):
             pass
@@ -403,21 +647,31 @@ def do_insert(config="default.conf", logging=False):
             raise Exception("Invalid configuration object "+ str(config))
 
     P.connect(conf=config, do_logging=logging)
+    SQLITE_EVIDENCE = P.Evidence(key="C_elegans_SQLite_DB", title="C. elegans sqlite database")
     try:
-        w = P.Worm()
-        net = P.Network()
-        w.neuron_network(net)
-        w.save()
+        WORM = P.Worm()
+        NETWORK = P.Network()
+        WORM.neuron_network(NETWORK)
+        NETWORK.worm(WORM)
 
         upload_neurons()
         upload_muscles()
+        upload_ionchannels()
+        upload_channelneuron_association()
+        upload_channelmuscle_association()
+        attach_neuromlfiles_to_channel()
         upload_lineage_and_descriptions()
         upload_connections()
-        upload_receptors_and_innexins()
-        upload_types()
+        upload_receptors_types_neurotransmitters_neuropeptides_innexins()
+        upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
+
+        print("Saving...")
+        WORM.save()
+
+        print("Serializing...")
         serialize_as_n3()
-        infer()
-    except:
+
+    except Exception:
         traceback.print_exc()
     finally:
         P.disconnect()
@@ -427,13 +681,20 @@ if __name__ == '__main__':
     #       Multiple runs will add the data again and again.
     # Takes about 5 minutes with ZODB FileStorage store
     # Takes about 3 minutes with Sleepycat store
-    import sys
-    import os
-    logging = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-l':
-        logging = True
+
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-l", "--do-logging", dest="do_logging",
+                      action="store_true", default=False,
+                      help="Enable log output")
+    parser.add_option("-c", "--config", dest="config", default='default.conf',
+                      help="Config file")
+
+    (options, _) = parser.parse_args()
+    OPTIONS = options
+
     try:
-        do_insert(logging=logging)
+        do_insert(config=options.config, logging=options.do_logging)
     except IOError as e:
         if e.errno == 2 and 'default.conf' in e.filename:
             print("Couldn't find the 'default.conf' configuration file. You may have attempted to run this script in the wrong directory")

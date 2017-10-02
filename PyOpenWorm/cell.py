@@ -1,10 +1,13 @@
-from PyOpenWorm import *
+from __future__ import print_function
+from PyOpenWorm.dataObject import DataObject, InverseProperty
+from PyOpenWorm.channel import Channel
 from string import Template
 import neuroml
-__all__ = [ "Cell" ]
+
+__all__ = ["Cell"]
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
-ns =  {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
+ns = {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}
 segment_query = Template("""
 SELECT ?seg_id ?seg_name ?x ?y ?z ?d ?par_id ?x_prox ?y_prox ?z_prox ?d_prox
 WHERE {
@@ -48,6 +51,7 @@ def _dict_merge(d1,d2):
     from itertools import chain
     dict(chain(d1.items(), d2.items()))
 
+
 class Cell(DataObject):
     """
     A biological cell.
@@ -86,21 +90,22 @@ class Cell(DataObject):
             >>> c.divisionVolume(v)
     """
     def __init__(self, name=False, lineageName=False, **kwargs):
-        DataObject.__init__(self,**kwargs)
+        super(Cell, self).__init__(**kwargs)
 
-        Cell.DatatypeProperty('lineageName',owner=self)
-        Cell.DatatypeProperty('name',owner=self)
-        Cell.DatatypeProperty('divisionVolume',owner=self)
-        Cell.DatatypeProperty('description',owner=self)
+        Cell.DatatypeProperty('lineageName', owner=self)
+        Cell.DatatypeProperty('name', owner=self)
+        Cell.DatatypeProperty('divisionVolume', owner=self)
+        Cell.DatatypeProperty('description', owner=self)
         Cell.DatatypeProperty('wormbaseID', owner=self)
         Cell.DatatypeProperty('synonym', owner=self, multiple=True)
+        Cell.ObjectProperty('channel', owner=self, multiple=True,
+                            value_type=Channel)
 
         if name:
             self.name(name)
 
         if lineageName:
             self.lineageName(lineageName)
-
 
     def _morphology(self):
         """Return the morphology of the cell. Currently this is restricted to
@@ -144,9 +149,6 @@ class Cell(DataObject):
             morph.segment_groups.append(s)
         return morph
 
-    def __eq__(self,other):
-        return DataObject.__eq__(self,other) or (isinstance(other,Cell) and set(self.name()) == set(other.name()))
-
     def blast(self):
         """
         Return the blast name.
@@ -164,7 +166,7 @@ class Cell(DataObject):
             ln = self.lineageName()
             x = re.split("[. ]", ln)
             return x[0]
-        except:
+        except Exception:
             return ""
 
     def daughterOf(self):
@@ -199,22 +201,27 @@ class Cell(DataObject):
             for z in Cell(lineageName=x).load():
                 yield z
 
+    def __str__(self):
+        if self.name.has_defined_value():
+            return str(self.name.defined_values[0].idl)
+        else:
+            return super(Cell, self).__str__()
+
+    @property
+    def defined(self):
+        return super(Cell, self).defined or self.name.has_defined_value()
+
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific
         # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+        # attribute is _already_ set, then we can get the identifier from it
+        # and return that. Otherwise, there's no telling from here what our
+        # identifier should be, so the variable identifier (from DataObject.
+        # identifier()) must be returned
+        if super(Cell, self).defined:
+            return super(Cell, self).identifier()
         else:
-            return ident
+            return self.make_identifier_direct(str(self.name.defined_values[0].identifier()))
 
+
+InverseProperty(Cell, 'channel', Channel, 'appearsIn')

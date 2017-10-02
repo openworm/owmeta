@@ -1,17 +1,27 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import PyOpenWorm as P
-from PyOpenWorm import *
+from .dataObject import DataObject
+from .cell import Cell
+import six
+import warnings
 
 __all__ = ['Connection']
+
 
 class SynapseType:
     Chemical = 'send'
     GapJunction = 'gapJunction'
 
+
 class Termination:
     Neuron = 'neuron'
     Muscle = 'muscle'
 
-class Connection(Relationship):
+
+class Connection(DataObject):
+
     """Connection between Cells
 
     Parameters
@@ -26,13 +36,15 @@ class Connection(Relationship):
         The kind of synaptic connection. 'gapJunction' indicates
         a gap junction and 'send' a chemical synapse
     synclass : string, optional
-        The kind of Neurotransmitter (if any) sent between `pre_cell` and `post_cell`
+        The kind of Neurotransmitter (if any) sent between `pre_cell` and
+        `post_cell`
 
     Attributes
     ----------
     termination : {'neuron', 'muscle'}
         Where the connection terminates. Inferred from type of post_cell
     """
+
     def __init__(self,
                  pre_cell=None,
                  post_cell=None,
@@ -41,29 +53,37 @@ class Connection(Relationship):
                  synclass=None,
                  termination=None,
                  **kwargs):
-        Relationship.__init__(self,**kwargs)
+        super(Connection, self).__init__(**kwargs)
 
-        Connection.ObjectProperty('post_cell',owner=self, value_type=Cell)
-        Connection.ObjectProperty('pre_cell',owner=self, value_type=Cell)
+        Connection.ObjectProperty('post_cell', owner=self, value_type=Cell)
+        Connection.ObjectProperty('pre_cell', owner=self, value_type=Cell)
 
-        Connection.DatatypeProperty('number',owner=self)
-        Connection.DatatypeProperty('synclass',owner=self)
-        Connection.DatatypeProperty('syntype',owner=self)
-        Connection.DatatypeProperty('termination',owner=self)
+        Connection.DatatypeProperty('number', owner=self)
+        Connection.DatatypeProperty('synclass', owner=self)
+        Connection.DatatypeProperty('syntype', owner=self)
+        Connection.DatatypeProperty('termination', owner=self)
 
         if isinstance(pre_cell, P.Cell):
             self.pre_cell(pre_cell)
         elif pre_cell is not None:
-            #TODO: don't assume that the pre_cell is a neuron
+            warnings.warn(
+                'Passing bare strings for PyOpenWorm.Connection cells is' +
+                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
+                ' instead.',
+                DeprecationWarning)
             self.pre_cell(P.Neuron(name=pre_cell, conf=self.conf))
 
         if (isinstance(post_cell, P.Cell)):
-            self.post_cell(post_cell) 
+            self.post_cell(post_cell)
         elif post_cell is not None:
-            #TODO: don't assume that the post_cell is a neuron
+            warnings.warn(
+                'Passing bare strings for PyOpenWorm.Connection cells is' +
+                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
+                ' instead.',
+                DeprecationWarning)
             self.post_cell(P.Neuron(name=post_cell, conf=self.conf))
 
-        if isinstance(termination, basestring):
+        if isinstance(termination, six.string_types):
             termination = termination.lower()
             if termination in ('neuron', Termination.Neuron):
                 self.termination(Termination.Neuron)
@@ -73,43 +93,52 @@ class Connection(Relationship):
         if isinstance(number, int):
             self.number(int(number))
         elif number is not None:
-            raise Exception("Connection number must be an int, given %s" % number)
+            raise Exception(
+                "Connection number must be an int, given %s" %
+                number)
 
-        if isinstance(syntype, basestring):
-            syntype=syntype.lower()
+        if isinstance(syntype, six.string_types):
+            syntype = syntype.lower()
             if syntype in ('send', SynapseType.Chemical):
                 self.syntype(SynapseType.Chemical)
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
 
-        if isinstance(synclass, basestring):
+        if isinstance(synclass, six.string_types):
             self.synclass(synclass)
 
+    @property
+    def defined(self):
+        return super(Connection, self).defined or \
+            (self.pre_cell.has_defined_value()
+             and self.post_cell.has_defined_value()
+             and self.syntype.has_defined_value())
+
     def identifier(self, *args, **kwargs):
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.pre_cell.hasValue()\
-            and self.post_cell.hasValue()\
-            and self.syntype.hasValue():
-            data = [next(self.pre_cell._get()).identifier(query=False),
-                    next(self.post_cell._get()).identifier(query=False),
-                    next(self.syntype._get())]
-            for i in range(len(data)):
-                if DataObject._is_variable(data[i]):
-                    data[i] = ""
-            if (self.synclass.hasValue()):
-                data.append(next(self.synclass._get()))
-            else:
-                data.append("")
-
-            if (self.number.hasValue()):
-                data.append(next(self.number._get()))
-            else:
-                data.append("")
-
-            return self.make_identifier(data)
+        if super(Connection, self).defined:
+            return super(Connection, self).identifier()
         else:
-            return ident
+            data = (self.pre_cell,
+                    self.post_cell,
+                    self.syntype)
+            data = tuple(x.defined_values[0].identifier().n3() for x in data)
+            data = "".join(data)
+            return self.make_identifier(data)
+
+    def __str__(self):
+        nom = []
+        if self.pre_cell.has_defined_value():
+            nom.append(('pre_cell', self.pre_cell.values[0]))
+        if self.post_cell.has_defined_value():
+            nom.append(('post_cell', self.post_cell.values[0]))
+        if self.syntype.has_defined_value():
+            nom.append(('syntype', self.syntype.values[0]))
+        if self.termination.has_defined_value():
+            nom.append(('termination', self.termination.values[0]))
+        if self.number.has_defined_value():
+            nom.append(('number', self.number.values[0]))
+        if self.synclass.has_defined_value():
+            nom.append(('synclass', self.synclass.values[0]))
+        return 'Connection(' + \
+               ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
+               ')'

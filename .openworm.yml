@@ -1,0 +1,11 @@
+--- 
+repo: openworm/PyOpenWorm
+shortDescription: "Unified, simple data access python library for data & facts about C. elegans anatomy"
+coordinator: stephen@openworm.org
+outputs: 
+  - openworm/CElegansNeuroML
+  - openworm/ChannelWorm
+parent:
+  - openworm/OpenWorm
+children:
+  - openworm/ChannelWorm

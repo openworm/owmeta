@@ -1,17 +1,17 @@
-from PyOpenWorm import *
-
+from .dataObject import DataObject
+from .evidence import Evidence
 
 class Experiment(DataObject):
     """
     Generic class for storing information about experiments
 
-    Should be overridden by specific types of experiments 
+    Should be overridden by specific types of experiments
     (example: see PatchClampExperiment in ChannelWorm.py).
 
     Overriding classes should have a list called "conditions" that
     contains the names of experimental conditions for that particular
-    type of experiment. 
-    Each of the items in "conditions" should also be either a 
+    type of experiment.
+    Each of the items in "conditions" should also be either a
     DatatypeProperty or ObjectProperty for the experiment a well.
 
     Parameters

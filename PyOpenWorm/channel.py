@@ -1,9 +1,16 @@
-from PyOpenWorm import *
+import rdflib as R
+from .pProperty import Property
+from .channelworm import ChannelModel
+from .dataObject import DataObject
+import PyOpenWorm
 
+
+# XXX: Why is this not an ObjectProperty?
 class Models(Property):
-    multiple=True
+    multiple = True
+
     def __init__(self, **kwargs):
-        Property.__init__(self, 'models', **kwargs)
+        super(Models, self).__init__('models', **kwargs)
         self._models = []
 
     def get(self, **kwargs):
@@ -23,12 +30,17 @@ class Models(Property):
             for m in self._models:
                 yield m
         else:
-            #make a dummy ChannelModel so we can load from db to memory
+            # make a dummy ChannelModel so we can load from db to memory
             c = ChannelModel()
             for m in c.load():
                 self._models.append(m)
-            #call `get()` again to yield ChannelModels the user asked for
-            self.get()
+            # call `get()` again to yield ChannelModels the user asked for
+            if len(self._models) > 0:
+                self.get()
+
+    @property
+    def values(self):
+        return self._models
 
     def set(self, m, **kwargs):
         """
@@ -47,10 +59,11 @@ class Models(Property):
         self._models.append(m)
         return m
 
-    def triples(self,**kwargs):
+    def triples(self, **kwargs):
         for c in self._models:
             for x in c.triples(**kwargs):
                 yield x
+
 
 class Channel(DataObject):
     """
@@ -60,7 +73,9 @@ class Channel(DataObject):
     ----------
     Models : Property
         Get experimental models of this ion channel
-    channel_name : DatatypeProperty
+    subfamily : DatatypeProperty
+        Ion channel's subfamily
+    name : DatatypeProperty
         Ion channel's name
     description : DatatypeProperty
         A description of the ion channel
@@ -72,54 +87,69 @@ class Channel(DataObject):
         Classification of the encoding gene
     proteins : DatatypeProperty
         Proteins associated with this channel
-    expression_pattern : DatatypeProperty
-       
+    expression_pattern : ObjectProperty
+
     """
 
     def __init__(self, name=False, **kwargs):
         DataObject.__init__(self, **kwargs)
         # Get Models of this Channel
         Models(owner=self)
-
-        Channel.DatatypeProperty('name', self) #channel_name
-        Channel.DatatypeProperty('description',self) #description
-        Channel.DatatypeProperty('gene_name', self) #gene_name
-        Channel.DatatypeProperty('gene_WB_ID', self) #gene_WB_ID
-        Channel.DatatypeProperty('expression_pattern', self) #expression_pattern
-        Channel.DatatypeProperty('proteins', self, multiple=True) #proteins
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('description_evidences', self)
-        #TODO: assert this in the adapter instead
-        #Channel.DatatypeProperty('expression_evidences', self)
+        Channel.DatatypeProperty('subfamily', owner=self)
+        Channel.DatatypeProperty('description', owner=self)
+        Channel.DatatypeProperty('name', self)
+        Channel.DatatypeProperty('description', self)
+        Channel.DatatypeProperty('gene_name', self)
+        Channel.DatatypeProperty('gene_WB_ID', self)
+        Channel.ObjectProperty('expression_pattern',
+                               owner=self,
+                               multiple=True,
+                               value_type=ExpressionPattern)
+        Channel.DatatypeProperty('neuroML_file', owner=self)
+        Channel.DatatypeProperty('proteins', self, multiple=True)
+        Channel.ObjectProperty('appearsIn', self, multiple=True,
+                               value_type=PyOpenWorm.cell.Cell)
+        # TODO: assert this in the adapter instead
+        # Channel.DatatypeProperty('description_evidences', self)
+        # TODO: assert this in the adapter instead
+        # Channel.DatatypeProperty('expression_evidences', self)
 
         if name:
             self.name(name)
 
-    def appearsIn(self):
-        """
-        TODO: Implement this method.
-        Return a list of Cells that this ion channel appears in.
-        """
-        pass
+    @property
+    def defined(self):
+        return super(Channel, self).defined or self.name.has_defined_value()
 
-    def identifier(self, *args, **kwargs):
-        # Copied from cell.py
-
-        # If the DataObject identifier isn't variable, then self is a specific
-        # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
-
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+    def identifier(self):
+        if super(Channel, self).defined:
+            return super(Channel, self).identifier()
         else:
-            return ident
+            # name is already set, so we can make an identifier from it
+            return self.make_identifier(self.name.defined_values[0])
 
+
+class ExpressionPattern(DataObject):
+    def __init__(self, wormbaseID=None, description=None, **kwargs):
+        super(ExpressionPattern, self).__init__(**kwargs)
+        ExpressionPattern.DatatypeProperty('wormbaseID', owner=self)
+        ExpressionPattern.DatatypeProperty('wormbaseURL', owner=self)
+        ExpressionPattern.DatatypeProperty('description', owner=self)
+
+        if wormbaseID:
+            self.wormbaseID(wormbaseID)
+            self.wormbaseURL(R.URIRef("http://www.wormbase.org/species/all/expr_pattern/"+wormbaseID))
+
+        if description:
+            self.description(description)
+
+    @property
+    def defined(self):
+        return super(ExpressionPattern, self).defined \
+                or self.wormbaseID.has_defined_value()
+
+    def identifier(self):
+        if super(ExpressionPattern, self).defined:
+            return super(ExpressionPattern, self).identifier()
+        else:
+            return self.make_identifier(self.wormbaseID.defined_values[0])

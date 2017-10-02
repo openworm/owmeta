@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from .dataObject import DataObject
+from __future__ import print_function
+from .dataObject import DataObject, InverseProperty
 from .muscle import Muscle
 from .cell import Cell
 from .network import Network
 
 
 class Worm(DataObject):
+
     """
     A representation of the whole worm.
 
     All worms with the same name are considered to be the same object.
-
-
 
     Attributes
     ----------
@@ -22,12 +22,16 @@ class Worm(DataObject):
 
     """
 
-    def __init__(self,scientific_name=False,**kwargs):
-        DataObject.__init__(self,**kwargs)
+    def __init__(self, scientific_name=False, **kwargs):
+        super(Worm, self).__init__(**kwargs)
         self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
-        Worm.ObjectProperty("muscle", owner=self, value_type=Muscle, multiple=True)
+        Worm.ObjectProperty(
+            "muscle",
+            owner=self,
+            value_type=Muscle,
+            multiple=True)
         Worm.ObjectProperty("cell", owner=self, value_type=Cell)
+        Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
 
         if scientific_name:
             self.scientific_name(scientific_name)
@@ -60,9 +64,7 @@ class Worm(DataObject):
 
     def muscles(self):
         """
-        Get all Muscle objects attached to the Worm
-
-        Returns a set of all muscles::
+        Get all Muscle objects attached to the Worm.
 
         Example::
 
@@ -89,21 +91,21 @@ class Worm(DataObject):
 
         return self.rdf
 
+    def defined(self):
+        return super(Worm, self).defined or self.name.has_defined_value()
+
     def identifier(self, *args, **kwargs):
         # If the DataObject identifier isn't variable, then self is a specific
         # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
-        ident = DataObject.identifier(self, *args, **kwargs)
-        if 'query' in kwargs and kwargs['query'] == True:
-            if not DataObject._is_variable(ident):
-                return ident
+        # attribute is _already_ set, then we can get the identifier from it
+        # and return that. Otherwise, there's no telling from here what our
+        # identifier should be, so the variable identifier (from
+        # DataObject.identifier() must be returned
 
-        if self.name.hasValue():
-            # name is already set, so we can make an identifier from it
-            n = next(self.name._get())
-            return self.make_identifier(n)
+        if super(Worm, self).defined:
+            return super(Worm, self).identifier()
         else:
-            return ident
+            return self.make_identifier(self.name.defined_values[0])
+
+
+InverseProperty(Worm, 'neuron_network', Network, 'worm')

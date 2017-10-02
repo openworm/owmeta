@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
 
@@ -15,13 +17,13 @@ def findSkippedTests():
                 count = False
                 for line in f:
                     if skippedTest in line:
-                        print 'found skipped test in file %s' %fname
+                        print('found skipped test in file %s' %fname)
                         count = True
                     elif expectedFailure in line:
-                        print 'found expected failure in file %s' %fname
+                        print('found expected failure in file %s' %fname)
                         count = True
                 if count:
-                    print '\n'
+                    print('\n')
                     count = False
 
 # Function to list function names in test suite so we can quickly see \
@@ -34,11 +36,11 @@ def listFunctionNames():
                     for line in f:
                         check = line.strip()[4:8]
                         if 'def ' in line and check != 'test' and check != '__in':
-                            print line.strip() + ' in file ' + fname
+                            print(line.strip() + ' in file ' + fname)
                             count = True
 
                     if count:
-                        print '\n'
+                        print('\n')
                         count = False
 
 # Add function to find dummy tests, i.e. ones that are simply marked pass.
@@ -50,9 +52,9 @@ def findDummyTests():
                     count = False
                     for line in f:
                         if 'pass' in line:
-                            print 'dummy test' + ' in file ' + fname
+                            print('dummy test' + ' in file ' + fname)
                             count = True
 
                     if count:
-                        print '\n'
+                        print('\n')
                         count = False

@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
-import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
+from PyOpenWorm import Worm, connect, disconnect, config
 
-from glob import glob
 
-from GraphDBInit import *
-
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class MiscTest(_DataTest):
     """Miscellaneous tests that have cropped up"""
-    @unittest.expectedFailure
+
+    def setUp(self):
+        connect(configFile='tests/data_integrity_test.conf')
+        self.g = config("rdf.graph")
+
+    def tearDown(self):
+        disconnect()
+
     def test_generators_do_not_reset(self):
         """
         This is for issue #175.  For some reason,

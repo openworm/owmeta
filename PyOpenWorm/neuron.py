@@ -1,5 +1,4 @@
-import sqlite3
-import sys
+from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm import Cell
 
@@ -7,6 +6,7 @@ from PyOpenWorm import Cell
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class Neuron(Cell):
+
     """
     A neuron.
 
@@ -63,14 +63,15 @@ class Neuron(Cell):
         junctions between this neuron and others
 
     """
+
     def __init__(self, name=False, **kwargs):
-        Cell.__init__(self,name=name,**kwargs)
+        super(Neuron, self).__init__(name=name, **kwargs)
         # Get neurons connected to this neuron
         Neighbor(owner=self)
         # Get connections from this neuron
         Connection(owner=self)
 
-        Neuron.DatatypeProperty("type",self, multiple=True)
+        Neuron.DatatypeProperty("type", self, multiple=True)
         Neuron.DatatypeProperty("receptor", self, multiple=True)
         Neuron.DatatypeProperty("innexin", self, multiple=True)
         Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
@@ -92,7 +93,7 @@ class Neuron(Cell):
         return count
 
     def Syn_degree(self):
-        """Get the degree of a this neuron for chemical synapse edges only
+        """Get the degree of this neuron for chemical synapse edges only
 
         :returns: total number of incoming and outgoing chemical synapses
         :rtype: int
@@ -113,35 +114,28 @@ class Neuron(Cell):
         """
         return self['nx'].node[self.name.one()]['ntype']
 
-
     def get_incidents(self, type=0):
         """ Get neurons which synapse at this neuron """
         # Directed graph. Getting accessible _from_ this node
-        for item in self['nx'].in_edges_iter(self.name(),data=True):
+        for item in self['nx'].in_edges_iter(self.name(), data=True):
             if 'GapJunction' in item[2]['synapse']:
                 yield item[0]
 
     def _as_neuroml(self):
-       """Return this neuron as a NeuroML representation
+        """Return this neuron as a NeuroML representation
 
-          :rtype: libNeuroML.Neuron
-       """
-
-    def __str__(self):
-        n = self.name()
-        if n is not None:
-            return n
-        else:
-            return ""
+           :rtype: libNeuroML.Neuron
+        """
 
 
 class Neighbor(P.Property):
-    multiple=True
-    def __init__(self,**kwargs):
-        P.Property.__init__(self,'neighbor',**kwargs)
+    multiple = True
+
+    def __init__(self, **kwargs):
+        super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
 
-    def get(self,**kwargs):
+    def get(self, **kwargs):
         """Get a list of neighboring neurons.
 
            Parameters
@@ -154,23 +148,34 @@ class Neighbor(P.Property):
         """
         if len(self._conns) > 0:
             for c in self._conns:
-                yield c.post_cell()
+                for post in c.post_cell.get():
+                    yield post
         else:
-            c = P.Connection(pre_cell=self.owner,**kwargs)
+            c = P.Connection(pre_cell=self.owner, **kwargs)
             for r in c.load():
                 yield r.post_cell()
 
+    @property
+    def defined_values(self):
+        return []
+
+    @property
+    def values(self):
+        return []
+
     def set(self, other, **kwargs):
-        c = P.Connection(pre_cell=self.owner,post_cell=other,**kwargs)
+        c = P.Connection(pre_cell=self.owner, post_cell=other, **kwargs)
         self._conns.append(c)
         return c
 
-    def triples(self,**kwargs):
+    def triples(self, **kwargs):
         for c in self._conns:
             for x in c.triples(**kwargs):
                 yield x
 
+
 class Connection(P.Property):
+
     """A representation of the connection between neurons. Either a gap junction
     or a chemical synapse
 
@@ -178,12 +183,13 @@ class Connection(P.Property):
     TODO: Add connection strength
     """
 
-    multiple=True
-    def __init__(self,**kwargs):
-        P.Property.__init__(self,'connection',**kwargs)
+    multiple = True
+
+    def __init__(self, **kwargs):
+        super(Connection, self).__init__('connection', **kwargs)
         self._conns = []
 
-    def get(self,pre_post_or_either='pre',**kwargs):
+    def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
@@ -197,17 +203,21 @@ class Connection(P.Property):
         """
         c = []
         if pre_post_or_either == 'pre':
-            c.append(P.Connection(pre_cell=self.owner,**kwargs))
+            c.append(P.Connection(pre_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'post':
-            c.append(P.Connection(post_cell=self.owner,**kwargs))
+            c.append(P.Connection(post_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'either':
-            c.append(P.Connection(pre_cell=self.owner,**kwargs))
-            c.append(P.Connection(post_cell=self.owner,**kwargs))
+            c.append(P.Connection(pre_cell=self.owner, **kwargs))
+            c.append(P.Connection(post_cell=self.owner, **kwargs))
         for x in c:
             for r in x.load():
                 yield r
 
-    def count(self,pre_post_or_either='pre',syntype=None, *args,**kwargs):
+    @property
+    def values(self):
+        return []
+
+    def count(self, pre_post_or_either='pre', syntype=None, *args, **kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
@@ -221,19 +231,22 @@ class Connection(P.Property):
         """
         options = dict()
         options["pre"] = """
-                     ?x c:pre_cell ?z .
-                     ?z sp:value <%s> .
+                     ?x c:pre_cell <%s> .
                      """ % self.owner.identifier()
         options["post"] = """
-                      ?x c:post_cell ?z .
-                      ?z sp:value <%s> .
+                      ?x c:post_cell <%s> .
                       """ % self.owner.identifier()
-        options["either"] = " { %s } UNION { %s } . " % (options['post'], options['pre'])
+        options["either"] = " { %s } UNION { %s } . " % (
+            options['post'],
+            options['pre'])
 
         if syntype is not None:
             if syntype.lower() == 'gapjunction':
-                syntype='gapJunction'
-            syntype_pattern = "FILTER( EXISTS { ?x c:syntype ?v . ?v sp:value \"%s\" . }) ." % syntype
+                syntype = 'gapJunction'
+            syntype_pattern = \
+                "FILTER( EXISTS {" \
+                "?x c:syntype  \"" + syntype + \
+                "\" . }) ."
         else:
             syntype_pattern = ''
 
@@ -265,11 +278,10 @@ class Connection(P.Property):
            -------
            A PyOpenWorm.neuron.Connection
         """
-        #XXX: Should this create a Connection here instead?
         assert(isinstance(conn, P.Connection))
         self._conns.append(conn)
 
-    def triples(self,**kwargs):
+    def triples(self, **kwargs):
         for c in self._conns:
             for x in c.triples(**kwargs):
                 yield x

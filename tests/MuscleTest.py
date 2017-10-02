@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 import sys
 sys.path.insert(0,".")
 import unittest
@@ -17,9 +19,9 @@ import doctest
 
 from glob import glob
 
-from GraphDBInit import * 
+from .GraphDBInit import *
 
-from DataTestTemplate import _DataTest
+from .DataTestTemplate import _DataTest
 
 class MuscleTest(_DataTest):
 
@@ -31,9 +33,8 @@ class MuscleTest(_DataTest):
         n = Neuron('some neuron')
         m.innervatedBy(n)
         m.save()
-
         v = Muscle(name='MDL08')
-        self.assertIn(Neuron('some neuron'), list(v.innervatedBy()))
+        self.assertIn(n, list(v.innervatedBy()))
 
     def test_muscle_neurons(self):
         """ Should be the same as innervatedBy """

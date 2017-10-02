@@ -5,7 +5,8 @@ See: "Metadata in PyOpenWorm" for discussion on semantics of what giving
 evidence for an object means.
 """
 
-import sys
+from __future__ import absolute_import
+from __future__ import print_function
 import PyOpenWorm as P
 
 #Create dummy database configuration.
@@ -19,7 +20,7 @@ n = P.Neuron(name='AVAL')
 
 #Create a new Evidence object with `doi` and `pmid` fields populated.
 #See `PyOpenWorm/evidence.py` for other available fields.
-e = P.Evidence(doi='125.41.3/ploscompbiol', pmid='57182010')
+e = P.Evidence(key='Anonymous2011', doi='125.41.3/ploscompbiol', pmid='12345678')
 
 #Evidence object asserts something about the enclosed dataObject.
 #Here we add a receptor to the Neuron we made earlier, and "assert it".
@@ -32,7 +33,7 @@ n.save()
 e.save()
 
 #What does my evidence object contain?
-print e
+print(e)
 
 #Disconnect from the database.
 P.disconnect()

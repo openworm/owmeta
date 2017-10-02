@@ -1,33 +1,21 @@
+from __future__ import absolute_import
 import sys
-sys.path.insert(0,".")
+sys.path.insert(0, ".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
 import os
 import subprocess as SP
-import subprocess
 import tempfile
-import doctest
 
-from glob import glob
 
 class ExampleRunnerTest(unittest.TestCase):
+
     """ Runs the examples to make sure we didn't break the API for them. """
 
-    #Currently these are all failing because we aren't reproducing the actual data that
+    # Currently these are all failing because we aren't reproducing the actual data that
     # a user gets when they grab the code for the first time
 
     @classmethod
     def setUpClass(self):
-        PyOpenWorm.connect()
-        PyOpenWorm.loadData(skipIfNewer=False)
-        PyOpenWorm.disconnect()
         os.chdir('examples')
 
     @classmethod
@@ -37,9 +25,16 @@ class ExampleRunnerTest(unittest.TestCase):
     def execfile(self, example_file_name):
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
-            stat = SP.call(["python", example_file_name], stdout=out, stderr=out)
+            stat = SP.call(["python", example_file_name],
+                    stdout=out,
+                    stderr=out)
             out.seek(0)
-            self.assertEqual(0, stat, out.read())
+            self.assertEqual(
+                0,
+                stat,
+                "Example failed with status {}. Its output:\n{}".format(
+                    stat,
+                    out.read()))
         os.unlink(fname)
 
     def test_run_NeuronBasicInfo(self):

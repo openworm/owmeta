@@ -3,19 +3,23 @@
 This file is used as a module in shortest_path.py
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import re
 import sys
 #import random as rnd
 import numpy as np
 import fileinput
+from six.moves import range
+from six.moves import zip
 def lca_table_print_matrix(M,labels,item_width=1):
     for i in labels:
         for j in labels:
-            if M.has_key((i, j)):
-                print "%*s" % (item_width,repr(M[(str(i), str(j))])),
+            if (i, j) in M:
+                print("%*s" % (item_width,repr(M[(str(i), str(j))])), end=' ')
             else:
-                print "%*s" % (item_width,"."),
-        print
+                print("%*s" % (item_width,"."), end=' ')
+        print()
 
 def tree_from_file(file_name):
     M = None
@@ -29,7 +33,7 @@ def tree_from_file(file_name):
         for (v,j) in zip(vs,range(0,numverts)):
             try:
                 k = float(v)
-            except:
+            except Exception:
                 k = float('+inf')
             if i == j:
                 k = 0
@@ -52,5 +56,5 @@ if __name__ == '__main__':
     numverts=M.shape[1]
     for i in range(0,numverts):
         for j in range(0,numverts):
-            print str(int(M[i,j])) + " ",
-        print
+            print(str(int(M[i,j])) + " ", end=' ')
+        print()

@@ -1,41 +1,62 @@
+from __future__ import print_function
 # a class for modules that need outside objects to parameterize their behavior (because what are generics?)
-# Modules inherit from this class and use their self['expected_configured_property']
-import traceback
+# Modules inherit from this class and use their
+# self['expected_configured_property']
+
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import six
 class ConfigValue(object):
+
     """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
     """
+
     def get(self):
         raise NotImplementedError
 
+
 class _C(ConfigValue):
+
     """ A helper class that simply stores a value and can report it back with the get method.
         Subclasses ConfigValue and implements the get method.
     """
+
     def __init__(self, v):
         self.v = v
+
     def get(self):
         return self.v
+
     def __str__(self):
         return str(self.v)
+
     def __repr__(self):
         return str(self.v)
 
 
 class BadConf(Exception):
+
     """ Special exception subclass for alerting the user to a bad configuration
     """
     pass
 
+
 class _link(ConfigValue):
+
     """ Helper class that groups values with configuration
     """
-    def __init__(self,members,c):
+
+    def __init__(self, members, c):
         self.members = members
         self.conf = c
+
     def get(self):
         return self.conf[self.members[0]]
 
+
 class Configure(object):
+
     """ A simple configuration object.  Enables setting and getting key-value pairs"""
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
@@ -46,11 +67,12 @@ class Configure(object):
             self._properties[x] = _C(initial_values[x])
 
     def __setitem__(self, pname, value):
-        #if the value being put in is not an instance
+        # if the value being put in is not an instance
         # of our ConfigValue, class, make it one.
         if not isinstance(value, ConfigValue):
             value = _C(value)
-        if (pname in self._properties) and isinstance(self._properties[pname], _link):
+        if (pname in self._properties) and isinstance(
+                self._properties[pname], _link):
             for x in self._properties[pname].members:
                 self._properties[x] = value
         else:
@@ -62,11 +84,11 @@ class Configure(object):
     def __iter__(self):
         return iter(self._properties)
 
-    def link(self,*names):
+    def link(self, *names):
         """ Call link() with the names of configuration values that should
         always be the same to link them together
         """
-        l = _link(names,self)
+        l = _link(names, self)
         for n in names:
             self._properties[n] = l
 
@@ -74,13 +96,15 @@ class Configure(object):
         return (thing in self._properties)
 
     def __str__(self):
-        return "\n".join("%s = %s" %(k,self._properties[k]) for k in self._properties)
+        return "{\n"+(",\n".join(
+            "\"%s\" : \"%s\"" %
+            (k, self._properties[k]) for k in self._properties)) + "\n}"
 
     def __len__(self):
         return len(self._properties)
 
     @classmethod
-    def open(cls,file_name):
+    def open(cls, file_name):
         """
         Open a configuration file and read it to build the internal state.
 
@@ -94,27 +118,29 @@ class Configure(object):
         d = json.load(f)
         for k in d:
             value = d[k]
-            if isinstance(value,basestring):
+            if isinstance(value, six.string_types):
                 if value.startswith("BASE/"):
                     from pkg_resources import Requirement, resource_filename
                     value = value[4:]
-                    value = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                    value = resource_filename(
+                        Requirement.parse('PyOpenWorm'),
+                        value)
                     d[k] = value
             c[k] = _C(d[k])
         f.close()
         c['configure.file_location'] = file_name
         return c
 
-    def copy(self,other):
+    def copy(self, other):
         """
         Copy this configuration into a different object.
 
         :param other: A different configuration object to copy the configuration from this object into
         :return:
         """
-        if isinstance(other,Configure):
+        if isinstance(other, Configure):
             self._properties = dict(other._properties)
-        elif isinstance(other,dict):
+        elif isinstance(other, dict):
             for x in other:
                 self[x] = other[x]
         return self
@@ -134,14 +160,17 @@ class Configure(object):
         else:
             raise KeyError(pname)
 
+
 class Configureable(object):
+
     """ An object which can accept configuration.  A base class intended to be subclassed. """
     conf = Configure()
     default = conf
+
     def __init__(self, conf=False):
         pass
 
-    def __getitem__(self,k):
+    def __getitem__(self, k):
         """
         Get a configuration value out by providing a key k
 
@@ -150,7 +179,7 @@ class Configureable(object):
         """
         return self.conf.get(k)
 
-    def __setitem__(self,k,v):
+    def __setitem__(self, k, v):
         """
         Set a key - value pair on this object
 
@@ -168,4 +197,4 @@ class Configureable(object):
         :param default: True if you want the default value, False if you don't (default)
         :return: Returns the configuration value corresponding to the key pname.
         """
-        return self.conf.get(pname,default)
+        return self.conf.get(pname, default)

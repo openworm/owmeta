@@ -1,25 +1,14 @@
+from __future__ import absolute_import
 import sys
-sys.path.insert(0,".")
+from six.moves import range
+sys.path.insert(0, ".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
+from PyOpenWorm import (DataUser, Configureable, BadConf, Configure)
 import rdflib
 import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
 
-from glob import glob
+from .DataTestTemplate import _DataTest
 
-from GraphDBInit import *
-
-from DataTestTemplate import _DataTest
 
 class DataUserTest(_DataTest):
 
@@ -48,6 +37,7 @@ class DataUserTest(_DataTest):
         with self.assertRaises(BadConf):
             DataUser()
         Configureable.conf = tmp
+
     @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):
         """ Assert that each statement has an uploader annotation """
@@ -59,7 +49,7 @@ class DataUserTest(_DataTest):
         o = rdflib.URIRef("http://somehost.com/o")
 
         # Add it to an RDF graph
-        g.add((s,p,o))
+        g.add((s, p, o))
 
         # Make a datauser
         du = DataUser(self.config)
@@ -67,15 +57,16 @@ class DataUserTest(_DataTest):
         try:
             # Add all of the statements in the graph
             du.add_statements(g)
-        except Exception, e:
-            self.fail("Should be able to add statements in the first place: "+str(e))
+        except Exception as e:
+            self.fail(
+                "Should be able to add statements in the first place: " +
+                str(e))
 
         g0 = du.conf['rdf.graph']
 
         # These are the properties that we should find
         uploader_n3_uri = du.conf['rdf.namespace']['uploader'].n3()
         upload_date_n3_uri = du.conf['rdf.namespace']['upload_date'].n3()
-        uploader_email = du.conf['user.email']
 
         # This is the query to get uploader information
         q = """
@@ -88,12 +79,12 @@ class DataUserTest(_DataTest):
          <http://somehost.com/o> .
         }
 
-        ?g """+uploader_n3_uri+""" ?u.
-        ?g """+upload_date_n3_uri+""" ?t.
+        ?g """ + uploader_n3_uri + """ ?u.
+        ?g """ + upload_date_n3_uri + """ ?t.
         } LIMIT 1
         """
         for x in g0.query(q):
-            self.assertEqual(du.conf['user.email'],str(x['u']))
+            self.assertEqual(du.conf['user.email'], str(x['u']))
 
     def test_add_statements_completes(self):
         """ Test that we can upload lots of triples.
@@ -105,6 +96,6 @@ class DataUserTest(_DataTest):
             s = rdflib.URIRef("http://somehost.com/s%d" % i)
             p = rdflib.URIRef("http://somehost.com/p%d" % i)
             o = rdflib.URIRef("http://somehost.com/o%d" % i)
-            g.add((s,p,o))
+            g.add((s, p, o))
         du = DataUser(conf=self.config)
         du.add_statements(g)
