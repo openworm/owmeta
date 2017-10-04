@@ -1,8 +1,5 @@
 from __future__ import absolute_import
-import sys
 import rdflib as R
-
-sys.path.insert(0,".")
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.muscle import Muscle

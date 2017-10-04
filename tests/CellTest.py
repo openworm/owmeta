@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 import sys
 from six.moves import zip
-sys.path.insert(0,".")
 import unittest
 import neuroml
 import neuroml.writers as writers

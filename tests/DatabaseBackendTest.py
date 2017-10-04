@@ -1,27 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
+from PyOpenWorm.configure import Configure, Configureable
+from PyOpenWorm.data import Data
+from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm import connect, config, disconnect
 from . import test_data as TD
-import networkx
-import rdflib
 import rdflib as R
-import pint as Q
 import os
-import subprocess as SP
 import subprocess
 import tempfile
-import doctest
+import traceback
 
-from glob import glob
-
-from .GraphDBInit import * 
+from .GraphDBInit import delete_zodb_data_store, make_graph, has_bsddb
 
 class DatabaseBackendTest(unittest.TestCase):
     """Integration tests that ensure basic functioning of the database
@@ -44,7 +36,7 @@ class DatabaseBackendTest(unittest.TestCase):
         d = Data()
         try:
             d.openDatabase()
-        except:
+        except Exception:
             self.fail("Bad state")
 
     def test_ZODB_persistence(self):
@@ -65,7 +57,7 @@ class DatabaseBackendTest(unittest.TestCase):
             d.openDatabase()
             self.assertEqual(20, len(list(d['rdf.graph'])))
             d.closeDatabase()
-        except:
+        except Exception:
             traceback.print_exc()
             self.fail("Bad state")
         delete_zodb_data_store(fname)
@@ -89,7 +81,7 @@ class DatabaseBackendTest(unittest.TestCase):
             d.openDatabase()
             self.assertEqual(20, len(list(d['rdf.graph'])))
             d.closeDatabase()
-        except:
+        except Exception:
             traceback.print_exc()
             self.fail("Bad state")
 
@@ -152,4 +144,4 @@ class DatabaseBackendTest(unittest.TestCase):
         """ The message should say something about connecting """
         Configureable.conf = False # Ensure that we are disconnected
         with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
-            do = DataObject()
+            DataObject()

@@ -1,22 +1,8 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
 import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
+from PyOpenWorm.configure import Configure, ConfigValue, Configureable
+from PyOpenWorm.data import Data
 
-from glob import glob
 
 class ConfigureTest(unittest.TestCase):
     """
@@ -72,7 +58,7 @@ class ConfigureTest(unittest.TestCase):
         try:
             d = Data.open("tests/test.conf")
             self.assertEqual("test_value", d["test_variable"])
-        except:
+        except Exception:
             self.fail("test.conf should exist and be valid JSON")
 
     def test_read_from_file_fail(self):

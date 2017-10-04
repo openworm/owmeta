@@ -1,9 +1,9 @@
 from __future__ import print_function
 from __future__ import absolute_import
-import sys
-sys.path.insert(0, ".")
 
-from PyOpenWorm import Neuron, Cell, Connection
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.cell import Cell
+from PyOpenWorm.connection import Connection
 import rdflib as R
 
 from .DataTestTemplate import _DataTest

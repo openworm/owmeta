@@ -3,6 +3,7 @@ from __future__ import print_function
 import os
 excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
 
+
 def findSkippedTests():
     skippedTest = '@unittest.skip'
     expectedFailure = '@unittest.expectedFailure'

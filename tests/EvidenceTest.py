@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from __future__ import absolute_import
-import sys
 from six.moves import range
-sys.path.insert(0, ".")
 import unittest
 from PyOpenWorm.evidence import Evidence, EvidenceError
 from PyOpenWorm.dataObject import DataObject
 
 from .DataTestTemplate import _DataTest
+
 
 class EvidenceTest(_DataTest):
 

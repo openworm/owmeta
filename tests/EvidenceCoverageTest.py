@@ -1,26 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import print_function
-import sys
-sys.path.insert(0,".")
 import unittest
 import PyOpenWorm as P
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
 
-from glob import glob
-
-from .GraphDBInit import *
 
 from .DataTestTemplate import _DataTest
+
 
 class EvidenceCoverageTest(_DataTest):
 
@@ -32,14 +18,19 @@ class EvidenceCoverageTest(_DataTest):
         evcheck = []
         for n in neurons:
 
-            hasEvidence = len(get_supporting_evidence(n)) + len(get_supporting_evidence(n.neurotransmitter)) + len(get_supporting_evidence(n.type)) + len(get_supporting_evidence(n.innexin)) + len(get_supporting_evidence(n.neuropeptide)) + len(get_supporting_evidence(n.receptor))
+            hasEvidence = len(
+                get_supporting_evidence(n)) + len(
+                get_supporting_evidence(n.neurotransmitter)) + len(
+                get_supporting_evidence(n.type)) + len(
+                get_supporting_evidence(n.innexin)) + len(
+                get_supporting_evidence(n.neuropeptide)) + len(
+                get_supporting_evidence(n.receptor))
 
             print(get_supporting_evidence(n.neurotransmitter))
 
             evcheck.append(hasEvidence)
 
         self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
-
 
     def test_verify_muslces_have_evidence(self):
         """ For each muscle in PyOpenWorm, verify
@@ -71,9 +62,10 @@ class EvidenceCoverageTest(_DataTest):
         supporting evidence. """
         pass
 
-    def get_supporting_evidence(fact):
-        """ Helper function for checking amount of Evidence.
-        Returns list of Evidence supporting fact. """
-        ev = P.Evidence()
-        ev.asserts(fact)
-        return list(ev.load())
+
+def get_supporting_evidence(fact):
+    """ Helper function for checking amount of Evidence.
+    Returns list of Evidence supporting fact. """
+    ev = P.Evidence()
+    ev.asserts(fact)
+    return list(ev.load())

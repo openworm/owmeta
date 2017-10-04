@@ -1,10 +1,6 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
 from PyOpenWorm import Connection, Neuron
 import rdflib as R
-
-from .GraphDBInit import *
 
 from .DataTestTemplate import _DataTest
 
