@@ -1,6 +1,8 @@
 from __future__ import print_function
 import PyOpenWorm as P
-from PyOpenWorm import Cell
+from yarom import yarom_import
+
+Cell = yarom_import('PyOpenWorm.cell.Cell')
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?

@@ -16,7 +16,8 @@ from yarom.propertyMixins import (ObjectPropertyMixin,
 from PyOpenWorm.data import DataUser
 import itertools
 import hashlib
-from lazy_object_proxy import Proxy
+
+from .relationshipProxy import RelationshipProxy, Rel
 
 L = logging.getLogger(__name__)
 
@@ -27,14 +28,14 @@ class _values(list):
         super(_values, self).append(v)
 
 
-class RealSimpleProperty(object):
+class RealSimpleProperty(DataUser):
 
     multiple = False
     link = R.URIRef("property")
     linkName = "property"
+    base_namespace = R.Namespace("http://openworm.org/entities/")
 
     def __init__(self, conf, owner):
-        self.conf = conf
         self._v = _values()
         self._vctx = _values()
         self.owner = owner
@@ -58,7 +59,7 @@ class RealSimpleProperty(object):
 
         self._insert_value(v)
 
-        return RelationshipProxy(Rel(self.owner, self, v))
+        return RelationshipProxy(Rel(self.owner, self, v)).in_context(self._defctx)
 
     def clear(self):
         for x in self._v:
@@ -128,6 +129,12 @@ class RealSimpleProperty(object):
 
     def one(self):
         return _next_or_none(self.get())
+
+    @classmethod
+    def on_mapper_add_class(cls, mapper):
+        cls.rdf_type = cls.base_namespace[cls.__name__]
+        cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
+        return cls
 
 
 class POCache(tuple):
@@ -358,38 +365,3 @@ def _property_to_string(self):
     s = str(self.linkName) + "=`" + \
         ";".join(str(s) for s in self.defined_values) + "'"
     return s
-
-
-class RelationshipProxy(Proxy):
-    def __repr__(self):
-        return repr(self.__wrapped__)
-
-    def in_context(self, context):
-        rel = self.__factory__
-        rel.p.context = context
-        return self
-
-    def unwrapped(self):
-        return self.__wrapped__
-
-
-class Rel(tuple):
-
-    """ A container for a relationship-assignment """
-    _map = dict(s=0, p=1, o=2)
-
-    def __new__(cls, s, p, o):
-        return super(Rel, cls).__new__(cls, (s, p, o))
-
-    def __getattr__(self, n):
-        return self[Rel._map[n]]
-
-    def __call__(self):
-        return self.rel()
-
-    def rel(self):
-        from .relationship import Relationship
-        return Relationship(
-            s=(self.s if self.s.defined else None),
-            p=self.p.rdf_object,
-            o=(self.o if self.o.defined else None))
