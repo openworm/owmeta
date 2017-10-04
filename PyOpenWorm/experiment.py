@@ -1,5 +1,7 @@
-from .dataObject import DataObject
-from .evidence import Evidence
+from yarom import yarom_import
+
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
 
 class Experiment(DataObject):
     """
@@ -20,10 +22,13 @@ class Experiment(DataObject):
         Supporting article for this experiment.
     """
     def __init__(self, reference=False, **kwargs):
-        DataObject.__init__(self, **kwargs)
-        Experiment.ObjectProperty('reference', owner=self, value_type=Evidence, multiple=True)
+        super(Experiment, self).__init__(self, **kwargs)
+        Experiment.ObjectProperty('reference',
+                                  owner=self,
+                                  value_type=Evidence,
+                                  multiple=True)
 
-        if(isinstance(reference,Evidence)):
+        if (isinstance(reference,Evidence)):
             #TODO: make this so the reference asserts this Experiment when it is added
             self.reference(reference)
 

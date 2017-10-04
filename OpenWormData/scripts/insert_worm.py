@@ -2,7 +2,7 @@ from __future__ import print_function
 from time import time
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
-from PyOpenWorm.datasource import DataTranslator, DataSource, Informational
+from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
 from PyOpenWorm.dataObject import Context
 import traceback
 import csv
@@ -61,10 +61,13 @@ class WormbaseIonChannelCSVDataSource(CSVDataSource):
 
 
 class WormbaseIonChannelCSVTranslator(DataTranslator):
-    data_source_type = WormbaseIonChannelCSVDataSource
+    input_type = WormbaseIonChannelCSVDataSource
+    output_type = DataObjectContextDataSource
 
     def translate(self, data_source):
         res = set([])
+        ctx = Context()
+        mapper = ctx.mapper
         try:
             with open(data_source.csv_file_name) as csvfile:
                 next(csvfile, None)
@@ -76,7 +79,7 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
                     gene_WB_ID = line[2].upper()
                     expression_pattern = line[3]
                     description = line[4]
-                    c = P.Channel(name=str(channel_name))
+                    c = mapper.Channel(name=str(channel_name))
                     c.gene_name(gene_name)
                     c.gene_WB_ID(gene_WB_ID)
                     c.description(description)
@@ -84,7 +87,7 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
                     regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                     matches = [regex.match(pat) for pat in patterns]
-                    patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
+                    patterns = [mapper.ExpressionPattern(wormbaseID=m.group(1),
                                                     description=m.group(2))
                                 for m in matches if m is not None]
                     for pat in patterns:
@@ -96,7 +99,7 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
 
 
 class WormbaseTextMatchCSVTranslator(DataTranslator):
-    data_source_type = WormbaseTextMatchCSVDataSource
+    input_type = WormbaseTextMatchCSVDataSource
 
     def translate(self, data_source):
         initcol = data_source.initial_cell_column
@@ -155,7 +158,7 @@ class NeuronCSVDataSource(CSVDataSource):
 
 
 class NeuronCSVDataTranslator(DataTranslator):
-    data_source_type = NeuronCSVDataSource
+    input_type = NeuronCSVDataSource
 
     def translate(self, data_source):
         evidences = dict()
@@ -411,6 +414,7 @@ def customizations(record):
     """
     return doi(link(author(record)))
 
+
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
     e = None
@@ -466,8 +470,6 @@ def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
         for filename in sorted(filenames):
             if filename.lower().endswith('.csv'):
                 _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
-
-
 
 
 def upload_connections():
@@ -687,9 +689,9 @@ def do_insert(config="default.conf", logging=False):
         for ds in DATA_SOURCES:
             best_translator = None
             for tr in TRANSLATORS:
-                if isinstance(ds, tr.data_source_type):
+                if isinstance(ds, tr.input_type):
                     if best_translator is None \
-                        or issubclass(tr.data_source_type, best_translator.data_source_type):
+                        or issubclass(tr.input_type, best_translator.input_type):
                         best_translator = tr
             if best_translator is not None:
                 print(ds)

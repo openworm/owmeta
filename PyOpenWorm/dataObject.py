@@ -1,16 +1,25 @@
 from __future__ import print_function
 import rdflib as R
 import random as RND
-import transaction
 import logging
 from itertools import groupby
+
+import PyOpenWorm
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
+from yarom.mapper import FCN
+from yarom.mapperUtils import warn_mismapping
+from yarom import yarom_import
 from .configure import BadConf
-from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty, RelationshipProxy
 from .data import DataUser
+
+ObjectProperty, DatatypeProperty, UnionProperty = \
+        yarom_import('PyOpenWorm.simpleProperty',
+                     ('ObjectProperty',
+                      'DatatypeProperty',
+                      'UnionProperty'))
 
 __all__ = [
     "DataObject",
@@ -43,6 +52,10 @@ class DataObject(GraphObject, DataUser):
     owner_properties : list of Property
         Properties belonging to parents of this object
     """
+    rdf_type = None
+    rdf_namespace = None
+    context = None  # XXX: Need to make some kind of default context for this
+    base_namespace = R.Namespace("http://openworm.org/entities/")
 
     def __init__(self, ident=None, key=None, **kwargs):
         try:
@@ -311,8 +324,10 @@ class DataObject(GraphObject, DataUser):
 
     @classmethod
     def register(cls):
-        """ Registers the class as a DataObject to be included in the configured rdf graph.
-            Puts this class under the control of the database for metadata.
+        """ Registers the class as a DataObject to be included in the
+        configured rdf graph.
+
+        Puts this class under the control of the database for metadata.
 
         :return: None
         """
@@ -378,12 +393,37 @@ class DataObject(GraphObject, DataUser):
             rdf_type = R.URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
+    @classmethod
+    def on_mapper_add_class(self, mapper):
+        self.parents = mapper.DataObjectsParents[FCN(self)]
+        self.rdf_type = self.base_namespace[self.__name__]
+        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
+        cls = getattr(PyOpenWorm, self.__name__, None)
+        if cls is not None and cls is not self:
+            new_name = "_" + self.__name__
+            warn_mismapping(L,
+                            'PyOpenWorm module',
+                            self.__name__,
+                            "nothing",
+                            '{}@0x{:X}'.format(cls, id(cls)))
+            if getattr(PyOpenWorm, new_name, False):
+                L.warning(
+                    "Still unable to add {0} to {1}. {0} will not be "
+                    "accessible through {1}".format(
+                        new_name,
+                        'PyOpenWorm module'))
+            else:
+                setattr(PyOpenWorm, new_name, self)
+        else:
+            setattr(PyOpenWorm, self.__name__, self)
+
 
 class RDFTypeProperty(DatatypeProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
     owner_type = DataObject
     multiple = True
+
 
 class DataObjectSingleton(DataObject):
     instance = None
@@ -409,8 +449,8 @@ class DataObjectSingleton(DataObject):
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
 
     """ The DataObject corresponding to rdfs:Class """
-    # XXX: This class may be changed from a singleton later to facilitate dumping
-    #      and reloading the object graph
+    # XXX: This class may be changed from a singleton later to facilitate
+    #      dumping and reloading the object graph
     rdf_type = R.RDFS['Class']
     auto_mapped = True
 
@@ -425,7 +465,6 @@ class RDFProperty(DataObjectSingleton):
 
     def __init__(self):
         super(RDFProperty, self).__init__(R.RDF["Property"])
-
 
 
 def oid(identifier_or_rdf_type, rdf_type=None):
@@ -610,41 +649,3 @@ class InverseProperty(object):
                                                      self.lhs_linkName,
                                                      self.rhs_class,
                                                      self.rhs_linkName)
-
-
-class Context(DataObject):
-    """
-    A context. Analogous to an RDF context, with some special sauce
-    """
-
-    def __init__(self, **kwargs):
-        super(Context, self).__init__(**kwargs)
-        """ A set of DataObjects """
-        self._contents = set([])
-        self._set_buffer_size = 10000
-
-    def contents(self):
-        return self._contents
-
-    def add_objects(self, objects):
-        self._contents.update(set(objects))
-
-    def save_context(self):
-        if self.conf['rdf.source'] == 'ZODB':
-            transaction.commit()
-            transaction.begin()
-        ctx = self.rdf.get_context(self.identifier())
-        ctx.addN((s, p, o, ctx) for s, p, o in self._contents_triples())
-        if self.conf['rdf.source'] == 'ZODB':
-            transaction.commit()
-            transaction.begin()
-
-    def _contents_triples(self):
-        ct = ComponentTripler(None, generator=True)
-        for obj in self._contents:
-            if type(obj) == RelationshipProxy:
-                obj = obj.unwrapped()
-            if id(obj) not in ct.seen:
-                ct.start = obj
-                for t in ct():
-                    yield t

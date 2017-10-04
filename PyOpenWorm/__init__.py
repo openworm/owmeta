@@ -65,24 +65,11 @@ import os
 
 # For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
-from .data import Data, DataUser
-from .dataObject import DataObject
+from .data import Data, DataUser, propertyTypes
 from .pProperty import Property
-from .simpleProperty import SimpleProperty
-from .cell import Cell
-from .network import Network
-from .neuron import Neuron
-from .worm import Worm
-from .relationship import Relationship
-from .evidence import Evidence, EvidenceError
-from .muscle import Muscle
+from .context import Context
 from .quantity import Quantity
-from .my_neuroml import NeuroML
-from .connection import Connection
-from .experiment import Experiment
-from .channel import Channel, ExpressionPattern
-from .channelworm import ChannelModel, PatchClampExperiment
-from .plot import Plot
+import yarom
 
 __import__('__main__').connected = False
 __all__ = [
@@ -97,27 +84,16 @@ __all__ = [
     "ConfigValue",
     "BadConf",
     "Data",
-    "DataObject",
     "DataUser",
     "propertyTypes",
     "Property",
-    "SimpleProperty",
-    "Cell",
-    "Network",
-    "Neuron",
-    "Worm",
-    "Relationship",
-    "EvidenceError",
-    "Muscle",
     "Quantity",
-    "NeuroML",
-    "Connection",
-    "Experiment",
-    "Channel",
-    "ExpressionPattern",
-    "ChannelModel",
-    "PatchClampExperiment",
-    "Plot"]
+    ]
+
+CONTEXT = Context(key="DefaultContext",
+                  base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+yarom.MAPPER = CONTEXT.mapper
 
 def get_data(path):
     # get a resource from the installed package location
@@ -253,29 +229,8 @@ def connect(configFile=False,
 
     Configureable.conf.openDatabase()
     logging.info("Connected to database")
-
     # have to register the right one to disconnect...
     atexit.register(disconnect)
-
-    # This takes all the classes that we want to store metadata in the database
-    #  and lets our data handling system know about them.
-    #  Should add new classes here if they need to be tracked!
-    DataObject.register()
-    Network.register()
-    Cell.register()
-    Neuron.register()
-    Worm.register()
-    Evidence.register()
-    Muscle.register()
-    Connection.register()
-    SimpleProperty.register()
-    Relationship.register()
-    Channel.register()
-    ExpressionPattern.register()
-    ChannelModel.register()
-    Experiment.register()
-    PatchClampExperiment.register()
-    Plot.register()
 
     m.connected = True
     if data:

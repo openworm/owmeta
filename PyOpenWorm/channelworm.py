@@ -1,7 +1,11 @@
-from .experiment import Experiment
 from .pProperty import Property
-from .evidence import Evidence
-from .dataObject import DataObject
+from yarom import yarom_import
+from yarom.utils import slice_dict
+
+Experiment = yarom_import('PyOpenWorm.experiment.Experiment')
+Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+
 
 class PatchClampExperiment(Experiment):
     """
@@ -53,44 +57,47 @@ class PatchClampExperiment(Experiment):
 
     """
 
+    conditions = [
+        'Ca_concentration',
+        'Cl_concentration',
+        'blockers',
+        'cell',
+        'cell_age',
+        'delta_t',
+        'duration',
+        'end_time',
+        'extra_solution',
+        'initial_voltage',
+        'ion_channel',
+        'membrane_capacitance',
+        'mutants',
+        'patch_type',
+        'pipette_solution',
+        'protocol_end',
+        'protocol_start',
+        'protocol_step',
+        'start_time',
+        'temperature',
+        'type',
+    ]
+
     def __init__(self, reference=False, **kwargs):
-        Experiment.__init__(self, reference)
+        conditions = slice_dict(kwargs, self.conditions)
+        kwargs = {k: kwargs[k] for k in kwargs if k not in conditions}
+        super(PatchClampExperiment, self).__init__(reference, **kwargs)
 
         # enumerate conditions patch-clamp experiments should have
-        self.conditions = [
-            'Ca_concentration',
-            'Cl_concentration',
-            'blockers',
-            'cell',
-            'cell_age',
-            'delta_t',
-            'duration',
-            'end_time',
-            'extra_solution',
-            'initial_voltage',
-            'ion_channel',
-            'membrane_capacitance',
-            'mutants',
-            'patch_type',
-            'pipette_solution',
-            'protocol_end',
-            'protocol_start',
-            'protocol_step',
-            'start_time',
-            'temperature',
-            'type',
-        ]
 
         for c in self.conditions:
             PatchClampExperiment.DatatypeProperty(c, self)
 
-        for c, v in kwargs.iteritems():
-            if c in self.conditions:
-                setattr(self, c, v)
+        for c, v in conditions:
+            setattr(self, c, v)
 
 
 class References(Property):
-    multiple=True
+    multiple = True
+
     def __init__(self, **kwargs):
         Property.__init__(self, 'references', **kwargs)
         self._refs = []

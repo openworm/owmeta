@@ -1,8 +1,12 @@
 from __future__ import print_function
-from PyOpenWorm.dataObject import DataObject, InverseProperty
-from PyOpenWorm.channel import Channel
+from yarom import yarom_import
+
 from string import Template
 import neuroml
+
+DataObject, InverseProperty = yarom_import('PyOpenWorm.dataObject',
+                                           ('DataObject', 'InverseProperty'))
+Channel = yarom_import('PyOpenWorm.channel.Channel')
 
 __all__ = ["Cell"]
 
@@ -47,6 +51,8 @@ WHERE {
   }
 }
 """)
+
+
 def _dict_merge(d1,d2):
     from itertools import chain
     dict(chain(d1.items(), d2.items()))

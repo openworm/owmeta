@@ -1,11 +1,15 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import PyOpenWorm as P
-from .dataObject import DataObject
-from .cell import Cell
+from yarom import yarom_import
+
 import six
 import warnings
+
+
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+Cell = yarom_import('PyOpenWorm.cell.Cell')
+Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 
 __all__ = ['Connection']
 
@@ -63,7 +67,7 @@ class Connection(DataObject):
         Connection.DatatypeProperty('syntype', owner=self)
         Connection.DatatypeProperty('termination', owner=self)
 
-        if isinstance(pre_cell, P.Cell):
+        if isinstance(pre_cell, Cell):
             self.pre_cell(pre_cell)
         elif pre_cell is not None:
             warnings.warn(
@@ -71,9 +75,9 @@ class Connection(DataObject):
                 ' deprecated. PyOpenWorm.Cell objects should be passed in' +
                 ' instead.',
                 DeprecationWarning)
-            self.pre_cell(P.Neuron(name=pre_cell, conf=self.conf))
+            self.pre_cell(Neuron(name=pre_cell, conf=self.conf))
 
-        if (isinstance(post_cell, P.Cell)):
+        if (isinstance(post_cell, Cell)):
             self.post_cell(post_cell)
         elif post_cell is not None:
             warnings.warn(
@@ -81,7 +85,7 @@ class Connection(DataObject):
                 ' deprecated. PyOpenWorm.Cell objects should be passed in' +
                 ' instead.',
                 DeprecationWarning)
-            self.post_cell(P.Neuron(name=post_cell, conf=self.conf))
+            self.post_cell(Neuron(name=post_cell, conf=self.conf))
 
         if isinstance(termination, six.string_types):
             termination = termination.lower()

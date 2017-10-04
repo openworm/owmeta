@@ -1,8 +1,10 @@
 import rdflib as R
 from .pProperty import Property
-from .channelworm import ChannelModel
-from .dataObject import DataObject
 import PyOpenWorm
+from yarom import yarom_import
+
+ChannelModel = yarom_import('PyOpenWorm.channelworm.ChannelModel')
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
 
 
 # XXX: Why is this not an ObjectProperty?

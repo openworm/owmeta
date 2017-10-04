@@ -1,4 +1,5 @@
 import six
+from .context import Context
 
 
 class Informational(object):
@@ -54,14 +55,24 @@ class DataSource(six.with_metaclass(DataSourceType, object)):
                       for info in self.info_fields) + '\n'
 
 
+class DataObjectContextDataSource(DataSource):
+    def __init__(self, context, **kwargs):
+        super(DataObjectContextDataSource, self).__init__(**kwargs)
+        if context is not None:
+            self.context = context
+        else:
+            self.context = Context()
+
+
 class DataTranslator(object):
     """ Translates from a data source to PyOpenWorm objects """
 
-    data_source_type = DataSource
+    input_type = DataSource
+    output_type = DataSource
 
     def get_data_objects(self, data_source):
         """ Override this to change how data objects are generated """
-        if not isinstance(data_source, self.data_source_type):
+        if not isinstance(data_source, self.input_type):
             return set([])
         else:
             return self.translate(data_source)
