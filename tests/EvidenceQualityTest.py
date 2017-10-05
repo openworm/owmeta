@@ -1,48 +1,47 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-import unittest
+
 from PyOpenWorm.evidence import Evidence
-import requests
+from six.moves.urllib.parse import urlparse
 
 from .DataTestTemplate import _DataTest
+import re
+
+# Regular expressions copied from:
+# https://www.crossref.org/blog/dois-and-matching-regular-expressions/
+DOI_REGEXEN = map(re.compile, (r'/^10.\d{4,9}/[-._;()/:A-Z0-9]+$/i',
+                               r'/^10.1002/[^\s]+$/i'))
 
 
 class EvidenceQualityTests(_DataTest):
-    @unittest.expectedFailure
     def test_has_valid_resource(self):
         """Checks if the object has either a valid DOI or URL"""
         ev = Evidence()
-        allEvidence = list(ev.load())
-        evcheck = []
+        allEvidence = set(ev.load())
+        qualityEvidence = set()
         for evobj in allEvidence:
-            if evobj.doi():
-                doi = evobj.doi()
-                val = requests.get('http://dx.doi.org/' + doi)
-                evcheck.append(val.status_code == 200)
+            doi = evobj.doi()
 
-            elif evobj.url():
-                url = evobj.url()
-                val = requests.get(url)
-                evcheck.append(val.status_code == 200)
+            if doi:
+                good_doi = False
+                for pat in DOI_REGEXEN:
+                    if pat.match(doi):
+                        good_doi = True
+                        break
+                if not good_doi:
+                    continue
 
-            else:
-                evcheck.append(False)
+            urls = evobj.uri.get()
+            good_uris = True
+            for uri in urls:
+                parsed = urlparse(uri)
+                if not parsed.scheme or not parsed.netloc:
+                    good_uris = False
+                    break
 
-        self.assertTrue(False not in evcheck)
+            if not good_uris:
+                continue
 
-    @unittest.expectedFailure
-    def test_resource_alignment(self):
-        """Checks that DOI and URL fields are aligned,
-        when both are present"""
-        ev = Evidence()
-        allEvidence = list(ev.load())
-        evcheck = []
-        for evobj in allEvidence:
-            if evobj.doi() and evobj.url():
-                doi = evobj.doi()
-                doival = requests.get('http://dx.doi.org/' + doi)
-                url = evobj.url()
-                urlval = requests.get(url)
-                evcheck.append(doival.status_code == urlval.status_code)
+            qualityEvidence.add(evobj)
 
-        self.assertTrue(False not in evcheck)
+        self.assertSetEqual(allEvidence, qualityEvidence)
