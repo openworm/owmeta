@@ -25,4 +25,3 @@ class UnicodeOutputChecker(doctest.OutputChecker):
         cleaned_got = self._remove_u_prefixes(got)
         res = _doctestOutputChecker.check_output(self, cleaned_want, cleaned_got, optionflags)
         return res
-

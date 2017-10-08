@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
-from PyOpenWorm import Plot, DataUser
+from PyOpenWorm.plot import Plot
+from PyOpenWorm.data import DataUser
 
 from .DataTestTemplate import _DataTest
+
 
 class PlotTest(_DataTest):
 
@@ -38,4 +38,3 @@ class PlotTest(_DataTest):
         ary = [[1,2],[3,4]]
         pl = Plot(data=ary)
         assert pl.get_data() == ary
-

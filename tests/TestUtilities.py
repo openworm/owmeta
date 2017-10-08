@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
+
 
 def findSkippedTests():
     skippedTest = '@unittest.skip'
@@ -11,7 +13,7 @@ def findSkippedTests():
     # expected failures.
 
     for fname in os.listdir('.'):
-        if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+        if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
             with open(fname) as f:
                 count = False
                 for line in f:
@@ -29,7 +31,7 @@ def findSkippedTests():
 # which ones do not adhere to the proper naming convention.
 def listFunctionNames():
         for fname in os.listdir('.'):
-            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+            if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
                 with open(fname) as f:
                     count = False
                     for line in f:
@@ -46,7 +48,7 @@ def listFunctionNames():
 # TODO: improve this to list function names
 def findDummyTests():
         for fname in os.listdir('.'):
-            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+            if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
                 with open(fname) as f:
                     count = False
                     for line in f:

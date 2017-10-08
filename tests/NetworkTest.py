@@ -1,6 +1,4 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0, ".")
 import PyOpenWorm
 from PyOpenWorm import Worm, Network, Neuron, Connection
 import networkx
