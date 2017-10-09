@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import PyOpenWorm as P
-from itertools import chain
-
-from PyOpenWorm.dataObject import DataObject
+from yarom import yarom_import
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+Connection = yarom_import('PyOpenWorm.connection.Connection')
+Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 
 
 class Network(DataObject):
@@ -23,17 +23,22 @@ class Network(DataObject):
         self.synapses = Network.ObjectProperty(
             'synapse',
             owner=self,
-            value_type=P.Connection,
+            value_type=Connection,
             multiple=True)
         self.neurons = Network.ObjectProperty(
             'neuron',
             owner=self,
-            value_type=P.Neuron,
+            value_type=Neuron,
             multiple=True)
+
+        if self.context:
+            Worm = self.context.load('PyOpenWorm.worm.Worm')
+        else:
+            Worm = yarom_import('PyOpenWorm.worm.Worm')
         Network.ObjectProperty(
             'worm',
             owner=self,
-            value_type=P.Worm,
+            value_type=Worm,
             multiple=False)
 
     def neuron_names(self):
@@ -43,7 +48,7 @@ class Network(DataObject):
         Example::
 
             # Grabs the representation of the neuronal network
-            >>> net = P.Worm().get_neuron_network()
+            >>> net = Worm().get_neuron_network()
 
             #NOTE: This is a VERY slow operation right now
             >>> len(set(net.neuron_names()))
@@ -52,7 +57,7 @@ class Network(DataObject):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        n = P.Neuron()
+        n = Neuron()
         self.neuron.set(n)
         res = n.name.get()
         self.neuron.unset(n)
@@ -65,7 +70,7 @@ class Network(DataObject):
         Example::
 
             # Grabs the representation of the neuronal network
-            >>> net = P.Worm().get_neuron_network()
+            >>> net = Worm().get_neuron_network()
 
             # Grab a specific neuron
             >>> aval = net.aneuron('AVAL')
@@ -76,9 +81,9 @@ class Network(DataObject):
 
         :param name: Name of a c. elegans neuron
         :returns: Neuron corresponding to the name given
-        :rtype: PyOpenWorm.Neuron
+        :rtype: PyOpenWorm.neuron.Neuron
         """
-        n = P.Neuron(name=name, conf=self.conf)
+        n = Neuron(name=name, conf=self.conf)
         return n
 
     def _synapses_csv(self):
@@ -90,12 +95,12 @@ class Network(DataObject):
         """
         for n, nbrs in self['nx'].adjacency_iter():
             for nbr, eattr in nbrs.items():
-                yield P.Connection(n,
-                                   nbr,
-                                   int(eattr['weight']),
-                                   eattr['synapse'],
-                                   eattr['neurotransmitter'],
-                                   conf=self.conf)
+                yield Connection(n,
+                                 nbr,
+                                 int(eattr['weight']),
+                                 eattr['synapse'],
+                                 eattr['neurotransmitter'],
+                                 conf=self.conf)
 
     def as_networkx(self):
         return self['nx']
@@ -108,7 +113,7 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        n = P.Neuron()
+        n = Neuron()
         n.type('sensory')
 
         self.neuron.set(n)
@@ -124,7 +129,7 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        n = P.Neuron()
+        n = Neuron()
         n.type('interneuron')
 
         self.neuron.set(n)
@@ -140,7 +145,7 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        n = P.Neuron()
+        n = Neuron()
         n.type('motor')
 
         self.neuron.set(n)

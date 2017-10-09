@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from .dataObject import DataObject, InverseProperty
-from .muscle import Muscle
-from .cell import Cell
-from .network import Network
+from yarom import yarom_import
+DataObject, InverseProperty = yarom_import('PyOpenWorm.dataObject',
+                                           ('DataObject', 'InverseProperty'))
+Muscle = yarom_import('PyOpenWorm.muscle.Muscle')
+Cell = yarom_import('PyOpenWorm.cell.Cell')
+Network = yarom_import('PyOpenWorm.network.Network')
 
 
 class Worm(DataObject):

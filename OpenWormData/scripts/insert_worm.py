@@ -3,12 +3,26 @@ from time import time
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
-from PyOpenWorm.dataObject import Context
+from PyOpenWorm.context import Context
+import logging
 import traceback
 import csv
 import re
 import os
 
+#logging.basicConfig(level=logging.DEBUG)
+CTX = Context(key="insert_worm", parent=P.CONTEXT,
+              base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+Channel = CTX.load('PyOpenWorm.channel.Channel')
+ExpressionPattern = CTX.load('PyOpenWorm.channel.ExpressionPattern')
+Neuron = CTX.load('PyOpenWorm.neuron.Neuron')
+Muscle = CTX.load('PyOpenWorm.muscle.Muscle')
+Evidence = CTX.load('PyOpenWorm.evidence.Evidence')
+Connection = CTX.load('PyOpenWorm.connection.Connection')
+Network = CTX.load('PyOpenWorm.network.Network')
+Worm = CTX.load('PyOpenWorm.worm.Worm')
+Cell = CTX.load('PyOpenWorm.cell.Cell')
 
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 WORM = None
@@ -66,10 +80,8 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
 
     def translate(self, data_source):
         res = set([])
-        ctx = Context()
-        mapper = ctx.mapper
         try:
-            with open(data_source.csv_file_name) as csvfile:
+            with open(data_source.csv_file_name, 'r') as csvfile:
                 next(csvfile, None)
                 csvreader = csv.reader(csvfile, skipinitialspace=True)
 
@@ -79,7 +91,7 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
                     gene_WB_ID = line[2].upper()
                     expression_pattern = line[3]
                     description = line[4]
-                    c = mapper.Channel(name=str(channel_name))
+                    c = Channel(name=str(channel_name))
                     c.gene_name(gene_name)
                     c.gene_WB_ID(gene_WB_ID)
                     c.description(description)
@@ -87,8 +99,8 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
                     regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                     matches = [regex.match(pat) for pat in patterns]
-                    patterns = [mapper.ExpressionPattern(wormbaseID=m.group(1),
-                                                    description=m.group(2))
+                    patterns = [ExpressionPattern(wormbaseID=m.group(1),
+                                                  description=m.group(2))
                                 for m in matches if m is not None]
                     for pat in patterns:
                         c.expression_pattern(pat)
@@ -106,14 +118,14 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
         ctype = data_source.cell_type
         res = set([])
         try:
-            with open(data_source.csv_file_name, 'rb') as f:
+            with open(data_source.csv_file_name, 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
                 for row in reader:
                     cells = self.extract_cell_names(header,
                                                     initcol,
                                                     row)
-                    ch = P.Channel(name=str(row[0]))
+                    ch = Channel(name=str(row[0]))
                     for cell in cells:
                         m = ctype(name=str(cell))
                         res.add(ch.appearsIn(m))
@@ -190,11 +202,11 @@ class NeuronCSVDataTranslator(DataTranslator):
                     try:
                         e2 = uris[evidenceURL]
                     except KeyError:
-                        e2 = P.Evidence(uri=evidenceURL)
+                        e2 = Evidence(uri=evidenceURL)
                         uris[evidenceURL] = e2
 
                 # grab the neuron object
-                n = P.Neuron(neuron_name)
+                n = Neuron(neuron_name)
 
                 if relation in ('neurotransmitter',
                                 'innexin',
@@ -226,14 +238,15 @@ class NeuronCSVDataTranslator(DataTranslator):
                         if e2 is not None:
                             e2.asserts(r)
         return res
-
+# DATA_SOURCES = [WormbaseIonChannelCSVDataSource(
+        # csv_file_name=IONCHANNEL_SOURCE)]
 DATA_SOURCES = [
     WormbaseTextMatchCSVDataSource(
-        cell_type=P.Neuron,
+        cell_type=Neuron,
         csv_file_name=CHANNEL_NEURON_SOURCE,
         initial_cell_column=101),
     WormbaseTextMatchCSVDataSource(
-        cell_type=P.Muscle,
+        cell_type=Muscle,
         csv_file_name=CHANNEL_MUSCLE_SOURCE,
         initial_cell_column=6),
     WormbaseIonChannelCSVDataSource(
@@ -268,7 +281,7 @@ def attach_neuromlfiles_to_channel():
             next(csvfile, None)
             csvreader = csv.reader(csvfile, skipinitialspace=True)
             for row in csvreader:
-                ch = P.Channel(name=str(row[0]))
+                ch = Channel(name=str(row[0]))
                 ch.neuroML_file(str(row[1]))
                 ch.save()
         print("neuroML file links attached")
@@ -283,7 +296,7 @@ def upload_muscles():
         with open(CELL_NAMES_SOURCE) as csvfile:
             csvreader = csv.reader(csvfile)
 
-            ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+            ev = Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
             w = WORM
             for num, line in enumerate(csvreader):
                 if num < 4:  # skip rows with no data
@@ -291,7 +304,7 @@ def upload_muscles():
 
                 if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
                     muscle_name = normalize_cell_name(line[0]).upper()
-                    m = P.Muscle(name=muscle_name)
+                    m = Muscle(name=muscle_name)
                     w.muscle(m)
             ev.asserts(w)
         #second step, get the relationships between them and add them to the graph
@@ -314,7 +327,7 @@ def upload_lineage_and_descriptions():
         w = WORM
         net = NETWORK
         # TODO: Improve this evidence marker
-        ev = P.Evidence(uri="http://www.wormatlas.org/celllist.htm")
+        ev = Evidence(uri="http://www.wormatlas.org/celllist.htm")
         cell_data = open(LINEAGE_LIST_LOC, "r")
 
         # Skip headers
@@ -380,7 +393,7 @@ def norn(x):
 def upload_neurons():
     try:
         #TODO: Improve this evidence marker
-        ev = P.Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+        ev = Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
         w = WORM
         n = NETWORK
         w.neuron_network(n)
@@ -395,7 +408,7 @@ def upload_neurons():
 
                 if line[5] == '1':  # neurons marked in this column
                     neuron_name = normalize_cell_name(line[0]).upper()
-                    n.neuron(P.Neuron(name=neuron_name))
+                    n.neuron(Neuron(name=neuron_name))
                     i = i + 1
 
         ev.asserts(n)
@@ -425,7 +438,7 @@ def parse_bibtex_into_evidence(file_name):
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             key = entry['ID']
-            e = P.Evidence(key=key)
+            e = Evidence(key=key)
 
             doi = entry.get('doi', None)
             if doi:
@@ -504,7 +517,7 @@ def upload_connections():
         }[x]
 
     def expand_muscle(name):
-        return P.Muscle(name + 'L'), P.Muscle(name + 'R')
+        return Muscle(name + 'L'), Muscle(name + 'R')
 
     # cells that are neither neurons or muscles. These are marked as
     # 'Other Cells' in the wormbase cell list but are still part of the new
@@ -535,7 +548,7 @@ def upload_connections():
         muscles = [muscle.name() for muscle in muscle_objs]
 
         # Evidence object to assert each connection
-        e = P.Evidence(key="emmons2015", title='herm_full_edgelist.csv')
+        e = Evidence(key="emmons2015", title='herm_full_edgelist.csv')
 
         with open(CONNECTOME_SOURCE) as csvfile:
             edge_reader = csv.reader(csvfile)
@@ -572,13 +585,13 @@ def upload_connections():
                     res = None
                     res2 = None
                     if name in neurons:
-                        res = P.Neuron(name)
+                        res = Neuron(name)
                     elif name in muscles:
-                        res = P.Muscle(name)
+                        res = Muscle(name)
                     elif name in to_expand_muscles:
                         res, res2 = expand_muscle(name)
                     elif name in other_cells:
-                        res = P.Cell(name)
+                        res = Cell(name)
 
                     if res is not None:
                         ret.append(res)
@@ -588,16 +601,16 @@ def upload_connections():
                     return ret
 
                 def add_synapse(source, target):
-                    c = P.Connection(pre_cell=source, post_cell=target,
+                    c = Connection(pre_cell=source, post_cell=target,
                                      number=weight, syntype=syn_type)
                     n.synapse(c)
                     e.asserts(c)
 
-                    if isinstance(source, P.Neuron) and isinstance(target, P.Neuron):
+                    if isinstance(source, Neuron) and isinstance(target, Neuron):
                         c.termination('neuron')
-                    elif isinstance(source, P.Neuron) and isinstance(target, P.Muscle):
+                    elif isinstance(source, Neuron) and isinstance(target, Muscle):
                         c.termination('muscle')
-                    elif isinstance(source, P.Muscle) and isinstance(target, P.Neuron):
+                    elif isinstance(source, Muscle) and isinstance(target, Neuron):
                         c.termination('muscle')
 
                     return c
@@ -677,12 +690,11 @@ def do_insert(config="default.conf", logging=False):
 
     P.connect(conf=config, do_logging=logging)
     try:
-        WORM = P.Worm()
+        WORM = Worm()
+        NETWORK = Network()
 
-        NETWORK = P.Network()
         WORM.neuron_network(NETWORK)
         NETWORK.worm(WORM)
-        c = Context(key="insert_worm")
         t0 = time()
         # upload_neurons()
         # upload_muscles()
@@ -696,11 +708,10 @@ def do_insert(config="default.conf", logging=False):
             if best_translator is not None:
                 print(ds)
                 print('Translating with', best_translator)
-                c.add_objects(best_translator.translate(ds))
+                best_translator.translate(ds)
             else:
                 print('No translator for', ds)
 
-        c.add_objects([c, NETWORK])
         # attach_neuromlfiles_to_channel()
         # upload_lineage_and_descriptions()
         # upload_connections()
@@ -709,8 +720,8 @@ def do_insert(config="default.conf", logging=False):
 
         #WORM.save()
         t1 = time()
-        print("Saving...")
-        c.save_context()
+        print("Saving %d objects..." % CTX.size())
+        CTX.save_context(P.config('rdf.graph'))
         t2 = time()
 
         print("Serializing...")

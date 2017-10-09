@@ -1,7 +1,9 @@
-from yarom.mapper import Mapper, UnmappedClassException, FCN
-import transaction
+import rdflib
+from yarom.mapper import Mapper, UnmappedClassException
 from yarom.graphObject import ComponentTripler
 from .relationshipProxy import RelationshipProxy
+
+from six.moves.urllib.parse import quote
 
 
 class context_wrapper(object):
@@ -18,22 +20,16 @@ class _ContextDOMapper(object):
 
     def __call__(self, attr):
         """ Returns the class for the attr """
-        ctxs = (self._ctx,)
-        while len(ctxs) > 0:
-            nextctxs = ()
-            for ctx in ctxs:
-                try:
-                    cls = ctx.mapper.load_class(attr)
-                    if FCN(cls) in ctx.mapper.MappedClasses:
-                        typ = type(cls)
-                        cls = typ(self._ctx.key + "_" + cls.__name__,
-                                  (context_wrapper, cls),
-                                  dict(context=self._ctx))
-                    return cls
-                except UnmappedClassException:
-                    nextctxs += ctx._parent_contexts
-            ctxs = nextctxs
-        raise UnmappedClassException(attr)
+        ret = self._ctx.mapper.load_class(attr)
+        try:
+            cls = self._ctx.mapper.lookup_class(attr)
+            typ = type(cls)
+            ret = typ(self._ctx.key + "_" + cls.__name__,
+                      (context_wrapper, cls),
+                      dict(context=self._ctx))
+        except UnmappedClassException:
+            pass
+        return ret
 
 
 class Context(object):
@@ -41,7 +37,8 @@ class Context(object):
     A context. Analogous to an RDF context, with some special sauce
     """
 
-    def __init__(self, key=None, parent_contexts=(), base_class_names=(),
+    def __init__(self, key=None, parent=None, base_class_names=(),
+                 base_namespace=None,
                  **kwargs):
         super(Context, self).__init__(**kwargs)
         """ A set of DataObjects """
@@ -50,10 +47,20 @@ class Context(object):
         self.key = key
         self._contents = dict()
         self._set_buffer_size = 10000
-        self.mapper = Mapper(base_class_names)
-        self._parent_contexts = parent_contexts
+        self._parent_context = parent
 
+        parent_mapper = None
+        if parent:
+            parent_mapper = parent.mapper
+        self.mapper = Mapper(base_class_names,
+                             base_namespace=base_namespace,
+                             parent=parent_mapper)
+
+        self.identifier = rdflib.URIRef(self.mapper.base_namespace[quote(key)])
         self.load = _ContextDOMapper(self)
+
+    def size(self):
+        return len(self._contents)
 
     def contents(self):
         return self._contents.viewvalues()
@@ -67,22 +74,36 @@ class Context(object):
     def add_objects(self, objects):
         self._contents.update((id(o), o) for o in objects)
 
-    def save_context(self):
-        if self.conf['rdf.source'] == 'ZODB':
-            transaction.commit()
-            transaction.begin()
-        ctx = self.rdf.get_context(self.identifier())
-        ctx.addN((s, p, o, ctx) for s, p, o in self._contents_triples())
-        if self.conf['rdf.source'] == 'ZODB':
-            transaction.commit()
-            transaction.begin()
+    def save_context(self, graph):
+        if hasattr(graph, 'commit'):
+            graph.commit()
+
+        if hasattr(graph, 'bind'):
+            for c in self.mapper.mapped_classes():
+                if hasattr(c, 'rdf_namespace'):
+                    graph.bind(c.__name__, c.rdf_namespace)
+
+        if isinstance(graph, set):
+            graph.update(self._contents_triples())
+        elif hasattr(graph, 'get_context'):
+            ident = self.identifier
+            ctx = graph.get_context(ident)
+            ctx.addN((s, p, o, ctx)
+                     for s, p, o in self._contents_triples())
+        else:
+            graph.addN((s, p, o, graph)
+                       for s, p, o in self._contents_triples())
+
+        if hasattr(graph, 'commit'):
+            graph.commit()
 
     def _contents_triples(self):
-        ct = ComponentTripler(None, generator=True)
+        seen = set()
         for obj in self._contents.values():
             if type(obj) == RelationshipProxy:
                 obj = obj.unwrapped()
-            if id(obj) not in ct.seen:
-                ct.start = obj
+            if id(obj) not in seen:
+                ct = ComponentTripler(obj, generator=True)
+                ct.seen = seen
                 for t in ct():
                     yield t
