@@ -1,13 +1,4 @@
 from __future__ import print_function
-# A consolidation of the data sources for the project
-# includes:
-# NetworkX!
-# RDFlib!
-# Other things!
-#
-# Works like Configure:
-# Inherit from the DataUser class to access data of all kinds (listed above)
-
 import sqlite3
 import networkx as nx
 import PyOpenWorm
@@ -21,8 +12,9 @@ import datetime
 import transaction
 import os
 import traceback
-import logging as L
+import logging
 from .utils import grouper
+from yarom.mapperUtils import parents_str
 
 __all__ = [
     "Data",
@@ -35,6 +27,7 @@ __all__ = [
     "DefaultSource",
     "ZODBSource"]
 
+L = logging.getLogger(__name__)
 
 class _B(ConfigValue):
 
@@ -204,7 +197,6 @@ class DataUser(Configureable):
         self._remove_from_store_by_query(graph)
 
     def _remove_from_store_by_query(self, q):
-        import logging as L
         s = " DELETE WHERE {" + q + " } "
         L.debug("deleting. s = " + s)
         self.conf['rdf.graph'].update(s)

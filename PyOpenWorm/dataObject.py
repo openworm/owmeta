@@ -10,7 +10,7 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mapper import FCN
-from yarom.mapperUtils import warn_mismapping
+from yarom.mapperUtils import warn_mismapping, parents_str
 from yarom import yarom_import
 from .configure import BadConf
 from .data import DataUser
@@ -299,10 +299,10 @@ class DataObject(GraphObject, DataUser):
 
             if _PropertyTypes_key in InverseProperties:
                 ip = InverseProperties[_PropertyTypes_key]
-                if ip.lhs_class == cls and value_type == ip.rhs_class:
+                if issubclass(cls, ip.lhs_class) and issubclass(value_type, ip.rhs_class):
                     _class = ip.rhs_class
                     _linkName = ip.rhs_linkName
-                elif ip.rhs_class == cls and value_type == ip.lhs_class:
+                elif issubclass(cls, ip.rhs_class) and issubclass(value_type, ip.lhs_class):
                     _class = ip.lhs_class
                     _linkName = ip.lhs_linkName
                 else:
@@ -322,27 +322,27 @@ class DataObject(GraphObject, DataUser):
             PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
 
-    @classmethod
-    def register(cls):
-        """ Registers the class as a DataObject to be included in the
-        configured rdf graph.
+    # @classmethod
+    # def register(cls):
+        # """ Registers the class as a DataObject to be included in the
+        # configured rdf graph.
 
-        Puts this class under the control of the database for metadata.
+        # Puts this class under the control of the database for metadata.
 
-        :return: None
-        """
-        # NOTE: This expects that configuration has been read in and that the
-        # database is available
-        assert(issubclass(cls, DataObject))
-        DataObjectTypes[cls.__name__] = cls
-        DataObjectsParents[cls.__name__] = [
-            x for x in cls.__bases__
-            if issubclass(x, DataObject)]
-        cls.parents = DataObjectsParents[cls.__name__]
-        cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
-        RDFTypeTable[cls.rdf_type] = cls
-        cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
-        cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
+        # :return: None
+        # """
+        # # NOTE: This expects that configuration has been read in and that the
+        # # database is available
+        # assert(issubclass(cls, DataObject))
+        # DataObjectTypes[cls.__name__] = cls
+        # DataObjectsParents[cls.__name__] = [
+            # x for x in cls.__bases__
+            # if issubclass(x, DataObject)]
+        # cls.parents = DataObjectsParents[cls.__name__]
+        # cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
+        # RDFTypeTable[cls.rdf_type] = cls
+        # cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
+        # cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
     @classmethod
     def attach_property(cls, owner, c):
@@ -396,8 +396,10 @@ class DataObject(GraphObject, DataUser):
     @classmethod
     def on_mapper_add_class(self, mapper):
         self.parents = mapper.DataObjectsParents[FCN(self)]
+
         self.rdf_type = self.base_namespace[self.__name__]
         self.rdf_namespace = R.Namespace(self.rdf_type + "/")
+
         cls = getattr(PyOpenWorm, self.__name__, None)
         if cls is not None and cls is not self:
             new_name = "_" + self.__name__
@@ -457,6 +459,11 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
     def __init__(self):
         super(RDFSClass, self).__init__(R.RDFS["Class"])
 
+    @classmethod
+    def on_mapper_add_class(self, mapper):
+        super(RDFSClass, self).on_mapper_add_class(mapper)
+        # TODO: Move this in the class's __init__
+        self.rdf_type = R.RDFS['Class']
 
 class RDFProperty(DataObjectSingleton):
 
@@ -465,6 +472,11 @@ class RDFProperty(DataObjectSingleton):
 
     def __init__(self):
         super(RDFProperty, self).__init__(R.RDF["Property"])
+
+    @classmethod
+    def on_mapper_add_class(self, mapper):
+        super(RDFProperty, self).on_mapper_add_class(mapper)
+        self.rdf_type = R.RDF['Property']
 
 
 def oid(identifier_or_rdf_type, rdf_type=None):
@@ -493,7 +505,7 @@ def oid(identifier_or_rdf_type, rdf_type=None):
 
     c = None
     try:
-        c = RDFTypeTable[rdf_type]
+        c = PyOpenWorm.CONTEXT.mapper.RDFTypeTable[rdf_type]
     except KeyError:
         c = DataObject
     L.debug("oid: making a {} with ident {}".format(c, identifier))
@@ -572,21 +584,23 @@ class values(DataObject):
 def get_most_specific_rdf_type(types):
     """ Gets the most specific rdf_type.
 
-    Returns the URI corresponding to the lowest in the DataObject class hierarchy
-    from among the given URIs.
+    Returns the URI corresponding to the lowest in the DataObject class
+    hierarchy from among the given URIs.
     """
-    most_specific_type = DataObject
+    mapper = PyOpenWorm.CONTEXT.mapper
+    most_specific_types = tuple(mapper.base_classes.values())
     for x in types:
         try:
-            class_object = RDFTypeTable[x]
-            if issubclass(class_object, most_specific_type):
-                most_specific_type = class_object
+            class_object = mapper.RDFTypeTable[x]
+            if issubclass(class_object, most_specific_types):
+                most_specific_types = (class_object,)
         except KeyError:
-            L.warn(
+            L.warning(
                 """A Python class corresponding to the type URI "{}" couldn't be found.
-            You may want to import the module containing the class as well as add additional type
-            annotations in order to resolve your objects to a more precise type.""".format(x))
-    return most_specific_type.rdf_type
+            You may want to import the module containing the class as well as
+            add additional type annotations in order to resolve your objects to
+            a more precise type.""".format(x))
+    return most_specific_types[0].rdf_type
 
 
 class PropertyDataObject(DataObject):

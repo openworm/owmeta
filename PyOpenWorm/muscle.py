@@ -1,7 +1,10 @@
 import PyOpenWorm as P
-from PyOpenWorm import Cell
+from yarom import yarom_import
+Cell = yarom_import('PyOpenWorm.cell.Cell')
+
 
 class Muscle(Cell):
+
     """A single muscle cell.
 
     See what neurons innervate a muscle:
@@ -24,7 +27,10 @@ class Muscle(Cell):
     """
 
     def __init__(self, name=False, **kwargs):
-        super(Muscle,self).__init__(name=name, **kwargs)
-        self.innervatedBy = Muscle.ObjectProperty("neurons",owner=self,value_type=P.Neuron, multiple=True)
-        Muscle.DatatypeProperty("receptors",owner=self,multiple=True)
-
+        super(Muscle, self).__init__(name=name, **kwargs)
+        self.innervatedBy = Muscle.ObjectProperty(
+            "neurons",
+            owner=self,
+            value_type=P.Neuron,
+            multiple=True)
+        Muscle.DatatypeProperty("receptors", owner=self, multiple=True)

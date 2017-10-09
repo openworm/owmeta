@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from PyOpenWorm import Worm, connect, disconnect, config
+from PyOpenWorm.worm import Worm
+from PyOpenWorm import connect, disconnect, config
 from .DataTestTemplate import _DataTest
 
 

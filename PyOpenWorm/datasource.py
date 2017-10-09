@@ -37,7 +37,7 @@ class DataSource(six.with_metaclass(DataSourceType, object)):
     """ A source for data that can get translated into PyOpenWorm objects """
     def __init__(self, **kwargs):
         self.info_fields = list(self.__class__._info_fields)
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             if isinstance(v, Informational):
                 info = v
                 info.name = k

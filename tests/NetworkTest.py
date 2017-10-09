@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 import PyOpenWorm
-from PyOpenWorm import Worm, Network, Neuron, Connection
+from PyOpenWorm.worm import Worm
+from PyOpenWorm.network import Network
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.connection import Connection
 import networkx
 
 from .DataTestTemplate import _DataTest

@@ -1,8 +1,10 @@
 from __future__ import absolute_import
-from PyOpenWorm import Connection, Neuron
+from PyOpenWorm.connection import Connection
+from PyOpenWorm.neuron import Neuron
 import rdflib as R
 
 from .DataTestTemplate import _DataTest
+
 
 class ConnectionTest(_DataTest):
     def setUp(self):

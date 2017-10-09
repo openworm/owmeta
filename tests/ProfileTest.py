@@ -2,7 +2,9 @@
 Not actually tests, but benchmarks.
 """
 from __future__ import print_function
-from PyOpenWorm import Neuron, Connection, connect, disconnect
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.connection import Connection
+from PyOpenWorm import connect, disconnect
 
 
 def setup():

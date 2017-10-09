@@ -47,7 +47,7 @@ def parse_bibtex_into_evidence(file_name):
                       'year',
                       'author',
                       'doi',
-                      ('link', 'url')]
+                      ('link', 'uri')]
             for x in fields:
                 if isinstance(x, tuple):
                     key, prop = x
