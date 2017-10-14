@@ -240,7 +240,8 @@ class NeuronCSVDataTranslator(DataTranslator):
                         if e2 is not None:
                             e2.asserts(r)
         return res
-
+# DATA_SOURCES = [WormbaseIonChannelCSVDataSource(
+        # csv_file_name=IONCHANNEL_SOURCE)]
 DATA_SOURCES = [
     WormbaseTextMatchCSVDataSource(
         cell_type=Neuron,
@@ -733,11 +734,11 @@ def do_insert(config="default.conf", logging=False):
         #WORM.save()
         t1 = time()
         print("Saving %d objects..." % CTX.size())
-        #CTX.save_context(P.config('rdf.graph'))
+        CTX.save_context(P.config('rdf.graph'))
         t2 = time()
 
         print("Serializing...")
-        #serialize_as_n3()
+        serialize_as_n3()
         t3 = time()
         print("generating objects took", t1 - t0, "seconds")
         print("saving objects took", t2 - t1, "seconds")

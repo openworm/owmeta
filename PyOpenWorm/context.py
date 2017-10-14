@@ -98,11 +98,12 @@ class Context(object):
             graph.commit()
 
     def _contents_triples(self):
-        ct = ComponentTripler(None, generator=True)
+        seen = set()
         for obj in self._contents.values():
             if type(obj) == RelationshipProxy:
                 obj = obj.unwrapped()
-            if id(obj) not in ct.seen:
-                ct.start = obj
+            if id(obj) not in seen:
+                ct = ComponentTripler(obj, generator=True)
+                ct.seen = seen
                 for t in ct():
                     yield t
