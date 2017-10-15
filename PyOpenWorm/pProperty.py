@@ -29,7 +29,6 @@ class Property(DataUser):
         super(Property, self).__init__(**kwargs)
         self.owner = owner
         if self.owner:
-            self.owner.properties.append(self)
             if name:
                 setattr(self.owner, name, self)
 

@@ -1,5 +1,11 @@
 from __future__ import print_function
+import rdflib
+from rdflib import plugin
+from rdflib.serializer import Serializer
 from time import time
+import sys
+sys.setrecursionlimit(100)
+from yarom.rdfUtils import triples_to_bgp
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
@@ -10,7 +16,7 @@ import csv
 import re
 import os
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 CTX = Context(key="insert_worm", parent=P.CONTEXT,
               base_class_names=('PyOpenWorm.dataObject.DataObject',
                                 'PyOpenWorm.simpleProperty.RealSimpleProperty'))
@@ -24,9 +30,7 @@ Network = CTX.load('PyOpenWorm.network.Network')
 Worm = CTX.load('PyOpenWorm.worm.Worm')
 Cell = CTX.load('PyOpenWorm.cell.Cell')
 
-SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
-SQLITE_EVIDENCE = None
 WORM = None
 NETWORK = None
 OPTIONS = None
@@ -118,7 +122,6 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
     def translate(self, data_source):
         initcol = data_source.initial_cell_column
         ctype = data_source.cell_type
-        res = set([])
         try:
             with open(data_source.csv_file_name, 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
@@ -130,10 +133,9 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
                     ch = Channel(name=str(row[0]))
                     for cell in cells:
                         m = ctype(name=str(cell))
-                        res.add(ch.appearsIn(m))
+                        ch.appearsIn(m)
         except Exception:
             traceback.print_exc()
-        return res
 
     def skip_to_header(self, reader):
         rows = 0
@@ -270,7 +272,7 @@ TRANSLATORS = [
 
 
 def serialize_as_n3():
-    P.config('rdf.graph').serialize('../WormData.n3', format='n3')
+    P.config('rdf.graph').serialize('../WormData.nt', format='nt')
     print('serialized to n3 file')
 
 
@@ -686,7 +688,6 @@ def infer():
 
 
 def do_insert(config="default.conf", logging=False):
-    global SQLITE_EVIDENCE
     global WORM
     global NETWORK
 
@@ -701,7 +702,6 @@ def do_insert(config="default.conf", logging=False):
             raise Exception("Invalid configuration object "+ str(config))
 
     P.connect(conf=config, do_logging=logging)
-    SQLITE_EVIDENCE = Evidence(key="C_elegans_SQLite_DB", title="C. elegans sqlite database")
     try:
         WORM = Worm()
         NETWORK = Network()
@@ -731,10 +731,12 @@ def do_insert(config="default.conf", logging=False):
         # upload_receptors_types_neurotransmitters_neuropeptides_innexins()
         # upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
-        #WORM.save()
         t1 = time()
         print("Saving %d objects..." % CTX.size())
         CTX.save_context(P.config('rdf.graph'))
+
+        print("Saved %d objects." % CTX.defcnt)
+        print("Saved %d triples." % CTX.tripcnt)
         t2 = time()
 
         print("Serializing...")

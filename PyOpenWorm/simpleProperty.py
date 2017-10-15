@@ -41,6 +41,10 @@ class RealSimpleProperty(DataUser):
         self.owner = owner
         self._defctx = owner.context
 
+    def eat(self, other):
+        for v in other._v:
+            self._insert_value_unique(v)
+
     def hasValue(self):
         return len(self._v) > 0
 
@@ -51,7 +55,7 @@ class RealSimpleProperty(DataUser):
         return False
 
     def set(self, v):
-        if not hasattr(v, "idl"):
+        if not hasattr(v, 'idl'):
             v = PropertyValue(v)
 
         if not self.multiple:
@@ -95,6 +99,12 @@ class RealSimpleProperty(DataUser):
             results = GraphObjectQuerier(v, self.rdf, parallel=False)()
             self._remove_value(v)
         return results
+
+    def _insert_value_unique(self, v):
+        for s in self._v:
+            if v.idl == s.idl:
+                return
+        self._insert_value(v)
 
     def _insert_value(self, v):
         self._v.add(v)

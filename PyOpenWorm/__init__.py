@@ -95,6 +95,7 @@ CONTEXT = Context(key="DefaultContext",
                                     'PyOpenWorm.simpleProperty.RealSimpleProperty'))
 yarom.MAPPER = CONTEXT.mapper
 
+
 def get_data(path):
     # get a resource from the installed package location
 
