@@ -3,6 +3,7 @@ import rdflib as R
 import random as RND
 import logging
 from itertools import groupby
+import six
 
 import PyOpenWorm
 
@@ -10,6 +11,7 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mapper import FCN
+from yarom.mappedClass import MappedClass
 from yarom.mapperUtils import warn_mismapping, parents_str
 from yarom import yarom_import
 from .configure import BadConf
@@ -37,7 +39,18 @@ DataObjectsParents = dict()
 InverseProperties = dict()
 
 
-class DataObject(GraphObject, DataUser):
+class ContextMappedClass(MappedClass):
+
+    def __call__(self, *args, **kwargs):
+        o = super(ContextMappedClass, self).__call__(*args,
+                                                     context=self.context,
+                                                     **kwargs)
+        if hasattr(self, 'context'):
+            self.context.add_object(o)
+        return o
+
+
+class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
 
     """ An object backed by the database
 
@@ -54,16 +67,15 @@ class DataObject(GraphObject, DataUser):
     """
     rdf_type = None
     rdf_namespace = None
-    context = None  # XXX: Need to make some kind of default context for this
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
-    def __init__(self, ident=None, key=None, **kwargs):
+    def __init__(self, ident=None, key=None, context=None, **kwargs):
         try:
             super(DataObject, self).__init__(**kwargs)
         except BadConf:
             raise Exception(
                 "You may need to connect to a database before continuing.")
-
+        self.context = context
         self.properties = []
         self.owner_properties = []
         self.po_cache = None
@@ -393,33 +405,6 @@ class DataObject(GraphObject, DataUser):
             rdf_type = R.URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
-    @classmethod
-    def on_mapper_add_class(self, mapper):
-        self.parents = mapper.DataObjectsParents[FCN(self)]
-
-        self.rdf_type = self.base_namespace[self.__name__]
-        self.rdf_namespace = R.Namespace(self.rdf_type + "/")
-
-        cls = getattr(PyOpenWorm, self.__name__, None)
-        if cls is not None and cls is not self:
-            new_name = "_" + self.__name__
-            warn_mismapping(L,
-                            'PyOpenWorm module',
-                            self.__name__,
-                            "nothing",
-                            '{}@0x{:X}'.format(cls, id(cls)))
-            if getattr(PyOpenWorm, new_name, False):
-                L.warning(
-                    "Still unable to add {0} to {1}. {0} will not be "
-                    "accessible through {1}".format(
-                        new_name,
-                        'PyOpenWorm module'))
-            else:
-                setattr(PyOpenWorm, new_name, self)
-        else:
-            setattr(PyOpenWorm, self.__name__, self)
-
-
 class RDFTypeProperty(DatatypeProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
@@ -459,11 +444,6 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
     def __init__(self):
         super(RDFSClass, self).__init__(R.RDFS["Class"])
 
-    @classmethod
-    def on_mapper_add_class(self, mapper):
-        super(RDFSClass, self).on_mapper_add_class(mapper)
-        # TODO: Move this in the class's __init__
-        self.rdf_type = R.RDFS['Class']
 
 class RDFProperty(DataObjectSingleton):
 
@@ -472,11 +452,6 @@ class RDFProperty(DataObjectSingleton):
 
     def __init__(self):
         super(RDFProperty, self).__init__(R.RDF["Property"])
-
-    @classmethod
-    def on_mapper_add_class(self, mapper):
-        super(RDFProperty, self).on_mapper_add_class(mapper)
-        self.rdf_type = R.RDF['Property']
 
 
 def oid(identifier_or_rdf_type, rdf_type=None):
@@ -611,6 +586,8 @@ class PropertyDataObject(DataObject):
     """
     rdf_type = R.RDF['Property']
 
+    def __init__(self, *args, **kwargs):
+        super(PropertyDataObject, self).__init__(*args, **kwargs)
 
 class _Resolver(RDFTypeResolver):
     instance = None

@@ -31,10 +31,7 @@ class Network(DataObject):
             value_type=Neuron,
             multiple=True)
 
-        if self.context:
-            Worm = self.context.load('PyOpenWorm.worm.Worm')
-        else:
-            Worm = yarom_import('PyOpenWorm.worm.Worm')
+        Worm = self.context.load('PyOpenWorm.worm.Worm')
         Network.ObjectProperty(
             'worm',
             owner=self,
