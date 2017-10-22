@@ -90,9 +90,39 @@ __all__ = [
     "Quantity",
     ]
 
-CONTEXT = Context(key="DefaultContext",
+# Base class names is empty because we won't be adding any objects to the
+# context automatically
+RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
+                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+
+RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
+                       imported=(RDF_CONTEXT,),
+                       base_namespace='http://www.w3.org/2000/01/rdf-schema#')
+
+BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
+                       ident='http://openworm.org/schema',
+                       base_namespace='http://openworm.org/schema#',
+                       base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                         'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+
+SCI_CTX = Context(imported=(BASE_CONTEXT,),
+                  ident='http://openworm.org/schema/sci',
+                  base_namespace='http://openworm.org/schema/sci#',
                   base_class_names=('PyOpenWorm.dataObject.DataObject',
                                     'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+
+SCI_BIO_CTX = Context(imported=(SCI_CTX,),
+                  ident='http://openworm.org/schema/sci/bio',
+                  base_namespace='http://openworm.org/schema/sci/bio#',
+                  base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+
+CONTEXT = Context(imported=(SCI_BIO_CTX,),
+                  ident='http://openworm.org/schema/bio',
+                  base_namespace='http://openworm.org/schema/bio#',
+                  base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+
 yarom.MAPPER = CONTEXT.mapper
 
 

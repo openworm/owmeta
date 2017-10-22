@@ -1,10 +1,11 @@
 from __future__ import absolute_import
 import rdflib as R
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
-from PyOpenWorm.muscle import Muscle
-
+from yarom import yarom_import
 from .DataTestTemplate import _DataTest
+
+Worm = yarom_import('PyOpenWorm.worm.Worm')
+Network = yarom_import('PyOpenWorm.network.Network')
+Muscle = yarom_import('PyOpenWorm.muscle.Muscle')
 
 
 class WormTest(_DataTest):

@@ -3,10 +3,12 @@ from __future__ import print_function
 import rdflib as R
 import random as RND
 import logging
+from six import with_metaclass
 
 from yarom.graphObject import (GraphObject,
                                GraphObjectQuerier,
                                ComponentTripler)
+from yarom.mappedProperty import MappedPropertyClass
 from yarom.rdfUtils import deserialize_rdflib_term
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
@@ -28,18 +30,43 @@ class _values(list):
         super(_values, self).append(v)
 
 
-class RealSimpleProperty(DataUser):
+class ContextMappedPropertyClass(MappedPropertyClass):
+    def __init__(self, *args, **kwargs):
+        super(ContextMappedPropertyClass, self).__init__(*args, **kwargs)
+        self.__context = None
 
+    def __call__(self, *args, **kwargs):
+        if 'context' not in kwargs:
+            if hasattr(self, 'context'):
+                kwargs['context'] = self.context
+        o = super(ContextMappedPropertyClass, self).__call__(*args,
+                                                             **kwargs)
+        return o
+
+    @property
+    def context(self):
+        return self.__context
+
+    @context.setter
+    def context(self, newc):
+        if self.__context is not None and self.__context != newc:
+            raise Exception('Contexts cannot be reassigned for a class')
+        self.__context = newc
+
+
+class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
+                                        DataUser)):
     multiple = False
     link = R.URIRef("property")
     linkName = "property"
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
-    def __init__(self, conf, owner):
+    def __init__(self, conf, owner, context=None):
         self._v = _values()
         self._vctx = _values()
         self.owner = owner
-        self._defctx = owner.context
+        if context is not None:
+            self.context = context
 
     def eat(self, other):
         for v in other._v:
@@ -62,8 +89,8 @@ class RealSimpleProperty(DataUser):
             self.clear()
 
         self._insert_value(v)
-
-        return RelationshipProxy(Rel(self.owner, self, v)).in_context(self._defctx)
+        rprox = RelationshipProxy(Rel(self.owner, self, v)).in_context(self.owner.context)
+        return rprox
 
     def clear(self):
         for x in self._v:

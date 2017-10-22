@@ -13,7 +13,6 @@ import logging
 
 from PyOpenWorm.data import DataUser
 from .DataTestTemplate import _DataTest
-logging.basicConfig(level=logging.DEBUG)
 
 Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 Muscle = yarom_import('PyOpenWorm.muscle.Muscle')

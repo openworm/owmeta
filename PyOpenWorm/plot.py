@@ -1,7 +1,7 @@
-from PyOpenWorm import DataObject
+from yarom import yarom_import
 
 
-class Plot(DataObject):
+class Plot(yarom_import('PyOpenWorm.dataObject.DataObject')):
     """
     Object for storing plot data in PyOpenWorm.
 
@@ -18,7 +18,7 @@ class Plot(DataObject):
     """
 
     def __init__(self, data=False, *args, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(Plot, self).__init__(*args, **kwargs)
         Plot.DatatypeProperty('_data_string', self, multiple=False)
 
         if data:

@@ -4,7 +4,7 @@ import PyOpenWorm
 from yarom import yarom_import
 
 ChannelModel = yarom_import('PyOpenWorm.channelworm.ChannelModel')
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 
 
 # XXX: Why is this not an ObjectProperty?
@@ -67,7 +67,7 @@ class Models(Property):
                 yield x
 
 
-class Channel(DataObject):
+class Channel(BiologyType):
     """
     A biological ion channel.
 
@@ -93,8 +93,10 @@ class Channel(DataObject):
 
     """
 
+    class_context = BiologyType.class_context
+
     def __init__(self, name=False, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(Channel, self).__init__(**kwargs)
         # Get Models of this Channel
         Models(owner=self)
         Channel.DatatypeProperty('subfamily', owner=self)
@@ -131,7 +133,10 @@ class Channel(DataObject):
             return self.make_identifier(self.name.defined_values[0])
 
 
-class ExpressionPattern(DataObject):
+class ExpressionPattern(BiologyType):
+
+    class_context = BiologyType.class_context
+
     def __init__(self, wormbaseID=None, description=None, **kwargs):
         super(ExpressionPattern, self).__init__(**kwargs)
         ExpressionPattern.DatatypeProperty('wormbaseID', owner=self)

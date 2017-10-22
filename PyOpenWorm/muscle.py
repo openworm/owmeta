@@ -1,6 +1,6 @@
-import PyOpenWorm as P
 from yarom import yarom_import
 Cell = yarom_import('PyOpenWorm.cell.Cell')
+Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 
 
 class Muscle(Cell):
@@ -11,7 +11,7 @@ class Muscle(Cell):
 
     Example::
 
-        >>> mdr21 = P.Muscle('MDR21')
+        >>> mdr21 = Muscle('MDR21')
         >>> innervates_mdr21 = mdr21.innervatedBy()
         >>> len(innervates_mdr21)
         4
@@ -26,11 +26,13 @@ class Muscle(Cell):
         an argument
     """
 
+    class_context = Cell.class_context
+
     def __init__(self, name=False, **kwargs):
         super(Muscle, self).__init__(name=name, **kwargs)
         self.innervatedBy = Muscle.ObjectProperty(
             "neurons",
             owner=self,
-            value_type=P.Neuron,
+            value_type=Neuron,
             multiple=True)
         Muscle.DatatypeProperty("receptors", owner=self, multiple=True)

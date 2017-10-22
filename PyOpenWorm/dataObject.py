@@ -4,18 +4,20 @@ import random as RND
 import logging
 from itertools import groupby
 import six
+from six.moves.urllib.parse import quote
+import hashlib
 
 import PyOpenWorm
+from PyOpenWorm import RDFS_CONTEXT, RDF_CONTEXT
 
 from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
-from yarom.mapper import FCN
 from yarom.mappedClass import MappedClass
-from yarom.mapperUtils import warn_mismapping, parents_str
 from yarom import yarom_import
 from .configure import BadConf
 from .data import DataUser
+from .context import Context
 
 ObjectProperty, DatatypeProperty, UnionProperty = \
         yarom_import('PyOpenWorm.simpleProperty',
@@ -40,17 +42,70 @@ InverseProperties = dict()
 
 
 class ContextMappedClass(MappedClass):
+    def __init__(self, name, bases, dct):
+        super(ContextMappedClass, self).__init__(name, bases, dct)
+
+        if 'class_context' in dct:
+            ctx_uri = dct['class_context']
+            if not isinstance(ctx_uri, R.URIRef) \
+               and isinstance(ctx_uri, (str, six.text_type)):
+                ctx_uri = R.URIRef(ctx_uri)
+            self.__context = Context.get_context(ctx_uri)
+        else:
+            self.__context = None
+
+    def after_mapper_module_load(self, mapper):
+        super(ContextMappedClass, self).on_mapper_add_class(mapper)
+        if self is not TypeDataObject:
+            self.rdf_type_object = TypeDataObject(ident=self.rdf_type,
+                                                  context=self.__context)
+        else:
+            self.rdf_type_object = None
 
     def __call__(self, *args, **kwargs):
+        # if 'context' not in kwargs or kwargs['context'] is None:
+            # if hasattr(self, 'context'):
+                # kwargs['context'] = self.context
         o = super(ContextMappedClass, self).__call__(*args,
-                                                     context=self.context,
                                                      **kwargs)
-        if hasattr(self, 'context'):
-            self.context.add_object(o)
+        if hasattr(o, 'context'):
+            o.context.add_object(o)
+        else:
+            ctx = kwargs.get('context', None)
+            if ctx is not None:
+                ctx.add_object(o)
+            elif hasattr(self, 'context'):
+                raise Exception("{} {} {}".format(self, kwargs['ident'],
+                                                  self.context))
+
+        if isinstance(o, PropertyDataObject):
+            o.rdf_type_property(RDFProperty.get_instance())
+        elif isinstance(o, RDFProperty):
+            o.rdf_type_property(RDFSClass.get_instance())
+        elif isinstance(o, RDFSClass):
+            o.rdf_type_property(o)
+        elif self is TypeDataObject:
+            o.rdf_type_property(RDFSClass.get_instance())
+        elif isinstance(o, TypeDataObject):
+            o.rdf_type_property(RDFSClass.get_instance())
+        else:
+            o.rdf_type_property.set(self.rdf_type_object)
         return o
 
+    @property
+    def context(self):
+        return self.__context
 
-class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
+    @context.setter
+    def context(self, newc):
+        if self.__context is not None and self.__context != newc:
+            raise Exception('Contexts cannot be reassigned for a class')
+        self.__context = newc
+
+
+class DataObject(six.with_metaclass(ContextMappedClass,
+                                    GraphObject,
+                                    DataUser)):
 
     """ An object backed by the database
 
@@ -65,17 +120,16 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
     owner_properties : list of Property
         Properties belonging to parents of this object
     """
-    rdf_type = None
-    rdf_namespace = None
+    class_context = 'http://openworm.org/schema'
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     def __init__(self, ident=None, key=None, context=None, **kwargs):
         try:
             super(DataObject, self).__init__(**kwargs)
         except BadConf:
-            raise Exception(
-                "You may need to connect to a database before continuing.")
-        self.context = context
+            pass
+        if context is not None:
+            self.context = context
         self.properties = []
         self.owner_properties = []
         self.po_cache = None
@@ -94,7 +148,6 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
 
         self._variable = R.Variable("V" + str(RND.random()))
         DataObject.attach_property(self, RDFTypeProperty)
-        self.rdf_type_property.set(self.rdf_type)
 
     def clear_po_cache(self):
         """ Clear the property-object cache for this object.
@@ -118,23 +171,19 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
         else:
             self._id = self.make_identifier(key)
 
-    def make_identifier(self, data):
-        import hashlib
-        return R.URIRef(
-            self.rdf_namespace[
-                "a" +
-                hashlib.md5(
-                    str(data).encode()).hexdigest()])
-
     def id_is_variable(self):
         """ Is the identifier a variable? """
         return not self.defined
 
     @classmethod
+    def make_identifier(cls, data):
+        hsh = "a" + hashlib.md5(str(data).encode()).hexdigest()
+        return R.URIRef(cls.rdf_namespace[hsh])
+
+    @classmethod
     def make_identifier_direct(cls, string):
         if not isinstance(string, str):
             raise Exception("make_identifier_direct only accepts strings")
-        from six.moves.urllib.parse import quote
         return R.URIRef(cls.rdf_namespace[quote(string)])
 
     def triples(self, *args, **kwargs):
@@ -306,7 +355,8 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
                          value_rdf_type=value_rdf_type,
                          value_type=value_type,
                          owner_type=owner_class,
-                         rdf_object=PropertyDataObject(ident=link),
+                         rdf_object=PropertyDataObject(ident=link,
+                                                       context=owner_class.context),
                          multiple=multiple)
 
             if _PropertyTypes_key in InverseProperties:
@@ -331,30 +381,9 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
             c = type(property_class_name,
                      tuple(classes),
                      props)
+            owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
-
-    # @classmethod
-    # def register(cls):
-        # """ Registers the class as a DataObject to be included in the
-        # configured rdf graph.
-
-        # Puts this class under the control of the database for metadata.
-
-        # :return: None
-        # """
-        # # NOTE: This expects that configuration has been read in and that the
-        # # database is available
-        # assert(issubclass(cls, DataObject))
-        # DataObjectTypes[cls.__name__] = cls
-        # DataObjectsParents[cls.__name__] = [
-            # x for x in cls.__bases__
-            # if issubclass(x, DataObject)]
-        # cls.parents = DataObjectsParents[cls.__name__]
-        # cls.rdf_type = cls.conf['rdf.namespace'][cls.__name__]
-        # RDFTypeTable[cls.rdf_type] = cls
-        # cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
-        # cls.conf['rdf.namespace_manager'].bind(cls.__name__, cls.rdf_namespace)
 
     @classmethod
     def attach_property(cls, owner, c):
@@ -405,15 +434,10 @@ class DataObject(six.with_metaclass(ContextMappedClass, GraphObject, DataUser)):
             rdf_type = R.URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
-class RDFTypeProperty(DatatypeProperty):
-    link = R.RDF['type']
-    linkName = "rdf_type_property"
-    owner_type = DataObject
-    multiple = True
-
 
 class DataObjectSingleton(DataObject):
     instance = None
+    class_context = R.URIRef('http://openworm.org/schema')
 
     def __init__(self, *args, **kwargs):
         if type(self)._gettingInstance:
@@ -424,13 +448,17 @@ class DataObjectSingleton(DataObject):
                 type(self).__name__)
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, **kwargs):
         if cls.instance is None:
             cls._gettingInstance = True
-            cls.instance = cls()
+            cls.instance = cls(**kwargs)
             cls._gettingInstance = False
 
         return cls.instance
+
+
+class TypeDataObject(DataObject):
+    class_context = R.URIRef('http://openworm.org/schema')
 
 
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
@@ -440,18 +468,34 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
     #      dumping and reloading the object graph
     rdf_type = R.RDFS['Class']
     auto_mapped = True
+    class_context = 'http://www.w3.org/2000/01/rdf-schema'
 
-    def __init__(self):
-        super(RDFSClass, self).__init__(R.RDFS["Class"])
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = RDFS_CONTEXT
+        super(RDFSClass, self).__init__(ident=R.RDFS["Class"],
+                                        *args,
+                                        **kwargs)
+
+
+class RDFTypeProperty(ObjectProperty):
+    link = R.RDF['type']
+    linkName = "rdf_type_property"
+    value_type = RDFSClass
+    owner_type = DataObject
+    multiple = True
 
 
 class RDFProperty(DataObjectSingleton):
 
     """ The DataObject corresponding to rdf:Property """
     rdf_type = R.RDF['Property']
+    class_context = R.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns')
 
-    def __init__(self):
-        super(RDFProperty, self).__init__(R.RDF["Property"])
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = RDF_CONTEXT
+        super(RDFProperty, self).__init__(ident=R.RDF["Property"],
+                                          *args,
+                                          **kwargs)
 
 
 def oid(identifier_or_rdf_type, rdf_type=None):
@@ -546,6 +590,8 @@ class values(DataObject):
 
     """
 
+    class_context = R.URIRef('http://openworm.org/schema')
+
     def __init__(self, group_name, **kwargs):
         DataObject.__init__(self, **kwargs)
         self.add = values.ObjectProperty('value', owner=self)
@@ -585,9 +631,11 @@ class PropertyDataObject(DataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
+    class_context = R.URIRef('http://openworm.org/schema')
 
     def __init__(self, *args, **kwargs):
         super(PropertyDataObject, self).__init__(*args, **kwargs)
+
 
 class _Resolver(RDFTypeResolver):
     instance = None

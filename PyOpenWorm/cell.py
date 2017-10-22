@@ -4,9 +4,9 @@ from yarom import yarom_import
 from string import Template
 import neuroml
 
-DataObject, InverseProperty = yarom_import('PyOpenWorm.dataObject',
-                                           ('DataObject', 'InverseProperty'))
+InverseProperty = yarom_import('PyOpenWorm.dataObject.InverseProperty')
 Channel = yarom_import('PyOpenWorm.channel.Channel')
+BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 
 __all__ = ["Cell"]
 
@@ -58,7 +58,7 @@ def _dict_merge(d1,d2):
     dict(chain(d1.items(), d2.items()))
 
 
-class Cell(DataObject):
+class Cell(BiologyType):
     """
     A biological cell.
 
@@ -95,6 +95,9 @@ class Cell(DataObject):
             >>> c = Cell(lineageName="AB plapaaaap")
             >>> c.divisionVolume(v)
     """
+
+    class_context = BiologyType.class_context
+
     def __init__(self, name=False, lineageName=False, **kwargs):
         super(Cell, self).__init__(**kwargs)
 

@@ -1,7 +1,10 @@
 from __future__ import absolute_import
-from PyOpenWorm import Channel, Cell, DataUser, config
-
+from PyOpenWorm import DataUser, config
+from yarom import yarom_import
 from .DataTestTemplate import _DataTest
+
+Channel = yarom_import('PyOpenWorm.channel.Channel')
+Cell = yarom_import('PyOpenWorm.cell.Cell')
 
 
 class ChannelTest(_DataTest):

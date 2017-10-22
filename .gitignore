@@ -33,6 +33,7 @@ OpenWormData/scripts/worm.db
 examples/*.npy
 examples/cell_indices
 OpenWormData/WormData.n3
+OpenWormData/WormData.n4
 *.ipynb
 *.out
 *.nb

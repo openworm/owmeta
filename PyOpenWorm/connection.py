@@ -7,8 +7,8 @@ import six
 import warnings
 
 
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
 Cell = yarom_import('PyOpenWorm.cell.Cell')
+BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 
 __all__ = ['Connection']
@@ -24,7 +24,7 @@ class Termination:
     Muscle = 'muscle'
 
 
-class Connection(DataObject):
+class Connection(BiologyType):
 
     """Connection between Cells
 
@@ -48,6 +48,8 @@ class Connection(DataObject):
     termination : {'neuron', 'muscle'}
         Where the connection terminates. Inferred from type of post_cell
     """
+
+    class_context = BiologyType.class_context
 
     def __init__(self,
                  pre_cell=None,

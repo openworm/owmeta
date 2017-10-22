@@ -1,10 +1,11 @@
 from __future__ import print_function
 from __future__ import absolute_import
-from PyOpenWorm import DataObject
-from PyOpenWorm.simpleProperty import SimpleProperty
+from yarom import yarom_import
 import rdflib as R
 
 from .DataTestTemplate import _DataTest
+
+DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
 
 
 class SimplePropertyTest(_DataTest):
@@ -96,19 +97,6 @@ class SimplePropertyTest(_DataTest):
         do1.boots(ob)
 
         self.assertEqual(c.identifier(), c1.identifier())
-
-    def test_triples_with_no_value(self):
-        """ Test that when there is no value set for a property, it still yields triples """
-        do = DataObject(ident=R.URIRef("http://example.org"))
-
-        class T(SimpleProperty):
-            property_type = 'DatatypeProperty'
-            linkName = 'test'
-            owner_type = DataObject
-
-        sp = DataObject.attach_property(do, T)
-        self.assertEqual(len(list(sp.triples())), 0)
-        self.assertEqual(len(list(sp.triples(query=True))), 0)
 
 
 class POCacheTest(_DataTest):
