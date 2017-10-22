@@ -1,4 +1,5 @@
 from yarom import yarom_import
+import rdflib
 
 DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
 Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
@@ -14,13 +15,14 @@ class Experiment(DataObject):
     contains the names of experimental conditions for that particular
     type of experiment.
     Each of the items in "conditions" should also be either a
-    DatatypeProperty or ObjectProperty for the experiment a well.
+    DatatypeProperty or ObjectProperty for the experiment as well.
 
     Parameters
     ----------
     reference : Evidence
         Supporting article for this experiment.
     """
+    class_context = 'http://openworm.org/schema/sci'
     def __init__(self, reference=False, **kwargs):
         super(Experiment, self).__init__(self, **kwargs)
         Experiment.ObjectProperty('reference',

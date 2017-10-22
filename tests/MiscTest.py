@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from PyOpenWorm.worm import Worm
+from yarom import yarom_import
 from PyOpenWorm import connect, disconnect, config
 from .DataTestTemplate import _DataTest
+
+Worm = yarom_import('PyOpenWorm.worm.Worm')
 
 
 class MiscTest(_DataTest):

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from yarom import yarom_import
-DataObject, InverseProperty = yarom_import('PyOpenWorm.dataObject',
-                                           ('DataObject', 'InverseProperty'))
+
+InverseProperty = yarom_import('PyOpenWorm.dataObject.InverseProperty')
 Muscle = yarom_import('PyOpenWorm.muscle.Muscle')
 Cell = yarom_import('PyOpenWorm.cell.Cell')
+BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 Network = yarom_import('PyOpenWorm.network.Network')
 
 
-class Worm(DataObject):
+class Worm(BiologyType):
 
     """
     A representation of the whole worm.
@@ -23,6 +24,8 @@ class Worm(DataObject):
         Muscles of the worm
 
     """
+
+    class_context = BiologyType.class_context
 
     def __init__(self, scientific_name=False, **kwargs):
         super(Worm, self).__init__(**kwargs)

@@ -56,6 +56,7 @@ class PatchClampExperiment(Experiment):
     type : DatatypeProperty
 
     """
+    class_context = 'http://openworm.org/schema/sci/bio'
 
     conditions = [
         'Ca_concentration',
@@ -197,6 +198,7 @@ class ChannelModel(DataObject):
         >>> ev.asserts(cm)
         >>> ev.save()
     """
+    class_context = 'http://openworm.org/schema/sci/bio'
 
     def __init__(self, modelType=False, *args, **kwargs):
         DataObject.__init__(self, **kwargs)

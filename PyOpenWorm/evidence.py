@@ -256,6 +256,8 @@ class Evidence(DataObject):
         A URL that points to evidence
     """
 
+    class_context = 'http://openworm.org/schema/sci'
+
     def __init__(
             self,
             conf=False,

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from yarom import yarom_import
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.context import Context
 Connection = yarom_import('PyOpenWorm.connection.Connection')
 Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
+BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 
 
-class Network(DataObject):
+class Network(BiologyType):
 
     """A network of neurons
 
@@ -17,6 +18,8 @@ class Network(DataObject):
     synapse
         Returns a set of all synapses in the network
     """
+
+    class_context = BiologyType.class_context
 
     def __init__(self, **kwargs):
         super(Network, self).__init__(**kwargs)
@@ -31,7 +34,8 @@ class Network(DataObject):
             value_type=Neuron,
             multiple=True)
 
-        Worm = self.context.load('PyOpenWorm.worm.Worm')
+        ctx = type(self).context
+        Worm = ctx.cc('PyOpenWorm.worm.Worm')
         Network.ObjectProperty(
             'worm',
             owner=self,

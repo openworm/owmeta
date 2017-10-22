@@ -1,11 +1,5 @@
 from __future__ import print_function
-import rdflib
-from rdflib import plugin
-from rdflib.serializer import Serializer
 from time import time
-import sys
-sys.setrecursionlimit(100)
-from yarom.rdfUtils import triples_to_bgp
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
@@ -16,10 +10,12 @@ import csv
 import re
 import os
 
-logging.basicConfig(level=logging.INFO)
-CTX = Context(key="insert_worm", parent=P.CONTEXT,
+# logging.basicConfig(level=logging.DEBUG)
+CTX = Context(ident="http://openworm.org/entities/bio#worm0",
+              imported=(P.CONTEXT,),
               base_class_names=('PyOpenWorm.dataObject.DataObject',
                                 'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+
 Channel = CTX.load('PyOpenWorm.channel.Channel')
 ExpressionPattern = CTX.load('PyOpenWorm.channel.ExpressionPattern')
 Neuron = CTX.load('PyOpenWorm.neuron.Neuron')
@@ -272,7 +268,7 @@ TRANSLATORS = [
 
 
 def serialize_as_n3():
-    P.config('rdf.graph').serialize('../WormData.nt', format='nt')
+    P.config('rdf.graph').serialize('../WormData.n4', format='nquads')
     print('serialized to n3 file')
 
 

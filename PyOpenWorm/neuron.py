@@ -66,6 +66,8 @@ class Neuron(Cell):
 
     """
 
+    class_context = Cell.class_context
+
     def __init__(self, name=False, **kwargs):
         super(Neuron, self).__init__(name=name, **kwargs)
         # Get neurons connected to this neuron
@@ -136,6 +138,7 @@ class Neighbor(P.Property):
     def __init__(self, **kwargs):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
+        self._conntype = self.owner.context.cc('PyOpenWorm.connection.Connection')
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
@@ -153,7 +156,7 @@ class Neighbor(P.Property):
                 for post in c.post_cell.get():
                     yield post
         else:
-            c = P.Connection(pre_cell=self.owner, **kwargs)
+            c = self._conntype(pre_cell=self.owner, **kwargs)
             for r in c.load():
                 yield r.post_cell()
 
@@ -166,7 +169,7 @@ class Neighbor(P.Property):
         return []
 
     def set(self, other, **kwargs):
-        c = P.Connection(pre_cell=self.owner, post_cell=other, **kwargs)
+        c = self._conntype(pre_cell=self.owner, post_cell=other, **kwargs)
         self._conns.append(c)
         return c
 
@@ -190,6 +193,7 @@ class Connection(P.Property):
     def __init__(self, **kwargs):
         super(Connection, self).__init__('connection', **kwargs)
         self._conns = []
+        self._conntype = self.owner.context.cc('PyOpenWorm.connection.Connection')
 
     def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.
@@ -205,12 +209,12 @@ class Connection(P.Property):
         """
         c = []
         if pre_post_or_either == 'pre':
-            c.append(P.Connection(pre_cell=self.owner, **kwargs))
+            c.append(self._conntype(pre_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'post':
-            c.append(P.Connection(post_cell=self.owner, **kwargs))
+            c.append(self._conntype(post_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'either':
-            c.append(P.Connection(pre_cell=self.owner, **kwargs))
-            c.append(P.Connection(post_cell=self.owner, **kwargs))
+            c.append(self._conntype(pre_cell=self.owner, **kwargs))
+            c.append(self._conntype(post_cell=self.owner, **kwargs))
         for x in c:
             for r in x.load():
                 yield r
@@ -280,7 +284,7 @@ class Connection(P.Property):
            -------
            A PyOpenWorm.neuron.Connection
         """
-        assert(isinstance(conn, P.Connection))
+        assert(isinstance(conn, self._conntype))
         self._conns.append(conn)
 
     def triples(self, **kwargs):
