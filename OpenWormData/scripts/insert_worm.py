@@ -24,11 +24,12 @@ ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
 def serialize_as_n3():
     dest = '../WormData.n3'
-    # XXX: Properties aren't initialized until the first object of a class is created,
-    #      so we create them here
+    # XXX: Properties aren't initialized until the first object of a class is
+    #      created, so we create them here
 
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
+
 
 def attach_neuromlfiles_to_channel():
     """ attach the links to the neuroml files for the ion channels
@@ -45,6 +46,7 @@ def attach_neuromlfiles_to_channel():
         print("neuroML file links attached")
     except Exception:
         traceback.print_exc()
+
 
 def upload_ionchannels():
     """ Upload muscles and the neurons that connect to them
@@ -69,7 +71,9 @@ def upload_ionchannels():
                 regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                 matches = [regex.match(pat) for pat in patterns]
-                patterns = [P.ExpressionPattern(wormbaseID=m.group(1), description=m.group(2)) for m in matches if m is not None]
+                patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
+                                                description=m.group(2))
+                            for m in matches if m is not None]
                 for pat in patterns:
                     c.expression_pattern(pat)
 
@@ -116,10 +120,11 @@ def upload_channelmuscle_association():
 
 
 def extract_neuron_names(heading, row):
+    FIRST_NEURON_NAME_COL = 101
     neuronlist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= 101:
+        if cols >= 0 and cols <= FIRST_NEURON_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
@@ -129,10 +134,11 @@ def extract_neuron_names(heading, row):
 
 
 def extract_muscle_names(heading, row):
+    FIRST_MUSCLE_NAME_COL = 6
     musclelist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= 6:
+        if cols >= 0 and cols <= FIRST_MUSCLE_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
