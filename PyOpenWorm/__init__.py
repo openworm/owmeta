@@ -65,7 +65,7 @@ import os
 
 # For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
-from .data import Data, DataUser, propertyTypes
+from .data import Data, DataUser
 from .pProperty import Property
 from .context import Context
 from .quantity import Quantity
@@ -85,7 +85,6 @@ __all__ = [
     "BadConf",
     "Data",
     "DataUser",
-    "propertyTypes",
     "Property",
     "Quantity",
     ]
