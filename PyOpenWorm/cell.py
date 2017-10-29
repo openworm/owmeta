@@ -1,5 +1,4 @@
 from __future__ import print_function
-import yarom
 from yarom import yarom_import
 
 from string import Template
@@ -10,8 +9,6 @@ Channel = yarom_import('PyOpenWorm.channel.Channel')
 BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
 
 __all__ = ["Cell"]
-
-print('Cell import, mapper', id(yarom.MAPPER))
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
 ns = {'ns1': 'http://www.neuroml.org/schema/neuroml2/'}

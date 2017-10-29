@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from yarom import yarom_import
-from PyOpenWorm.context import Context
+
 Connection = yarom_import('PyOpenWorm.connection.Connection')
 Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
 BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
@@ -33,9 +33,7 @@ class Network(BiologyType):
             owner=self,
             value_type=Neuron,
             multiple=True)
-
-        ctx = type(self).context
-        Worm = ctx.cc('PyOpenWorm.worm.Worm')
+        Worm = Network.context.cc('PyOpenWorm.worm.Worm')
         Network.ObjectProperty(
             'worm',
             owner=self,

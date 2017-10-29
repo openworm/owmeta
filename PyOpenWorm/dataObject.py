@@ -56,6 +56,8 @@ class ContextMappedClass(MappedClass):
 
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
+            if self.__context is None:
+                raise Exception("The class {} has no context".format(self.__name__))
             self.rdf_type_object = TypeDataObject(ident=self.rdf_type,
                                                   context=self.__context)
         else:
@@ -343,6 +345,8 @@ class DataObject(six.with_metaclass(ContextMappedClass,
                 value_rdf_type = False
 
             if link is None:
+                if owner_class.rdf_namespace is None:
+                    raise Exception("{}.rdf_namespace is None".format(owner_class))
                 link = owner_class.rdf_namespace[linkName]
             classes = [klass]
             props = dict(linkName=linkName,

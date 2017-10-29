@@ -92,6 +92,9 @@ __all__ = [
 # Base class names is empty because we won't be adding any objects to the
 # context automatically
 
+# An "empty" context, that serves as the default when no context is defined
+DEF_CTX = Context()
+
 RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
                       base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 
@@ -99,7 +102,6 @@ RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
                        imported=(RDF_CONTEXT,),
                        base_namespace='http://www.w3.org/2000/01/rdf-schema#')
 
-DEF_CTX = Context()
 
 BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
                        ident='http://openworm.org/schema',

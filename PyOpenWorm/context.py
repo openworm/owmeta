@@ -12,12 +12,15 @@ from six import with_metaclass
 
 def _M(ctx, c):
     class _H(type(c)):
-        def __init__(self, *args, **kwargs):
-            super(_H, self).__init__(*args, **kwargs)
+        def __init__(self, name, bases, dct):
+            super(_H, self).__init__(name, bases, dct)
             self.__ctx = ctx
 
         def __call__(self, *args, **kwargs):
             return super(_H, self).__call__(*args, context=self.__ctx, **kwargs)
+
+        def __str__(self):
+            return 'ContextualizedClass(' + repr(ctx) + ", " + repr(c) + ")"
 
         # TODO: Create a wrapper for rdf_type_object in the calling context
         # def __getattr__(self, name):
@@ -50,6 +53,9 @@ class _ContextDOMapper(Mapper):
             res = _M(self._ctx, c)
             self._wrapped_classes[attr] = res
         return res
+
+    def load_class(self, clsname):
+        return super(_ContextDOMapper, self).load_class(clsname)
 
     def __str__(self):
         return repr(self)
@@ -187,4 +193,7 @@ class Context(object):
                     yield t
 
     def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
         return 'Context(ident="{}")'.format(self.identifier)

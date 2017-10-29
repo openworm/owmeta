@@ -9,6 +9,8 @@ class Relationship(DataObject):
         For SimpleProperty objects, this acts like a RDF Reified triple.
         """
 
+    class_context = 'http://openworm.org/schema'
+
     def __init__(self, s=None, p=None, o=None, **kwargs):
         super(Relationship, self).__init__(**kwargs)
         Relationship.ObjectProperty('subject', owner=self, multiple=False)
