@@ -185,7 +185,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         return R.URIRef(cls.rdf_namespace[quote(string)])
 
     def triples(self, *args, **kwargs):
-        return ComponentTripler(self)()
+        return ComponentTripler(self, **kwargs)()
 
     def __str__(self):
         s = self.__class__.__name__ + "("
@@ -395,7 +395,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
 
         return res
 
-    def graph_pattern(self, shorten=False, show_namespaces=True):
+    def graph_pattern(self, shorten=False, show_namespaces=True, **kwargs):
         """ Get the graph pattern for this object.
 
         It should be as simple as converting the result of triples() into a BGP
@@ -410,7 +410,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         nm = None
         if shorten:
             nm = self.namespace_manager
-        return triples_to_bgp(self.triples(), namespace_manager=nm,
+        return triples_to_bgp(self.triples(**kwargs), namespace_manager=nm,
                               show_namespaces=show_namespaces)
 
     def retract(self):
