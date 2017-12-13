@@ -1,12 +1,11 @@
 from __future__ import print_function
-from yarom import yarom_import
 
 from string import Template
 import neuroml
 
-InverseProperty = yarom_import('PyOpenWorm.dataObject.InverseProperty')
-Channel = yarom_import('PyOpenWorm.channel.Channel')
-BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
+from PyOpenWorm.dataObject import InverseProperty
+from PyOpenWorm.channel import Channel
+from PyOpenWorm.biology import BiologyType
 
 __all__ = ["Cell"]
 
@@ -131,20 +130,29 @@ class Cell(BiologyType):
 
             if r['par_id']:
                 par = neuroml.SegmentParent(segments=str(r['par_id']))
-                s = neuroml.Segment(name=str(r['seg_name']), id=str(r['seg_id']), parent=par)
+                s = neuroml.Segment(name=str(r['seg_name']),
+                                    id=str(r['seg_id']), parent=par)
             else:
-                s = neuroml.Segment(name=str(r['seg_name']), id=str(r['seg_id']))
+                s = neuroml.Segment(name=str(r['seg_name']),
+                                    id=str(r['seg_id']))
 
             if r['x_prox']:
-                loop_prox = neuroml.Point3DWithDiam(*(r[x] for x in ['x_prox','y_prox','z_prox','d_prox']))
+                loop_prox = neuroml.Point3DWithDiam(*(r[x] for x
+                                                      in ['x_prox',
+                                                          'y_prox',
+                                                          'z_prox',
+                                                          'd_prox']))
                 s.proximal = loop_prox
 
-            loop = neuroml.Point3DWithDiam(*(r[x] for x in ['x','y','z','d']))
+            loop = neuroml.Point3DWithDiam(*(r[x] for x in ['x',
+                                                            'y',
+                                                            'z',
+                                                            'd']))
             s.distal = loop
             morph.segments.append(s)
         # Query for segment groups
         query = segment_group_query.substitute(morph_name=morph_name)
-        qres = self.rdf.query(query,initNs=ns)
+        qres = self.rdf.query(query, initNs=ns)
         for r in qres:
             s = neuroml.SegmentGroup(id=r['gid'])
             if r['member']:
@@ -167,8 +175,8 @@ class Cell(BiologyType):
             >>> c = Cell(name="ADAL")
             >>> c.blast() # Returns "AB"
 
-        Note that this isn't a Property. It returns the blast extracted from the ''first''
-        lineageName saved.
+        Note that this isn't a Property. It returns the blast extracted from
+        the ''first'' lineageName saved.
         """
         import re
         try:
@@ -195,7 +203,7 @@ class Cell(BiologyType):
         Example::
 
             >>> c = Cell(lineageName="AB plapaaaap")
-            >>> c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"),Cell(lineageName="AB plapaaaapa")] """
+            >>> c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"), Cell(lineageName="AB plapaaaapa")] """
         # XXX: This is pretty icky. We sorely need a convenient way to plug-in
         #      custom patterns to the load query.
         # Alternatively, represent the daughterOf/parentOf relationship with

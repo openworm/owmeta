@@ -14,16 +14,11 @@ from yarom.graphObject import GraphObject, ComponentTripler, GraphObjectQuerier
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
-from yarom import yarom_import
 from .configure import BadConf
 from .data import DataUser
 from .context import Context
 
-ObjectProperty, DatatypeProperty, UnionProperty = \
-        yarom_import('PyOpenWorm.simpleProperty',
-                     ('ObjectProperty',
-                      'DatatypeProperty',
-                      'UnionProperty'))
+from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
 
 __all__ = [
     "DataObject",

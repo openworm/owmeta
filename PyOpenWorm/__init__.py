@@ -71,6 +71,9 @@ from .context import Context
 from .quantity import Quantity
 import yarom
 
+from importlib import machinery
+import wrapt
+
 __import__('__main__').connected = False
 __all__ = [
     "get_data",
@@ -128,6 +131,49 @@ CONTEXT = Context(imported=(SCI_BIO_CTX,),
                                     'PyOpenWorm.simpleProperty.RealSimpleProperty'))
 
 yarom.MAPPER = CONTEXT.mapper
+
+
+class PyOpenWormFinder(machinery.PathFinder):
+    def __init__(self, mapper, *args):
+        super(PyOpenWormFinder, self).__init__(*args)
+        self._mapper = mapper
+
+    def find_spec(self, fullname, path, target=None):
+        s = super(PyOpenWormFinder, self).find_spec(fullname, path, target)
+        if s is not None:
+            if s.loader is not None:
+                old_loader = s.loader
+                if hasattr(old_loader, 'exec_module'):
+                    s.loader = ModuleLoaderProxy(self._mapper, old_loader)
+                else:
+                    s.loader = LegacyModuleLoaderProxy(self._mapper,
+                                                       old_loader)
+        return s
+
+
+class ModuleLoaderProxy0(wrapt.ObjectProxy):
+    def __init__(self, mapper, *args):
+        super(ModuleLoaderProxy0, self).__init__(*args)
+        self._self_mapper = mapper
+
+
+class LegacyModuleLoaderProxy(ModuleLoaderProxy0):
+    def load_module(self, fullname):
+        cb = lambda: self.__wrapped__.load_module(fullname)
+        return self._self_mapper.process_module(module_name=fullname,
+                                                cb=cb)
+
+
+class ModuleLoaderProxy(ModuleLoaderProxy0):
+    def exec_module(self, m):
+        cb = lambda: self.__wrapped__.exec_module(m)
+        self._self_mapper.process_module(m, cb=cb)
+
+    def create_module(self, m):
+        return self.__wrapped__.create_module(m)
+
+
+sys.meta_path.insert(0, PyOpenWormFinder(CONTEXT.mapper))
 
 
 def get_data(path):
