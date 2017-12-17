@@ -1,9 +1,8 @@
-from yarom import yarom_import
 from .datasource import DataTranslator, DataSource
 import bibtexparser
 from bibtexparser.customization import author, link, doi
 
-Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
+from PyOpenWorm.evidence import Evidence
 
 
 class BibTexDataSource(DataSource):

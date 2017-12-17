@@ -91,7 +91,7 @@ class DataUser(Configureable):
 
     @property
     def namespace_manager(self):
-        return self.conf['rdf.namespace_manager']
+        return self.conf.get('rdf.namespace_manager', None)
 
     @rdf.setter
     def rdf(self, value):

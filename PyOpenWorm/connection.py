@@ -1,15 +1,12 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from yarom import yarom_import
 
 import six
-import warnings
 
 
-Cell = yarom_import('PyOpenWorm.cell.Cell')
-BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
-Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
+from PyOpenWorm.biology import BiologyType
+from PyOpenWorm.cell import Cell
 
 __all__ = ['Connection']
 
@@ -72,22 +69,12 @@ class Connection(BiologyType):
         if isinstance(pre_cell, Cell):
             self.pre_cell(pre_cell)
         elif pre_cell is not None:
-            warnings.warn(
-                'Passing bare strings for PyOpenWorm.Connection cells is' +
-                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
-                ' instead.',
-                DeprecationWarning)
-            self.pre_cell(Neuron(name=pre_cell, conf=self.conf))
+            raise ValueError("PyOpenWorm.cell.Cell objects should be passed in for pre_cell")
 
-        if (isinstance(post_cell, Cell)):
+        if isinstance(post_cell, Cell):
             self.post_cell(post_cell)
         elif post_cell is not None:
-            warnings.warn(
-                'Passing bare strings for PyOpenWorm.Connection cells is' +
-                ' deprecated. PyOpenWorm.Cell objects should be passed in' +
-                ' instead.',
-                DeprecationWarning)
-            self.post_cell(Neuron(name=post_cell, conf=self.conf))
+            raise ValueError("PyOpenWorm.cell.Cell objects should be passed in for post_cell")
 
         if isinstance(termination, six.string_types):
             termination = termination.lower()

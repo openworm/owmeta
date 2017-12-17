@@ -1,8 +1,5 @@
-from yarom import yarom_import
-import rdflib
-
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
-Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
+from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.evidence import Evidence
 
 class Experiment(DataObject):
     """

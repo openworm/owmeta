@@ -1,4 +1,3 @@
-from yarom import yarom_import
 from PyOpenWorm.pProperty import Property
 from six.moves.urllib.parse import urlparse, unquote, urlencode
 from six.moves.urllib.request import Request, urlopen
@@ -6,7 +5,7 @@ from six.moves.urllib.error import HTTPError, URLError
 import logging
 import re
 
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.dataObject import DataObject
 
 logger = logging.getLogger(__file__)
 class EvidenceError(Exception):

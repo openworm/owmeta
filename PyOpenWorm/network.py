@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from yarom import yarom_import
 
-Connection = yarom_import('PyOpenWorm.connection.Connection')
-Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
-BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
+from PyOpenWorm.connection import Connection
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.biology import BiologyType
 
 
 class Network(BiologyType):
@@ -33,7 +32,7 @@ class Network(BiologyType):
             owner=self,
             value_type=Neuron,
             multiple=True)
-        Worm = Network.context.cc('PyOpenWorm.worm.Worm')
+        from PyOpenWorm.worm import Worm
         Network.ObjectProperty(
             'worm',
             owner=self,

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from yarom import yarom_import
 
-InverseProperty = yarom_import('PyOpenWorm.dataObject.InverseProperty')
-Muscle = yarom_import('PyOpenWorm.muscle.Muscle')
-Cell = yarom_import('PyOpenWorm.cell.Cell')
-BiologyType = yarom_import('PyOpenWorm.biology.BiologyType')
-Network = yarom_import('PyOpenWorm.network.Network')
+from PyOpenWorm.dataObject import InverseProperty
+from PyOpenWorm.muscle import Muscle
+from PyOpenWorm.cell import Cell
+from PyOpenWorm.biology import BiologyType
+from PyOpenWorm.network import Network
 
 
 class Worm(BiologyType):
@@ -96,6 +95,7 @@ class Worm(BiologyType):
 
         return self.rdf
 
+    @property
     def defined(self):
         return super(Worm, self).defined or self.name.has_defined_value()
 

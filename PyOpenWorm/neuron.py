@@ -1,8 +1,9 @@
 from __future__ import print_function
 import PyOpenWorm as P
-from yarom import yarom_import
 
-Cell = yarom_import('PyOpenWorm.cell.Cell')
+from PyOpenWorm.pProperty import Property
+from PyOpenWorm.cell import Cell
+from PyOpenWorm.connection import Connection
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
@@ -73,7 +74,7 @@ class Neuron(Cell):
         # Get neurons connected to this neuron
         Neighbor(owner=self)
         # Get connections from this neuron
-        Connection(owner=self)
+        ConnectionProperty(owner=self)
 
         Neuron.DatatypeProperty("type", self, multiple=True)
         Neuron.DatatypeProperty("receptor", self, multiple=True)
@@ -132,13 +133,13 @@ class Neuron(Cell):
         """
 
 
-class Neighbor(P.Property):
+class Neighbor(Property):
     multiple = True
 
     def __init__(self, **kwargs):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
-        self._conntype = self.owner.context.cc('PyOpenWorm.connection.Connection')
+        self._conntype = Connection
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
@@ -179,7 +180,7 @@ class Neighbor(P.Property):
                 yield x
 
 
-class Connection(P.Property):
+class ConnectionProperty(Property):
 
     """A representation of the connection between neurons. Either a gap junction
     or a chemical synapse
@@ -191,9 +192,9 @@ class Connection(P.Property):
     multiple = True
 
     def __init__(self, **kwargs):
-        super(Connection, self).__init__('connection', **kwargs)
+        super(ConnectionProperty, self).__init__('connection', **kwargs)
         self._conns = []
-        self._conntype = self.owner.context.cc('PyOpenWorm.connection.Connection')
+        self._conntype = Connection
 
     def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.

@@ -1,7 +1,6 @@
-from yarom import yarom_import
+from PyOpenWorm.dataObject import DataObject
 
-
-class Plot(yarom_import('PyOpenWorm.dataObject.DataObject')):
+class Plot(DataObject):
     """
     Object for storing plot data in PyOpenWorm.
 

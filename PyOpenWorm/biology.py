@@ -1,6 +1,5 @@
-from yarom import yarom_import
 
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.dataObject import DataObject
 
 
 class BiologyType(DataObject):

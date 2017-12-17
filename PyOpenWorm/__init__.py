@@ -6,7 +6,8 @@ PyOpenWorm
 
 OpenWorm Unified Data Abstract Layer.
 
-An introduction to PyOpenWorm can be found in the README on our `Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
+An introduction to PyOpenWorm can be found in the README on our
+`Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
 
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
@@ -65,14 +66,9 @@ import os
 
 # For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
-from .data import Data, DataUser
-from .pProperty import Property
 from .context import Context
-from .quantity import Quantity
 import yarom
-
-from importlib import machinery
-import wrapt
+from yarom.mapper import Mapper
 
 __import__('__main__').connected = False
 __all__ = [
@@ -86,94 +82,49 @@ __all__ = [
     "Configureable",
     "ConfigValue",
     "BadConf",
-    "Data",
-    "DataUser",
-    "Property",
     "Quantity",
     ]
 
 # Base class names is empty because we won't be adding any objects to the
 # context automatically
-
+mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                  'PyOpenWorm.simpleProperty.RealSimpleProperty'))
 # An "empty" context, that serves as the default when no context is defined
-DEF_CTX = Context()
+DEF_CTX = Context(mapper=mapper)
 
 RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
-                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                      mapper=mapper)
 
 RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
                        imported=(RDF_CONTEXT,),
-                       base_namespace='http://www.w3.org/2000/01/rdf-schema#')
+                       base_namespace='http://www.w3.org/2000/01/rdf-schema#',
+                       mapper=mapper)
 
 
 BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
                        ident='http://openworm.org/schema',
                        base_namespace='http://openworm.org/schema#',
-                       base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                         'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+                       mapper=mapper)
 
 SCI_CTX = Context(imported=(BASE_CONTEXT,),
                   ident='http://openworm.org/schema/sci',
                   base_namespace='http://openworm.org/schema/sci#',
-                  base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+                  mapper=mapper)
 
 SCI_BIO_CTX = Context(imported=(SCI_CTX,),
                       ident='http://openworm.org/schema/sci/bio',
                       base_namespace='http://openworm.org/schema/sci/bio#',
-                      base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                        'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+                      mapper=mapper)
 
 CONTEXT = Context(imported=(SCI_BIO_CTX,),
                   ident='http://openworm.org/schema/bio',
                   base_namespace='http://openworm.org/schema/bio#',
-                  base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+                  mapper=mapper)
 
 yarom.MAPPER = CONTEXT.mapper
 
-
-class PyOpenWormFinder(machinery.PathFinder):
-    def __init__(self, mapper, *args):
-        super(PyOpenWormFinder, self).__init__(*args)
-        self._mapper = mapper
-
-    def find_spec(self, fullname, path, target=None):
-        s = super(PyOpenWormFinder, self).find_spec(fullname, path, target)
-        if s is not None:
-            if s.loader is not None:
-                old_loader = s.loader
-                if hasattr(old_loader, 'exec_module'):
-                    s.loader = ModuleLoaderProxy(self._mapper, old_loader)
-                else:
-                    s.loader = LegacyModuleLoaderProxy(self._mapper,
-                                                       old_loader)
-        return s
-
-
-class ModuleLoaderProxy0(wrapt.ObjectProxy):
-    def __init__(self, mapper, *args):
-        super(ModuleLoaderProxy0, self).__init__(*args)
-        self._self_mapper = mapper
-
-
-class LegacyModuleLoaderProxy(ModuleLoaderProxy0):
-    def load_module(self, fullname):
-        cb = lambda: self.__wrapped__.load_module(fullname)
-        return self._self_mapper.process_module(module_name=fullname,
-                                                cb=cb)
-
-
-class ModuleLoaderProxy(ModuleLoaderProxy0):
-    def exec_module(self, m):
-        cb = lambda: self.__wrapped__.exec_module(m)
-        self._self_mapper.process_module(m, cb=cb)
-
-    def create_module(self, m):
-        return self.__wrapped__.create_module(m)
-
-
-sys.meta_path.insert(0, PyOpenWormFinder(CONTEXT.mapper))
+from .quantity import Quantity
 
 
 def get_data(path):
@@ -204,6 +155,7 @@ def config(key=None):
 
 def loadConfig(f):
     """ Load configuration for the module. """
+    from .data import Data
     Configureable.conf = Data.open(f)
     return Configureable.conf
 
@@ -257,8 +209,8 @@ def loadData(
                 if data_file_time < db_file_time:
                     return
         except Exception as e:
-            logging.exception("Failed to determine if the serialized data file is older than the binary database. The data"
-                            " file will be reloaded. Reason: {}".format(e.message))
+            logging.exception("Failed to determine if the serialized data file is older than the binary database."
+                              " The data file will be reloaded. Reason: {}".format(e.message))
     sys.stderr.write(
         "[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
@@ -280,6 +232,7 @@ def connect(configFile=False,
     """
     import logging
     import atexit
+    from .data import Data
     m = __import__('__main__')
     if m.connected:
         print ("PyOpenWorm already connected")

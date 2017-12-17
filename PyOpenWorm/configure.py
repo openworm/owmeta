@@ -55,6 +55,8 @@ class _link(ConfigValue):
         return self.conf[self.members[0]]
 
 
+NO_DEFAULT = object()
+
 class Configure(object):
 
     """ A simple configuration object.  Enables setting and getting key-value pairs"""
@@ -145,7 +147,7 @@ class Configure(object):
                 self[x] = other[x]
         return self
 
-    def get(self, pname, default=False):
+    def get(self, pname, default=NO_DEFAULT):
         """
         Get some parameter value out by asking for a key
 
@@ -155,7 +157,7 @@ class Configure(object):
         """
         if pname in self._properties:
             return self._properties[pname].get()
-        elif default:
+        elif default is not NO_DEFAULT:
             return default
         else:
             raise KeyError(pname)

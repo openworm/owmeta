@@ -1,10 +1,9 @@
 from .pProperty import Property
-from yarom import yarom_import
 from yarom.utils import slice_dict
 
-Experiment = yarom_import('PyOpenWorm.experiment.Experiment')
-Evidence = yarom_import('PyOpenWorm.evidence.Evidence')
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.experiment import Experiment
+from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.dataObject import DataObject
 
 
 class PatchClampExperiment(Experiment):

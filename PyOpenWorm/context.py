@@ -1,70 +1,38 @@
 from __future__ import print_function
+import sys
+from types import ModuleType
 import rdflib
-from yarom.mapper import Mapper
-from yarom.graphObject import DescendantTripler
-from .relationshipProxy import RelationshipProxy
+import wrapt
 from .dataObjectUtils import merge_data_objects
+from .import_contextualizer import ImportContextualizer
+from .contextualize import Contextualizable, ContextualizingProxy
 
 from six.moves.urllib.parse import quote
 from six import text_type
-from six import with_metaclass
 
 
-def _M(ctx, c):
-    class _H(type(c)):
-        def __init__(self, name, bases, dct):
-            super(_H, self).__init__(name, bases, dct)
-            self.__ctx = ctx
+class ModuleProxy(wrapt.ObjectProxy):
+    def __init__(self, ctx, *args, **kwargs):
+        super(ModuleProxy, self).__init__(*args, **kwargs)
+        self._self_overrides = dict()
+        self._self_ctx = ctx
 
-        def __call__(self, *args, **kwargs):
-            return super(_H, self).__call__(*args, context=self.__ctx, **kwargs)
+    def add_attr_override(self, name, override):
+        self._self_overrides[name] = override
 
-        def __str__(self):
-            return 'ContextualizedClass(' + repr(ctx) + ", " + repr(c) + ")"
-
-        # TODO: Create a wrapper for rdf_type_object in the calling context
-        # def __getattr__(self, name):
-            # print('gettin', self.__class__.__mro__, name)
-            # return super(_H, self).__getattr__(name)
-
-    class _G(with_metaclass(_H, c)):
-        rdf_namespace = c.rdf_namespace
-        rdf_type = c.rdf_type
-
-    return _G
+    def __getattr__(self, name):
+        o = self._self_overrides.get(name, None)
+        if o is not None:
+            return o
+        else:
+            o = super(ModuleProxy, self).__getattr__(name)
+            if isinstance(o, Contextualizable):
+                o = o.contextualize(self._self_ctx)
+                self._self_overrides[name] = o
+            return o
 
 
-class _ContextDOMapper(Mapper):
-    """ This is just a wrapper for a Mapper """
-
-    def __init__(self, ctx, **kwargs):
-        super(_ContextDOMapper, self).__init__(**kwargs)
-        self._ctx = ctx
-        self._wrapped_classes = dict()
-
-    def decorate_class(self, cls):
-        return cls
-
-    def __call__(self, attr):
-        """ Returns the class for the attr """
-        res = self._wrapped_classes.get(attr, None)
-        if res is None:
-            c = self.load_class(attr)
-            res = _M(self._ctx, c)
-            self._wrapped_classes[attr] = res
-        return res
-
-    def load_class(self, clsname):
-        return super(_ContextDOMapper, self).load_class(clsname)
-
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        return "{}(ctx={})".format(type(self).__name__, self._ctx)
-
-
-class Context(object):
+class Context(ImportContextualizer, Contextualizable):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
@@ -77,8 +45,8 @@ class Context(object):
 
     def __init__(self, key=None,
                  imported=(),
-                 base_class_names=(),
                  ident=None,
+                 mapper=None,
                  base_namespace=None,
                  **kwargs):
         super(Context, self).__init__(**kwargs)
@@ -103,17 +71,15 @@ class Context(object):
         Context.contexts[ident] = self
 
         self._contents = dict()
+        self._statements = []
         self._set_buffer_size = 10000
         self._imported_contexts = imported
+        self._rdf_object = None
+        self.mapper = mapper
+        self.base_namespace = base_namespace
 
-        imported_mappers = tuple(im.mapper for im in imported)
-        self.mapper = _ContextDOMapper(self,
-                                       base_class_names=base_class_names,
-                                       base_namespace=base_namespace,
-                                       imported=imported_mappers)
-
-        self.cc = self.mapper.load_class
-        self.load = self.mapper
+        self.tripcnt = 0
+        self.defcnt = 0
 
     def size(self):
         return len(self._contents) + sum(x.size()
@@ -125,47 +91,64 @@ class Context(object):
     def clear(self):
         self._contents.clear()
 
+    def add_statement(self, stmt):
+        if self.identifier != stmt.context.identifier:
+            raise ValueError("Cannot add statements from a different context")
+        self._statements.append(stmt)
+
+    def remove_statement(self, stmt):
+        self._statements.remove(stmt)
+
     def add_object(self, o):
         self._contents[id(o)] = o
 
     def add_objects(self, objects):
         self._contents.update((id(o), o) for o in objects)
 
-    def save_context(self, graph):
+    def save_context(self, graph, inline_imports=False):
         self.tripcnt = 0
         self.defcnt = 0
         for ctx in self._imported_contexts:
-            ctx.save_context(graph)
+            if inline_imports:
+                ctx.save_context(graph, inline_imports=inline_imports)
+                self.tripcnt += ctx.tripcnt
+                self.defcnt += ctx.defcnt
+
+            for cctx in ctx._imported_contexts:
+                ctx_graph = self.get_target_graph(graph)
+                if ctx.identifier is not None \
+                        and cctx.identifier is not None \
+                        and not isinstance(cctx.identifier, rdflib.term.BNode):
+                    ctx_graph.add((ctx.identifier,
+                                   rdflib.URIRef('http://example.com/imports'),
+                                   cctx.identifier))
+
         if hasattr(graph, 'commit'):
             graph.commit()
 
-        if hasattr(graph, 'bind'):
+        if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
                 if hasattr(c, 'rdf_namespace'):
                     graph.bind(c.__name__, c.rdf_namespace)
+
         if isinstance(graph, set):
             graph.update(self.contents_triples())
-        elif self.identifier is not None:
-            if hasattr(graph, 'graph_aware') and graph.graph_aware:
-                ident = self.identifier
-                ctx = graph.graph(ident)
-                ctx.addN((s, p, o, ctx)
-                         for s, p, o in self.contents_triples())
-            elif hasattr(graph, 'context_aware') and graph.context_aware:
-                ctx = graph.get_context(self.identifier)
-                ctx.addN((s, p, o, ctx)
-                         for s, p, o in self.contents_triples())
-            else:
-                graph.addN((s, p, o, graph)
-                           for s, p, o in self.contents_triples())
         else:
-            graph.addN((s, p, o, graph)
-                       for s, p, o in self.contents_triples())
+            ctx_graph = self.get_target_graph(graph)
+            ctx_graph.addN((s, p, o, ctx_graph)
+                           for s, p, o in self.contents_triples())
 
         if hasattr(graph, 'commit'):
             graph.commit()
-        self.tripcnt += sum(x.tripcnt for x in self._imported_contexts)
-        self.defcnt += sum(x.defcnt for x in self._imported_contexts)
+
+    def get_target_graph(self, graph):
+        res = graph
+        if self.identifier is not None:
+            if hasattr(graph, 'graph_aware') and graph.graph_aware:
+                res = graph.graph(self.identifier)
+            elif hasattr(graph, 'context_aware') and graph.context_aware:
+                res = graph.get_context(self.identifier)
+        return res
 
     def _merged_contents(self):
         newc = dict()
@@ -180,20 +163,77 @@ class Context(object):
         return newc.values()
 
     def contents_triples(self):
-        seen_edges = set()
-        for obj in self._merged_contents():
-            if obj.defined:
-                if type(obj) == RelationshipProxy:
-                    obj = obj.unwrapped()
-                ct = DescendantTripler(obj, transitive=False)
-                ct.seen_edges = seen_edges
-                self.defcnt += 1
-                for t in ct():
-                    self.tripcnt += 1
-                    yield t
+        for x in self._statements:
+            self.tripcnt += 1
+            try:
+                yield (x.subject.identifier(), x.property.link, x.object.identifier())
+            except Exception as e:
+                print(e, file=sys.stderr)
+                raise e
+
+    def contextualize(self, context):
+        return ContextualizingProxy(context, self)
+
+    @property
+    def rdf_object(self):
+        if self._rdf_object is None:
+            # XXX: This is a hack that works for `Evidence.asserts(a.b(c))`
+            # since we have to define the Context's RDF type *somewhere*.
+            # Really though, A context's rdf_object should have its type
+            # statement defined in some other context which specifically holds
+            # context metadata.
+            from PyOpenWorm.contextDataObject import ContextDataObject
+            if self.context is None:
+                raise ValueError("Context is none for rdf_object init {} {} of type {}".format(self,
+                                                                                               id(self),
+                                                                                               type(self)))
+            self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
+        return self._rdf_object
+
+    def __call__(self, o):
+        if isinstance(o, ModuleType):
+            return ModuleProxy(self, o)
+        elif isinstance(o, dict):
+            return ContextContextManager(self, o)
+        elif isinstance(o, Contextualizable):
+            return o.contextualize(self)
+        else:
+            return o
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
         return 'Context(ident="{}")'.format(self.identifier)
+
+
+class ContextContextManager(object):
+    """ The context manager created when Context::__call__ is passed a dict """
+
+    def __init__(self, ctx, to_import):
+        self._overrides = dict()
+        self._ctx = ctx
+        self._backing_dict = to_import
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
+    def __getattr__(self, name):
+        return self.lookup(name)
+
+    def __getitem__(self, key):
+        return self.lookup(key)
+
+    def lookup(self, key):
+        o = self._overrides.get(key, None)
+        if o is not None:
+            return o
+        else:
+            o = self._backing_dict[key]
+            if isinstance(o, Contextualizable):
+                o = o.contextualize(self._ctx)
+                self._overrides[key] = o
+            return o

@@ -4,27 +4,35 @@ import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
 from PyOpenWorm.context import Context
-import logging
+# import logging
 import traceback
 import csv
 import re
 import os
+from yarom import MAPPER
 
+import PyOpenWorm.import_override as impo
+impo.Overrider(MAPPER).wrap_import()
 # logging.basicConfig(level=logging.DEBUG)
-CTX = Context(ident="http://openworm.org/entities/bio#worm0",
-              imported=(P.CONTEXT,),
-              base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+CTX = Context(ident="http://openworm.org/entities/bio#worm0-data",
+              imported=(P.CONTEXT,))
 
-Channel = CTX.load('PyOpenWorm.channel.Channel')
-ExpressionPattern = CTX.load('PyOpenWorm.channel.ExpressionPattern')
-Neuron = CTX.load('PyOpenWorm.neuron.Neuron')
-Muscle = CTX.load('PyOpenWorm.muscle.Muscle')
-Evidence = CTX.load('PyOpenWorm.evidence.Evidence')
-Connection = CTX.load('PyOpenWorm.connection.Connection')
-Network = CTX.load('PyOpenWorm.network.Network')
-Worm = CTX.load('PyOpenWorm.worm.Worm')
-Cell = CTX.load('PyOpenWorm.cell.Cell')
+from CTX.PyOpenWorm.channel import Channel
+from CTX.PyOpenWorm.channel import ExpressionPattern
+from CTX.PyOpenWorm.neuron import Neuron
+from CTX.PyOpenWorm.muscle import Muscle
+from CTX.PyOpenWorm.connection import Connection
+from CTX.PyOpenWorm.network import Network
+from CTX.PyOpenWorm.worm import Worm
+from CTX.PyOpenWorm.cell import Cell
+
+EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
+              imported=(P.CONTEXT,))
+
+from EVCTX.PyOpenWorm.evidence import Evidence
+
+IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
+              imported=(CTX, EVCTX))
 
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 WORM = None
@@ -460,31 +468,6 @@ def parse_bibtex_into_evidence(file_name):
     return res
 
 
-
-
-def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
-    """ Augment the metadata about neurons with information about receptors,
-        neuron types, neurotransmitters, neuropeptides and innexins.
-        As we go, add evidence objects to each statement."""
-    print ("uploading statements about types, receptors, innexins, neurotransmitters and neuropeptides")
-
-    _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(
-        NEURON_EXPRESSION_DATA_SOURCE
-    )
-
-
-def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
-    """ Augment the metadata about neurons with information about receptor, neurotransmitter, and neuropeptide
-    expression from additional sources.
-    """
-    print ("uploading additional statements about receptors, neurotransmitters and neuropeptides")
-
-    for root, _, filenames in sorted(os.walk(ADDITIONAL_EXPR_DATA_DIR)):
-        for filename in sorted(filenames):
-            if filename.lower().endswith('.csv'):
-                _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(os.path.join(root, filename))
-
-
 def upload_connections():
 
     print ("uploading statements about connections")
@@ -602,7 +585,7 @@ def upload_connections():
 
                 def add_synapse(source, target):
                     c = Connection(pre_cell=source, post_cell=target,
-                                     number=weight, syntype=syn_type)
+                                   number=weight, syntype=syn_type)
                     n.synapse(c)
                     e.asserts(c)
 
@@ -719,11 +702,11 @@ def do_insert(config="default.conf", logging=False):
         # upload_additional_receptors_neurotransmitters_neuropeptides_innexins()
 
         t1 = time()
-        print("Saving %d objects..." % CTX.size())
-        CTX.save_context(P.config('rdf.graph'))
+        print("Saving %d objects..." % IWCTX.size())
+        IWCTX.save_context(P.config('rdf.graph'), inline_imports=True)
 
-        print("Saved %d objects." % CTX.defcnt)
-        print("Saved %d triples." % CTX.tripcnt)
+        print("Saved %d objects." % IWCTX.defcnt)
+        print("Saved %d triples." % IWCTX.tripcnt)
         t2 = time()
 
         print("Serializing...")

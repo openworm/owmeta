@@ -1,6 +1,5 @@
-from yarom import yarom_import
-Cell = yarom_import('PyOpenWorm.cell.Cell')
-Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
+from PyOpenWorm.cell import Cell
+from PyOpenWorm.neuron import Neuron
 
 
 class Muscle(Cell):

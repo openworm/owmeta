@@ -16,10 +16,11 @@ from yarom.propertyMixins import (ObjectPropertyMixin,
                                   DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from PyOpenWorm.data import DataUser
+from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass
+from PyOpenWorm.statement import Statement
 import itertools
 import hashlib
-
-from .relationshipProxy import RelationshipProxy, Rel
+from lazy_object_proxy import Proxy
 
 L = logging.getLogger(__name__)
 
@@ -30,17 +31,13 @@ class _values(list):
         super(_values, self).append(v)
 
 
-class ContextMappedPropertyClass(MappedPropertyClass):
+class ContextMappedPropertyClass(MappedPropertyClass, Contextualizable, ContextualizableClass):
     def __init__(self, *args, **kwargs):
         super(ContextMappedPropertyClass, self).__init__(*args, **kwargs)
         self.__context = None
 
     def __call__(self, *args, **kwargs):
-        if 'context' not in kwargs:
-            if hasattr(self, 'context'):
-                kwargs['context'] = self.context
-        o = super(ContextMappedPropertyClass, self).__call__(*args,
-                                                             **kwargs)
+        o = super(ContextMappedPropertyClass, self).__call__(*args, **kwargs)
         return o
 
     @property
@@ -54,30 +51,55 @@ class ContextMappedPropertyClass(MappedPropertyClass):
         self.__context = newc
 
 
+class _ContextualizableLazyProxy(Proxy, Contextualizable):
+    """ Contextualizes its factory for execution """
+    def contextualize(self, context):
+        assert isinstance(self.__factory__, Contextualizable)
+        self.__factory__ = self.__factory__.contextualize(context)
+        return self
+
+
+class _StatementContextRDFObjectFactory(Contextualizable):
+    __slots__ = ('context', 'statement')
+
+    def __init__(self, statement):
+        self.context = None
+        self.statement = statement
+
+    def contextualize(self, context):
+        self.context = context
+        return self
+
+    def __call__(self):
+        if self.context is None:
+            raise ValueError("No context has been set for this proxy")
+        return self.statement.context.contextualize(self.context).rdf_object
+
+
 class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
-                                        DataUser)):
+                                        DataUser, Contextualizable)):
     multiple = False
     link = R.URIRef("property")
     linkName = "property"
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
-    def __init__(self, conf, owner, context=None):
+    def __init__(self, conf, owner):
         self._v = _values()
-        self._vctx = _values()
         self.owner = owner
-        if context is not None:
-            self.context = context
 
-    def eat(self, other):
-        for v in other._v:
-            self._insert_value_unique(v)
+    @property
+    def context(self):
+        return self.owner.context
 
-    def hasValue(self):
-        return len(self._v) > 0
+    def has_value(self):
+        for x in self._v:
+            if x.context == self.context:
+                return True
+        return False
 
     def has_defined_value(self):
         for x in self._v:
-            if x.defined:
+            if x.context == self.context and x.object.defined:
                 return True
         return False
 
@@ -88,21 +110,23 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if not self.multiple:
             self.clear()
 
-        self._insert_value(v)
-        rprox = RelationshipProxy(Rel(self.owner, self, v)).in_context(self.owner.context)
-        return rprox
+        stmt = self._insert_value(v)
+
+        return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
 
     def clear(self):
         for x in self._v:
-            self._remove_value(x)
+            assert self in x.object.owner_properties
+            x.object.owner_properties.remove(self)
+            self._v.remove(x)
 
     @property
     def defined_values(self):
-        return tuple(x for x in self._v if x.defined)
+        return tuple(x.object for x in self._v if x.object.defined and x.context == self.context)
 
     @property
     def values(self):
-        return self._v
+        return tuple(x.object for x in self._v if x.context == self.context)
 
     @property
     def rdf(self):
@@ -127,24 +151,17 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self._remove_value(v)
         return results
 
-    def _insert_value_unique(self, v):
-        for s in self._v:
-            if v.idl == s.idl:
-                return
-        self._insert_value(v)
-
     def _insert_value(self, v):
-        self._v.add(v)
+        stmt = Statement(self.owner, self, v, self.context)
+        self._v.add(stmt)
         if self not in v.owner_properties:
             v.owner_properties.append(self)
-
-    def _set_context(self, v, ctx):
-        self._vctx[self._v.index(v)] = ctx
+        return stmt
 
     def _remove_value(self, v):
         assert self in v.owner_properties
         v.owner_properties.remove(self)
-        self._v.remove(v)
+        self._v.remove(Statement(self.owner, self, v, self.context))
 
     def _ensure_fresh_po_cache(self):
         owner = self.owner
@@ -212,17 +229,21 @@ class _ValueProperty(RealSimpleProperty):
         return "_ValueProperty(" + str(self._owner_property) + ")"
 
 
+class _ContextualizingPropertySetMixin(object):
+    def set(self, v):
+        if isinstance(v, _ContextualizableLazyProxy):
+            v = v.contextualize(self.context)
+        return super(_ContextualizingPropertySetMixin, self).set(v)
+
+
 class _ObjectPropertyMixin(ObjectPropertyMixin):
 
     def set(self, v):
-        from .dataObject import DataObject
-        if not isinstance(v, (SimpleProperty, DataObject, Variable,
-                              RelationshipProxy)):
+        if not isinstance(v, GraphObject):
             raise Exception(
-                "An ObjectProperty only accepts DataObject, SimpleProperty,"
-                " RelationshipProxy, or Variable instances. Got a "
-                + str(type(v)) + " aka " +
-                str(type(v).__bases__))
+                "An ObjectProperty only accepts GraphObject instances. Got a " +
+                str(type(v)) + " a.k.a. " +
+                " or ".join(str(x) for x in type(v).__bases__))
         return super(ObjectPropertyMixin, self).set(v)
 
 
@@ -234,7 +255,7 @@ class _DatatypeValueProperty (DatatypePropertyMixin, _ValueProperty):
     pass
 
 
-class ObjectProperty (_ObjectPropertyMixin, RealSimpleProperty):
+class ObjectProperty (_ContextualizingPropertySetMixin, _ObjectPropertyMixin, RealSimpleProperty):
 
     def get(self):
         r = super(ObjectProperty, self).get()
@@ -312,7 +333,7 @@ class SimpleProperty(GraphObject, DataUser):
         self._pp.unset(v)
 
     def get(self):
-        if self._pp.hasValue():
+        if self._pp.has_value():
             if self.property_type == 'ObjectProperty':
                 return self._pp.values
             else:
@@ -349,8 +370,8 @@ class SimpleProperty(GraphObject, DataUser):
     def triples(self, *args, **kwargs):
         return ComponentTripler(self)()
 
-    def hasValue(self):
-        return self._pp.hasValue()
+    def has_value(self):
+        return self._pp.has_value()
 
     def has_defined_value(self):
         return self._pp.has_defined_value()

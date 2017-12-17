@@ -29,7 +29,8 @@ class Rel(tuple):
         return self.rel()
 
     def rel(self):
-        R = self.p.context.load('PyOpenWorm.relationship.Relationship')
+        from PyOpenWorm.relationship import Relationship
+        R = self.p.context(Relationship)
         return R(
             s=(self.s if self.s.defined else None),
             p=self.p.rdf_object,
