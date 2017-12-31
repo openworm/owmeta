@@ -480,3 +480,6 @@ class Evidence(DataObject):
 
         for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
             self.author(x.text)
+
+
+__yarom_mapped_classes__ = (Evidence,)

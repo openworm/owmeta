@@ -4,7 +4,7 @@ import unittest
 import subprocess
 import tempfile
 
-from PyOpenWorm import Configure
+from PyOpenWorm.configure import Configure
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
@@ -23,6 +23,10 @@ class _DataTest(unittest.TestCase):
                 pass
             else:
                 raise e
+
+    @classmethod
+    def setUpClass(cls):
+        pass
 
     def setUp(self):
         # Set do_logging to True if you like walls of text

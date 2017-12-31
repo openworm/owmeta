@@ -3,15 +3,14 @@ from __future__ import absolute_import
 
 import logging
 # logging.basicConfig(level=logging.DEBUG)
-from yarom import yarom_import
 
 import rdflib as R
 
 from .DataTestTemplate import _DataTest
 
-Neuron = yarom_import("PyOpenWorm.neuron.Neuron")
-Cell = yarom_import("PyOpenWorm.cell.Cell")
-Connection = yarom_import("PyOpenWorm.connection.Connection")
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.cell import Cell
+from PyOpenWorm.connection import Connection
 
 class NeuronTest(_DataTest):
 

@@ -159,3 +159,6 @@ class ExpressionPattern(BiologyType):
             return super(ExpressionPattern, self).identifier()
         else:
             return self.make_identifier(self.wormbaseID.defined_values[0])
+
+
+__yarom_mapped_classes__ = (Channel, ExpressionPattern)

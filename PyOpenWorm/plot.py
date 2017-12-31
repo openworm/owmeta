@@ -1,5 +1,6 @@
 from PyOpenWorm.dataObject import DataObject
 
+
 class Plot(DataObject):
     """
     Object for storing plot data in PyOpenWorm.
@@ -67,3 +68,6 @@ class Plot(DataObject):
             return self._to_list(self._data_string())
         else:
             raise AttributeError('You must call "set_data" first.')
+
+
+__yarom_mapped_classes__ = (Plot,)

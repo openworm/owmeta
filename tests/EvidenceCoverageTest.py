@@ -2,7 +2,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
-import PyOpenWorm as P
+
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.worm import Worm
+from PyOpenWorm.evidence import Evidence
 
 
 from .DataTestTemplate import _DataTest
@@ -14,7 +17,7 @@ class EvidenceCoverageTest(_DataTest):
         """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
 
-        neurons = list(P.Neuron().load())
+        neurons = list(Neuron().load())
         evcheck = []
         for n in neurons:
 
@@ -35,7 +38,7 @@ class EvidenceCoverageTest(_DataTest):
     def test_verify_muslces_have_evidence(self):
         """ For each muscle in PyOpenWorm, verify
         that there is supporting evidence"""
-        muscles = list(P.Worm().muscles())
+        muscles = list(Worm().muscles())
         muscle_evcheck = []
         for mobj in muscles:
             hasEvidence = len(get_supporting_evidence(mobj))
@@ -47,7 +50,7 @@ class EvidenceCoverageTest(_DataTest):
     def test_verify_connections_have_evidence(self):
         """ For each connection in PyOpenWorm, verify that there is
         supporting evidence. """
-        net = P.Worm().get_neuron_network()
+        net = Worm().get_neuron_network()
         connections = list(net.synapses())
         evcheck = []
         for c in connections:
@@ -66,6 +69,6 @@ class EvidenceCoverageTest(_DataTest):
 def get_supporting_evidence(fact):
     """ Helper function for checking amount of Evidence.
     Returns list of Evidence supporting fact. """
-    ev = P.Evidence()
+    ev = Evidence()
     ev.asserts(fact)
     return list(ev.load())

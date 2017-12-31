@@ -69,6 +69,7 @@ from .configure import Configure, Configureable, ConfigValue, BadConf
 from .context import Context
 import yarom
 from yarom.mapper import Mapper
+from PyOpenWorm.import_override import Overrider
 
 __import__('__main__').connected = False
 __all__ = [
@@ -82,7 +83,6 @@ __all__ = [
     "Configureable",
     "ConfigValue",
     "BadConf",
-    "Quantity",
     ]
 
 # Base class names is empty because we won't be adding any objects to the
@@ -123,8 +123,7 @@ CONTEXT = Context(imported=(SCI_BIO_CTX,),
                   mapper=mapper)
 
 yarom.MAPPER = CONTEXT.mapper
-
-from .quantity import Quantity
+Overrider(yarom.MAPPER).wrap_import()
 
 
 def get_data(path):

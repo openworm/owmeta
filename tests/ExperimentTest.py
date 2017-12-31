@@ -1,8 +1,8 @@
 from __future__ import absolute_import
+from .DataTestTemplate import _DataTest
 from PyOpenWorm.experiment import Experiment
 from PyOpenWorm.data import DataUser
 
-from .DataTestTemplate import _DataTest
 
 class ExperimentTest(_DataTest):
 
@@ -21,4 +21,3 @@ class ExperimentTest(_DataTest):
         ex = Experiment()
         with self.assertRaises(NotImplementedError):
             ex.get_conditions()
-

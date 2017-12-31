@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import PyOpenWorm
+
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.neuron import Neuron
@@ -22,7 +22,7 @@ class NetworkTest(_DataTest):
         Test that we can retrieve a Neuron by name.
         """
         self.assertTrue(isinstance(self.net.aneuron('AVAL'),
-                        PyOpenWorm.Neuron))
+                        Neuron))
 
     def test_neurons(self):
         """

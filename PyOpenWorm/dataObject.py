@@ -42,8 +42,9 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
 
-        if 'class_context' in dct:
-            ctx_uri = dct['class_context']
+        ctx_uri = ContextMappedClass._find_class_context(dct, bases)
+
+        if ctx_uri is not None:
             if not isinstance(ctx_uri, R.URIRef) \
                and isinstance(ctx_uri, (str, six.text_type)):
                 ctx_uri = R.URIRef(ctx_uri)
@@ -51,21 +52,48 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         else:
             self.__context = None
 
+        if not hasattr(self, 'base_namespace') or self.base_namespace is None:
+            self.base_namespace = ContextMappedClass._find_base_namespace(dct, bases)
+
+    @classmethod
+    def _find_class_context(cls, dct, bases):
+        ctx_uri = dct.get('class_context', None)
+        if ctx_uri is None:
+            for b in bases:
+                if hasattr(b, 'context') and b.context is not None:
+                    ctx_uri = b.context.identifier
+                    break
+
+        return ctx_uri
+
+    @classmethod
+    def _find_base_namespace(cls, dct, bases):
+        base_ns = dct.get('base_namespace', None)
+        if base_ns is None:
+            for b in bases:
+                if hasattr(b, 'base_namespace') and b.base_namespace is not None:
+                    base_ns = b.base_namespace
+                    break
+
+        return base_ns
+
     def contextualize_class(self, context):
+        outer_self = self
+
         class _H(type(self)):
             def __init__(self, name, bases, dct):
                 super(_H, self).__init__(name, bases, dct)
                 self.__ctx = context
                 if self.__ctx is None:
-                    raise Exception()
+                    raise Exception(name)
 
             def __call__(self, *args, **kwargs):
                 if self.__ctx is None:
                     raise Exception()
                 return super(_H, self).__call__(*args, **kwargs)
 
-            def __str__(self):
-                return 'ContextualizedClass(' + repr(context) + ", " + repr(self) + ")"
+            def __repr__(self):
+                return repr(outer_self) + '.contextualize_class(' + repr(context) + ')'
 
             @property
             def context(self):
@@ -73,18 +101,17 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
 
         _temp_ctx = context
 
-        class _G(six.with_metaclass(_H, self)):
-            rdf_namespace = self.rdf_namespace
-            rdf_type = self.rdf_type
-            context = _temp_ctx
-
+        _G = _H('_H_' + self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
+                                                     rdf_type=self.rdf_type,
+                                                     class_context=_temp_ctx.identifier))
         return _G
 
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
-            if self.__context is None:
-                raise Exception("The class {} has no context".format(self.__name__))
-            self.rdf_type_object = TypeDataObject.contextualize(self.__context)(ident=self.rdf_type)
+            if self.context is None:
+                raise Exception("The class {0} has no context...but: {1} for {2}".format(self, self.context, self.rdf_type))
+            L.debug('Creating rdf_type_object for {} in {}'.format(self, self.context))
+            self.rdf_type_object = TypeDataObject.contextualize(self.context)(ident=self.rdf_type)
         else:
             self.rdf_type_object = None
 
@@ -162,6 +189,8 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         if ident is not None:
+            if not isinstance(ident, str):
+                raise Exception('poop brigade: {}'.format(type(ident)))
             self._id = R.URIRef(ident)
         else:
             # Randomly generate an identifier if the derived class can't
@@ -711,3 +740,7 @@ class InverseProperty(object):
                                                      self.lhs_linkName,
                                                      self.rhs_class,
                                                      self.rhs_linkName)
+
+
+__yarom_mapped_classes__ = (DataObject, RDFSClass, TypeDataObject, RDFProperty,
+                            values, PropertyDataObject)

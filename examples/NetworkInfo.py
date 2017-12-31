@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
+from PyOpenWorm.worm import Worm
 """
 Get information about the network.
 
@@ -20,7 +21,7 @@ print("Connecting to the database...")
 P.connect('default.conf')
 
 #Get the worm object.
-worm = P.Worm()
+worm = Worm()
 
 #Extract the network object from the worm object.
 net = worm.neuron_network()

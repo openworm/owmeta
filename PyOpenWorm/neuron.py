@@ -292,3 +292,6 @@ class ConnectionProperty(Property):
         for c in self._conns:
             for x in c.triples(**kwargs):
                 yield x
+
+
+__yarom_mapped_classes__ = (Neuron,)

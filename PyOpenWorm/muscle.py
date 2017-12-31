@@ -35,3 +35,6 @@ class Muscle(Cell):
             value_type=Neuron,
             multiple=True)
         Muscle.DatatypeProperty("receptors", owner=self, multiple=True)
+
+
+__yarom_mapped_classes__ = (Muscle,)

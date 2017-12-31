@@ -242,3 +242,4 @@ class Cell(BiologyType):
 
 
 InverseProperty(Cell, 'channel', Channel, 'appearsIn')
+__yarom_mapped_classes__ = (Cell,)

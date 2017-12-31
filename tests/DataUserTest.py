@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 from six.moves import range
 import unittest
-from PyOpenWorm import (DataUser, Configureable, BadConf, Configure)
+from PyOpenWorm.data import DataUser
+from PyOpenWorm.configure import (Configureable, BadConf, Configure)
 import rdflib
 import rdflib as R
 

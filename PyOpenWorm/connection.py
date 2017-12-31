@@ -103,9 +103,9 @@ class Connection(BiologyType):
     @property
     def defined(self):
         return super(Connection, self).defined or \
-            (self.pre_cell.has_defined_value()
-             and self.post_cell.has_defined_value()
-             and self.syntype.has_defined_value())
+            (self.pre_cell.has_defined_value() and
+             self.post_cell.has_defined_value() and
+             self.syntype.has_defined_value())
 
     def identifier(self, *args, **kwargs):
         if super(Connection, self).defined:
@@ -135,3 +135,6 @@ class Connection(BiologyType):
         return 'Connection(' + \
                ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
                ')'
+
+
+__yarom_mapped_classes__ = (Connection,)

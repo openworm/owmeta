@@ -4,7 +4,22 @@ from PyOpenWorm.import_contextualizer import ImportContextualizer
 
 
 class Overrider(object):
+    instances = dict()
+
+    def __new__(cls, mapper):
+        if len(Overrider.instances.keys()) > 1:
+            raise Exception('noon')
+        inst = Overrider.instances.get(mapper, None)
+        if inst is not None:
+            return inst
+        sup = super(Overrider, cls).__new__(cls)
+        Overrider.instances[mapper] = sup
+        return sup
+
     def __init__(self, mapper):
+        if hasattr(self, 'mapper') and self.mapper is not None:
+            return
+
         self.i = 0
         self.k = 0
         self.mapper = mapper
@@ -44,7 +59,10 @@ class Overrider(object):
             finally:
                 self.i -= 1
         self.import_wrapper = import_wrapper
+        self.wrapped = None
 
     def wrap_import(self):
-        wrapped = builtins.__import__
-        builtins.__import__ = self.import_wrapper(wrapped)
+        if self.wrapped is None:
+            self.wrapped = builtins.__import__
+
+        builtins.__import__ = self.import_wrapper(self.wrapped)

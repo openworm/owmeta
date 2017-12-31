@@ -1,6 +1,7 @@
 from PyOpenWorm.dataObject import DataObject
 from PyOpenWorm.evidence import Evidence
 
+
 class Experiment(DataObject):
     """
     Generic class for storing information about experiments
@@ -20,14 +21,15 @@ class Experiment(DataObject):
         Supporting article for this experiment.
     """
     class_context = 'http://openworm.org/schema/sci'
+
     def __init__(self, reference=False, **kwargs):
-        super(Experiment, self).__init__(self, **kwargs)
+        super(Experiment, self).__init__(**kwargs)
         Experiment.ObjectProperty('reference',
                                   owner=self,
                                   value_type=Evidence,
                                   multiple=True)
 
-        if (isinstance(reference,Evidence)):
+        if isinstance(reference, Evidence):
             #TODO: make this so the reference asserts this Experiment when it is added
             self.reference(reference)
 
@@ -36,21 +38,19 @@ class Experiment(DataObject):
     def get_conditions(self):
         """Return conditions and their associated values in a dict."""
         if not hasattr(self, 'conditions'):
-            raise NotImplementedError(
-                '"Conditions" attribute must be overridden'
-            )
+            raise NotImplementedError('"conditions" attribute must be overridden')
 
 
         for c in self.conditions:
             value = getattr(self, c)
-            try:
-                value()
-                #property is callable
+            if callable(value):
                 self._condits[c] = value()
-            except:
+            else:
                 if value:
                     #if property is not empty
                     self._condits[c] = value
 
         return self._condits
 
+
+__yarom_mapped_classes__ = (Experiment,)

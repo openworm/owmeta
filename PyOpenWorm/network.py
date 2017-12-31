@@ -162,3 +162,6 @@ class Network(BiologyType):
         return super(Network, self).defined or self.worm.has_defined_value()
 
     # def neuroml(self):
+
+
+__yarom_mapped_classes__ = (Network,)

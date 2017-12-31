@@ -54,3 +54,6 @@ class Relationship(DataObject):
                 flip = True
         s += ")"
         return s
+
+
+__yarom_mapped_classes__ = (Relationship,)

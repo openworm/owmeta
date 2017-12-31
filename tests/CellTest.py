@@ -6,17 +6,15 @@ import unittest
 import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
-from yarom import yarom_import
 import yarom
 import os
-import logging
 
 from PyOpenWorm.data import DataUser
 from .DataTestTemplate import _DataTest
 
-Neuron = yarom_import('PyOpenWorm.neuron.Neuron')
-Muscle = yarom_import('PyOpenWorm.muscle.Muscle')
-Cell = yarom_import('PyOpenWorm.cell.Cell')
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.muscle import Muscle
+from PyOpenWorm.cell import Cell
 
 
 class CellTest(_DataTest):

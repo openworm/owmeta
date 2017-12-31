@@ -114,3 +114,4 @@ class Worm(BiologyType):
 
 
 InverseProperty(Worm, 'neuron_network', Network, 'worm')
+__yarom_mapped_classes__ = (Worm,)
