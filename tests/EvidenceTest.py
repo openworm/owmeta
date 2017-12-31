@@ -3,10 +3,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from six.moves import range
 import unittest
+from .DataTestTemplate import _DataTest
 from PyOpenWorm.evidence import Evidence, EvidenceError
 from PyOpenWorm.dataObject import DataObject
-
-from .DataTestTemplate import _DataTest
 
 
 class EvidenceTest(_DataTest):
@@ -45,7 +44,8 @@ class EvidenceTest(_DataTest):
 
     def test_pubmed_multiple_authors_list(self):
         """
-        When multiple authors are on a paper, all of their names should be returned in an iterator. Publication order not necessarily preserved
+        When multiple authors are on a paper, all of their names should be
+        returned in an iterator. Publication order not necessarily preserved
         """
         pmid = "24098140"
         alist = [
@@ -104,8 +104,8 @@ class EvidenceTest(_DataTest):
         r = DataObject(key="relationship")
         e.asserts(r)
         e.save()
-        l = list(e.asserts())
-        self.assertIn(r, l)
+        s = list(e.asserts())
+        self.assertIn(r, s)
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
@@ -176,6 +176,7 @@ class EvidenceTest(_DataTest):
         e1 = Evidence(author='Rodney Dangerfield')
         facts = list(e1.asserts())
         self.assertIn(r, facts)
+
 
 class Issue211EvidenceTest(_DataTest):
     """

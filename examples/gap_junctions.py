@@ -4,8 +4,8 @@ How to get a particular Neuron's gap junctions from the database.
 
 from __future__ import absolute_import
 from __future__ import print_function
-from PyOpenWorm.worm import Worm
 import PyOpenWorm as P
+from PyOpenWorm.worm import Worm
 
 # Connect to existing database.
 P.connect('default.conf')

@@ -4,7 +4,6 @@ from __future__ import absolute_import
 import unittest
 from PyOpenWorm.configure import Configure, Configureable
 from PyOpenWorm.data import Data
-from PyOpenWorm.dataObject import DataObject
 from PyOpenWorm import connect, config, disconnect
 from . import test_data as TD
 import rdflib as R
@@ -14,6 +13,7 @@ import tempfile
 import traceback
 
 from .GraphDBInit import delete_zodb_data_store, make_graph, has_bsddb
+
 
 class DatabaseBackendTest(unittest.TestCase):
     """Integration tests that ensure basic functioning of the database
@@ -42,7 +42,7 @@ class DatabaseBackendTest(unittest.TestCase):
     def test_ZODB_persistence(self):
         """ Should be able to init without these values """
         c = Configure()
-        fname ='ZODB.fs'
+        fname = 'ZODB.fs'
         c['rdf.source'] = 'ZODB'
         c['rdf.store_conf'] = fname
         Configureable.conf = c
@@ -62,11 +62,11 @@ class DatabaseBackendTest(unittest.TestCase):
             self.fail("Bad state")
         delete_zodb_data_store(fname)
 
-    @unittest.skipIf((has_bsddb==False), "Sleepycat requires working bsddb")
+    @unittest.skipIf((has_bsddb is False), "Sleepycat requires working bsddb")
     def test_Sleepycat_persistence(self):
         """ Should be able to init without these values """
         c = Configure()
-        fname='Sleepycat_store'
+        fname = 'Sleepycat_store'
         c['rdf.source'] = 'Sleepycat'
         c['rdf.store_conf'] = fname
         Configureable.conf = c
@@ -97,7 +97,7 @@ class DatabaseBackendTest(unittest.TestCase):
         c['rdf.store'] = 'default'
         c['trix_location'] = f[1]
 
-        with open(f[1],'w') as fo:
+        with open(f[1], 'w') as fo:
             fo.write(TD.TriX_data)
 
         connect(conf=c)
@@ -124,7 +124,7 @@ class DatabaseBackendTest(unittest.TestCase):
         c['rdf.serialization'] = f[1]
         c['rdf.serialization_format'] = 'trig'
         c['rdf.store'] = 'default'
-        with open(f[1],'w') as fo:
+        with open(f[1], 'w') as fo:
             fo.write(TD.Trig_data)
 
         connect(conf=c)
@@ -139,9 +139,3 @@ class DatabaseBackendTest(unittest.TestCase):
             pass
         finally:
             disconnect()
-
-    def test_helpful_message_on_non_connection(self):
-        """ The message should say something about connecting """
-        Configureable.conf = False # Ensure that we are disconnected
-        with self.assertRaisesRegexp(Exception, ".*[cC]onnect.*"):
-            DataObject()

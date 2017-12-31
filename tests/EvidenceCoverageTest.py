@@ -2,13 +2,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
+from .DataTestTemplate import _DataTest
 
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.evidence import Evidence
-
-
-from .DataTestTemplate import _DataTest
 
 
 class EvidenceCoverageTest(_DataTest):

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+from .DataTestTemplate import _DataTest
 from PyOpenWorm.evidence import Evidence
 from six.moves.urllib.parse import urlparse
 
-from .DataTestTemplate import _DataTest
 import re
 
 # Regular expressions copied from:

@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
-import PyOpenWorm
+from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, RDFTypeTable
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
@@ -15,7 +15,7 @@ class DataObjectTest(_DataTest):
 
     def test_DataUser(self):
         do = DataObject()
-        self.assertTrue(isinstance(do, PyOpenWorm.DataUser))
+        self.assertTrue(isinstance(do, DataUser))
 
     def test_identifier(self):
         """ Test that we can set and return an identifier """

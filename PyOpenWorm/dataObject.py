@@ -109,7 +109,8 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
             if self.context is None:
-                raise Exception("The class {0} has no context...but: {1} for {2}".format(self, self.context, self.rdf_type))
+                raise Exception("The class {0} has no context for TypeDataObject(ident={2})".format(
+                    self, self.context, self.rdf_type))
             L.debug('Creating rdf_type_object for {} in {}'.format(self, self.context))
             self.rdf_type_object = TypeDataObject.contextualize(self.context)(ident=self.rdf_type)
         else:
@@ -145,6 +146,20 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
     def definition_context(self):
         """ Unlike self.context, definition_context isn't meant to be overriden """
         return self.__context
+
+
+def contextualized_data_object(context, obj):
+    # We have to get the important attributes of the proxied object's type and
+    # copy them in here. This is only necessary for the attributes which are
+    # not passed onto instances (e.g. attributes with mangled names)
+    obj_type = type(obj)
+    ctx_proxy_typ = type(ContextualizingProxy)
+    newtyp = ctx_proxy_typ('CtxProxyClass_' + obj.__class__.__name__,
+                           (ContextualizingProxy,),
+                           dict(rdf_namespace=obj_type.rdf_namespace,
+                                rdf_type=obj_type.rdf_type,
+                                context=obj_type.context))
+    return newtyp(context, obj)
 
 
 class DataObject(six.with_metaclass(ContextMappedClass,
@@ -199,7 +214,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
             self._id = None
 
         if key is not None:
-            self.setKey(key)
+            self.set_key(key)
 
         self._variable = R.Variable("V" + str(RND.random()))
         DataObject.attach_property(self, RDFTypeProperty)
@@ -220,7 +235,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         s += ")"
         return s
 
-    def setKey(self, key):
+    def set_key(self, key):
         if isinstance(key, str):
             self._id = self.make_identifier_direct(key)
         else:
@@ -488,7 +503,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
             return oid(identifier_or_rdf_type, rdf_type)
 
     def contextualize(self, context):
-        return ContextualizingProxy(context, self)
+        return contextualized_data_object(context, self)
 
 
 class DataObjectSingleton(DataObject):
