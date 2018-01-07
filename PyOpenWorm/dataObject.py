@@ -23,6 +23,7 @@ from .contextualize import ContextualizingProxy
 from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
 
 __all__ = [
+    "BaseDataObject",
     "DataObject",
     "values",
     "DataObjectTypes",
@@ -123,7 +124,6 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         elif self.context is not None:
             self.context.add_object(o)
         else:
-            # DEF_CTX.add_object(o)
             raise Exception("{} {} {}".format(self, kwargs['ident'], self.context))
 
         if isinstance(o, PropertyDataObject):
@@ -162,10 +162,10 @@ def contextualized_data_object(context, obj):
     return newtyp(context, obj)
 
 
-class DataObject(six.with_metaclass(ContextMappedClass,
-                                    GraphObject,
-                                    DataUser,
-                                    Contextualizable)):
+class BaseDataObject(six.with_metaclass(ContextMappedClass,
+                                        GraphObject,
+                                        DataUser,
+                                        Contextualizable)):
 
     """ An object backed by the database
 
@@ -180,11 +180,12 @@ class DataObject(six.with_metaclass(ContextMappedClass,
     owner_properties : list of Property
         Properties belonging to parents of this object
     """
+    rdf_type = R.RDFS['Resource']
     class_context = 'http://openworm.org/schema'
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     def __new__(cls, *args, **kwargs):
-        res = super(DataObject, cls).__new__(cls)
+        res = super(BaseDataObject, cls).__new__(cls)
         ores = res
         res = res.contextualize(cls.context)
         # We have to do this because wrapt.Proxy is shit
@@ -195,7 +196,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
 
     def __init__(self, ident=None, key=None, **kwargs):
         try:
-            super(DataObject, self).__init__(**kwargs)
+            super(BaseDataObject, self).__init__(**kwargs)
         except BadConf:
             pass
         self.properties = []
@@ -217,7 +218,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
             self.set_key(key)
 
         self._variable = R.Variable("V" + str(RND.random()))
-        DataObject.attach_property(self, RDFTypeProperty)
+        BaseDataObject.attach_property(self, RDFTypeProperty)
 
     def clear_po_cache(self):
         """ Clear the property-object cache for this object.
@@ -270,7 +271,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
 
     def __eq__(self, other):
         """ This method should not be overridden by subclasses """
-        return (isinstance(other, DataObject) and
+        return (isinstance(other, BaseDataObject) and
                 self.defined and
                 other.defined and
                 (self.identifier() == other.identifier()))
@@ -338,7 +339,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.DataObject
+        owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
         return cls._create_property(*args, property_type='DatatypeProperty', **kwargs)
@@ -346,29 +347,29 @@ class DataObject(six.with_metaclass(ContextMappedClass,
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
         """ Attach a, possibly new, property to this class that has a complex
-        DataObject for its values
+        BaseDataObject for its values
 
         Parameters
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.DataObject
+        owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         value_type : type
-            The type of DataObject for values of this property
+            The type of BaseDataObject for values of this property
         """
         return cls._create_property(*args, property_type='ObjectProperty', **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
         """ Attach a, possibly new, property to this class that has a simple
-        type (string,number,etc) or DataObject for its values
+        type (string,number,etc) or BaseDataObject for its values
 
         Parameters
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.DataObject
+        owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
         return cls._create_property(
@@ -394,7 +395,7 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         _PropertyTypes_key = (cls, linkName)
 
         if not value_type:
-            value_type = DataObject
+            value_type = BaseDataObject
 
         c = None
         if _PropertyTypes_key in PropertyTypes:
@@ -506,7 +507,11 @@ class DataObject(six.with_metaclass(ContextMappedClass,
         return contextualized_data_object(context, self)
 
 
-class DataObjectSingleton(DataObject):
+class DataObject(BaseDataObject):
+    pass
+
+
+class DataObjectSingleton(BaseDataObject):
     instance = None
     class_context = R.URIRef('http://openworm.org/schema')
 
@@ -528,7 +533,7 @@ class DataObjectSingleton(DataObject):
         return cls.instance
 
 
-class TypeDataObject(DataObject):
+class TypeDataObject(BaseDataObject):
     class_context = R.URIRef('http://openworm.org/schema')
 
 
@@ -549,7 +554,7 @@ class RDFTypeProperty(ObjectProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
     value_type = RDFSClass
-    owner_type = DataObject
+    owner_type = BaseDataObject
     multiple = True
 
 
@@ -593,7 +598,7 @@ def oid(identifier_or_rdf_type, rdf_type=None):
     try:
         c = PyOpenWorm.CONTEXT.mapper.RDFTypeTable[rdf_type]
     except KeyError:
-        c = DataObject
+        c = BaseDataObject
     L.debug("oid: making a {} with ident {}".format(c, identifier))
 
     # if its our class name, then make our own object
@@ -660,7 +665,7 @@ class values(DataObject):
     class_context = R.URIRef('http://openworm.org/schema')
 
     def __init__(self, group_name, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(values, self).__init__(self, **kwargs)
         self.add = values.ObjectProperty('value', owner=self)
         self.group_name = values.DatatypeProperty('name', owner=self)
         self.name(group_name)
@@ -711,7 +716,7 @@ class _Resolver(RDFTypeResolver):
     def get_instance(cls):
         if cls.instance is None:
             cls.instance = RDFTypeResolver(
-                DataObject.rdf_type,
+                BaseDataObject.rdf_type,
                 get_most_specific_rdf_type,
                 oid,
                 deserialize_rdflib_term)
@@ -757,5 +762,5 @@ class InverseProperty(object):
                                                      self.rhs_linkName)
 
 
-__yarom_mapped_classes__ = (DataObject, RDFSClass, TypeDataObject, RDFProperty,
+__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject, RDFProperty,
                             values, PropertyDataObject)
