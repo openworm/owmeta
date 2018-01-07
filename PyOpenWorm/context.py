@@ -166,7 +166,7 @@ class Context(ImportContextualizer, Contextualizable):
         for x in self._statements:
             self.tripcnt += 1
             try:
-                yield (x.subject.identifier(), x.property.link, x.object.identifier())
+                yield x.to_triple()
             except Exception as e:
                 print(e, file=sys.stderr)
                 raise e

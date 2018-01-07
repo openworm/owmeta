@@ -67,8 +67,9 @@ class _StatementContextRDFObjectFactory(Contextualizable):
         self.statement = statement
 
     def contextualize(self, context):
-        self.context = context
-        return self
+        temp = _StatementContextRDFObjectFactory(self.statement)
+        temp.context = context
+        return temp
 
     def __call__(self):
         if self.context is None:
