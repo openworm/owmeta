@@ -58,51 +58,6 @@ def _json_request(url):
         return {}
 
 
-class AssertsAllAbout(Property):
-    # TODO: Needs tests!
-    multiple = True
-    linkName = "asserts_all_about"
-
-    def __init__(self, **kwargs):
-        Property.__init__(self, 'asserts_all_about', **kwargs)
-
-    @property
-    def values(self):
-        return []
-
-    def set(self, o, **kwargs):
-        """Establish the "asserts" relationship for all of the properties of the given object"""
-        self.owner.asserts(o)
-        for p in o.properties:
-            self.owner.asserts(p)
-
-    def get(self, **kwargs):
-        # traverse the hierarchy of ObjectProperties and return all of the
-        # asserts relationships...
-        ns = {"ow": self.base_namespace,
-              "ns1": self.rdf_namespace,
-              "ev": self.base_namespace["Evidence"] + "/",
-              "ns2": self.base_namespace["SimpleProperty"] + "/"
-              }
-        q = """
-        SELECT ?DataObject ?x ?prop WHERE
-        {
-            ?DataObject rdf:type ow:DataObject .
-            ?DataObject ?x ?DataObject_prop .
-            ?DataObject_prop sp:value ?prop .
-            ?Evidence ev:asserts ?Evidence_asserts .
-            filter (EXISTS { ?DataObject_prop rdf:type ow:Property . })
-        # object
-        # asserts property pattern
-        # general property pattern
-        }
-        """
-
-    def triples(self, **kwargs):
-        # XXX: All triples here are from ``asserts``
-        return []
-
-
 class Evidence(DataObject):
 
     """
@@ -287,7 +242,6 @@ class Evidence(DataObject):
         super(Evidence,self).__init__(conf=conf, **kwargs)
         self._fields = dict()
         Evidence.ObjectProperty('asserts', multiple=True, owner=self)
-        AssertsAllAbout(owner=self)
 
         multivalued_fields = ('author', 'uri')
         other_fields = ('year', 'title', 'doi', 'wbid', 'pmid')
