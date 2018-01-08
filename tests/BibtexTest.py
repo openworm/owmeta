@@ -1,6 +1,6 @@
+from .DataTestTemplate import _DataTest
 from PyOpenWorm.bibtex import parse_bibtex_into_evidence
 from os.path import dirname, abspath, join
-from .DataTestTemplate import _DataTest
 
 
 class BibtexTest(_DataTest):
@@ -11,7 +11,7 @@ class BibtexTest(_DataTest):
         bt = parse_bibtex_into_evidence(filepath)
         for x in bt.values():
             self.assertEqual(
-                set(x.author()),
+                set(x.reference().author()),
                 {"Altun, Zeynep F",
                  "Chen, Bojun",
                  "Wang, Zhao-Weng",

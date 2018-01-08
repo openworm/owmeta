@@ -16,7 +16,7 @@ class SimplePropertyTest(_DataTest):
         do1 = DataObject(ident=R.URIRef("http://example.org"))
         c = DataObject.DatatypeProperty("boots", do)
         c1 = DataObject.DatatypeProperty("boots", do1)
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_same_value_same_id_not_empty(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -25,7 +25,7 @@ class SimplePropertyTest(_DataTest):
         c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('partition')
         do1.boots('partition')
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_same_value_same_id_not_empty_object_property(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -36,7 +36,7 @@ class SimplePropertyTest(_DataTest):
         c1 = DataObject.ObjectProperty("boots", do1)
         do.boots(dz)
         do1.boots(dz1)
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_diff_value_diff_id_equal(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -45,7 +45,7 @@ class SimplePropertyTest(_DataTest):
         c1 = DataObject.DatatypeProperty("boots", do1)
         do.boots('join')
         do1.boots('partition')
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_diff_prop_same_name_same_object_same_value_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -53,7 +53,7 @@ class SimplePropertyTest(_DataTest):
         c1 = DataObject.DatatypeProperty("boots", do)
         c('join')
         c1('join')
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_diff_prop_same_name_same_object_diff_value_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -61,7 +61,7 @@ class SimplePropertyTest(_DataTest):
         c1 = DataObject.DatatypeProperty("boots", do)
         c('partition')
         c1('join')
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_diff_value_insert_order_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -75,7 +75,7 @@ class SimplePropertyTest(_DataTest):
         do1.boots('partition')
         do1.boots('join')
         do1.boots('simile')
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_object_property_diff_value_insert_order_same_id(self):
         do = DataObject(ident=R.URIRef("http://example.org"))
@@ -96,17 +96,19 @@ class SimplePropertyTest(_DataTest):
         do1.boots(oa)
         do1.boots(ob)
 
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
 
 class POCacheTest(_DataTest):
 
+    ctx_classes = (DataObject,)
+
     def setUp(self):
         super(POCacheTest, self).setUp()
-        o = DataObject(ident=R.URIRef("http://example.org/a"))
+        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
         DataObject.DatatypeProperty("boots", o)
         o.boots('h')
-        o.save()
+        self.save()
 
     def test_cache_refresh_after_triple_add(self):
         o = DataObject(ident=R.URIRef("http://example.org/a"))

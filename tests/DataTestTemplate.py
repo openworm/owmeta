@@ -1,9 +1,11 @@
 from __future__ import absolute_import
+import sys
 import PyOpenWorm
 import unittest
 import subprocess
 import tempfile
 
+from PyOpenWorm.context import Context
 from PyOpenWorm.configure import Configure
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
@@ -39,6 +41,16 @@ class _DataTest(unittest.TestCase):
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
         PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
+        self.context = Context(ident='http://example.org/test-context')
+        typ = type(self)
+        if hasattr(typ, 'ctx_classes'):
+            if isinstance(dict, typ.ctx_classes):
+                self.ctx = self.context(typ.ctx_classes)
+            else:
+                self.ctx = self.context({x.__name__: x for x in typ.ctx_classes})
+        else:
+            print('No `ctx_classes` was defined', file=sys.stderr)
+        self.save = lambda: self.context.save_context(PyOpenWorm.config('rdf.graph'))
 
     def tearDown(self):
         PyOpenWorm.disconnect()

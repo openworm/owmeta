@@ -1,31 +1,32 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+from .DataTestTemplate import _DataTest
+
 from PyOpenWorm.muscle import Muscle
 from PyOpenWorm.neuron import Neuron
 
-from .DataTestTemplate import _DataTest
-
 
 class MuscleTest(_DataTest):
+    ctx_classes = (Muscle, Neuron)
 
     def test_muscle(self):
         self.assertTrue(isinstance(Muscle(name='MDL08'), Muscle))
 
     def test_innervatedBy(self):
-        m = Muscle('MDL08')
-        n = Neuron('some neuron')
+        m = self.ctx.Muscle('MDL08')
+        n = self.ctx.Neuron('some neuron')
         m.innervatedBy(n)
-        m.save()
+        self.save()
         v = Muscle(name='MDL08')
         self.assertIn(n, list(v.innervatedBy()))
 
     def test_muscle_neurons(self):
         """ Should be the same as innervatedBy """
-        m = Muscle(name='MDL08')
-        neu = Neuron(name="tnnetenba")
+        m = self.ctx.Muscle(name='MDL08')
+        neu = self.ctx.Neuron(name="tnnetenba")
         m.neurons(neu)
-        m.save()
+        self.save()
 
         m = Muscle(name='MDL08')
         self.assertIn(Neuron('tnnetenba'), list(m.neurons()))

@@ -154,7 +154,7 @@ class Context(ImportContextualizer, Contextualizable):
         newc = dict()
         for k in self._contents.values():
             if k.defined:
-                kid = k.identifier()
+                kid = k.identifier
                 prek = newc.get(kid, None)
                 if prek:
                     newc[kid] = merge_data_objects(prek, k)
@@ -168,7 +168,6 @@ class Context(ImportContextualizer, Contextualizable):
             try:
                 yield x.to_triple()
             except Exception as e:
-                print(e, file=sys.stderr)
                 raise e
 
     def contextualize(self, context):
@@ -214,6 +213,7 @@ class ContextContextManager(object):
         self._overrides = dict()
         self._ctx = ctx
         self._backing_dict = to_import
+        self.save = self._ctx.save_context
 
     def __enter__(self):
         return self

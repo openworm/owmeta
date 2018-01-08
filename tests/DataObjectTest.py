@@ -20,7 +20,7 @@ class DataObjectTest(_DataTest):
     def test_identifier(self):
         """ Test that we can set and return an identifier """
         do = DataObject(ident="http://example.org")
-        self.assertEqual(do.identifier(), R.URIRef("http://example.org"))
+        self.assertEqual(do.identifier, R.URIRef("http://example.org"))
 
     @unittest.skip("Should be tracked by version control")
     def test_uploader(self):

@@ -1,12 +1,30 @@
 from __future__ import print_function
-import PyOpenWorm as P
 
+import sys
+import traceback
+from wrapt import ObjectProxy
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.cell import Cell
 from PyOpenWorm.connection import Connection
 
 
 # XXX: Should we specify somewhere whether we have NetworkX or something else?
+
+class NeuronProxy(ObjectProxy):
+
+    def __init__(self, neighbor, connection, *args):
+        super(NeuronProxy, self).__init__(*args)
+        self._self_neighbor = neighbor
+        self._self_connection = connection
+
+    @property
+    def neighbor(self):
+        return self._self_neighbor
+
+    @property
+    def connection(self):
+        return self._self_connection
+
 
 class Neuron(Cell):
 
@@ -85,6 +103,14 @@ class Neuron(Cell):
         self.get_neighbors = self.neighbor
         self.receptors = self.receptor
 
+    def contextualize(self, context):
+        res = super(Neuron, self).contextualize(context)
+        if hasattr(self, 'neighbor'):
+            res = NeuronProxy(self.neighbor.contextualize(context),
+                              self.connection.contextualize(context),
+                              res)
+        return res
+
     def GJ_degree(self):
         """Get the degree of this neuron for gap junction edges only
 
@@ -139,7 +165,11 @@ class Neighbor(Property):
     def __init__(self, **kwargs):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
-        self._conntype = Connection
+        self._conntype = Connection.contextualize(self.owner.context)
+
+    def contextualize(self, context):
+        res = super(Neighbor, self).contextualize(context)
+        return res
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
@@ -157,7 +187,7 @@ class Neighbor(Property):
                 for post in c.post_cell.get():
                     yield post
         else:
-            c = self._conntype(pre_cell=self.owner, **kwargs)
+            c = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
             for r in c.load():
                 yield r.post_cell()
 
@@ -239,10 +269,10 @@ class ConnectionProperty(Property):
         options = dict()
         options["pre"] = """
                      ?x c:pre_cell <%s> .
-                     """ % self.owner.identifier()
+                     """ % self.owner.identifier
         options["post"] = """
                       ?x c:post_cell <%s> .
-                      """ % self.owner.identifier()
+                      """ % self.owner.identifier
         options["either"] = " { %s } UNION { %s } . " % (
             options['post'],
             options['pre'])

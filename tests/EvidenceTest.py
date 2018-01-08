@@ -9,6 +9,7 @@ from PyOpenWorm.dataObject import DataObject
 
 
 class EvidenceTest(_DataTest):
+    ctx_classes = (Evidence,)
 
     @unittest.skip("Post alpha")
     def test_bibtex_init(self):
@@ -83,11 +84,7 @@ class EvidenceTest(_DataTest):
         """ Initialize with wormbase source """
         # Wormbase lacks anything beyond the author,date format for a lot of
         # papers
-        self.assertIn(
-            u'Frederic et al., 2013',
-            list(
-                Evidence(
-                    wormbase="WBPaper00044287").author()))
+        self.assertIn(u'Frederic et al., 2013', list(Evidence(wormbase="WBPaper00044287").author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
@@ -100,21 +97,21 @@ class EvidenceTest(_DataTest):
         """
         Asserting something should allow us to get it back.
         """
-        e = Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
+        e = self.ctx.Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
         r = DataObject(key="relationship")
-        e.asserts(r)
+        e.supports(r)
         e.save()
-        s = list(e.asserts())
+        s = list(e.supports())
         self.assertIn(r, s)
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
         e = Evidence(key="a", author='tom@cn.com')
         r = DataObject(key="relationship")
-        e.asserts(r)
+        e.supports(r)
         e.save()
         e0 = Evidence()
-        e0.asserts(r)
+        e0.supports(r)
         s = list(e0.load())
         author = s[0].author.one()
         self.assertIn('tom@cn.com', author)
@@ -125,15 +122,15 @@ class EvidenceTest(_DataTest):
         r = DataObject(key='relationship')
 
         e = Evidence(key="a", author='tom@cn.com')
-        e.asserts(r)
+        e.supports(r)
         e.save()
 
         e1 = Evidence(key="b", year=1999)
-        e1.asserts(r)
+        e1.supports(r)
         e1.save()
 
         e0 = Evidence()
-        e0.asserts(r)
+        e0.supports(r)
         for x in e0.load():
             a = x.author.one()
             y = x.year()
@@ -151,15 +148,15 @@ class EvidenceTest(_DataTest):
         distinct results even if there are matching values """
         e = Evidence(key="k", author='tom@cn.com')
         r = DataObject(key="a_statement")
-        e.asserts(r)
+        e.supports(r)
         e.save()
 
         e1 = Evidence(key="j", author='tom@cn.com')
-        e1.asserts(r)
+        e1.supports(r)
         e1.save()
 
         e0 = Evidence()
-        e0.asserts(r)
+        e0.supports(r)
         self.assertEqual(2, len(list(e0.load())))
 
     def test_evidence_retrieves_instead_of_overwrites(self):
@@ -170,11 +167,11 @@ class EvidenceTest(_DataTest):
         """
         e = Evidence(key="NBK", author='Rodney Dangerfield', title="Natural Born Killers")
         r = DataObject(key='Dangerfields_dramatic_range')
-        e.asserts(r)
+        e.supports(r)
         e.save()
 
         e1 = Evidence(author='Rodney Dangerfield')
-        facts = list(e1.asserts())
+        facts = list(e1.supports())
         self.assertIn(r, facts)
 
 
@@ -192,10 +189,10 @@ class Issue211EvidenceTest(_DataTest):
         self.e2 = Evidence()
 
         c = DataObject(key=23)
-        self.e1.asserts(c)
-        self.e2.asserts(c)
+        self.e1.supports(c)
+        self.e2.supports(c)
         self.evs = Evidence()
-        self.evs.asserts(c)
+        self.evs.supports(c)
 
         self.expected_ids = set(['777', '888'])
 

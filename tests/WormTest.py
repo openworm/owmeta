@@ -9,19 +9,21 @@ from PyOpenWorm.muscle import Muscle
 
 class WormTest(_DataTest):
     """Test for Worm."""
+    ctx_classes = (Worm, Network, Muscle)
+
     def test_get_network(self):
-        w = Worm()
-        w.neuron_network(Network())
-        w.save()
+        w = self.ctx.Worm()
+        w.neuron_network(self.ctx.Network())
+        self.save()
         self.assertIsInstance(Worm().get_neuron_network(), Network)
 
     def test_muscles1(self):
-        w = Worm()
-        w.muscle(Muscle(name='MDL08'))
-        w.muscle(Muscle(name='MDL15'))
-        w.save()
-        self.assertIn(Muscle(name='MDL08'), list(Worm().muscles()))
-        self.assertIn(Muscle(name='MDL15'), list(Worm().muscles()))
+        w = self.ctx.Worm()
+        w.muscle(self.ctx.Muscle(name='MDL08'))
+        w.muscle(self.ctx.Muscle(name='MDL15'))
+        self.save()
+        self.assertIn(self.ctx.Muscle(name='MDL08'), list(self.ctx.Worm().muscles()))
+        self.assertIn(self.ctx.Muscle(name='MDL15'), list(self.ctx.Worm().muscles()))
 
     def test_get_semantic_net(self):
         g0 = Worm().get_semantic_net()

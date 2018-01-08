@@ -151,15 +151,11 @@ class Network(BiologyType):
         self.neuron.unset(n)
         return res
 
-    def identifier(self, *args, **kwargs):
-        if super(Network, self).defined:
-            return super(Network, self).identifier()
-        else:
-            return self.make_identifier(self.worm.defined_values[0].identifier().n3())
+    def identifier_augment(self):
+        return self.make_identifier(self.worm.defined_values[0].identifier.n3())
 
-    @property
-    def defined(self):
-        return super(Network, self).defined or self.worm.has_defined_value()
+    def defined_augment(self):
+        return self.worm.has_defined_value()
 
     # def neuroml(self):
 

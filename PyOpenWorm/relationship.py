@@ -26,22 +26,17 @@ class Relationship(DataObject):
         if o is not None:
             self.object(o)
 
-    @property
-    def defined(self):
-        return (super(Relationship, self).defined or
-                (self.subject.has_defined_value() and
-                 self.property.has_defined_value() and
-                 self.object.has_defined_value()))
+    def defined_augment(self):
+        return (self.subject.has_defined_value() and
+                self.property.has_defined_value() and
+                self.object.has_defined_value())
 
-    def identifier(self):
-        if super(Relationship, self).defined:
-            return super(Relationship, self).identifier()
-        else:
-            data = (self.subject,
-                    self.property,
-                    self.object)
-            data = "".join(x.defined_values[0].identifier().n3() for x in data)
-            return self.make_identifier(data)
+    def identifier_augment(self):
+        data = (self.subject,
+                self.property,
+                self.object)
+        data = "".join(x.defined_values[0].identifier.n3() for x in data)
+        return self.make_identifier(data)
 
     def __repr__(self):
         s = "Relationship("

@@ -8,7 +8,8 @@ class Overrider(object):
 
     def __new__(cls, mapper):
         if len(Overrider.instances.keys()) > 1:
-            raise Exception('noon')
+            raise Exception(" ".join(str(x) for x in Overrider.instances.keys()))
+
         inst = Overrider.instances.get(mapper, None)
         if inst is not None:
             return inst
@@ -63,6 +64,10 @@ class Overrider(object):
 
     def wrap_import(self):
         if self.wrapped is None:
+            if not hasattr(builtins, '__import__'):
+                raise Exception('a')
             self.wrapped = builtins.__import__
 
         builtins.__import__ = self.import_wrapper(self.wrapped)
+        if not hasattr(builtins, '__import__'):
+            raise Exception('b')

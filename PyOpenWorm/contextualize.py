@@ -45,7 +45,8 @@ class ContextualizingProxy(wrapt.ObjectProxy):
         return self.__wrapped__(*args, **kwargs)
 
     def __repr__(self):
-        return 'ContextualizingProxy({}, {})'.format(self._self_context, self.__wrapped__)
+        return 'ContextualizingProxy({}, {})'.format(repr(self._self_context),
+                                                     repr(self.__wrapped__))
 
 
 class ContextualizableClass(type):

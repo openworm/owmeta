@@ -2,7 +2,9 @@ from .datasource import DataTranslator, DataSource
 import bibtexparser
 from bibtexparser.customization import author, link, doi
 
+
 from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.document import Document
 
 
 class BibTexDataSource(DataSource):
@@ -37,7 +39,7 @@ def parse_bibtex_into_evidence(file_name):
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             key = entry['ID']
-            e = Evidence(key=key)
+            e = Document(key=key)
 
             for ath in entry.get('author', tuple()):
                 e.author(ath)
@@ -56,7 +58,7 @@ def parse_bibtex_into_evidence(file_name):
                 for m in entry.get(key, tuple()):
                     getattr(e, prop)(m)
 
-            res[key] = e
+            res[key] = Evidence(reference=e)
 
     return res
 

@@ -27,12 +27,13 @@ from CTX.PyOpenWorm.worm import Worm
 from CTX.PyOpenWorm.cell import Cell
 
 EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
-              imported=(P.CONTEXT,))
+                imported=(P.CONTEXT,))
 
 from EVCTX.PyOpenWorm.evidence import Evidence
+from EVCTX.PyOpenWorm.document import Document
 
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
-              imported=(CTX, EVCTX))
+                imported=(CTX, EVCTX))
 
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
 WORM = None
@@ -210,7 +211,7 @@ class NeuronCSVDataTranslator(DataTranslator):
                     try:
                         e2 = uris[evidenceURL]
                     except KeyError:
-                        e2 = Evidence(uri=evidenceURL)
+                        e2 = Document(uri=evidenceURL)
                         uris[evidenceURL] = e2
 
                 # grab the neuron object
@@ -246,8 +247,39 @@ class NeuronCSVDataTranslator(DataTranslator):
                         if e2 is not None:
                             e2.asserts(r)
         return res
-# DATA_SOURCES = [WormbaseIonChannelCSVDataSource(
-        # csv_file_name=IONCHANNEL_SOURCE)]
+
+
+class MuscleCSVDataSource(CSVDataSource):
+    def __init__(self, **kwargs):
+        super(MuscleCSVDataSource, self).__init__(**kwargs)
+
+
+class MuscleCSVTranslator(DataTranslator):
+    input_type = MuscleCSVDataSource
+
+    def translate(self, data_source):
+        """ Upload muscles and the neurons that connect to them """
+        try:
+            with open(data_source.csv_file_name) as csvfile:
+                csvreader = csv.reader(csvfile)
+
+                ev = Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+                w = WORM
+                for num, line in enumerate(csvreader):
+                    if num < 4:  # skip rows with no data
+                        continue
+
+                    if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
+                        muscle_name = normalize_cell_name(line[0]).upper()
+                        m = Muscle(name=muscle_name)
+                        w.muscle(m)
+                ev.asserts(w)
+
+            print ("uploaded muscles")
+        except Exception:
+            traceback.print_exc()
+
+
 DATA_SOURCES = [
     WormbaseTextMatchCSVDataSource(
         cell_type=Neuron,
@@ -315,7 +347,7 @@ def upload_muscles():
                     m = Muscle(name=muscle_name)
                     w.muscle(m)
             ev.asserts(w)
-        #second step, get the relationships between them and add them to the graph
+        # second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
         traceback.print_exc()
@@ -400,7 +432,7 @@ def norn(x):
 
 def upload_neurons():
     try:
-        #TODO: Improve this evidence marker
+        # TODO: Improve this evidence marker
         ev = Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
         w = WORM
         n = NETWORK
@@ -420,7 +452,7 @@ def upload_neurons():
                     i = i + 1
 
         ev.asserts(n)
-        #second step, get the relationships between them and add them to the graph
+        # second step, get the relationships between them and add them to the graph
         print ("uploaded " + str(i) + " neurons")
     except Exception:
         traceback.print_exc()
@@ -434,6 +466,38 @@ def customizations(record):
     :returns: -- customized record
     """
     return doi(link(author(record)))
+
+
+def parse_bibtex_into_document(file_name):
+    import bibtexparser
+    e = None
+    res = dict()
+    with open(file_name) as bibtex_file:
+        parser = bibtexparser.bparser.BibTexParser()
+        parser.customization = customizations
+        bib_database = bibtexparser.load(bibtex_file, parser=parser)
+        for entry in bib_database.entries:
+            key = entry['ID']
+            e = Document(key=key)
+
+            doi = entry.get('doi', None)
+            if doi:
+                e.doi(doi)
+
+            author = entry.get('author', ())
+            for ath in author:
+                e.author(ath)
+
+            title = entry.get('title', None)
+            if title:
+                e.title(title)
+
+            year = entry.get('year', None)
+            if year:
+                e.year(year)
+
+            res[key] = e
+    return res
 
 
 def parse_bibtex_into_evidence(file_name):
@@ -613,9 +677,9 @@ def upload_connections():
                             other_connections += 1
 
         e.asserts(n)  # assert the whole connectome too
-        print('Total neuron to neuron connections added = %i' %neuron_connections)
-        print('Total neuron to muscle connections added = %i' %muscle_connections)
-        print('Total other connections added = %i' %other_connections)
+        print('Total neuron to neuron connections added = %i' % neuron_connections)
+        print('Total neuron to muscle connections added = %i' % muscle_connections)
+        print('Total other connections added = %i' % other_connections)
         print('uploaded connections')
 
     except Exception:
@@ -630,7 +694,7 @@ def infer():
 
     try:
         w = WORM
-        semnet = w.rdf #fetches the entire worm.db graph
+        semnet = w.rdf  # fetches the entire worm.db graph
 
         rule_store, rule_graph, network = SetupRuleStore(makeNetwork=True)
         closureDeltaGraph = Graph()
@@ -646,11 +710,11 @@ def infer():
         for x in closureDeltaGraph:
             w.rdf.add(x)
 
-        ###uncomment next 4 lines to print inferred facts to human-readable file (demo purposes)
-        #inferred_facts = closureDeltaGraph.serialize(format='n3') #format inferred facts to notation 3
-        #inferred = open('what_was_inferred.n3', 'w')
-        #inferred.write(inferred_facts)
-        #inferred.close()
+        ## uncomment next 4 lines to print inferred facts to human-readable file (demo purposes)
+        # inferred_facts = closureDeltaGraph.serialize(format='n3') #format inferred facts to notation 3
+        # inferred = open('what_was_inferred.n3', 'w')
+        # inferred.write(inferred_facts)
+        # inferred.close()
 
     except Exception:
         traceback.print_exc()
@@ -669,7 +733,7 @@ def do_insert(config="default.conf", logging=False):
         elif isinstance(config, dict):
             config = P.Configure().copy(config)
         else:
-            raise Exception("Invalid configuration object "+ str(config))
+            raise Exception("Invalid configuration object " + str(config))
 
     P.connect(conf=config, do_logging=logging)
     try:
@@ -685,8 +749,8 @@ def do_insert(config="default.conf", logging=False):
             best_translator = None
             for tr in TRANSLATORS:
                 if isinstance(ds, tr.input_type):
-                    if best_translator is None \
-                        or issubclass(tr.input_type, best_translator.input_type):
+                    if best_translator is None or \
+                            issubclass(tr.input_type, best_translator.input_type):
                         best_translator = tr
             if best_translator is not None:
                 print(ds)

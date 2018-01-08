@@ -11,11 +11,13 @@ from .DataTestTemplate import _DataTest
 
 class NetworkTest(_DataTest):
 
-    def setUp(s):
-        _DataTest.setUp(s)
-        s.net = Network(conf=s.config)
-        s.worm = Worm()
-        s.worm.neuron_network(s.net)
+    ctx_classes = (Worm, Network, Neuron)
+
+    def setUp(self):
+        super(NetworkTest, self).setUp()
+        self.net = self.ctx.Network(conf=self.config)
+        self.worm = self.ctx.Worm()
+        self.worm.neuron_network(self.net)
 
     def test_aneuron(self):
         """
@@ -29,9 +31,9 @@ class NetworkTest(_DataTest):
         Test that we can add arbitrary Neurons to the Network,
         and that they can be accessed afterwards.
         """
-        self.net.neuron(Neuron(name='AVAL'))
-        self.net.neuron(Neuron(name='DD5'))
-        self.net.save()
+        self.net.neuron(self.ctx.Neuron(name='AVAL'))
+        self.net.neuron(self.ctx.Neuron(name='DD5'))
+        self.save()
 
         self.assertTrue('AVAL' in self.net.neuron_names())
         self.assertTrue('DD5' in self.net.neuron_names())

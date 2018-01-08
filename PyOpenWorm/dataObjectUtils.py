@@ -3,7 +3,7 @@ L = logging.getLogger(__name__)
 
 
 def merge_data_objects(a, b):
-    if not (a.defined and b.defined and a.identifier() == b.identifier()):
+    if not (a.defined and b.defined and a.identifier == b.identifier):
         L.warning(
             repr(a) +
             " will not merge with " +

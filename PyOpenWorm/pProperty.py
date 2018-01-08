@@ -1,7 +1,8 @@
 from .data import DataUser
+from .contextualize import Contextualizable
 
 
-class Property(DataUser):
+class Property(Contextualizable, DataUser):
     """ Store a value associated with a DataObject
 
     Properties can be be accessed like methods. A method call like::
@@ -28,6 +29,7 @@ class Property(DataUser):
     def __init__(self, name=False, owner=False, **kwargs):
         super(Property, self).__init__(**kwargs)
         self.owner = owner
+        self.linkName = name
         if self.owner:
             if name:
                 setattr(self.owner, name, self)
@@ -92,4 +94,3 @@ class Property(DataUser):
                     return next(iter(r))
                 except StopIteration:
                     return None
-

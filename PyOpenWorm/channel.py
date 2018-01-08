@@ -124,9 +124,10 @@ class Channel(BiologyType):
     def defined(self):
         return super(Channel, self).defined or self.name.has_defined_value()
 
+    @property
     def identifier(self):
         if super(Channel, self).defined:
-            return super(Channel, self).identifier()
+            return super(Channel, self).identifier
         else:
             # name is already set, so we can make an identifier from it
             return self.make_identifier(self.name.defined_values[0])
@@ -154,9 +155,10 @@ class ExpressionPattern(BiologyType):
         return super(ExpressionPattern, self).defined \
                 or self.wormbaseID.has_defined_value()
 
+    @property
     def identifier(self):
         if super(ExpressionPattern, self).defined:
-            return super(ExpressionPattern, self).identifier()
+            return super(ExpressionPattern, self).identifier
         else:
             return self.make_identifier(self.wormbaseID.defined_values[0])
 

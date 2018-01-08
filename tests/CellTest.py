@@ -18,43 +18,45 @@ from PyOpenWorm.cell import Cell
 
 
 class CellTest(_DataTest):
+    ctx_classes = (Cell, Neuron, Muscle)
+
     def test_DataUser(self):
         do = Cell('', conf=self.config)
         self.assertTrue(isinstance(do, DataUser))
 
     def test_lineageName(self):
         """ Test that we can retrieve the lineage name """
-        c = Cell(name="ADAL", conf=self.config)
+        c = self.ctx.Cell(name="ADAL", conf=self.config)
         c.lineageName("AB plapaaaapp")
-        c.save()
+        self.save()
         self.assertEqual("AB plapaaaapp", Cell(name="ADAL").lineageName())
 
     def test_wormbaseID(self):
         """ Test that a Cell object has a wormbase ID """
-        c = Cell(name="ADAL", conf=self.config)
+        c = self.ctx.Cell(name="ADAL", conf=self.config)
         c.wormbaseID("WBbt:0004013")
-        c.save()
-        self.assertEqual("WBbt:0004013", Cell(name="ADAL").wormbaseID())
+        self.save()
+        self.assertEqual("WBbt:0004013", self.ctx.Cell(name="ADAL").wormbaseID())
 
     def test_synonyms(self):
         """ Test that we can add and retrieve synonyms. """
-        c = Cell(name="ADAL", conf=self.config)
+        c = self.ctx.Cell(name="ADAL", conf=self.config)
         c.synonym("lineage name: ABplapaaaapp")
-        c.save()
+        self.save()
         self.assertEqual(
             set(["lineage name: ABplapaaaapp"]),
-            Cell(name="ADAL").synonym())
+            self.ctx.Cell(name="ADAL").synonym())
 
     def test_same_name_same_id(self):
         """
         Test that two Cell objects with the same name have the same
-        identifier()
+        identifier
 
         Saves us from having too many inserts of the same object.
         """
         c = Cell(name="boots")
         c1 = Cell(name="boots")
-        self.assertEqual(c.identifier(), c1.identifier())
+        self.assertEqual(c.identifier, c1.identifier)
 
     def test_blast_space(self):
         """
@@ -77,10 +79,11 @@ class CellTest(_DataTest):
         Test that we can get the children of a cell
         Tests for anterior, posterior, left, right, ventral, dorsal divisions
         """
-        p = Cell(name="peas")
+        p = self.ctx.Cell(name="peas")
         base = 'ab.tahsuetoahusenoat'
         p.lineageName(base)
-        p.save()
+        self.save()
+        print(p.rdf.serialize(format='n3').decode('utf8'))
 
         c = ["carrots",
              "jam",
@@ -93,7 +96,9 @@ class CellTest(_DataTest):
 
         for x, l in zip(c, division_directions):
             ln = base + l
-            Cell(name=x, lineageName=ln).save()
+            self.ctx.Cell(name=x, lineageName=ln)
+        self.save()
+        print(p.rdf.serialize(format='n3').decode('utf8'))
         names = set(str(x.name()) for x in p.parentOf())
         self.assertEqual(set(c), names)
 
@@ -103,12 +108,14 @@ class CellTest(_DataTest):
         """
         base = "ab.tahsuetoahusenoat"
         child = base + "u"
-        p = Cell(name="peas")
+        p = self.ctx.Cell(name="peas")
         p.lineageName(base)
-        p.save()
-        c = Cell(name="carrots")
+        self.save()
+        print(p.rdf.get_context(self.context.identifier).serialize(format='n3').decode('utf8'))
+        c = self.ctx.Cell(name="carrots")
         c.lineageName(child)
-        c.save()
+        self.save()
+        print(p.rdf.get_context(self.context.identifier).serialize(format='n3').decode('utf8'))
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 

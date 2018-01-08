@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from random import random
 import six
 
 
@@ -107,16 +108,22 @@ class Connection(BiologyType):
              self.post_cell.has_defined_value() and
              self.syntype.has_defined_value())
 
-    def identifier(self, *args, **kwargs):
+    @property
+    def identifier(self):
+        the_id = None
+        r = random()
         if super(Connection, self).defined:
-            return super(Connection, self).identifier()
+            the_id = super(Connection, self).identifier
         else:
             data = (self.pre_cell,
                     self.post_cell,
                     self.syntype)
-            data = tuple(x.defined_values[0].identifier().n3() for x in data)
+            print(r, data)
+            data = tuple(x.defined_values[0].identifier.n3() for x in data)
             data = "".join(data)
-            return self.make_identifier(data)
+            the_id = self.make_identifier(data)
+        print(r, the_id)
+        return the_id
 
     def __str__(self):
         nom = []
@@ -132,9 +139,12 @@ class Connection(BiologyType):
             nom.append(('number', self.number.values[0]))
         if self.synclass.has_defined_value():
             nom.append(('synclass', self.synclass.values[0]))
-        return 'Connection(' + \
-               ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
-               ')'
+        if len(nom) == 0:
+            return super(Connection, self).__str__()
+        else:
+            return 'Connection(' + \
+                   ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
+                   ')'
 
 
 __yarom_mapped_classes__ = (Connection,)
