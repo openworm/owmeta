@@ -1,9 +1,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
-import rdflib as R
 
-import PyOpenWorm
 from .DataTestTemplate import _DataTest
 
 from PyOpenWorm.neuron import Neuron
@@ -57,7 +55,6 @@ class NeuronTest(_DataTest):
         neighbors = list(n.neighbor())
         self.assertIn(self.neur('PVCL'), neighbors)
         self.save()
-        print(PyOpenWorm.config('rdf.graph').serialize(format='n3'))
         self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
 
     def test_neighbor_count(self):

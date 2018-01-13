@@ -83,7 +83,6 @@ class CellTest(_DataTest):
         base = 'ab.tahsuetoahusenoat'
         p.lineageName(base)
         self.save()
-        print(p.rdf.serialize(format='n3').decode('utf8'))
 
         c = ["carrots",
              "jam",
@@ -98,7 +97,6 @@ class CellTest(_DataTest):
             ln = base + l
             self.ctx.Cell(name=x, lineageName=ln)
         self.save()
-        print(p.rdf.serialize(format='n3').decode('utf8'))
         names = set(str(x.name()) for x in p.parentOf())
         self.assertEqual(set(c), names)
 
@@ -111,11 +109,9 @@ class CellTest(_DataTest):
         p = self.ctx.Cell(name="peas")
         p.lineageName(base)
         self.save()
-        print(p.rdf.get_context(self.context.identifier).serialize(format='n3').decode('utf8'))
         c = self.ctx.Cell(name="carrots")
         c.lineageName(child)
         self.save()
-        print(p.rdf.get_context(self.context.identifier).serialize(format='n3').decode('utf8'))
         parent_p = c.daughterOf().name()
         self.assertEqual("peas", parent_p)
 
@@ -146,8 +142,7 @@ class CellTest(_DataTest):
 
         try:
             validate_neuroml2("temp.nml")
-        except Exception as e:
-            print(e)
+        except Exception:
             self.fail("Should validate")
         sys.stdout = f
 
@@ -156,7 +151,6 @@ class CellTest(_DataTest):
         Test that retrieving all Cells gives us the right number of Cell
         objects.
         """
-        print(yarom.MAPPER)
         num_cells = len(list(Cell().load()))
 
         m = list(Muscle().load())

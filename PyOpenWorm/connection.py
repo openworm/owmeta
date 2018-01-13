@@ -118,11 +118,9 @@ class Connection(BiologyType):
             data = (self.pre_cell,
                     self.post_cell,
                     self.syntype)
-            print(r, data)
             data = tuple(x.defined_values[0].identifier.n3() for x in data)
             data = "".join(data)
             the_id = self.make_identifier(data)
-        print(r, the_id)
         return the_id
 
     def __str__(self):

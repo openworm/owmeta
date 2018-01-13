@@ -8,7 +8,8 @@ class Overrider(object):
 
     def __new__(cls, mapper):
         if len(Overrider.instances.keys()) > 1:
-            raise Exception(" ".join(str(x) for x in Overrider.instances.keys()))
+            raise Exception('Only one Overrider should exist. There are overriders for these: ' +
+                            ' '.join(str(x) for x in Overrider.instances.keys()))
 
         inst = Overrider.instances.get(mapper, None)
         if inst is not None:
@@ -65,9 +66,8 @@ class Overrider(object):
     def wrap_import(self):
         if self.wrapped is None:
             if not hasattr(builtins, '__import__'):
-                raise Exception('a')
+                raise Exception("'builtins' module does not have an '__import__' attribute."
+                                " Cannot override import mechanism")
             self.wrapped = builtins.__import__
 
         builtins.__import__ = self.import_wrapper(self.wrapped)
-        if not hasattr(builtins, '__import__'):
-            raise Exception('b')

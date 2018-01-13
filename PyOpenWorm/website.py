@@ -28,7 +28,7 @@ class Website(DataObject):
             self.url(url)
 
     def defined_augment(self):
-        return self.url.has_defined_value
+        return self.url.has_defined_value()
 
     def identifier_augment(self):
         return self.url.defined_values[0].identifier

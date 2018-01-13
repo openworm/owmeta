@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import sys
-import traceback
 from wrapt import ObjectProxy
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.cell import Cell
@@ -166,10 +164,6 @@ class Neighbor(Property):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
         self._conntype = Connection.contextualize(self.owner.context)
-
-    def contextualize(self, context):
-        res = super(Neighbor, self).contextualize(context)
-        return res
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
