@@ -1,10 +1,9 @@
 from .datasource import DataTranslator, DataSource
 import bibtexparser
-from bibtexparser.customization import author, link, doi
+from bibtexparser.customization import link, doi
 
 
 from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.document import Document
 
 
 def tuplify(record):
@@ -12,6 +11,23 @@ def tuplify(record):
         if val not in ('ID',):
             if not isinstance(record[val], (list, tuple)):
                 record[val] = (record[val],)
+    return record
+
+
+def author(record):
+    """
+    Split author field by 'and' into a list of names.
+
+    :param record: the record.
+    :type record: dict
+    :returns: dict -- the modified record.
+
+    """
+    if "author" in record:
+        if record["author"]:
+            record["author"] = [i.strip() for i in record["author"].replace('\n', ' ').split(" and ")]
+        else:
+            del record["author"]
     return record
 
 
@@ -46,6 +62,8 @@ def update_document_with_bibtex(document, bibtex_entry):
 
 def bibtex_to_document(bibtex_entry):
     """ Takes a single BibTeX entry and translates it into a Document object """
+    from PyOpenWorm.document import Document
+
     res = Document()
     update_document_with_bibtex(res, bibtex_entry)
     return res

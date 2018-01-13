@@ -316,6 +316,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if self._id is not None:
             return self._id
         elif self.defined_augment():
+            print('wtf', self._id)
             return self.identifier_augment()
         else:
             raise Exception(IdentifierMissingException(self))

@@ -86,9 +86,9 @@ class Evidence(DataObject):
             self.reference(reference)
 
     def defined_augment(self):
-        return ((self.supports.has_defined_value or
-                 self.refutes.has_defined_value) and
-                self.reference.has_defined_value)
+        return ((self.supports.has_defined_value() or
+                 self.refutes.has_defined_value()) and
+                self.reference.has_defined_value())
 
     def identifier_augment(self):
         s = ""

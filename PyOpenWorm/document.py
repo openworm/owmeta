@@ -11,53 +11,11 @@ from PyOpenWorm import bibtex as BIB
 logger = logging.getLogger(__file__)
 
 
-def _pubmed_uri_to_pmid(uri):
-    parsed = urlparse(uri)
-    pmid = int(parsed.path.split("/")[2])
-    return pmid
-
-
-def _doi_uri_to_doi(uri):
-    parsed = urlparse(uri)
-    doi = parsed.path.split("/")[1]
-    # the doi from a url needs to be decoded
-    doi = unquote(doi)
-    return doi
-
-
-def _url_request(url, headers={}):
-    try:
-        r = Request(url, headers=headers)
-        s = urlopen(r, timeout=1)
-        info = dict(s.info())
-        content_type = {k.lower(): info[k] for k in info}['content-type']
-        md = re.search("charset *= *([^ ]+)", content_type)
-        if md:
-            s.charset = md.group(1)
-
-        return s
-    except HTTPError:
-        return ""
-    except URLError:
-        return ""
-
-
-def _json_request(url):
-    import json
-    headers = {'Content-Type': 'application/json'}
-    try:
-        data = _url_request(url, headers).read().decode('UTF-8')
-        if hasattr(data, 'charset'):
-            return json.loads(data, encoding=data.charset)
-        else:
-            return json.loads(data)
-    except BaseException:
-        logger.warning("Couldn't retrieve JSON data from " + url,
-                       exc_info=True)
-        return {}
-
-
 class WormbaseRetrievalException(Exception):
+    pass
+
+
+class PubmedRetrievalException(Exception):
     pass
 
 
@@ -119,21 +77,25 @@ class Document(DataObject):
         Parameters
         ----------
         bibtex : string
-            A string containing a single BibTeX entry. Parsed during initialization, but not saved thereafter, optional
+            A string containing a single BibTeX entry. Parsed during initialization, but not saved thereafter. optional
         doi : string
-            A Digital Object Identifier (DOI), optional
+            A Digital Object Identifier (DOI). optional
         pmid : string
-            A PubMed ID (PMID) that points to a paper, optional
+            A PubMed ID (PMID) that points to a paper. optional
+        pubmed : string
+            A PubMed ID (PMID) or URL that points to a paper. Ignored if 'pmid' is provided. optional
+        wbid : string
+            An ID from WormBase that points to a record. optional
         wormbaseid : string
-            An ID from WormBase that points to a record, optional
+            An ID or URL from WormBase that points to a record. Ignored if 'wbid' is provided. optional
         author : string
-            The author of the document, optional
+            The author of the document. optional
         title : string
-            The title of the document, optional
+            The title of the document. optional
         year : string or int
-            The date (e.g., publication date) of the document, optional
+            The date (e.g., publication date) of the document. optional
         uri : string
-            A URL that points to document, optional
+            A URL that points to document. optional
         """
         super(Document, self).__init__(**kwargs)
         self._fields = dict()
@@ -151,26 +113,38 @@ class Document(DataObject):
             self.update_with_bibtex(bibtex)
 
         if pmid is not None:
-            self._fields['pmid'] = pmid
+            self.pmid.set(pmid)
         elif pubmed is not None:
-            self._fields['pmid'] = pubmed
+            if pubmed[:4] == 'http':
+                # Probably a uri, right?
+                _tmp = _pubmed_uri_to_pmid(pubmed)
+                if _tmp is None:
+                    raise ValueError("Couldn't convert Pubmed URL to a PubMed ID")
+                pmid = _tmp
+            else:
+                pmid = pubmed
+            self.pmid.set(pmid)
 
-        if 'pmid' in self._fields:
-            self.pmid(self._fields['pmid'])
+        if wormbase is not None:
+            if wormbase[:4] == 'http':
+                _tmp = _wormbase_uri_to_wbid(wormbase)
+                if _tmp is None:
+                    raise ValueError("Couldn't convert Wormbase URL to a Wormbase ID")
+                wbid = _tmp
+            else:
+                wbid = wormbase
+        elif wormbaseid is not None:
+            wbid = wormbaseid
 
         if wbid is not None:
-            self._fields['wormbase'] = wbid
-        elif wormbase is not None:
-            self._fields['wormbase'] = wormbase
-        elif wormbaseid is not None:
-            self._fields['wormbase'] = wormbaseid
-
-        if 'wormbase' in self._fields:
-            self.wbid(self._fields['wormbase'])
+            self.wbid.set(wbid)
 
         if doi is not None:
-            self._fields['doi'] = doi
-            self.doi(doi)
+            if doi[:4] == 'http':
+                _tmp = _doi_uri_to_doi(doi)
+                if _tmp is not None:
+                    doi = _tmp
+            self.doi.set(doi)
 
         if year is not None:
             self.year(year)
@@ -188,10 +162,10 @@ class Document(DataObject):
 
     def update_with_bibtex(self, bibtex):
         bib_db = BIB.loads(bibtex)
-        if len(bib_db) > 1:
+        if len(bib_db.entries) > 1:
             raise ValueError('The given BibTex string has %d entries.'
                              ' Cannot determine which entry to use for the document' % len(bib_db))
-        BIB.update_document_with_bibtex(self, bib_db[0])
+        BIB.update_document_with_bibtex(self, bib_db.entries[0])
 
     def defined_augment(self):
         for x in self.id_precedence:
@@ -219,11 +193,12 @@ class Document(DataObject):
         # _Very_ few of these have these fields filled in
         wbid = self.wbid.defined_values
         if len(wbid) == 1:
-            wbid = wbid[0]
+            wbid = wbid[0].identifier.toPython()
 
             # get the author
             try:
-                j = _json_request('http://api.wormbase.org/rest/field/paper/' + wbid + '/overview')
+                j = _json_request('http://api.wormbase.org/rest/field/paper/' + str(wbid) + '/overview')
+                print(j)
                 if 'overview' in j:
                     f = j['overview']
                     if 'authors' in f:
@@ -285,13 +260,10 @@ class Document(DataObject):
                 if 'year' in r:
                     self.year(r['year'])
 
-    def _pubmed_extract(self):
+    def update_from_pubmed(self):
         def pmRequest(pmid):
             import xml.etree.ElementTree as ET  # Python 2.5 and up
-            base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-            # XXX: There's more data in esummary.fcgi?, but I don't know how to
-            # parse it
-            url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
+            url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + str(pmid)
             s = _url_request(url)
             if hasattr(s, 'charset'):
                 parser = ET.XMLParser(encoding=s.charset)
@@ -300,20 +272,83 @@ class Document(DataObject):
 
             return ET.parse(s, parser)
 
-        pmid = self._fields['pmid']
-        if pmid[:4] == 'http':
-            # Probably a uri, right?
-            pmid = _pubmed_uri_to_pmid(pmid)
-        pmid = int(pmid)
+        pmid = self.pmid.defined_values
+        if len(pmid) == 1:
+            pmid = pmid[0].identifier.toPython()
 
-        try:
-            tree = pmRequest(pmid)
-        except Exception:
-            logger.warning("Couldn't retrieve Pubmed info", exc_info=True)
-            return
+            try:
+                tree = pmRequest(pmid)
+            except Exception:
+                logger.warning("Couldn't retrieve Pubmed info", exc_info=True)
+                return
+            for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
+                self.author(x.text)
 
-        for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
-            self.author(x.text)
+            for x in tree.findall('./DocSum/Item[@Name="Title"]'):
+                self.title(x.text)
+
+            for x in tree.findall('./DocSum/Item[@Name="DOI"]'):
+                self.doi(x.text)
+
+            for x in tree.findall('./DocSum/Item[@Name="PubDate"]'):
+                self.year(x.text)
+
+        elif len(pmid) == 0:
+            raise PubmedRetrievalException('No Pubmed ID is attached to this document. Cannot retrieve Pubmed data')
+        else:
+            raise PubmedRetrievalException('More than one Pubmed ID is attached to this document.'
+                                           ' Please try with just one Pubmed ID')
+
+
+def _wormbase_uri_to_wbid(uri):
+    return str(urlparse(uri).path.split("/")[2])
+
+
+def _pubmed_uri_to_pmid(uri):
+    return str(urlparse(uri).path.split("/")[2])
+
+
+def _doi_uri_to_doi(uri):
+    # DOI URL to DOI translation is complicated. This is a cop-out.
+    parsed = urlparse(uri)
+    if 'doi.org' in parsed.netloc:
+        doi = parsed.path.split("/", 1)[1]
+    else:
+        doi = None
+
+    return doi
+
+
+def _url_request(url, headers={}):
+    try:
+        r = Request(url, headers=headers)
+        s = urlopen(r, timeout=1)
+        info = dict(s.info())
+        content_type = {k.lower(): info[k] for k in info}['content-type']
+        md = re.search("charset *= *([^ ]+)", content_type)
+        if md:
+            s.charset = md.group(1)
+
+        return s
+    except HTTPError:
+        return ""
+    except URLError:
+        return ""
+
+
+def _json_request(url):
+    import json
+    headers = {'Content-Type': 'application/json'}
+    try:
+        data = _url_request(url, headers).read().decode('UTF-8')
+        if hasattr(data, 'charset'):
+            return json.loads(data, encoding=data.charset)
+        else:
+            return json.loads(data)
+    except BaseException:
+        logger.warning("Couldn't retrieve JSON data from " + url,
+                       exc_info=True)
+        return {}
 
 
 __yarom_mapped_classes__ = (Document,)
