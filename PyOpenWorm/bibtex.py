@@ -7,13 +7,6 @@ from PyOpenWorm.evidence import Evidence
 from PyOpenWorm.document import Document
 
 
-class BibTexDataSource(DataSource):
-
-    def __init__(self, bibtex_file_name, **kwargs):
-        super(BibTexDataSource, self).__init__(**kwargs)
-        self.bibtex_file_name = bibtex_file_name
-
-
 def tuplify(record):
     for val in record:
         if val not in ('ID',):
@@ -31,36 +24,75 @@ def customizations(record):
     return tuplify(doi(link(author(record))))
 
 
-def parse_bibtex_into_evidence(file_name):
-    res = dict()
+def update_document_with_bibtex(document, bibtex_entry):
+    document.set_key(bibtex_entry['ID'])
+    for ath in bibtex_entry.get('author', tuple()):
+        document.author(ath)
+
+    fields = ['title',
+              'year',
+              'author',
+              'doi',
+              ('link', 'uri')]
+    for x in fields:
+        if isinstance(x, tuple):
+            key, prop = x
+        else:
+            prop = x
+            key = x
+        for m in bibtex_entry.get(key, ()):
+            getattr(document, prop)(m)
+
+
+def bibtex_to_document(bibtex_entry):
+    """ Takes a single BibTeX entry and translates it into a Document object """
+    res = Document()
+    update_document_with_bibtex(res, bibtex_entry)
+    return res
+
+
+def make_default_bibtex_parser():
+    parser = bibtexparser.bparser.BibTexParser()
+    parser.customization = customizations
+    return parser
+
+
+def loads(bibtex_string):
+    parser = make_default_bibtex_parser()
+    return bibtexparser.loads(bibtex_string, parser=parser)
+
+
+def load(bibtex_file):
+    parser = make_default_bibtex_parser()
+    return bibtexparser.load(bibtex_file, parser=parser)
+
+
+def load_from_file_named(file_name):
     with open(file_name) as bibtex_file:
-        parser = bibtexparser.bparser.BibTexParser()
-        parser.customization = customizations
-        bib_database = bibtexparser.load(bibtex_file, parser=parser)
-        for entry in bib_database.entries:
-            key = entry['ID']
-            e = Document(key=key)
+        return load(bibtex_file)
 
-            for ath in entry.get('author', tuple()):
-                e.author(ath)
 
-            fields = ['title',
-                      'year',
-                      'author',
-                      'doi',
-                      ('link', 'uri')]
-            for x in fields:
-                if isinstance(x, tuple):
-                    key, prop = x
-                else:
-                    prop = x
-                    key = x
-                for m in entry.get(key, tuple()):
-                    getattr(e, prop)(m)
-
-            res[key] = Evidence(reference=e)
+def parse_bibtex_into_documents(file_name):
+    res = dict()
+    bib_database = load_from_file_named(file_name)
+    for entry in bib_database.entries:
+        entry_id = entry['ID']
+        res[entry_id] = bibtex_to_document(entry)
 
     return res
+
+
+def parse_bibtex_into_evidence(file_name):
+    return {k: Evidence(reference=v)
+            for k, v
+            in parse_bibtex_into_documents(file_name).items()}
+
+
+class BibTexDataSource(DataSource):
+
+    def __init__(self, bibtex_file_name, **kwargs):
+        super(BibTexDataSource, self).__init__(**kwargs)
+        self.bibtex_file_name = bibtex_file_name
 
 
 class BibTexDataTranslator(DataTranslator):

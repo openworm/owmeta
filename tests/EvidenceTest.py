@@ -100,7 +100,7 @@ class EvidenceTest(_DataTest):
         e = self.ctx.Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
         r = DataObject(key="relationship")
         e.supports(r)
-        e.save()
+        self.save()
         s = list(e.supports())
         self.assertIn(r, s)
 

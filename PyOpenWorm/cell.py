@@ -224,22 +224,11 @@ class Cell(BiologyType):
         else:
             return super(Cell, self).__str__()
 
-    @property
-    def defined(self):
-        return super(Cell, self).defined or self.name.has_defined_value()
+    def defined_augment(self):
+        return self.name.has_defined_value()
 
-    @property
-    def identifier(self, *args, **kwargs):
-        # If the DataObject identifier isn't variable, then self is a specific
-        # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it
-        # and return that. Otherwise, there's no telling from here what our
-        # identifier should be, so the variable identifier (from DataObject.
-        # identifier) must be returned
-        if super(Cell, self).defined:
-            return super(Cell, self).identifier
-        else:
-            return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
+    def identifier_augment(self, *args, **kwargs):
+        return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
 
 
 InverseProperty(Cell, 'channel', Channel, 'appearsIn')

@@ -1,4 +1,4 @@
-from six.moves.urllib.parse import urlparse, unquote
+from six.moves.urllib.parse import urlparse, unquote, urlencode
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
 import re
@@ -6,6 +6,7 @@ import logging
 from yarom.graphObject import IdentifierMissingException
 
 from .dataObject import DataObject
+from PyOpenWorm import bibtex as BIB
 
 logger = logging.getLogger(__file__)
 
@@ -54,6 +55,10 @@ def _json_request(url):
         logger.warning("Couldn't retrieve JSON data from " + url,
                        exc_info=True)
         return {}
+
+
+class WormbaseRetrievalException(Exception):
+    pass
 
 
 # A little bit about why this a separate type from Document:
@@ -113,6 +118,8 @@ class Document(DataObject):
         """
         Parameters
         ----------
+        bibtex : string
+            A string containing a single BibTeX entry. Parsed during initialization, but not saved thereafter, optional
         doi : string
             A Digital Object Identifier (DOI), optional
         pmid : string
@@ -120,13 +127,13 @@ class Document(DataObject):
         wormbaseid : string
             An ID from WormBase that points to a record, optional
         author : string
-            The author of the evidence
+            The author of the document, optional
         title : string
-            The title of the evidence
+            The title of the document, optional
         year : string or int
-            The date (e.g., publication date) of the evidence
+            The date (e.g., publication date) of the document, optional
         uri : string
-            A URL that points to evidence
+            A URL that points to document, optional
         """
         super(Document, self).__init__(**kwargs)
         self._fields = dict()
@@ -140,13 +147,15 @@ class Document(DataObject):
         for x in other_fields:
             Document.DatatypeProperty(x, owner=self)
 
+        if bibtex is not None:
+            self.update_with_bibtex(bibtex)
+
         if pmid is not None:
             self._fields['pmid'] = pmid
         elif pubmed is not None:
             self._fields['pmid'] = pubmed
 
         if 'pmid' in self._fields:
-            self._pubmed_extract()
             self.pmid(self._fields['pmid'])
 
         if wbid is not None:
@@ -157,16 +166,11 @@ class Document(DataObject):
             self._fields['wormbase'] = wormbaseid
 
         if 'wormbase' in self._fields:
-            self._wormbase_extract()
             self.wbid(self._fields['wormbase'])
 
         if doi is not None:
             self._fields['doi'] = doi
-            self._crossref_doi_extract()
             self.doi(doi)
-
-        if bibtex is not None:
-            self._fields['bibtex'] = bibtex
 
         if year is not None:
             self.year(year)
@@ -182,6 +186,13 @@ class Document(DataObject):
         if uri is not None:
             self.uri(uri)
 
+    def update_with_bibtex(self, bibtex):
+        bib_db = BIB.loads(bibtex)
+        if len(bib_db) > 1:
+            raise ValueError('The given BibTex string has %d entries.'
+                             ' Cannot determine which entry to use for the document' % len(bib_db))
+        BIB.update_document_with_bibtex(self, bib_db[0])
+
     def defined_augment(self):
         for x in self.id_precedence:
             if getattr(self, x).has_defined_value():
@@ -195,6 +206,114 @@ class Document(DataObject):
                 s = str(idKind) + ":" + idprop.defined_values[0].identifier.n3()
                 return self.make_identifier(s)
         raise IdentifierMissingException(self)
+
+    # TODO: Provide a way to override modification of already set values.
+    def update_from_wormbase(self, replace_existing=False):
+        """ Queries wormbase for additional data to fill in the Document.
+
+        If replace_existing is set to `True`, then existing values will be cleared.
+        """
+
+        # XXX: wormbase's REST API is pretty sparse in terms of data provided.
+        #     Would be better off using AQL or the perl interface
+        # _Very_ few of these have these fields filled in
+        wbid = self.wbid.defined_values
+        if len(wbid) == 1:
+            wbid = wbid[0]
+
+            # get the author
+            try:
+                j = _json_request('http://api.wormbase.org/rest/field/paper/' + wbid + '/overview')
+                if 'overview' in j:
+                    f = j['overview']
+                    if 'authors' in f:
+                        dat = f['authors']['data']
+                        if dat is not None:
+                            if replace_existing and self.author.has_defined_value:
+                                self.author.clear()
+                            for x in dat:
+                                self.author.set(x['label'])
+
+                    for fname in ('pmid', 'year', 'title', 'doi'):
+                        if fname in f and f[fname]['data'] is not None:
+                            attr = getattr(self, fname)
+                            if replace_existing and attr.has_defined_value:
+                                attr.clear()
+                            attr.set(f[fname]['data'])
+            except Exception:
+                logger.warning("Couldn't retrieve Wormbase data", exc_info=True)
+        elif len(wbid) == 0:
+            raise WormbaseRetrievalException("There is no Wormbase ID attached to this Document."
+                                             " So no data can be retrieved")
+        else:
+            raise WormbaseRetrievalException("There is more than one Wormbase ID attached to this Document."
+                                             " Please try with just one Wormbase ID")
+
+    def _crossref_doi_extract(self):
+        # Extract data from crossref
+        def crRequest(doi):
+            data = {'q': doi}
+            data_encoded = urlencode(data)
+            return _json_request(
+                'http://search.labs.crossref.org/dois?%s' %
+                data_encoded)
+
+        doi = self._fields['doi']
+        if doi[:4] == 'http':
+            doi = _doi_uri_to_doi(doi)
+        try:
+            r = crRequest(doi)
+        except Exception:
+            logger.warning("Couldn't retrieve Crossref info", exc_info=True)
+            return
+        # XXX: I don't think coins is meant to be used, but it has structured
+        # data...
+        if len(r) > 0:
+            extra_data = r[0]['coins'].split('&amp;')
+            fields = (x.split("=") for x in extra_data)
+            fields = [[y.replace('+', ' ').strip() for y in x] for x in fields]
+            authors = [x[1] for x in fields if x[0] == 'rft.au']
+            for a in authors:
+                self.author(a)
+            # no error for bad ids, just an empty list
+            if len(r) > 0:
+                # Crossref can process multiple doi's at one go and return the
+                # metadata. we just need the first one
+                r = r[0]
+                if 'title' in r:
+                    self.title(r['title'])
+                if 'year' in r:
+                    self.year(r['year'])
+
+    def _pubmed_extract(self):
+        def pmRequest(pmid):
+            import xml.etree.ElementTree as ET  # Python 2.5 and up
+            base = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
+            # XXX: There's more data in esummary.fcgi?, but I don't know how to
+            # parse it
+            url = base + "esummary.fcgi?db=pubmed&id=%d" % pmid
+            s = _url_request(url)
+            if hasattr(s, 'charset'):
+                parser = ET.XMLParser(encoding=s.charset)
+            else:
+                parser = None
+
+            return ET.parse(s, parser)
+
+        pmid = self._fields['pmid']
+        if pmid[:4] == 'http':
+            # Probably a uri, right?
+            pmid = _pubmed_uri_to_pmid(pmid)
+        pmid = int(pmid)
+
+        try:
+            tree = pmRequest(pmid)
+        except Exception:
+            logger.warning("Couldn't retrieve Pubmed info", exc_info=True)
+            return
+
+        for x in tree.findall('./DocSum/Item[@Name="AuthorList"]/Item'):
+            self.author(x.text)
 
 
 __yarom_mapped_classes__ = (Document,)
