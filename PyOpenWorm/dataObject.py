@@ -219,8 +219,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         if ident is not None:
-            if not isinstance(ident, str):
-                raise Exception('poop brigade: {}'.format(type(ident)))
             self._id = R.URIRef(ident)
         else:
             # Randomly generate an identifier if the derived class can't
