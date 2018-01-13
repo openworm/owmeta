@@ -1,6 +1,6 @@
-import builtins
 import wrapt
 from PyOpenWorm.import_contextualizer import ImportContextualizer
+import six
 
 
 class Overrider(object):
@@ -64,6 +64,7 @@ class Overrider(object):
         self.wrapped = None
 
     def wrap_import(self):
+        builtins = six.moves.builtins
         if self.wrapped is None:
             if not hasattr(builtins, '__import__'):
                 raise Exception("'builtins' module does not have an '__import__' attribute."
