@@ -7,8 +7,8 @@ python:
 install:
 - python setup.py install
 script:
-- py.test -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py
-- py.test -m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py
+- python setup.py test --addopts "-m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- python setup.py test --addopts "-m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 
 after_success:
 - coveralls

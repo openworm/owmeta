@@ -39,14 +39,19 @@ for line in open('PyOpenWorm/__init__.py'):
     if line.startswith("__version__"):
         version = line.split("=")[1].strip()[1:-1]
 setup(
-    name = 'PyOpenWorm',
-    cmdclass = {'install': install},
-    zip_safe = False,
+    name='PyOpenWorm',
+    cmdclass={'install': install},
+    zip_safe=False,
+    setup_requires=['pytest-runner'],
+    tests_require=[
+        'pytest>=3.0.6',
+        'pytest-cov==2.5.1',
+        'discover==0.4.0'
+    ],
     install_requires=[
         'bibtexparser==0.6.1',
         'BTrees==4.0.8',
         'decorator==3.4.0',
-        'discover==0.4.0',
         'html5lib==0.999',
         'isodate==0.5.0',
         'libneuroml',
@@ -55,8 +60,6 @@ setup(
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.2.0',
-        'pytest>=3.0.6',
-        'pytest-cov==2.0.0',
         'rdflib==4.1.2',
         'rdflib-zodb>=1.0.0',
         'requests',
@@ -73,25 +76,25 @@ setup(
         'lazy-object-proxy==1.2.1',
         'wrapt'
     ],
-    dependency_links = [
+    dependency_links=[
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/mwatts15/rdflib-zodb.git@master#egg=rdflib-zodb-1.1-dev'
     ],
-    version = version,
-    packages = ['PyOpenWorm'],
-    package_data = {
+    version=version,
+    packages=['PyOpenWorm'],
+    package_data={
         'PyOpenWorm': ['default.conf']
     },
     include_package_data=True,
-    author = 'OpenWorm.org authors and contributors',
-    author_email = 'info@openworm.org',
-    description = 'A Python library for working with OpenWorm data and models',
-    long_description = long_description,
-    license = 'MIT',
+    author='OpenWorm.org authors and contributors',
+    author_email='info@openworm.org',
+    description='A Python library for working with OpenWorm data and models',
+    long_description=long_description,
+    license='MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
-    download_url = 'https://github.com/openworm/PyOpenWorm/archive/master.zip',
-    classifiers = [
+    download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
+    classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',

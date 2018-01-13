@@ -116,7 +116,6 @@ class Document(DataObject):
             self.pmid.set(pmid)
         elif pubmed is not None:
             if pubmed[:4] == 'http':
-                # Probably a uri, right?
                 _tmp = _pubmed_uri_to_pmid(pubmed)
                 if _tmp is None:
                     raise ValueError("Couldn't convert Pubmed URL to a PubMed ID")
