@@ -67,13 +67,13 @@ class ConfigureTest(unittest.TestCase):
             Data.open("tests/test_data/bad_test.conf")
 
     def test_configurable_init_empty(self):
-        """Ensure Configureable gets init'd with the defalut if nothing's given"""
+        """Ensure Configureable gets init'd with the defalut if nothing is given"""
         i = Configureable()
-        self.assertEqual(Configureable.conf,i.conf)
+        self.assertEqual(Configureable.conf, i.conf)
 
     def test_configurable_init_False(self):
-        """Ensure Configureable gets init'd with the defalut if False is given"""
-        i = Configureable(conf=False)
+        """Ensure Configureable gets init'd with the defalut if None is given"""
+        i = Configureable(conf=None)
         self.assertEqual(Configureable.conf, i.conf)
 
     def test_dict_init(self):

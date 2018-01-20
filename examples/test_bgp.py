@@ -10,18 +10,21 @@ from PyOpenWorm.connection import Connection
 from PyOpenWorm.neuron import Neuron
 
 P.connect('default.conf')
+
+
 def pp_connection(conn):
     print(conn.pre_cell(), conn.post_cell(), conn.syntype(), conn.synclass(), conn.number())
 
+
 try:
 
-    query_object = Connection(pre_cell='AVAL')
+    query_object = Connection(pre_cell=Neuron(name='AVAL'))
     print('STARTING WITH AVAL')
     for x in query_object.load():
         pp_connection(x)
     print()
     print('STARTING WITH PVCL')
-    query_object = Connection(pre_cell='PVCL')
+    query_object = Connection(pre_cell=Neuron(name='PVCL'))
     for x in query_object.load():
         pp_connection(x)
 

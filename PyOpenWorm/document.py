@@ -1,4 +1,4 @@
-from six.moves.urllib.parse import urlparse, unquote, urlencode
+from six.moves.urllib.parse import urlparse, urlencode
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
 import re
@@ -165,6 +165,13 @@ class Document(DataObject):
             raise ValueError('The given BibTex string has %d entries.'
                              ' Cannot determine which entry to use for the document' % len(bib_db))
         BIB.update_document_with_bibtex(self, bib_db.entries[0])
+
+    def to_context(self):
+        from PyOpenWorm.documentContext import DocumentContext
+        if self.context is not None:
+            return DocumentContext.contextualize(self.context)(self)
+        else:
+            return DocumentContext(self)
 
     def defined_augment(self):
         for x in self.id_precedence:

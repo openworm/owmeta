@@ -1,16 +1,22 @@
 import six
+from collections import OrderedDict
+from .identifier_mixin import IdMixin
 from .context import Context
 
 
 class Informational(object):
-    def __init__(self, name=None, display_name=None, value=None):
+    def __init__(self, name=None, display_name=None, description=None, value=None, default_value=None):
         self.name = name
         self.display_name = name if display_name is None else display_name
+        self.default_value = None
         self._value = value
 
     def __repr__(self):
-        return 'Informational(name=\'' + self.name + \
-                           '\', display_name=\'' + self.display_name + '\')'
+        return ("Informational(name='{}',"
+                " display_name='{}',"
+                " default_value='{}')").format(self.name,
+                                               self.display_name,
+                                               self.default_value)
 
 
 class DataSourceType(type):
@@ -33,26 +39,35 @@ class DataSourceType(type):
                 cls._info_fields += x._info_fields
 
 
-class DataSource(six.with_metaclass(DataSourceType, object)):
+class DataSource(six.with_metaclass(DataSourceType, IdMixin())):
     """ A source for data that can get translated into PyOpenWorm objects """
     def __init__(self, **kwargs):
-        self.info_fields = list(self.__class__._info_fields)
+        self.info_fields = OrderedDict((i.name, i) for i in self.__class__._info_fields)
         for k, v in kwargs.items():
             if isinstance(v, Informational):
+                # Any Informational we get must represent a *new* field, so we
+                # raise a value error if one with the same name already exists
+                if k in self.info_fields:
+                    raise ValueError('The provided ad hoc field, "{}",'
+                                     ' has already been declared by the class'.format(k))
                 info = v
                 info.name = k
                 v = info._value
                 delattr(info, '_value')
-                self.info_fields.append(info)
+                self.info_fields[k] = info
             else:
-                self.info_fields.append(Informational(name=k))
+                if k not in self.info_fields:
+                    raise ValueError('Received a value for an undeclared field, "{}"'.format(k))
             setattr(self, k, v)
+        for n, inf in self.info_fields.items():
+            if not hasattr(self, n):
+                setattr(self, n, inf.default_value)
 
     def __str__(self):
         return self.__class__.__name__ + '\n' + \
             '\n'.join('    ' + ': '.join((info.display_name,
                                          repr(getattr(self, info.name))))
-                      for info in self.info_fields) + '\n'
+                      for info in self.info_fields.values()) + '\n'
 
 
 class DataObjectContextDataSource(DataSource):

@@ -5,24 +5,23 @@ import random as RND
 import logging
 from itertools import groupby
 import six
-from six.moves.urllib.parse import quote
+# from six.moves.urllib.parse import quote
 import hashlib
 
 import PyOpenWorm
-from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass
+from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualize_metaclass
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
-                               GraphObjectQuerier,
-                               IdentifierMissingException)
+                               GraphObjectQuerier)
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
 from yarom.mapper import FCN
-from .configure import BadConf
 from .data import DataUser
-from .context import Context
+from .context import Contexts
 from .contextualize import ContextualizingProxy
+from .identifier_mixin import IdMixin
 
 from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
 
@@ -50,10 +49,10 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         ctx_uri = ContextMappedClass._find_class_context(dct, bases)
 
         if ctx_uri is not None:
-            if not isinstance(ctx_uri, R.URIRef) \
+            if not isinstance(ctx_uri, URIRef) \
                and isinstance(ctx_uri, (str, six.text_type)):
-                ctx_uri = R.URIRef(ctx_uri)
-            self.__context = Context.get_context(ctx_uri)
+                ctx_uri = URIRef(ctx_uri)
+            self.__context = Contexts[ctx_uri]
         else:
             self.__context = None
 
@@ -85,30 +84,8 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
     def contextualize_class(self, context):
         if context is None:
             return self
-
-        outer_self = self
-
-        class _H(type(self)):
-            def __init__(self, name, bases, dct):
-                super(_H, self).__init__(name, bases, dct)
-                self.__ctx = context
-                if self.__ctx is None:
-                    raise Exception(name)
-
-            def __call__(self, *args, **kwargs):
-                if self.__ctx is None:
-                    raise Exception()
-                return super(_H, self).__call__(*args, **kwargs)
-
-            def __repr__(self):
-                return repr(outer_self) + '.contextualize_class(' + repr(context) + ')'
-
-            @property
-            def context(self):
-                return self.__ctx
-
+        _H = contextualize_metaclass(context, self)
         _temp_ctx = context
-
         _G = _H('_H_' + self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
                                                      rdf_type=self.rdf_type,
                                                      class_context=_temp_ctx.identifier))
@@ -159,13 +136,11 @@ def contextualized_data_object(context, obj):
     # We have to get the important attributes of the proxied object's type and
     # copy them in here. This is only necessary for the attributes which are
     # not passed onto instances (e.g. attributes with mangled names)
-    obj_type = type(obj)
+
     ctx_proxy_typ = type(ContextualizingProxy)
     newtyp = ctx_proxy_typ('CtxProxyClass_' + obj.__class__.__name__,
-                           (ContextualizingProxy,),
-                           dict(rdf_namespace=obj_type.rdf_namespace,
-                                rdf_type=obj_type.rdf_type,
-                                context=obj_type.context))
+                           (ContextualizingProxy,), dict())
+
     res = newtyp(context, obj)
     new_properties = []
     if hasattr(res, 'properties'):
@@ -177,6 +152,7 @@ def contextualized_data_object(context, obj):
 
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
+                                        IdMixin(object, hashfunc=hashlib.md5),
                                         GraphObject,
                                         DataUser,
                                         Contextualizable)):
@@ -199,35 +175,26 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     def __new__(cls, *args, **kwargs):
-        res = super(BaseDataObject, cls).__new__(cls)
-        ores = res
-        res = res.contextualize(cls.context)
-        # We have to do this because wrapt.Proxy is shit
-        res.__init__ = type(ores).__init__.__get__(res, type(ores))
-        type(ores).__init__(res, *args, **kwargs)
-        # res.context = cls.context
+        """ This is defined so that the __init__ method gets a contextualized
+        instance, allowing for statements made in __init__ to be contextualized.
+        """
+        ores = super(BaseDataObject, cls).__new__(cls)
+        res = ores.contextualize(cls.context)
+        # Python skips __init__ if the result of __new__ doesn't have cls as
+        # its type, but we still want it to happen, so we have to call __init__
+        # ourselves.
+        otype = type(ores)
+        res.__init__ = otype.__init__.__get__(res, otype)
+        otype.__init__(res, *args, **kwargs)
+
         return res
 
-    def __init__(self, ident=None, key=None, **kwargs):
-        try:
-            super(BaseDataObject, self).__init__(**kwargs)
-        except BadConf:
-            pass
+    def __init__(self, **kwargs):
+        super(BaseDataObject, self).__init__(**kwargs)
         self.properties = []
         self.owner_properties = []
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
-
-        if ident is not None:
-            self._id = R.URIRef(ident)
-        else:
-            # Randomly generate an identifier if the derived class can't
-            # come up with one from the start. Ensures we always have something
-            # that functions as an identifier
-            self._id = None
-
-        if key is not None:
-            self.set_key(key)
 
         self._variable = R.Variable("V" + str(RND.random()))
         BaseDataObject.attach_property(self, RDFTypeProperty)
@@ -249,26 +216,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         s += ")"
         return s
 
-    def set_key(self, key):
-        if isinstance(key, str):
-            self._id = self.make_identifier_direct(key)
-        else:
-            self._id = self.make_identifier(key)
-
     def id_is_variable(self):
         """ Is the identifier a variable? """
         return not self.defined
-
-    @classmethod
-    def make_identifier(cls, data):
-        hsh = "a" + hashlib.md5(str(data).encode()).hexdigest()
-        return URIRef(cls.rdf_namespace[hsh])
-
-    @classmethod
-    def make_identifier_direct(cls, string):
-        if not isinstance(string, str):
-            raise Exception("make_identifier_direct only accepts strings")
-        return URIRef(cls.rdf_namespace[quote(string)])
 
     def triples(self, *args, **kwargs):
         return ComponentTripler(self, **kwargs)()
@@ -308,45 +258,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 yield oid(ident, the_type)
         else:
             return
-
-    @property
-    def identifier(self):
-        if self._id is not None:
-            return self._id
-        elif self.defined_augment():
-            return self.identifier_augment()
-        else:
-            raise Exception(IdentifierMissingException(self))
-
-    def identifier_augment(self):
-        """ Override this method to define an identifier in lieu of one explicity set.
-
-        One must also override :meth:`defined_augment` to return True whenever
-        this method could return a valid identifier.
-        :exc:`~yarom.graphObject.IdentifierMissingException` should be
-        raised if an identifier cannot be generated by this method.
-
-        Raises
-        ------
-
-        IdentifierMissingException
-
-        """
-        raise IdentifierMissingException(self)
-
-    @property
-    def defined(self):
-        if self._id is not None:
-            return True
-        else:
-            return self.defined_augment()
-
-    def defined_augment(self):
-        """ This fuction must return False if :meth:`identifier_augment` would
-        raise an :exc:`~yarom.graphObject.IdentifierMissingException`. Override
-        it when defining a non-standard identifier for subclasses of DataObjects.
-        """
-        return False
 
     def variable(self):
         return self._variable
@@ -539,13 +450,13 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
     @classmethod
     def object_from_id(cls, identifier_or_rdf_type, rdf_type=None):
-        if not isinstance(identifier_or_rdf_type, R.URIRef):
-            identifier_or_rdf_type = R.URIRef(identifier_or_rdf_type)
+        if not isinstance(identifier_or_rdf_type, URIRef):
+            identifier_or_rdf_type = URIRef(identifier_or_rdf_type)
 
         if rdf_type is None:
             return oid(identifier_or_rdf_type)
         else:
-            rdf_type = R.URIRef(rdf_type)
+            rdf_type = URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
     def contextualize(self, context):
@@ -558,7 +469,7 @@ class DataObject(BaseDataObject):
 
 class DataObjectSingleton(BaseDataObject):
     instance = None
-    class_context = R.URIRef('http://openworm.org/schema')
+    class_context = URIRef('http://openworm.org/schema')
 
     def __init__(self, *args, **kwargs):
         if self._gettingInstance:
@@ -579,7 +490,7 @@ class DataObjectSingleton(BaseDataObject):
 
 
 class TypeDataObject(BaseDataObject):
-    class_context = R.URIRef('http://openworm.org/schema')
+    class_context = URIRef('http://openworm.org/schema')
 
 
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
@@ -614,7 +525,7 @@ class RDFProperty(DataObjectSingleton):
 
     """ The DataObject corresponding to rdf:Property """
     rdf_type = R.RDF['Property']
-    class_context = R.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns')
+    class_context = URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns')
 
     def __init__(self, *args, **kwargs):
         super(RDFProperty, self).__init__(ident=R.RDF["Property"],
@@ -714,7 +625,7 @@ class values(DataObject):
 
     """
 
-    class_context = R.URIRef('http://openworm.org/schema')
+    class_context = URIRef('http://openworm.org/schema')
 
     def __init__(self, group_name, **kwargs):
         super(values, self).__init__(self, **kwargs)
@@ -756,7 +667,7 @@ class PropertyDataObject(DataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
-    class_context = R.URIRef('http://openworm.org/schema')
+    class_context = URIRef('http://openworm.org/schema')
 
     def __init__(self, *args, **kwargs):
         super(PropertyDataObject, self).__init__(*args, **kwargs)

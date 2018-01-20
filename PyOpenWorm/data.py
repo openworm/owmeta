@@ -2,7 +2,7 @@ from __future__ import print_function
 import sqlite3
 import networkx as nx
 import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
+from PyOpenWorm import Configureable, Configure, ConfigValue
 import hashlib
 import csv
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
@@ -14,7 +14,6 @@ import os
 import traceback
 import logging
 from .utils import grouper
-from yarom.mapperUtils import parents_str
 
 __all__ = [
     "Data",
@@ -28,6 +27,7 @@ __all__ = [
     "ZODBSource"]
 
 L = logging.getLogger(__name__)
+
 
 class _B(ConfigValue):
 
@@ -74,8 +74,6 @@ class DataUser(Configureable):
 
     def __init__(self, **kwargs):
         super(DataUser, self).__init__(**kwargs)
-        if not isinstance(self.conf, Data):
-            raise BadConf("Not a Data instance: " + str(self.conf))
 
     @property
     def base_namespace(self):

@@ -68,10 +68,12 @@ class Issue211EvidenceTest(_DataTest):
 
     """
 
+    ctx_classes = (Evidence,)
+
     def setUp(self):
         super(Issue211EvidenceTest, self).setUp()
-        self.e1 = Evidence()
-        self.e2 = Evidence()
+        self.e1 = self.ctx.Evidence()
+        self.e2 = self.ctx.Evidence()
 
         c = DataObject(key=23)
         self.e1.supports(c)
@@ -85,18 +87,8 @@ class Issue211EvidenceTest(_DataTest):
         getattr(self.e1, prop)('777')
         getattr(self.e2, prop)('888')
         self.save()
-        self.save()
         loaded_ids = set(getattr(self.evs, prop).get())
         self.assertTrue(self.expected_ids.issubset(loaded_ids))
 
-    def test_multiple_pmid_evidence_for_single_fact(self):
-        self.assertEvidences('pmid')
-
-    def test_multiple_doi_evidence_for_single(self):
-        self.assertEvidences('doi')
-
-    def test_multiple_wbid_evidence_for_single(self):
-        self.assertEvidences('wbid')
-
-    def test_multiple_uri_evidence_for_single(self):
-        self.assertEvidences('uri')
+    def test_references(self):
+        self.assertEvidences('reference')

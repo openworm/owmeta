@@ -101,7 +101,7 @@ def parse_bibtex_into_documents(file_name):
 
 
 def parse_bibtex_into_evidence(file_name):
-    return {k: Evidence(reference=v)
+    return {k: Evidence(reference=v, supports=v.to_context().rdf_object)
             for k, v
             in parse_bibtex_into_documents(file_name).items()}
 

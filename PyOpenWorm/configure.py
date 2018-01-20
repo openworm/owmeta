@@ -169,8 +169,9 @@ class Configureable(object):
     conf = Configure()
     default = conf
 
-    def __init__(self, conf=False):
-        pass
+    def __init__(self, conf=None):
+        if conf is not None:
+            self.conf = conf
 
     def __getitem__(self, k):
         """

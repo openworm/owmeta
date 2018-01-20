@@ -1,14 +1,14 @@
 from __future__ import print_function
-import sys
 from types import ModuleType
 import rdflib
 import wrapt
 from .dataObjectUtils import merge_data_objects
 from .import_contextualizer import ImportContextualizer
-from .contextualize import Contextualizable, ContextualizingProxy
+from .contextualize import Contextualizable, ContextualizableClass, ContextualizingProxy
 
 from six.moves.urllib.parse import quote
 from six import text_type
+import six
 
 
 class ModuleProxy(wrapt.ObjectProxy):
@@ -32,16 +32,20 @@ class ModuleProxy(wrapt.ObjectProxy):
             return o
 
 
-class Context(ImportContextualizer, Contextualizable):
+Contexts = dict()
+
+
+class ContextMeta(ContextualizableClass):
+    def __call__(self, *args, **kwargs):
+        o = super(ContextMeta, self).__call__(*args, **kwargs)
+        Contexts[o.identifier] = o
+        return o
+
+
+class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable)):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
-
-    contexts = dict()
-
-    @classmethod
-    def get_context(cls, uri):
-        return cls.contexts[uri]
 
     def __init__(self, key=None,
                  imported=(),
@@ -67,13 +71,15 @@ class Context(ImportContextualizer, Contextualizable):
         if ident is None and key is not None:
             ident = rdflib.URIRef(base_namespace[quote(key)])
 
-        self.identifier = ident
-        Context.contexts[ident] = self
+        if not hasattr(self, 'identifier'):
+            self.identifier = ident
+        else:
+            raise Exception(self)
 
         self._contents = dict()
         self._statements = []
         self._set_buffer_size = 10000
-        self._imported_contexts = imported
+        self._imported_contexts = list(imported)
         self._rdf_object = None
         self.mapper = mapper
         self.base_namespace = base_namespace
@@ -90,6 +96,9 @@ class Context(ImportContextualizer, Contextualizable):
 
     def clear(self):
         self._contents.clear()
+
+    def add_import(self, context):
+        self._imported_contexts.append(context)
 
     def add_statement(self, stmt):
         if self.identifier != stmt.context.identifier:

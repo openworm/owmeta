@@ -1,14 +1,17 @@
 from __future__ import print_function
 from time import time
+from rdflib.namespace import Namespace
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
 from PyOpenWorm.context import Context
+from PyOpenWorm.bibtex import parse_bibtex_into_documents
 # import logging
 import traceback
 import csv
 import re
 import os
+import hashlib
 from yarom import MAPPER
 
 import PyOpenWorm.import_override as impo
@@ -48,15 +51,20 @@ CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
 NEURON_EXPRESSION_DATA_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
+TRANS_NS = Namespace('http://openworm.org/entities/translators/')
+
+class LocalFileDataSource(DataSource):
+    metadata = (Informational('file_name', 'File name'),)
 
 
-class CSVDataSource(DataSource):
-    metadata = (Informational('csv_file_name', 'File name'),)
+class CSVDataSource(LocalFileDataSource):
+    metadata = (Informational('csv_file_name', 'CSV file name'),
+                Informational('csv_header', 'Header column names'))
 
-    def __init__(self, csv_file_name, header=None, **kwargs):
-        super(CSVDataSource, self).__init__(**kwargs)
-        self.csv_file_name = csv_file_name
-        self.header = header
+    def __init__(self, csv_file_name, **kwargs):
+        super(CSVDataSource, self).__init__(csv_file_name=csv_file_name,
+                                            file_name=csv_file_name,
+                                            **kwargs)
 
 
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
@@ -77,11 +85,11 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
     def __init__(self, **kwargs):
         super(WormbaseIonChannelCSVDataSource, self).__init__(
-                header=['channel_name',
-                        'gene_name',
-                        'gene_WB_ID',
-                        'expression_pattern',
-                        'description'],
+                csv_header=['channel_name',
+                            'gene_name',
+                            'gene_WB_ID',
+                            'expression_pattern',
+                            'description'],
                 **kwargs)
 
 
@@ -123,6 +131,8 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
 
 class WormbaseTextMatchCSVTranslator(DataTranslator):
     input_type = WormbaseTextMatchCSVDataSource
+    output_type = DataWithEvidenceDataSource
+    identifier = TRANS_NS.WormbaseTextMatchCSVTranslator
 
     def translate(self, data_source):
         initcol = data_source.initial_cell_column
@@ -162,96 +172,77 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
 
 
 class NeuronCSVDataSource(CSVDataSource):
-    def __init__(self, bibtex_files=None, **kwargs):
-        """
-        Parameters
-        ----------
-        bibtex_files : list
-            a list of bibtex files that are referenced in the csv file by entry
-            ID
-        """
+    metadata = (Informational('bibtex_files', 'BibTeX files',
+                              description='List of BibTeX files that are referenced in the csv file by entry ID'),)
 
-        """
-        A list of bibtex files that are referenced in the csv file by entry ID
-        """
-        super(NeuronCSVDataSource, self).__init__(**kwargs)
-        self.bibtex_files = bibtex_files
+
+class DataWithEvidenceDataSource(DataSource):
+    metadata = (Informational('evidence_context', 'Evidence context',
+                              description='The context in which evidence for the "Data context" is defined'),
+                Informational('data_context', 'Data context',
+                              description='The context in which primary data for this data source is defined'))
 
 
 class NeuronCSVDataTranslator(DataTranslator):
     input_type = NeuronCSVDataSource
+    output_type = DataWithEvidenceDataSource
+    identifier = TRANS_NS.NeuronCSVDataTranslator
 
     def translate(self, data_source):
-        evidences = dict()
+        documents = dict()
         if data_source.bibtex_files is not None:
             for bib in data_source.bibtex_files:
-                evidences.update(parse_bibtex_into_evidence(bib))
-        res = []
+                documents.update(parse_bibtex_into_documents(bib))
+
+        res = DataWithEvidenceDataSource(key=data_source.identifier.n3() + self.identifier.n3())
+        res.data_context = Context(ident=,
+                                   imported=(P.CONTEXT,))
+        res.evidence_context = Context(ident='http://openworm.org/entities/translators/NeuronCSVDataTranslator',
+                                   imported=(P.CONTEXT,))
         file_path = data_source.csv_file_name
         # set up evidence objects in advance
-
-        uris = dict()
 
         with open(file_path) as f:
             reader = csv.reader(f)
             next(reader)  # skip the header row
 
             for row in reader:
-                neuron_name = row[0]
-                relation = row[1].lower()
-                data = row[2]
-                evidence = row[3]
-                evidenceURL = row[4]
+                neuron_name, relation, data, evidence, documentURL = row
+                relation = relation.lower()
 
-                # pick correct evidence given the row
-                e = evidences.get(evidence, None)
+                doc = documents.get(evidence, None)
 
-                e2 = None
-                if len(evidenceURL) > 0:
-                    try:
-                        e2 = uris[evidenceURL]
-                    except KeyError:
-                        e2 = Document(uri=evidenceURL)
-                        uris[evidenceURL] = e2
+                doc1 = None
+                if len(documentURL) > 0:
+                    doc1 = documents.get(documentURL, Document(uri=documentURL))
+                    documents[documentURL] = doc1
 
-                # grab the neuron object
                 n = Neuron(neuron_name)
 
                 if relation in ('neurotransmitter',
                                 'innexin',
                                 'neuropeptide',
                                 'receptor'):
-                    r = getattr(n, relation)(data)
-                    res.append(r)
-                    if e is not None:
-                        e.asserts(r)
-                    if e2 is not None:
-                        e2.asserts(r)
+                    for d in (doc, doc1):
+                        if d is not None:
+                            d.to_context()(getattr(n, relation))(data)
                 elif relation == 'type':
-                    types = []
-                    if 'sensory' in data.lower():
-                        types.append('sensory')
-                    if 'interneuron' in data.lower():
-                        types.append('interneuron')
-                    if 'motor' in data.lower():
-                        types.append('motor')
-                    if 'unknown' in data.lower():
-                        types.append('unknown')
-                    # assign the data, grab the relation into r
+                    _data = data.lower()
+                    types = [x for x in ('sensory', 'interneuron', 'motor', 'unknown') if x in _data]
+
                     for t in types:
-                        r = n.type(t)
-                        res.append(r)
-                        # assert the evidence on the relationship
-                        if e is not None:
-                            e.asserts(r)
-                        if e2 is not None:
-                            e2.asserts(r)
+                        for d in (doc, doc1):
+                            if d is not None:
+                                d.to_context()(n).type(t)
+        for d in documents.values():
+            pctx = d.to_context()
+            echo = EVCTX(pctx)
+            Evidence(reference=echo.rdf_object, supports=d)
         return res
 
 
 class MuscleCSVDataSource(CSVDataSource):
-    def __init__(self, **kwargs):
-        super(MuscleCSVDataSource, self).__init__(**kwargs)
+    pass
 
 
 class MuscleCSVTranslator(DataTranslator):
@@ -263,17 +254,20 @@ class MuscleCSVTranslator(DataTranslator):
             with open(data_source.csv_file_name) as csvfile:
                 csvreader = csv.reader(csvfile)
 
-                ev = Evidence(key="wormbase", title="C. elegans Cell List - WormBase.csv")
-                w = WORM
+                doc = Document(key="wormbase", title="C. elegans Cell List - WormBase.csv")
+                doc_ctx = doc.to_context()
+                Evidence(reference=doc, supports=doc_ctx.rdf_object)
+                w = WORM.contextualize(doc_ctx)
+                _Muscle = Muscle.contextualize(doc_ctx)
+
                 for num, line in enumerate(csvreader):
                     if num < 4:  # skip rows with no data
                         continue
 
                     if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
                         muscle_name = normalize_cell_name(line[0]).upper()
-                        m = Muscle(name=muscle_name)
+                        m = _Muscle(name=muscle_name)
                         w.muscle(m)
-                ev.asserts(w)
 
             print ("uploaded muscles")
         except Exception:
@@ -294,7 +288,8 @@ DATA_SOURCES = [
     NeuronCSVDataSource(
         csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
         bibtex_files=['../aux_data/bibtex_files/altun2009.bib',
-                      '../aux_data/bibtex_files/WormAtlas.bib'])
+                      '../aux_data/bibtex_files/WormAtlas.bib']),
+    MuscleCSVDataSource(csv_file_name=CELL_NAMES_SOURCE)
     ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename))
          for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR)
          for filename in sorted(filenames)
@@ -304,7 +299,8 @@ DATA_SOURCES = [
 TRANSLATORS = [
     WormbaseTextMatchCSVTranslator(),
     WormbaseIonChannelCSVTranslator(),
-    NeuronCSVDataTranslator()]
+    NeuronCSVDataTranslator(),
+    MuscleCSVTranslator()]
 
 
 def serialize_as_n3():
@@ -346,7 +342,7 @@ def upload_muscles():
                     muscle_name = normalize_cell_name(line[0]).upper()
                     m = Muscle(name=muscle_name)
                     w.muscle(m)
-            ev.asserts(w)
+            ev.supports(w)
         # second step, get the relationships between them and add them to the graph
         print ("uploaded muscles")
     except Exception:
@@ -416,7 +412,7 @@ def upload_lineage_and_descriptions():
         # Also requires removing neurons and muscles from the list once
         # they've been identified so they aren't stored twice
 
-        ev.asserts(w)
+        ev.supports(w)
         print ("uploaded lineage and descriptions")
     except Exception:
         traceback.print_exc()
@@ -451,7 +447,7 @@ def upload_neurons():
                     n.neuron(Neuron(name=neuron_name))
                     i = i + 1
 
-        ev.asserts(n)
+        ev.supports(n)
         # second step, get the relationships between them and add them to the graph
         print ("uploaded " + str(i) + " neurons")
     except Exception:
@@ -479,38 +475,6 @@ def parse_bibtex_into_document(file_name):
         for entry in bib_database.entries:
             key = entry['ID']
             e = Document(key=key)
-
-            doi = entry.get('doi', None)
-            if doi:
-                e.doi(doi)
-
-            author = entry.get('author', ())
-            for ath in author:
-                e.author(ath)
-
-            title = entry.get('title', None)
-            if title:
-                e.title(title)
-
-            year = entry.get('year', None)
-            if year:
-                e.year(year)
-
-            res[key] = e
-    return res
-
-
-def parse_bibtex_into_evidence(file_name):
-    import bibtexparser
-    e = None
-    res = dict()
-    with open(file_name) as bibtex_file:
-        parser = bibtexparser.bparser.BibTexParser()
-        parser.customization = customizations
-        bib_database = bibtexparser.load(bibtex_file, parser=parser)
-        for entry in bib_database.entries:
-            key = entry['ID']
-            e = Evidence(key=key)
 
             doi = entry.get('doi', None)
             if doi:
@@ -651,7 +615,7 @@ def upload_connections():
                     c = Connection(pre_cell=source, post_cell=target,
                                    number=weight, syntype=syn_type)
                     n.synapse(c)
-                    e.asserts(c)
+                    e.supports(c)
 
                     if isinstance(source, Neuron) and isinstance(target, Neuron):
                         c.termination('neuron')
@@ -676,7 +640,7 @@ def upload_connections():
                         else:
                             other_connections += 1
 
-        e.asserts(n)  # assert the whole connectome too
+        e.supports(n)  # assert the whole connectome too
         print('Total neuron to neuron connections added = %i' % neuron_connections)
         print('Total neuron to muscle connections added = %i' % muscle_connections)
         print('Total other connections added = %i' % other_connections)
@@ -745,6 +709,7 @@ def do_insert(config="default.conf", logging=False):
         t0 = time()
         # upload_neurons()
         # upload_muscles()
+        ctxen = []
         for ds in DATA_SOURCES:
             best_translator = None
             for tr in TRANSLATORS:
@@ -755,7 +720,11 @@ def do_insert(config="default.conf", logging=False):
             if best_translator is not None:
                 print(ds)
                 print('Translating with', best_translator)
-                best_translator.translate(ds)
+                x = best_translator.translate(ds)
+                if x is not None:
+                    for t in x:
+                        if isinstance(t, Context):
+                            ctxen.append(t)
             else:
                 print('No translator for', ds)
 
@@ -767,6 +736,8 @@ def do_insert(config="default.conf", logging=False):
 
         t1 = time()
         print("Saving %d objects..." % IWCTX.size())
+        for ctx in ctxen:
+            ctx.save_context(P.config('rdf.graph'))
         IWCTX.save_context(P.config('rdf.graph'), inline_imports=True)
 
         print("Saved %d objects." % IWCTX.defcnt)
