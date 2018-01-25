@@ -272,10 +272,7 @@ def _get_or_set(self, *args, **kwargs):
 
 
 def _next_or_none(r):
-    try:
-        return next(iter(r))
-    except StopIteration:
-        return None
+    return next(iter(r), None)
 
 
 def _property_to_string(self):

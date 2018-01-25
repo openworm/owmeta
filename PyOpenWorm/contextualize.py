@@ -9,6 +9,17 @@ class Contextualizable(object):
         return None
 
     def contextualize(self, context):
+        """
+        Return an object with the given context. If the provided ``context`` is
+        `None`, then `self` MUST be returned unmodified.
+
+        It is generally not correct to set a field on the object and return the
+        same object as this would change the context for other users of the
+        object. Also, returning a copy of the object is usually inappropriate
+        for mutable objects. Immutable objects may maintain a 'context'
+        property and return a copy of themselves with that property set to the
+        provided ``context`` argument.
+        """
         return self
 
 

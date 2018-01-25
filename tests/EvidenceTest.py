@@ -84,10 +84,10 @@ class Issue211EvidenceTest(_DataTest):
         self.expected_ids = set(['777', '888'])
 
     def assertEvidences(self, prop):
-        getattr(self.e1, prop)('777')
-        getattr(self.e2, prop)('888')
+        getattr(self.e1, prop)(DataObject(ident='777'))
+        getattr(self.e2, prop)(DataObject(ident='888'))
         self.save()
-        loaded_ids = set(getattr(self.evs, prop).get())
+        loaded_ids = set(str(x.identifier) for x in getattr(self.evs, prop).get())
         self.assertTrue(self.expected_ids.issubset(loaded_ids))
 
     def test_references(self):

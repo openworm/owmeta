@@ -13,12 +13,13 @@ class DocumentContext(six.with_metaclass(DocumentContextMeta, Context)):
     """ A Context that corresponds to a document. """
 
     def __new__(cls, *args, **kwargs):
-        # TODO: Evaluate whether we need to do this
-        res = super(DocumentContext, cls).__new__(cls)
-        ores = res
-        res = res.contextualize(cls.context)
-        res.__init__ = type(ores).__init__.__get__(res, type(ores))
-        type(ores).__init__(res, *args, **kwargs)
+        ores = super(DocumentContext, cls).__new__(cls)
+        if cls.context is not None:
+            res = ores.contextualize(cls.context)
+            res.__init__ = type(ores).__init__.__get__(res, type(ores))
+            type(ores).__init__(res, *args, **kwargs)
+        else:
+            res = ores
         return res
 
     def __init__(self, document):

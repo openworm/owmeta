@@ -198,7 +198,16 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
         return self._rdf_object
 
-    def __call__(self, o):
+    def __call__(self, o=None, **kwargs):
+        """
+        Parameters
+        ----------
+        o : object
+            The object to contexualize. Defaults to locals()
+        """
+        if o is None:
+            o = kwargs
+
         if isinstance(o, ModuleType):
             return ModuleProxy(self, o)
         elif isinstance(o, dict):
@@ -223,6 +232,9 @@ class ContextContextManager(object):
         self._ctx = ctx
         self._backing_dict = to_import
         self.save = self._ctx.save_context
+
+    def __call__(self, o):
+        return self._ctx(o)
 
     def __enter__(self):
         return self

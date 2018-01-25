@@ -1,4 +1,5 @@
 from __future__ import print_function
+from functools import partial
 import rdflib as R
 from rdflib.term import URIRef
 import random as RND
@@ -132,6 +133,10 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         return self.__context
 
 
+class _partial_property(partial):
+    pass
+
+
 def contextualized_data_object(context, obj):
     # We have to get the important attributes of the proxied object's type and
     # copy them in here. This is only necessary for the attributes which are
@@ -179,17 +184,20 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         instance, allowing for statements made in __init__ to be contextualized.
         """
         ores = super(BaseDataObject, cls).__new__(cls)
-        res = ores.contextualize(cls.context)
-        # Python skips __init__ if the result of __new__ doesn't have cls as
-        # its type, but we still want it to happen, so we have to call __init__
-        # ourselves.
-        otype = type(ores)
-        res.__init__ = otype.__init__.__get__(res, otype)
-        otype.__init__(res, *args, **kwargs)
+        if cls.context is not None:
+            res = ores.contextualize(cls.context)
+            # Python skips __init__ if the result of __new__ doesn't have cls as
+            # its type, but we still want it to happen, so we have to call __init__
+            # ourselves.
+            otype = type(ores)
+            res.__init__ = otype.__init__.__get__(res, otype)
+            otype.__init__(res, *args, **kwargs)
+        else:
+            res = ores
 
         return res
 
-    def __init__(self, **kwargs):
+    def __init__(self, rdfs_comment=None, rdfs_label=None, **kwargs):
         super(BaseDataObject, self).__init__(**kwargs)
         self.properties = []
         self.owner_properties = []
@@ -199,6 +207,12 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self._variable = R.Variable("V" + str(RND.random()))
         BaseDataObject.attach_property(self, RDFTypeProperty)
         BaseDataObject.attach_property(self, RDFSCommentProperty)
+        BaseDataObject.attach_property(self, RDFSLabelProperty)
+        if rdfs_comment:
+            self.rdfs_comment = rdfs_comment
+
+        if rdfs_label:
+            self.rdfs_label = rdfs_label
 
     def clear_po_cache(self):
         """ Clear the property-object cache for this object.
@@ -238,6 +252,12 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 self.defined and
                 other.defined and
                 (self.identifier == other.identifier))
+
+    def __setattr__(self, name, val):
+        if isinstance(val, _partial_property):
+            val(owner=self, linkName=name)
+        else:
+            super(BaseDataObject, self).__setattr__(name, val)
 
     def count(self):
         return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
@@ -298,7 +318,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return cls._create_property(*args, property_type='DatatypeProperty', **kwargs)
+        try:
+            return cls._create_property(*args, property_type='DatatypeProperty', **kwargs)
+        except TypeError:
+            return _partial_property(cls._create_property, *args, property_type='DatatypeProperty', **kwargs)
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
@@ -314,7 +337,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         value_type : type
             The type of BaseDataObject for values of this property
         """
-        return cls._create_property(*args, property_type='ObjectProperty', **kwargs)
+        try:
+            return cls._create_property(*args, property_type='ObjectProperty', **kwargs)
+        except TypeError:
+            return _partial_property(cls._create_property, *args, property_type='ObjectProperty', **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
@@ -328,10 +354,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return cls._create_property(
-            *args,
-            property_type='UnionProperty',
-            **kwargs)
+        try:
+            return cls._create_property(*args, property_type='UnionProperty', **kwargs)
+        except TypeError:
+            return _partial_property(cls._create_property, *args, property_type='UnionProperty', **kwargs)
 
     @classmethod
     def _create_property(
@@ -460,7 +486,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return oid(identifier_or_rdf_type, rdf_type)
 
     def contextualize(self, context):
-        return contextualized_data_object(context, self)
+        if context is not None:
+            return contextualized_data_object(context, self)
+        else:
+            return self
 
 
 class DataObject(BaseDataObject):
@@ -517,6 +546,13 @@ class RDFTypeProperty(ObjectProperty):
 class RDFSCommentProperty(DatatypeProperty):
     link = R.RDFS['comment']
     linkName = 'rdfs_comment'
+    owner_type = BaseDataObject
+    multiple = True
+
+
+class RDFSLabelProperty(DatatypeProperty):
+    link = R.RDFS['label']
+    linkName = 'rdfs_label'
     owner_type = BaseDataObject
     multiple = True
 
