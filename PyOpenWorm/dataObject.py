@@ -6,11 +6,11 @@ import random as RND
 import logging
 from itertools import groupby
 import six
-# from six.moves.urllib.parse import quote
 import hashlib
+import traceback
 
 import PyOpenWorm
-from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualize_metaclass
+from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualize_metaclass, contextualize_helper
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -28,6 +28,7 @@ from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
 
 __all__ = [
     "BaseDataObject",
+    "ContextMappedClass",
     "DataObject",
     "values",
     "DataObjectTypes",
@@ -90,6 +91,7 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         _G = _H('_H_' + self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
                                                      rdf_type=self.rdf_type,
                                                      class_context=_temp_ctx.identifier))
+        # print('contextualize_class', _G.context)
         return _G
 
     def after_mapper_module_load(self, mapper):
@@ -116,7 +118,7 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         elif isinstance(o, RDFProperty):
             o.rdf_type_property(RDFSClass.get_instance())
         elif isinstance(o, RDFSClass):
-            o.rdf_type_property(o)
+            o.rdf_type_property.set(o)
         elif isinstance(o, TypeDataObject):
             o.rdf_type_property(RDFSClass.get_instance())
         else:
@@ -138,22 +140,24 @@ class _partial_property(partial):
 
 
 def contextualized_data_object(context, obj):
-    # We have to get the important attributes of the proxied object's type and
-    # copy them in here. This is only necessary for the attributes which are
-    # not passed onto instances (e.g. attributes with mangled names)
-
-    ctx_proxy_typ = type(ContextualizingProxy)
-    newtyp = ctx_proxy_typ('CtxProxyClass_' + obj.__class__.__name__,
-                           (ContextualizingProxy,), dict())
-
-    res = newtyp(context, obj)
-    new_properties = []
+    res = contextualize_helper(context, obj)
     if hasattr(res, 'properties'):
-        for p in res.properties:
-            ctxd_p = p.contextualize(context)
-            new_properties.append(ctxd_p)
-            setattr(res, p.linkName, ctxd_p)
+        cprop = res.properties.contextualize(context)
+        res.add_attr_override('properties', cprop)
+        for p in cprop:
+            res.add_attr_override(p.linkName, p)
     return res
+
+
+class ContextualizableList(Contextualizable, list):
+
+    def __init__(self, context=None):
+        self._context = context
+
+    def contextualize(self, context):
+        res = type(self)(context=context)
+        res += type(self)(x.contextualize(context) for x in self)
+        return res
 
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
@@ -190,16 +194,19 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             # its type, but we still want it to happen, so we have to call __init__
             # ourselves.
             otype = type(ores)
+            # if otype.__name__ == 'NeuronCSVDataTranslator' or 'Translation' in otype.__name__:
+                # print('NEWING', otype, cls.context, id(ores), id(res))
             res.__init__ = otype.__init__.__get__(res, otype)
             otype.__init__(res, *args, **kwargs)
         else:
+            # print('CONTEXT IS NOOOOOOOOOOOOOOOOOOOOOONE NEWING', otype, cls.context, id(ores))
             res = ores
 
         return res
 
     def __init__(self, rdfs_comment=None, rdfs_label=None, **kwargs):
         super(BaseDataObject, self).__init__(**kwargs)
-        self.properties = []
+        self.properties = ContextualizableList(context=self.context)
         self.owner_properties = []
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
@@ -365,7 +372,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             linkName,
             owner,
             property_type,
-            value_type=False,
+            value_type=None,
             multiple=False,
             link=None):
         # XXX This should actually get called for all of the properties when
@@ -376,7 +383,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         property_class_name = str(owner_class_name + "_" + linkName)
         _PropertyTypes_key = (cls, linkName)
 
-        if not value_type:
+        if value_type is None:
             value_type = BaseDataObject
 
         c = None
@@ -436,11 +443,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
 
-    @classmethod
-    def attach_property(cls, owner, c):
-        res = c(owner=owner,
-                conf=owner.conf,
-                resolver=_Resolver.get_instance())
+    @staticmethod
+    def attach_property(owner, c):
+        res = c.contextualize(owner.context)(owner=owner,
+                                             conf=owner.conf,
+                                             resolver=_Resolver.get_instance())
         owner.properties.append(res)
         setattr(owner, c.linkName, res)
 

@@ -89,6 +89,7 @@ __all__ = [
 # context automatically
 mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
                                   'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+BASE_SCHEMA_URL = 'http://openworm.org/schema'
 # An "empty" context, that serves as the default when no context is defined
 DEF_CTX = Context(mapper=mapper)
 
@@ -103,23 +104,23 @@ RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
 
 
 BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
-                       ident='http://openworm.org/schema',
-                       base_namespace='http://openworm.org/schema#',
+                       ident=BASE_SCHEMA_URL,
+                       base_namespace=BASE_SCHEMA_URL + '#',
                        mapper=mapper)
 
 SCI_CTX = Context(imported=(BASE_CONTEXT,),
-                  ident='http://openworm.org/schema/sci',
-                  base_namespace='http://openworm.org/schema/sci#',
+                  ident=BASE_SCHEMA_URL + '/sci',
+                  base_namespace=BASE_SCHEMA_URL + '/sci#',
                   mapper=mapper)
 
 SCI_BIO_CTX = Context(imported=(SCI_CTX,),
-                      ident='http://openworm.org/schema/sci/bio',
-                      base_namespace='http://openworm.org/schema/sci/bio#',
+                      ident=BASE_SCHEMA_URL + '/sci/bio',
+                      base_namespace=BASE_SCHEMA_URL + '/sci/bio#',
                       mapper=mapper)
 
 CONTEXT = Context(imported=(SCI_BIO_CTX,),
-                  ident='http://openworm.org/schema/bio',
-                  base_namespace='http://openworm.org/schema/bio#',
+                  ident=BASE_SCHEMA_URL + '/bio',
+                  base_namespace=BASE_SCHEMA_URL + '/bio#',
                   mapper=mapper)
 
 yarom.MAPPER = CONTEXT.mapper

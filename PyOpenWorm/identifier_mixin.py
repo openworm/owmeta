@@ -21,7 +21,6 @@ def IdMixin(typ=object, hashfunc=None):
         Should return an object can ``.encode()`` to a :class:`bytes` (a.k.a.
         :class:`str` in Python 2).  Defaults to `hashlib.md5`
     """
-
     res = _IdMixins.get((id(typ), hashfunc), None)
     if res is None:
         class _IdMixin(typ):
@@ -64,7 +63,7 @@ def IdMixin(typ=object, hashfunc=None):
                 elif self.defined_augment():
                     return self.identifier_augment()
                 else:
-                    raise Exception(IdentifierMissingException(self))
+                    raise IdentifierMissingException(self)
 
             def identifier_augment(self):
                 """ Override this method to define an identifier in lieu of one explicity set.

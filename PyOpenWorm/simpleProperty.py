@@ -13,7 +13,7 @@ from yarom.propertyMixins import (ObjectPropertyMixin,
                                   DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass
+from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualized_new, contextualize_helper
 from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
@@ -84,9 +84,11 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._v = _values()
         self.owner = owner
 
-    @property
-    def context(self):
-        return self.owner.context
+    def contextualize(self, context):
+        # print('contextualizing', self, id(self), context)
+        res = contextualize_helper(context, self)
+        # print('contextualized', self, 'id(self)', id(self), 'id(res)', id(res), context, res.context)
+        return res
 
     def has_value(self):
         for x in self._v:
@@ -96,11 +98,16 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def has_defined_value(self):
         for x in self._v:
-            if x.context == self.context and x.object.defined:
-                return True
+            if x.object.defined:
+                if x.context == self.context:
+                    return True
+                else:
+                    print("SKIPPING BECAUSE THE CONTEXT IS WRONG")
         return False
 
     def set(self, v):
+        if v is None:
+            raise ValueError('It is not permitted to declare a property to have value the None')
         if not hasattr(v, 'idl'):
             v = PropertyValue(v)
 
@@ -108,6 +115,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self.clear()
 
         stmt = self._insert_value(v)
+        # print('setting', self.linkName)
+        # if self.linkName in ('rdf_type_property','translator'):
+            # print('setting', self.linkName, 'type(self)', type(self), 'id(self)',
+                  # id(self), 'id(self.owner)', id(self.owner), 'id(v)', id(v), 'self.context', self.context)
         self.context.add_statement(stmt)
         return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
 
@@ -175,19 +186,29 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._remove_value(v)
 
     def __call__(self, *args, **kwargs):
+        # print('RealSimpleProperty, __call__', type(self), id(self))
         return _get_or_set(self, *args, **kwargs)
 
     def __repr__(self):
         return _property_to_string(self)
 
     def one(self):
-        return _next_or_none(self.get())
+        return next(iter(self.get()), None)
+
+    def onedef(self):
+        for x in self._v:
+            if x.object.defined and x.context == self.context:
+                return x.object
+        return None
 
     @classmethod
     def on_mapper_add_class(cls, mapper):
         cls.rdf_type = cls.base_namespace[cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         return cls
+
+
+RealSimpleProperty.__new__ = contextualized_new(RealSimpleProperty)
 
 
 class POCache(tuple):
@@ -237,6 +258,10 @@ class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
             s.add(self._resolver.deserializer(x.idl))
         return itertools.chain(r, s)
 
+    def onedef(self):
+        x = super(DatatypeProperty, self).onedef()
+        return self._resolver.deserializer(x.identifier)
+
 
 class UnionProperty(UnionPropertyMixin, RealSimpleProperty):
 
@@ -268,16 +293,13 @@ def _get_or_set(self, *args, **kwargs):
         if self.multiple:
             return set(r)
         else:
-            return _next_or_none(r)
-
-
-def _next_or_none(r):
-    return next(iter(r), None)
+            return next(iter(r), None)
 
 
 def _property_to_string(self):
-    assert hasattr(self, 'linkName')
-    assert hasattr(self, 'defined_values')
-    s = str(self.linkName) + "=`" + \
-        ";".join(str(s) for s in self.defined_values) + "'"
+    try:
+        s = str(self.linkName) + "=`" + \
+            ";".join(str(s) for s in self.defined_values) + "'"
+    except AttributeError:
+        s = str(self.linkName) + '(no defined_values)'
     return s

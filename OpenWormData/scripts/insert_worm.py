@@ -4,7 +4,6 @@ from rdflib.namespace import Namespace
 from rdflib.term import URIRef
 import PyOpenWorm as P
 from PyOpenWorm.utils import normalize_cell_name
-from PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
 from PyOpenWorm.context import Context
 from PyOpenWorm.bibtex import parse_bibtex_into_documents
 # import logging
@@ -36,6 +35,7 @@ EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
 from EVCTX.PyOpenWorm.evidence import Evidence
 from EVCTX.PyOpenWorm.document import Document
 from EVCTX.PyOpenWorm.website import Website
+from EVCTX.PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
 
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
                 imported=(CTX, EVCTX))
@@ -56,17 +56,17 @@ ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 TRANS_NS = Namespace('http://openworm.org/entities/translators/')
 
 class LocalFileDataSource(DataSource):
-    metadata = (Informational('file_name', 'File name'),)
+    file_name = Informational(display_name='File name')
 
 
 class CSVDataSource(LocalFileDataSource):
-    metadata = (Informational('csv_file_name', 'CSV file name'),
-                Informational('csv_header', 'Header column names'))
+    csv_file_name = Informational(display_name='CSV file name')
+    csv_header = Informational(display_name='Header column names', multiple=False)
 
-    def __init__(self, csv_file_name, **kwargs):
-        super(CSVDataSource, self).__init__(csv_file_name=csv_file_name,
-                                            file_name=csv_file_name,
-                                            **kwargs)
+    # def __init__(self, csv_file_name, **kwargs):
+        # super(CSVDataSource, self).__init__(csv_file_name=csv_file_name,
+                                            # file_name=csv_file_name,
+                                            # **kwargs)
 
 
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
@@ -85,25 +85,24 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
 
 
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
-    def __init__(self, **kwargs):
-        super(WormbaseIonChannelCSVDataSource, self).__init__(
-                csv_header=('channel_name',
-                            'gene_name',
-                            'gene_WB_ID',
-                            'expression_pattern',
-                            'description'),
-                **kwargs)
+    csv_header = ('channel_name',
+                  'gene_name',
+                  'gene_WB_ID',
+                  'expression_pattern',
+                  'description')
+
 
 class DataWithEvidenceDataSource(DataSource):
-    metadata = (Informational('evidence_context', 'Evidence context',
-                              description='The context in which evidence for the "Data context" is defined'),
-                Informational('data_context', 'Data context',
-                              description='The context in which primary data for this data source is defined'),
-                Informational('contexts', 'Other contexts',
-                              description='Other contexts defined by the data translator'))
+    evidence_context = Informational(display_name='Evidence context',
+                                     description='The context in which evidence for the "Data context" is defined')
+    data_context = Informational(display_name='Data context',
+                                 description='The context in which primary data for this data source is defined')
+    contexts = Informational(display_name='Other contexts',
+                             description='Other contexts defined by the data translator')
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/DataWithEvidenceDataSource#")
     def __init__(self, *args, **kwargs):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)
+        # print(self.translation._v)
         self.data_context = Context(ident=self.identifier + '#data',
                                     imported=(P.CONTEXT,))
         self.evidence_context = Context(ident=self.identifier + '#evidence',
@@ -119,7 +118,7 @@ class WormbaseIonChannelCSVTranslator(DataTranslator):
     def translate(self, data_source):
         res = set([])
         try:
-            with open(data_source.csv_file_name, 'r') as csvfile:
+            with open(data_source.csv_file_name.one(), 'r') as csvfile:
                 next(csvfile, None)
                 csvreader = csv.reader(csvfile, skipinitialspace=True)
 
@@ -157,7 +156,7 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
         initcol = data_source.initial_cell_column
         ctype = data_source.cell_type
         try:
-            with open(data_source.csv_file_name, 'r') as f:
+            with open(data_source.csv_file_name.one(), 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
                 for row in reader:
@@ -192,8 +191,8 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
 
 class NeuronCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/NeuronCSVDataSource#")
-    metadata = (Informational('bibtex_files', 'BibTeX files',
-                              description='List of BibTeX files that are referenced in the csv file by entry ID'),)
+    bibtex_files = Informational(display_name='BibTeX files',
+                                 description='List of BibTeX files that are referenced in the csv file by entry ID')
 
 
 class NeuronCSVDataTranslator(DataTranslator):
@@ -203,14 +202,18 @@ class NeuronCSVDataTranslator(DataTranslator):
 
     def translate(self, data_source):
         # Define the result data source and the distinguished contexts
-        res = self.make_new_output(data_source)
+        # print('NeuronCSVDataTranslator instance self', self)
+        # print('NeuronCSVDataTranslator instance type', type(self))
+        # print('NeuronCSVDataTranslator instance context', self.context)
+        # print('NeuronCSVDataTranslator instance output_Type', self.output_type, self.output_type.rdf_namespace)
+        res = self.make_new_output((data_source,))
 
         documents = dict()
         if data_source.bibtex_files is not None:
-            for bib in data_source.bibtex_files:
+            for bib in data_source.bibtex_files.onedef():
                 documents.update(parse_bibtex_into_documents(bib, res.evidence_context))
 
-        with open(data_source.csv_file_name) as f:
+        with open(data_source.csv_file_name.one()) as f:
             reader = csv.reader(f)
             next(reader)  # skip the header row
 
@@ -247,34 +250,32 @@ class NeuronCSVDataTranslator(DataTranslator):
 
 class WormBaseCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/MuscleCSVDataSource#")
-    def __init__(self, **kwargs):
-        super(WormBaseCSVDataSource, self).__init__(csv_header=("Cell",
-                                                                "Lineage Name",
-                                                                "Description",
-                                                                "Total count of identified adult-only hermaphrodite cells",
-                                                                "Total count of adult-only male cells",
-                                                                "Neurons (no male-specific cells)",
-                                                                "Neurons (male-specific)",
-                                                                "Body wall muscles",
-                                                                "Pharynx muscles",
-                                                                "Other muscles",
-                                                                "Other adult-only cells in the hermaphrodite",
-                                                                "Other adult-only hermaphrodite-specific cells (not present in males)",
-                                                                "Motor neurons related to body wall muscles",
-                                                                "Embryonic cells not present in adult",
-                                                                "Male-specific cells",
-                                                                "Male-specific adult-only cells",
-                                                                "Cells with non-unique name",
-                                                                "",
-                                                                "VirtualWorm blender model names",
-                                                                "WormBase ID",
-                                                                "Synonyms"), **kwargs)
+    csv_header=("Cell",
+                "Lineage Name",
+                "Description",
+                "Total count of identified adult-only hermaphrodite cells",
+                "Total count of adult-only male cells",
+                "Neurons (no male-specific cells)",
+                "Neurons (male-specific)",
+                "Body wall muscles",
+                "Pharynx muscles",
+                "Other muscles",
+                "Other adult-only cells in the hermaphrodite",
+                "Other adult-only hermaphrodite-specific cells (not present in males)",
+                "Motor neurons related to body wall muscles",
+                "Embryonic cells not present in adult",
+                "Male-specific cells",
+                "Male-specific adult-only cells",
+                "Cells with non-unique name",
+                "",
+                "VirtualWorm blender model names",
+                "WormBase ID",
+                "Synonyms")
 
 
 class WormAtlasCellListDataSource(CSVDataSource):
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/WormAtlasCellListDataSource#")
     csv_header = ('Cell', 'Lineage Name', 'Description')
-    metadata = (Informational('neurons_source', identifier=URIRef('http://openworm.org/schema/DataSource/source')),)
 
 
 class MuscleWormBaseCSVTranslator(DataTranslator):
@@ -284,8 +285,8 @@ class MuscleWormBaseCSVTranslator(DataTranslator):
 
     def translate(self, data_source):
         """ Upload muscles and the neurons that connect to them """
-        res = self.make_new_output(data_source)
-        with open(data_source.csv_file_name) as csvfile:
+        res = self.make_new_output((data_source,))
+        with open(data_source.csv_file_name.one()) as csvfile:
             csvreader = csv.reader(csvfile)
 
             # TODO: Improve this evidence by going back to the actual research
@@ -314,7 +315,7 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronWormBaseCSVTranslator
     def translate(self, data_source):
-        res = self.make_new_output(data_source)
+        res = self.make_new_output((data_source,))
         # TODO: Improve this evidence by going back to the actual research
         #       by using the wormbase REST API in addition to or instead of the CSV file
         with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
@@ -327,7 +328,7 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
             w.neuron_network(n)
             n.worm(w)
 
-            with open(data_source.csv_file_name) as csvfile:
+            with open(data_source.csv_file_name.one()) as csvfile:
                 csvreader = csv.reader(csvfile)
 
                 for num, line in enumerate(csvreader):
@@ -371,10 +372,10 @@ DATA_SOURCES = [
 
 
 TRANSLATORS = [
-    WormbaseTextMatchCSVTranslator(),
-    WormbaseIonChannelCSVTranslator(),
+    # WormbaseTextMatchCSVTranslator(),
+    # WormbaseIonChannelCSVTranslator(),
     NeuronCSVDataTranslator(),
-    MuscleWormBaseCSVTranslator(),
+    # MuscleWormBaseCSVTranslator(),
     NeuronWormBaseCSVTranslator()]
 
 
@@ -410,7 +411,7 @@ class WormAtlasCellListDataTranslator(DataTranslator):
         # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
         # at the sub-class insert and have a reasoner relate
         # the two sets of inserts.
-        res = self.make_new_output(source=data_source,
+        res = self.make_new_output(sources=data_source,
                                    neurons_source=neurons_source)
         try:
             with res.data_context(Worm=Worm, Network=Network) as ctx:
@@ -418,7 +419,7 @@ class WormAtlasCellListDataTranslator(DataTranslator):
                 net = ctx.Network()
             # TODO: Improve this evidence marker
             doc = res.evidence_context(Document)(url="http://www.wormatlas.org/celllist.htm")
-            with open(data_source.csv_file_name, "r") as cell_data:
+            with open(data_source.csv_file_name.one(), "r") as cell_data:
 
                 # Skip headers
                 next(cell_data)

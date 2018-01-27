@@ -2,20 +2,23 @@ import six
 from rdflib.term import URIRef
 from rdflib.namespace import Namespace
 from collections import OrderedDict
-from .identifier_mixin import IdMixin
 from .context import Context
-from .dataObject import DataObject
+from .dataObject import BaseDataObject
 
 
 class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
-                 value=None, default_value=None, identifier=None):
+                 value=None, default_value=None, identifier=None,
+                 property_type='DatatypeProperty', multiple=True):
         self.name = name
         self.display_name = name if display_name is None else display_name
         self.default_value = default_value
         self.description = description
         self._value = value
         self.identifier = identifier
+        self.property_type = property_type
+        self.cls = None
+        self.multiple = multiple
 
     def __repr__(self):
         return ("Informational(name='{}',"
@@ -29,30 +32,45 @@ class Informational(object):
                                           repr(self.identifier))
 
 
-class DataSourceType(type):
+class DataSourceType(type(BaseDataObject)):
 
     """A type for DataSources
 
     Sets up the graph with things needed for MappedClasses
     """
     def __init__(self, name, bases, dct):
-        super(DataSourceType, self).__init__(name, bases, dct)
         self._info_fields = []
+        others = []
+        newdct = dict()
         for z in dct:
-            if z == 'metadata':
-                for meta in dct[z]:
-                    if isinstance(meta, Informational):
-                        if meta.identifier is None:
-                            meta.identifier = self.rdf_namespace[meta.name]
-                        self._info_fields.append(meta)
+            meta = dct[z]
+            if isinstance(meta, Informational):
+                if meta.identifier is None:
+                    if self.rdf_namespace is not None:
+                        meta.identifier = self.rdf_namespace[meta.name]
+                meta.cls = self
+                meta.name = z
+                self._info_fields.append(meta)
+            else:
+                others.append((z, dct[z]))
 
         for x in bases:
             if hasattr(x, '_info_fields'):
                 self._info_fields += x._info_fields
 
+        for k, v in others:
+            for inf in self._info_fields:
+                if inf.name == k:
+                    inf.default_value = v
+                    break
+            else: # no 'break'
+                newdct[k] = v
 
-class DataSource(six.with_metaclass(DataSourceType, IdMixin())):
-    """
+        super(DataSourceType, self).__init__(name, bases, newdct)
+
+
+class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
+    '''
     A source for data that can get translated into PyOpenWorm objects.
 
     The value for any field can be passed to __init__ by name. Additionally, if
@@ -63,56 +81,61 @@ class DataSource(six.with_metaclass(DataSourceType, IdMixin())):
 
     that value will be used over the default value for the field, but not over
     any value provided to __init__.
-    """
-    metadata = (Informational(name='translator', display_name='Translator',
-                              description='The translator that constructed this data source'),
-                Informational(name='source', display_name='Input source',
-                              description='The data source that was translated into this one',
-                              identifier=URIRef('http://openworm.org/schema/DataSource/source')))
+    '''
+
+    source = Informational(display_name='Input source',
+                           description='The data source that was translated into this one',
+                           identifier=URIRef('http://openworm.org/schema/DataSource/source'),
+                           property_type='ObjectProperty')
+
+    translation = Informational(display_name='Translation',
+                                description='Information about the translation process that created this object',
+                                identifier=URIRef('http://openworm.org/schema/DataSource/translation'),
+                                property_type='ObjectProperty')
+
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/DataSource#")
 
     def __init__(self, **kwargs):
         self.info_fields = OrderedDict((i.name, i) for i in self.__class__._info_fields)
         parent_kwargs = dict()
+        new_kwargs = dict()
         for k, v in kwargs.items():
-            if isinstance(v, Informational):
-                # Any Informational we get must represent a *new* field, so we
-                # raise a value error if one with the same name already exists
-                if k in self.info_fields:
-                    raise ValueError('The provided ad hoc field, "{}",'
-                                     ' has already been declared by the class'.format(k))
-                info = v
-                info.name = k
-                v = info._value
-                delattr(info, '_value')
-                self.info_fields[k] = info
+            if k not in self.info_fields:
+                parent_kwargs[k] = v
             else:
-                if k not in self.info_fields:
-                    parent_kwargs[k] = v
-                    continue
-            setattr(self, k, v)
+                new_kwargs[k] = v
         super(DataSource, self).__init__(**parent_kwargs)
         for n, inf in self.info_fields.items():
-            if not hasattr(self, n):
-                setattr(self, n, inf.default_value)
+            getattr(inf.cls, inf.property_type)(owner=self,
+                                                linkName=inf.name,
+                                                multiple=True,
+                                                link=inf.identifier)
+            v = new_kwargs.get(n, None)
+            if v is not None:
+                self.context(getattr(self, inf.name))(v)
+            else:
+                try:
+                    if not self.context(getattr(self, inf.name)).has_defined_value() and inf.default_value is not None:
+                        self.context(getattr(self, inf.name))(inf.default_value)
+                except AttributeError as e:
+                    print("HANDLING AttributeError in DataSource")
+                    print(repr(type(self)), id(self), getattr(self, inf.name))
+                    raise e
 
     def defined_augment(self):
-        return (self.source is not None and
-                self.translator is not None and
-                self.source.defined and
-                self.translator.defined)
+        return self.translation.has_defined_value()
 
     def identifier_augment(self):
-        return self.make_identifier(self.source.identifier.n3() + self.translator.identifier.n3())
+        return self.make_identifier(self.translation.defined_values[0].identifier.n3())
 
     def __str__(self):
         return self.__class__.__name__ + '\n' + \
             '\n'.join('    ' + ': '.join((info.display_name,
-                                         repr(getattr(self, info.name))))
+                                         repr(list(getattr(self, info.name).defined_values))))
                       for info in self.info_fields.values()) + '\n'
 
 
-class Translation(DataObject):
+class Translation(BaseDataObject):
     """
     Representation of the method by which a DataSource was translated and
     the sources of that translation.  Unlike the 'source' field attached to
@@ -122,7 +145,14 @@ class Translation(DataObject):
 
     def __init__(self, translator, **kwargs):
         super(Translation, self).__init__(**kwargs)
-        self.translator = Translation.ObjectProperty()
+        Translation.ObjectProperty('translator', owner=self)
+        self.translator(translator)
+
+    def defined_augment(self):
+        return self.translator.has_defined_value() and self.translator.onedef().defined
+
+    def identifier_augment(self):
+        return self.make_identifier(self.translator.onedef().identifier.n3())
 
 
 class DataObjectContextDataSource(DataSource):
@@ -134,7 +164,7 @@ class DataObjectContextDataSource(DataSource):
             self.context = Context()
 
 
-class DataTranslator(IdMixin()):
+class DataTranslator(BaseDataObject):
     """ Translates from a data source to PyOpenWorm objects """
 
     input_type = DataSource
@@ -142,8 +172,8 @@ class DataTranslator(IdMixin()):
     translator_identifier = None
 
     def __init__(self):
-        if type(self).translator_identifier is not None:
-            super(DataTranslator, self).__init__(ident=type(self).translator_identifier)
+        if self.translator_identifier is not None:
+            super(DataTranslator, self).__init__(ident=self.translator_identifier)
         else:
             super(DataTranslator, self).__init__()
 
@@ -157,8 +187,17 @@ class DataTranslator(IdMixin()):
     def translate(self, data_source):
         raise NotImplementedError()
 
-    def make_new_output(self, input_source, *args, **kwargs):
-        return self.output_type(*args, source=input_source, translator=self, **kwargs)
+    def make_translation(self):
+        # print('MAKING TRANSLATION', id(self), self.context)
+        return Translation.contextualize(self.context)(translator=self)
+
+    def make_new_output(self, sources, *args, **kwargs):
+        # print('making output_type', type(self), self.output_type)
+        res = self.output_type(*args, translation=self.make_translation(), **kwargs)
+        for s in sources:
+            # print('setting source', s)
+            res.contextualize(self.context).source(s)
+        return res
 
 
 class PersonDataTranslator(DataTranslator):
@@ -174,3 +213,6 @@ class PersonDataTranslator(DataTranslator):
         self.person = person
 
     # No translate impl is provided here since this is intended purely as a descriptive object
+
+
+__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator)
