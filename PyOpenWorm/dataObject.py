@@ -84,16 +84,13 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
 
         return base_ns
 
-    def contextualize_class(self, context, mem=dict()):
+    def contextualize_class_augment(self, context):
         if context is None:
             return self
-        res = mem.get((id(self), context), None)
-        if res is None:
-            ctxd_meta = contextualize_metaclass(context, self)
-            res = ctxd_meta('_H0', (self,), dict(rdf_namespace=self.rdf_namespace,
-                                                 rdf_type=self.rdf_type,
-                                                 class_context=context.identifier))
-            mem[(id(self), context)] = res
+        ctxd_meta = contextualize_metaclass(context, self)
+        res = ctxd_meta('_H0', (self,), dict(rdf_namespace=self.rdf_namespace,
+                                             rdf_type=self.rdf_type,
+                                             class_context=context.identifier))
         return res
 
     def after_mapper_module_load(self, mapper):
@@ -107,8 +104,6 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
             self.rdf_type_object = None
 
     def __call__(self, *args, **kwargs):
-        if self.context is not None:
-            kwargs['context'] = self.context
         o = super(ContextMappedClass, self).__call__(*args, **kwargs)
 
         if isinstance(o, PropertyDataObject):
@@ -138,18 +133,12 @@ class _partial_property(partial):
 
 
 def contextualized_data_object(context, obj):
-    if obj.context is None:
-        obj.context = context
-        if hasattr(obj, 'properties'):
-            obj.properties = obj.properties.contextualize(context)
-        res = obj
-    else:
-        res = contextualize_helper(context, obj)
-        if hasattr(res, 'properties'):
-            cprop = res.properties.contextualize(context)
-            res.add_attr_override('properties', cprop)
-            for p in cprop:
-                res.add_attr_override(p.linkName, p)
+    res = contextualize_helper(context, obj)
+    if hasattr(res, 'properties'):
+        cprop = res.properties.contextualize(context)
+        res.add_attr_override('properties', cprop)
+        for p in cprop:
+            res.add_attr_override(p.linkName, p)
     return res
 
 
@@ -496,7 +485,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             rdf_type = URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
-    def contextualize(self, context):
+    def contextualize_augment(self, context):
         if context is not None:
             return contextualized_data_object(context, self)
         else:

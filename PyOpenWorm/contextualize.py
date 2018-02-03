@@ -1,8 +1,12 @@
 import wrapt
+from weakref import WeakValueDictionary
 
 
 class Contextualizable(object):
-    __slots__ = ()
+
+    def __init__(self, *args, **kwargs):
+        super(Contextualizable, self).__init__(*args, **kwargs)
+        self._contexts = WeakValueDictionary()
 
     @property
     def context(self):
@@ -20,6 +24,14 @@ class Contextualizable(object):
         property and return a copy of themselves with that property set to the
         provided ``context`` argument.
         """
+        ctxd = self._contexts.get(context)
+        if ctxd is not None:
+            return ctxd
+        ctxd = self.contextualize_augment(context)
+        self._contexts[context] = ctxd
+        return ctxd
+
+    def contextualize_augment(self, context):
         return self
 
 
@@ -48,6 +60,8 @@ def get_wrapped(self):
 
 
 class ContextualizingProxy(wrapt.ObjectProxy):
+    __slots__ = ('_self_context', '_self_overrides')
+
     def __init__(self, ctx, *args, **kwargs):
         super(ContextualizingProxy, self).__init__(*args, **kwargs)
         self._self_context = ctx
@@ -163,11 +177,15 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                                                      repr(self.__wrapped__))
 
 
+cc_map = {'contextualize': 'contextualize_class',
+          'contextualize_augment': 'contextualize_class_agument'}
+
+
 class ContextualizableClass(type):
     """ A super-type for contextualizable classes """
 
     def __getattribute__(self, name):
-        return super(ContextualizableClass, self).__getattribute__('contextualize_class' if name == 'contextualize' else name)
+        return super(ContextualizableClass, self).__getattribute__(cc_map.get(name, name))
 
     def contextualize_class(self, context):
         if context is None:

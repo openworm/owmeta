@@ -64,6 +64,9 @@ __author__ = 'Stephen Larson'
 import sys
 import os
 
+# The c extensions are incompatible with our code...
+os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
+
 # For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
 from .context import Context
