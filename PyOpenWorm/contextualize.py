@@ -27,29 +27,24 @@ UNSET = object()
 
 
 def contextualize_metaclass(context, self):
-    outer_self = self
 
     class _H(type(self)):
         def __init__(self, name, bases, dct):
             super(_H, self).__init__(name, bases, dct)
             self.__ctx = context
-            if self.__ctx is None:
-                raise Exception(name)
-
-        def __call__(self, *args, **kwargs):
-            if self.__ctx is None:
-                raise Exception()
-            return super(_H, self).__call__(*args, **kwargs)
 
         def __repr__(self):
             return self.__name__ + '.contextualize_class(' + repr(context) + ')'
 
         @property
         def context(self):
-            # print('contextualize_metaclass', 'outer_self', outer_self, 'self.__ctx', self.__ctx)
             return self.__ctx
 
     return _H
+
+
+def get_wrapped(self):
+    return super(ContextualizingProxy, self).__getattribute__('__wrapped__')
 
 
 class ContextualizingProxy(wrapt.ObjectProxy):
@@ -64,22 +59,20 @@ class ContextualizingProxy(wrapt.ObjectProxy):
     def __getattribute__(self, name):
         """ This behavior is what I would expect, but wrapt doesn't work this way..."""
         if name is 'context':
-            return self._self_context
+            return super(ContextualizingProxy, self).__getattribute__('_self_context')
 
-        if name is '_self_overrides':
-            return super(ContextualizingProxy, self).__getattribute__(name)
-
-        override = self._self_overrides.get(name, None)
+        override = super(ContextualizingProxy, self).__getattribute__('_self_overrides').get(name, None)
         if override is not None:
             return override
         # debug = False
-
+        wrapped = None
         if name not in ('__wrapped__', '__factory__', '__class__'):
             k = UNSET
             if name in type(self).__dict__:
                 k = type(self).__dict__[name]
             else:
-                for t in type(self.__wrapped__).mro():
+                wrapped = get_wrapped(self)
+                for t in type(wrapped).mro():
                     if name in t.__dict__:
                         k = t.__dict__[name]
                         break
@@ -94,7 +87,8 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                             # if debug: print('getting attribute on
                             # wrapped...', type(self.__wrapped__),
                             # id(self.__wrapped__))
-                            res = object.__getattr__(self.__wrapped__, name)
+                            wrapped = get_wrapped(self) if wrapped is None else wrapped
+                            res = object.__getattr__(wrapped, name)
                             # if debug: print('got attribute on wrapped', res)
                             return res
                         except AttributeError:
@@ -107,19 +101,22 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                             # classmethods to 'just work', so for this case, we pass in
                             # the wrapped's type
                             if isinstance(k, classmethod):
-                                return k.__get__(self.__wrapped__, type(self.__wrapped__))
+                                wrapped = get_wrapped(self) if wrapped is None else wrapped
+                                return k.__get__(wrapped, type(wrapped))
                             else:
                                 return k.__get__(self, type(self))
                     else:
                         # It's a data descriptor, so we invoke it unconditionally
                         if isinstance(k, classmethod):
-                            return k.__get__(self.__wrapped__, type(self.__wrapped__))
+                            wrapped = get_wrapped(self) if wrapped is None else wrapped
+                            return k.__get__(wrapped, type(wrapped))
                         else:
                             return k.__get__(self, type(self))
                 else:
                     try:
                         # if debug: print('getting csv_header')
-                        res = object.__getattribute__(self.__wrapped__, name)
+                        wrapped = get_wrapped(self) if wrapped is None else wrapped
+                        res = object.__getattribute__(wrapped, name)
                         # if debug: print('and we got it', res)
                         return res
                     except AttributeError:
@@ -129,10 +126,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
 
     def __setattr__(self, name, value):
         if name.startswith('_self_'):
-            # print('self',name, repr(type(self)))
-            # print('self', name,self.__dict__)
             object.__setattr__(self, name, value)
-
         elif name == '__wrapped__':
             object.__setattr__(self, name, value)
             try:
@@ -143,11 +137,9 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                 object.__setattr__(self, '__qualname__', value.__qualname__)
             except AttributeError:
                 pass
-
         elif name == '__qualname__':
-            setattr(self.__wrapped__, name, value)
+            setattr(get_wrapped(self), name, value)
             object.__setattr__(self, name, value)
-
         else:
             mro = type(self).mro()
             for x in mro:
@@ -156,7 +148,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                     attr.__set__(self, value)
                     break
             else: # no break
-                setattr(self.__wrapped__, name, value)
+                setattr(get_wrapped(self), name, value)
 
     def __call__(self, *args, **kwargs):
         # Omitted by default and only included in CallableObjectProxy by wrapt.
@@ -175,20 +167,13 @@ class ContextualizableClass(type):
     """ A super-type for contextualizable classes """
 
     def __getattribute__(self, name):
-        if name != 'contextualize':
-            return super(ContextualizableClass, self).__getattribute__(name)
-        else:
-            return super(ContextualizableClass, self).__getattribute__('contextualize_class')
+        return super(ContextualizableClass, self).__getattribute__('contextualize_class' if name == 'contextualize' else name)
 
     def contextualize_class(self, context):
-        # print('test', self, context)
         if context is None:
             return self
         _H = contextualize_metaclass(context, self)
-        _temp_ctx = context
-        _G = _H('_H_' + self.__name__, (self,), dict(class_context=_temp_ctx.identifier))
-        # print('contextualize_class', self, _G.context)
-        return _G
+        return _H('_H1', (self,), dict(class_context=context.identifier))
 
 
 def is_data_descriptor(k):

@@ -209,8 +209,9 @@ class NeuronCSVDataTranslator(DataTranslator):
         res = self.make_new_output((data_source,))
 
         documents = dict()
-        if data_source.bibtex_files is not None:
-            for bib in data_source.bibtex_files.onedef():
+        bibtex_files = data_source.bibtex_files.onedef()
+        if bibtex_files is not None:
+            for bib in bibtex_files:
                 documents.update(parse_bibtex_into_documents(bib, res.evidence_context))
 
         with open(data_source.csv_file_name.one()) as f:
@@ -222,7 +223,9 @@ class NeuronCSVDataTranslator(DataTranslator):
                 relation = relation.lower()
 
                 docs = []
-                docs.append(documents.get(evidence, None))
+                doc = documents.get(evidence, None)
+                if doc is not None:
+                    docs.append(doc)
 
                 if len(documentURL) > 0:
                     doc1 = documents.get(documentURL, res.evidence_context(Document)(uri=documentURL))

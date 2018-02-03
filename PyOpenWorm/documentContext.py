@@ -6,7 +6,9 @@ from PyOpenWorm.context import Context, ContextMeta
 class DocumentContextMeta(ContextMeta):
 
     def contextualize_class(self, context):
-        return contextualize_metaclass(context, self)('Contextualized_' + self.__name__, (self,), dict())
+        if context is None:
+            return self
+        return contextualize_metaclass(context, self)('_H2', (self,), dict())
 
 
 class DocumentContext(six.with_metaclass(DocumentContextMeta, Context)):

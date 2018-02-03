@@ -164,7 +164,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     def _insert_value(self, v):
         stmt = Statement(self.owner, self, v, self.context)
         self._v.add(stmt)
-        if self not in v.owner_properties:
+        if id(self) not in (id(x) for x in v.owner_properties):
             v.owner_properties.append(self)
         return stmt
 
@@ -260,7 +260,7 @@ class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
 
     def onedef(self):
         x = super(DatatypeProperty, self).onedef()
-        return self._resolver.deserializer(x.identifier)
+        return self._resolver.deserializer(x.identifier) if x is not None else x
 
 
 class UnionProperty(UnionPropertyMixin, RealSimpleProperty):

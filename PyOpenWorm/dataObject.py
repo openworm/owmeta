@@ -7,10 +7,12 @@ import logging
 from itertools import groupby
 import six
 import hashlib
-import traceback
 
 import PyOpenWorm
-from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualize_metaclass, contextualize_helper
+from PyOpenWorm.contextualize import (Contextualizable,
+                                      ContextualizableClass,
+                                      contextualize_metaclass,
+                                      contextualize_helper)
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -21,7 +23,6 @@ from yarom.mappedClass import MappedClass
 from yarom.mapper import FCN
 from .data import DataUser
 from .context import Contexts
-from .contextualize import ContextualizingProxy
 from .identifier_mixin import IdMixin
 
 from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
@@ -83,16 +84,17 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
 
         return base_ns
 
-    def contextualize_class(self, context):
+    def contextualize_class(self, context, mem=dict()):
         if context is None:
             return self
-        _H = contextualize_metaclass(context, self)
-        _temp_ctx = context
-        _G = _H('_H_' + self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
-                                                     rdf_type=self.rdf_type,
-                                                     class_context=_temp_ctx.identifier))
-        # print('contextualize_class', _G.context)
-        return _G
+        res = mem.get((id(self), context), None)
+        if res is None:
+            ctxd_meta = contextualize_metaclass(context, self)
+            res = ctxd_meta('_H0', (self,), dict(rdf_namespace=self.rdf_namespace,
+                                                 rdf_type=self.rdf_type,
+                                                 class_context=context.identifier))
+            mem[(id(self), context)] = res
+        return res
 
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
@@ -105,13 +107,9 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
             self.rdf_type_object = None
 
     def __call__(self, *args, **kwargs):
+        if self.context is not None:
+            kwargs['context'] = self.context
         o = super(ContextMappedClass, self).__call__(*args, **kwargs)
-        if hasattr(o, 'context') and o.context is not None:
-            o.context.add_object(o)
-        elif self.context is not None:
-            self.context.add_object(o)
-        else:
-            raise Exception("{} {} {}".format(self, kwargs['ident'], self.context))
 
         if isinstance(o, PropertyDataObject):
             o.rdf_type_property(RDFProperty.get_instance())
@@ -140,12 +138,18 @@ class _partial_property(partial):
 
 
 def contextualized_data_object(context, obj):
-    res = contextualize_helper(context, obj)
-    if hasattr(res, 'properties'):
-        cprop = res.properties.contextualize(context)
-        res.add_attr_override('properties', cprop)
-        for p in cprop:
-            res.add_attr_override(p.linkName, p)
+    if obj.context is None:
+        obj.context = context
+        if hasattr(obj, 'properties'):
+            obj.properties = obj.properties.contextualize(context)
+        res = obj
+    else:
+        res = contextualize_helper(context, obj)
+        if hasattr(res, 'properties'):
+            cprop = res.properties.contextualize(context)
+            res.add_attr_override('properties', cprop)
+            for p in cprop:
+                res.add_attr_override(p.linkName, p)
     return res
 
 
