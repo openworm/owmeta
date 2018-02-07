@@ -49,7 +49,7 @@ setup(
         'discover==0.4.0'
     ],
     install_requires=[
-        'bibtexparser==0.6.1',
+        'bibtexparser==0.6.2',
         'BTrees==4.0.8',
         'decorator==3.4.0',
         'html5lib==0.999',
@@ -77,6 +77,7 @@ setup(
         'wrapt'
     ],
     dependency_links=[
+        'git://github.com/sciunto-org/python-bibtexparser.git@ee212b9ef17efb48c7a9eaff3a2e609a9905914f#egg=bibtexparser-0.6.2',
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
         'git://github.com/mwatts15/rdflib-zodb.git@master#egg=rdflib-zodb-1.1-dev'

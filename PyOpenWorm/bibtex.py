@@ -1,16 +1,47 @@
 from .datasource import DataTranslator, DataSource
+import re
 import bibtexparser
-from bibtexparser.customization import link, doi
-
-
 from PyOpenWorm.evidence import Evidence
 
 
-def tuplify(record):
+def listify_one(record, name):
+    if not isinstance(record[name], (list, tuple)):
+        record[name] = [record[name]]
+    elif isinstance(record[name], tuple):
+        record[name] = list(record[name])
+    return record
+
+
+def listify(record):
     for val in record:
-        if val not in ('ID',):
-            if not isinstance(record[val], (list, tuple)):
-                record[val] = (record[val],)
+        if val not in ('ID', 'ENTRYTYPE', 'title', 'note'):
+            listify_one(record, val)
+    return record
+
+
+def doi(record):
+    """
+
+    :param record: the record.
+    :type record: dict
+    :returns: dict -- the modified record.
+
+    """
+    doi = record.get('doi')
+    if doi is not None:
+        if 'link' not in record:
+            record['link'] = []
+        for item in record['link']:
+            if 'doi' in item:
+                break
+        else: # no break
+            if not isinstance(doi, (list, tuple)):
+                doi = [doi]
+
+            for link in doi:
+                if link.startswith('10'):
+                    link = 'http://dx.doi.org/' + link
+                record['link'].append(link)
     return record
 
 
@@ -31,13 +62,64 @@ def author(record):
     return record
 
 
+HOWPUB_URL_RE = re.compile(r'\\url{([^}]+)}')
+
+
+def note_url(record):
+    note = record.get('note')
+    if note is not None:
+        for u in HOWPUB_URL_RE.finditer(note):
+            url = record.get('url')
+            if url is None:
+                record['url'] = [u.group(1)]
+            else:
+                listify_one(record, 'url')['url'].append(u.group(1))
+    return record
+
+
+def url(record):
+    u = record.get('howpublished', '')
+    md = HOWPUB_URL_RE.match(u)
+    if md:
+        v = record.get('url')
+        if isinstance(v, tuple):
+            record['url'] = list(v)
+
+        if isinstance(v, list):
+            v.append(md[1])
+
+    url = record.get('url')
+    link = record.get('link')
+
+    if url is None:
+        if isinstance(link, tuple):
+            record['url'] = list(link)
+        elif isinstance(link, list):
+            record['url'] = link
+        elif link is not None:
+            record['url'] = [link]
+        return record
+
+    if isinstance(url, tuple):
+        url = list(url)
+        record['url'] = url
+
+    if isinstance(url, list):
+        if isinstance(link, (list, tuple)):
+            url.extend(link)
+        elif link is not None:
+            url.append(link)
+
+    return record
+
+
 def customizations(record):
     """Use some functions delivered by the library
 
     :param record: a record
     :returns: -- customized record
     """
-    return tuplify(doi(link(author(record))))
+    return url(note_url(doi(listify(author(record)))))
 
 
 def bibtex_to_document(bibtex_entry, context=None):
@@ -70,7 +152,7 @@ def update_document_with_bibtex(document, bibtex_entry):
 
 
 def make_default_bibtex_parser():
-    parser = bibtexparser.bparser.BibTexParser()
+    parser = bibtexparser.bparser.BibTexParser(common_strings=True)
     parser.customization = customizations
     return parser
 
