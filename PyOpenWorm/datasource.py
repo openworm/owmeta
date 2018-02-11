@@ -20,6 +20,12 @@ class Informational(object):
         self.cls = None
         self.multiple = multiple
 
+    def copy(self):
+        res = type(self)()
+        for x in vars(self):
+            setattr(res, x, getattr(self, x))
+        return res
+
     def __repr__(self):
         return ("Informational(name='{}',"
                 " display_name={},"
@@ -39,7 +45,7 @@ class DataSourceType(type(BaseDataObject)):
     Sets up the graph with things needed for MappedClasses
     """
     def __init__(self, name, bases, dct):
-        self._info_fields = []
+        self.__info_fields = []
         others = []
         newdct = dict()
         for z in dct:
@@ -50,23 +56,28 @@ class DataSourceType(type(BaseDataObject)):
                         meta.identifier = self.rdf_namespace[meta.name]
                 meta.cls = self
                 meta.name = z
-                self._info_fields.append(meta)
+                self.__info_fields.append(meta)
             else:
                 others.append((z, dct[z]))
 
         for x in bases:
-            if hasattr(x, '_info_fields'):
-                self._info_fields += x._info_fields
+            if isinstance(x, DataSourceType):
+                self.__info_fields += [inf.copy() for inf in x.__info_fields]
 
         for k, v in others:
-            for inf in self._info_fields:
-                if inf.name == k:
-                    inf.default_value = v
+            for i in range(len(self.__info_fields)):
+                if self.__info_fields[i].name == k:
+                    self.__info_fields[i] = self.__info_fields[i].copy()
+                    self.__info_fields[i].default_value = v
                     break
             else: # no 'break'
                 newdct[k] = v
 
         super(DataSourceType, self).__init__(name, bases, newdct)
+
+    @property
+    def info_fields(self):
+        return self.__info_fields
 
 
 class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
@@ -96,7 +107,7 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/DataSource#")
 
     def __init__(self, **kwargs):
-        self.info_fields = OrderedDict((i.name, i) for i in self.__class__._info_fields)
+        self.info_fields = OrderedDict((i.name, i) for i in self.__class__.info_fields)
         parent_kwargs = dict()
         new_kwargs = dict()
         for k, v in kwargs.items():
@@ -115,8 +126,9 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
                 self.context(getattr(self, inf.name))(v)
             else:
                 try:
-                    if not self.context(getattr(self, inf.name)).has_defined_value() and inf.default_value is not None:
-                        self.context(getattr(self, inf.name))(inf.default_value)
+                    ctxd_prop = self.context(getattr(self, inf.name))
+                    if not ctxd_prop.has_defined_value() and inf.default_value is not None:
+                        ctxd_prop(inf.default_value)
                 except AttributeError as e:
                     print("HANDLING AttributeError in DataSource")
                     print(repr(type(self)), id(self), getattr(self, inf.name))
@@ -129,10 +141,13 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
         return self.make_identifier(self.translation.defined_values[0].identifier.n3())
 
     def __str__(self):
-        return self.__class__.__name__ + '\n' + \
-            '\n'.join('    ' + ': '.join((info.display_name,
-                                         repr(list(getattr(self, info.name).defined_values))))
-                      for info in self.info_fields.values()) + '\n'
+        try:
+            return self.__class__.__name__ + '\n' + \
+                '\n'.join('    ' + ': '.join((info.display_name,
+                                             repr(list(getattr(self, info.name).defined_values))))
+                          for info in self.info_fields.values()) + '\n'
+        except AttributeError:
+            return super(DataSource, self).__str__()
 
 
 class Translation(BaseDataObject):

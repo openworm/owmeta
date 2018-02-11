@@ -2,11 +2,13 @@ import wrapt
 from weakref import WeakValueDictionary
 
 
-class Contextualizable(object):
+class BaseContextualizable(object):
 
     def __init__(self, *args, **kwargs):
-        super(Contextualizable, self).__init__(*args, **kwargs)
-        self._contexts = WeakValueDictionary()
+        super(BaseContextualizable, self).__init__(*args, **kwargs)
+
+        if not hasattr(self, '_contexts'):
+            self._contexts = WeakValueDictionary()
 
     @property
     def context(self):
@@ -31,8 +33,61 @@ class Contextualizable(object):
         self._contexts[context] = ctxd
         return ctxd
 
+    def add_contextualization(self, context, contextualization):
+        try:
+            self._contexts[context] = contextualization
+        except AttributeError:
+            self._contexts = WeakValueDictionary()
+            self._contexts[context] = contextualization
+
     def contextualize_augment(self, context):
         return self
+
+
+class Contextualizable(BaseContextualizable):
+    """
+    A BaseContextualizable with the addition of a default behavior of setting
+    the context from the class's 'context' attribute. This generally requires
+    that for the metaclass of the Contextualizable that a 'context' data
+    property is defined. For example:
+
+    >>> class AMeta(ContextualizableClass):
+    >>>     @property
+    >>>     def context(self):
+    >>>         return self.__context
+
+    >>>     @context.setter
+    >>>     def context(self, ctx):
+    >>>         self.__context = ctx
+
+    >>> class A(six.with_metaclass(Contextualizable)):
+    >>>     pass
+
+    """
+
+    def __new__(cls, *args, **kwargs):
+        """
+        This is defined so that the __init__ method gets a contextualized
+        instance, allowing for statements made in __init__ to be contextualized.
+        """
+        ores = super(Contextualizable, cls).__new__(cls)
+        if cls.context is not None:
+            ores.context = cls.context
+            ores.add_contextualization(cls.context, ores)
+            res = ores
+        else:
+            ores.context = None
+            res = ores
+
+        return res
+
+    @property
+    def context(self):
+        return self.__context
+
+    @context.setter
+    def context(self, ctx):
+        self.__context = ctx
 
 
 UNSET = object()
@@ -51,6 +106,10 @@ def contextualize_metaclass(context, self):
         @property
         def context(self):
             return self.__ctx
+
+    # Setting the name just for debugging...don't care much about the other
+    # attributes for now.
+    _H.__name__ = 'Ctxd_Meta_' + self.__name__
 
     return _H
 
@@ -177,21 +236,34 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                                                      repr(self.__wrapped__))
 
 
-cc_map = {'contextualize': 'contextualize_class',
+CC_MAP = {'contextualize': 'contextualize_class',
           'contextualize_augment': 'contextualize_class_agument'}
 
 
 class ContextualizableClass(type):
     """ A super-type for contextualizable classes """
 
+    def __new__(self, name, typ, dct):
+        res = super(ContextualizableClass, self).__new__(self, name, typ, dct)
+        res.__contexts = WeakValueDictionary()
+        return res
+
     def __getattribute__(self, name):
-        return super(ContextualizableClass, self).__getattribute__(cc_map.get(name, name))
+        return super(ContextualizableClass, self).__getattribute__(CC_MAP.get(name, name))
 
     def contextualize_class(self, context):
+        ctxd = self.__contexts.get(context)
+        if ctxd is not None:
+            return ctxd
+        ctxd = self.contextualize_class_augment(context)
+        self.__contexts[context] = ctxd
+        return ctxd
+
+    def contextualize_class_augment(self, context):
         if context is None:
             return self
         _H = contextualize_metaclass(context, self)
-        return _H('_H1', (self,), dict(class_context=context.identifier))
+        return _H(self.__name__, (self,), dict(class_context=context.identifier))
 
 
 def is_data_descriptor(k):
@@ -213,6 +285,22 @@ def contextualized_new(ccls):
     return _helper
 
 
+class _ContextualzingProxyMetaType(type(ContextualizingProxy)):
+    def __new__(self, name, typ, dct, oclasstyp):
+        res = super(_ContextualzingProxyMetaType, self).__new__(self, name, typ, dct)
+        res._oct = oclasstyp
+        return res
+
+    def __init__(self, name, typ, dct, oclasstyp):
+        self._oct = oclasstyp
+
+    def __getattr__(self, name):
+        try:
+            return super(_ContextualzingProxyMetaType, self).__getattr__(name)
+        except AttributeError:
+            return getattr(self._oct, name)
+
+
 def contextualize_helper(context, obj):
     """
     Does some extra stuff to make access to the type of a ContextualizingProxy
@@ -223,10 +311,7 @@ def contextualize_helper(context, obj):
 
     ctx = getattr(obj, 'context', None)
     if ctx is not None and ctx is context:
-        # print('Already have this context', ctx)
         return obj
-
-    ctx_proxy_typ = type(ContextualizingProxy)
 
     # Copy our special properties into the class so that they
     # always take precedence over attributes of the same name added
@@ -234,37 +319,37 @@ def contextualize_helper(context, obj):
     # duplicating the implementation for them in all derived classes.
 
     pclass_dct = dict()
-    # if hasattr(obj.__class__, 'rdf_type'):
-        # print('occo', obj.__class__, obj.__class__.rdf_type)
     for k, v in vars(obj.__class__).items():
         if k not in ('__wrapped__', '__name__', '__doc__',
                      '__module__', '__weakref__', '__dict__',
                      '__init__'):
-            # if is_mangled_name(k, obj.__class__):
-                # demangle(k)
             if hasattr(v, '__get__'):
                 pclass_dct[k] = v
             else:
-                def myget(self, o, typ, k=k, oclass=obj.__class__):
-                    # print('MYGET', self, type(o), typ)
-                    if o is None:
-                        res = getattr(oclass, k)
-                        # print('MYGET', res)
-                        return res
-                    else:
-                        # print('MYGET OOPS')
-                        raise AttributeError()
-                pclass_dct[k] = type('proxy_to_' + k, (object,), {'__get__': myget})()
-    spclass_dct = dict()
-    for k in dir(type(obj.__class__)):
-        # XXX: Let's just be lazy here. We can refine the filtering later...
-        if not (k.endswith('__') and k.startswith('__')):
-            # These we assign directly.
-            spclass_dct[k] = getattr(type(obj.__class__), k)
-    new_ctx_proxy_typ = type('_I_' + ctx_proxy_typ.__name__, (ctx_proxy_typ,), spclass_dct)
+                pclass_dct[k] = proxy_to_X(obj.__class__, k)
 
-    newtyp = new_ctx_proxy_typ('CtxProxyClass_' + obj.__class__.__name__,
-                               (ContextualizingProxy,), pclass_dct)
-    res = newtyp(context, obj)
+    newtyp = _ContextualzingProxyMetaType('CtxProxyClass_' + obj.__class__.__name__,
+                                          (ContextualizingProxy,),
+                                          pclass_dct,
+                                          type(obj.__class__))
+    return newtyp(context, obj)
 
-    return res
+
+class proxy_to_X(object):
+    __slots__ = ('_oclass', '_key')
+
+    def __init__(self, oclass, key):
+        self._oclass = oclass
+        self._key = key
+
+    def __get__(self, o, typ):
+        if o is None:
+            return getattr(self._oclass, self._key)
+        else:
+            raise AttributeError()
+
+    def __str__(self):
+        return 'proxy_to_' + self._key
+
+    def __repr__(self):
+        return 'contextualize.proxy_to_X({}, {})'.format(repr(self._oclass), repr(self._key))

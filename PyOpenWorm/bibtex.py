@@ -13,8 +13,11 @@ def listify_one(record, name):
 
 
 def listify(record):
+    # Since some items can be multiples, it simplifies code in most places to
+    # just make everything a list, even if it cannot appear more than once in
+    # the properly formatted record.
     for val in record:
-        if val not in ('ID', 'ENTRYTYPE', 'title', 'note'):
+        if val not in ('ID', 'ENTRYTYPE'):
             listify_one(record, val)
     return record
 
@@ -68,12 +71,13 @@ HOWPUB_URL_RE = re.compile(r'\\url{([^}]+)}')
 def note_url(record):
     note = record.get('note')
     if note is not None:
-        for u in HOWPUB_URL_RE.finditer(note):
-            url = record.get('url')
-            if url is None:
-                record['url'] = [u.group(1)]
-            else:
-                listify_one(record, 'url')['url'].append(u.group(1))
+        for n in note:
+            for u in HOWPUB_URL_RE.finditer(n):
+                url = record.get('url')
+                if url is None:
+                    record['url'] = [u.group(1)]
+                else:
+                    listify_one(record, 'url')['url'].append(u.group(1))
     return record
 
 

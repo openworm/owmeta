@@ -4,7 +4,10 @@ import rdflib
 import wrapt
 from .dataObjectUtils import merge_data_objects
 from .import_contextualizer import ImportContextualizer
-from .contextualize import Contextualizable, ContextualizableClass, ContextualizingProxy
+from .contextualize import (BaseContextualizable,
+                            Contextualizable,
+                            ContextualizableClass,
+                            ContextualizingProxy)
 
 from six.moves.urllib.parse import quote
 from six import text_type
@@ -26,7 +29,7 @@ class ModuleProxy(wrapt.ObjectProxy):
             return o
         else:
             o = super(ModuleProxy, self).__getattr__(name)
-            if isinstance(o, Contextualizable):
+            if isinstance(o, (BaseContextualizable, ContextualizableClass)):
                 o = o.contextualize(self._self_ctx)
                 self._self_overrides[name] = o
             return o
@@ -212,8 +215,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             return ModuleProxy(self, o)
         elif isinstance(o, dict):
             return ContextContextManager(self, o)
-        elif isinstance(o, Contextualizable):
+        elif isinstance(o, BaseContextualizable):
             return o.contextualize(self)
+        elif isinstance(o, ContextualizableClass):
+            # Yes, you can call contextualize on a class and it'll do the right
+            # thing, but let's keep it simple here, okay?
+            return o.contextualize_class(self)
         else:
             return o
 
@@ -254,7 +261,7 @@ class ContextContextManager(object):
             return o
         else:
             o = self._backing_dict[key]
-            if isinstance(o, Contextualizable):
+            if isinstance(o, (BaseContextualizable, ContextualizableClass)):
                 o = o.contextualize(self._ctx)
                 self._overrides[key] = o
             return o

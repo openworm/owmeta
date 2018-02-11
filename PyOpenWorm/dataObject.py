@@ -45,7 +45,7 @@ DataObjectsParents = dict()
 InverseProperties = dict()
 
 
-class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
+class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
 
@@ -88,9 +88,9 @@ class ContextMappedClass(MappedClass, Contextualizable, ContextualizableClass):
         if context is None:
             return self
         ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta('_H0', (self,), dict(rdf_namespace=self.rdf_namespace,
-                                             rdf_type=self.rdf_type,
-                                             class_context=context.identifier))
+        res = ctxd_meta(self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
+                                                     rdf_type=self.rdf_type,
+                                                     class_context=context.identifier))
         return res
 
     def after_mapper_module_load(self, mapper):
@@ -134,7 +134,7 @@ class _partial_property(partial):
 
 def contextualized_data_object(context, obj):
     res = contextualize_helper(context, obj)
-    if hasattr(res, 'properties'):
+    if obj is not res and hasattr(res, 'properties'):
         cprop = res.properties.contextualize(context)
         res.add_attr_override('properties', cprop)
         for p in cprop:
@@ -182,17 +182,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         """
         ores = super(BaseDataObject, cls).__new__(cls)
         if cls.context is not None:
-            res = ores.contextualize(cls.context)
-            # Python skips __init__ if the result of __new__ doesn't have cls as
-            # its type, but we still want it to happen, so we have to call __init__
-            # ourselves.
-            otype = type(ores)
-            # if otype.__name__ == 'NeuronCSVDataTranslator' or 'Translation' in otype.__name__:
-                # print('NEWING', otype, cls.context, id(ores), id(res))
-            res.__init__ = otype.__init__.__get__(res, otype)
-            otype.__init__(res, *args, **kwargs)
+            ores.context = cls.context
+            ores.add_contextualization(cls.context, ores)
+            res = ores
         else:
-            # print('CONTEXT IS NOOOOOOOOOOOOOOOOOOOOOONE NEWING', otype, cls.context, id(ores))
+            ores.context = None
             res = ores
 
         return res
@@ -213,6 +207,14 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         if rdfs_label:
             self.rdfs_label = rdfs_label
+
+    @property
+    def context(self):
+        return self.__context
+
+    @context.setter
+    def context(self, value):
+        self.__context = value
 
     def clear_po_cache(self):
         """ Clear the property-object cache for this object.
@@ -438,9 +440,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
     @staticmethod
     def attach_property(owner, c):
-        res = c.contextualize(owner.context)(owner=owner,
-                                             conf=owner.conf,
-                                             resolver=_Resolver.get_instance())
+        ctxd_pclass = c.contextualize(owner.context)
+        resolver = _Resolver.get_instance()
+        res = ctxd_pclass(owner=owner, conf=owner.conf, resolver=resolver)
         owner.properties.append(res)
         setattr(owner, c.linkName, res)
 

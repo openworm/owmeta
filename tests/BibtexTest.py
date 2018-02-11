@@ -29,22 +29,6 @@ class BibtexTest(_DataTest):
         bt = self.loads(bibtex)
         self.assertEqual(bt['ID'], 'ex')
 
-    def test_title_not_listified(self):
-        bibtex = u"""@ARTICLE{ex,
-          title = {How to Catch a Thief}
-        }
-        """
-        bt = self.loads(bibtex)
-        self.assertEqual(bt['title'], 'How to Catch a Thief')
-
-    def test_note_not_listified(self):
-        bibtex = u"""@ARTICLE{ex,
-          note = {There's nothing to say about it}
-        }
-        """
-        bt = self.loads(bibtex)
-        self.assertEqual(bt['note'], 'There\'s nothing to say about it')
-
     def test_parse(self):
         basepath = dirname(__file__)
         filepath = abspath(join(basepath, "test_data", "test.bib"))

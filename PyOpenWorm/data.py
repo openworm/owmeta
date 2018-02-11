@@ -72,9 +72,6 @@ class DataUser(Configureable):
     Classes which use the database should inherit from DataUser.
     """
 
-    def __init__(self, **kwargs):
-        super(DataUser, self).__init__(**kwargs)
-
     @property
     def base_namespace(self):
         return self.conf['rdf.namespace']
@@ -211,25 +208,29 @@ class DataUser(Configureable):
         return n
 
 
-class Data(Configure, Configureable):
+class Data(Configureable, Configure):
 
     """
     Provides configuration for access to the database.
 
-    Usally doesn't need to be accessed directly
+    Usually doesn't need to be accessed directly
     """
 
-    def __init__(self, conf=False):
-        Configure.__init__(self)
-        Configureable.__init__(self)
-        # We copy over all of the configuration that we were given
+    def __init__(self, conf=None, **kwargs):
+        """
+        Parameters
+        ----------
+        conf : Configure
+            A Configure object
+        """
+
+        super(Data, self).__init__(**kwargs)
         if conf:
             self.copy(conf)
         else:
             self.copy(Configureable.conf)
         self.namespace = Namespace("http://openworm.org/entities/")
-        self.molecule_namespace = Namespace(
-            "http://openworm.org/entities/molecules/")
+        self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash

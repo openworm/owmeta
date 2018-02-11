@@ -1,8 +1,23 @@
+from six import with_metaclass
 from .data import DataUser
-from .contextualize import Contextualizable
+from .contextualize import Contextualizable, ContextualizableClass
 
 
-class Property(Contextualizable, DataUser):
+class PropertyMeta(ContextualizableClass):
+    def __init__(self, name, bases, dct):
+        super(PropertyMeta, self).__init__(name, bases, dct)
+        self.__context = None
+
+    @property
+    def context(self):
+        return self.__context
+
+    @context.setter
+    def context(self, ctx):
+        self.__context = ctx
+
+
+class Property(with_metaclass(PropertyMeta, Contextualizable, DataUser)):
     """ Store a value associated with a DataObject
 
     Properties can be be accessed like methods. A method call like::
@@ -62,13 +77,10 @@ class Property(Contextualizable, DataUser):
         """ Returns a single value for the ``Property`` whether or not it is multivalued.
         """
 
-        try:
-            r = self.get()
-            return next(iter(r))
-        except StopIteration:
-            return None
+        r = self.get()
+        return next(iter(r), None)
 
-    def hasValue(self):
+    def has_value(self):
         """ Returns true if the Property has any values set on it.
 
         This may be defined differently for each property
@@ -90,7 +102,4 @@ class Property(Contextualizable, DataUser):
             if self.multiple:
                 return set(r)
             else:
-                try:
-                    return next(iter(r))
-                except StopIteration:
-                    return None
+                return next(iter(r), None)

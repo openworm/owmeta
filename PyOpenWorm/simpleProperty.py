@@ -13,7 +13,8 @@ from yarom.propertyMixins import (ObjectPropertyMixin,
                                   DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.contextualize import Contextualizable, ContextualizableClass, contextualized_new, contextualize_helper
+from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
+                                      contextualize_helper)
 from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
@@ -27,14 +28,10 @@ class _values(list):
         super(_values, self).append(v)
 
 
-class ContextMappedPropertyClass(MappedPropertyClass, Contextualizable, ContextualizableClass):
+class ContextMappedPropertyClass(MappedPropertyClass, ContextualizableClass):
     def __init__(self, *args, **kwargs):
         super(ContextMappedPropertyClass, self).__init__(*args, **kwargs)
         self.__context = None
-
-    def __call__(self, *args, **kwargs):
-        o = super(ContextMappedPropertyClass, self).__call__(*args, **kwargs)
-        return o
 
     @property
     def context(self):
@@ -80,15 +77,13 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     linkName = "property"
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
-    def __init__(self, conf, owner):
+    def __init__(self, conf, owner, **kwargs):
+        super(RealSimpleProperty, self).__init__(**kwargs)
         self._v = _values()
         self.owner = owner
 
-    def contextualize(self, context):
-        # print('contextualizing', self, id(self), context)
-        res = contextualize_helper(context, self)
-        # print('contextualized', self, 'id(self)', id(self), 'id(res)', id(res), context, res.context)
-        return res
+    def contextualize_augment(self, context):
+        return contextualize_helper(context, self)
 
     def has_value(self):
         for x in self._v:
@@ -206,9 +201,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         cls.rdf_type = cls.base_namespace[cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         return cls
-
-
-RealSimpleProperty.__new__ = contextualized_new(RealSimpleProperty)
 
 
 class POCache(tuple):

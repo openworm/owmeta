@@ -57,6 +57,7 @@ class _link(ConfigValue):
 
 NO_DEFAULT = object()
 
+
 class Configure(object):
 
     """ A simple configuration object.  Enables setting and getting key-value pairs"""
@@ -169,7 +170,8 @@ class Configureable(object):
     conf = Configure()
     default = conf
 
-    def __init__(self, conf=None):
+    def __init__(self, conf=None, **kwargs):
+        super(Configureable, self).__init__(**kwargs)
         if conf is not None:
             self.conf = conf
 
