@@ -151,16 +151,16 @@ def config(key=None):
     :return: the instance of the Configure class currently operating.
     """
     if key is None:
-        return Configureable.conf
+        return Configureable.default
     else:
-        return Configureable.conf[key]
+        return Configureable.default[key]
 
 
 def loadConfig(f):
     """ Load configuration for the module. """
     from .data import Data
-    Configureable.conf = Data.open(f)
-    return Configureable.conf
+    Configureable.default = Data.open(f)
+    return Configureable.default
 
 
 def disconnect(c=False):
@@ -171,7 +171,7 @@ def disconnect(c=False):
         return
 
     if not c:
-        c = Configureable.conf
+        c = Configureable.default
 
     if c:
         c.closeDatabase()
@@ -248,13 +248,11 @@ def connect(configFile=False,
         if not isinstance(conf, Data):
             # Initializes a Data object with
             # the Configureable.conf
-            Configureable.conf = Data(conf)
-        else:
-            Configureable.conf = conf
+            conf = Data(conf)
     elif configFile:
-        loadConfig(configFile)
+        conf = loadConfig(configFile)
     else:
-        Configureable.conf = Data({
+        conf = Data({
             "connectomecsv": "OpenWormData/aux_data/connectome.csv",
             "neuronscsv": "OpenWormData/aux_data/neurons.csv",
             "rdf.source": "ZODB",
@@ -264,7 +262,8 @@ def connect(configFile=False,
             "rdf.upload_block_statement_count": 50
         })
 
-    Configureable.conf.openDatabase()
+    Configureable.default = conf
+    conf.openDatabase()
     logging.info("Connected to database")
     # have to register the right one to disconnect...
     atexit.register(disconnect)

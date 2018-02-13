@@ -25,15 +25,17 @@ class ConfigureTest(unittest.TestCase):
     def test_ConfigValue(self):
         """ Assign a ConfigValue"""
         c = Configure()
+
         class pipe(ConfigValue):
             def get(self):
                 return "sign"
         c['seven'] = pipe()
-        self.assertEqual("sign",c['seven'])
+        self.assertEqual("sign", c['seven'])
 
     def test_getter_no_ConfigValue(self):
         """ Assign a method with a "get". Should return a the object rather than calling its get method """
         c = Configure()
+
         class pipe:
             def get(self):
                 return "sign"
@@ -43,7 +45,8 @@ class ConfigureTest(unittest.TestCase):
     def test_late_get(self):
         """ "get" shouldn't be called until the value is *dereferenced* """
         c = Configure()
-        a = {'t' : False}
+        a = {'t': False}
+
         class pipe(ConfigValue):
             def get(self):
                 a['t'] = True
@@ -69,12 +72,12 @@ class ConfigureTest(unittest.TestCase):
     def test_configurable_init_empty(self):
         """Ensure Configureable gets init'd with the defalut if nothing is given"""
         i = Configureable()
-        self.assertEqual(Configureable.conf, i.conf)
+        self.assertEqual(Configureable.default, i.conf)
 
     def test_configurable_init_False(self):
         """Ensure Configureable gets init'd with the defalut if None is given"""
         i = Configureable(conf=None)
-        self.assertEqual(Configureable.conf, i.conf)
+        self.assertEqual(Configureable.default, i.conf)
 
     def test_dict_init(self):
         c = Configure(x=4, y=3)

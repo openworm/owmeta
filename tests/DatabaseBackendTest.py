@@ -23,7 +23,7 @@ class DatabaseBackendTest(unittest.TestCase):
         c = Configure()
         c['rdf.source'] = 'default'
         c['rdf.store'] = 'default'
-        Configureable.conf = c
+        Configureable.default = c
         d = Data()
         d.openDatabase()
 
@@ -32,7 +32,7 @@ class DatabaseBackendTest(unittest.TestCase):
     def test_init_no_rdf_store(self):
         """ Should be able to init without these values """
         c = Configure()
-        Configureable.conf = c
+        Configureable.default = c
         d = Data()
         try:
             d.openDatabase()
@@ -45,7 +45,7 @@ class DatabaseBackendTest(unittest.TestCase):
         fname = 'ZODB.fs'
         c['rdf.source'] = 'ZODB'
         c['rdf.store_conf'] = fname
-        Configureable.conf = c
+        Configureable.default = c
         d = Data()
         try:
             d.openDatabase()
@@ -69,7 +69,7 @@ class DatabaseBackendTest(unittest.TestCase):
         fname = 'Sleepycat_store'
         c['rdf.source'] = 'Sleepycat'
         c['rdf.store_conf'] = fname
-        Configureable.conf = c
+        Configureable.default = c
         d = Data()
         try:
             d.openDatabase()

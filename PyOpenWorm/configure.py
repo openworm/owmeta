@@ -7,6 +7,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 import six
+
+
 class ConfigValue(object):
 
     """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
@@ -91,9 +93,9 @@ class Configure(object):
         """ Call link() with the names of configuration values that should
         always be the same to link them together
         """
-        l = _link(names, self)
+        link = _link(names, self)
         for n in names:
-            self._properties[n] = l
+            self._properties[n] = link
 
     def __contains__(self, thing):
         return (thing in self._properties)
@@ -164,16 +166,24 @@ class Configure(object):
             raise KeyError(pname)
 
 
+class ImmutableConfigure(Configure):
+    def __setitem__(self, k, v):
+        raise TypeError('\'{}\' object does not support item assignment'.format(repr(type(self))))
+
+
 class Configureable(object):
 
     """ An object which can accept configuration.  A base class intended to be subclassed. """
-    conf = Configure()
-    default = conf
+    default = ImmutableConfigure()
 
     def __init__(self, conf=None, **kwargs):
         super(Configureable, self).__init__(**kwargs)
         if conf is not None:
+            if conf is self:
+                raise ValueError('The \'conf\' of a Configureable cannot be itself')
             self.conf = conf
+        else:
+            self.conf = Configureable.default
 
     def __getitem__(self, k):
         """
@@ -194,7 +204,7 @@ class Configureable(object):
         """
         self.conf[k] = v
 
-    def get(self, pname, default=False):
+    def get(self, pname, default=None):
         """
         The getter for the configuration
 
@@ -202,4 +212,6 @@ class Configureable(object):
         :param default: True if you want the default value, False if you don't (default)
         :return: Returns the configuration value corresponding to the key pname.
         """
+        if self.conf is self:
+            raise ValueError('The \'conf\' of a Configureable cannot be itself')
         return self.conf.get(pname, default)

@@ -228,7 +228,7 @@ class Data(Configureable, Configure):
         if conf:
             self.copy(conf)
         else:
-            self.copy(Configureable.conf)
+            self.copy(Configureable.default)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['nx'] = _B(self._init_networkX)
@@ -239,7 +239,7 @@ class Data(Configureable, Configure):
     @classmethod
     def open(cls, file_name):
         """ Open a file storing configuration in a JSON format """
-        Configureable.conf = Configure.open(file_name)
+        Configureable.default = Configure.open(file_name)
         return cls()
 
     def openDatabase(self):
@@ -282,11 +282,9 @@ class Data(Configureable, Configure):
     def _init_rdf_graph(self):
         # Set these in case they were left out
         c = self.conf
-        self['rdf.source'] = c['rdf.source'] = c.get('rdf.source', 'default')
-        self['rdf.store'] = c['rdf.store'] = c.get('rdf.store', 'default')
-        self['rdf.store_conf'] = c['rdf.store_conf'] = c.get(
-            'rdf.store_conf',
-            'default')
+        self['rdf.source'] = c.get('rdf.source', 'default')
+        self['rdf.store'] = c.get('rdf.store', 'default')
+        self['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
 
         # XXX:The conf=self can probably be removed
         self.sources = {'sqlite': SQLiteSource,
@@ -340,6 +338,12 @@ class Data(Configureable, Configure):
             g[row[0]][row[1]]['synapse'] = row[2]
             g[row[0]][row[1]]['neurotransmitter'] = row[4]
         return g
+
+    def __setitem__(self, k, v):
+        return Configure.__setitem__(self, k, v)
+
+    def __getitem__(self, k):
+        return Configure.__getitem__(self, k)
 
 
 def modification_date(filename):

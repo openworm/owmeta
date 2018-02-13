@@ -60,7 +60,8 @@ class LocalFileDataSource(DataSource):
 
 
 class CSVDataSource(LocalFileDataSource):
-    csv_file_name = Informational(display_name='CSV file name')
+    csv_file_name = Informational(display_name='CSV file name',
+                                  also=LocalFileDataSource.file_name)
     csv_header = Informational(display_name='Header column names', multiple=False)
 
     # def __init__(self, csv_file_name, **kwargs):
@@ -246,7 +247,7 @@ class NeuronCSVDataTranslator(DataTranslator):
                             d.as_context(Neuron)(neuron_name).type(t)
         for d in documents.values():
             contextualized_doc_ctx = res.evidence_context(d.as_context)
-            res.evidence_context(Evidence)(reference=contextualized_doc_ctx.rdf_object, supports=d)
+            res.evidence_context(Evidence)(reference=d, supports=contextualized_doc_ctx.rdf_object)
             res.contexts.append(d.as_context)
         return res
 

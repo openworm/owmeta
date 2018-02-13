@@ -1,7 +1,7 @@
 import six
 from rdflib.term import URIRef
 from rdflib.namespace import Namespace
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from .context import Context
 from .dataObject import BaseDataObject
 
@@ -9,7 +9,8 @@ from .dataObject import BaseDataObject
 class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
                  value=None, default_value=None, identifier=None,
-                 property_type='DatatypeProperty', multiple=True):
+                 property_type='DatatypeProperty', multiple=True,
+                 also=()):
         self.name = name
         self.display_name = name if display_name is None else display_name
         self.default_value = default_value
@@ -17,8 +18,18 @@ class Informational(object):
         self._value = value
         self.identifier = identifier
         self.property_type = property_type
-        self.cls = None
         self.multiple = multiple
+        if also and not isinstance(also, (list, tuple)):
+            also = (also,)
+        self.also = also
+
+        self.default_override = None
+        """
+        An override for the default value, typically set by setting the value
+        in a DataSource class dictionary
+        """
+
+        self.cls = None
 
     def copy(self):
         res = type(self)()
@@ -36,6 +47,10 @@ class Informational(object):
                                           repr(self.default_value),
                                           repr(self.description),
                                           repr(self.identifier))
+
+
+class DuplicateAlsoException(Exception):
+    pass
 
 
 class DataSourceType(type(BaseDataObject)):
@@ -68,7 +83,7 @@ class DataSourceType(type(BaseDataObject)):
             for i in range(len(self.__info_fields)):
                 if self.__info_fields[i].name == k:
                     self.__info_fields[i] = self.__info_fields[i].copy()
-                    self.__info_fields[i].default_value = v
+                    self.__info_fields[i].default_override = v
                     break
             else: # no 'break'
                 newdct[k] = v
@@ -116,23 +131,35 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             else:
                 new_kwargs[k] = v
         super(DataSource, self).__init__(**parent_kwargs)
+        vals = defaultdict(dict)
         for n, inf in self.info_fields.items():
+            v = new_kwargs.get(n, None)
+            if v is not None:
+                vals[n]['i'] = v
+            else:
+                v = inf.default_value
+
+            if inf.default_override is not None:
+                vals[n]['e'] = inf.default_override
+
+            vals[n]['d'] = inf.default_value
+
+            for also in inf.also:
+                if v is not None and vals[also.name].setdefault('a', v) != v:
+                    raise DuplicateAlsoException('Only one also is allowed')
+
+        for n, vl in vals.items():
+            inf = self.info_fields[n]
+            v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
+
+            # Make the property
             getattr(inf.cls, inf.property_type)(owner=self,
                                                 linkName=inf.name,
                                                 multiple=True,
                                                 link=inf.identifier)
-            v = new_kwargs.get(n, None)
+            ctxd_prop = self.context(getattr(self, inf.name))
             if v is not None:
-                self.context(getattr(self, inf.name))(v)
-            else:
-                try:
-                    ctxd_prop = self.context(getattr(self, inf.name))
-                    if not ctxd_prop.has_defined_value() and inf.default_value is not None:
-                        ctxd_prop(inf.default_value)
-                except AttributeError as e:
-                    print("HANDLING AttributeError in DataSource")
-                    print(repr(type(self)), id(self), getattr(self, inf.name))
-                    raise e
+                ctxd_prop(v)
 
     def defined_augment(self):
         return self.translation.has_defined_value()
