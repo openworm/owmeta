@@ -64,11 +64,6 @@ class CSVDataSource(LocalFileDataSource):
                                   also=LocalFileDataSource.file_name)
     csv_header = Informational(display_name='Header column names', multiple=False)
 
-    # def __init__(self, csv_file_name, **kwargs):
-        # super(CSVDataSource, self).__init__(csv_file_name=csv_file_name,
-                                            # file_name=csv_file_name,
-                                            # **kwargs)
-
 
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
     def __init__(self, cell_type, initial_cell_column, **kwargs):
@@ -112,37 +107,43 @@ class DataWithEvidenceDataSource(DataSource):
 
 
 
+class NeuronCSVDataSource(CSVDataSource):
+    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/NeuronCSVDataSource#")
+    bibtex_files = Informational(display_name='BibTeX files',
+                                 description='List of BibTeX files that are referenced in the csv file by entry ID')
+
+
 class WormbaseIonChannelCSVTranslator(DataTranslator):
     input_type = WormbaseIonChannelCSVDataSource
-    output_type = DataObjectContextDataSource
+    output_type = DataWithEvidenceDataSource
+    translator_identifier = TRANS_NS.WormbaseIonChannelCSVTranslator
 
     def translate(self, data_source):
-        res = set([])
+        res = self.make_new_output((data_source,))
         try:
             with open(data_source.csv_file_name.onedef(), 'r') as csvfile:
                 next(csvfile, None)
                 csvreader = csv.reader(csvfile, skipinitialspace=True)
+                with res.data_context(Channel=Channel, ExpressionPattern=ExpressionPattern) as ctx:
+                    for line in csvreader:
+                        channel_name = normalize_cell_name(line[0]).upper()
+                        gene_name = line[1].upper()
+                        gene_WB_ID = line[2].upper()
+                        expression_pattern = line[3]
+                        description = line[4]
+                        c = ctx.Channel(name=str(channel_name))
+                        c.gene_name(gene_name)
+                        c.gene_WB_ID(gene_WB_ID)
+                        c.description(description)
+                        patterns = expression_pattern.split(r' | ')
+                        regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
-                for line in csvreader:
-                    channel_name = normalize_cell_name(line[0]).upper()
-                    gene_name = line[1].upper()
-                    gene_WB_ID = line[2].upper()
-                    expression_pattern = line[3]
-                    description = line[4]
-                    c = Channel(name=str(channel_name))
-                    c.gene_name(gene_name)
-                    c.gene_WB_ID(gene_WB_ID)
-                    c.description(description)
-                    patterns = expression_pattern.split(r' | ')
-                    regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
-
-                    matches = [regex.match(pat) for pat in patterns]
-                    patterns = [ExpressionPattern(wormbaseID=m.group(1),
-                                                  description=m.group(2))
-                                for m in matches if m is not None]
-                    for pat in patterns:
-                        c.expression_pattern(pat)
-                    res.add(c)
+                        matches = [regex.match(pat) for pat in patterns]
+                        patterns = [ctx.ExpressionPattern(wormbaseID=m.group(1),
+                                                          description=m.group(2))
+                                    for m in matches if m is not None]
+                        for pat in patterns:
+                            c.expression_pattern(pat)
         except Exception:
             traceback.print_exc()
         return res
@@ -156,20 +157,23 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
     def translate(self, data_source):
         initcol = data_source.initial_cell_column
         ctype = data_source.cell_type
+        res = self.make_new_output((data_source,))
         try:
             with open(data_source.csv_file_name.onedef(), 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
-                for row in reader:
-                    cells = self.extract_cell_names(header,
-                                                    initcol,
-                                                    row)
-                    ch = Channel(name=str(row[0]))
-                    for cell in cells:
-                        m = ctype(name=str(cell))
-                        ch.appearsIn(m)
+                with res.data_context(Channel=Channel) as ctx:
+                    for row in reader:
+                        cells = self.extract_cell_names(header,
+                                                        initcol,
+                                                        row)
+                        ch = ctx.Channel(name=str(row[0]))
+                        for cell in cells:
+                            m = ctype(name=str(cell))
+                            ch.appearsIn(m)
         except Exception:
             traceback.print_exc()
+        return res
 
     def skip_to_header(self, reader):
         rows = 0
@@ -190,23 +194,12 @@ class WormbaseTextMatchCSVTranslator(DataTranslator):
         return res
 
 
-class NeuronCSVDataSource(CSVDataSource):
-    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/NeuronCSVDataSource#")
-    bibtex_files = Informational(display_name='BibTeX files',
-                                 description='List of BibTeX files that are referenced in the csv file by entry ID')
-
-
 class NeuronCSVDataTranslator(DataTranslator):
     input_type = NeuronCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronCSVDataTranslator
 
     def translate(self, data_source):
-        # Define the result data source and the distinguished contexts
-        # print('NeuronCSVDataTranslator instance self', self)
-        # print('NeuronCSVDataTranslator instance type', type(self))
-        # print('NeuronCSVDataTranslator instance context', self.context)
-        # print('NeuronCSVDataTranslator instance output_Type', self.output_type, self.output_type.rdf_namespace)
         res = self.make_new_output((data_source,))
 
         documents = dict()
@@ -349,14 +342,17 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
 # website / document
 DATA_SOURCES = [
     WormbaseTextMatchCSVDataSource(
+        key='WormbaseTextMatchCSVChannelNeuronDataSource',
         cell_type=Neuron,
         csv_file_name=CHANNEL_NEURON_SOURCE,
         initial_cell_column=101),
     WormbaseTextMatchCSVDataSource(
+        key='WormbaseTextMatchCSVChannelMuscleDataSource',
         cell_type=Muscle,
         csv_file_name=CHANNEL_MUSCLE_SOURCE,
         initial_cell_column=6),
     WormbaseIonChannelCSVDataSource(
+        key='WormbaseIonChannelCSVDataSource',
         csv_file_name=IONCHANNEL_SOURCE),
     NeuronCSVDataSource(
         key='WormAtlasNeuronTypesSource',
@@ -369,18 +365,18 @@ DATA_SOURCES = [
     WormAtlasCellListDataSource(
         key='WormAtlasCellList',
         csv_file_name=LINEAGE_LIST_LOC)
-    ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename))
+    ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key='NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0])
          for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR)
          for filename in sorted(filenames)
          if filename.lower().endswith('.csv')]
 
 
 TRANSLATORS = [
-    # WormbaseTextMatchCSVTranslator(),
-    # WormbaseIonChannelCSVTranslator(),
-    NeuronCSVDataTranslator()]
-    # MuscleWormBaseCSVTranslator(),
-    # NeuronWormBaseCSVTranslator()]
+    WormbaseTextMatchCSVTranslator(),
+    WormbaseIonChannelCSVTranslator(),
+    NeuronCSVDataTranslator(),
+    MuscleWormBaseCSVTranslator(),
+    NeuronWormBaseCSVTranslator()]
 
 
 def serialize_as_nquads():

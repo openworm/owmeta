@@ -176,6 +176,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     class_context = 'http://openworm.org/schema'
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
+    _next_variable_int = 0
+
     def __new__(cls, *args, **kwargs):
         """ This is defined so that the __init__ method gets a contextualized
         instance, allowing for statements made in __init__ to be contextualized.
@@ -198,7 +200,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
-        self._variable = R.Variable("V" + str(RND.random()))
+        self._variable = self.next_variable()
         BaseDataObject.attach_property(self, RDFTypeProperty)
         BaseDataObject.attach_property(self, RDFSCommentProperty)
         BaseDataObject.attach_property(self, RDFSLabelProperty)
@@ -207,6 +209,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         if rdfs_label:
             self.rdfs_label = rdfs_label
+
+    @classmethod
+    def next_variable(cls):
+        cls._next_variable_int += 1
+        return R.Variable('a' + cls.__name__ + '_' + str(DataObject._next_variable_int))
 
     @property
     def context(self):
