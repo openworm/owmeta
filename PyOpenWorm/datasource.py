@@ -153,10 +153,7 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
 
             # Make the property
-            getattr(inf.cls, inf.property_type)(owner=self,
-                                                linkName=inf.name,
-                                                multiple=True,
-                                                link=inf.identifier)
+            getattr(inf.cls, inf.property_type)(owner=self, linkName=inf.name, multiple=True, link=inf.identifier)
             ctxd_prop = self.context(getattr(self, inf.name))
             if v is not None:
                 ctxd_prop(v)
@@ -230,14 +227,11 @@ class DataTranslator(BaseDataObject):
         raise NotImplementedError()
 
     def make_translation(self):
-        # print('MAKING TRANSLATION', id(self), self.context)
         return Translation.contextualize(self.context)(translator=self)
 
     def make_new_output(self, sources, *args, **kwargs):
-        # print('making output_type', type(self), self.output_type)
         res = self.output_type(*args, translation=self.make_translation(), **kwargs)
         for s in sources:
-            # print('setting source', s)
             res.contextualize(self.context).source(s)
         return res
 

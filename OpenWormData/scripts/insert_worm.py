@@ -11,8 +11,7 @@ import csv
 import re
 import os
 from yarom import MAPPER
-import tracemalloc
-if tracemalloc.is_tracing(): tracemalloc.take_snapshot().dump('before_imports.tm')
+
 import PyOpenWorm.import_override as impo
 impo.Overrider(MAPPER).wrap_import()
 # logging.basicConfig(level=logging.DEBUG)
@@ -35,7 +34,6 @@ from EVCTX.PyOpenWorm.evidence import Evidence
 from EVCTX.PyOpenWorm.document import Document
 from EVCTX.PyOpenWorm.website import Website
 from EVCTX.PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
-if tracemalloc.is_tracing(): tracemalloc.take_snapshot().dump('after_imports.tm')
 
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
                 imported=(CTX, EVCTX))
@@ -54,18 +52,23 @@ NEURON_EXPRESSION_DATA_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 TRANS_NS = Namespace('http://openworm.org/entities/translators/')
+DS_NS = Namespace('http://openworm.org/entities/data_sources/')
 
 class LocalFileDataSource(DataSource):
     file_name = Informational(display_name='File name')
 
 
 class CSVDataSource(LocalFileDataSource):
+    rdf_namespace = Namespace(DS_NS['CSVDataSource#'])
+
     csv_file_name = Informational(display_name='CSV file name',
                                   also=LocalFileDataSource.file_name)
     csv_header = Informational(display_name='Header column names', multiple=False)
 
 
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
+    rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
+
     def __init__(self, cell_type, initial_cell_column, **kwargs):
         """
         Parameters
@@ -81,6 +84,9 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
 
 
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
+
+    rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
+
     csv_header = ['channel_name',
                   'gene_name',
                   'gene_WB_ID',
@@ -95,7 +101,7 @@ class DataWithEvidenceDataSource(DataSource):
                                  description='The context in which primary data for this data source is defined')
     contexts = Informational(display_name='Other contexts',
                              description='Other contexts defined by the data translator')
-    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/DataWithEvidenceDataSource#")
+    rdf_namespace = Namespace(DS_NS['DataWithEvidenceDataSource#'])
     def __init__(self, *args, **kwargs):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)
         # print(self.translation._v)
@@ -108,7 +114,7 @@ class DataWithEvidenceDataSource(DataSource):
 
 
 class NeuronCSVDataSource(CSVDataSource):
-    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/NeuronCSVDataSource#")
+    rdf_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
     bibtex_files = Informational(display_name='BibTeX files',
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
 
@@ -246,7 +252,7 @@ class NeuronCSVDataTranslator(DataTranslator):
 
 
 class WormBaseCSVDataSource(CSVDataSource):
-    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/MuscleCSVDataSource#")
+    rdf_namespace = Namespace(DS_NS['MuscleCSVDataSource#'])
     csv_header = ["Cell",
                   "Lineage Name",
                   "Description",
@@ -271,7 +277,7 @@ class WormBaseCSVDataSource(CSVDataSource):
 
 
 class WormAtlasCellListDataSource(CSVDataSource):
-    rdf_namespace = Namespace("http://openworm.org/entities/data_sources/WormAtlasCellListDataSource#")
+    rdf_namespace = Namespace(DS_NS['WormAtlasCellListDataSource#'])
     csv_header = ['Cell', 'Lineage Name', 'Description']
 
 
@@ -303,7 +309,6 @@ class MuscleWormBaseCSVTranslator(DataTranslator):
                         muscle_name = normalize_cell_name(line[0]).upper()
                         m = ctx.Muscle(name=muscle_name)
                         w.muscle(m)
-            res.contexts.append(doc.as_context)
         return res
 
 
@@ -319,7 +324,7 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
             doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
             ctx.Evidence(reference=doc, supports=doc.as_context.rdf_object)
 
-        with doc.as_context(Worm=Worm, Network=Network, Neuron=Neuron) as ctx:
+        with res.data_context(Worm=Worm, Network=Network, Neuron=Neuron) as ctx:
             w = ctx.Worm()
             n = ctx.Network()
             w.neuron_network(n)
@@ -335,7 +340,6 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
                     if line[5] == '1':  # neurons marked in this column
                         neuron_name = normalize_cell_name(line[0]).upper()
                         n.neuron(ctx.Neuron(name=neuron_name))
-        res.contexts.append(doc.as_context)
         return res
 # TODO: Make PersonDataTranslators and Document/Website DataSource for the
 # documents these come from. Need to verify who made the translation from the
@@ -414,11 +418,11 @@ class WormAtlasCellListDataTranslator(DataTranslator):
         res = self.make_new_output(sources=data_source,
                                    neurons_source=neurons_source)
         try:
-            with res.data_context(Worm=Worm, Network=Network) as ctx:
-                w = ctx.Worm()
-                net = ctx.Network()
+            net = neurons_source.data_context(Network)()
+            w = res.data_context(Worm)()
             # TODO: Improve this evidence marker
             doc = res.evidence_context(Document)(url="http://www.wormatlas.org/celllist.htm")
+            doc_ctx = doc.as_context
             with open(data_source.csv_file_name.onedef(), "r") as cell_data:
 
                 # Skip headers
@@ -453,15 +457,15 @@ class WormAtlasCellListDataTranslator(DataTranslator):
 
                     data[name] = {"lineageName": lineageName, "desc": desc}
 
-            def add_data_to_cell(n):
-                name = n.name.onedef()
-                cell_data = data[str(name)]
-                n.lineageName(cell_data['lineageName'])
-                n.description(cell_data['desc'])
-                w.cell(n)
-
             for n in net.neurons():
-                add_data_to_cell(n)
+                # Get the name of the neuron in its original context
+                name = n.name.one()
+                cell_data = data[str(name)]
+                # Make statements in the result context
+                nn = res.data_context(n)
+                nn.lineageName(cell_data['lineageName'])
+                nn.description(cell_data['desc'])
+                w.cell(nn)
 
             # TODO: Add data for other cells here. Requires relating named
             # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
@@ -472,9 +476,10 @@ class WormAtlasCellListDataTranslator(DataTranslator):
             print ("uploaded lineage and descriptions")
         except Exception:
             traceback.print_exc()
+        return res
 
 
-def upload_connections():
+def translate(data_source):
 
     print ("uploading statements about connections")
 
@@ -693,12 +698,10 @@ def do_insert(config="default.conf", logging=False):
                 print(ds)
                 for trans in translators:
                     print('Translating with', trans)
-                    if tracemalloc.is_tracing(): tracemalloc.take_snapshot().dump('before_translation.{}.tm'.format(i))
                     x = trans.translate(ds)
                     if x is not None:
                         sources.append(x)
                 i += 1
-        if tracemalloc.is_tracing(): tracemalloc.take_snapshot().dump('after_translations.tm')
 
         # attach_neuromlfiles_to_channel()
         # upload_lineage_and_descriptions()
@@ -712,7 +715,6 @@ def do_insert(config="default.conf", logging=False):
             for ctx in src.contexts:
                 ctx.save_context(P.config('rdf.graph'))
         IWCTX.save_context(P.config('rdf.graph'), inline_imports=True)
-        if tracemalloc.is_tracing(): tracemalloc.take_snapshot().dump('after_saving.tm')
 
         print("Saved %d objects." % IWCTX.defcnt)
         print("Saved %d triples." % IWCTX.tripcnt)

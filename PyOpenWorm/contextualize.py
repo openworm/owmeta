@@ -275,12 +275,10 @@ def contextualized_new(ccls):
         ores = super(ccls, cls).__new__(cls)
         if cls.context is not None:
             res = ores.contextualize(cls.context)
-            # print('NEWING', cls, cls.context, id(ores), id(res))
             res.__init__ = type(ores).__init__.__get__(res, type(ores))
             type(ores).__init__(res, *args, **kwargs)
         else:
             res = ores
-            # print('NEWING (None context)', cls, cls.context, id(ores), id(res))
         return res
     return _helper
 

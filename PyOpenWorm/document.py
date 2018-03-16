@@ -4,7 +4,7 @@ from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
 from yarom.graphObject import IdentifierMissingException
-from .documentContext import DocumentContext
+from .context import Context
 from .dataObject import DataObject
 
 from PyOpenWorm import bibtex as BIB
@@ -31,9 +31,9 @@ class BaseDocument(DataObject):
     @property
     def as_context(self):
         if self.context is not None:
-            return DocumentContext.contextualize(self.context)(self)
+            return Context.contextualize(self.context)(ident=self.identifier)
         else:
-            return DocumentContext(self)
+            return Context(ident=self.identifier)
 
 
 class Document(BaseDocument):
@@ -325,6 +325,11 @@ def _doi_uri_to_doi(uri):
     return doi
 
 
+class EmptyRes(object):
+    def read(self):
+        return bytes()
+
+
 def _url_request(url, headers={}):
     try:
         r = Request(url, headers=headers)
@@ -337,9 +342,11 @@ def _url_request(url, headers={}):
 
         return s
     except HTTPError:
-        return ""
+        logger.error("Error in request for {}".format(url), exc_info=True)
+        return EmptyRes()
     except URLError:
-        return ""
+        logger.error("Error in request for {}".format(url), exc_info=True)
+        return EmptyRes()
 
 
 def _json_request(url):
