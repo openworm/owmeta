@@ -204,9 +204,11 @@ class Document(BaseDocument):
 
             # get the author
             try:
-                j = _json_request('http://api.wormbase.org/rest/field/paper/' + str(wbid) + '/overview')
-                if 'overview' in j:
-                    f = j['overview']
+                root = self.conf.get('wormbase_api_root_url', 'http://rest.wormbase.org')
+                url = root + '/rest/widget/paper/' + str(wbid) + '/overview?content-type=application%2Fjson'
+                j = _json_request(url)
+                if 'fields' in j:
+                    f = j['fields']
                     if 'authors' in f:
                         dat = f['authors']['data']
                         if dat is not None:
@@ -351,7 +353,7 @@ def _url_request(url, headers={}):
 
 def _json_request(url):
     import json
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Accept': 'application/json'}
     try:
         data = _url_request(url, headers).read().decode('UTF-8')
         if hasattr(data, 'charset'):
