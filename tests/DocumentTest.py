@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .DataTestTemplate import _DataTest
 from PyOpenWorm.document import Document
 import pytest
