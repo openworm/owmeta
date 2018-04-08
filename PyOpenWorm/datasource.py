@@ -209,6 +209,7 @@ class DataTranslator(BaseDataObject):
     input_type = DataSource
     output_type = DataSource
     translator_identifier = None
+    translation_type = Translation
 
     def __init__(self):
         if self.translator_identifier is not None:
@@ -223,11 +224,24 @@ class DataTranslator(BaseDataObject):
         else:
             return self.translate(data_source)
 
-    def translate(self, data_source):
+    def translate(self, *args, **kwargs):
+        '''
+        Notionally, this method takes a data source, which is translated into
+        some other data source. There doesn't necessarily need to be an input
+        data source.
+        '''
         raise NotImplementedError()
 
     def make_translation(self):
-        return Translation.contextualize(self.context)(translator=self)
+        '''
+        It's intended that implementations of DataTranslator will override this
+        method to make custom Translations according with how different
+        arguments to Translate are (or are not) distinguished.
+
+        The actual properties of a Translation subclass must be defined within
+        the 'translate' method
+        '''
+        return self.translation_type.contextualize(self.context)(translator=self)
 
     def make_new_output(self, sources, *args, **kwargs):
         res = self.output_type(*args, translation=self.make_translation(), **kwargs)

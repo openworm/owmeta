@@ -1,12 +1,15 @@
 from rdflib.term import URIRef
 from six.moves.urllib.parse import quote
 import hashlib
+import logging
 from yarom.graphObject import IdentifierMissingException
 
 
 __all__ = ['IdMixin']
 # Dictionary of previously created mixins
 _IdMixins = dict()
+
+L = logging.getLogger(__name__)
 
 
 def IdMixin(typ=object, hashfunc=None):
@@ -36,25 +39,54 @@ def IdMixin(typ=object, hashfunc=None):
                     # that functions as an identifier
                     self._id = None
 
+                self._key = None
                 if key is not None:
                     self.set_key(key)
 
             @classmethod
             def make_identifier(cls, data):
-                hsh = "a" + cls.hashfun(str(data).encode()).hexdigest()
-                return URIRef(cls.rdf_namespace[hsh])
+                '''
+                Makes an identifier based on this class' namespace by calling
+                __str__ on the data and passing to the class' hashfunc.
+
+                If the __str__ for data's type doesn't function as an
+                identifier, you should use either
+                :meth:`make_identifier_direct` or override
+                :meth:`identifier_augment` and :meth:`defined_augment`
+                '''
+                strdata = str(data)
+                if strdata:
+                    hsh = "a" + cls.hashfun(strdata.encode()).hexdigest()
+                    return URIRef(cls.rdf_namespace[hsh])
+                else:
+                    raise ValueError('Cannot use falsy value'
+                                     ' {} to make an identifier'.format(strdata))
 
             @classmethod
             def make_identifier_direct(cls, string):
                 if not isinstance(string, str):
-                    raise Exception("make_identifier_direct only accepts strings")
+                    raise ValueError('make_identifier_direct only accepts strings')
                 return URIRef(cls.rdf_namespace[quote(string)])
 
+            @property
+            def key(self):
+                return self._key
+
+            @key.setter
+            def key(self, key):
+                self.set_key(key)
+
             def set_key(self, key):
+                '''
+                Sets the identifier for this object based on the given key
+
+                Equivalent to self.key = key
+                '''
                 if isinstance(key, str):
                     self._id = self.make_identifier_direct(key)
                 else:
                     self._id = self.make_identifier(key)
+                self._key = str(key)
 
             @property
             def identifier(self):

@@ -33,7 +33,7 @@ EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
 from EVCTX.PyOpenWorm.evidence import Evidence
 from EVCTX.PyOpenWorm.document import Document
 from EVCTX.PyOpenWorm.website import Website
-from EVCTX.PyOpenWorm.datasource import DataTranslator, DataSource, Informational, DataObjectContextDataSource
+from EVCTX.PyOpenWorm.datasource import (DataTranslator, DataSource, Informational, Translation)
 
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
                 imported=(CTX, EVCTX))
@@ -65,6 +65,7 @@ class CSVDataSource(LocalFileDataSource):
                                   also=LocalFileDataSource.file_name)
     csv_header = Informational(display_name='Header column names', multiple=False)
 
+    csv_field_delimiter = Informational(display_name='CSV field delimiter')
 
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
@@ -118,6 +119,17 @@ class NeuronCSVDataSource(CSVDataSource):
     bibtex_files = Informational(display_name='BibTeX files',
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
 
+
+class CSVDataTranslator(DataTranslator):
+
+    def make_reader(self, source):
+        params = dict()
+        if source.csv_field_delimiter.has_defined_value():
+            params['delimiter'] = source.csv_field_delimiter.onedef()
+
+        params['skipinitialspace'] = True
+
+        return csv.reader(source.csv_file_name.onedef(), **params)
 
 class WormbaseIonChannelCSVTranslator(DataTranslator):
     input_type = WormbaseIonChannelCSVDataSource
@@ -341,73 +353,19 @@ class NeuronWormBaseCSVTranslator(DataTranslator):
                         neuron_name = normalize_cell_name(line[0]).upper()
                         n.neuron(ctx.Neuron(name=neuron_name))
         return res
-# TODO: Make PersonDataTranslators and Document/Website DataSource for the
-# documents these come from. Need to verify who made the translation from the
-# website / document
-DATA_SOURCES = [
-    WormbaseTextMatchCSVDataSource(
-        key='WormbaseTextMatchCSVChannelNeuronDataSource',
-        cell_type=Neuron,
-        csv_file_name=CHANNEL_NEURON_SOURCE,
-        initial_cell_column=101),
-    WormbaseTextMatchCSVDataSource(
-        key='WormbaseTextMatchCSVChannelMuscleDataSource',
-        cell_type=Muscle,
-        csv_file_name=CHANNEL_MUSCLE_SOURCE,
-        initial_cell_column=6),
-    WormbaseIonChannelCSVDataSource(
-        key='WormbaseIonChannelCSVDataSource',
-        csv_file_name=IONCHANNEL_SOURCE),
-    NeuronCSVDataSource(
-        key='WormAtlasNeuronTypesSource',
-        csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
-        bibtex_files=['../aux_data/bibtex_files/altun2009.bib',
-                      '../aux_data/bibtex_files/WormAtlas.bib']),
-    WormBaseCSVDataSource(
-        key='WormBaseCSVDataSource',
-        csv_file_name=CELL_NAMES_SOURCE),
-    WormAtlasCellListDataSource(
-        key='WormAtlasCellList',
-        csv_file_name=LINEAGE_LIST_LOC)
-    ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key='NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0])
-         for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR)
-         for filename in sorted(filenames)
-         if filename.lower().endswith('.csv')]
 
 
-TRANSLATORS = [
-    WormbaseTextMatchCSVTranslator(),
-    WormbaseIonChannelCSVTranslator(),
-    NeuronCSVDataTranslator(),
-    MuscleWormBaseCSVTranslator(),
-    NeuronWormBaseCSVTranslator()]
+class WormAtlasCellListDataTranslation(Translation):
+    def __init__(self, **kwargs):
+        super(WormAtlasCellListDataTranslation, self).__init__(**kwargs)
+        self.neurons_source = WormAtlasCellListDataTranslation.ObjectProperty()
 
 
-def serialize_as_nquads():
-    P.config('rdf.graph').serialize('../WormData.n4', format='nquads')
-    print('serialized to nquads file')
-
-
-def attach_neuromlfiles_to_channel():
-    """ attach the links to the neuroml files for the ion channels
-    """
-    print("attaching links to neuroml files")
-    try:
-        with open(CHANNEL_NEUROMLFILE) as csvfile:
-            next(csvfile, None)
-            csvreader = csv.reader(csvfile, skipinitialspace=True)
-            for row in csvreader:
-                ch = Channel(name=str(row[0]))
-                ch.neuroML_file(str(row[1]))
-                ch.save()
-        print("neuroML file links attached")
-    except Exception:
-        traceback.print_exc()
-
-
-class WormAtlasCellListDataTranslator(DataTranslator):
+class WormAtlasCellListDataTranslator(CSVDataTranslator):
     input_type = (WormAtlasCellListDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
+    translation_type = WormAtlasCellListDataTranslation
+    translator_identifier = TRANS_NS.WormAtlasCellListDataTranslator
 
     def translate(self, data_source, neurons_source):
         # XXX: This wants a way to insert cells, then later, to insert neurons from the same set
@@ -415,23 +373,26 @@ class WormAtlasCellListDataTranslator(DataTranslator):
         # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
         # at the sub-class insert and have a reasoner relate
         # the two sets of inserts.
-        res = self.make_new_output(sources=data_source,
-                                   neurons_source=neurons_source)
+        res = self.make_new_output(sources=(data_source, neurons_source))
+        tr = res.translation.onedef()
+        tr.neurons_source(neurons_source)
         try:
             net = neurons_source.data_context(Network)()
             w = res.data_context(Worm)()
             # TODO: Improve this evidence marker
-            doc = res.evidence_context(Document)(url="http://www.wormatlas.org/celllist.htm")
+            doc = res.evidence_context(Website)(url="http://www.wormatlas.org/celllist.htm")
             doc_ctx = doc.as_context
             with open(data_source.csv_file_name.onedef(), "r") as cell_data:
 
                 # Skip headers
                 next(cell_data)
 
+                self.make_reader(data_source)
                 csvreader = csv.reader(cell_data, skipinitialspace=True)
                 cell_name_counters = dict()
                 data = dict()
                 for j in csvreader:
+                    print(j)
                     name = j[0]
                     lineageName = j[1]
                     desc = j[2]
@@ -472,11 +433,87 @@ class WormAtlasCellListDataTranslator(DataTranslator):
             # Also requires removing neurons and muscles from the list once
             # they've been identified so they aren't stored twice
 
-            ev.supports(w)
+            # ev.supports(w)
             print ("uploaded lineage and descriptions")
         except Exception:
             traceback.print_exc()
         return res
+
+
+# TODO: Make PersonDataTranslators and Document/Website DataSource for the
+# documents these come from. Need to verify who made the translation from the
+# website / document
+DATA_SOURCES = [
+    WormbaseTextMatchCSVDataSource(
+        key='WormbaseTextMatchCSVChannelNeuronDataSource',
+        cell_type=Neuron,
+        csv_file_name=CHANNEL_NEURON_SOURCE,
+        initial_cell_column=101),
+    WormbaseTextMatchCSVDataSource(
+        key='WormbaseTextMatchCSVChannelMuscleDataSource',
+        cell_type=Muscle,
+        csv_file_name=CHANNEL_MUSCLE_SOURCE,
+        initial_cell_column=6),
+    WormbaseIonChannelCSVDataSource(
+        key='WormbaseIonChannelCSVDataSource',
+        csv_file_name=IONCHANNEL_SOURCE),
+    NeuronCSVDataSource(
+        key='WormAtlasNeuronTypesSource',
+        csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
+        bibtex_files=['../aux_data/bibtex_files/altun2009.bib',
+                      '../aux_data/bibtex_files/WormAtlas.bib']),
+    WormBaseCSVDataSource(
+        key='WormBaseCSVDataSource',
+        csv_file_name=CELL_NAMES_SOURCE),
+    WormAtlasCellListDataSource(
+        key='WormAtlasCellList',
+        csv_file_name=LINEAGE_LIST_LOC)
+    ] + [NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key='NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0])
+         for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR)
+         for filename in sorted(filenames)
+         if filename.lower().endswith('.csv')]
+
+DATA_SOURCES_BY_KEY = {x.key: x for x in DATA_SOURCES}
+
+TRANS_MAP = [
+    # ('WormbaseTextMatchCSVChannelNeuronDataSource',
+     # WormbaseTextMatchCSVTranslator),
+    # ('WormbaseTextMatchCSVChannelMuscleDataSource',
+     # WormbaseTextMatchCSVTranslator),
+    # ('WormbaseIonChannelCSVDataSource',
+     # WormbaseIonChannelCSVTranslator),
+    ('WormAtlasNeuronTypesSource',
+     NeuronCSVDataTranslator,
+     'Neurons'),
+    # ('WormBaseCSVDataSource',
+     # MuscleWormBaseCSVTranslator),
+    # ('WormBaseCSVDataSource',
+     # NeuronWormBaseCSVTranslator),
+    (('WormAtlasCellList', 'Neurons'),
+     WormAtlasCellListDataTranslator)
+]
+
+
+def serialize_as_nquads():
+    P.config('rdf.graph').serialize('../WormData.n4', format='nquads')
+    print('serialized to nquads file')
+
+
+def attach_neuromlfiles_to_channel():
+    """ attach the links to the neuroml files for the ion channels
+    """
+    print("attaching links to neuroml files")
+    try:
+        with open(CHANNEL_NEUROMLFILE) as csvfile:
+            next(csvfile, None)
+            csvreader = csv.reader(csvfile, skipinitialspace=True)
+            for row in csvreader:
+                ch = Channel(name=str(row[0]))
+                ch.neuroML_file(str(row[1]))
+                ch.save()
+        print("neuroML file links attached")
+    except Exception:
+        traceback.print_exc()
 
 
 def translate(data_source):
@@ -671,6 +708,7 @@ def infer():
 def do_insert(config="default.conf", logging=False):
     global WORM
     global NETWORK
+    global DATA_SOURCES_BY_KEY
 
     if config:
         if isinstance(config, P.Configure):
@@ -684,24 +722,35 @@ def do_insert(config="default.conf", logging=False):
 
     P.connect(conf=config, do_logging=logging)
     try:
-        i = 0
         t0 = time()
-        sources = []
-        for ds in DATA_SOURCES:
-            translators = []
-            for tr in TRANSLATORS:
-                if isinstance(ds, tr.input_type):
-                    translators.append(tr)
-            if len(translators) == 0:
-                print('No translator for', ds)
+        translators = dict()
+        for t in TRANS_MAP:
+            if not isinstance(t[0], (list, tuple)):
+                source_keys = (t[0],)
             else:
-                print(ds)
-                for trans in translators:
-                    print('Translating with', trans)
-                    x = trans.translate(ds)
-                    if x is not None:
-                        sources.append(x)
-                i += 1
+                source_keys = t[0]
+
+            sources = tuple(DATA_SOURCES_BY_KEY[s] for s in source_keys)
+            translator_class = t[1]
+            if len(t) > 2:
+                output_key = t[2]
+            else:
+                output_key = None
+            translator = translators.get(translator_class, None)
+            if not translator:
+                translator = translator_class()
+                translators[translator_class] = translator
+
+            print('\n'.join(str(s) for s in sources))
+            print('Translating with {}'.format(translator))
+            res = translator.translate(*sources)
+
+            if output_key:
+                res.key = output_key
+            print('Result {}'.format(res))
+            if res.key:
+                DATA_SOURCES_BY_KEY[res.key] = res
+
 
         # attach_neuromlfiles_to_channel()
         # upload_lineage_and_descriptions()
@@ -709,7 +758,8 @@ def do_insert(config="default.conf", logging=False):
 
         t1 = time()
         print("Saving %d objects..." % IWCTX.size())
-        for src in sources:
+        for src in (s for s in DATA_SOURCES_BY_KEY.values()
+                    if isinstance(s, DataWithEvidenceDataSource)):
             src.data_context.save_context(P.config('rdf.graph'))
             src.evidence_context.save_context(P.config('rdf.graph'))
             for ctx in src.contexts:
