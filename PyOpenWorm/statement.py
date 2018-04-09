@@ -1,3 +1,7 @@
+import logging
+
+L = logging.getLogger(__name__)
+
 
 class Statement(object):
     __slots__ = ('subject', 'property', 'object', 'context')

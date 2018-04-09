@@ -2,6 +2,7 @@ from __future__ import print_function
 from types import ModuleType
 import rdflib
 import wrapt
+from .configure import Configureable
 from .dataObjectUtils import merge_data_objects
 from .import_contextualizer import ImportContextualizer
 from .contextualize import (BaseContextualizable,
@@ -45,7 +46,7 @@ class ContextMeta(ContextualizableClass):
         return o
 
 
-class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable)):
+class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, Configureable)):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
@@ -117,7 +118,13 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     def add_objects(self, objects):
         self._contents.update((id(o), o) for o in objects)
 
-    def save_context(self, graph, inline_imports=False):
+    def save_context(self, graph=None, inline_imports=False):
+        if not graph:
+            try:
+                graph = self.conf['rdf.graph']
+            except KeyError:
+                raise Exception('No graph was given and configuration has no graph')
+
         self.tripcnt = 0
         self.defcnt = 0
         for ctx in self._imported_contexts:
@@ -201,7 +208,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
         return self._rdf_object
 
-    def __call__(self, o=None, **kwargs):
+    def __call__(self, o=None, *args, **kwargs):
         """
         Parameters
         ----------
@@ -210,6 +217,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         """
         if o is None:
             o = kwargs
+        elif args:
+            o = {x.__name__: x for x in [o] + list(args)}
 
         if isinstance(o, ModuleType):
             return ModuleProxy(self, o)

@@ -86,6 +86,9 @@ class Configure(object):
     def __getitem__(self, pname):
         return self._properties[pname].get()
 
+    def __delitem__(self, pname):
+        del self._properties[pname]
+
     def __iter__(self):
         return iter(self._properties)
 

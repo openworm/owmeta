@@ -243,7 +243,7 @@ class Data(Configureable, Configure):
         return cls()
 
     def openDatabase(self):
-        """ Open a the configured database """
+        """ Open the configured database """
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
         self.source.open()

@@ -149,7 +149,7 @@ class ContextualizableList(Contextualizable, list):
 
     def contextualize(self, context):
         res = type(self)(context=context)
-        res += type(self)(x.contextualize(context) for x in self)
+        res += list(x.contextualize(context) for x in self)
         return res
 
 
@@ -742,7 +742,8 @@ class _InversePropertyMixin(object):
     def set(self, other):
         assert isinstance(other, self.rhs_class)
         rhs_prop = getattr(other, self.rhs_linkName)
-        super(_InversePropertyMixin, rhs_prop).set(self.owner)
+        ctxd_rhs_prop = rhs_prop.contextualize(self.context)
+        super(_InversePropertyMixin, ctxd_rhs_prop).set(self.owner)
         return super(_InversePropertyMixin, self).set(other)
 
     def unset(self, other):

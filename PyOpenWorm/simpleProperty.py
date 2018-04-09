@@ -110,10 +110,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self.clear()
 
         stmt = self._insert_value(v)
-        # print('setting', self.linkName)
-        # if self.linkName in ('rdf_type_property','translator'):
-            # print('setting', self.linkName, 'type(self)', type(self), 'id(self)',
-                  # id(self), 'id(self.owner)', id(self.owner), 'id(v)', id(v), 'self.context', self.context)
         self.context.add_statement(stmt)
         return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
 

@@ -66,9 +66,6 @@ class DataSourceType(type(BaseDataObject)):
         for z in dct:
             meta = dct[z]
             if isinstance(meta, Informational):
-                if meta.identifier is None:
-                    if self.rdf_namespace is not None:
-                        meta.identifier = self.rdf_namespace[meta.name]
                 meta.cls = self
                 meta.name = z
                 self.__info_fields.append(meta)
@@ -153,7 +150,9 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
 
             # Make the property
-            getattr(inf.cls, inf.property_type)(owner=self, linkName=inf.name, multiple=True, link=inf.identifier)
+            getattr(inf.cls, inf.property_type)(owner=self,
+                                                linkName=inf.name,
+                                                multiple=True)
             ctxd_prop = self.context(getattr(self, inf.name))
             if v is not None:
                 ctxd_prop(v)
@@ -265,4 +264,4 @@ class PersonDataTranslator(DataTranslator):
     # No translate impl is provided here since this is intended purely as a descriptive object
 
 
-__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator)
+__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator, PersonDataTranslator)
