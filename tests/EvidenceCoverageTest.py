@@ -12,8 +12,10 @@ from PyOpenWorm.evidence import Evidence
 class EvidenceCoverageTest(_DataTest):
 
     def test_verify_neurons_have_evidence(self):
-        """ For each neuron in PyOpenWorm, verify
-        that there is supporting evidence"""
+        """
+        For each neuron in PyOpenWorm, verify
+        that there is supporting evidence
+        """
 
         neurons = list(Neuron().load())
         evcheck = []
