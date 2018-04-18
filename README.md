@@ -35,8 +35,41 @@ forget about which representation is being used under the hood.
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
 
+Syntactical constructs in this library are intuitive and easy
+to understand what they will return within the knowledge domain of *C. elegans*,
+rather than in the programming domain of its underlying technologies. Wherever possible,
+pure-python libraries or those with few compilation requirements,
+rather than those that create extra dependencies on external native libraries are used.
+
 Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
 -----------------------------
+
+Versioning data as code
+-----------------------
+
+A library that attempts to reliably expose dynamic data can often be broken because
+the underlying data sets that define it change over time.  This is because data
+changes can cause queries to return different answers than before, causing
+unpredictable behavior.  
+
+As such, to create a stable foundational library for others to reuse, the version
+of the PyOpenWorm library guarantees the user a specific version of the data
+behind that library.  In addition, unit tests are used to ensure basic sanity
+checks on data are maintained.  As data are improved, the maintainers of the
+library can perform appropriate regression tests prior to each new release to
+guarantee stability.
+
+Distinguishing between known facts versus inferred knowledge  
+------------------------------------------------------------------------------------------
+
+In an effort to make the library most helpful to experimental scientists, PyOpenWorm
+strives to keep the easiest-to-access features of this API only returning data that is
+uncontroversial and well supported by evidence.  At the same time, there is an
+important need to incorporate information that may not be confirmed by observation,
+and instead is the result of an inference process.  These inferred data will also
+be marked with evidence that clearly indicates its status as not authoritative.
+PyOpenWorm endeavors to make the access to inferred data clearly separate from
+uncontroversial data reported in peer-reviewed literature.
 
 Installation
 ------------
@@ -196,7 +229,7 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 
 ```
 
-Modelling data
+Modeling data
 --------------
 
 PyOpenWorm also provides access to store and retrieve data about models.
@@ -232,45 +265,3 @@ Documentation
 -------------
 
 Further documentation [is available online](http://pyopenworm.readthedocs.org).
-
-Ease of use
------------
-
-PyOpenWorm should be easy to use and easy to install, to make it most accessible.  
-Python beginners should be able to get information out about c. elegans from
-this library.  
-
-Syntactical constructs in this library should be intuitive and easy
-to understand what they will return within the knowledge domain of c. elegans,
-rather than in the programming domain of its underlying technologies.  Values that
-are returned should be easily interpretable and easy to read.
-
-Wherever possible, pure-python libraries or those with few compilation requirements,
-rather than those that create extra dependencies on external native libraries are used.
-
-Versioning data as code
------------------------
-
-A library that attempts to reliably expose dynamic data can often be broken because
-the underlying data sets that define it change over time.  This is because data
-changes can cause queries to return different answers than before, causing
-unpredictable behavior.  
-
-As such, to create a stable foundational library for others to reuse, the version
-of the PyOpenWorm library guarantees the user a specific version of the data
-behind that library.  In addition, unit tests are used to ensure basic sanity
-checks on data are maintained.  As data are improved, the maintainers of the
-library can perform appropriate regression tests prior to each new release to
-guarantee stability.
-
-Making it easy to get out authoritative data, keeping inferred data as an advanced feature
-------------------------------------------------------------------------------------------
-
-In an effort to make the library most helpful to experimental scientists, PyOpenWorm
-strives to keep the easiest-to-access features of this API only returning data that is
-uncontroversial and well supported by evidence.  At the same time, there is an
-important need to incorporate information that may not be confirmed by observation,
-and instead is the result of an inference process.  These inferred data will also
-be marked with evidence that clearly indicates its status as not authoritative.
-PyOpenWorm endeavors to make the access to inferred data clearly separate from
-uncontroversial data reported in peer-reviewed literature.
