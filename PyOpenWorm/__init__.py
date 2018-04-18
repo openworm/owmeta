@@ -65,7 +65,7 @@ import os
 
 # For re-export
 from .configure import Configure, Configureable, ConfigValue, BadConf
-from .data import Data, DataUser, propertyTypes
+from .data import Data, DataUser
 from .dataObject import DataObject
 from .pProperty import Property
 from .simpleProperty import SimpleProperty

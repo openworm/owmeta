@@ -7,9 +7,7 @@ import re
 import os
 
 
-SQLITE_DB_LOC = '../aux_data/celegans.db'
 LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
-SQLITE_EVIDENCE = None
 WORM = None
 NETWORK = None
 OPTIONS = None
@@ -26,11 +24,12 @@ ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
 
 def serialize_as_n3():
     dest = '../WormData.n3'
-    # XXX: Properties aren't initialized until the first object of a class is created,
-    #      so we create them here
+    # XXX: Properties aren't initialized until the first object of a class is
+    #      created, so we create them here
 
     P.config('rdf.graph').serialize(dest, format='n3')
     print('serialized to n3 file')
+
 
 def attach_neuromlfiles_to_channel():
     """ attach the links to the neuroml files for the ion channels
@@ -47,6 +46,7 @@ def attach_neuromlfiles_to_channel():
         print("neuroML file links attached")
     except Exception:
         traceback.print_exc()
+
 
 def upload_ionchannels():
     """ Upload muscles and the neurons that connect to them
@@ -71,7 +71,9 @@ def upload_ionchannels():
                 regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                 matches = [regex.match(pat) for pat in patterns]
-                patterns = [P.ExpressionPattern(wormbaseID=m.group(1), description=m.group(2)) for m in matches if m is not None]
+                patterns = [P.ExpressionPattern(wormbaseID=m.group(1),
+                                                description=m.group(2))
+                            for m in matches if m is not None]
                 for pat in patterns:
                     c.expression_pattern(pat)
 
@@ -118,10 +120,11 @@ def upload_channelmuscle_association():
 
 
 def extract_neuron_names(heading, row):
+    FIRST_NEURON_NAME_COL = 101
     neuronlist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= 101:
+        if cols >= 0 and cols <= FIRST_NEURON_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
@@ -131,10 +134,11 @@ def extract_neuron_names(heading, row):
 
 
 def extract_muscle_names(heading, row):
+    FIRST_MUSCLE_NAME_COL = 6
     musclelist = []
     cols = 0
     for col in row:
-        if cols >= 0 and cols <= 6:
+        if cols >= 0 and cols <= FIRST_MUSCLE_NAME_COL:
             cols += 1
         else:
             if col == '1' or col == '2':
@@ -283,49 +287,48 @@ def upload_neurons():
         traceback.print_exc()
 
 
-def get_altun_evidence():
-    return parse_bibtex_into_evidence('../aux_data/bibtex_files/altun2009.bib')
+def customizations(record):
+    from bibtexparser.customization import author, link, doi
+    """Use some functions delivered by the library
 
-
-def get_wormatlas_evidence():
-    return parse_bibtex_into_evidence('../aux_data/bibtex_files/WormAtlas.bib')
+    :param record: a record
+    :returns: -- customized record
+    """
+    return doi(link(author(record)))
 
 
 def parse_bibtex_into_evidence(file_name):
     import bibtexparser
     e = None
+    res = dict()
     with open(file_name) as bibtex_file:
-        bib_database = bibtexparser.load(bibtex_file)
-        key = bib_database.entries[0]['ID']
-        e = P.Evidence(key=key)
+        parser = bibtexparser.bparser.BibTexParser()
+        parser.customization = customizations
+        bib_database = bibtexparser.load(bibtex_file, parser=parser)
+        for entry in bib_database.entries:
+            key = entry['ID']
+            e = P.Evidence(key=key)
 
-        try:
-            doi = bib_database.entries[0]['doi']
+            doi = entry.get('doi', None)
             if doi:
                 e.doi(doi)
-        except KeyError:
-            pass
 
-        try:
-            author = bib_database.entries[0]['author']
-            if author:
-                e.author(author)
-        except KeyError:
-            pass
+            author = entry.get('author', ())
+            for ath in author:
+                e.author(ath)
 
-        try:
-            title = bib_database.entries[0]['title']
+            title = entry.get('title', None)
             if title:
                 e.title(title)
-        except KeyError:
-            pass
-        try:
-            year = bib_database.entries[0]['year']
+
+            year = entry.get('year', None)
             if year:
                 e.year(year)
-        except KeyError:
-            pass
-    return e
+
+            res[key] = e
+    return res
+
+
 
 
 def upload_receptors_types_neurotransmitters_neuropeptides_innexins():
@@ -353,8 +356,13 @@ def upload_additional_receptors_neurotransmitters_neuropeptides_innexins():
 
 def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(file_path):
     # set up evidence objects in advance
-    altun_ev = get_altun_evidence()
-    wormatlas_ev = get_wormatlas_evidence()
+    #
+
+    evidences = dict()
+    bibtex_files = ('../aux_data/bibtex_files/altun2009.bib',
+                    '../aux_data/bibtex_files/WormAtlas.bib')
+    for bib in bibtex_files:
+        evidences.update(parse_bibtex_into_evidence(bib))
 
     i = 0
 
@@ -371,19 +379,10 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
             evidence = row[3]
             evidenceURL = row[4]
 
-            # prepare evidence
-            e = P.Evidence()
+            e = evidences.get(evidence, None)
 
-            # pick correct evidence given the row
-            if 'altun' in evidence.lower():
-                e = altun_ev
-            elif 'wormatlas' in evidence.lower():
-                e = wormatlas_ev
-
-            e2 = []
-            try:
-                e2 = uris[evidenceURL]
-            except KeyError:
+            e2 = uris.get(evidenceURL, None)
+            if not e2:
                 e2 = P.Evidence(uri=evidenceURL)
                 uris[evidenceURL] = e2
 
@@ -391,34 +390,15 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
             n = P.Neuron(neuron_name)
             NETWORK.neuron(n)
 
-            if relation == 'neurotransmitter':
-                # assign the data, grab the relation into r
-                r = n.neurotransmitter(data)
-                # assert the evidence on the relationship
-                e.asserts(r)
-                e2.asserts(r)
-
-            elif relation == 'innexin':
-                # assign the data, grab the relation into r
-                r = n.innexin(data)
-                # assert the evidence on the relationship
-                e.asserts(r)
-                e2.asserts(r)
-
-            elif relation == 'neuropeptide':
-                # assign the data, grab the relation into r
-                r = n.neuropeptide(data)
-                # assert the evidence on the relationship
-                e.asserts(r)
-                e2.asserts(r)
-
-            elif relation == 'receptor':
-                # assign the data, grab the relation into r
-                r = n.receptor(data)
-                # assert the evidence on the relationship
-                e.asserts(r)
-                e2.asserts(r)
-
+            if relation in ('neurotransmitter',
+                            'innexin',
+                            'neuropeptide',
+                            'receptor'):
+                r = getattr(n, relation)(data)
+                if e:
+                    e.asserts(r)
+                if e2:
+                    e2.asserts(r)
             elif relation == 'type':
                 types = []
                 if 'sensory' in (data.lower()):
@@ -433,8 +413,10 @@ def _upload_receptors_types_neurotransmitters_neuropeptides_innexins_from_file(f
                 for t in types:
                     r = n.type(t)
                     # assert the evidence on the relationship
-                    e.asserts(r)
-                    e2.asserts(r)
+                    if e:
+                        e.asserts(r)
+                    if e2:
+                        e2.asserts(r)
             i += 1
     print(
         'uploaded {} statements about types, receptors, innexins, neurotransmitters and neuropeptides from {}'.format(
@@ -632,7 +614,6 @@ def infer():
 
 
 def do_insert(config="default.conf", logging=False):
-    global SQLITE_EVIDENCE
     global WORM
     global NETWORK
 
@@ -647,7 +628,6 @@ def do_insert(config="default.conf", logging=False):
             raise Exception("Invalid configuration object "+ str(config))
 
     P.connect(conf=config, do_logging=logging)
-    SQLITE_EVIDENCE = P.Evidence(key="C_elegans_SQLite_DB", title="C. elegans sqlite database")
     try:
         WORM = P.Worm()
         NETWORK = P.Network()

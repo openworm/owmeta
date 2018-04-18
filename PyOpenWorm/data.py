@@ -71,15 +71,6 @@ class _UTC(datetime.tzinfo):
 
 utc = _UTC()
 
-propertyTypes = {"send": 'http://openworm.org/entities/356',
-                 "Neuropeptide": 'http://openworm.org/entities/354',
-                 "Receptor": 'http://openworm.org/entities/361',
-                 "is a": 'http://openworm.org/entities/1515',
-                 "neuromuscular junction": 'http://openworm.org/entities/1516',
-                 "Innexin": 'http://openworm.org/entities/355',
-                 "Neurotransmitter": 'http://openworm.org/entities/313',
-                 "gap junction": 'http://openworm.org/entities/357'}
-
 
 class DataUser(Configureable):
 

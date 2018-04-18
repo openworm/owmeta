@@ -513,7 +513,7 @@ class PropertyDataObject(DataObject):
 
     Try not to confuse this with the Property class
     """
-    rdf_type = R.RDF['type']
+    rdf_type = R.RDF['Property']
 
 
 class _Resolver(RDFTypeResolver):

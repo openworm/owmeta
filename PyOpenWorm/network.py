@@ -152,7 +152,7 @@ class Network(DataObject):
         if super(Network, self).defined:
             return super(Network, self).identifier()
         else:
-            return self.make_identifier(self.worm.defined_values[0])
+            return self.make_identifier(self.worm.defined_values[0].identifier().n3())
 
     @property
     def defined(self):
