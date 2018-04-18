@@ -5,12 +5,36 @@
 PyOpenWorm
 ===========
 
-A unified, simple data access library in Python for data, facts, and models of
-*C. elegans* anatomy for the [OpenWorm project](http://www.openworm.org)
+A data access layer in Python which integrates disparate structures
+and representations for *C. elegans* anatomy and physiology.  Provides a
+clean, high-level interface used by the rest of
+the OpenWorm project](http://www.openworm.org).  
 
 What does it do?
 ----------------
+There are many different useful ways to compute with data related to the worm.
+Different data structures have different strengths and answer different questions.
+For example, a NetworkX representation of the connectome as a complex graph enables
+questions to be asked about first and second nearest neighbors of a given neuron.
+In contrast, an RDF semantic graph representation is useful for reading and
+writing annotations about multiple aspects of a neuron, such as what papers
+have been written about it, multiple different properties it may have such as
+ion channels and neurotransmitter receptors.  A NeuroML representation is useful
+for answering questions about model morphology and simulation parameters.  Lastly,
+a Blender representation is a full 3D shape definition that can be used for
+calculations in 3D space.  Further representations regarding activity patterns
+such as Neo or simulated activity can be considered as well.
 
+Using these different representations separately leads to ad hoc scripting for
+for each representation.  This presents a challenge for data integration and
+consolidation of information in 'master' authoritative representations.  By
+creating a unified data access layer, different representations
+can become encapsulated into an abstract view.  This allows the user to work with
+objects related to the biological reality of the worm.  This has the advantage that
+the user can forget about which representation is being used under the hood.  
+
+The worm itself has a unified sense of neurons, networks, muscles,
+ion channels, etc and so should our code.
 Enables a simple Python API for asking various questions about the cells of the
 *C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
 of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
@@ -18,6 +42,9 @@ for the OpenWorm project.  In addition, it is a repository for various iteration
 of inferred / predicted data about *C. elegans*.  Uncontroversial facts and
 inferred information are distinguished through the use of explicit Evidence
 references.
+
+Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
+----------------
 
 Installation
 ------------
@@ -71,33 +98,6 @@ returned as a side-effect of the update.
 Relationship objects are key to the `Evidence class <#evidence>`_ for making
 statements which can be sourced. Relationships can themselves be members in a
 relationship, allowing for fairly complex statements to be made about entities.
-
-Why is this necessary?
-----------------------
-
-There are many different useful ways to compute with data related to the worm.
-Different data structures have different strengths and answer different questions.
-For example, a NetworkX representation of the connectome as a complex graph enables
-questions to be asked about first and second nearest neighbors of a given neuron.
-In contrast, an RDF semantic graph representation is useful for reading and
-writing annotations about multiple aspects of a neuron, such as what papers
-have been written about it, multiple different properties it may have such as
-ion channels and neurotransmitter receptors.  A NeuroML representation is useful
-for answering questions about model morphology and simulation parameters.  Lastly,
-a Blender representation is a full 3D shape definition that can be used for
-calculations in 3D space.  Further representations regarding activity patterns
-such as Neo or simulated activity can be considered as well.
-
-Using these different representations separately leads to ad hoc scripting for
-for each representation.  This presents a challenge for data integration and
-consolidation of information in 'master' authoritative representations.  By
-creating a unified data access layer, different representations
-can become encapsulated into an abstract view.  This allows the user to work with
-objects related to the biological reality of the worm.  This has the advantage that
-the user can forget about which representation is being used under the hood.  
-
-The worm itself has a unified sense of neurons, networks, muscles,
-ion channels, etc and so should our code.
 
 More examples
 -------------
