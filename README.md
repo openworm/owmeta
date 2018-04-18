@@ -8,7 +8,7 @@ PyOpenWorm
 A data access layer in Python which integrates disparate structures
 and representations for *C. elegans* anatomy and physiology.  Provides a
 clean, high-level interface used by the rest of
-the OpenWorm project](http://www.openworm.org).  
+[OpenWorm](http://www.openworm.org).  
 
 What does it do?
 ----------------
@@ -44,7 +44,7 @@ inferred information are distinguished through the use of explicit Evidence
 references.
 
 Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
-----------------
+-----------------------------
 
 Installation
 ------------
