@@ -38,8 +38,7 @@ ion channels, etc and so should our code.
 Syntactical constructs in this library are intuitive and easy
 to understand what they will return within the knowledge domain of *C. elegans*,
 rather than in the programming domain of its underlying technologies. Wherever possible,
-pure-python libraries or those with few compilation requirements,
-rather than those that create extra dependencies on external native libraries are used.
+pure Python libraries or those with few compilation requirements are used.
 
 Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
 -----------------------------
