@@ -17,7 +17,7 @@ Consequently, from a software perspective, a variety of underlying
 representations are needed to store different aspects
 of the relevant anatomy and physiology.  For example,
 a NetworkX representation of the connectome as a complex graph enables
-questions to be asked about first and second nearest neighbors of a given neuron.
+questions to be asked about nearest neighbors of a given neuron.
 An RDF semantic graph representation is useful for reading and
 writing annotations about multiple aspects of a neuron, such as what papers
 have been written about it, properties it may have such as
@@ -30,18 +30,10 @@ The diversity of underlying representations required for OpenWorm
 presents a challenge for data integration and consolidation.  PyOpenWorm solves
 this challenge with a unified data access layer whereby different representations
 are encapsulated into an abstract view.  This allows the user to work with
-objects related to the biological reality of the worm, and
+objects related to the *biological reality of the worm*, and
 forget about which representation is being used under the hood.  
 The worm itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
-
-Enables a simple Python API for asking various questions about the cells of the
-*C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
-of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
-for the OpenWorm project.  In addition, it is a repository for various iterations
-of inferred / predicted data about *C. elegans*.  Uncontroversial facts and
-inferred information are distinguished through the use of explicit Evidence
-references.
 
 Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
 -----------------------------
