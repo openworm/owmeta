@@ -33,11 +33,11 @@ are encapsulated into an abstract view.  This allows the user to work with
 objects related to the *biological reality of the worm*, and
 forget about which representation is being used under the hood.  The worm
 itself has a unified sense of neurons, networks, muscles,
-ion channels, etc and so should our code.
+ion channels, etc. and so should our code.
 
 Syntactical constructs in PyOpenWorm reflect the structure of
 the corresponding biological knowledge-base
-rather than the programming domain of the underlying technologies. Wherever possible,
+rather than the programming idioms of the underlying technologies. Wherever possible,
 pure Python libraries or those with few compilation requirements are used.
 
 Relationship to ChannelWorm
@@ -228,7 +228,8 @@ as well:
 
 ```
 
-The same type of operation can be used for the experiment data model.
+The same type of operation can be obtain the experimental data a given
+model was derived from.  
 
 ```python
 # Get experiment(s) that back up the data model
