@@ -37,7 +37,7 @@ ion channels, etc and so should our code.
 
 Syntactical constructs in PyOpenWorm reflect the structure of
 the corresponding biological knowledge-base
-rather than in the programming domain of the underlying technologies. Wherever possible,
+rather than the programming domain of the underlying technologies. Wherever possible,
 pure Python libraries or those with few compilation requirements are used.
 
 Relationship to ChannelWorm
@@ -45,14 +45,14 @@ Relationship to ChannelWorm
 [ChannelWorm](https://github.com/openworm/ChannelWorm) is
 the sub-project of OpenWorm which houses ion channel models.  In the future,
 we expect ChannelWorm to be a "consumer" of PyOpenWorm.  A PyOpenWorm database will house
-physical models, the plots they are derived from (there is a Plot type in PyOpenWorm),
+physical models, the digitized plots they are derived from (there is a Plot type in PyOpenWorm),
 and provide code to put those models into enumerated formats along with auxillary
-files or comments.  However, because these projects were developed somewhat independently,
+files or comments.  However, because these projects were not developed sequentially,
 there is currently some overlap in functionality, and PyOpenWorm itself houses
 a fairly substantial amount of physiological information about *C. elegans.*
 Ultimately, the pure core of PyOpenWorm, which is a meant to be a data framework
-for storing metadata and provenance (i.e. parameters and trajectories)
-associated with simulations, will be separated out into standalone functionality.  
+for storing metadata and provenance (i.e. parameters and trajectories
+associated with simulations), will be separated out into standalone functionality.  
 
 Versioning data as code
 -----------------------
@@ -160,6 +160,14 @@ Returns a set of all muscles::
 158
 
 ```
+In an effort to make the library most helpful to experimental scientists, PyOpenWorm
+strives to keep the easiest-to-access features of this API only returning data that is
+uncontroversial and well supported by evidence.  At the same time, there is an
+important need to incorporate information that may not be confirmed by observation,
+and instead is the result of an inference process.  These inferred data will also
+be marked with evidence that clearly indicates its status as not authoritative.
+PyOpenWorm endeavors to make the access to inferred data clearly separate from
+uncontroversial data reported in peer-reviewed literature.
 
 Add some evidence::
 
