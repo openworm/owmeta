@@ -220,7 +220,9 @@ PyOpenWorm also provides the ability to store and retrieve data about models.
 As described above, ultimately, ion channel models will be part of the ChannelWorm
 repository.  And as the project evolves, other models, such as for reproduction
 and development, may be housed in their own repositories.  But for the time being,
-the PyOpenWorm repository contains specific models as well.
+the PyOpenWorm repository contains specific models as well.  These models
+will eventually be transferred to an appropriate and independent
+data repository within the OpenWorm suite of tools.  
 
 ```python
 # Get data for a subtype of voltage-gated potassium channels
