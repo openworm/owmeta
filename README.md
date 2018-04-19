@@ -5,19 +5,66 @@
 PyOpenWorm
 ===========
 
-A unified, simple data access library in Python for data, facts, and models of
-*C. elegans* anatomy for the [OpenWorm project](http://www.openworm.org)
-
-What does it do?
-----------------
-
-Enables a simple Python API for asking various questions about the cells of the
-*C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
+A data access layer in Python which integrates disparate structures
+and representations for *C. elegans* anatomy and physiology. Enables a simple Python API
+for asking various questions about the cells of the
+*C. elegans* and enabling data sharing for the purpose
 of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
-for the OpenWorm project.  In addition, it is a repository for various iterations
-of inferred / predicted data about *C. elegans*.  Uncontroversial facts and
-inferred information are distinguished through the use of explicit Evidence
-references.
+for the [OpenWorm](http://www.openworm.org) project.
+
+Overview
+--------
+The data and models required to simulate *C. elegans* are highly heterogeneous.
+Consequently, from a software perspective, a variety of underlying
+representations are needed to store different aspects
+of the relevant anatomy and physiology.  For example,
+a NetworkX representation of the connectome as a complex graph enables
+questions to be asked about nearest neighbors of a given neuron.
+An RDF semantic graph representation is useful for reading and
+writing annotations about multiple aspects of a neuron, such as what papers
+have been written about it, properties it may have such as
+ion channels and neurotransmitter receptors, etc.  A NeuroML representation is useful
+for answering questions about model morphology and simulation parameters.  A
+Blender representation is a full 3D shape definition that can be used for
+calculations in 3D space.
+
+The diversity of underlying representations required for OpenWorm
+presents a challenge for data integration and consolidation.  PyOpenWorm solves
+this challenge with a unified data access layer whereby different representations
+are encapsulated into an abstract view.  This allows the user to work with
+objects related to the *biological reality of the worm*, and
+forget about which representation is being used under the hood.  The worm
+itself has a unified sense of neurons, networks, muscles,
+ion channels, etc. and so should our code.
+
+Relationship to ChannelWorm
+-----------------------------
+[ChannelWorm](https://github.com/openworm/ChannelWorm) is
+the sub-project of OpenWorm which houses ion channel models.  In the future,
+we expect ChannelWorm to be a "consumer" of PyOpenWorm.  A PyOpenWorm database will house
+physical models, the digitized plots they are derived from (there is a Plot type in PyOpenWorm),
+and provide code to put those models into enumerated formats along with auxillary
+files or comments.  However, because these projects were not developed sequentially,
+there is currently some overlap in functionality, and PyOpenWorm itself houses
+a fairly substantial amount of physiological information about *C. elegans.*
+Ultimately, the pure core of PyOpenWorm, which is meant to be a data framework
+for storing metadata and provenance (i.e. parameters and trajectories
+associated with simulations), will be separated out into standalone functionality.
+
+Versioning data as code
+-----------------------
+
+A library that attempts to reliably expose dynamic data can often be broken because
+the underlying data sets that define it change over time.  This is because data
+changes can cause queries to return different answers than before, causing
+unpredictable behavior.
+
+As such, to create a stable foundational library for others to reuse, the version
+of the PyOpenWorm library guarantees the user a specific version of the data
+behind that library.  In addition, unit tests are used to ensure basic sanity
+checks on data are maintained.  As data are improved, the maintainers of the
+library can perform appropriate regression tests prior to each new release to
+guarantee stability.
 
 Installation
 ------------
@@ -61,49 +108,6 @@ Then you can try out a few things:
 
 ```
 
-How to use this library
------------------------
-
-PyOpenWorm enables making statements about biological entities in the worm or
-querying previously made statements. In addition, statements may concern the
-evidence for statements, called Relationships.  ``a.B()``, the Query form, will
-query against the database for the value or values that are related to ``a``
-through ``B``; on the other hand, ``a.B(c)``, the Update form, will add a
-statement to the database that ``a`` relates to ``c`` through ``B``. For the
-Update form, a Relationship object describing the relationship stated is
-returned as a side-effect of the update.
-
-Relationship objects are key to the `Evidence class <#evidence>`_ for making
-statements which can be sourced. Relationships can themselves be members in a
-relationship, allowing for fairly complex statements to be made about entities.
-
-Why is this necessary?
-----------------------
-
-There are many different useful ways to compute with data related to the worm.
-Different data structures have different strengths and answer different questions.
-For example, a NetworkX representation of the connectome as a complex graph enables
-questions to be asked about first and second nearest neighbors of a given neuron.
-In contrast, an RDF semantic graph representation is useful for reading and
-writing annotations about multiple aspects of a neuron, such as what papers
-have been written about it, multiple different properties it may have such as
-ion channels and neurotransmitter receptors.  A NeuroML representation is useful
-for answering questions about model morphology and simulation parameters.  Lastly,
-a Blender representation is a full 3D shape definition that can be used for
-calculations in 3D space.  Further representations regarding activity patterns
-such as Neo or simulated activity can be considered as well.
-
-Using these different representations separately leads to ad hoc scripting for
-for each representation.  This presents a challenge for data integration and
-consolidation of information in 'master' authoritative representations.  By
-creating a unified data access layer, different representations
-can become encapsulated into an abstract view.  This allows the user to work with
-objects related to the biological reality of the worm.  This has the advantage that
-the user can forget about which representation is being used under the hood.  
-
-The worm itself has a unified sense of neurons, networks, muscles,
-ion channels, etc and so should our code.
-
 More examples
 -------------
 
@@ -142,8 +146,10 @@ Returns a set of all muscles::
 158
 
 ```
-
-Add some evidence::
+Because the ultimate aim of OpenWorm is to be a platform for biological research,
+the physiological data in PyOpenWorm should be uncontroversial and well supported by
+evidence.  Using the Evidence type, it is possible to link data and models
+to corresponding articles from peer-reviewed literature:
 
 ```python
 >>> from PyOpenWorm.document import Document
@@ -168,7 +174,7 @@ PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
 
 ```
 
-See what some evidence stated::
+Retrieve evidence:
 ```python
 >>> doc = evctx.stored(Document)(author='Sulston et al.', date='1983')
 >>> e0 = evctx.stored(Evidence)(reference=doc)
@@ -197,7 +203,7 @@ PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
 
 ```
 
-See what neurons express some neuropeptide::
+See what neurons express a given neuropeptide::
 ```python
 >>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
@@ -215,13 +221,17 @@ Get direct access to the RDFLib graph::
 
 ```
 
-Modelling data
+Modeling data
 --------------
 
-PyOpenWorm also provides access to store and retrieve data about models.
-Following are some examples of these types of operations.
+As described above, ultimately, ion channel models will be part of the ChannelWorm
+repository.  And as the project evolves, other models, such as for reproduction
+and development, may be housed in their own repositories.  But for the time being,
+the PyOpenWorm repository contains specific models as well. These models
+will eventually be transferred to an appropriate and independent
+data repository within the OpenWorm suite of tools.
 
-Retrieve an ion channel's models from the database::
+
 
 ```python
 # Get data for a subtype of voltage-gated potassium channels
@@ -230,7 +240,8 @@ Retrieve an ion channel's models from the database::
 
 ```
 
-The same type of operation can be used for the experiment data model.
+The same type of operation can be used to obtain the experimental data a given
+model was derived from.
 
 ```python
 # Get experiment(s) that back up the data model
@@ -251,45 +262,3 @@ Documentation
 -------------
 
 Further documentation [is available online](http://pyopenworm.readthedocs.org).
-
-Ease of use
------------
-
-PyOpenWorm should be easy to use and easy to install, to make it most accessible.  
-Python beginners should be able to get information out about c. elegans from
-this library.  
-
-Syntactical constructs in this library should be intuitive and easy
-to understand what they will return within the knowledge domain of c. elegans,
-rather than in the programming domain of its underlying technologies.  Values that
-are returned should be easily interpretable and easy to read.
-
-Wherever possible, pure-python libraries or those with few compilation requirements,
-rather than those that create extra dependencies on external native libraries are used.
-
-Versioning data as code
------------------------
-
-A library that attempts to reliably expose dynamic data can often be broken because
-the underlying data sets that define it change over time.  This is because data
-changes can cause queries to return different answers than before, causing
-unpredictable behavior.  
-
-As such, to create a stable foundational library for others to reuse, the version
-of the PyOpenWorm library guarantees the user a specific version of the data
-behind that library.  In addition, unit tests are used to ensure basic sanity
-checks on data are maintained.  As data are improved, the maintainers of the
-library can perform appropriate regression tests prior to each new release to
-guarantee stability.
-
-Making it easy to get out authoritative data, keeping inferred data as an advanced feature
-------------------------------------------------------------------------------------------
-
-In an effort to make the library most helpful to experimental scientists, PyOpenWorm
-strives to keep the easiest-to-access features of this API only returning data that is
-uncontroversial and well supported by evidence.  At the same time, there is an
-important need to incorporate information that may not be confirmed by observation,
-and instead is the result of an inference process.  These inferred data will also
-be marked with evidence that clearly indicates its status as not authoritative.
-PyOpenWorm endeavors to make the access to inferred data clearly separate from
-uncontroversial data reported in peer-reviewed literature.
