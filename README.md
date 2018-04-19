@@ -50,7 +50,7 @@ and provide code to put those models into enumerated formats along with auxillar
 files or comments.  However, because these projects were not developed sequentially,
 there is currently some overlap in functionality, and PyOpenWorm itself houses
 a fairly substantial amount of physiological information about *C. elegans.*
-Ultimately, the pure core of PyOpenWorm, which is a meant to be a data framework
+Ultimately, the pure core of PyOpenWorm, which is meant to be a data framework
 for storing metadata and provenance (i.e. parameters and trajectories
 associated with simulations), will be separated out into standalone functionality.  
 
