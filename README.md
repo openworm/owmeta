@@ -49,7 +49,7 @@ physical models, the plots they are derived from (there is a Plot type in PyOpen
 and provide code to put those models into enumerated formats along with auxillary
 files or comments.  However, because these projects were developed somewhat independently,
 there is currently some overlap in functionality, and PyOpenWorm itself houses
-a fairly substantial amount of physiological information itself about *C. elegans.*
+a fairly substantial amount of physiological information about *C. elegans.*
 Ultimately, the pure core of PyOpenWorm, which is a meant to be a data framework
 for storing metadata and provenance (i.e. parameters and trajectories)
 associated with simulations, will be separated out into standalone functionality.  
@@ -68,18 +68,6 @@ behind that library.  In addition, unit tests are used to ensure basic sanity
 checks on data are maintained.  As data are improved, the maintainers of the
 library can perform appropriate regression tests prior to each new release to
 guarantee stability.
-
-Distinguishing between known facts versus inferred knowledge  
-------------------------------------------------------------------------------------------
-
-In an effort to make the library most helpful to experimental scientists, PyOpenWorm
-strives to keep the easiest-to-access features of this API only returning data that is
-uncontroversial and well supported by evidence.  At the same time, there is an
-important need to incorporate information that may not be confirmed by observation,
-and instead is the result of an inference process.  These inferred data will also
-be marked with evidence that clearly indicates its status as not authoritative.
-PyOpenWorm endeavors to make the access to inferred data clearly separate from
-uncontroversial data reported in peer-reviewed literature.
 
 Installation
 ------------
