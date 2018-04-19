@@ -147,9 +147,7 @@ Returns a set of all muscles::
 Because the ultimate aim of OpenWorm is to be a platform for biological research,
 the physiological data in PyOpenWorm should be uncontroversial and well supported by
 evidence.  Using the Evidence type, it is possible to link data and models
-to corresponding articles from peer-reviewed literature.
-
-Add some evidence::
+to corresponding articles from peer-reviewed literature:
 
 ```python
 >>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
@@ -164,7 +162,7 @@ Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston
 
 ```
 
-See what some evidence stated::
+Retrieve evidence:
 ```python
 >>> e0 = P.Evidence(author='Sulston et al.', date='1983')
 >>> assertions = e0.asserts()
@@ -189,7 +187,7 @@ object of that type and calling `load()`::
 
 ```
 
-See what neurons express some neuropeptide::
+See what neurons express a given neuropeptide::
 ```python
 >>> n = P.Neuron()
 >>> n.neuropeptide("INS-26")
@@ -219,7 +217,6 @@ Modeling data
 --------------
 
 PyOpenWorm also provides access to store and retrieve data about models.
-Following are some examples of these types of operations.
 
 Retrieve an ion channel's models from the database::
 
