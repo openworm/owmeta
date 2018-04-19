@@ -162,13 +162,8 @@ Returns a set of all muscles::
 ```
 Because the ultimate aim of OpenWorm is to be a platform for biological research,
 the physiological data in PyOpenWorm should be uncontroversial and well supported by evidence.  
-
-At the same time, there is an important need to incorporate information
-that may not be confirmed by observation,and instead is the result of an
-inference process.  These inferred data will also
-be marked with evidence that clearly indicates its status as not authoritative.
-PyOpenWorm endeavors to make the access to inferred data clearly separate from
-uncontroversial data reported in peer-reviewed literature.
+Using the Evidence type, it is possible to link data and models
+to corresponding articles from peer-reviewed literature.
 
 Add some evidence::
 
