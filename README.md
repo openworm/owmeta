@@ -216,9 +216,10 @@ Returns the C. elegans connectome represented as a [NetworkX](http://networkx.gi
 Modeling data
 --------------
 
-PyOpenWorm also provides access to store and retrieve data about models.
-
-Retrieve an ion channel's models from the database::
+PyOpenWorm also provides the ability to store and retrieve data about models.
+As described above, ultimately, these models will be part of the ChannelWorm
+repository.  But for the time being, PyOpenWorm houses some specific models
+as well:
 
 ```python
 # Get data for a subtype of voltage-gated potassium channels
