@@ -228,7 +228,7 @@ as well:
 
 ```
 
-The same type of operation can be obtain the experimental data a given
+The same type of operation can be used to obtain the experimental data a given
 model was derived from.  
 
 ```python
