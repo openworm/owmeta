@@ -31,17 +31,28 @@ presents a challenge for data integration and consolidation.  PyOpenWorm solves
 this challenge with a unified data access layer whereby different representations
 are encapsulated into an abstract view.  This allows the user to work with
 objects related to the *biological reality of the worm*, and
-forget about which representation is being used under the hood.  
-The worm itself has a unified sense of neurons, networks, muscles,
+forget about which representation is being used under the hood.  The worm
+itself has a unified sense of neurons, networks, muscles,
 ion channels, etc and so should our code.
 
-Syntactical constructs in this library are intuitive and easy
-to understand what they will return within the knowledge domain of *C. elegans*,
-rather than in the programming domain of its underlying technologies. Wherever possible,
+Syntactical constructs in PyOpenWorm reflect the structure of
+the corresponding biological knowledge-base
+rather than in the programming domain of the underlying technologies. Wherever possible,
 pure Python libraries or those with few compilation requirements are used.
 
-Relationship to [ChannelWorm](https://github.com/openworm/ChannelWorm)
+Relationship to ChannelWorm
 -----------------------------
+[ChannelWorm](https://github.com/openworm/ChannelWorm) is
+the sub-project of OpenWorm which houses ion channel models.  In the future,
+we expect ChannelWorm to be a "consumer" of PyOpenWorm.  A PyOpenWorm database will house
+physical models, the plots they are derived from (there is a Plot type in PyOpenWorm),
+and provide code to put those models into enumerated formats along with auxillary
+files or comments.  However, because these projects were developed somewhat independently,
+there is currently some overlap in functionality, and PyOpenWorm itself houses
+a fairly substantial amount of physiological information itself about *C. elegans.*
+Ultimately, the pure core of PyOpenWorm, which is a meant to be a data framework
+for storing metadata and provenance (i.e. parameters and trajectories)
+associated with simulations, will be separated out into standalone functionality.  
 
 Versioning data as code
 -----------------------
