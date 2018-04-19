@@ -106,22 +106,6 @@ Then you can try out a few things:
 
 ```
 
-How to use this library
------------------------
-
-PyOpenWorm enables making statements about biological entities in the worm or
-querying previously made statements. In addition, statements may concern the
-evidence for statements, called Relationships.  ``a.B()``, the Query form, will
-query against the database for the value or values that are related to ``a``
-through ``B``; on the other hand, ``a.B(c)``, the Update form, will add a
-statement to the database that ``a`` relates to ``c`` through ``B``. For the
-Update form, a Relationship object describing the relationship stated is
-returned as a side-effect of the update.
-
-Relationship objects are key to the `Evidence class <#evidence>`_ for making
-statements which can be sourced. Relationships can themselves be members in a
-relationship, allowing for fairly complex statements to be made about entities.
-
 More examples
 -------------
 
