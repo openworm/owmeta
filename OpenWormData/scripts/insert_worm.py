@@ -29,6 +29,9 @@ from PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
 from PyOpenWorm.data_trans.wormatlas import (WormAtlasCellListDataSource,
                                              WormAtlasCellListDataTranslator)
 
+from PyOpenWorm.data_trans.connections import (WormAtlasCellListDataSource,
+                                             WormAtlasCellListDataTranslator)
+
 from CTX.PyOpenWorm.channel import Channel
 from CTX.PyOpenWorm.neuron import Neuron
 from CTX.PyOpenWorm.muscle import Muscle
