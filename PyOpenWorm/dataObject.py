@@ -271,14 +271,17 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     def count(self):
         return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
+    def _graph(self):
+        return self.context.rdf_graph()
+
     def load(self):
-        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
+        g = self._graph()
+        idents = GraphObjectQuerier(self, g, parallel=False)()
         if idents:
-            choices = self.rdf.triples_choices((list(idents),
-                                                R.RDF['type'],
-                                                None))
-            grouped_type_triples = groupby(choices,
-                                           lambda x: x[0])
+            choices = g.triples_choices((list(idents),
+                                        R.RDF['type'],
+                                        None))
+            grouped_type_triples = groupby(choices, lambda x: x[0])
             for ident, type_triples in grouped_type_triples:
                 types = set()
                 for __, __, rdf_type in type_triples:

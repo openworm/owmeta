@@ -223,13 +223,20 @@ class DataTranslator(BaseDataObject):
         else:
             return self.translate(data_source)
 
+    def __call__(self, *args, **kwargs):
+        self.output_key = kwargs.pop('output_key', None)
+        try:
+            return self.translate(*args, **kwargs)
+        finally:
+            self.output_key = None
+
     def translate(self, *args, **kwargs):
         '''
         Notionally, this method takes a data source, which is translated into
         some other data source. There doesn't necessarily need to be an input
         data source.
         '''
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def make_translation(self):
         '''
@@ -243,7 +250,8 @@ class DataTranslator(BaseDataObject):
         return self.translation_type.contextualize(self.context)(translator=self)
 
     def make_new_output(self, sources, *args, **kwargs):
-        res = self.output_type(*args, translation=self.make_translation(), **kwargs)
+        res = self.output_type(*args, translation=self.make_translation(),
+                               key=self.output_key, **kwargs)
         for s in sources:
             res.contextualize(self.context).source(s)
         return res

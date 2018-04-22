@@ -39,3 +39,15 @@ class Statement(object):
                                                                         repr(self.property),
                                                                         repr(self.object),
                                                                         repr(self.context))
+
+    def __getitem__(self, idx):
+        if idx == 0:
+            return self.subject
+        elif idx == 1:
+            return self.property
+        elif idx == 2:
+            return self.object
+        elif idx == 3:
+            return self.context
+        else:
+            raise IndexError

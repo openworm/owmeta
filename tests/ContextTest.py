@@ -53,3 +53,12 @@ class ContextTest(_DataTest):
         del ctx.conf['rdf.graph']
         with self.assertRaisesRegexp(Exception, r'graph'):
             ctx.save_context()
+
+    def test_context_store(self):
+        class A(DataObject):
+            pass
+
+        ctx = Context(ident='http://example.com/context_1')
+        ctx(A)(ident='anA')
+        self.assertIn(URIRef('anA'),
+                      tuple(x.identifier for x in ctx.query(A)().load()))

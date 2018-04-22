@@ -1,10 +1,13 @@
 from __future__ import print_function
 from types import ModuleType
 import rdflib
+from rdflib.term import Variable
+from rdflib.graph import ConjunctiveGraph
 import wrapt
 from .configure import Configureable
 from .dataObjectUtils import merge_data_objects
 from .import_contextualizer import ImportContextualizer
+from .context_store import ContextStore
 from .contextualize import (BaseContextualizable,
                             Contextualizable,
                             ContextualizableClass,
@@ -118,8 +121,22 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     def add_objects(self, objects):
         self._contents.update((id(o), o) for o in objects)
 
+    @property
+    def imports(self):
+        for x in self._imported_contexts:
+            yield x
+
+    def save_imports(self, graph):
+        for ctx in self._imported_contexts:
+            if self.identifier is not None \
+                    and ctx.identifier is not None \
+                    and not isinstance(ctx.identifier, rdflib.term.BNode):
+                graph.add((self.identifier,
+                           rdflib.URIRef('http://example.com/imports'),
+                           ctx.identifier))
+
     def save_context(self, graph=None, inline_imports=False):
-        if not graph:
+        if graph is None:
             try:
                 graph = self.conf['rdf.graph']
             except KeyError:
@@ -133,15 +150,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                 self.tripcnt += ctx.tripcnt
                 self.defcnt += ctx.defcnt
 
-            for cctx in ctx._imported_contexts:
-                ctx_graph = self.get_target_graph(graph)
-                if ctx.identifier is not None \
-                        and cctx.identifier is not None \
-                        and not isinstance(cctx.identifier, rdflib.term.BNode):
-                    ctx_graph.add((ctx.identifier,
-                                   rdflib.URIRef('http://example.com/imports'),
-                                   cctx.identifier))
-
         if hasattr(graph, 'commit'):
             graph.commit()
 
@@ -154,8 +162,20 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             graph.update(self.contents_triples())
         else:
             ctx_graph = self.get_target_graph(graph)
+            # ctx_graph.addN((s, p, o, ctx_graph)
+                           # for s, p, o in self.contents_triples())
+            # for s, p, o in self.contents_triples():
+                # if not (isinstance(s, Variable) or
+                        # isinstance(p, Variable) or
+                        # isinstance(o, Variable)):
+                    # print(s, p, o, ctx_graph)
+                    # ctx_graph.add((s, p, o))
             ctx_graph.addN((s, p, o, ctx_graph)
-                           for s, p, o in self.contents_triples())
+                           for s, p, o
+                           in self.contents_triples()
+                           if not (isinstance(s, Variable) or
+                                   isinstance(p, Variable) or
+                                   isinstance(o, Variable)))
 
         if hasattr(graph, 'commit'):
             graph.commit()
@@ -237,7 +257,27 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return repr(self)
 
     def __repr__(self):
-        return 'Context(ident="{}")'.format(self.identifier)
+        return self.__class__.__name__ + '(ident="{}")'.format(self.identifier)
+
+    def rdf_graph(self):
+        return ConjunctiveGraph(store=ContextStore(context=self))
+
+    @property
+    def query(self):
+        '''
+        Returns a context without anything in it to used for querying against this context
+        '''
+        return QueryContext(data_context=self,
+                            ident=self.identifier)
+
+
+class QueryContext(Context):
+    def __init__(self, data_context, *args, **kwargs):
+        super(QueryContext, self).__init__(*args, **kwargs)
+        self._data = data_context
+
+    def rdf_graph(self):
+        return self._data.rdf_graph()
 
 
 class ContextContextManager(object):
@@ -248,6 +288,10 @@ class ContextContextManager(object):
         self._ctx = ctx
         self._backing_dict = to_import
         self.save = self._ctx.save_context
+
+    @property
+    def context(self):
+        return self._ctx
 
     def __call__(self, o):
         return self._ctx(o)

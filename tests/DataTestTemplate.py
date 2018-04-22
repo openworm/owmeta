@@ -1,11 +1,9 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import sys
 import PyOpenWorm
 import unittest
 import subprocess
 import tempfile
-from warnings import warn
 
 from PyOpenWorm.context import Context
 from PyOpenWorm.configure import Configure
@@ -50,8 +48,6 @@ class _DataTest(unittest.TestCase):
                 self.ctx = self.context(typ.ctx_classes)
             else:
                 self.ctx = self.context({x.__name__: x for x in typ.ctx_classes})
-        else:
-            warn('No `ctx_classes` was defined')
         self.save = lambda: self.context.save_context(PyOpenWorm.config('rdf.graph'))
 
     def tearDown(self):

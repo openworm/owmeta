@@ -29,8 +29,8 @@ from PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
 from PyOpenWorm.data_trans.wormatlas import (WormAtlasCellListDataSource,
                                              WormAtlasCellListDataTranslator)
 
-from PyOpenWorm.data_trans.connections import (WormAtlasCellListDataSource,
-                                             WormAtlasCellListDataTranslator)
+from PyOpenWorm.data_trans.connections import (ConnectomeCSVDataSource,
+                                               NeuronConnectomeCSVTranslator)
 
 from CTX.PyOpenWorm.channel import Channel
 from CTX.PyOpenWorm.neuron import Neuron
@@ -72,6 +72,10 @@ class NeuronCSVDataTranslator(DataTranslator):
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronCSVDataTranslator
 
+    def __init__(self, *args, **kwargs):
+        super(NeuronCSVDataTranslator, self).__init__(*args, **kwargs)
+        self.__document_contexts = dict()
+
     def translate(self, data_source):
         res = self.make_new_output((data_source,))
 
@@ -101,7 +105,7 @@ class NeuronCSVDataTranslator(DataTranslator):
 
                 if relation in ('neurotransmitter', 'innexin', 'neuropeptide', 'receptor'):
                     for d in docs:
-                        getattr(d.as_context(Neuron)(neuron_name), relation)(data)
+                        getattr(self.context_for(d)(Neuron)(neuron_name), relation)(data)
                 elif relation == 'type':
                     _data = data.lower()
                     # type data aren't normalized so we check for strings within the _data string
@@ -109,11 +113,18 @@ class NeuronCSVDataTranslator(DataTranslator):
 
                     for t in types:
                         for d in docs:
-                            d.as_context(Neuron)(neuron_name).type(t)
+                            self.context_for(d)(Neuron)(neuron_name).type(t)
         for d in documents.values():
-            contextualized_doc_ctx = res.evidence_context(d.as_context)
+            contextualized_doc_ctx = res.evidence_context(self.context_for(d))
             res.evidence_context(Evidence)(reference=d, supports=contextualized_doc_ctx.rdf_object)
-            res.contexts.append(d.as_context)
+            res.data_context.add_import(contextualized_doc_ctx)
+        return res
+
+    def context_for(self, document):
+        res = self.__document_contexts.get(document.identifier)
+        if res is None:
+            self.__document_contexts[document.identifier] = Context(ident=self.identifier + '/context_for?document=' + document.identifier)
+            res = self.__document_contexts[document.identifier]
         return res
 
 
@@ -144,7 +155,10 @@ DATA_SOURCES = [
         csv_file_name=CELL_NAMES_SOURCE),
     WormAtlasCellListDataSource(
         key='WormAtlasCellList',
-        csv_file_name=LINEAGE_LIST_LOC)
+        csv_file_name=LINEAGE_LIST_LOC),
+    ConnectomeCSVDataSource(
+        key='EmmonsConnectomeCSVDataSource',
+        csv_file_name=CONNECTOME_SOURCE)
 ]
 
 EXTRA_NEURON_SOURCES = []
@@ -159,25 +173,27 @@ DATA_SOURCES += EXTRA_NEURON_SOURCES
 DATA_SOURCES_BY_KEY = {x.key: x for x in DATA_SOURCES}
 
 TRANS_MAP = [
-    ('WormbaseTextMatchCSVChannelNeuronDataSource',
-     WormbaseTextMatchCSVTranslator),
-    (('WormAtlasCellList', 'Neurons'),
-     WormAtlasCellListDataTranslator),
-    ('WormbaseTextMatchCSVChannelMuscleDataSource',
-     WormbaseTextMatchCSVTranslator),
-    ('WormbaseIonChannelCSVDataSource',
-     WormbaseIonChannelCSVTranslator),
+    # ('WormbaseTextMatchCSVChannelNeuronDataSource',
+     # WormbaseTextMatchCSVTranslator),
+    # (('WormAtlasCellList', 'Neurons'),
+     # WormAtlasCellListDataTranslator),
+    # ('WormbaseTextMatchCSVChannelMuscleDataSource',
+     # WormbaseTextMatchCSVTranslator),
+    # ('WormbaseIonChannelCSVDataSource',
+     # WormbaseIonChannelCSVTranslator),
     ('WormAtlasNeuronTypesSource',
      NeuronCSVDataTranslator,
      'Neurons'),
-    ('WormBaseCSVDataSource',
-     MuscleWormBaseCSVTranslator),
-    ('WormBaseCSVDataSource',
-     NeuronWormBaseCSVTranslator)
+    # ('WormBaseCSVDataSource',
+     # MuscleWormBaseCSVTranslator),
+    (('EmmonsConnectomeCSVDataSource', 'Neurons'),
+     NeuronConnectomeCSVTranslator),
+    # ('WormBaseCSVDataSource',
+     # NeuronWormBaseCSVTranslator)
 ]
 
-for s in EXTRA_NEURON_SOURCES:
-    TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
+# for s in EXTRA_NEURON_SOURCES:
+    # TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
 
 
 def serialize_as_nquads():
@@ -271,10 +287,8 @@ def do_insert(config="default.conf", logging=False):
 
                 print('\n'.join(str(s) for s in sources))
                 print('Translating with {}'.format(translator))
-                res = translator.translate(*sources)
+                res = translator(*sources, output_key=output_key)
 
-                if output_key:
-                    res.key = output_key
                 print('Result {}'.format(res))
                 if res.key:
                     DATA_SOURCES_BY_KEY[res.key] = res
@@ -293,8 +307,8 @@ def do_insert(config="default.conf", logging=False):
         for src in DATA_SOURCES_BY_KEY.values():
             if isinstance(src, DataWithEvidenceDataSource):
                 print('saving', src)
-                src.data_context.save_context(P.config('rdf.graph'))
-                src.evidence_context.save_context(P.config('rdf.graph'))
+                src.data_context.save_context(P.config('rdf.graph'), inline_imports=True)
+                src.evidence_context.save_context(P.config('rdf.graph'), inline_imports=True)
                 for ctx in src.contexts:
                     ctx.save_context(P.config('rdf.graph'))
         IWCTX.save_context(P.config('rdf.graph'), inline_imports=True)
