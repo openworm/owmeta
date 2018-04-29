@@ -1,5 +1,4 @@
 import traceback
-import csv
 
 from ..datasource import Translation
 from ..network import Network
@@ -10,7 +9,6 @@ from rdflib.namespace import Namespace
 from .csv_ds import CSVDataSource, CSVDataTranslator
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 from .common_data import DS_NS, TRANS_NS
-
 
 
 class WormAtlasCellListDataSource(CSVDataSource):
@@ -41,13 +39,13 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
         tr = res.translation.onedef()
         tr.neurons_source(neurons_source)
         try:
-            net_q = neurons_source.data_context(Network)()
+            net_q = neurons_source.data_context.query(Network)()
             net = next(net_q.load(), net_q)
-            print(net, net_q)
-            w = res.data_context(Worm)()
+
             # TODO: Improve this evidence marker
             doc = res.evidence_context(Website)(url="http://www.wormatlas.org/celllist.htm")
-            doc_ctx = doc.as_context
+            doc_ctx = res.data_context_for(document=doc)
+            w = doc_ctx(Worm)()
 
             with self.make_reader(data_source, skipinitialspace=True, skipheader=True) as csvreader:
                 cell_name_counters = dict()
@@ -83,7 +81,7 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
                 name = n.name.one()
                 cell_data = data[str(name)]
                 # Make statements in the result context
-                nn = res.data_context(n)
+                nn = doc_ctx(n)
                 nn.lineageName(cell_data['lineageName'])
                 nn.description(cell_data['desc'])
                 w.cell(nn)
@@ -93,11 +91,11 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
             # Also requires removing neurons and muscles from the list once
             # they've been identified so they aren't stored twice
 
-            # ev.supports(w)
             print ("uploaded lineage and descriptions")
         except Exception:
             traceback.print_exc()
         return res
+
 
 __yarom_mapped_classes__ = (WormAtlasCellListDataSource,
                             WormAtlasCellListDataTranslator,
