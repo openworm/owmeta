@@ -95,14 +95,14 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
             with open(data_source.csv_file_name.onedef(), 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
-                with res.data_context(Channel=Channel) as ctx:
+                with res.data_context(Channel=Channel, CType=ctype) as ctx:
                     for row in reader:
                         cells = self.extract_cell_names(header,
                                                         initcol,
                                                         row)
                         ch = ctx.Channel(name=str(row[0]))
                         for cell in cells:
-                            m = ctype(name=str(cell))
+                            m = ctx.CType(name=str(cell))
                             ch.appearsIn(m)
         except Exception:
             traceback.print_exc()

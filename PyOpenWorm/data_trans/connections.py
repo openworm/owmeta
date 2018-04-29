@@ -69,13 +69,11 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
             # contract of the ConjunctiveGraph with 'default_is_union==True').
             # Otherwise, we should query only for what's in that graph.
             #
-            print('loaded network context', i_n)
             neuron_objs = list(set(i_n.neurons()))
             muscle_objs = list(i_w.muscles())
             # get lists of neuron and muscles names
             neurons = [neuron.name() for neuron in neuron_objs]
             muscles = [muscle.name() for muscle in muscle_objs]
-            print(neurons)
             o_w = res.data_context(Worm)()
             o_n = res.data_context(Network)(worm=o_w)
             # Evidence object to assert each connection

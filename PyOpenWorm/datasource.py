@@ -250,8 +250,8 @@ class DataTranslator(BaseDataObject):
         return self.translation_type.contextualize(self.context)(translator=self)
 
     def make_new_output(self, sources, *args, **kwargs):
-        res = self.output_type(*args, translation=self.make_translation(),
-                               key=self.output_key, **kwargs)
+        res = self.output_type.contextualize(self.context)(*args, translation=self.make_translation(),
+                                                           key=self.output_key, **kwargs)
         for s in sources:
             res.contextualize(self.context).source(s)
         return res

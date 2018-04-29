@@ -18,13 +18,13 @@ CTX = Context(ident="http://openworm.org/entities/bio#worm0-data",
 
 from PyOpenWorm.data_trans.csv_ds import CSVDataSource
 from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-from PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
-                                            WormBaseCSVDataSource,
-                                            WormbaseTextMatchCSVDataSource,
-                                            MuscleWormBaseCSVTranslator,
-                                            NeuronWormBaseCSVTranslator,
-                                            WormbaseIonChannelCSVTranslator,
-                                            WormbaseIonChannelCSVDataSource)
+from CTX.PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
+                                                WormBaseCSVDataSource,
+                                                WormbaseTextMatchCSVDataSource,
+                                                MuscleWormBaseCSVTranslator,
+                                                NeuronWormBaseCSVTranslator,
+                                                WormbaseIonChannelCSVTranslator,
+                                                WormbaseIonChannelCSVDataSource)
 
 from PyOpenWorm.data_trans.wormatlas import (WormAtlasCellListDataSource,
                                              WormAtlasCellListDataTranslator)
@@ -181,14 +181,14 @@ DATA_SOURCES += EXTRA_NEURON_SOURCES
 DATA_SOURCES_BY_KEY = {x.key: x for x in DATA_SOURCES}
 
 TRANS_MAP = [
-    # ('WormbaseTextMatchCSVChannelNeuronDataSource',
-     # WormbaseTextMatchCSVTranslator),
-    # (('WormAtlasCellList', 'Neurons'),
-     # WormAtlasCellListDataTranslator),
-    # ('WormbaseTextMatchCSVChannelMuscleDataSource',
-     # WormbaseTextMatchCSVTranslator),
-    # ('WormbaseIonChannelCSVDataSource',
-     # WormbaseIonChannelCSVTranslator),
+    ('WormbaseTextMatchCSVChannelNeuronDataSource',
+     WormbaseTextMatchCSVTranslator),
+    (('WormAtlasCellList', 'Neurons'),
+     WormAtlasCellListDataTranslator),
+    ('WormbaseTextMatchCSVChannelMuscleDataSource',
+     WormbaseTextMatchCSVTranslator),
+    ('WormbaseIonChannelCSVDataSource',
+     WormbaseIonChannelCSVTranslator),
     ('WormAtlasNeuronTypesSource',
      NeuronCSVDataTranslator,
      'Neurons'),
@@ -197,12 +197,12 @@ TRANS_MAP = [
      'Muscles'),
     (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
      NeuronConnectomeCSVTranslator),
-    # ('WormBaseCSVDataSource',
-     # NeuronWormBaseCSVTranslator)
+    ('WormBaseCSVDataSource',
+     NeuronWormBaseCSVTranslator)
 ]
 
-# for s in EXTRA_NEURON_SOURCES:
-    # TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
+for s in EXTRA_NEURON_SOURCES:
+    TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
 
 
 def serialize_as_nquads():

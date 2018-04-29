@@ -186,7 +186,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._remove_value(v)
 
     def __call__(self, *args, **kwargs):
-        # print('RealSimpleProperty, __call__', type(self), id(self))
         return _get_or_set(self, *args, **kwargs)
 
     def __repr__(self):

@@ -1,5 +1,7 @@
 import wrapt
+import six
 from weakref import WeakValueDictionary
+from rdflib.term import URIRef
 
 
 class BaseContextualizable(object):
@@ -77,7 +79,8 @@ class Contextualizable(BaseContextualizable):
         instance, allowing for statements made in __init__ to be contextualized.
         """
         ores = super(Contextualizable, cls).__new__(cls)
-        if cls.context is not None:
+        # XXX: This shouldn't really ever be the property...
+        if not isinstance(cls.context, property):
             ores.context = cls.context
             ores.add_contextualization(cls.context, ores)
             res = ores
@@ -93,6 +96,8 @@ class Contextualizable(BaseContextualizable):
 
     @context.setter
     def context(self, ctx):
+        if isinstance(ctx, property):
+            raise Exception()
         self.__context = ctx
 
 

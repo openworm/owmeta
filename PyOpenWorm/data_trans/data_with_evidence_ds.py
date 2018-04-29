@@ -16,10 +16,10 @@ class DataWithEvidenceDataSource(DataSource):
     def __init__(self, *args, **kwargs):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)
 
-        self.data_context = Context(ident=self.identifier + '-data',
-                                    imported=(CONTEXT,))
-        self.evidence_context = Context(ident=self.identifier + '-evidence',
-                                        imported=(CONTEXT,))
+        self.data_context = Context.contextualize(self.context)(ident=self.identifier + '-data',
+                                                                imported=(CONTEXT,))
+        self.evidence_context = Context.contextualize(self.context)(ident=self.identifier + '-evidence',
+                                                                    imported=(CONTEXT,))
 
         self.data_context_info(self.data_context.rdf_object)
         self.evidence_context_info(self.evidence_context.rdf_object)

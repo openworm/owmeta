@@ -11,7 +11,8 @@ from .context_store import ContextStore
 from .contextualize import (BaseContextualizable,
                             Contextualizable,
                             ContextualizableClass,
-                            ContextualizingProxy)
+                            ContextualizingProxy,
+                            contextualize_metaclass)
 
 from six.moves.urllib.parse import quote
 from six import text_type
@@ -43,6 +44,21 @@ Contexts = dict()
 
 
 class ContextMeta(ContextualizableClass):
+    @property
+    def context(self):
+        return None
+
+    @context.setter
+    def context(self, v):
+        pass
+
+    def contextualize_class_augment(self, context):
+        if context is None:
+            return self
+        ctxd_meta = contextualize_metaclass(context, self)
+        res = ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
+        return res
+
     def __call__(self, *args, **kwargs):
         o = super(ContextMeta, self).__call__(*args, **kwargs)
         Contexts[o.identifier] = o
