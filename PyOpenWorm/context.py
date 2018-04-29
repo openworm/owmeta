@@ -88,6 +88,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self._set_buffer_size = 10000
         self._imported_contexts = list(imported)
         self._rdf_object = None
+        self._graph = None
         self.mapper = mapper
         self.base_namespace = base_namespace
 
@@ -99,10 +100,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                                          for x in self._imported_contexts)
 
     def contents(self):
-        return self._contents.viewvalues()
+        return (x for x in self._statements)
 
     def clear(self):
-        self._contents.clear()
+        self._statements.clear()
 
     def add_import(self, context):
         self._imported_contexts.append(context)
@@ -110,16 +111,18 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     def add_statement(self, stmt):
         if self.identifier != stmt.context.identifier:
             raise ValueError("Cannot add statements from a different context")
+        self._graph = None
         self._statements.append(stmt)
 
     def remove_statement(self, stmt):
+        self._graph = None
         self._statements.remove(stmt)
 
     def add_object(self, o):
-        self._contents[id(o)] = o
+        pass
 
     def add_objects(self, objects):
-        self._contents.update((id(o), o) for o in objects)
+        pass
 
     @property
     def imports(self):
@@ -135,23 +138,23 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                            rdflib.URIRef('http://example.com/imports'),
                            ctx.identifier))
 
-    def save_context(self, graph=None, inline_imports=False):
+    def save_context(self, graph=None, inline_imports=False, autocommit=True):
         if graph is None:
             try:
                 graph = self.conf['rdf.graph']
             except KeyError:
                 raise Exception('No graph was given and configuration has no graph')
 
+        if autocommit and hasattr(graph, 'commit'):
+            graph.commit()
+
         self.tripcnt = 0
         self.defcnt = 0
-        for ctx in self._imported_contexts:
-            if inline_imports:
-                ctx.save_context(graph, inline_imports=inline_imports)
+        if inline_imports:
+            for ctx in self._imported_contexts:
+                ctx.save_context(graph, inline_imports, False)
                 self.tripcnt += ctx.tripcnt
                 self.defcnt += ctx.defcnt
-
-        if hasattr(graph, 'commit'):
-            graph.commit()
 
         if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
@@ -162,14 +165,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             graph.update(self.contents_triples())
         else:
             ctx_graph = self.get_target_graph(graph)
-            # ctx_graph.addN((s, p, o, ctx_graph)
-                           # for s, p, o in self.contents_triples())
-            # for s, p, o in self.contents_triples():
-                # if not (isinstance(s, Variable) or
-                        # isinstance(p, Variable) or
-                        # isinstance(o, Variable)):
-                    # print(s, p, o, ctx_graph)
-                    # ctx_graph.add((s, p, o))
             ctx_graph.addN((s, p, o, ctx_graph)
                            for s, p, o
                            in self.contents_triples()
@@ -177,7 +172,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                                    isinstance(p, Variable) or
                                    isinstance(o, Variable)))
 
-        if hasattr(graph, 'commit'):
+        if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
     def get_target_graph(self, graph):
@@ -260,7 +255,9 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return self.__class__.__name__ + '(ident="{}")'.format(self.identifier)
 
     def rdf_graph(self):
-        return ConjunctiveGraph(store=ContextStore(context=self))
+        if self._graph is None:
+            self._graph = ConjunctiveGraph(store=ContextStore(context=self))
+        return self._graph
 
     @property
     def query(self):

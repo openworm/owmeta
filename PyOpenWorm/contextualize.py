@@ -33,6 +33,12 @@ class BaseContextualizable(object):
         self._contexts[context] = ctxd
         return ctxd
 
+    def decontextualize(self):
+        """
+        Return the object with all contexts removed
+        """
+        return self
+
     def add_contextualization(self, context, contextualization):
         try:
             self._contexts[context] = contextualization
@@ -227,17 +233,12 @@ class ContextualizingProxy(wrapt.ObjectProxy):
         # Omitted by default and only included in CallableObjectProxy by wrapt.
         # Dunno why.
 
-        # print('WRAPPED CALL', self.__wrapped__.__call__.__func__)
         res = self.__wrapped__.__call__.__func__(self, *args, **kwargs)
         return res
 
     def __repr__(self):
         return 'ContextualizingProxy({}, {})'.format(repr(self._self_context),
                                                      repr(self.__wrapped__))
-
-
-CC_MAP = {'contextualize': 'contextualize_class',
-          'contextualize_augment': 'contextualize_class_agument'}
 
 
 class ContextualizableClass(type):
@@ -249,7 +250,12 @@ class ContextualizableClass(type):
         return res
 
     def __getattribute__(self, name):
-        return super(ContextualizableClass, self).__getattribute__(CC_MAP.get(name, name))
+        if name == 'contextualize':
+            return super(ContextualizableClass, self).__getattribute__('contextualize_class')
+        elif name == 'contextualize_augment':
+            return super(ContextualizableClass, self).__getattribute__('contextualize_class_augment')
+        else:
+            return super(ContextualizableClass, self).__getattribute__(name)
 
     def contextualize_class(self, context):
         ctxd = self.__contexts.get(context)
@@ -299,12 +305,22 @@ class _ContextualzingProxyMetaType(type(ContextualizingProxy)):
             return getattr(self._oct, name)
 
 
-def contextualize_helper(context, obj):
+def decontextualize_helper(obj):
+    """
+    Removes contexts from a ContextualizingProxy
+    """
+    ret = obj
+    while isinstance(ret, ContextualizingProxy):
+        ret = get_wrapped(ret)
+    return contextualize_helper(None, ret, True)
+
+
+def contextualize_helper(context, obj, noneok=False):
     """
     Does some extra stuff to make access to the type of a ContextualizingProxy
     work more-or-less like access to the the wrapped object
     """
-    if context is None:
+    if not noneok and context is None:
         return obj
 
     ctx = getattr(obj, 'context', None)

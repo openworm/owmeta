@@ -20,7 +20,7 @@ class Network(BiologyType):
 
     class_context = BiologyType.class_context
 
-    def __init__(self, **kwargs):
+    def __init__(self, worm=None, **kwargs):
         super(Network, self).__init__(**kwargs)
         self.synapses = Network.ObjectProperty(
             'synapse',
@@ -38,6 +38,9 @@ class Network(BiologyType):
             owner=self,
             value_type=Worm,
             multiple=False)
+
+        if worm is not None:
+            self.worm(worm)
 
     def neuron_names(self):
         """

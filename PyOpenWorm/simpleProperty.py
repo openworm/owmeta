@@ -81,8 +81,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         super(RealSimpleProperty, self).__init__(**kwargs)
         self._v = _values()
         self.owner = owner
+        self._hdf = None
 
     def contextualize_augment(self, context):
+        self._hdf = None
         return contextualize_helper(context, self)
 
     def has_value(self):
@@ -92,12 +94,13 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return False
 
     def has_defined_value(self):
+        if self._hdf is not None:
+            return self._hdf
         for x in self._v:
-            if x.object.defined:
-                if x.context == self.context:
+            if x.context == self.context:
+                if x.object.defined:
+                    self._hdf = True
                     return True
-                else:
-                    print("SKIPPING BECAUSE THE CONTEXT IS WRONG")
         return False
 
     def set(self, v):
@@ -114,6 +117,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
 
     def clear(self):
+        self._hdf = None
         for x in self._v:
             assert self in x.object.owner_properties
             x.object.owner_properties.remove(self)
@@ -130,7 +134,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     @property
     def rdf(self):
-        return self.conf['rdf.graph']
+        if self.context is not None:
+            return self.context.rdf_graph()
+        else:
+            return self.conf['rdf.graph']
 
     @property
     def identifier(self):
@@ -154,13 +161,15 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def _insert_value(self, v):
         stmt = Statement(self.owner, self, v, self.context)
+        self._hdf = None
         self._v.add(stmt)
-        if id(self) not in (id(x) for x in v.owner_properties):
+        if self not in v.owner_properties:
             v.owner_properties.append(self)
         return stmt
 
     def _remove_value(self, v):
         assert self in v.owner_properties
+        self._hdf = None
         v.owner_properties.remove(self)
         self._v.remove(Statement(self.owner, self, v, self.context))
 
@@ -219,7 +228,7 @@ class _ContextualizingPropertySetMixin(object):
         return super(_ContextualizingPropertySetMixin, self).set(v)
 
 
-class _ObjectPropertyMixin(ObjectPropertyMixin):
+class ObjectProperty (_ContextualizingPropertySetMixin, ObjectPropertyMixin, RealSimpleProperty):
 
     def set(self, v):
         if not isinstance(v, GraphObject):
@@ -227,13 +236,10 @@ class _ObjectPropertyMixin(ObjectPropertyMixin):
                 "An ObjectProperty only accepts GraphObject instances. Got a " +
                 str(type(v)) + " a.k.a. " +
                 " or ".join(str(x) for x in type(v).__bases__))
-        return super(ObjectPropertyMixin, self).set(v)
-
-
-class ObjectProperty (_ContextualizingPropertySetMixin, _ObjectPropertyMixin, RealSimpleProperty):
+        return super(ObjectProperty, self).set(v)
 
     def get(self):
-        r = super(ObjectProperty, self).get()
+        r = (x.contextualize(self.context) for x in super(ObjectProperty, self).get())
         return itertools.chain(self.defined_values, r)
 
 

@@ -12,7 +12,8 @@ import PyOpenWorm
 from PyOpenWorm.contextualize import (Contextualizable,
                                       ContextualizableClass,
                                       contextualize_metaclass,
-                                      contextualize_helper)
+                                      contextualize_helper,
+                                      decontextualize_helper)
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -152,6 +153,11 @@ class ContextualizableList(Contextualizable, list):
         res += list(x.contextualize(context) for x in self)
         return res
 
+    def decontextualize(self):
+        res = type(self)()
+        res += list(x.decontextualize() for x in self)
+        return res
+
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                         IdMixin(object, hashfunc=hashlib.md5),
@@ -287,7 +293,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 for __, __, rdf_type in type_triples:
                     types.add(rdf_type)
                 the_type = get_most_specific_rdf_type(types)
-                yield oid(ident, the_type)
+                yield oid(ident, the_type, self.context)
         else:
             return
 
@@ -497,6 +503,17 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             rdf_type = URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
+    def decontextualize(self):
+        if self.context is None:
+            return self
+        res = decontextualize_helper(self)
+        if self is not res:
+            cprop = res.properties.decontextualize()
+            res.add_attr_override('properties', cprop)
+            for p in cprop:
+                res.add_attr_override(p.linkName, p)
+        return res
+
     def contextualize_augment(self, context):
         if context is not None:
             return contextualized_data_object(context, self)
@@ -581,7 +598,7 @@ class RDFProperty(DataObjectSingleton):
                                           **kwargs)
 
 
-def oid(identifier_or_rdf_type, rdf_type=None):
+def oid(identifier_or_rdf_type, rdf_type=None, context=None):
     """ Create an object from its rdf type
 
     Parameters
@@ -615,6 +632,8 @@ def oid(identifier_or_rdf_type, rdf_type=None):
     # if its our class name, then make our own object
     # if there's a part after that, that's the property name
     o = None
+    if context is not None:
+        c = context(c)
     if identifier is not None:
         o = c(ident=identifier)
     else:

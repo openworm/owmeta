@@ -36,7 +36,7 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
 
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
 
-    rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
+    rdf_namespace = Namespace(DS_NS['WormbaseIonChannelCSVDataSource#'])
 
     csv_header = ['channel_name',
                   'gene_name',

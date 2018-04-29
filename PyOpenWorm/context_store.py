@@ -1,6 +1,5 @@
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
-from rdflib.graph import ConjunctiveGraph
 from rdflib.term import Variable
 
 
@@ -22,7 +21,7 @@ class ContextStore(Store):
     def open(self, configuration, create=False):
         from .context import Contexts
         ctx = Contexts.get(configuration)
-        if ctx:
+        if ctx is not None:
             self._init_store(ctx)
             return VALID_STORE
         else:
@@ -30,7 +29,7 @@ class ContextStore(Store):
 
     def _init_store(self, ctx):
         self.ctx = ctx
-        if not self._memory_store:
+        if self._memory_store is None:
             self._memory_store = IOMemory()
             self._init_store0(ctx)
 
@@ -39,7 +38,7 @@ class ContextStore(Store):
             seen = set()
         ctxid = ctx.identifier
         if ctxid in seen:
-            raise Exception("Cycle detected on {} in context imports".format(ctxid))
+            return
         seen.add(ctxid)
         self._memory_store.addN((s, p, o, ctxid)
                                 for s, p, o
@@ -93,6 +92,9 @@ class ContextStore(Store):
 
         :returns: a generator over Nodes
         """
+        if self._memory_store is None:
+            raise Exception("Database has not been opened")
+        return self._memory_store.contexts(triple)
 
     def query(self, query, initNs, initBindings, queryGraph, **kwargs):
         """

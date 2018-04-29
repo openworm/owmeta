@@ -27,6 +27,7 @@ class NeuronConnectomeCSVTranslation(Translation):
     def __init__(self, **kwargs):
         super(NeuronConnectomeCSVTranslation, self).__init__(**kwargs)
         self.neurons_source = NeuronConnectomeCSVTranslation.ObjectProperty()
+        self.muscles_source = NeuronConnectomeCSVTranslation.ObjectProperty()
 
 
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
@@ -35,9 +36,9 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
     translator_identifier = TRANS_NS.NeuronConnectomeCSVTranslator
     translation_type = NeuronConnectomeCSVTranslation
 
-    def translate(self, data_source, neurons_source):
+    def translate(self, data_source, neurons_source, muscles_source):
 
-        print ("uploading statements about connections", neurons_source)
+        print ("uploading statements about connections", neurons_source, muscles_source)
 
         # muscle cells that are generically defined in source and need to be broken
         # into pair of L and R before being added to PyOpenWorm
@@ -51,22 +52,32 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         muscle_connections = 0
         other_connections = 0
 
-        res = self.make_new_output(sources=(data_source, neurons_source))
+        res = self.make_new_output(sources=(data_source, neurons_source, muscles_source))
         tr = res.translation.onedef()
         tr.neurons_source(neurons_source)
+        tr.muscles_source(muscles_source)
 
         try:
-            w = Worm()
+            # XXX: should there be a different src for muscles?
+            w_q = neurons_source.data_context.query(Worm)()
             n_q = neurons_source.data_context.query(Network)()
-            n = next(n_q.load(), n_q)
-
-            neuron_objs = list(set(n.neurons()))
-            muscle_objs = list(w.muscles())
-
+            i_n = next(n_q.load(), n_q)
+            i_w = next(w_q.load(), w_q)
+            print(i_n.context)
+            # XXX: If the context we query for is the same ID as the default
+            # context, then we should query the merge of all graphs (using the
+            # contract of the ConjunctiveGraph with 'default_is_union==True').
+            # Otherwise, we should query only for what's in that graph.
+            #
+            print('loaded network context', i_n)
+            neuron_objs = list(set(i_n.neurons()))
+            muscle_objs = list(i_w.muscles())
             # get lists of neuron and muscles names
             neurons = [neuron.name() for neuron in neuron_objs]
             muscles = [muscle.name() for muscle in muscle_objs]
-
+            print(neurons)
+            o_w = res.data_context(Worm)()
+            o_n = res.data_context(Network)(worm=o_w)
             # Evidence object to assert each connection
             ctxd_Document = res.evidence_context(Document)
             doc = ctxd_Document(key="emmons2015",
@@ -123,8 +134,8 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
                         for s in sources:
                             for t in targets:
                                 conn = add_synapse(ctx, s, t, weight, syn_type)
-                                n.synapse(conn)
-                                kind = conn.termination()
+                                o_n.synapse(conn)
+                                kind = conn.termination.onedef()
                                 if kind == 'muscle':
                                     muscle_connections += 1
                                 elif kind == 'neuron':
@@ -169,9 +180,8 @@ def add_synapse(ctx, source, target, weight, syn_type):
 
     if isinstance(source, ctx.Neuron) and isinstance(target, ctx.Neuron):
         c.termination('neuron')
-    elif isinstance(source, ctx.Neuron) and isinstance(target, ctx.Muscle):
-        c.termination('muscle')
-    elif isinstance(source, ctx.Muscle) and isinstance(target, ctx.Neuron):
+    elif isinstance(source, ctx.Neuron) and isinstance(target, ctx.Muscle) or \
+            isinstance(source, ctx.Muscle) and isinstance(target, ctx.Neuron):
         c.termination('muscle')
 
     return c

@@ -35,6 +35,8 @@ from PyOpenWorm.data_trans.connections import (ConnectomeCSVDataSource,
 from CTX.PyOpenWorm.channel import Channel
 from CTX.PyOpenWorm.neuron import Neuron
 from CTX.PyOpenWorm.muscle import Muscle
+from PyOpenWorm.worm import Worm
+from PyOpenWorm.network import Network
 
 EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
                 imported=(P.CONTEXT,))
@@ -84,7 +86,8 @@ class NeuronCSVDataTranslator(DataTranslator):
         if bibtex_files is not None:
             for bib in bibtex_files:
                 documents.update(parse_bibtex_into_documents(bib, res.evidence_context))
-
+        w = res.data_context(Worm)()
+        n = res.data_context(Network)(worm=w)
         with open(data_source.csv_file_name.onedef()) as f:
             reader = csv.reader(f)
             next(reader)  # skip the header row
@@ -105,7 +108,9 @@ class NeuronCSVDataTranslator(DataTranslator):
 
                 if relation in ('neurotransmitter', 'innexin', 'neuropeptide', 'receptor'):
                     for d in docs:
-                        getattr(self.context_for(d)(Neuron)(neuron_name), relation)(data)
+                        neu = self.context_for(d)(Neuron)(neuron_name)
+                        n.neuron(neu)
+                        getattr(neu, relation)(data)
                 elif relation == 'type':
                     _data = data.lower()
                     # type data aren't normalized so we check for strings within the _data string
@@ -113,7 +118,9 @@ class NeuronCSVDataTranslator(DataTranslator):
 
                     for t in types:
                         for d in docs:
-                            self.context_for(d)(Neuron)(neuron_name).type(t)
+                            neu = self.context_for(d)(Neuron)(neuron_name)
+                            n.neuron(neu)
+                            neu.type(t)
         for d in documents.values():
             contextualized_doc_ctx = res.evidence_context(self.context_for(d))
             res.evidence_context(Evidence)(reference=d, supports=contextualized_doc_ctx.rdf_object)
@@ -123,7 +130,8 @@ class NeuronCSVDataTranslator(DataTranslator):
     def context_for(self, document):
         res = self.__document_contexts.get(document.identifier)
         if res is None:
-            self.__document_contexts[document.identifier] = Context(ident=self.identifier + '/context_for?document=' + document.identifier)
+            ctxid = self.identifier + '/context_for?document=' + document.identifier
+            self.__document_contexts[document.identifier] = Context(ident=ctxid)
             res = self.__document_contexts[document.identifier]
         return res
 
@@ -184,9 +192,10 @@ TRANS_MAP = [
     ('WormAtlasNeuronTypesSource',
      NeuronCSVDataTranslator,
      'Neurons'),
-    # ('WormBaseCSVDataSource',
-     # MuscleWormBaseCSVTranslator),
-    (('EmmonsConnectomeCSVDataSource', 'Neurons'),
+    ('WormBaseCSVDataSource',
+     MuscleWormBaseCSVTranslator,
+     'Muscles'),
+    (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
      NeuronConnectomeCSVTranslator),
     # ('WormBaseCSVDataSource',
      # NeuronWormBaseCSVTranslator)
@@ -304,14 +313,15 @@ def do_insert(config="default.conf", logging=False):
 
         t1 = time()
         print("Saving %d objects..." % IWCTX.size())
+        graph = P.config('rdf.graph')
         for src in DATA_SOURCES_BY_KEY.values():
             if isinstance(src, DataWithEvidenceDataSource):
                 print('saving', src)
-                src.data_context.save_context(P.config('rdf.graph'), inline_imports=True)
-                src.evidence_context.save_context(P.config('rdf.graph'), inline_imports=True)
+                IWCTX.add_import(src.data_context)
+                IWCTX.add_import(src.evidence_context)
                 for ctx in src.contexts:
-                    ctx.save_context(P.config('rdf.graph'))
-        IWCTX.save_context(P.config('rdf.graph'), inline_imports=True)
+                    IWCTX.add_import(ctx)
+        IWCTX.save_context(graph, inline_imports=True)
 
         print("Saved %d objects." % IWCTX.defcnt)
         print("Saved %d triples." % IWCTX.tripcnt)
