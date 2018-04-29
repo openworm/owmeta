@@ -37,7 +37,7 @@ class DataWithEvidenceDataSource(DataSource):
         res = self.__ad_hoc_contexts.get(key)
         if res is None:
             ctxid = self.identifier + '/context_for?' + key
-            self.__ad_hoc_contexts[key] = Context(ident=ctxid)
+            self.__ad_hoc_contexts[key] = Context.contextualize(self.context)(ident=ctxid)
             res = self.__ad_hoc_contexts[key]
         return res
 

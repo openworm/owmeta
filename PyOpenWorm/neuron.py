@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from wrapt import ObjectProxy
+from PyOpenWorm import CONTEXT
 from PyOpenWorm.pProperty import Property
 from PyOpenWorm.cell import Cell
 from PyOpenWorm.connection import Connection

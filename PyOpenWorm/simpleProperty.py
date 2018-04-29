@@ -227,7 +227,42 @@ class _ContextualizingPropertySetMixin(object):
         return super(_ContextualizingPropertySetMixin, self).set(v)
 
 
+class OPResolver(object):
+
+    def __init__(self, context):
+        self._ctx = context
+
+    def id2ob(self, ident, typ):
+        from .dataObject import oid
+        return oid(ident, typ, self._ctx)
+
+    @property
+    def type_resolver(self):
+        from .dataObject import _Resolver
+        return _Resolver.get_instance().type_resolver
+
+    @property
+    def deserializer(self):
+        from .dataObject import _Resolver
+        return _Resolver.get_instance().deserializer
+
+    @property
+    def base_type(self):
+        from .dataObject import _Resolver
+        return _Resolver.get_instance().base_type
+
+
 class ObjectProperty (_ContextualizingPropertySetMixin, ObjectPropertyMixin, RealSimpleProperty):
+
+    def __init__(self, *args, **kwargs):
+        super(ObjectProperty, self).__init__(*args, **kwargs)
+        self.resolver = OPResolver(self.context)
+
+    def contextualize_augment(self, context):
+        res = super(ObjectProperty, self).contextualize_augment(context)
+        if self is not res:
+            res.add_attr_override('resolver', OPResolver(context))
+        return res
 
     def set(self, v):
         if not isinstance(v, GraphObject):
@@ -238,7 +273,7 @@ class ObjectProperty (_ContextualizingPropertySetMixin, ObjectPropertyMixin, Rea
         return super(ObjectProperty, self).set(v)
 
     def get(self):
-        r = (x.contextualize(self.context) for x in super(ObjectProperty, self).get())
+        r = super(ObjectProperty, self).get()
         return itertools.chain(self.defined_values, r)
 
 
@@ -248,12 +283,12 @@ class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
         r = super(DatatypeProperty, self).get()
         s = set()
         for x in self.defined_values:
-            s.add(self._resolver.deserializer(x.idl))
+            s.add(self.resolver.deserializer(x.idl))
         return itertools.chain(r, s)
 
     def onedef(self):
         x = super(DatatypeProperty, self).onedef()
-        return self._resolver.deserializer(x.identifier) if x is not None else x
+        return self.resolver.deserializer(x.identifier) if x is not None else x
 
 
 class UnionProperty(UnionPropertyMixin, RealSimpleProperty):
@@ -264,7 +299,7 @@ class UnionProperty(UnionPropertyMixin, RealSimpleProperty):
         s = set()
         for x in self.defined_values:
             if isinstance(x, R.Literal):
-                s.add(self._resolver.deserializer(x.idl))
+                s.add(self.resolver.deserializer(x.idl))
         return itertools.chain(r, s)
 
 

@@ -4,6 +4,7 @@ from ..datasource import Translation
 from ..network import Network
 from ..worm import Worm
 from ..website import Website
+from ..evidence import Evidence
 
 from rdflib.namespace import Namespace
 from .csv_ds import CSVDataSource, CSVDataTranslator
@@ -44,7 +45,9 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
 
             # TODO: Improve this evidence marker
             doc = res.evidence_context(Website)(url="http://www.wormatlas.org/celllist.htm")
+            ev = res.evidence_context(Evidence)(reference=doc)
             doc_ctx = res.data_context_for(document=doc)
+            ev.supports(doc_ctx.rdf_object)
             w = doc_ctx(Worm)()
 
             with self.make_reader(data_source, skipinitialspace=True, skipheader=True) as csvreader:
