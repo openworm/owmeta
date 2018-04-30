@@ -154,7 +154,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                            rdflib.URIRef('http://example.com/imports'),
                            ctx.identifier))
 
-    def save_context(self, graph=None, inline_imports=False, autocommit=True):
+    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
+        if seen is None:
+            seen = set([])
+        if id(self) in seen:
+            return
+        seen.add(id(self))
         if graph is None:
             try:
                 graph = self.conf['rdf.graph']
@@ -168,7 +173,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self.defcnt = 0
         if inline_imports:
             for ctx in self._imported_contexts:
-                ctx.save_context(graph, inline_imports, False)
+                ctx.save_context(graph, inline_imports, False, seen)
                 self.tripcnt += ctx.tripcnt
                 self.defcnt += ctx.defcnt
 

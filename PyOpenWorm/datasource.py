@@ -10,8 +10,9 @@ class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
                  value=None, default_value=None, identifier=None,
                  property_type='DatatypeProperty', multiple=True,
-                 also=()):
+                 property_name=None, also=()):
         self.name = name
+        self._property_name = property_name
         self.display_name = name if display_name is None else display_name
         self.default_value = default_value
         self.description = description
@@ -30,6 +31,14 @@ class Informational(object):
         """
 
         self.cls = None
+
+    @property
+    def property_name(self):
+        return self.name if self._property_name is None else self._property_name
+
+    @property_name.setter
+    def property_name(self, v):
+        self._property_name = v
 
     def copy(self):
         res = type(self)()
@@ -149,10 +158,18 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             inf = self.info_fields[n]
             v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
 
-            # Make the property
-            getattr(inf.cls, inf.property_type)(owner=self,
-                                                linkName=inf.name,
-                                                multiple=True)
+            # Make the POW property
+            # To break it down, we set the name to the info name since that's
+            # how we access the info on this object, but the inf.property_name
+            # (which may or may not be the same as the name) also gets the POW
+            # property by the normal semantics of DataObject.
+            #
+            # Kludge? Elegant solution to a stupid problem? You decide!
+            setattr(self,
+                    inf.name,
+                    getattr(inf.cls, inf.property_type)(owner=self,
+                                                        linkName=inf.property_name,
+                                                        multiple=True))
             ctxd_prop = self.context(getattr(self, inf.name))
             if v is not None:
                 ctxd_prop(v)
@@ -181,16 +198,39 @@ class Translation(BaseDataObject):
     source to a translation.
     """
 
-    def __init__(self, translator, **kwargs):
+    def __init__(self, translator=None, **kwargs):
         super(Translation, self).__init__(**kwargs)
         Translation.ObjectProperty('translator', owner=self)
-        self.translator(translator)
+        if translator is not None:
+            self.translator(translator)
 
     def defined_augment(self):
         return self.translator.has_defined_value() and self.translator.onedef().defined
 
     def identifier_augment(self):
         return self.make_identifier(self.translator.onedef().identifier.n3())
+
+
+class GenericTranslation(Translation):
+    """
+    A generic translation that just has sources in order
+    """
+
+    def __init__(self, source=None, **kwargs):
+        super(GenericTranslation, self).__init__(**kwargs)
+        self.source = GenericTranslation.ObjectProperty(multiple=True)
+
+        if source is not None:
+            self.source(source)
+
+    def defined_augment(self):
+        return super(GenericTranslation, self).defined_augment() and \
+                self.source.has_defined_value()
+
+    def identifier_augment(self):
+        data = super(GenericTranslation, self).identifier_augment().n3() + \
+                "".join(x.identifier.n3() for x in self.source.defined_values)
+        return self.make_identifier(data)
 
 
 class DataObjectContextDataSource(DataSource):
@@ -202,7 +242,7 @@ class DataObjectContextDataSource(DataSource):
             self.context = Context()
 
 
-class DataTranslator(BaseDataObject):
+class BaseDataTranslator(BaseDataObject):
     """ Translates from a data source to PyOpenWorm objects """
 
     input_type = DataSource
@@ -212,9 +252,9 @@ class DataTranslator(BaseDataObject):
 
     def __init__(self):
         if self.translator_identifier is not None:
-            super(DataTranslator, self).__init__(ident=self.translator_identifier)
+            super(BaseDataTranslator, self).__init__(ident=self.translator_identifier)
         else:
-            super(DataTranslator, self).__init__()
+            super(BaseDataTranslator, self).__init__()
 
     def get_data_objects(self, data_source):
         """ Override this to change how data objects are generated """
@@ -238,7 +278,7 @@ class DataTranslator(BaseDataObject):
         '''
         raise NotImplementedError
 
-    def make_translation(self):
+    def make_translation(self, sources=()):
         '''
         It's intended that implementations of DataTranslator will override this
         method to make custom Translations according with how different
@@ -250,14 +290,31 @@ class DataTranslator(BaseDataObject):
         return self.translation_type.contextualize(self.context)(translator=self)
 
     def make_new_output(self, sources, *args, **kwargs):
-        res = self.output_type.contextualize(self.context)(*args, translation=self.make_translation(),
+        trans = self.make_translation(sources)
+        res = self.output_type.contextualize(self.context)(*args, translation=trans,
                                                            key=self.output_key, **kwargs)
         for s in sources:
             res.contextualize(self.context).source(s)
+
         return res
 
 
-class PersonDataTranslator(DataTranslator):
+class DataTranslator(BaseDataTranslator):
+    """
+    A specialization with the GenericTranslation translation type that adds
+    sources for the translation automatically when a new output is made
+    """
+
+    translation_type = GenericTranslation
+
+    def make_translation(self, sources=()):
+        res = super(DataTranslator, self).make_translation(sources)
+        for s in sources:
+            res.source(s)
+        return res
+
+
+class PersonDataTranslator(BaseDataTranslator):
     """ A person who was responsible for carrying out the translation of a data source """
 
     def __init__(self, person):
@@ -272,4 +329,5 @@ class PersonDataTranslator(DataTranslator):
     # No translate impl is provided here since this is intended purely as a descriptive object
 
 
-__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator, PersonDataTranslator)
+__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator,
+                            BaseDataTranslator, GenericTranslation, PersonDataTranslator)

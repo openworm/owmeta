@@ -12,7 +12,7 @@ from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.muscle import Muscle
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
-from PyOpenWorm.datasource import Translation
+from PyOpenWorm.datasource import GenericTranslation
 
 from .csv_ds import CSVDataTranslator, CSVDataSource
 from .common_data import TRANS_NS
@@ -23,11 +23,21 @@ class ConnectomeCSVDataSource(CSVDataSource):
     pass
 
 
-class NeuronConnectomeCSVTranslation(Translation):
+class NeuronConnectomeCSVTranslation(GenericTranslation):
     def __init__(self, **kwargs):
         super(NeuronConnectomeCSVTranslation, self).__init__(**kwargs)
         self.neurons_source = NeuronConnectomeCSVTranslation.ObjectProperty()
         self.muscles_source = NeuronConnectomeCSVTranslation.ObjectProperty()
+
+    def defined_augment(self):
+        return super(NeuronConnectomeCSVTranslation, self).defined_augment() and \
+                self.neurons_source.has_defined_value() and \
+                self.muscles_source.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(super(NeuronConnectomeCSVTranslation, self).identifier_augment().n3() +
+                                    self.neurons_source.onedef().identifier.n3() +
+                                    self.muscles_source.onedef().identifier.n3())
 
 
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
@@ -35,6 +45,13 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronConnectomeCSVTranslator
     translation_type = NeuronConnectomeCSVTranslation
+
+    def make_translation(self, sources):
+        tr = super(NeuronConnectomeCSVTranslator, self).make_translation()
+        tr.source(sources[0])
+        tr.neurons_source(sources[1])
+        tr.muscles_source(sources[2])
+        return tr
 
     def translate(self, data_source, neurons_source, muscles_source):
 
@@ -53,9 +70,6 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         other_connections = 0
 
         res = self.make_new_output(sources=(data_source, neurons_source, muscles_source))
-        tr = res.translation.onedef()
-        tr.neurons_source(neurons_source)
-        tr.muscles_source(muscles_source)
 
         try:
             # XXX: should there be a different src for muscles?

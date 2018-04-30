@@ -1,6 +1,6 @@
 import traceback
 
-from ..datasource import Translation
+from ..datasource import GenericTranslation
 from ..network import Network
 from ..worm import Worm
 from ..website import Website
@@ -18,10 +18,18 @@ class WormAtlasCellListDataSource(CSVDataSource):
     csv_field_delimiter = '\t'
 
 
-class WormAtlasCellListDataTranslation(Translation):
+class WormAtlasCellListDataTranslation(GenericTranslation):
     def __init__(self, **kwargs):
         super(WormAtlasCellListDataTranslation, self).__init__(**kwargs)
         self.neurons_source = WormAtlasCellListDataTranslation.ObjectProperty()
+
+    def defined_augment(self):
+        return super(WormAtlasCellListDataTranslation, self).defined_augment() and \
+                self.neurons_source.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(super(WormAtlasCellListDataTranslation, self).identifier_augment().n3() +
+                                    self.neurons_source.onedef().identifier.n3())
 
 
 class WormAtlasCellListDataTranslator(CSVDataTranslator):
@@ -30,6 +38,12 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
     translation_type = WormAtlasCellListDataTranslation
     translator_identifier = TRANS_NS.WormAtlasCellListDataTranslator
 
+    def make_translation(self, sources):
+        res = super(WormAtlasCellListDataTranslator, self).make_translation()
+        res.source(sources[0])
+        res.neurons_source(sources[1])
+        return res
+
     def translate(self, data_source, neurons_source):
         # XXX: This wants a way to insert cells, then later, to insert neurons from the same set
         # and have the later recoginzed as the former. Identifier matching limits us here. It would
@@ -37,8 +51,6 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
         # at the sub-class insert and have a reasoner relate
         # the two sets of inserts.
         res = self.make_new_output(sources=(data_source, neurons_source))
-        tr = res.translation.onedef()
-        tr.neurons_source(neurons_source)
         try:
             net_q = neurons_source.data_context.query(Network)()
             net = next(net_q.load(), net_q)

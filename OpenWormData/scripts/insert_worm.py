@@ -181,28 +181,28 @@ DATA_SOURCES += EXTRA_NEURON_SOURCES
 DATA_SOURCES_BY_KEY = {x.key: x for x in DATA_SOURCES}
 
 TRANS_MAP = [
-    # ('WormbaseTextMatchCSVChannelNeuronDataSource',
-     # WormbaseTextMatchCSVTranslator),
+    ('WormbaseTextMatchCSVChannelNeuronDataSource',
+     WormbaseTextMatchCSVTranslator),
     (('WormAtlasCellList', 'Neurons'),
      WormAtlasCellListDataTranslator),
-    # ('WormbaseTextMatchCSVChannelMuscleDataSource',
-     # WormbaseTextMatchCSVTranslator),
-    # ('WormbaseIonChannelCSVDataSource',
-     # WormbaseIonChannelCSVTranslator),
+    ('WormbaseTextMatchCSVChannelMuscleDataSource',
+     WormbaseTextMatchCSVTranslator),
+    ('WormbaseIonChannelCSVDataSource',
+     WormbaseIonChannelCSVTranslator),
     ('WormAtlasNeuronTypesSource',
      NeuronCSVDataTranslator,
      'Neurons'),
-    # ('WormBaseCSVDataSource',
-     # MuscleWormBaseCSVTranslator,
-     # 'Muscles'),
-    # (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
-     # NeuronConnectomeCSVTranslator),
-    # ('WormBaseCSVDataSource',
-     # NeuronWormBaseCSVTranslator)
+    ('WormBaseCSVDataSource',
+     MuscleWormBaseCSVTranslator,
+     'Muscles'),
+    (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
+     NeuronConnectomeCSVTranslator),
+    ('WormBaseCSVDataSource',
+     NeuronWormBaseCSVTranslator)
 ]
 
-# for s in EXTRA_NEURON_SOURCES:
-    # TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
+for s in EXTRA_NEURON_SOURCES:
+    TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
 
 
 def serialize_as_nquads():
