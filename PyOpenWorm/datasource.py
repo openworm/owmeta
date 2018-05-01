@@ -182,10 +182,15 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
 
     def __str__(self):
         try:
-            return self.__class__.__name__ + '\n' + \
-                '\n'.join('    ' + ': '.join((info.display_name,
-                                             repr(list(getattr(self, info.name).defined_values))))
-                          for info in self.info_fields.values()) + '\n'
+            sio = six.StringIO()
+            print(self.__class__.__name__, file=sio)
+            for info in self.info_fields.values():
+                print('    ' + info.display_name, end=': ', file=sio)
+                for val in getattr(self, info.name).defined_values:
+                    val_line_sep = '\n      ' + ' ' * len(info.display_name)
+                    print(val_line_sep.join(str(val).split('\n')), end=' ', file=sio)
+                print(file=sio)
+            return sio.getvalue()
         except AttributeError:
             return super(DataSource, self).__str__()
 

@@ -53,11 +53,16 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
     def translate(self, data_source):
         res = self.make_new_output((data_source,))
         try:
+            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
+                doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+                doc_ctx = res.data_context_for(document=doc)
+                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
+
             with open(data_source.csv_file_name.onedef(), 'r') as csvfile:
                 next(csvfile, None)
                 csvreader = csv.reader(csvfile, skipinitialspace=True)
-                with res.data_context(Channel=Channel,
-                                      ExpressionPattern=ExpressionPattern) as ctx:
+                with doc_ctx(Channel=Channel,
+                             ExpressionPattern=ExpressionPattern) as ctx:
                     for line in csvreader:
                         channel_name = normalize_cell_name(line[0]).upper()
                         gene_name = line[1].upper()
@@ -92,10 +97,15 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
         ctype = data_source.cell_type
         res = self.make_new_output((data_source,))
         try:
+            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
+                doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+                doc_ctx = res.data_context_for(document=doc)
+                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
+
             with open(data_source.csv_file_name.onedef(), 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
-                with res.data_context(Channel=Channel, CType=ctype) as ctx:
+                with doc_ctx(Channel=Channel, CType=ctype) as ctx:
                     for row in reader:
                         cells = self.extract_cell_names(header,
                                                         initcol,
@@ -167,9 +177,10 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
                 doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
-                ctx.Evidence(reference=doc, supports=doc.as_context.rdf_object)
+                doc_ctx = res.data_context_for(document=doc)
+                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with doc.as_context(Worm=Worm, Muscle=Muscle) as ctx:
+            with doc_ctx(Worm=Worm, Muscle=Muscle) as ctx:
                 w = ctx.Worm()
 
                 for num, line in enumerate(csvreader):
@@ -194,12 +205,12 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         #       by using the wormbase REST API in addition to or instead of the CSV file
         with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
             doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
-            ctx.Evidence(reference=doc, supports=doc.as_context.rdf_object)
+            doc_ctx = res.data_context_for(document=doc)
+            ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-        with res.data_context(Worm=Worm, Network=Network, Neuron=Neuron) as ctx:
+        with doc_ctx(Worm=Worm, Network=Network, Neuron=Neuron) as ctx:
             w = ctx.Worm()
             n = ctx.Network()
-            w.neuron_network(n)
             n.worm(w)
 
             with open(data_source.csv_file_name.onedef()) as csvfile:

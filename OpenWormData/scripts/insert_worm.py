@@ -294,11 +294,11 @@ def do_insert(config="default.conf", logging=False):
                     translator = translator_class()
                     translators[translator_class] = translator
 
-                print('\n'.join(str(s) for s in sources))
+                print('\n'.join('Input({}/{}): {}'.format(i + 1, len(sources), s) for i, s in enumerate(sources)))
                 print('Translating with {}'.format(translator))
                 res = translator(*sources, output_key=output_key)
 
-                print('Result {}'.format(res))
+                print('Result: {}'.format(res))
                 if res.key:
                     DATA_SOURCES_BY_KEY[res.key] = res
                 else:
