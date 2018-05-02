@@ -4,7 +4,7 @@ import rdflib
 from rdflib.term import Variable
 from rdflib.graph import ConjunctiveGraph
 import wrapt
-from .configure import Configureable
+from .data import DataUser
 from .dataObjectUtils import merge_data_objects
 from .import_contextualizer import ImportContextualizer
 from .context_store import ContextStore
@@ -65,7 +65,7 @@ class ContextMeta(ContextualizableClass):
         return o
 
 
-class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, Configureable)):
+class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, DataUser)):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
@@ -237,10 +237,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             # statement defined in some other context which specifically holds
             # context metadata.
             from PyOpenWorm.contextDataObject import ContextDataObject
-            if self.context is None:
-                raise ValueError("Context is none for rdf_object init {} {} of type {}".format(self,
-                                                                                               id(self),
-                                                                                               type(self)))
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
         return self._rdf_object
 
@@ -273,7 +269,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return repr(self)
 
     def __repr__(self):
-        return self.__class__.__name__ + '(ident="{}")'.format(self.identifier)
+        return self.__class__.__name__ + '(ident="{}")'.format(getattr(self, 'identifier', '???'))
+
+    def load_graph_from_configured_store(self):
+        self._graph = self.conf['rdf.graph']
 
     def rdf_graph(self):
         if self._graph is None:
@@ -285,6 +284,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         '''
         Returns a context without anything in it to used for querying against this context
         '''
+        return QueryContext(data_context=self,
+                            ident=self.identifier)
+
+    @property
+    def query_configured_store(self):
+        self.load_graph_from_configured_store()
         return QueryContext(data_context=self,
                             ident=self.identifier)
 

@@ -72,13 +72,19 @@ class DataUser(Configureable):
     Classes which use the database should inherit from DataUser.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(DataUser, self).__init__(*args, **kwargs)
+        self.__base_namespace = None
+
     @property
     def base_namespace(self):
+        if self.__base_namespace is not None:
+            return self.__base_namespace
         return self.conf['rdf.namespace']
 
     @base_namespace.setter
-    def base_namespace_set(self, value):
-        self.conf['rdf.namespace'] = value
+    def base_namespace(self, value):
+        self.__base_namespace = value
 
     @property
     def rdf(self):
@@ -87,10 +93,6 @@ class DataUser(Configureable):
     @property
     def namespace_manager(self):
         return self.conf.get('rdf.namespace_manager', None)
-
-    @rdf.setter
-    def rdf(self, value):
-        self.conf['rdf.graph'] = value
 
     def _remove_from_store(self, g):
         # Note the assymetry with _add_to_store. You must add actual elements, but deletes
