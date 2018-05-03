@@ -1,22 +1,20 @@
 from __future__ import print_function
 from warnings import warn
 from time import time
-from rdflib.namespace import Namespace
 import PyOpenWorm as P
 from PyOpenWorm.context import Context
-from PyOpenWorm.bibtex import parse_bibtex_into_documents
 import traceback
 import csv
 import os
 from yarom import MAPPER
-from PyOpenWorm.data_trans.common_data import TRANS_NS, DS_NS
+from PyOpenWorm.data_trans.neuron_data import (NeuronCSVDataSource,
+                                               NeuronCSVDataTranslator)
 
 import PyOpenWorm.import_override as impo
 impo.Overrider(MAPPER).wrap_import()
 CTX = Context(ident="http://openworm.org/entities/bio#worm0-data",
               imported=(P.CONTEXT,))
 
-from PyOpenWorm.data_trans.csv_ds import CSVDataSource
 from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
 from CTX.PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
                                                 WormBaseCSVDataSource,
@@ -35,16 +33,10 @@ from PyOpenWorm.data_trans.connections import (ConnectomeCSVDataSource,
 from CTX.PyOpenWorm.channel import Channel
 from CTX.PyOpenWorm.neuron import Neuron
 from CTX.PyOpenWorm.muscle import Muscle
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
 
 EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
                 imported=(P.CONTEXT,))
 
-from EVCTX.PyOpenWorm.evidence import Evidence
-from EVCTX.PyOpenWorm.document import Document
-from EVCTX.PyOpenWorm.datasource import (DataTranslator,
-                                         Informational)
 
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
                 imported=(CTX, EVCTX))
@@ -61,80 +53,6 @@ CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
 NEURON_EXPRESSION_DATA_SOURCE = "../aux_data/Modified celegans db dump.csv"
 
 ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
-
-
-class NeuronCSVDataSource(CSVDataSource):
-    rdf_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
-    bibtex_files = Informational(display_name='BibTeX files',
-                                 description='List of BibTeX files that are referenced in the csv file by entry ID')
-
-
-class NeuronCSVDataTranslator(DataTranslator):
-    input_type = NeuronCSVDataSource
-    output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.NeuronCSVDataTranslator
-
-    def __init__(self, *args, **kwargs):
-        super(NeuronCSVDataTranslator, self).__init__(*args, **kwargs)
-        self.__document_contexts = dict()
-
-    def translate(self, data_source):
-        res = self.make_new_output((data_source,))
-
-        documents = dict()
-        bibtex_files = data_source.bibtex_files.onedef()
-        if bibtex_files is not None:
-            for bib in bibtex_files:
-                documents.update(parse_bibtex_into_documents(bib, res.evidence_context))
-        w = res.data_context(Worm)()
-        n = res.data_context(Network)(worm=w)
-        with open(data_source.csv_file_name.onedef()) as f:
-            reader = csv.reader(f)
-            next(reader)  # skip the header row
-
-            for row in reader:
-                neuron_name, relation, data, evidence, documentURL = row
-                relation = relation.lower()
-
-                docs = []
-                doc = documents.get(evidence, None)
-                if doc is not None:
-                    docs.append(doc)
-
-                if len(documentURL) > 0:
-                    doc1 = documents.get(documentURL, res.evidence_context(Document)(uri=documentURL))
-                    documents[documentURL] = doc1
-                    docs.append(doc1)
-
-                if relation in ('neurotransmitter', 'innexin', 'neuropeptide', 'receptor'):
-                    for d in docs:
-                        neu = self.context_for(d)(Neuron)(neuron_name)
-                        n.neuron(neu)
-                        getattr(neu, relation)(data)
-                elif relation == 'type':
-                    _data = data.lower()
-                    # type data aren't normalized so we check for strings within the _data string
-                    types = [x for x in ('sensory', 'interneuron', 'motor', 'unknown') if x in _data]
-
-                    for t in types:
-                        for d in docs:
-                            neu = self.context_for(d)(Neuron)(neuron_name)
-                            n.neuron(neu)
-                            neu.type(t)
-        for d in documents.values():
-            contextualized_doc_ctx = res.evidence_context(self.context_for(d))
-            res.evidence_context(Evidence)(reference=d, supports=contextualized_doc_ctx.rdf_object)
-            res.data_context.add_import(contextualized_doc_ctx)
-        return res
-
-    def context_for(self, document):
-        res = self.__document_contexts.get(document.identifier)
-        if res is None:
-            ctxid = self.identifier + '/context_for?document=' + document.identifier
-            self.__document_contexts[document.identifier] = Context(ident=ctxid)
-            res = self.__document_contexts[document.identifier]
-        return res
-
 
 # TODO: Make PersonDataTranslators and Document/Website DataSource for the
 # documents these come from. Need to verify who made the translation from the
@@ -160,10 +78,16 @@ DATA_SOURCES = [
                       '../aux_data/bibtex_files/WormAtlas.bib']),
     WormBaseCSVDataSource(
         key='WormBaseCSVDataSource',
-        csv_file_name=CELL_NAMES_SOURCE),
+        csv_file_name=CELL_NAMES_SOURCE,
+        description="CSV converted from this Google Spreadsheet: "
+                    "https://docs.google.com/spreadsheets/d/"
+                    "1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1"),
     WormAtlasCellListDataSource(
         key='WormAtlasCellList',
-        csv_file_name=LINEAGE_LIST_LOC),
+        csv_file_name=LINEAGE_LIST_LOC,
+        description="CSV converted from this Google Spreadsheet: "
+                    "https://docs.google.com/spreadsheets/d/"
+                    "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit"),
     ConnectomeCSVDataSource(
         key='EmmonsConnectomeCSVDataSource',
         csv_file_name=CONNECTOME_SOURCE)

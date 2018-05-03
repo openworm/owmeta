@@ -375,4 +375,4 @@ def _json_request(url):
         return {}
 
 
-__yarom_mapped_classes__ = (BaseDocument, Document,)
+__yarom_mapped_classes__ = (BaseDocument, Document)

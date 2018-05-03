@@ -155,6 +155,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                            ctx.identifier))
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
+        self.tripcnt = 0
+        self.defcnt = 0
         if seen is None:
             seen = set([])
         if id(self) in seen:
@@ -169,8 +171,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
-        self.tripcnt = 0
-        self.defcnt = 0
         if inline_imports:
             for ctx in self._imported_contexts:
                 ctx.save_context(graph, inline_imports, False, seen)

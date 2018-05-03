@@ -77,7 +77,6 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
             n_q = neurons_source.data_context.query(Network)()
             i_n = next(n_q.load(), n_q)
             i_w = next(w_q.load(), w_q)
-            print(i_n.context)
             # XXX: If the context we query for is the same ID as the default
             # context, then we should query the merge of all graphs (using the
             # contract of the ConjunctiveGraph with 'default_is_union==True').
@@ -97,7 +96,8 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
                                 year=2015,
                                 uri='http://abstracts.genetics-gsa.org/cgi-bin/'
                                 'celegans15s/wsrch15.pl?author=emmons&sort=ptimes&'
-                                'sbutton=Detail&absno=155110844&sid=668862')
+                                'sbutton=Detail&absno=155110844&sid=668862',
+                                rdfs_comment="Data related by personal communication")
             doc.author('Emmons, S.')
             doc.author('Cook, S.')
             doc.author('Jarrell, T.')

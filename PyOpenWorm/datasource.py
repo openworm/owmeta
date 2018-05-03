@@ -125,6 +125,9 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
                                 identifier=URIRef('http://openworm.org/schema/DataSource/translation'),
                                 property_type='ObjectProperty')
 
+    description = Informational(display_name='Description',
+                                description='Free-text describing the data source')
+
     rdf_namespace = Namespace("http://openworm.org/entities/data_sources/DataSource#")
 
     def __init__(self, **kwargs):
