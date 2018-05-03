@@ -3,16 +3,15 @@ python:
 - '2.7'
 - '3.4'
 - '3.6'
-
 install:
 - python setup.py install
 script:
 - python setup.py test --addopts "-m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 - python setup.py test --addopts "-m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
-
 after_success:
 - coveralls
 - "./codespeed-submit.sh"
 env:
   global:
-    secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
+  - secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
+  - secure: obACglcs9BR5fTbFcS0giZDMMTMXdvFBD1gwKf0Gb0Xv/vx7mZZv+wDN2YBfSHznrBwI06vwWHVobfRVd+LBu84dQNsTU+kavNAuSc+eDsjvslmmEWLtsjEC6qN4J9Z9Dw8svK87wu124cG3hEkKLbTIykrSbCAZmr44W/X0DPuOkJwGKJCKJ+31/HEAneQYoaZR3H2AmuH47Fksr/i8B/uUmFGOQlpPOdpEsA/UN14D4Wr+prvkKXDhMUReOm2K+PcjomFlXhSzfRhgb4FjObg0Im1/OzZQJqYwcj79LOK3G5oCMqtJRnggGqcoVXwO6AWm7pE59j3Z5rVFo0pofchjDuD0SePoe4KSZWCj3iI5bxlcKOJbufygC/gY8nDgW+Ns2pOzk8Gzl1lnFXUM+jch4N8KunT+Sc1FwSR13JBl7MAoZY3gcMUjsazIbm7UyeJFVnm2BD7RMpKDl4ntyBWbvYxradDL+zLnCBhkaJqDixmgpTdt8KcLRLU2JMZIWQLv9ZH0u9khDggYUwRsae/r5FIlwy1sR0OJSj2WDP3Jfw2GfpMMSR7wNVfA1O70r4zLlJ9Uo2lEACI0q+5mgxC+un2lnDN79mE5kUIxSLHa7y3MEdTIRt41Jhn9ViwW03gZIqe6K2iIuSt1zGLAKfIeKM2yGC0OdedkW4g09p0=
