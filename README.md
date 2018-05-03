@@ -6,13 +6,15 @@ PyOpenWorm
 ===========
 
 A data access layer in Python which integrates disparate structures
-and representations for *C. elegans* anatomy and physiology.  Provides a
-clean, high-level interface used by the rest of
-[OpenWorm](http://www.openworm.org).
+and representations for *C. elegans* anatomy and physiology. Enables a simple Python API
+for asking various questions about the cells of the
+*C. elegans* and enabling data sharing for the purpose
+of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects)
+for the [OpenWorm](http://www.openworm.org) project.
 
 Overview
 --------
-The data and models required to simulate *C. elegans* are highly heterogenous.
+The data and models required to simulate *C. elegans* are highly heterogeneous.
 Consequently, from a software perspective, a variety of underlying
 representations are needed to store different aspects
 of the relevant anatomy and physiology.  For example,
@@ -34,11 +36,6 @@ objects related to the *biological reality of the worm*, and
 forget about which representation is being used under the hood.  The worm
 itself has a unified sense of neurons, networks, muscles,
 ion channels, etc. and so should our code.
-
-Syntactical constructs in PyOpenWorm reflect the structure of
-the corresponding biological knowledge-base
-rather than the programming idioms of the underlying technologies. Wherever possible,
-pure Python libraries or those with few compilation requirements are used.
 
 Relationship to ChannelWorm
 -----------------------------
@@ -232,7 +229,7 @@ data repository within the OpenWorm suite of tools.
 
 ```
 
-The same type of operation can be obtain the experimental data a given
+The same type of operation can be used to obtain the experimental data a given
 model was derived from.
 
 ```python
