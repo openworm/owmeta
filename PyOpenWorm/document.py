@@ -280,7 +280,7 @@ class Document(BaseDocument):
     def update_from_pubmed(self):
         def pmRequest(pmid):
             import xml.etree.ElementTree as ET  # Python 2.5 and up
-            url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=%s&api_key=%s' % (str(pmid), self.conf['pubmed.api_key'])
+            url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=%s&api_key=%s' % (str(pmid), self.conf['pubmed.api_key'])
             s = _url_request(url)
             if hasattr(s, 'charset'):
                 parser = ET.XMLParser(encoding=s.charset)

@@ -134,6 +134,10 @@ class Configure(object):
                         Requirement.parse('PyOpenWorm'),
                         value)
                     d[k] = value
+                if value.startswith("$"):
+                    from os import environ
+                    value = environ['PUBMED_API_KEY']
+                    d[k] = value
             c[k] = _C(d[k])
         f.close()
         c['configure.file_location'] = file_name
