@@ -76,7 +76,7 @@ setup(
         'zodb==4.1.0',
         'zope.interface==4.1.1',
         'lazy-object-proxy==1.2.1',
-        'wrapt'
+        'wrapt==1.10.11'
     ],
     dependency_links=[
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',

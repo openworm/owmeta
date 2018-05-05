@@ -84,9 +84,6 @@ class ConfigureTest(unittest.TestCase):
                 os.unlink(tf.name)
 
     def test_read_from_file_env_val_fail_name_1(self):
-        """
-        You cannot read from argv in config files...
-        """
         tf = self.tempfile()
         print('{"z": "$1"}', file=tf)
         tf.close()
@@ -97,9 +94,6 @@ class ConfigureTest(unittest.TestCase):
             os.unlink(tf.name)
 
     def test_read_from_file_env_val_fail_name_2(self):
-        """
-        You cannot read from argv in config files...
-        """
         tf = self.tempfile()
         print('{"z": "$1StillNoGood"}', file=tf)
         tf.close()
@@ -110,9 +104,6 @@ class ConfigureTest(unittest.TestCase):
             os.unlink(tf.name)
 
     def test_read_from_file_env_val_no_recurse(self):
-        """
-        You cannot read from argv in config files...
-        """
         with patch.dict('os.environ', {'ENV_VAR': 'myapikey', "ENV_VAR1": "$ENV_VAR"}):
             tf = self.tempfile()
             print('{"z": "$ENV_VAR1"}', file=tf)
@@ -120,6 +111,61 @@ class ConfigureTest(unittest.TestCase):
             try:
                 c = Configure.open(tf.name)
                 self.assertEqual(c['z'], '$ENV_VAR')
+            finally:
+                os.unlink(tf.name)
+
+    def test_read_from_file_env_val_empty_string(self):
+        with patch.dict('os.environ', {'ENV_VAR': ''}):
+            tf = self.tempfile()
+            print('{"z": "$ENV_VAR"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertIsNone(c['z'])
+            finally:
+                os.unlink(tf.name)
+
+    def test_read_from_file_env_val_not_defined(self):
+        with patch.dict('os.environ', (), clear=True):
+            tf = self.tempfile()
+            print('{"z": "$ENV_VAR"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertIsNone(c['z'])
+            finally:
+                os.unlink(tf.name)
+
+    def test_read_from_file_env_val_embedded_success(self):
+        with patch.dict('os.environ', {'USER': 'dave'}, clear=True):
+            tf = self.tempfile()
+            print('{"greeting": "Hello, $USER"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertEqual(c['greeting'], 'Hello, dave')
+            finally:
+                os.unlink(tf.name)
+
+    def test_read_from_file_env_val_multi_embedded_success(self):
+        with patch.dict('os.environ', {'USER': 'dave', 'IS_SUPER': 'normal'}, clear=True):
+            tf = self.tempfile()
+            print('{"greeting": "Hello, $IS_SUPER $USER"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertEqual(c['greeting'], 'Hello, normal dave')
+            finally:
+                os.unlink(tf.name)
+
+    def test_read_from_file_env_val_multi_empty(self):
+        with patch.dict('os.environ', (), clear=True):
+            tf = self.tempfile()
+            print('{"z": "$V1$V2"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertIsNone(c['z'])
             finally:
                 os.unlink(tf.name)
 

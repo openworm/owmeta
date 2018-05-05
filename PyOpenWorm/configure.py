@@ -125,27 +125,23 @@ class Configure(object):
             for k in d:
                 value = d[k]
                 if isinstance(value, six.string_types):
+                    def matchf(md):
+                        match = md.group(1)
+                        valid_var_name = re.match(r'^[A-Za-z_]', match)
+                        if valid_var_name:
+                            res = environ.get(match, None)
+                            res = None if res == '' else res
+                        else:
+                            raise ValueError("'%s' is an invalid env-var name\n"
+                                             "Env-var names must be alphnumeric "
+                                             "and start with either a letter or '_'" % match)
+                        return res
+                    res = re.sub(r'\$([A-Za-z0-9_]+)', matchf, value)
+                    res = None if res == '' else res
+                    d[k] = res
                     if value.startswith("BASE/"):
                         value = value[4:]
-                        value = resource_filename(
-                            Requirement.parse('PyOpenWorm'),
-                            value)
-                        d[k] = value
-                    if value.startswith("$"):
-                        try:
-                            value = value[1:]
-                            valid_var_name = re.match(r'^[A-Za-z_][\w\d_]+', value)
-                            if valid_var_name:
-                                value = environ[value]
-                            else:
-                                msg = ("'%s' is an invalid env-var name\n"
-                                       "Env-var names must be alphnumeric "
-                                       "and start with either a letter or '_'" % value)
-                                raise ValueError(msg)
-                        except ValueError:
-                            raise
-                        except Exception:
-                            value = None
+                        value = resource_filename(Requirement.parse('PyOpenWorm'), value)
                         d[k] = value
                 c[k] = _C(d[k])
         c['configure.file_location'] = file_name
