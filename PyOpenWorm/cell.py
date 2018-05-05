@@ -108,6 +108,8 @@ class Cell(BiologyType):
         Cell.DatatypeProperty('synonym', owner=self, multiple=True)
         Cell.ObjectProperty('channel', owner=self, multiple=True,
                             value_type=Channel)
+        self.daughterOf = Cell.ObjectProperty(value_type=Cell)
+        self.parentOf = Cell.ObjectProperty(value_type=Cell, multiple=True)
 
         if name:
             self.name(name)
@@ -185,38 +187,6 @@ class Cell(BiologyType):
             return x[0]
         except Exception:
             return ""
-
-    def daughterOf(self):
-        """ Return the parent(s) of the cell in terms of developmental lineage.
-
-        Example::
-
-            >>> c = Cell(lineageName="AB plapaaaap")
-            >>> c.daughterOf() # Returns [Cell(lineageName="AB plapaaaa")]"""
-        ln = self.lineageName()
-        parent_ln = ln[:-1]
-        return Cell(lineageName=parent_ln)
-
-    def parentOf(self):
-        """ Return the direct daughters of the cell in terms of developmental lineage.
-
-        Example::
-
-            >>> c = Cell(lineageName="AB plapaaaap")
-            >>> c.parentOf() # Returns [Cell(lineageName="AB plapaaaapp"), Cell(lineageName="AB plapaaaapa")] """
-        # XXX: This is pretty icky. We sorely need a convenient way to plug-in
-        #      custom patterns to the load query.
-        # Alternatively, represent the daughterOf/parentOf relationship with
-        # RDF statements rather than making it implicit in the lineageNames
-
-        # hackish. just query for the possible children lineage names...
-        ln = self.lineageName()
-        possible_child_lns = [ln + "a", ln + "v",
-                              ln + "p", ln + "r",
-                              ln + "l", ln + "d"]
-        for x in possible_child_lns:
-            for z in Cell(lineageName=x).load():
-                yield z
 
     def __str__(self):
         if self.name.has_defined_value():
