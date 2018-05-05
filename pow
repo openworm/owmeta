@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+from os.path import dirname, join as pth_join
+from pkgutil import get_loader
+
+parser = argparse.ArgumentParser()
+package_path = dirname(get_loader('OpenWormData.scripts').get_filename())
+
+parser.add_argument('--config', '-c',
+                    help='PyOpenWorm configuration file',
+                    default=pth_join(package_path, 'default.conf'))
+subs = parser.add_subparsers(dest='subparser')
+init_graph = subs.add_parser('init_graph')
+options = parser.parse_args()
+
+if options.subparser == 'init_graph':
+    from OpenWormData.scripts.insert_worm import do_insert
+    os.chdir(package_path)
+    do_insert(config=options.config)

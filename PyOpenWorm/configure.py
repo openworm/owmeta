@@ -1,12 +1,11 @@
 from __future__ import print_function
-# a class for modules that need outside objects to parameterize their behavior (because what are generics?)
-# Modules inherit from this class and use their
-# self['expected_configured_property']
-
-
 from __future__ import absolute_import
 from __future__ import unicode_literals
 import six
+from pkg_resources import Requirement, resource_filename
+import json
+import re
+from os import environ
 
 
 class ConfigValue(object):
@@ -119,41 +118,36 @@ class Configure(object):
         :param file_name: configuration file encoded as JSON
         :return: a Configure object with the configuration taken from the JSON file
         """
-        import json
 
-        f = open(file_name)
-        c = Configure()
-        d = json.load(f)
-        for k in d:
-            value = d[k]
-            if isinstance(value, six.string_types):
-                if value.startswith("BASE/"):
-                    from pkg_resources import Requirement, resource_filename
-                    value = value[4:]
-                    value = resource_filename(
-                        Requirement.parse('PyOpenWorm'),
-                        value)
-                    d[k] = value
-                if value.startswith("$"):
-                    import re
-                    from os import environ
-                    try:
-                        value = value[1:]
-                        valid_var_name = re.match(r'^[A-Za-z_][\w\d_]+', value)
-                        if valid_var_name:
-                            value = environ[value]
-                        else:
-                            msg = ("'%s' is an invalid env-var name\n"
-                                  "Env-var names must be alphnumeric "
-                                  "and start with either a letter or '_'" % value)
-                            raise ValueError(msg)
-                    except ValueError:
-                        raise
-                    except Exception:
-                        value = None                    
-                    d[k] = value
-            c[k] = _C(d[k])
-        f.close()
+        with open(file_name) as f:
+            c = Configure()
+            d = json.load(f)
+            for k in d:
+                value = d[k]
+                if isinstance(value, six.string_types):
+                    if value.startswith("BASE/"):
+                        value = value[4:]
+                        value = resource_filename(
+                            Requirement.parse('PyOpenWorm'),
+                            value)
+                        d[k] = value
+                    if value.startswith("$"):
+                        try:
+                            value = value[1:]
+                            valid_var_name = re.match(r'^[A-Za-z_][\w\d_]+', value)
+                            if valid_var_name:
+                                value = environ[value]
+                            else:
+                                msg = ("'%s' is an invalid env-var name\n"
+                                       "Env-var names must be alphnumeric "
+                                       "and start with either a letter or '_'" % value)
+                                raise ValueError(msg)
+                        except ValueError:
+                            raise
+                        except Exception:
+                            value = None
+                        d[k] = value
+                c[k] = _C(d[k])
         c['configure.file_location'] = file_name
         return c
 

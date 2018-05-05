@@ -187,7 +187,6 @@ def infer():
 
 
 def do_insert(config="default.conf", logging=False):
-    global WORM
     global DATA_SOURCES_BY_KEY
 
     P.connect(configFile=config, do_logging=logging)

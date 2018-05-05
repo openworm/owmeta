@@ -10,10 +10,12 @@ def _post_install():
     import subprocess
     subprocess.call([sys.executable, 'post_install.py'])
 
+
 class install(_install):
     def run(self):
         self.do_egg_install()
         self.execute(_post_install, (), msg='Running post-install script(s)')
+
 
 long_description = """
 PyOpenWorm
@@ -82,7 +84,8 @@ setup(
         'git://github.com/mwatts15/rdflib-zodb.git@master#egg=rdflib-zodb-1.1-dev'
     ],
     version=version,
-    packages=['PyOpenWorm'],
+    packages=['PyOpenWorm',
+              'PyOpenWorm.data_trans'],
     package_data={
         'PyOpenWorm': ['default.conf']
     },
