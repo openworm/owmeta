@@ -58,11 +58,7 @@ class Network(BiologyType):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        n = Neuron()
-        self.neuron.set(n)
-        res = n.name.get()
-        self.neuron.unset(n)
-        return res
+        return set(x.name() for x in self.neuron())
 
     def aneuron(self, name):
         """

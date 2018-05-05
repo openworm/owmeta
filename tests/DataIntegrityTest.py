@@ -12,8 +12,10 @@ from PyOpenWorm.utils import normalize_cell_name
 import rdflib as R
 from six.moves import map
 from six.moves import range
+import pytest
 
 
+@pytest.mark.inttest
 class DataIntegrityTest(unittest.TestCase):
 
     """ Integration tests that read from the database and ensure that basic

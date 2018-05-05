@@ -15,7 +15,8 @@ class WormTest(_DataTest):
         w = self.ctx.Worm()
         w.neuron_network(self.ctx.Network())
         self.save()
-        self.assertIsInstance(Worm().get_neuron_network(), Network)
+        nn = self.ctx.Worm().neuron_network()
+        self.assertIsInstance(nn, Network)
 
     def test_muscles1(self):
         w = self.ctx.Worm()

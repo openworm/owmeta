@@ -74,5 +74,5 @@ class NeuronTest(_DataTest):
     def test_init_from_lineage_name(self):
         c = self.ctx.Neuron(lineageName="AB plapaaaap", name="ADAL")
         self.save()
-        c = Neuron(lineageName="AB plapaaaap")
+        c = self.context.query(Neuron)(lineageName="AB plapaaaap")
         self.assertEqual(c.name(), 'ADAL')

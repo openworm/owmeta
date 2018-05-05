@@ -35,8 +35,9 @@ class NetworkTest(_DataTest):
         self.net.neuron(self.ctx.Neuron(name='DD5'))
         self.save()
 
-        self.assertTrue('AVAL' in self.net.neuron_names())
-        self.assertTrue('DD5' in self.net.neuron_names())
+        nns = set(self.net.neuron_names())
+        self.assertTrue('AVAL' in nns)
+        self.assertTrue('DD5' in nns)
 
     def test_synapses_rdf(self):
         """ Check that synapses() returns connection objects """
