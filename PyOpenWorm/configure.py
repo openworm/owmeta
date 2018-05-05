@@ -134,6 +134,24 @@ class Configure(object):
                         Requirement.parse('PyOpenWorm'),
                         value)
                     d[k] = value
+                if value.startswith("$"):
+                    import re
+                    from os import environ
+                    try:
+                        value = value[1:]
+                        valid_var_name = re.match(r'^[A-Za-z_][\w\d_]+', value)
+                        if valid_var_name:
+                            value = environ[value]
+                        else:
+                            msg = ("'%s' is an invalid env-var name\n"
+                                  "Env-var names must be alphnumeric "
+                                  "and start with either a letter or '_'" % value)
+                            raise ValueError(msg)
+                    except ValueError:
+                        raise
+                    except Exception:
+                        value = None                    
+                    d[k] = value
             c[k] = _C(d[k])
         f.close()
         c['configure.file_location'] = file_name

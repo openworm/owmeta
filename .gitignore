@@ -42,3 +42,4 @@ snakefood
 # I'm not sure what makes .cache, but it isn't human...
 .cache
 .coverage
+.pytest_cache/*
