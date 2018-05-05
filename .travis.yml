@@ -5,6 +5,7 @@ python:
 - '3.6'
 install:
 - python setup.py install
+- pow init_graph
 script:
 - python setup.py test --addopts "-m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 - python setup.py test --addopts "-m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"

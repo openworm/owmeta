@@ -2,19 +2,7 @@
 #
 
 from setuptools import setup
-from setuptools.command.install import install as _install
-import sys
-
-
-def _post_install():
-    import subprocess
-    subprocess.call([sys.executable, 'post_install.py'])
-
-
-class install(_install):
-    def run(self):
-        self.do_egg_install()
-        self.execute(_post_install, (), msg='Running post-install script(s)')
+import os
 
 
 long_description = """
@@ -40,9 +28,19 @@ references.
 for line in open('PyOpenWorm/__init__.py'):
     if line.startswith("__version__"):
         version = line.split("=")[1].strip()[1:-1]
+
+package_data_excludes = ['.*', '*.bkp', '~*']
+
+
+def excludes(base):
+    res = []
+    for x in package_data_excludes:
+        res.append(os.path.join(base, x))
+    return res
+
+
 setup(
     name='PyOpenWorm',
-    cmdclass={'install': install},
     zip_safe=False,
     setup_requires=['pytest-runner'],
     tests_require=[
@@ -85,11 +83,13 @@ setup(
     ],
     version=version,
     packages=['PyOpenWorm',
-              'PyOpenWorm.data_trans'],
-    package_data={
-        'PyOpenWorm': ['default.conf']
-    },
+              'PyOpenWorm.data_trans',
+              'OpenWormData',
+              'OpenWormData.scripts'],
     include_package_data=True,
+    exclude_package_data={'OpenWormData': [excludes(x) for x in ('aux_data',
+                                                                 'aux_data/bibtex_files',
+                                                                 'aux_data/expression_data')]},
     author='OpenWorm.org authors and contributors',
     author_email='info@openworm.org',
     description='A Python library for working with OpenWorm data and models',
@@ -97,6 +97,7 @@ setup(
     license='MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
     download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
+    scripts=['scripts/pow'],
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',

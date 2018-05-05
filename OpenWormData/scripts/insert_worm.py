@@ -10,6 +10,8 @@ from yarom import MAPPER
 from PyOpenWorm.data_trans.neuron_data import (NeuronCSVDataSource,
                                                NeuronCSVDataTranslator)
 
+from PyOpenWorm.package_utils import get_library_location
+
 import PyOpenWorm.import_override as impo
 impo.Overrider(MAPPER).wrap_import()
 CTX = Context(ident="http://openworm.org/entities/bio#worm0-data",
@@ -41,92 +43,105 @@ EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
 IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
                 imported=(CTX, EVCTX))
 
-LINEAGE_LIST_LOC = '../aux_data/C. elegans Cell List - WormAtlas.tsv'
+LINEAGE_LIST_LOC = 'C. elegans Cell List - WormAtlas.tsv'
 WORM = None
 OPTIONS = None
-CELL_NAMES_SOURCE = "../aux_data/C. elegans Cell List - WormBase.csv"
-CONNECTOME_SOURCE = "../aux_data/herm_full_edgelist.csv"
-IONCHANNEL_SOURCE = "../aux_data/ion_channel.csv"
-CHANNEL_MUSCLE_SOURCE = "../aux_data/Ion channels - Ion Channel To Body Muscle.tsv"
-CHANNEL_NEURON_SOURCE = "../aux_data/Ion channels - Ion Channel To Neuron.tsv"
-CHANNEL_NEUROMLFILE = "../aux_data/NeuroML_Channel.csv"
-NEURON_EXPRESSION_DATA_SOURCE = "../aux_data/Modified celegans db dump.csv"
+CELL_NAMES_SOURCE = "C. elegans Cell List - WormBase.csv"
+CONNECTOME_SOURCE = "herm_full_edgelist.csv"
+IONCHANNEL_SOURCE = "ion_channel.csv"
+CHANNEL_MUSCLE_SOURCE = "Ion channels - Ion Channel To Body Muscle.tsv"
+CHANNEL_NEURON_SOURCE = "Ion channels - Ion Channel To Neuron.tsv"
+CHANNEL_NEUROMLFILE = "NeuroML_Channel.csv"
+NEURON_EXPRESSION_DATA_SOURCE = "Modified celegans db dump.csv"
 
-ADDITIONAL_EXPR_DATA_DIR = '../aux_data/expression_data'
+ADDITIONAL_EXPR_DATA_DIR = 'expression_data'
+
+
+def aux_data(s):
+    d = get_library_location('OpenWormData')
+    return os.path.join(d, 'aux_data', s)
+
 
 # TODO: Make PersonDataTranslators and Document/Website DataSource for the
 # documents these come from. Need to verify who made the translation from the
 # website / document
-DATA_SOURCES = [
-    WormbaseTextMatchCSVDataSource(
-        key='WormbaseTextMatchCSVChannelNeuronDataSource',
-        cell_type=Neuron,
-        csv_file_name=CHANNEL_NEURON_SOURCE,
-        initial_cell_column=101),
-    WormbaseTextMatchCSVDataSource(
-        key='WormbaseTextMatchCSVChannelMuscleDataSource',
-        cell_type=Muscle,
-        csv_file_name=CHANNEL_MUSCLE_SOURCE,
-        initial_cell_column=6),
-    WormbaseIonChannelCSVDataSource(
-        key='WormbaseIonChannelCSVDataSource',
-        csv_file_name=IONCHANNEL_SOURCE),
-    NeuronCSVDataSource(
-        key='WormAtlasNeuronTypesSource',
-        csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
-        bibtex_files=['../aux_data/bibtex_files/altun2009.bib',
-                      '../aux_data/bibtex_files/WormAtlas.bib']),
-    WormBaseCSVDataSource(
-        key='WormBaseCSVDataSource',
-        csv_file_name=CELL_NAMES_SOURCE,
-        description="CSV converted from this Google Spreadsheet: "
-                    "https://docs.google.com/spreadsheets/d/"
-                    "1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1"),
-    WormAtlasCellListDataSource(
-        key='WormAtlasCellList',
-        csv_file_name=LINEAGE_LIST_LOC,
-        description="CSV converted from this Google Spreadsheet: "
-                    "https://docs.google.com/spreadsheets/d/"
-                    "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit"),
-    ConnectomeCSVDataSource(
-        key='EmmonsConnectomeCSVDataSource',
-        csv_file_name=CONNECTOME_SOURCE)
-]
+def init_sources():
+    return [
+        WormbaseTextMatchCSVDataSource(
+            key='WormbaseTextMatchCSVChannelNeuronDataSource',
+            cell_type=Neuron,
+            csv_file_name=aux_data(CHANNEL_NEURON_SOURCE),
+            initial_cell_column=101),
+        WormbaseTextMatchCSVDataSource(
+            key='WormbaseTextMatchCSVChannelMuscleDataSource',
+            cell_type=Muscle,
+            csv_file_name=aux_data(CHANNEL_MUSCLE_SOURCE),
+            initial_cell_column=6),
+        WormbaseIonChannelCSVDataSource(
+            key='WormbaseIonChannelCSVDataSource',
+            csv_file_name=aux_data(IONCHANNEL_SOURCE)),
+        NeuronCSVDataSource(
+            key='WormAtlasNeuronTypesSource',
+            csv_file_name=aux_data(NEURON_EXPRESSION_DATA_SOURCE),
+            bibtex_files=[aux_data('bibtex_files/altun2009.bib'),
+                          aux_data('bibtex_files/WormAtlas.bib')]),
+        WormBaseCSVDataSource(
+            key='WormBaseCSVDataSource',
+            csv_file_name=aux_data(CELL_NAMES_SOURCE),
+            description="CSV converted from this Google Spreadsheet: "
+                        "https://docs.google.com/spreadsheets/d/"
+                        "1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1"),
+        WormAtlasCellListDataSource(
+            key='WormAtlasCellList',
+            csv_file_name=aux_data(LINEAGE_LIST_LOC),
+            description="CSV converted from this Google Spreadsheet: "
+                        "https://docs.google.com/spreadsheets/d/"
+                        "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit"),
+        ConnectomeCSVDataSource(
+            key='EmmonsConnectomeCSVDataSource',
+            csv_file_name=aux_data(CONNECTOME_SOURCE))
+    ]
 
-EXTRA_NEURON_SOURCES = []
-for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR):
-    for filename in sorted(filenames):
-        if filename.lower().endswith('.csv'):
-            name = 'NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0]
-            EXTRA_NEURON_SOURCES.append(NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key=name))
 
-DATA_SOURCES += EXTRA_NEURON_SOURCES
+def init_extra_sources():
+    res = []
+    for root, _, filenames in os.walk(aux_data(ADDITIONAL_EXPR_DATA_DIR)):
+        for filename in sorted(filenames):
+            if filename.lower().endswith('.csv'):
+                name = 'NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0]
+                res.append(NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key=name))
 
-DATA_SOURCES_BY_KEY = {x.key: x for x in DATA_SOURCES}
+    return res
 
-TRANS_MAP = [
-    ('WormbaseTextMatchCSVChannelNeuronDataSource',
-     WormbaseTextMatchCSVTranslator),
-    (('WormAtlasCellList', 'Neurons'),
-     WormAtlasCellListDataTranslator),
-    ('WormbaseTextMatchCSVChannelMuscleDataSource',
-     WormbaseTextMatchCSVTranslator),
-    ('WormbaseIonChannelCSVDataSource',
-     WormbaseIonChannelCSVTranslator),
-    ('WormAtlasNeuronTypesSource',
-     NeuronCSVDataTranslator,
-     'Neurons'),
-    ('WormBaseCSVDataSource',
-     MuscleWormBaseCSVTranslator,
-     'Muscles'),
-    (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
-     NeuronConnectomeCSVTranslator),
-    ('WormBaseCSVDataSource',
-     NeuronWormBaseCSVTranslator)
-]
 
-for s in EXTRA_NEURON_SOURCES:
-    TRANS_MAP.append((s.key, NeuronCSVDataTranslator))
+def init_translators():
+    return [
+        ('WormbaseTextMatchCSVChannelNeuronDataSource',
+         WormbaseTextMatchCSVTranslator),
+        (('WormAtlasCellList', 'Neurons'),
+         WormAtlasCellListDataTranslator),
+        ('WormbaseTextMatchCSVChannelMuscleDataSource',
+         WormbaseTextMatchCSVTranslator),
+        ('WormbaseIonChannelCSVDataSource',
+         WormbaseIonChannelCSVTranslator),
+        ('WormAtlasNeuronTypesSource',
+         NeuronCSVDataTranslator,
+         'Neurons'),
+        ('WormBaseCSVDataSource',
+         MuscleWormBaseCSVTranslator,
+         'Muscles'),
+        (('EmmonsConnectomeCSVDataSource', 'Neurons', 'Muscles'),
+         NeuronConnectomeCSVTranslator),
+        ('WormBaseCSVDataSource',
+         NeuronWormBaseCSVTranslator)
+    ]
+
+
+def init_extra_neuron_data_translators(sources):
+    res = []
+    for s in sources:
+        res.append((s.key, NeuronCSVDataTranslator))
+    return res
 
 
 def serialize_as_nquads():
@@ -187,13 +202,15 @@ def infer():
 
 
 def do_insert(config="default.conf", logging=False):
-    global DATA_SOURCES_BY_KEY
-
+    sources = init_sources()
+    extras = init_extra_sources()
+    data_sources_by_key = {x.key: x for x in sources + extras}
+    trans_map = init_translators() + init_extra_neuron_data_translators(extras)
     P.connect(configFile=config, do_logging=logging)
     try:
         t0 = time()
         translators = dict()
-        remaining = list(TRANS_MAP)
+        remaining = list(trans_map)
         last_remaining = None
         while remaining != last_remaining:
             next_remaining = []
@@ -203,7 +220,7 @@ def do_insert(config="default.conf", logging=False):
                 else:
                     source_keys = t[0]
 
-                sources = tuple(DATA_SOURCES_BY_KEY.get(s) for s in source_keys)
+                sources = tuple(data_sources_by_key.get(s) for s in source_keys)
                 if None in sources:
                     next_remaining.append(t)
                     continue
@@ -223,21 +240,20 @@ def do_insert(config="default.conf", logging=False):
 
                 print('Result: {}'.format(res))
                 if res.key:
-                    DATA_SOURCES_BY_KEY[res.key] = res
+                    data_sources_by_key[res.key] = res
                 else:
-                    DATA_SOURCES_BY_KEY[res.identifier] = res
+                    data_sources_by_key[res.identifier] = res
             last_remaining = list(remaining)
             remaining = next_remaining
         for x in remaining:
             warn("Failed to process: {}".format(x))
 
         # attach_neuromlfiles_to_channel()
-        # upload_connections()
 
         t1 = time()
         print("Saving %d objects..." % IWCTX.size())
         graph = P.config('rdf.graph')
-        for src in DATA_SOURCES_BY_KEY.values():
+        for src in data_sources_by_key.values():
             if isinstance(src, DataWithEvidenceDataSource):
                 print('saving', src)
                 IWCTX.add_import(src.data_context)

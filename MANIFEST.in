@@ -1,4 +1,2 @@
-include OpenWormData/scripts/insert_worm.py
-include OpenWormData/scripts/default.conf
-recursive-include OpenWormData/aux_data/*
-include pow
+recursive-include OpenWormData/aux_data *
+include PyOpenWorm/default.conf
