@@ -1,7 +1,5 @@
 import wrapt
-import six
 from weakref import WeakValueDictionary
-from rdflib.term import URIRef
 
 
 class BaseContextualizable(object):
@@ -117,7 +115,6 @@ def contextualize_metaclass(context, self):
         @property
         def context(self):
             return self.__ctx
-
     # Setting the name just for debugging...don't care much about the other
     # attributes for now.
     _H.__name__ = 'Ctxd_Meta_' + self.__name__
@@ -274,7 +271,9 @@ class ContextualizableClass(type):
         if context is None:
             return self
         _H = contextualize_metaclass(context, self)
-        return _H(self.__name__, (self,), dict(class_context=context.identifier))
+        res = _H(self.__name__, (self,), dict(class_context=context.identifier))
+        res.__module__ = self.__module__
+        return res
 
 
 def is_data_descriptor(k):
@@ -298,6 +297,7 @@ class _ContextualzingProxyMetaType(type(ContextualizingProxy)):
     def __new__(self, name, typ, dct, oclasstyp):
         res = super(_ContextualzingProxyMetaType, self).__new__(self, name, typ, dct)
         res._oct = oclasstyp
+        res.__module__ = oclasstyp.__module__
         return res
 
     def __init__(self, name, typ, dct, oclasstyp):

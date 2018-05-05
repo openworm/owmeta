@@ -12,6 +12,7 @@ from yarom.propertyValue import PropertyValue
 from yarom.propertyMixins import (ObjectPropertyMixin,
                                   DatatypePropertyMixin,
                                   UnionPropertyMixin)
+from yarom.mapper import FCN
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
                                       contextualize_helper)
@@ -77,7 +78,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     linkName = "property"
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
-    def __init__(self, conf, owner, **kwargs):
+    def __init__(self, owner, **kwargs):
         super(RealSimpleProperty, self).__init__(**kwargs)
         self._v = _values()
         self.owner = owner
@@ -189,7 +190,8 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return _get_or_set(self, *args, **kwargs)
 
     def __repr__(self):
-        return _property_to_string(self)
+        fcn = FCN(type(self))
+        return '{}(conf={}, owner={})()'.format(fcn, repr(self.conf), repr(self.owner))
 
     def one(self):
         return next(iter(self.get()), None)

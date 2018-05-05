@@ -450,6 +450,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             c = type(property_class_name,
                      tuple(classes),
                      props)
+            c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
