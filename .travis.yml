@@ -9,8 +9,9 @@ install:
 script:
 - python setup.py test --addopts "-m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 - python setup.py test --addopts "-m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
-after_success:
+after_script:
 - coveralls
+after_success:
 - "./codespeed-submit.sh"
 env:
   global:
