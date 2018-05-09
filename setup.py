@@ -3,6 +3,7 @@
 
 from setuptools import setup
 import os
+import sys
 
 
 long_description = """
@@ -46,8 +47,8 @@ setup(
     tests_require=[
         'pytest>=3.0.6',
         'pytest-cov==2.5.1',
-        'discover==0.4.0'
-    ],
+        'discover==0.4.0',
+    ] + ['mock==2.0.0'] if sys.version_info.major == 2 else [],
     install_requires=[
         'bibtexparser==1.0.1',
         'BTrees==4.0.8',
@@ -75,7 +76,7 @@ setup(
         'zope.interface==4.1.1',
         'lazy-object-proxy==1.2.1',
         'wrapt==1.10.11'
-    ],
+    ] + ['zodbpickle==1.0'] if sys.version_info.major == 2 else [],
     dependency_links=[
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
         'git://github.com/zopefoundation/ZODB.git#egg=ZODB',

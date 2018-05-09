@@ -1,7 +1,11 @@
 from __future__ import absolute_import
+from __future__ import print_function
 import tempfile
 import unittest
-from unittest.mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 from PyOpenWorm.configure import Configure, ConfigValue, Configureable
 from PyOpenWorm.data import Data
 import os

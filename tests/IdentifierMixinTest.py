@@ -1,5 +1,9 @@
 import unittest
-from unittest.mock import MagicMock
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
+
 from PyOpenWorm.identifier_mixin import IdMixin
 
 

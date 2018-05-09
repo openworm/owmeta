@@ -139,7 +139,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
 
     def __getattribute__(self, name):
         """ This behavior is what I would expect, but wrapt doesn't work this way..."""
-        if name is 'context':
+        if name == 'context':
             return super(ContextualizingProxy, self).__getattribute__('_self_context')
 
         override = super(ContextualizingProxy, self).__getattribute__('_self_overrides').get(name, None)
