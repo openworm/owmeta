@@ -145,7 +145,7 @@ def init_extra_neuron_data_translators(sources):
 
 
 def serialize_as_nquads():
-    P.config('rdf.graph').serialize('../WormData.n4', format='nquads')
+    P.config('rdf.graph').serialize('WormData.n4', format='nquads')
     print('serialized to nquads file')
 
 
