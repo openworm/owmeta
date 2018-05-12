@@ -138,13 +138,15 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf['rdf.graph']
+            return self.conf.get('rdf.graph', None)
 
     @property
     def identifier(self):
         return self.link
 
     def get(self):
+        if self.rdf is None:
+            return ()
         results = None
         owner = self.owner
         if owner.defined:
@@ -177,11 +179,13 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     def _ensure_fresh_po_cache(self):
         owner = self.owner
         ident = owner.identifier
-        if (owner.po_cache is None or owner.po_cache.cache_index !=
-                self.conf['rdf.graph.change_counter']):
-            owner.po_cache = POCache(
-                self.conf['rdf.graph.change_counter'], frozenset(
-                    self.rdf.predicate_objects(ident)))
+        try:
+            graph_index = self.conf['rdf.graph.change_counter']
+        except KeyError:
+            graph_index = None
+
+        if graph_index is None or owner.po_cache is None or owner.po_cache.cache_index != graph_index:
+            owner.po_cache = POCache(graph_index, frozenset(self.rdf.predicate_objects(ident)))
 
     def unset(self, v):
         self._remove_value(v)

@@ -6,10 +6,10 @@ from _pytest.runner import runtestprotocol
 pytest_plugins = 'tests.pytest_profile'
 
 
-def pytest_runtest_protocol(item, nextitem):
-    print(str(item.name) + '...', end='')
-    reports = runtestprotocol(item, nextitem=nextitem)
-    for report in reports:
-        if report.when == 'call':
-            print(report.outcome)
-    return True
+def pytest_runtest_logstart(nodeid, location):
+    print(str(nodeid) + '...', end='')
+
+def pytest_runtest_logfinish(nodeid, location):
+    print()
+
+

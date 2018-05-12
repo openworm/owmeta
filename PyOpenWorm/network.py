@@ -80,7 +80,7 @@ class Network(BiologyType):
         :returns: Neuron corresponding to the name given
         :rtype: PyOpenWorm.neuron.Neuron
         """
-        n = Neuron(name=name, conf=self.conf)
+        n = Neuron.contextualize(self.context)(name=name, conf=self.conf)
         return n
 
     def _synapses_csv(self):

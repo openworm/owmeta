@@ -202,10 +202,12 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         super(BaseDataObject, self).__init__(**kwargs)
         self.properties = ContextualizableList(context=self.context)
         self.owner_properties = []
+
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         self._variable = self.next_variable()
+        self.__conf = None
         BaseDataObject.attach_property(self, RDFTypeProperty)
         BaseDataObject.attach_property(self, RDFSCommentProperty)
         BaseDataObject.attach_property(self, RDFSLabelProperty)
@@ -214,6 +216,24 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         if rdfs_label:
             self.rdfs_label = rdfs_label
+
+    @property
+    def conf(self):
+        if self.context is None:
+            return self.__conf
+        else:
+            return self.context.conf
+
+    @property
+    def rdf(self):
+        if self.context is not None:
+            return self.context.rdf_graph()
+        else:
+            return self.conf.get('rdf.graph', None)
+
+    @conf.setter
+    def conf(self, conf):
+        self.__conf = conf
 
     @classmethod
     def next_variable(cls):

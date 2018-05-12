@@ -12,8 +12,13 @@ parser.add_argument('--config', '-c',
                     default=pth_join(package_path, 'default.conf'))
 subs = parser.add_subparsers(dest='subparser')
 init_graph = subs.add_parser('init_graph')
+list_contexts = subs.add_parser('list_contexts')
 options = parser.parse_args()
 
 if options.subparser == 'init_graph':
     from OpenWormData.scripts.insert_worm import do_insert
     do_insert(config=options.config)
+elif options.subparser == 'list_contexts':
+    from PyOpenWorm.data import Data
+    dat = Data.open(options.config)
+    dat.init_database()

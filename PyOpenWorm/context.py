@@ -5,7 +5,7 @@ from rdflib.term import Variable
 from rdflib.graph import ConjunctiveGraph
 import wrapt
 from .data import DataUser
-from .dataObjectUtils import merge_data_objects
+
 from .import_contextualizer import ImportContextualizer
 from .context_store import ContextStore
 from .contextualize import (BaseContextualizable,
@@ -205,18 +205,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                 res = graph.get_context(self.identifier)
         return res
 
-    def _merged_contents(self):
-        newc = dict()
-        for k in self._contents.values():
-            if k.defined:
-                kid = k.identifier
-                prek = newc.get(kid, None)
-                if prek:
-                    newc[kid] = merge_data_objects(prek, k)
-                else:
-                    newc[kid] = k
-        return newc.values()
-
     def contents_triples(self):
         for x in self._statements:
             self.tripcnt += 1
@@ -272,35 +260,43 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return self.__class__.__name__ + '(ident="{}")'.format(getattr(self, 'identifier', '???'))
 
     def load_graph_from_configured_store(self):
-        self._graph = self.conf['rdf.graph']
+        return self.conf['rdf.graph']
 
     def rdf_graph(self):
         if self._graph is None:
-            self._graph = ConjunctiveGraph(store=ContextStore(context=self))
+            self._graph = self.load_staged_graph()
         return self._graph
+
+    def load_combined_graph(self):
+        return ConjunctiveGraph(store=ContextStore(context=self,
+                                                   include_stored=True))
+
+    def load_staged_graph(self):
+        return ConjunctiveGraph(store=ContextStore(context=self))
 
     @property
     def query(self):
-        '''
-        Returns a context without anything in it to used for querying against this context
-        '''
-        return QueryContext(data_context=self,
+        return QueryContext(graph=self.load_combined_graph(),
                             ident=self.identifier)
 
     @property
-    def query_configured_store(self):
-        self.load_graph_from_configured_store()
-        return QueryContext(data_context=self,
+    def staged(self):
+        return QueryContext(graph=self.load_staged_graph(),
+                            ident=self.identifier)
+
+    @property
+    def stored(self):
+        return QueryContext(graph=self.load_graph_from_configured_store(),
                             ident=self.identifier)
 
 
 class QueryContext(Context):
-    def __init__(self, data_context, *args, **kwargs):
+    def __init__(self, graph, *args, **kwargs):
         super(QueryContext, self).__init__(*args, **kwargs)
-        self._data = data_context
+        self.__graph = graph
 
     def rdf_graph(self):
-        return self._data.rdf_graph()
+        return self.__graph
 
 
 class ContextContextManager(object):

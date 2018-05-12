@@ -65,7 +65,11 @@ class DataIntegrityTest(unittest.TestCase):
 
         """
         muscles = self.qctx(Worm)().muscles()
-        self.assertEqual(158, len(muscles))
+        i = 0
+        for m in muscles:
+            print(i, m)
+            i += 1
+        self.assertEqual(158, i)
 
     def test_INS_26_neuropeptide_neuron_list(self):
         """

@@ -1,12 +1,17 @@
+from itertools import chain
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
 
 
+class ContextStoreException(Exception):
+    pass
+
+
 class ContextStore(Store):
     context_aware = True
 
-    def __init__(self, identifier=None, context=None, **kwargs):
+    def __init__(self, identifier=None, context=None, include_stored=False, **kwargs):
         """
         Parameters
         ----------
@@ -15,6 +20,7 @@ class ContextStore(Store):
         """
         super(ContextStore, self).__init__(identifier=identifier, **kwargs)
         self._memory_store = None
+        self._include_stored = include_stored
         if context is not None:
             self._init_store(context)
 
@@ -29,6 +35,15 @@ class ContextStore(Store):
 
     def _init_store(self, ctx):
         self.ctx = ctx
+
+        if self._include_stored:
+            try:
+                self._store_store = ctx.conf['rdf.graph'].store
+            except KeyError as e:
+                raise ContextStoreException('No "rdf.graph" is configured', e)
+        else:
+            self._store_store = None
+
         if self._memory_store is None:
             self._memory_store = IOMemory()
             self._init_store0(ctx)
@@ -68,7 +83,9 @@ class ContextStore(Store):
         if self._memory_store is None:
             raise Exception("Database has not been opened")
         subject, predicate, object = triple_pattern
-        return self._memory_store.triples(triple_pattern, context)
+        return chain(self._memory_store.triples(triple_pattern, context),
+                     () if self._store_store is None
+                     else self._store_store.triples(triple_pattern, context))
 
     def __len__(self, context=None):
         """

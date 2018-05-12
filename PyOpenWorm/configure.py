@@ -33,7 +33,7 @@ class _C(ConfigValue):
         return str(self.v)
 
     def __repr__(self):
-        return str(self.v)
+        return repr(self.v)
 
 
 class BadConf(Exception):
@@ -104,8 +104,8 @@ class Configure(object):
 
     def __str__(self):
         return "{\n"+(",\n".join(
-            "\"%s\" : \"%s\"" %
-            (k, self._properties[k]) for k in self._properties)) + "\n}"
+            "\"%s\" : %s" %
+            (k, repr(self._properties[k])) for k in self._properties)) + "\n}"
 
     def __len__(self):
         return len(self._properties)
