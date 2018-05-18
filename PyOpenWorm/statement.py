@@ -1,5 +1,7 @@
 import logging
 
+from yarom.mapper import FCN
+
 L = logging.getLogger(__name__)
 
 
@@ -35,10 +37,11 @@ class Statement(object):
                 self.context.identifier == other.context.identifier)
 
     def __repr__(self):
-        return 'Statement(subj={}, prop={}, obj={}, context={})'.format(repr(self.subject),
-                                                                        repr(self.property),
-                                                                        repr(self.object),
-                                                                        repr(self.context))
+        return '{}(subj={}, prop={}, obj={}, context={})'.format(FCN(type(self)),
+                                                                 repr(self.subject),
+                                                                 repr(self.property),
+                                                                 repr(self.object),
+                                                                 repr(self.context))
 
     def __getitem__(self, idx):
         if idx == 0:

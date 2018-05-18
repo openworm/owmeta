@@ -13,6 +13,7 @@ from .contextualize import (BaseContextualizable,
                             ContextualizableClass,
                             ContextualizingProxy,
                             contextualize_metaclass)
+from yarom.mapper import FCN
 
 from six.moves.urllib.parse import quote
 from six import text_type
@@ -257,7 +258,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return repr(self)
 
     def __repr__(self):
-        return self.__class__.__name__ + '(ident="{}")'.format(getattr(self, 'identifier', '???'))
+        return '{}(ident="{}")'.format(FCN(type(self)), getattr(self, 'identifier', '???'))
 
     def load_graph_from_configured_store(self):
         return self.conf['rdf.graph']

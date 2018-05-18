@@ -40,7 +40,7 @@ class DataIntegrityTest(unittest.TestCase):
         PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")
         self.context = Context()
-        self.qctx = self.context.query_configured_store
+        self.qctx = self.context.stored
 
     def tearDown(self):
         PyOpenWorm.disconnect()

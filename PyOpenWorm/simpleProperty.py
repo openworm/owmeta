@@ -52,6 +52,9 @@ class _ContextualizableLazyProxy(Proxy, Contextualizable):
         self.__factory__ = self.__factory__.contextualize(context)
         return self
 
+    def __repr__(self):
+        return '{}({})'.format(FCN(type(self)), repr(self.__factory__))
+
 
 class _StatementContextRDFObjectFactory(Contextualizable):
     __slots__ = ('context', 'statement')
@@ -69,6 +72,9 @@ class _StatementContextRDFObjectFactory(Contextualizable):
         if self.context is None:
             raise ValueError("No context has been set for this proxy")
         return self.statement.context.contextualize(self.context).rdf_object
+
+    def __repr__(self):
+        return '{}({})'.format(FCN(type(self)), repr(self.statement))
 
 
 class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
@@ -195,7 +201,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def __repr__(self):
         fcn = FCN(type(self))
-        return '{}(conf={}, owner={})()'.format(fcn, repr(self.conf), repr(self.owner))
+        return '{}(owner={})'.format(fcn, repr(self.owner))
 
     def one(self):
         return next(iter(self.get()), None)

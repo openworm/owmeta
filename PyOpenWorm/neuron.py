@@ -218,16 +218,19 @@ class ConnectionProperty(Property):
     def __init__(self, **kwargs):
         super(ConnectionProperty, self).__init__('connection', **kwargs)
         self._conns = []
-        self._conntype = Connection
+        self._conntype = Connection.contextualize(self.owner.context)
 
     def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
            ----------
-           type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           pre_post_or_either: str
+               What kind of connection to look for.
+               'pre': Owner is the source of the connection
+               'post': Owner is the destination of the connection
+               'either': Owner is either the source or destination of the connection
+
            Returns
            -------
            list of Connection
@@ -240,6 +243,7 @@ class ConnectionProperty(Property):
         elif pre_post_or_either == 'either':
             c.append(self._conntype(pre_cell=self.owner, **kwargs))
             c.append(self._conntype(post_cell=self.owner, **kwargs))
+
         for x in c:
             for r in x.load():
                 yield r
@@ -248,7 +252,7 @@ class ConnectionProperty(Property):
     def values(self):
         return []
 
-    def count(self, pre_post_or_either='pre', syntype=None, *args, **kwargs):
+    def count(self, pre_post_or_either='pre', *args, **kwargs):
         c = []
         conntype = self._conntype.contextualize(self.context)
         if pre_post_or_either == 'pre':
@@ -258,10 +262,8 @@ class ConnectionProperty(Property):
         elif pre_post_or_either == 'either':
             c.append(conntype(pre_cell=self.owner, **kwargs))
             c.append(conntype(post_cell=self.owner, **kwargs))
-        res = 0
-        for x in c:
-            res += sum(1 for _ in x.load())
-        return res
+
+        return sum(x.count() for x in c)
 
     def set(self, conn, **kwargs):
         """Add a connection associated with the owner Neuron
