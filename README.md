@@ -170,8 +170,8 @@ PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
 
 See what some evidence stated::
 ```python
->>> doc = ctx.stored(Document)(author='Sulston et al.', date='1983')
->>> e0 = ctx.stored(Evidence)(reference=doc)
+>>> doc = evctx.stored(Document)(author='Sulston et al.', date='1983')
+>>> e0 = evctx.stored(Evidence)(reference=doc)
 >>> supported_ctx = e0.supports()
 
 # is the neuron's presence asserted?
