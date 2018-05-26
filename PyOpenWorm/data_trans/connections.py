@@ -73,8 +73,8 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
 
         try:
             # XXX: should there be a different src for muscles?
-            w_q = neurons_source.data_context.query(Worm)()
-            n_q = neurons_source.data_context.query(Network)()
+            w_q = muscles_source.data_context.stored(Worm)()
+            n_q = neurons_source.data_context.stored(Network)()
             i_n = next(n_q.load(), n_q)
             i_w = next(w_q.load(), w_q)
             # XXX: If the context we query for is the same ID as the default
@@ -140,8 +140,8 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
                         if target in changed_muscles:
                             target = changed_muscle(target)
 
-                        sources = marshall(ctx, source, muscles, neurons)
-                        targets = marshall(ctx, target, muscles, neurons)
+                        sources = convert_to_cell(ctx, source, muscles, neurons)
+                        targets = convert_to_cell(ctx, target, muscles, neurons)
 
                         for s in sources:
                             for t in targets:
@@ -165,7 +165,7 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         return res
 
 
-def marshall(ctx, name, muscles, neurons):
+def convert_to_cell(ctx, name, muscles, neurons):
     ret = []
     res = None
     res2 = None
@@ -239,3 +239,5 @@ def changed_muscle(x):
 
 def expand_muscle(ctx, name):
     return ctx(Muscle)(name + 'L'), ctx(Muscle)(name + 'R')
+
+__yarom_mapped_classes__ = (ConnectomeCSVDataSource, NeuronConnectomeCSVTranslator)

@@ -28,13 +28,14 @@ the database later. ``Worm``, for instance has a property, ``neuron_network``,
 which points to the ``Network`` which should contain all neural cells and
 synaptic connections. To initialize the hierarchy you would do something like::
 
-    w = Worm('C. briggsae') # The name is optional and currently defaults to 'C. elegans'
-    nn = Network()          # make a neuron network
-    w.neuron_network(nn)    # attach to the worm the neuron network
-    n = Neuron()            # make an unnamed neuron
-    n.receptor('UNC-13')    # state that the neuron has a UNC-13 type receptor
-    nn.neuron(n)            # attach to the neuron network
-    w.save()                # save all of the data attached to the worm
+    ctx = Context(ident='http://example.org/c-briggsae')
+    w = ctx(Worm)('C. briggsae') # The name is optional and currently defaults to 'C. elegans'
+    nn = ctx(Network)()          # make a neuron network
+    w.neuron_network(nn)         # attach to the worm the neuron network
+    n = ctx(Neuron)()            # make an unnamed neuron
+    n.receptor('UNC-13')         # state that the neuron has a UNC-13 type receptor
+    nn.neuron(n)                 # attach to the neuron network
+    ctx.save_context()           # save all of the data attached to the worm
 
 It is possible to create objects without attaching them to anything and they can
 still be referenced by calling load on an instance of the object's class as in
@@ -58,7 +59,8 @@ matching some conditions without needing to ``load()`` and ``save()`` them from
 the database.
 * Statements like::
 
-    w = Worm()
+    ctx = Context(ident='http://example.org/c-briggsae')
+    w = ctx.stored(Worm)()
     w.neuron_network.neuron.receptor('UNC-13')
     l = list(w.load()) # Get a list of worms with neurons expressing 'UNC-13'
 
@@ -67,13 +69,13 @@ the database.
   getting all worms with those networks::
 
     worms = set()
-    n = Neuron()
+    n = ctx.stored(Neuron)()
     n.receptor('UNC-13')
     for ns in n.load():
-        nn = Network()
+        nn = ctx.stored(Network)()
         nn.neuron(ns)
         for z in nn.load():
-            w = Worm()
+            w = ctx.stored(Worm)()
             w.neuron_network(z)
             worms.add(w)
     l = list(worms)
@@ -83,7 +85,7 @@ the database.
 
 * Also, queries like::
 
-    l = list(Worm('C. briggsae').neuron_network.neuron.receptor()) # get a list
+    l = list(ctx.stored(Worm)('C. briggsae').neuron_network.neuron.receptor()) # get a list
     #of all receptors expressed in neurons of C. briggsae
 
   Again, not difficult to write out, but in this case it actually gives a much
@@ -92,7 +94,7 @@ the database.
 
   We'd also like operators for composing many such strings so::
 
-    Worm('C. briggsae').neuron_network.neuron.get('receptor', 'innexin') # list
+    ctx.stored(Worm)('C. briggsae').neuron_network.neuron.get('receptor', 'innexin') # list
     #of (receptor, innexin) values for each neuron
 
   would be possible with one query and thus not requiring parsing and iterating

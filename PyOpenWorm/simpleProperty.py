@@ -144,7 +144,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf.get('rdf.graph', None)
+            return self.conf['rdf.graph']
 
     @property
     def identifier(self):

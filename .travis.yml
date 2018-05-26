@@ -9,8 +9,8 @@ install:
 - python setup.py install
 - pow init_graph
 script:
-- python setup.py test --addopts "-m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
-- python setup.py test --addopts "-m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- python setup.py test --addopts "--verbose -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- python setup.py test --addopts "--verbose -m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 after_script:
 - coveralls
 after_success:

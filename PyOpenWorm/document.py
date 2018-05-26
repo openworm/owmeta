@@ -9,7 +9,7 @@ from .dataObject import DataObject
 
 from PyOpenWorm import bibtex as BIB
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class WormbaseRetrievalException(Exception):

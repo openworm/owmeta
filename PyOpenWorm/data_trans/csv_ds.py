@@ -23,7 +23,7 @@ class CSVDataTranslator(DataTranslator):
     def make_reader(self, source, skipheader=True, **kwargs):
         params = dict()
         if source.csv_field_delimiter.has_defined_value():
-            params['delimiter'] = source.csv_field_delimiter.onedef()
+            params['delimiter'] = str(source.csv_field_delimiter.onedef())
 
         params['skipinitialspace'] = True
         params.update(kwargs)

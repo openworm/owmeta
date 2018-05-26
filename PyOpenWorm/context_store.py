@@ -3,6 +3,8 @@ from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
 
+from .context_common import CONTEXT_IMPORTS
+
 
 class ContextStoreException(Exception):
     pass
@@ -11,14 +13,14 @@ class ContextStoreException(Exception):
 class ContextStore(Store):
     context_aware = True
 
-    def __init__(self, identifier=None, context=None, include_stored=False, **kwargs):
+    def __init__(self, context=None, include_stored=False, **kwargs):
         """
         Parameters
         ----------
-            identifier : rdflib.term.URIRef
-                context URI?
+            context : PyOpenWorm.context.Context
+                context
         """
-        super(ContextStore, self).__init__(identifier=identifier, **kwargs)
+        super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
         if context is not None:
@@ -37,10 +39,7 @@ class ContextStore(Store):
         self.ctx = ctx
 
         if self._include_stored:
-            try:
-                self._store_store = ctx.conf['rdf.graph'].store
-            except KeyError as e:
-                raise ContextStoreException('No "rdf.graph" is configured', e)
+            self._store_store = RDFContextStore(ctx)
         else:
             self._store_store = None
 
@@ -82,10 +81,12 @@ class ContextStore(Store):
         context = getattr(context, 'identifier', context)
         if self._memory_store is None:
             raise Exception("Database has not been opened")
-        subject, predicate, object = triple_pattern
+        context_triples = []
+        if self._store_store is not None:
+            context_triples.append(self._store_store.triples(triple_pattern,
+                                                             context))
         return chain(self._memory_store.triples(triple_pattern, context),
-                     () if self._store_store is None
-                     else self._store_store.triples(triple_pattern, context))
+                     *context_triples)
 
     def __len__(self, context=None):
         """
@@ -113,18 +114,49 @@ class ContextStore(Store):
             raise Exception("Database has not been opened")
         return self._memory_store.contexts(triple)
 
-    def query(self, query, initNs, initBindings, queryGraph, **kwargs):
-        """
-        If stores provide their own SPARQL implementation, override this.
 
-        queryGraph is None, a URIRef or '__UNION__'
-        If None the graph is specified in the query-string/object
-        If URIRef it specifies the graph to query,
-        If  '__UNION__' the union of all named graphs should be queried
-        (This is used by ConjunctiveGraphs
-        Values other than None obviously only makes sense for
-        context-aware stores.)
+class RDFContextStore(Store):
+    # Returns triples imported by the given context
+    context_aware = True
 
-        """
+    def __init__(self, context=None, imports_graph=None, **kwargs):
+        super(RDFContextStore, self).__init__(**kwargs)
+        self.__graph = context.conf['rdf.graph']
+        self.__imports_graph = imports_graph
+        self.__store = self.__graph.store
+        self.__context = context
+        self.__context_transitive_imports = None
 
-        raise NotImplementedError
+    def __init_contexts(self):
+        if self.__store is not None and self.__context_transitive_imports is None:
+            imports = set()
+            border = set([self.__context.identifier])
+            while border:
+                new_border = set()
+                for b in border:
+                    itr = self.__store.triples((b, CONTEXT_IMPORTS, None),
+                                               context=self.__imports_graph)
+                    for t in itr:
+                        new_border.add(t[0][2])
+                imports |= border
+                border = new_border
+            self.__context_transitive_imports = imports
+
+    def triples(self, pattern, context=None):
+        self.__init_contexts()
+        context = getattr(context, 'identifier', context)
+        for t in self.__store.triples(pattern, context):
+            contexts = set(t[1])
+            inter = self.__context_transitive_imports & contexts
+            if inter:
+                yield t[0], inter
+
+    def contexts(self, triple=None):
+        if triple is not None:
+            for x in self.triples(triple):
+                for c in x[1]:
+                    yield c
+        else:
+            self.__init_contexts()
+            for c in self.__context_transitive_imports:
+                yield c

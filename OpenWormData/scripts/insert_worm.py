@@ -14,17 +14,15 @@ from PyOpenWorm.package_utils import get_library_location
 
 import PyOpenWorm.import_override as impo
 impo.Overrider(MAPPER).wrap_import()
-CTX = Context(ident="http://openworm.org/entities/bio#worm0-data",
-              imported=(P.CONTEXT,))
 
 from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-from CTX.PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
-                                                WormBaseCSVDataSource,
-                                                WormbaseTextMatchCSVDataSource,
-                                                MuscleWormBaseCSVTranslator,
-                                                NeuronWormBaseCSVTranslator,
-                                                WormbaseIonChannelCSVTranslator,
-                                                WormbaseIonChannelCSVDataSource)
+from PyOpenWorm.data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
+                                            WormBaseCSVDataSource,
+                                            WormbaseTextMatchCSVDataSource,
+                                            MuscleWormBaseCSVTranslator,
+                                            NeuronWormBaseCSVTranslator,
+                                            WormbaseIonChannelCSVTranslator,
+                                            WormbaseIonChannelCSVDataSource)
 
 from PyOpenWorm.data_trans.wormatlas import (WormAtlasCellListDataSource,
                                              WormAtlasCellListDataTranslator)
@@ -32,16 +30,9 @@ from PyOpenWorm.data_trans.wormatlas import (WormAtlasCellListDataSource,
 from PyOpenWorm.data_trans.connections import (ConnectomeCSVDataSource,
                                                NeuronConnectomeCSVTranslator)
 
-from CTX.PyOpenWorm.channel import Channel
-from CTX.PyOpenWorm.neuron import Neuron
-from CTX.PyOpenWorm.muscle import Muscle
-
-EVCTX = Context(ident="http://openworm.org/entities/bio#worm0-evidence",
-                imported=(P.CONTEXT,))
-
-
-IWCTX = Context(ident="http://openworm.org/entities/bio#worm0",
-                imported=(CTX, EVCTX))
+from PyOpenWorm.channel import Channel
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.muscle import Muscle
 
 LINEAGE_LIST_LOC = 'C. elegans Cell List - WormAtlas.tsv'
 WORM = None
@@ -201,7 +192,14 @@ def infer():
     print ("filled in with inferred data")
 
 
-def do_insert(config="default.conf", logging=False):
+def do_insert(ident, config="default.conf", logging=False):
+
+    CTX = Context(ident=ident + '-data', imported=(P.CONTEXT,))
+
+    EVCTX = Context(ident=ident + '-evidence', imported=(P.CONTEXT,))
+
+    IWCTX = Context(ident=ident, imported=(CTX, EVCTX))
+
     sources = init_sources()
     extras = init_extra_sources()
     data_sources_by_key = {x.key: x for x in sources + extras}
@@ -239,10 +237,20 @@ def do_insert(config="default.conf", logging=False):
                 res = translator(*sources, output_key=output_key)
 
                 print('Result: {}'.format(res))
-                if res.key:
-                    data_sources_by_key[res.key] = res
-                else:
-                    data_sources_by_key[res.identifier] = res
+                if isinstance(res, DataWithEvidenceDataSource):
+                    res.data_context.save_context(inline_imports=True)
+                    res.data_context.save_imports()
+                    res.evidence_context.save_context(inline_imports=True)
+                    res.evidence_context.save_imports()
+                    for ctx in res.contexts:
+                        ctx.save_context(inline_imports=True)
+                        ctx.save_imports()
+
+                if res:
+                    if res.key:
+                        data_sources_by_key[res.key] = res
+                    else:
+                        data_sources_by_key[res.identifier] = res
             last_remaining = list(remaining)
             remaining = next_remaining
         for x in remaining:
@@ -256,11 +264,12 @@ def do_insert(config="default.conf", logging=False):
         for src in data_sources_by_key.values():
             if isinstance(src, DataWithEvidenceDataSource):
                 print('saving', src)
-                IWCTX.add_import(src.data_context)
-                IWCTX.add_import(src.evidence_context)
+                CTX.add_import(src.data_context)
+                EVCTX.add_import(src.evidence_context)
                 for ctx in src.contexts:
                     IWCTX.add_import(ctx)
         IWCTX.save_context(graph, inline_imports=True)
+        IWCTX.save_imports(graph)
 
         print("Saved %d objects." % IWCTX.defcnt)
         print("Saved %d triples." % IWCTX.tripcnt)
@@ -296,4 +305,4 @@ if __name__ == '__main__':
     (options, _) = parser.parse_args()
     OPTIONS = options
 
-    do_insert(config=options.config, logging=options.do_logging)
+    do_insert("http://openworm.org/entities/bio#worm0", config=options.config, logging=options.do_logging)

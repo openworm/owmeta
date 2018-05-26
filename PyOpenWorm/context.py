@@ -7,12 +7,13 @@ import wrapt
 from .data import DataUser
 
 from .import_contextualizer import ImportContextualizer
-from .context_store import ContextStore
+from .context_store import ContextStore, RDFContextStore
 from .contextualize import (BaseContextualizable,
                             Contextualizable,
                             ContextualizableClass,
                             ContextualizingProxy,
                             contextualize_metaclass)
+from .context_common import CONTEXT_IMPORTS
 from yarom.mapper import FCN
 
 from six.moves.urllib.parse import quote
@@ -146,14 +147,20 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         for x in self._imported_contexts:
             yield x
 
-    def save_imports(self, graph):
+    def save_imports(self, graph=None):
+        if graph is None:
+            try:
+                graph = self.conf['rdf.graph']
+            except KeyError:
+                raise Exception('No graph was given and configuration has no graph')
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
                     and not isinstance(ctx.identifier, rdflib.term.BNode):
                 graph.add((self.identifier,
-                           rdflib.URIRef('http://example.com/imports'),
+                           CONTEXT_IMPORTS,
                            ctx.identifier))
+                ctx.save_imports(graph)
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
         self.tripcnt = 0
@@ -261,7 +268,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return '{}(ident="{}")'.format(FCN(type(self)), getattr(self, 'identifier', '???'))
 
     def load_graph_from_configured_store(self):
-        return self.conf['rdf.graph']
+        return ConjunctiveGraph(store=RDFContextStore(self))
 
     def rdf_graph(self):
         if self._graph is None:
