@@ -52,7 +52,7 @@ WHERE {
 """)
 
 
-def _dict_merge(d1,d2):
+def _dict_merge(d1, d2):
     from itertools import chain
     dict(chain(d1.items(), d2.items()))
 
@@ -121,7 +121,7 @@ class Cell(BiologyType):
         """Return the morphology of the cell. Currently this is restricted to
            `Neuron <#neuron>`_ objects.
         """
-        morph_name = "morphology_" + str(next(self.name()))
+        morph_name = "morphology_" + str(self.name())
 
         # Query for segments
         query = segment_query.substitute(morph_name=morph_name)

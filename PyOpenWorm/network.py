@@ -109,7 +109,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('sensory')
 
         self.neuron.set(n)
@@ -125,7 +125,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('interneuron')
 
         self.neuron.set(n)
@@ -141,7 +141,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('motor')
 
         self.neuron.set(n)

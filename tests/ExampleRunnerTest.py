@@ -42,7 +42,6 @@ class ExampleRunnerTest(unittest.TestCase):
         # XXX: No `synclass' is given, so all neurons are called `excitatory'
         self.execfile("NetworkInfo.py")
 
-    @unittest.expectedFailure
     def test_run_morpho(self):
         self.execfile("morpho.py")
 

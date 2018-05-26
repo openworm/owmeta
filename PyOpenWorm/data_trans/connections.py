@@ -54,9 +54,6 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         return tr
 
     def translate(self, data_source, neurons_source, muscles_source):
-
-        print ("uploading statements about connections")
-
         # muscle cells that are generically defined in source and need to be broken
         # into pair of L and R before being added to PyOpenWorm
 

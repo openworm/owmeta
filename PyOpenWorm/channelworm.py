@@ -1,9 +1,7 @@
-from .pProperty import Property
 from yarom.utils import slice_dict
 
-from PyOpenWorm.experiment import Experiment
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.dataObject import DataObject
+from .experiment import Experiment
+from .dataObject import DataObject
 
 
 class PatchClampExperiment(Experiment):
@@ -91,76 +89,14 @@ class PatchClampExperiment(Experiment):
         for c in self.conditions:
             PatchClampExperiment.DatatypeProperty(c, self)
 
-        for c, v in conditions:
-            setattr(self, c, v)
+        for c, v in conditions.items():
+            getattr(self, c).set(v)
 
-
-class References(Property):
-    multiple = True
-
-    def __init__(self, **kwargs):
-        Property.__init__(self, 'references', **kwargs)
-        self._refs = []
-
-    def set(self, e=False, **kwargs):
-        """
-        Add a reference to the list.
-        This method will also take care of mapping the Evidence's assertion to
-        this ChannelModel
-
-        Parameters
-        ----------
-        e : Evidence or Experiment
-            The Experiment or Evidence that supports this ChannelModel
-
-        Returns
-        -------
-        None
-
-        Example::
-
-            e = P.Evidence(author='Sulston et al.', date='1983')
-            cm = ChannelModel()
-            cm.references.set(e)
-        """
-        if isinstance(e, Evidence):
-            e.asserts(self.owner)
-            self._refs.append(e)
-        elif isinstance(e, Experiment):
-            e = e.reference()
-            e.asserts(self.owner)
-            self._refs.append(e)
-
-    def get(self, **kwargs):
-        """
-        Retrieve the reference list for this ChannelModel
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        Set of Evidence and Experiment objects
-        """
-        if len(self._refs) == 0:
-            #Make dummy Evidence to load from db
-            ev = Evidence()
-            ev.asserts(self.owner)
-            #Make dummy Experiment with this Evidence
-            ex = Experiment(reference=ev)
-            #load from db
-            for e in ev.load():
-                self._refs.append(e)
-            for e in ex.load():
-                self._refs.append(e)
-        #now return the iterable set
-        for r in self._refs:
-            yield r
 
 class ChannelModelType:
     patchClamp = "Patch clamp experiment"
     homologyEstimate = "Estimation based on homology"
+
 
 class ChannelModel(DataObject):
     """
@@ -200,12 +136,11 @@ class ChannelModel(DataObject):
     class_context = 'http://openworm.org/schema/sci/bio'
 
     def __init__(self, modelType=False, *args, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(ChannelModel, self).__init__(*args, **kwargs)
         ChannelModel.DatatypeProperty('modelType', self)
         ChannelModel.DatatypeProperty('ion', self, multiple=True)
         ChannelModel.DatatypeProperty('gating', self, multiple=True)
         ChannelModel.DatatypeProperty('conductance', self)
-        References(owner=self)
 
         #Change modelType value to something from ChannelModelType class on init
         if (isinstance(modelType, str)):
@@ -215,3 +150,20 @@ class ChannelModel(DataObject):
             elif modelType in ('patch-clamp', ChannelModelType.patchClamp):
                 self.modelType(ChannelModelType.patchClamp)
 
+
+class PatchClampChannelModel(ChannelModel):
+    def __init__(self, **kwargs):
+        super(PatchClampChannelModel, self).__init__(modelType='patch-clamp',
+                                                     **kwargs)
+        self.modeled_from = PatchClampChannelModel.ObjectProperty(value_type=PatchClampExperiment)
+
+
+class HomologyChannelModel(ChannelModel):
+    def __init__(self, **kwargs):
+        super(HomologyChannelModel, self).__init__(modelType='homology',
+                                                   **kwargs)
+        from PyOpenWorm.channel import Channel
+        self.homolog = HomologyChannelModel.ObjectProperty(value_type=Channel)
+
+
+__yarom_mapped_classes__ = (ChannelModel, PatchClampExperiment)

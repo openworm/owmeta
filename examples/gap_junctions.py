@@ -6,13 +6,17 @@ from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
+from PyOpenWorm.context import Context
+from OpenWormData import BIO_ENT_NS
 
 # Connect to existing database.
 P.connect('default.conf')
 
 
+ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+
 # Put the Worm's Network object in a variable.
-net = Worm().get_neuron_network()
+net = ctx(Worm)().get_neuron_network()
 
 # Put a particular Neuron object in a variable ('AVAL' in this example).
 aval = net.aneuron('AVAL')

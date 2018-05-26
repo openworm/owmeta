@@ -47,7 +47,7 @@ setup(
     zip_safe=False,
     setup_requires=['pytest-runner'],
     tests_require=[
-        'pytest==3.0.7',
+        'pytest>=3.4.0',
         'pytest-cov==2.5.1',
         'discover==0.4.0',
     ] + (['mock==2.0.0'] if PY2 else []),
@@ -64,7 +64,7 @@ setup(
         'Pint',
         'pyparsing==2.2.0',
         'rdflib==4.1.2',
-        'rdflib-zodb>=1.0.0',
+        'pow-store-zodb==0.0.3',
         'requests',
         'six==1.10.0',
         'SPARQLWrapper==1.6.2',
@@ -81,8 +81,7 @@ setup(
     ] + (['zodbpickle==1.0'] if PY2 else []),
     dependency_links=[
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
-        'git://github.com/zopefoundation/ZODB.git#egg=ZODB',
-        'git://github.com/mwatts15/rdflib-zodb.git@master#egg=rdflib-zodb-1.1-dev'
+        'git://github.com/zopefoundation/ZODB.git#egg=ZODB'
     ],
     version=version,
     packages=['PyOpenWorm',

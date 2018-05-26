@@ -336,12 +336,11 @@ class DataIntegrityTest(unittest.TestCase):
         for muscle_object in muscles:
             self.assertIsInstance(muscle_object, Cell)
 
-    @unittest.expectedFailure
     def test_correct_connections_number(self):
-        """ This test verifies that there are exactly 6916 connections. """
+        """ This test verifies that there are exactly 7319 connections. """
         net = self.qctx(Worm)().get_neuron_network()
         # XXX: The synapses contain some cells that aren't neurons
-        self.assertEqual(6916, len(net.synapses()))
+        self.assertEqual(7319, net.synapses.count())
 
     @unittest.skip("Takes too long")
     def test_connection_content_matches(self):

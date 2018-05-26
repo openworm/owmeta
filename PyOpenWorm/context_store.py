@@ -144,9 +144,9 @@ class RDFContextStore(Store):
 
     def triples(self, pattern, context=None):
         self.__init_contexts()
-        context = getattr(context, 'identifier', context)
+        # context = getattr(context, 'identifier', context)
         for t in self.__store.triples(pattern, context):
-            contexts = set(t[1])
+            contexts = set(getattr(c, 'identifier', c) for c in t[1])
             inter = self.__context_transitive_imports & contexts
             if inter:
                 yield t[0], inter
@@ -155,7 +155,7 @@ class RDFContextStore(Store):
         if triple is not None:
             for x in self.triples(triple):
                 for c in x[1]:
-                    yield c
+                    yield getattr(c, 'identifier', c)
         else:
             self.__init_contexts()
             for c in self.__context_transitive_imports:

@@ -6,7 +6,7 @@ from PyOpenWorm.document import Document
 from PyOpenWorm.website import Website
 
 
-connect(configFile="PyOpenWorm/default.conf")
+connect(configFile="default.conf")
 print('the graph', config('rdf.graph'))
 
 
@@ -33,7 +33,7 @@ ctxs = query_context(config('rdf.graph'), qctx)
 for c in ctxs:
     mqctx = Context()
     print('CONTEXT', c.identifier)
-    ev = mqctx.query_configured_store(Evidence)()
+    ev = mqctx.stored(Evidence)()
     ev.supports(Context(ident=c.identifier).rdf_object)
     for x in ev.load():
         ref = x.reference()

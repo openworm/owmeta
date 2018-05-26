@@ -54,7 +54,7 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
         res = self.make_new_output((data_source,))
         try:
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
@@ -98,7 +98,7 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
         res = self.make_new_output((data_source,))
         try:
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
@@ -176,7 +176,7 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
@@ -204,7 +204,7 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         # TODO: Improve this evidence by going back to the actual research
         #       by using the wormbase REST API in addition to or instead of the CSV file
         with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-            doc = ctx.Website(key="wormbase", url="Wormbase.org", title="WormBase")
+            doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
             doc_ctx = res.data_context_for(document=doc)
             ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 

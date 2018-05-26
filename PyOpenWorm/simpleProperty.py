@@ -264,7 +264,15 @@ class OPResolver(object):
         return _Resolver.get_instance().base_type
 
 
-class ObjectProperty (_ContextualizingPropertySetMixin, ObjectPropertyMixin, RealSimpleProperty):
+class PropertyCountMixin(object):
+    def count(self):
+        return sum(1 for _ in super(PropertyCountMixin, self).get())
+
+
+class ObjectProperty (_ContextualizingPropertySetMixin,
+                      ObjectPropertyMixin,
+                      PropertyCountMixin,
+                      RealSimpleProperty):
 
     def __init__(self, *args, **kwargs):
         super(ObjectProperty, self).__init__(*args, **kwargs)
@@ -289,7 +297,7 @@ class ObjectProperty (_ContextualizingPropertySetMixin, ObjectPropertyMixin, Rea
         return itertools.chain(self.defined_values, r)
 
 
-class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
+class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
 
     def get(self):
         r = super(DatatypeProperty, self).get()
@@ -303,7 +311,10 @@ class DatatypeProperty (DatatypePropertyMixin, RealSimpleProperty):
         return self.resolver.deserializer(x.identifier) if x is not None else x
 
 
-class UnionProperty(UnionPropertyMixin, RealSimpleProperty):
+class UnionProperty(_ContextualizingPropertySetMixin,
+                    UnionPropertyMixin,
+                    PropertyCountMixin,
+                    RealSimpleProperty):
 
     """ A Property that can handle either DataObjects or basic types """
     def get(self):
