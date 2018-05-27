@@ -281,8 +281,9 @@ class Document(BaseDocument):
         def pmRequest(pmid):
             import xml.etree.ElementTree as ET  # Python 2.5 and up
             url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + str(pmid)
-            if self.conf['pubmed.api_key']:
-                url += '&api_key=' + self.conf['pubmed.api_key']
+            key = self.get('pubmed.api_key', None)
+            if key:
+                url += '&api_key=' + key
             else:
                 logger.warning("PubMed API key not defined. API calls will be limited.")
             s = _url_request(url)
@@ -296,7 +297,6 @@ class Document(BaseDocument):
         pmid = self.pmid.defined_values
         if len(pmid) == 1:
             pmid = pmid[0].identifier.toPython()
-
             try:
                 tree = pmRequest(pmid)
             except Exception:
