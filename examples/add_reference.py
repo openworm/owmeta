@@ -23,9 +23,6 @@ P.connect(conf=d)
 ctx = Context(ident='http://example.org/data')
 evctx = Context(ident='http://example.org/meta')
 
-print(id(P.config('rdf.graph')))
-print(P.config('rdf.graph'))
-print(evctx.stored.rdf_graph().serialize(format='n3').decode('utf-8'))
 # Create a new Neuron object to work with
 n = ctx(Neuron)(name='AVAL')
 
@@ -42,16 +39,9 @@ n.receptor('UNC-8')
 
 e.supports(ctx.rdf_object)
 
-print(id(ctx.conf['rdf.graph']))
 # Save the Neuron and Evidence objects to the database.
 ctx.save_context()
 evctx.save_context()
-
-print(1)
-print(evctx.stored.rdf_graph().serialize(format='nquads').decode('utf-8'))
-
-print(2)
-print(evctx.conf['rdf.graph'].serialize(format='nquads').decode('utf-8'))
 
 # What does my evidence object contain?
 for e_i in evctx.stored(Evidence)().load():
