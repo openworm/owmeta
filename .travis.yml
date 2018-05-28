@@ -5,7 +5,7 @@ python:
 - '3.6'
 before_install:
 - pip install coveralls
-- pip install pytest>=3.4.0
+- pip install --upgrade pytest>=3.4.0
 install:
 - python setup.py install
 - pow init_graph
