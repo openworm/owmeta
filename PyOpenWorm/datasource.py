@@ -174,7 +174,7 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
                     getattr(inf.cls, inf.property_type)(owner=self,
                                                         linkName=inf.property_name,
                                                         multiple=True))
-            ctxd_prop = self.context(getattr(self, inf.name))
+            ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)
 

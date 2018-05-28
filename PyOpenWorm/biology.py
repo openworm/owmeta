@@ -1,4 +1,3 @@
-
 from PyOpenWorm.dataObject import DataObject
 
 

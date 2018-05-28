@@ -192,9 +192,17 @@ class Configureable(object):
         if conf is not None:
             if conf is self:
                 raise ValueError('The \'conf\' of a Configureable cannot be itself')
-            self.conf = conf
+            self.__conf = conf
         else:
-            self.conf = Configureable.default
+            self.__conf = Configureable.default
+
+    @property
+    def conf(self):
+        return self.__conf
+
+    @conf.setter
+    def conf(self, conf):
+        self.__conf = conf
 
     def __getitem__(self, k):
         """

@@ -15,7 +15,6 @@ from .contextualize import (BaseContextualizable,
                             contextualize_metaclass)
 from .context_common import CONTEXT_IMPORTS
 from yarom.mapper import FCN
-
 from six.moves.urllib.parse import quote
 from six import text_type
 import six

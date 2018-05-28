@@ -42,7 +42,6 @@ class ContextStore(Store):
             self._store_store = RDFContextStore(ctx)
         else:
             self._store_store = None
-
         if self._memory_store is None:
             self._memory_store = IOMemory()
             self._init_store0(ctx)
@@ -144,7 +143,7 @@ class RDFContextStore(Store):
 
     def triples(self, pattern, context=None):
         self.__init_contexts()
-        # context = getattr(context, 'identifier', context)
+
         for t in self.__store.triples(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
             inter = self.__context_transitive_imports & contexts

@@ -2,8 +2,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
+import itertools
 from .DataTestTemplate import _DataTest
-
+import PyOpenWorm
+from PyOpenWorm.context import Context
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.evidence import Evidence
@@ -11,25 +13,32 @@ from PyOpenWorm.evidence import Evidence
 
 class EvidenceCoverageTest(_DataTest):
 
+    def setUp(self):
+        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.g = PyOpenWorm.config("rdf.graph")
+        self.context = Context()
+        self.qctx = self.context.stored
+
+    def tearDown(self):
+        PyOpenWorm.disconnect()
+
     def test_verify_neurons_have_evidence(self):
         """ For each neuron in PyOpenWorm, verify
         that there is supporting evidence"""
 
-        neurons = list(Neuron().load())
+        neurons = list(self.qctx(Neuron)().load())
         evcheck = []
+        knowns = dict()
         for n in neurons:
-
-            hasEvidence = len(
-                get_supporting_evidence(n)) + len(
-                get_supporting_evidence(n.neurotransmitter)) + len(
-                get_supporting_evidence(n.type)) + len(
-                get_supporting_evidence(n.innexin)) + len(
-                get_supporting_evidence(n.neuropeptide)) + len(
-                get_supporting_evidence(n.receptor))
-
-            print(get_supporting_evidence(n.neurotransmitter))
-
-            evcheck.append(hasEvidence)
+            pp = [x.statements for x in (n.neurotransmitter,
+                                         n.type,
+                                         n.innexin,
+                                         n.neuropeptide)]
+            for stmt in itertools.chain(*pp):
+                if stmt.context.identifier in knowns:
+                    n = self.get_supporting_evidence(stmt)
+                    knowns[stmt.context.identifier] = n
+                    evcheck.append(n)
 
         self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
 
@@ -37,12 +46,18 @@ class EvidenceCoverageTest(_DataTest):
         """ For each muscle in PyOpenWorm, verify
         that there is supporting evidence"""
         muscles = list(Worm().muscles())
-        muscle_evcheck = []
-        for mobj in muscles:
-            hasEvidence = len(get_supporting_evidence(mobj))
-            muscle_evcheck.append(hasEvidence)
+        evcheck = []
+        knowns = dict()
+        for n in muscles:
+            pp = [x.statements for x in (n.receptors,
+                                         n.innervatedBy)]
+            for stmt in itertools.chain(*pp):
+                if stmt.context.identifier in knowns:
+                    n = self.get_supporting_evidence(stmt)
+                    knowns[stmt.context.identifier] = n
+                    evcheck.append(n)
 
-        self.assertTrue(0 not in muscle_evcheck)
+        self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
 
     @unittest.expectedFailure
     def test_verify_connections_have_evidence(self):
@@ -52,7 +67,7 @@ class EvidenceCoverageTest(_DataTest):
         connections = list(net.synapses())
         evcheck = []
         for c in connections:
-            has_evidence = len(get_supporting_evidence(c))
+            has_evidence = len(self.get_supporting_evidence(c))
             evcheck.append(has_evidence)
 
         self.assertTrue(0 not in evcheck)
@@ -63,10 +78,9 @@ class EvidenceCoverageTest(_DataTest):
         supporting evidence. """
         pass
 
-
-def get_supporting_evidence(fact):
-    """ Helper function for checking amount of Evidence.
-    Returns list of Evidence supporting fact. """
-    ev = Evidence()
-    ev.asserts(fact)
-    return list(ev.load())
+    def get_supporting_evidence(self, stmt):
+        """ Helper function for checking amount of Evidence.
+        Returns list of Evidence supporting fact. """
+        ev = self.qctx(Evidence)()
+        ev.supports(stmt.context.rdf_object)
+        return ev.count()

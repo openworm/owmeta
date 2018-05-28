@@ -67,8 +67,9 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         ctx_uri = dct.get('class_context', None)
         if ctx_uri is None:
             for b in bases:
-                if hasattr(b, 'context') and b.context is not None:
-                    ctx_uri = b.context.identifier
+                pctx = getattr(b, 'definition_context', None)
+                if pctx is not None:
+                    ctx_uri = pctx.identifier
                     break
 
         return ctx_uri
@@ -95,11 +96,11 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
-            if self.context is None:
-                raise Exception("The class {0} has no context for TypeDataObject(ident={2})".format(
-                    self, self.context, self.rdf_type))
-            L.debug('Creating rdf_type_object for {} in {}'.format(self, self.context))
-            self.rdf_type_object = TypeDataObject.contextualize(self.context)(ident=self.rdf_type)
+            if self.definition_context is None:
+                raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
+                    self, self.rdf_type))
+            L.debug('Creating rdf_type_object for {} in {}'.format(self, self.definition_context))
+            self.rdf_type_object = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
         else:
             self.rdf_type_object = None
 
@@ -120,7 +121,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     @property
     def context(self):
-        return self.__context
+        return None
 
     @property
     def definition_context(self):
@@ -207,7 +208,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         self._variable = self.next_variable()
-        self.__conf = None
         BaseDataObject.attach_property(self, RDFTypeProperty)
         BaseDataObject.attach_property(self, RDFSCommentProperty)
         BaseDataObject.attach_property(self, RDFSLabelProperty)
@@ -220,9 +220,13 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     @property
     def conf(self):
         if self.context is None:
-            return self.__conf
+            return super(BaseDataObject, self).conf
         else:
             return self.context.conf
+
+    @conf.setter
+    def conf(self, conf):
+        super(BaseDataObject, self).conf = conf
 
     @property
     def rdf(self):
@@ -230,10 +234,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return self.context.rdf_graph()
         else:
             return self.conf.get('rdf.graph', None)
-
-    @conf.setter
-    def conf(self, conf):
-        self.__conf = conf
 
     @classmethod
     def next_variable(cls):
@@ -294,18 +294,14 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             super(BaseDataObject, self).__setattr__(name, val)
 
     def count(self):
-        return len(GraphObjectQuerier(self, self._graph(), parallel=False)())
-
-    def _graph(self):
-        return self.context.rdf_graph()
+        return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
     def load(self):
-        g = self._graph()
-        idents = GraphObjectQuerier(self, g, parallel=False)()
+        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
         if idents:
-            choices = g.triples_choices((list(idents),
-                                        R.RDF['type'],
-                                        None))
+            choices = self.rdf.triples_choices((list(idents),
+                                                R.RDF['type'],
+                                                None))
             grouped_type_triples = groupby(choices, lambda x: x[0])
             for ident, type_triples in grouped_type_triples:
                 types = set()
@@ -444,7 +440,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                          value_rdf_type=value_rdf_type,
                          value_type=value_type,
                          owner_type=owner_class,
-                         rdf_object=PropertyDataObject.contextualize(owner_class.context)(ident=link),
+                         rdf_object=PropertyDataObject.contextualize(owner_class.definition_context)(ident=link),
                          multiple=multiple)
 
             if _PropertyTypes_key in InverseProperties:
@@ -545,7 +541,13 @@ class DataObject(BaseDataObject):
     pass
 
 
-class DataObjectSingleton(BaseDataObject):
+class DataObjectSingletonMeta(type(BaseDataObject)):
+    @property
+    def context(self):
+        return self.definition_context
+
+
+class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataObject)):
     instance = None
     class_context = URIRef('http://openworm.org/schema')
 
@@ -553,9 +555,7 @@ class DataObjectSingleton(BaseDataObject):
         if self._gettingInstance:
             super(DataObjectSingleton, self).__init__(*args, **kwargs)
         else:
-            raise Exception(
-                "You must call getInstance to get " +
-                type(self).__name__)
+            raise Exception("You must call getInstance to get " + type(self).__name__)
 
     @classmethod
     def get_instance(cls, **kwargs):

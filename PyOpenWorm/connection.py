@@ -2,7 +2,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from random import random
 import six
 
 
@@ -111,7 +110,6 @@ class Connection(BiologyType):
     @property
     def identifier(self):
         the_id = None
-        r = random()
         if super(Connection, self).defined:
             the_id = super(Connection, self).identifier
         else:

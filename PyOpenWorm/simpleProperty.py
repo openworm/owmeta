@@ -16,6 +16,7 @@ from yarom.mapper import FCN
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
                                       contextualize_helper)
+from PyOpenWorm.context import Context
 from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
@@ -120,7 +121,8 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self.clear()
 
         stmt = self._insert_value(v)
-        self.context.add_statement(stmt)
+        if self.context is not None:
+            self.context.add_statement(stmt)
         return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
 
     def clear(self):
@@ -185,10 +187,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     def _ensure_fresh_po_cache(self):
         owner = self.owner
         ident = owner.identifier
-        try:
-            graph_index = self.conf['rdf.graph.change_counter']
-        except KeyError:
-            graph_index = None
+        graph_index = self.conf.get('rdf.graph.change_counter', None)
 
         if graph_index is None or owner.po_cache is None or owner.po_cache.cache_index != graph_index:
             owner.po_cache = POCache(graph_index, frozenset(self.rdf.predicate_objects(ident)))
@@ -217,6 +216,15 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         cls.rdf_type = cls.base_namespace[cls.__name__]
         cls.rdf_namespace = R.Namespace(cls.rdf_type + "/")
         return cls
+
+    @property
+    def defined_statements(self):
+        return tuple(x for x in self._v
+                     if x.object.defined and x.subject.defined)
+
+    @property
+    def statements(self):
+        return self.rdf.quads((self.owner.idl, self.link, None, None))
 
 
 class POCache(tuple):
@@ -296,6 +304,15 @@ class ObjectProperty (_ContextualizingPropertySetMixin,
         r = super(ObjectProperty, self).get()
         return itertools.chain(self.defined_values, r)
 
+    @property
+    def statements(self):
+        return itertools.chain(self.defined_statements,
+                               (Statement(self.owner,
+                                          self,
+                                          self.id2ob(x[2]),
+                                          Context(ident=x[3]))
+                                for x in super(ObjectProperty, self).statements))
+
 
 class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
 
@@ -309,6 +326,15 @@ class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimplePro
     def onedef(self):
         x = super(DatatypeProperty, self).onedef()
         return self.resolver.deserializer(x.identifier) if x is not None else x
+
+    @property
+    def statements(self):
+        return itertools.chain(self.defined_statements,
+                               (Statement(self.owner,
+                                          self,
+                                          self.resolver.deserializer(x[2]),
+                                          Context(ident=x[3]))
+                                for x in super(DatatypeProperty, self).statements))
 
 
 class UnionProperty(_ContextualizingPropertySetMixin,

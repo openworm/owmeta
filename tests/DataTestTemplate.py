@@ -49,10 +49,8 @@ class _DataTest(unittest.TestCase):
             else:
                 self.ctx = self.context({x.__name__: x for x in typ.ctx_classes})
 
-        def save():
-            self.context.save_context()
-
-        self.save = save
+    def save(self):
+        self.context.save_context()
 
     def tearDown(self):
         PyOpenWorm.disconnect()
