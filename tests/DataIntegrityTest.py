@@ -53,7 +53,7 @@ class DataIntegrityTest(unittest.TestCase):
         #        test_compare_to_xls fails. Other conditions may cause
         #        it to pass
         net = self.qctx(Worm)().get_neuron_network()
-        self.assertEqual(302, len(set(net.neuron_names())))
+        self.assertEqual(302, net.neuron.count())
 
     def test_correct_muscle_number(self):
         """
@@ -64,12 +64,7 @@ class DataIntegrityTest(unittest.TestCase):
             https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1
 
         """
-        muscles = self.qctx(Worm)().muscles()
-        i = 0
-        for m in muscles:
-            print(i, m)
-            i += 1
-        self.assertEqual(158, i)
+        self.assertEqual(158, self.qctx(Worm)().muscle.count())
 
     def test_INS_26_neuropeptide_neuron_list(self):
         """

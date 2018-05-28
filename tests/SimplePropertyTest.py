@@ -133,7 +133,7 @@ class POCacheTest(_DataTest):
 
     def test_cache_refresh_after_triple_add(self):
         o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        self.ctx.DataObject.DatatypeProperty("boots", o)
+        DataObject.DatatypeProperty("boots", o)
         o.boots()
         c1 = o.po_cache
         self.assertIsNotNone(c1)
@@ -145,7 +145,7 @@ class POCacheTest(_DataTest):
 
     def test_cache_no_refresh_for_no_change(self):
         o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        self.ctx.DataObject.DatatypeProperty("boots", o)
+        DataObject.DatatypeProperty("boots", o)
         o.boots()
         c1 = o.po_cache
         self.assertIsNotNone(c1)
@@ -154,7 +154,7 @@ class POCacheTest(_DataTest):
 
     def test_cache_refresh_after_triple_remove(self):
         o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        self.ctx.DataObject.DatatypeProperty("boots", o)
+        DataObject.DatatypeProperty("boots", o)
         o.boots()
         c1 = o.po_cache
         self.assertIsNotNone(c1)
@@ -168,7 +168,7 @@ class POCacheTest(_DataTest):
 
     def test_cache_refresh_clear(self):
         o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        self.ctx.DataObject.DatatypeProperty("boots", o)
+        DataObject.DatatypeProperty("boots", o)
         o.boots()
         c1 = o.po_cache
         self.assertIsNotNone(c1)
