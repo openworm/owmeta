@@ -16,6 +16,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
+from PyOpenWorm.context import Context
+from OpenWormData import BIO_ENT_NS
 import os
 print(os.getcwd())
 P.connect('default.conf')
@@ -28,7 +30,9 @@ def get_names(it):
     return res
 
 
-w = Worm()
+ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+
+w = ctx(Worm)()
 net = w.neuron_network()
 print("Retrieving names...")
 inter = get_names(net.interneurons())

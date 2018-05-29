@@ -32,12 +32,26 @@ class Overrider(object):
             self.i += 1
             try:
                 m = [None, None]
+                if len(args) > 4 and args[4]:
+                    depth = args[4]
+
+                    if args[1] is None:
+                        raise ImportError("No globals given to import to detect calling module for relative import")
+
+                    caller = args[1].get('__name__', None)
+
+                    if caller is None:
+                        raise ImportError("No calling module in import globals to resolve relative import")
+
+                    parent = caller.rsplit('.', depth)[0]
+                    module_name = parent + '.' + args[0]
+                else:
+                    module_name = args[0]
 
                 def cb():
                     if len(args) >= 3:
                         importer_locals = args[2]
                         if importer_locals is not None:
-                            module_name = args[0]
                             splits = module_name.split('.', 1)
                             if len(splits) == 2:
                                 first, rest = splits
@@ -51,13 +65,16 @@ class Overrider(object):
                                     return orig__import__(*new_args, **kwargs)
                     return orig__import__(*args, **kwargs)
 
+                def cb1():
+                    return orig__import__(*args, **kwargs)
+
                 def mb(mod):
                     if m[0] is not None:
                         return m[0](mod)
                     else:
                         return mod
 
-                return mb(self.mapper.process_module(module_name=args[0], cb=cb))
+                return mb(self.mapper.process_module(module_name=module_name, cb=cb))
             finally:
                 self.i -= 1
         self.import_wrapper = import_wrapper

@@ -1,12 +1,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import sys
-from six.moves import zip
 import unittest
 import neuroml
 import neuroml.writers as writers
 import PyOpenWorm
-import yarom
 import os
 
 from PyOpenWorm.data import DataUser
@@ -29,7 +27,7 @@ class CellTest(_DataTest):
         c = self.ctx.Cell(name="ADAL", conf=self.config)
         c.lineageName("AB plapaaaapp")
         self.save()
-        self.assertEqual("AB plapaaaapp", Cell(name="ADAL").lineageName())
+        self.assertEqual("AB plapaaaapp", self.ctx.Cell(name="ADAL").lineageName())
 
     def test_wormbaseID(self):
         """ Test that a Cell object has a wormbase ID """
@@ -74,46 +72,27 @@ class CellTest(_DataTest):
         c.lineageName("ab.tahsuetoahusenoatu")
         self.assertEqual(c.blast(), "ab")
 
-    def test_parentOf(self):
+    def test_daughterOf(self):
         """
-        Test that we can get the children of a cell
-        Tests for anterior, posterior, left, right, ventral, dorsal divisions
+        Test that we can get the daughterOf of a cell
         """
         p = self.ctx.Cell(name="peas")
-        base = 'ab.tahsuetoahusenoat'
-        p.lineageName(base)
+        c = self.ctx.Cell(name="carrots")
+        c.daughterOf(p)
         self.save()
+        parent_p = self.ctx.Cell(name='carrots').daughterOf().name()
+        self.assertEqual("peas", parent_p)
 
-        c = ["carrots",
-             "jam",
-             "peanuts",
-             "celery",
-             "tuna",
-             "chicken"]
-
-        division_directions = "alvpdr"
-
-        for x, l in zip(c, division_directions):
-            ln = base + l
-            self.ctx.Cell(name=x, lineageName=ln)
-        self.save()
-        names = set(str(x.name()) for x in p.parentOf())
-        self.assertEqual(set(c), names)
-
-    def test_daughterOf(self):
+    def test_daughterOf_inverse(self):
         """
         Test that we can get the parent of a cell
         """
-        base = "ab.tahsuetoahusenoat"
-        child = base + "u"
         p = self.ctx.Cell(name="peas")
-        p.lineageName(base)
-        self.save()
         c = self.ctx.Cell(name="carrots")
-        c.lineageName(child)
+        c.daughterOf(p)
         self.save()
-        parent_p = c.daughterOf().name()
-        self.assertEqual("peas", parent_p)
+        parent_p = set(x.name() for x in self.ctx.Cell(name='peas').parentOf())
+        self.assertIn("carrots", parent_p)
 
     @unittest.skip('Long runner')
     def test_morphology_is_NeuroML_morphology(self):
@@ -145,23 +124,6 @@ class CellTest(_DataTest):
         except Exception:
             self.fail("Should validate")
         sys.stdout = f
-
-    def test_loading_cells_retrieves_all_cells(self):
-        """
-        Test that retrieving all Cells gives us the right number of Cell
-        objects.
-        """
-        num_cells = len(list(Cell().load()))
-
-        m = list(Muscle().load())
-        num_muscles = len(m)
-
-        n = list(Neuron().load())
-        num_neurons = len(n)
-
-        sum_cells = num_neurons + num_muscles
-
-        self.assertEqual(sum_cells, num_cells)
 
     def test_str(self):
         self.assertEqual('cell_name', str(Cell('cell_name')))

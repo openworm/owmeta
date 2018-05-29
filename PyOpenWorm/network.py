@@ -20,7 +20,7 @@ class Network(BiologyType):
 
     class_context = BiologyType.class_context
 
-    def __init__(self, **kwargs):
+    def __init__(self, worm=None, **kwargs):
         super(Network, self).__init__(**kwargs)
         self.synapses = Network.ObjectProperty(
             'synapse',
@@ -39,6 +39,9 @@ class Network(BiologyType):
             value_type=Worm,
             multiple=False)
 
+        if worm is not None:
+            self.worm(worm)
+
     def neuron_names(self):
         """
         Gets the complete set of neurons' names in this network.
@@ -55,11 +58,7 @@ class Network(BiologyType):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        n = Neuron()
-        self.neuron.set(n)
-        res = n.name.get()
-        self.neuron.unset(n)
-        return res
+        return set(x.name() for x in self.neuron())
 
     def aneuron(self, name):
         """
@@ -81,8 +80,7 @@ class Network(BiologyType):
         :returns: Neuron corresponding to the name given
         :rtype: PyOpenWorm.neuron.Neuron
         """
-        n = Neuron(name=name, conf=self.conf)
-        return n
+        return Neuron.contextualize(self.context)(name=name, conf=self.conf)
 
     def _synapses_csv(self):
         """
@@ -111,7 +109,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('sensory')
 
         self.neuron.set(n)
@@ -127,7 +125,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('interneuron')
 
         self.neuron.set(n)
@@ -143,7 +141,7 @@ class Network(BiologyType):
         :rtype: iter(Neuron)
         """
 
-        n = Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('motor')
 
         self.neuron.set(n)

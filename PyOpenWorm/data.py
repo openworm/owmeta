@@ -1,10 +1,8 @@
 from __future__ import print_function
 import sqlite3
-import networkx as nx
 import PyOpenWorm
 from PyOpenWorm import Configureable, Configure, ConfigValue
 import hashlib
-import csv
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
@@ -29,20 +27,28 @@ __all__ = [
 L = logging.getLogger(__name__)
 
 
+_B_UNSET = object()
+
+
 class _B(ConfigValue):
 
     def __init__(self, f):
-        self.v = False
+        self.v = _B_UNSET
         self.f = f
 
     def get(self):
-        if not self.v:
+        if self.v is _B_UNSET:
             self.v = self.f()
 
         return self.v
 
     def invalidate(self):
-        self.v = False
+        self.v = None
+
+    def __repr__(self):
+        if self.v is _B_UNSET:
+            return 'Thunk of ' + repr(self.f)
+        return repr(self.v)
 
 
 ZERO = datetime.timedelta(0)
@@ -72,13 +78,19 @@ class DataUser(Configureable):
     Classes which use the database should inherit from DataUser.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(DataUser, self).__init__(*args, **kwargs)
+        self.__base_namespace = None
+
     @property
     def base_namespace(self):
+        if self.__base_namespace is not None:
+            return self.__base_namespace
         return self.conf['rdf.namespace']
 
     @base_namespace.setter
-    def base_namespace_set(self, value):
-        self.conf['rdf.namespace'] = value
+    def base_namespace(self, value):
+        self.__base_namespace = value
 
     @property
     def rdf(self):
@@ -87,10 +99,6 @@ class DataUser(Configureable):
     @property
     def namespace_manager(self):
         return self.conf.get('rdf.namespace_manager', None)
-
-    @rdf.setter
-    def rdf(self, value):
-        self.conf['rdf.graph'] = value
 
     def _remove_from_store(self, g):
         # Note the assymetry with _add_to_store. You must add actual elements, but deletes
@@ -208,7 +216,7 @@ class DataUser(Configureable):
         return n
 
 
-class Data(Configureable, Configure):
+class Data(Configure):
 
     """
     Provides configuration for access to the database.
@@ -223,27 +231,34 @@ class Data(Configureable, Configure):
         conf : Configure
             A Configure object
         """
-
         super(Data, self).__init__(**kwargs)
-        if conf:
+
+        if conf is not None:
             self.copy(conf)
         else:
             self.copy(Configureable.default)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
-        self['nx'] = _B(self._init_networkX)
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
 
     @classmethod
+    def load(cls, file_name):
+        """ Load a file into a new Data instance storing configuration in a JSON format """
+        return cls.open(file_name)
+
+    @classmethod
     def open(cls, file_name):
-        """ Open a file storing configuration in a JSON format """
-        Configureable.default = Configure.open(file_name)
-        return cls()
+        """ Load a file into a new Data instance storing configuration in a JSON format """
+        # Configureable.default = Configure.open(file_name)
+        return cls(conf=Configure.open(file_name))
 
     def openDatabase(self):
-        """ Open a the configured database """
+        self.init_database()
+
+    def init_database(self):
+        """ Open the configured database """
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
         self.source.open()
@@ -281,10 +296,9 @@ class Data(Configureable, Configure):
 
     def _init_rdf_graph(self):
         # Set these in case they were left out
-        c = self.conf
-        self['rdf.source'] = c.get('rdf.source', 'default')
-        self['rdf.store'] = c.get('rdf.store', 'default')
-        self['rdf.store_conf'] = c.get('rdf.store_conf', 'default')
+        self['rdf.source'] = self.get('rdf.source', 'default')
+        self['rdf.store'] = self.get('rdf.store', 'default')
+        self['rdf.store_conf'] = self.get('rdf.store_conf', 'default')
 
         # XXX:The conf=self can probably be removed
         self.sources = {'sqlite': SQLiteSource,
@@ -294,7 +308,7 @@ class Data(Configureable, Configure):
                         'trix': TrixSource,
                         'serialization': SerializationSource,
                         'zodb': ZODBSource}
-        source = self.sources[self['rdf.source'].lower()]()
+        source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
 
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
@@ -306,38 +320,6 @@ class Data(Configureable, Configure):
             self.molecule_namespace[
                 hashlib.sha224(
                     str(data)).hexdigest()])
-
-    def _init_networkX(self):
-        g = nx.DiGraph()
-
-        # Neuron table
-        csvfile = open(self.conf['neuronscsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            neurontype = ""
-            # Detects neuron function
-            if "sensory" in row[1].lower():
-                neurontype += "sensory"
-            if "motor" in row[1].lower():
-                neurontype += "motor"
-            if "interneuron" in row[1].lower():
-                neurontype += "interneuron"
-            if len(neurontype) == 0:
-                neurontype = "unknown"
-
-            if len(row[0]) > 0:  # Only saves valid neuron names
-                g.add_node(row[0], ntype=neurontype)
-
-        # Connectome table
-        csvfile = open(self.conf['connectomecsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            g.add_edge(row[0], row[1], weight=row[3])
-            g[row[0]][row[1]]['synapse'] = row[2]
-            g[row[0]][row[1]]['neurotransmitter'] = row[4]
-        return g
 
     def __setitem__(self, k, v):
         return Configure.__setitem__(self, k, v)

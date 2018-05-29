@@ -79,7 +79,7 @@ by members of the OpenWorm project that has since been retired. The history of t
 mostly contained in
 `this forum post <https://groups.google.com/forum/#!topic/openworm-discuss/G9wKoR8N-l0/discussion>`_
 We decided to use the Emmons data set [3]_ as the authoritative source
-for connectome data, as it is the very latest version and updated version of the C. elegans connectome that we are familiar with.
+for connectome data, as it is the very latest version and updated version of the C. *elegans* connectome that we are familiar with.
 
 ----------
 

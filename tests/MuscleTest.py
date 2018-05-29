@@ -18,7 +18,7 @@ class MuscleTest(_DataTest):
         n = self.ctx.Neuron('some neuron')
         m.innervatedBy(n)
         self.save()
-        v = Muscle(name='MDL08')
+        v = self.ctx.Muscle(name='MDL08')
         self.assertIn(n, list(v.innervatedBy()))
 
     def test_muscle_neurons(self):
@@ -28,5 +28,5 @@ class MuscleTest(_DataTest):
         m.neurons(neu)
         self.save()
 
-        m = Muscle(name='MDL08')
-        self.assertIn(Neuron('tnnetenba'), list(m.neurons()))
+        m = self.ctx.Muscle(name='MDL08')
+        self.assertIn(self.ctx.Neuron('tnnetenba'), list(m.neurons()))

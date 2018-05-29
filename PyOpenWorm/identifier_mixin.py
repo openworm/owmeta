@@ -31,6 +31,9 @@ def IdMixin(typ=object, hashfunc=None):
 
             def __init__(self, ident=None, key=None, *args, **kwargs):
                 super(_IdMixin, self).__init__(*args, **kwargs)
+                if key is not None and ident is not None:
+                    raise Exception("Only one of 'key' or 'ident' can be given to Context")
+
                 if ident is not None:
                     self._id = URIRef(ident)
                 else:

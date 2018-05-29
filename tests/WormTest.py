@@ -15,7 +15,8 @@ class WormTest(_DataTest):
         w = self.ctx.Worm()
         w.neuron_network(self.ctx.Network())
         self.save()
-        self.assertIsInstance(Worm().get_neuron_network(), Network)
+        nn = self.ctx.Worm().neuron_network()
+        self.assertIsInstance(nn, Network)
 
     def test_muscles1(self):
         w = self.ctx.Worm()
@@ -26,5 +27,5 @@ class WormTest(_DataTest):
         self.assertIn(self.ctx.Muscle(name='MDL15'), list(self.ctx.Worm().muscles()))
 
     def test_get_semantic_net(self):
-        g0 = Worm().get_semantic_net()
+        g0 = self.ctx.Worm().get_semantic_net()
         self.assertTrue(isinstance(g0, R.ConjunctiveGraph))

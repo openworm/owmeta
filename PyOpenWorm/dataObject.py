@@ -2,7 +2,6 @@ from __future__ import print_function
 from functools import partial
 import rdflib as R
 from rdflib.term import URIRef
-import random as RND
 import logging
 from itertools import groupby
 import six
@@ -12,7 +11,8 @@ import PyOpenWorm
 from PyOpenWorm.contextualize import (Contextualizable,
                                       ContextualizableClass,
                                       contextualize_metaclass,
-                                      contextualize_helper)
+                                      contextualize_helper,
+                                      decontextualize_helper)
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -67,8 +67,9 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         ctx_uri = dct.get('class_context', None)
         if ctx_uri is None:
             for b in bases:
-                if hasattr(b, 'context') and b.context is not None:
-                    ctx_uri = b.context.identifier
+                pctx = getattr(b, 'definition_context', None)
+                if pctx is not None:
+                    ctx_uri = pctx.identifier
                     break
 
         return ctx_uri
@@ -95,11 +96,11 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     def after_mapper_module_load(self, mapper):
         if self is not TypeDataObject:
-            if self.context is None:
-                raise Exception("The class {0} has no context for TypeDataObject(ident={2})".format(
-                    self, self.context, self.rdf_type))
-            L.debug('Creating rdf_type_object for {} in {}'.format(self, self.context))
-            self.rdf_type_object = TypeDataObject.contextualize(self.context)(ident=self.rdf_type)
+            if self.definition_context is None:
+                raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
+                    self, self.rdf_type))
+            L.debug('Creating rdf_type_object for {} in {}'.format(self, self.definition_context))
+            self.rdf_type_object = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
         else:
             self.rdf_type_object = None
 
@@ -120,7 +121,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     @property
     def context(self):
-        return self.__context
+        return None
 
     @property
     def definition_context(self):
@@ -149,7 +150,12 @@ class ContextualizableList(Contextualizable, list):
 
     def contextualize(self, context):
         res = type(self)(context=context)
-        res += type(self)(x.contextualize(context) for x in self)
+        res += list(x.contextualize(context) for x in self)
+        return res
+
+    def decontextualize(self):
+        res = type(self)()
+        res += list(x.decontextualize() for x in self)
         return res
 
 
@@ -197,6 +203,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         super(BaseDataObject, self).__init__(**kwargs)
         self.properties = ContextualizableList(context=self.context)
         self.owner_properties = []
+
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
@@ -209,6 +216,24 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         if rdfs_label:
             self.rdfs_label = rdfs_label
+
+    @property
+    def conf(self):
+        if self.context is None:
+            return super(BaseDataObject, self).conf
+        else:
+            return self.context.conf
+
+    @conf.setter
+    def conf(self, conf):
+        super(BaseDataObject, self).conf = conf
+
+    @property
+    def rdf(self):
+        if self.context is not None:
+            return self.context.rdf_graph()
+        else:
+            return self.conf.get('rdf.graph', None)
 
     @classmethod
     def next_variable(cls):
@@ -277,14 +302,13 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             choices = self.rdf.triples_choices((list(idents),
                                                 R.RDF['type'],
                                                 None))
-            grouped_type_triples = groupby(choices,
-                                           lambda x: x[0])
+            grouped_type_triples = groupby(choices, lambda x: x[0])
             for ident, type_triples in grouped_type_triples:
                 types = set()
                 for __, __, rdf_type in type_triples:
                     types.add(rdf_type)
                 the_type = get_most_specific_rdf_type(types)
-                yield oid(ident, the_type)
+                yield oid(ident, the_type, self.context)
         else:
             return
 
@@ -416,7 +440,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                          value_rdf_type=value_rdf_type,
                          value_type=value_type,
                          owner_type=owner_class,
-                         rdf_object=PropertyDataObject.contextualize(owner_class.context)(ident=link),
+                         rdf_object=PropertyDataObject.contextualize(owner_class.definition_context)(ident=link),
                          multiple=multiple)
 
             if _PropertyTypes_key in InverseProperties:
@@ -441,6 +465,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             c = type(property_class_name,
                      tuple(classes),
                      props)
+            c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
         return cls.attach_property(owner, c)
@@ -494,6 +519,17 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             rdf_type = URIRef(rdf_type)
             return oid(identifier_or_rdf_type, rdf_type)
 
+    def decontextualize(self):
+        if self.context is None:
+            return self
+        res = decontextualize_helper(self)
+        if self is not res:
+            cprop = res.properties.decontextualize()
+            res.add_attr_override('properties', cprop)
+            for p in cprop:
+                res.add_attr_override(p.linkName, p)
+        return res
+
     def contextualize_augment(self, context):
         if context is not None:
             return contextualized_data_object(context, self)
@@ -505,7 +541,13 @@ class DataObject(BaseDataObject):
     pass
 
 
-class DataObjectSingleton(BaseDataObject):
+class DataObjectSingletonMeta(type(BaseDataObject)):
+    @property
+    def context(self):
+        return self.definition_context
+
+
+class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataObject)):
     instance = None
     class_context = URIRef('http://openworm.org/schema')
 
@@ -513,9 +555,7 @@ class DataObjectSingleton(BaseDataObject):
         if self._gettingInstance:
             super(DataObjectSingleton, self).__init__(*args, **kwargs)
         else:
-            raise Exception(
-                "You must call getInstance to get " +
-                type(self).__name__)
+            raise Exception("You must call getInstance to get " + type(self).__name__)
 
     @classmethod
     def get_instance(cls, **kwargs):
@@ -578,7 +618,7 @@ class RDFProperty(DataObjectSingleton):
                                           **kwargs)
 
 
-def oid(identifier_or_rdf_type, rdf_type=None):
+def oid(identifier_or_rdf_type, rdf_type=None, context=None):
     """ Create an object from its rdf type
 
     Parameters
@@ -612,6 +652,8 @@ def oid(identifier_or_rdf_type, rdf_type=None):
     # if its our class name, then make our own object
     # if there's a part after that, that's the property name
     o = None
+    if context is not None:
+        c = context(c)
     if identifier is not None:
         o = c(ident=identifier)
     else:
@@ -742,7 +784,8 @@ class _InversePropertyMixin(object):
     def set(self, other):
         assert isinstance(other, self.rhs_class)
         rhs_prop = getattr(other, self.rhs_linkName)
-        super(_InversePropertyMixin, rhs_prop).set(self.owner)
+        ctxd_rhs_prop = rhs_prop.contextualize(self.context)
+        super(_InversePropertyMixin, ctxd_rhs_prop).set(self.owner)
         return super(_InversePropertyMixin, self).set(other)
 
     def unset(self, other):

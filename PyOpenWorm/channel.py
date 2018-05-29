@@ -1,69 +1,7 @@
 import rdflib as R
-from .pProperty import Property
-import PyOpenWorm
 
 from PyOpenWorm.channelworm import ChannelModel
 from PyOpenWorm.biology import BiologyType
-
-
-# XXX: Why is this not an ObjectProperty?
-class Models(Property):
-    multiple = True
-
-    def __init__(self, **kwargs):
-        super(Models, self).__init__('models', **kwargs)
-        self._models = []
-
-    def get(self, **kwargs):
-        """
-        Get a list of models for this channel
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        set of ChannelModel
-        """
-
-        if len(self._models) > 0:
-            for m in self._models:
-                yield m
-        else:
-            # make a dummy ChannelModel so we can load from db to memory
-            c = ChannelModel()
-            for m in c.load():
-                self._models.append(m)
-            # call `get()` again to yield ChannelModels the user asked for
-            if len(self._models) > 0:
-                self.get()
-
-    @property
-    def values(self):
-        return self._models
-
-    def set(self, m, **kwargs):
-        """
-        Add a model to this Channel
-
-        Parameters
-        ----------
-        m : ChannelModel
-            The model to be added (instance of ChannelModel class)
-
-        Returns
-        -------
-        The ChannelModel being inserted (this is a side-effect)
-        """
-
-        self._models.append(m)
-        return m
-
-    def triples(self, **kwargs):
-        for c in self._models:
-            for x in c.triples(**kwargs):
-                yield x
 
 
 class Channel(BiologyType):
@@ -96,8 +34,7 @@ class Channel(BiologyType):
 
     def __init__(self, name=False, **kwargs):
         super(Channel, self).__init__(**kwargs)
-        # Get Models of this Channel
-        Models(owner=self)
+        from PyOpenWorm.cell import Cell
         Channel.DatatypeProperty('subfamily', owner=self)
         Channel.DatatypeProperty('description', owner=self)
         Channel.DatatypeProperty('name', self)
@@ -111,7 +48,8 @@ class Channel(BiologyType):
         Channel.DatatypeProperty('neuroML_file', owner=self)
         Channel.DatatypeProperty('proteins', self, multiple=True)
         Channel.ObjectProperty('appearsIn', self, multiple=True,
-                               value_type=PyOpenWorm.cell.Cell)
+                               value_type=Cell)
+        self.model = Channel.ObjectProperty(value_type=ChannelModel)
         # TODO: assert this in the adapter instead
         # Channel.DatatypeProperty('description_evidences', self)
         # TODO: assert this in the adapter instead

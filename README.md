@@ -40,14 +40,19 @@ subdirectory. You can read it in by doing:
 Then you can try out a few things:
 
 ```python
+# Make the context
+>>> from PyOpenWorm.context import Context
+>>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data')
 
 # Grabs the representation of the neuronal network
->>> net = P.Worm().get_neuron_network()
+>>> from PyOpenWorm.worm import Worm
+>>> net = ctx.stored(Worm)().neuron_network()
 
 # Grab a specific neuron
->>> aval = net.aneuron('AVAL')
+>>> from PyOpenWorm.neuron import Neuron
+>>> aval = ctx.stored(Neuron)(name='AVAL')
 
->>> list(aval.type())[0]
+>>> aval.type.one()
 'interneuron'
 
 #show how many connections go out of AVAL
@@ -113,7 +118,7 @@ Returns information about individual neurons::
 ['GGR-3', 'GLR-1', ... 'NPR-4', 'UNC-8']
 
 #show how many chemical synapses go in and out of AVAL
->>> aval.Syn_degree()
+>>> aval.connection.count('either', syntype='send')
 105
 
 ```
@@ -132,7 +137,7 @@ Returns the list of all neurons::
 Returns a set of all muscles::
 
 ```python
->>> muscles = P.Worm().muscles()
+>>> muscles = ctx.stored(Worm)().muscles()
 >>> len(muscles)
 158
 
@@ -141,29 +146,36 @@ Returns a set of all muscles::
 Add some evidence::
 
 ```python
->>> e = P.Evidence(key="Sulston83", author='Sulston et al.', date='1983')
->>> avdl = P.Neuron(name="AVDL")
+>>> from PyOpenWorm.document import Document
+>>> from PyOpenWorm.evidence import Evidence
+
+# Make a context for evidence (i.e., statements about other groups of statements)
+>>> evctx = Context(ident='http://example.org/evidence/context')
+
+# Make a context for defining domain knowledge
+>>> dctx = Context(ident='http://example.org/data/context')
+>>> doc = evctx(Document)(key="Sulston83", author='Sulston et al.', date='1983')
+>>> e = evctx(Evidence)(key="Sulston83", reference=doc)
+>>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'), p=rdflib.term.URIRef('http://openworm.org/entities/Cell/lineageName'), o=rdflib.term.Literal('AB alaaapalr'))
->>> e.asserts(avdl)
-Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))
->>> e.asserts(avdl.lineageName("AB alaaapalr"))
-Relationship(s=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'), p=rdflib.term.URIRef('http://openworm.org/entities/Evidence/asserts'), o=rdflib.term.URIRef('http://openworm.org/entities/Relationship/ad1bb78ba8307e126ff62a44d9999104e'))
->>> e.save()
+PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+
+>>> e.supports(dctx.rdf_object)
+PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+
+>>> dctx.save_context()
+>>> evctx.save_context()
 
 ```
 
 See what some evidence stated::
 ```python
->>> e0 = P.Evidence(author='Sulston et al.', date='1983')
->>> assertions = e0.asserts()
+>>> doc = evctx.stored(Document)(author='Sulston et al.', date='1983')
+>>> e0 = evctx.stored(Evidence)(reference=doc)
+>>> supported_ctx = e0.supports()
 
 # is the neuron's presence asserted?
->>> avdl in list(e0.asserts())
-True
-
-# is the lineageName of the neuron asserted?
->>> avdl.lineageName("AB alaaapalr") in list(e0.asserts())
+>>> dctx.identifier == supported_ctx.identifier
 True
 
 ```
@@ -172,17 +184,24 @@ For most types (i.e., subclasses of `P.DataObject`) that do not have required
 initialization arguments, you can load all members of that type by making an
 object of that type and calling `load()`::
 ```python
->>> neurons = list(P.Neuron().load())
->>> len(neurons)
+>>> from PyOpenWorm.network import Network
+>>> with ctx.stored(Worm, Neuron, Network) as cctx:
+...     w = cctx.Worm()
+...     net = cctx.Network()
+...     w.neuron_network(net)
+PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+
+...     neur = cctx.Neuron()
+...     neur.count()
 302
 
 ```
 
 See what neurons express some neuropeptide::
 ```python
->>> n = P.Neuron()
+>>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
-Relationship(p=rdflib.term.URIRef('http://openworm.org/entities/Neuron/neuropeptide'), o=rdflib.term.Literal('INS-26'))
+PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
 
 >>> sorted(x.name() for x in n.load())
 ['ASEL', 'ASER', 'ASIL', 'ASIR']
@@ -196,14 +215,6 @@ Get direct access to the RDFLib graph::
 
 ```
 
-Returns the C. elegans connectome represented as a [NetworkX](http://networkx.github.io/documentation/latest/) graph::
-
-```python
->>> net.as_networkx()
-<networkx.classes.digraph.DiGraph object at ...>
-
-```
-
 Modelling data
 --------------
 
@@ -214,7 +225,7 @@ Retrieve an ion channel's models from the database::
 
 ```python
 # Get data for a subtype of voltage-gated potassium channels
->> kv1 = P.IonChannel('Kv1')
+>> kv1 = ctx(IonChannel)('Kv1')
 >> mods = list(kv1.models.get())
 
 ```

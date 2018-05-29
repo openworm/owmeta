@@ -64,6 +64,8 @@ __author__ = 'Stephen Larson'
 import sys
 import os
 
+BASE_SCHEMA_URL = 'http://openworm.org/schema'
+
 # The c extensions are incompatible with our code...
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 
@@ -92,7 +94,6 @@ __all__ = [
 # context automatically
 mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
                                   'PyOpenWorm.simpleProperty.RealSimpleProperty'))
-BASE_SCHEMA_URL = 'http://openworm.org/schema'
 # An "empty" context, that serves as the default when no context is defined
 DEF_CTX = Context(mapper=mapper)
 
@@ -264,8 +265,8 @@ def connect(configFile=False,
 
     Configureable.default = conf
     conf.openDatabase()
-    logging.info("Connected to database")
-    # have to register the right one to disconnect...
+    logging.getLogger('PyOpenWorm').info("Connected to database")
+
     atexit.register(disconnect)
 
     m.connected = True

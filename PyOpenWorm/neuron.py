@@ -218,16 +218,19 @@ class ConnectionProperty(Property):
     def __init__(self, **kwargs):
         super(ConnectionProperty, self).__init__('connection', **kwargs)
         self._conns = []
-        self._conntype = Connection
+        self._conntype = Connection.contextualize(self.owner.context)
 
     def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
            ----------
-           type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           pre_post_or_either: str
+               What kind of connection to look for.
+               'pre': Owner is the source of the connection
+               'post': Owner is the destination of the connection
+               'either': Owner is either the source or destination of the connection
+
            Returns
            -------
            list of Connection
@@ -240,6 +243,7 @@ class ConnectionProperty(Property):
         elif pre_post_or_either == 'either':
             c.append(self._conntype(pre_cell=self.owner, **kwargs))
             c.append(self._conntype(post_cell=self.owner, **kwargs))
+
         for x in c:
             for r in x.load():
                 yield r
@@ -248,54 +252,18 @@ class ConnectionProperty(Property):
     def values(self):
         return []
 
-    def count(self, pre_post_or_either='pre', syntype=None, *args, **kwargs):
-        """Get a list of connections associated with the owning neuron.
+    def count(self, pre_post_or_either='pre', *args, **kwargs):
+        c = []
+        conntype = self._conntype.contextualize(self.context)
+        if pre_post_or_either == 'pre':
+            c.append(conntype(pre_cell=self.owner, **kwargs))
+        elif pre_post_or_either == 'post':
+            c.append(conntype(post_cell=self.owner, **kwargs))
+        elif pre_post_or_either == 'either':
+            c.append(conntype(pre_cell=self.owner, **kwargs))
+            c.append(conntype(post_cell=self.owner, **kwargs))
 
-           Parameters
-           ----------
-           See parameters for PyOpenWorm.connection.Connection
-
-           Returns
-           -------
-           int
-               The number of connections matching the paramters given
-        """
-        options = dict()
-        options["pre"] = """
-                     ?x c:pre_cell <%s> .
-                     """ % self.owner.identifier
-        options["post"] = """
-                      ?x c:post_cell <%s> .
-                      """ % self.owner.identifier
-        options["either"] = " { %s } UNION { %s } . " % (
-            options['post'],
-            options['pre'])
-
-        if syntype is not None:
-            if syntype.lower() == 'gapjunction':
-                syntype = 'gapJunction'
-            syntype_pattern = \
-                "FILTER( EXISTS {" \
-                "?x c:syntype  \"" + syntype + \
-                "\" . }) ."
-        else:
-            syntype_pattern = ''
-
-        q = """
-        prefix ow: <http://openworm.org/entities/>
-        prefix c: <http://openworm.org/entities/Connection/>
-        prefix sp: <http://openworm.org/entities/SimpleProperty/>
-        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        SELECT (COUNT(?x) as ?count) WHERE {
-         %s
-         %s
-        }
-        """ % (options[pre_post_or_either], syntype_pattern)
-
-        res = 0
-        for x in self.conf['rdf.graph'].query(q):
-            res = x['count']
-        return int(res)
+        return sum(x.count() for x in c)
 
     def set(self, conn, **kwargs):
         """Add a connection associated with the owner Neuron

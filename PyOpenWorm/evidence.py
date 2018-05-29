@@ -2,7 +2,7 @@ import logging
 
 from PyOpenWorm.dataObject import DataObject
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class EvidenceError(Exception):

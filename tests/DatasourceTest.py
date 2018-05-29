@@ -59,11 +59,11 @@ class DataSourceTest(unittest.TestCase):
         self.assertNotEqual(self.DS1.info_fields, self.DS2.info_fields)
 
     def test_subclass_class_info_fields_2(self):
-        self.assertEqual(len(self.DS1.info_fields), 3,
+        self.assertEqual(len(self.DS1.info_fields), 4,
                          msg='should have translation, source, and "a"')
 
     def test_subclass_class_info_fields_3(self):
-        self.assertEqual(len(self.DS2.info_fields), 4,
+        self.assertEqual(len(self.DS2.info_fields), 5,
                          msg='should have translation, source, and "a" and "b"')
 
     def test_also(self):
