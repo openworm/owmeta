@@ -160,6 +160,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                            CONTEXT_IMPORTS,
                            ctx.identifier))
                 ctx.save_imports(graph)
+        return graph
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
         self.tripcnt = 0
