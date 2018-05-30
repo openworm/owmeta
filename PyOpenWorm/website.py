@@ -1,40 +1,19 @@
 from .document import BaseDocument
+from .dataObject import DatatypeProperty
 
 
 class Website(BaseDocument):
 
-    """
-    A representation of website
+    """ A representation of a website """
 
-    Attributes
-    ----------
-    url : DatatypeProperty
-        A URL for the website
-    title : DatatypeProperty
-        The official name for the website
-    """
-    def __init__(
-            self,
-            url=None,
-            title=None,
-            **kwargs):
-        """
-        Parameters
-        ----------
-        url : str
-            A URL for the website
-        title : str
-            The official name for the website
-        """
-        super(Website, self).__init__(rdfs_comment=title, **kwargs)
-        Website.DatatypeProperty('url', owner=self)
-        Website.DatatypeProperty('title', owner=self)
+    url = DatatypeProperty()
+    ''' A URL for the website '''
 
-        if url:
-            self.url(url)
+    title = DatatypeProperty()
+    ''' The official name for the website '''
 
-        if title:
-            self.title(title)
+    def __init__(self, title=None, **kwargs):
+        super(Website, self).__init__(rdfs_comment=title, title=title, **kwargs)
 
     def defined_augment(self):
         return self.url.has_defined_value()

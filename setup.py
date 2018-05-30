@@ -2,6 +2,8 @@
 #
 
 from setuptools import setup
+import distutils.cmd
+import distutils.log
 import os
 import sys
 
@@ -55,20 +57,23 @@ setup(
         'bibtexparser==1.0.1',
         'BTrees==4.0.8',
         'decorator==3.4.0',
+        'gitpython>=2.1.1',
         'html5lib==0.999',
         'isodate==0.5.0',
+        'lazy-object-proxy==1.2.1',
         'libneuroml',
         'networkx==1.9',
-        'numpydoc==0.5',
+        'numpydoc>=0.7.0',
         'persistent==4.0.8',
         'Pint',
-        'pyparsing==2.2.0',
-        'rdflib==4.1.2',
         'pow-store-zodb==0.0.3',
+        'pyparsing==2.2.0',
+        'rdflib>=4.1.2',
         'requests',
         'six==1.10.0',
         'SPARQLWrapper==1.6.2',
         'transaction==1.4.4',
+        'wrapt==1.10.11',
         'xlrd',
         'yarom',
         'zc.lockfile==1.1.0',
@@ -76,8 +81,6 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-        'lazy-object-proxy==1.2.1',
-        'wrapt==1.10.11'
     ] + (['zodbpickle==1.0'] if PY2 else []),
     dependency_links=[
         'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',

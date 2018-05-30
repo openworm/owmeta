@@ -1,11 +1,15 @@
-from PyOpenWorm import DataUser,Neuron,Network
+from PyOpenWorm.neuron import Neuron
+
+from PyOpenWorm.data import DataUser
 import neuroml as N
+
 
 class NeuroML(DataUser):
     @classmethod
     def generate(cls, o, t=2):
         """
-        Get a NeuroML object that represents the given object. The ``type`` determines what content is included in the NeuroML object:
+        Get a NeuroML object that represents the given object. The ``type``
+        determines what content is included in the NeuroML object:
 
         :param o: The object to generate neuroml from
         :param t: The what kind of content should be included in the document
@@ -15,7 +19,7 @@ class NeuroML(DataUser):
         :returns: A NeuroML object that represents the given object.
         :rtype: NeuroMLDocument
         """
-        if isinstance(o,Neuron):
+        if isinstance(o, Neuron):
             # read in the morphology data
             d = N.NeuroMLDocument(id=o.name())
             c = N.Cell(id=o.name())
@@ -32,7 +36,8 @@ class NeuroML(DataUser):
         :param o: The NeuroMLDocument to write
         :param n: The name of the file to write to
         """
-        N.writers.NeuroMLWriter.write(o, nml_file)
+        N.writers.NeuroMLWriter.write(o, n)
+
     @classmethod
     def validate(cls, o):
         pass

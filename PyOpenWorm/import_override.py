@@ -80,6 +80,21 @@ class Overrider(object):
         self.import_wrapper = import_wrapper
         self.wrapped = None
 
+    def install_excepthook(self):
+        import traceback
+        import sys
+
+        def filtering_except_hook(type, value, tb):
+            s = ['Traceback (most recent call last, import_override removed):\n']
+            s += traceback.format_list([x for x in traceback.extract_tb(tb)
+                                        if x[2] != 'process_module' and
+                                        not x[0].endswith('PyOpenWorm/import_override.py') and
+                                        not (x[0].endswith('wrapt/wrappers.py') and x[2] == '__call__')])
+            s += traceback.format_exception_only(type, value)
+            for l in s:
+                six.print_(l, file=sys.stderr, end='')
+        sys.excepthook = filtering_except_hook
+
     def wrap_import(self):
         builtins = six.moves.builtins
         if self.wrapped is None:

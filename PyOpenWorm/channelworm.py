@@ -1,7 +1,8 @@
 from yarom.utils import slice_dict
 
 from .experiment import Experiment
-from .dataObject import DataObject
+from .dataObject import DataObject, DatatypeProperty, ObjectProperty
+from .channel_common import CHANNEL_RDF_TYPE
 
 
 class PatchClampExperiment(Experiment):
@@ -104,25 +105,6 @@ class ChannelModel(DataObject):
 
     There may be multiple models for a single channel.
 
-    Parameters
-    ----------
-    modelType : DatatypeProperty
-        What this model is based on (either "homology" or "patch-clamp")
-
-    Attributes
-    ----------
-    modelType : DatatypeProperty
-        Passed in on construction
-    ion : DatatypeProperty
-        The type of ion this channel selects for
-    gating : DatatypeProperty
-        The gating mechanism for this channel ("voltage" or name of ligand(s) )
-    references : Property
-        Evidence for this model. May be either Experiment or Evidence object(s).
-    conductance : DatatypeProperty
-        The conductance of this ion channel. This is the initial value, and
-        should be entered as a Quantity object.
-
     Example usage::
 
         # Create a ChannelModel
@@ -135,12 +117,20 @@ class ChannelModel(DataObject):
     """
     class_context = 'http://openworm.org/schema/sci/bio'
 
-    def __init__(self, modelType=False, *args, **kwargs):
+    modelType = DatatypeProperty()
+    ''' The type of model employed to describe a channel '''
+
+    ion = DatatypeProperty(multiple=True)
+    ''' The type of ion this channel selects for '''
+
+    gating = DatatypeProperty(multiple=True)
+    ''' The gating mechanism for this channel ("voltage" or name of ligand(s) ) '''
+
+    conductance = DatatypeProperty()
+    ''' The conductance of this ion channel. This is the initial value, and should be entered as a Quantity object. '''
+
+    def __init__(self, modelType=None, *args, **kwargs):
         super(ChannelModel, self).__init__(*args, **kwargs)
-        ChannelModel.DatatypeProperty('modelType', self)
-        ChannelModel.DatatypeProperty('ion', self, multiple=True)
-        ChannelModel.DatatypeProperty('gating', self, multiple=True)
-        ChannelModel.DatatypeProperty('conductance', self)
 
         #Change modelType value to something from ChannelModelType class on init
         if (isinstance(modelType, str)):
@@ -152,18 +142,21 @@ class ChannelModel(DataObject):
 
 
 class PatchClampChannelModel(ChannelModel):
+    modeled_from = ObjectProperty(value_type=PatchClampExperiment)
+
     def __init__(self, **kwargs):
         super(PatchClampChannelModel, self).__init__(modelType='patch-clamp',
                                                      **kwargs)
-        self.modeled_from = PatchClampChannelModel.ObjectProperty(value_type=PatchClampExperiment)
 
 
 class HomologyChannelModel(ChannelModel):
+    #
+    # from PyOpenWorm.channel import Channel
+    homolog = ObjectProperty(value_rdf_type=CHANNEL_RDF_TYPE)
+
     def __init__(self, **kwargs):
         super(HomologyChannelModel, self).__init__(modelType='homology',
                                                    **kwargs)
-        from PyOpenWorm.channel import Channel
-        self.homolog = HomologyChannelModel.ObjectProperty(value_type=Channel)
 
 
-__yarom_mapped_classes__ = (ChannelModel, PatchClampExperiment)
+__yarom_mapped_classes__ = (ChannelModel, HomologyChannelModel, PatchClampChannelModel, PatchClampExperiment)
