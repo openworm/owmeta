@@ -1,4 +1,5 @@
 from rdflib.term import URIRef
+from rdflib.graph import ConjunctiveGraph
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
 from .DataTestTemplate import _DataTest
@@ -69,3 +70,30 @@ class ContextTest(_DataTest):
         ctx = Context(ident='http://example.com/context_1')
         ctxda = ctx(A)(ident='anA')
         self.assertIsNone(ctxda.decontextualize().context)
+
+    def test_init_imports(self):
+        ctx = Context(ident='http://example.com/context_1')
+        self.assertEqual(len(list(ctx.imports)), 0)
+
+    def test_create_graph(self):
+        ctx = Context(ident='http://example.com/context_1')
+        graph = ctx.save_imports()
+        self.assertEqual(len(graph), 0)
+
+    def test_save_import(self):
+        ctx = Context(ident='http://example.com/context_1')
+        new_ctx = Context(ident='http://example.com/context_1')
+        ctx.add_import(new_ctx)
+        create_graph = ctx.save_imports()
+        self.assertEqual(create_graph, ctx.save_imports())
+
+    def test_add_import(self):
+        ctx = Context(ident='http://example.com/context_1')
+        ctx2 = Context(ident='http://example.com/context_2')
+        ctx2_1 = Context(ident='http://example.com/context_2_1')
+        ctx.add_import(ctx2)
+        ctx.add_import(ctx2_1)
+        ctx3 = Context(ident='http://example.com/context_3')
+        ctx3.add_import(ctx)
+        final_ctx = Context(ident='http://example.com/context_1', imported=(ctx3,))
+        self.assertEqual(len(final_ctx.save_imports()), 4)
