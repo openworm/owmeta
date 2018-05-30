@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import unittest
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, RDFTypeTable
+from PyOpenWorm.dataObject import DataObject
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 import rdflib as R
@@ -31,10 +31,11 @@ class DataObjectTest(_DataTest):
         u = r.uploader()
         self.assertEqual(self.config['user.email'], u)
 
-    def test_object_from_id(self):
-        print(RDFTypeTable)
+    def test_object_from_id_type_0(self):
         g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
+
+    def test_object_from_id_type_1(self):
         g = DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
 
