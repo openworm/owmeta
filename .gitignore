@@ -43,3 +43,7 @@ snakefood
 .cache
 .coverage
 .pytest_cache/*
+
+# api docs are generated but housed in the docs/ directory with the handwritten
+# kind
+docs/api
