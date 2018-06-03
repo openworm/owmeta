@@ -1,11 +1,15 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
+import rdflib as R
+import six
+import warnings
+
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
-import rdflib as R
+
 from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
@@ -69,8 +73,13 @@ class DataObjectTest(_DataTest):
             b = DatatypeProperty()
             properties_are_init_args = False
 
-        with self.assertRaises(TypeError):
-            B(a=5)
+        if six.PY2:
+            with warnings.catch_warnings(record=True) as w:
+                B(a=5)
+                self.assertTrue(len(w) > 0 and issubclass(w[0].category, DeprecationWarning))
+        else:
+            with self.assertRaises(TypeError):
+                B(a=5)
 
     def test_properties_are_init_args_subclass_parent_unchanged(self):
         class A(DataObject):
