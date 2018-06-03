@@ -75,6 +75,7 @@ class DataObjectTest(_DataTest):
 
         if six.PY2:
             with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
                 B(a=5)
                 self.assertTrue(len(w) > 0 and issubclass(w[0].category, DeprecationWarning))
         else:
