@@ -108,6 +108,14 @@ class Cell(BiologyType):
                                 inverse_of=(This, 'parentOf'))
     parentOf = ObjectProperty(value_type=This, multiple=True)
 
+    def __init__(self, name=None, lineageName=None, **kwargs):
+        super(Cell, self).__init__(**kwargs)
+        if name:
+            self.name(name)
+
+        if lineageName:
+            self.lineageName(lineageName)
+
     def _morphology(self):
         """Return the morphology of the cell. Currently this is restricted to
            `Neuron <#neuron>`_ objects.
