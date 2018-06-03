@@ -65,9 +65,8 @@ class RegenerateAPIDocsCommand(distutils.cmd.Command):
 
     def __call__(self, *args, **kwargs):
         import subprocess
-        os.putenv('SPHINX_APIDOC_OPTIONS','members,no-undoc-members,show-inheritance')
-        subprocess.call('sphinx-apidoc -M -f -e -d 2 -o docs/api PyOpenWorm'.split(' '),
-                        )
+        os.putenv('SPHINX_APIDOC_OPTIONS', 'members,no-undoc-members,show-inheritance')
+        subprocess.call('sphinx-apidoc -M -f -e -d 2 -o docs/api PyOpenWorm'.split(' '))
 
 
 setup(
@@ -87,7 +86,8 @@ setup(
         'isodate==0.5.0',
         'libneuroml',
         'networkx==1.9',
-        'numpydoc==0.5',
+        'numpydoc',
+        'sphinx-apidoc',
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.2.0',
