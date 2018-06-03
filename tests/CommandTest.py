@@ -1,6 +1,6 @@
 import unittest
 import tempfile
-from PyOpenWorm.command import POW
+from PyOpenWorm.command import POW, UnreadableGraphException
 import os
 from os.path import exists, abspath
 import shutil
@@ -49,3 +49,12 @@ class CommandTest(unittest.TestCase):
         with open('default.conf', 'r') as f:
             conf = json.load(f)
             self.assertEqual(conf['rdf.store_conf'], abspath('worm.db'), msg='path is updated')
+
+    def test_fetch_graph_no_accessor_finder(self):
+        with self.assertRaises(Exception):
+            self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
+
+    def test_fetch_graph_no_accessor(self):
+        with self.assertRaises(UnreadableGraphException):
+            self.cut.graph_accessor_finder = lambda url: None
+            self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")

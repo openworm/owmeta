@@ -84,10 +84,6 @@ __all__ = [
     "disconnect",
     "connect",
     "config",
-    "Configure",
-    "Configureable",
-    "ConfigValue",
-    "BadConf",
     ]
 
 # Base class names is empty because we won't be adding any objects to the

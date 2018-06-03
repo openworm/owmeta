@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import unittest
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 import rdflib as R
@@ -52,3 +52,51 @@ class DataObjectTest(_DataTest):
         self.assertRegexpMatches(repr(DataObject(ident="http://example.com")),
                                  r"DataObject\(ident=rdflib\.term\.URIRef\("
                                  r"u?[\"']http://example.com[\"']\)\)")
+
+    def test_properties_are_init_args(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+        a = A(a=5)
+        self.assertEqual(5, a.a())
+
+    def test_properties_are_init_args_subclass_override(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            b = DatatypeProperty()
+            properties_are_init_args = False
+
+        with self.assertRaises(TypeError):
+            B(a=5)
+
+    def test_properties_are_init_args_subclass_parent_unchanged(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            b = DatatypeProperty()
+            properties_are_init_args = False
+
+        a = A(a=5)
+        self.assertEqual(5, a.a())
+
+    def test_properties_are_init_args_subclass_explicit(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            def __init__(self, a=None, **kw):
+                super(B, self).__init__(**kw)
+                pass
+
+        b = B(a=5)
+        self.assertIsNone(b.a())
+
+    def test_rdfs_comment_property(self):
+        a = DataObject(rdfs_comment='Hello')
+        self.assertIn('Hello', a.rdfs_comment())

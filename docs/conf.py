@@ -12,7 +12,7 @@
 # serve to show the default.
 
 import sys, os
-
+import PyOpenWorm
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -24,11 +24,11 @@ sys.path.insert(0, os.path.abspath('../'))
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
 numpydoc_show_class_members = False
-autodoc_default_flags = ['members','show-inheritance']
+autodoc_default_flags = []
 autodoc_member_order = 'groupwise'
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.todo', 'sphinx.ext.autosummary', 'sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode', 'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyOpenWorm'
-copyright = u'2013, OpenWorm'
+copyright = u'2013-2018, OpenWorm'
 
 # For substitutions in docs
 rst_epilog = """
@@ -93,6 +93,8 @@ exclude_patterns = ['_build']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+todo_include_todos = True
+
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
@@ -115,7 +117,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
         html_theme = 'sphinx_rtd_theme'
         html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
     except ImportError:
-        html_theme = 'default'
+        html_theme = 'alabaster'
 else:
     html_theme = 'default'
 
@@ -157,7 +159,12 @@ else:
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.

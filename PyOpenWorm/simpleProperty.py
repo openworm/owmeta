@@ -20,30 +20,25 @@ from PyOpenWorm.context import Context
 from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
+from .inverse_property import InversePropertyMixin
 
 L = logging.getLogger(__name__)
-
-
-class _values(list):
-
-    def add(self, v):
-        super(_values, self).append(v)
 
 
 class ContextMappedPropertyClass(MappedPropertyClass, ContextualizableClass):
     def __init__(self, *args, **kwargs):
         super(ContextMappedPropertyClass, self).__init__(*args, **kwargs)
-        self.__context = None
+        self._cmpc_context = None
 
     @property
     def context(self):
-        return self.__context
+        return object.__getattribute__(self, '_cmpc_context')
 
     @context.setter
     def context(self, newc):
-        if self.__context is not None and self.__context != newc:
+        if self._cmpc_context is not None and self._cmpc_context != newc:
             raise Exception('Contexts cannot be reassigned for a class')
-        self.__context = newc
+        self._cmpc_context = newc
 
 
 class _ContextualizableLazyProxy(Proxy, Contextualizable):
@@ -87,7 +82,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def __init__(self, owner, **kwargs):
         super(RealSimpleProperty, self).__init__(**kwargs)
-        self._v = _values()
+        self._v = []
         self.owner = owner
         self._hdf = None
 
@@ -120,10 +115,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if not self.multiple:
             self.clear()
 
-        stmt = self._insert_value(v)
+        stmt = self._insert_value(v, self.context)
         if self.context is not None:
             self.context.add_statement(stmt)
-        return _ContextualizableLazyProxy(_StatementContextRDFObjectFactory(stmt))
+        return stmt
 
     def clear(self):
         self._hdf = None
@@ -170,10 +165,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self._remove_value(v)
         return results
 
-    def _insert_value(self, v):
+    def _insert_value(self, v, ctx=None):
         stmt = Statement(self.owner, self, v, self.context)
         self._hdf = None
-        self._v.add(stmt)
+        self._v.append(stmt)
         if self not in v.owner_properties:
             v.owner_properties.append(self)
         return stmt
@@ -338,6 +333,7 @@ class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimplePro
 
 
 class UnionProperty(_ContextualizingPropertySetMixin,
+                    InversePropertyMixin,
                     UnionPropertyMixin,
                     PropertyCountMixin,
                     RealSimpleProperty):

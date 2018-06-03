@@ -36,8 +36,8 @@ class NetworkTest(_DataTest):
         self.net.neuron(self.ctx.Neuron(name='AVAL'))
         self.net.neuron(self.ctx.Neuron(name='DD5'))
         self.save()
-
-        nns = set(self.net.neuron_names())
+        net = self.ctx.Network()
+        nns = set(net.neuron_names())
         self.assertTrue('AVAL' in nns)
         self.assertTrue('DD5' in nns)
 
