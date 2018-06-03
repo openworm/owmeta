@@ -38,23 +38,6 @@ Notes:
   objects are created by querying the database; these may be made out-of-date in that case.
 
 - ``a : {x_0,...,x_n}`` means ``a`` could have the value of any one of ``x_0`` through ``x_n``
-
-Classes
--------
-
-.. automodule:: PyOpenWorm.experiment
-.. automodule:: PyOpenWorm.channel
-.. automodule:: PyOpenWorm.evidence
-.. automodule:: PyOpenWorm.network
-.. automodule:: PyOpenWorm.neuron
-.. automodule:: PyOpenWorm.worm
-.. automodule:: PyOpenWorm.muscle
-.. automodule:: PyOpenWorm.connection
-.. automodule:: PyOpenWorm.relationship
-.. automodule:: PyOpenWorm.dataObject
-.. automodule:: PyOpenWorm.data
-.. automodule:: PyOpenWorm.cell
-.. automodule:: PyOpenWorm.configure
 """
 
 from __future__ import print_function
@@ -69,8 +52,7 @@ BASE_SCHEMA_URL = 'http://openworm.org/schema'
 # The c extensions are incompatible with our code...
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 
-# For re-export
-from .configure import Configure, Configureable, ConfigValue, BadConf
+from .configure import Configureable
 from .context import Context
 import yarom
 from yarom.mapper import Mapper
@@ -124,7 +106,8 @@ CONTEXT = Context(imported=(SCI_BIO_CTX,),
                   mapper=mapper)
 
 yarom.MAPPER = CONTEXT.mapper
-Overrider(yarom.MAPPER).wrap_import()
+Overrider(yarom.MAPPER).wrap_import().install_excepthook()
+
 
 
 def get_data(path):
