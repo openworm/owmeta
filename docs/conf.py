@@ -27,8 +27,11 @@ autodoc_default_flags = []
 autodoc_member_order = 'groupwise'
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode', 'numpydoc']
-
+extensions = ['sphinxcontrib.apidoc', 'sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode', 'numpydoc']
+apidoc_module_dir = '../PyOpenWorm'
+apidoc_output_dir = 'api'
+apidoc_excluded_paths = []
+apidoc_separate_modules = True
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -107,7 +110,7 @@ todo_include_todos = True
 # a list of builtin themes.
 
 # on_rtd is whether we are on readthedocs.org
-import os
+os.putenv('SPHINX_APIDOC_OPTIONS', 'members,no-undoc-members,show-inheritance')
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # if not on_rtd:  # only import and set the theme if we're building docs locally
@@ -120,10 +123,10 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # else:
 html_theme = 'alabaster'
 
-if on_rtd:
-    import subprocess
-    os.putenv('SPHINX_APIDOC_OPTIONS', 'members,no-undoc-members,show-inheritance')
-    subprocess.call('sphinx-apidoc -M -f -e -d 2 -o api PyOpenWorm'.split(' '))
+# if on_rtd:
+    # import subprocess
+    # os.putenv('SPHINX_APIDOC_OPTIONS', 'members,no-undoc-members,show-inheritance')
+    # subprocess.call('sphinx-apidoc -M -f -e -d 2 -o api PyOpenWorm'.split(' '))
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
