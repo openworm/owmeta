@@ -109,14 +109,13 @@ class Document(BaseDocument):
             An ID or URL from WormBase that points to a record. Ignored if `wbid` or `wormbaseid` are provided. optional
         """
         super(Document, self).__init__(**kwargs)
-        self._fields = dict()
 
         self.id_precedence = ('doi', 'pmid', 'wbid', 'uri')
 
         if bibtex is not None:
             self.update_with_bibtex(bibtex)
 
-        if not self.pmid.has_defined_value() and pubmed is not None:
+        if pubmed is not None and not self.pmid.has_defined_value():
             if pubmed[:4] == 'http':
                 _tmp = _pubmed_uri_to_pmid(pubmed)
                 if _tmp is None:
@@ -126,7 +125,7 @@ class Document(BaseDocument):
                 pmid = pubmed
             self.pmid.set(pmid)
 
-        if not self.wbid.has_defined_value() and wormbase is not None:
+        if wormbase is not None and not self.wbid.has_defined_value():
             if wormbase[:4] == 'http':
                 _tmp = _wormbase_uri_to_wbid(wormbase)
                 if _tmp is None:
@@ -217,7 +216,7 @@ class Document(BaseDocument):
                 'http://search.labs.crossref.org/dois?%s' %
                 data_encoded)
 
-        doi = self._fields['doi']
+        doi = self.doi()
         if doi[:4] == 'http':
             doi = _doi_uri_to_doi(doi)
         try:

@@ -100,10 +100,9 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if self._hdf is not None:
             return self._hdf
         for x in self._v:
-            if x.context == self.context:
-                if x.object.defined:
-                    self._hdf = True
-                    return True
+            if x.context == self.context and x.object.defined:
+                self._hdf = True
+                return True
         return False
 
     def set(self, v):
