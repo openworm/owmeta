@@ -90,7 +90,7 @@ class Overrider(object):
                                        not x[0].endswith('PyOpenWorm/import_override.py') and
                                        not (x[0].endswith('wrapt/wrappers.py') and x[2] == '__call__')])
             for l in s:
-                print(l, file=sys.stderr, end='')
+                six.print_(l, file=sys.stderr, end='')
         sys.excepthook = filtering_except_hook
         return self
 
