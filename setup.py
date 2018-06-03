@@ -86,7 +86,7 @@ setup(
         'isodate==0.5.0',
         'libneuroml',
         'networkx==1.9',
-        'numpydoc',
+        'numpydoc>=0.7.0',
         'sphinxcontrib-apidoc',
         'persistent==4.0.8',
         'Pint',

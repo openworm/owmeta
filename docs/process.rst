@@ -12,7 +12,7 @@ Interface
 Access is through a Python library which communicates with the database. This
 library serves the function of providing an object oriented view on the database
 that can be accessed through the Python scripts commonly used in the project.
-The :ref:`draft api <api>` is described separately.
+The :ref:`api <pow_module>` is described separately.
 
 Data modelling
 --------------
@@ -99,7 +99,7 @@ A technique called RDF reification allows us to annotate arbitrary facts in our
 database with additional information. This technique allows for the addition of
 structured citation data to facts in the database as well as annotations for
 tracking responsibility for uploads to the database. Further details for the
-attachment of evidence using this technique are given in the :ref:`draft api <api>`.
+attachment of evidence using this technique are given in the :ref:`api <pow_module>`.
 
 In line with current practices for communication through the source code
 management platform, Github, we would like to track responsibility for new
