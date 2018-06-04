@@ -191,7 +191,7 @@ class ContextualizableList(Contextualizable, list):
         return res
 
     def decontextualize(self):
-        res = type(self)()
+        res = type(self)(None)
         res += list(x.decontextualize() for x in self)
         return res
 

@@ -1,4 +1,8 @@
 import unittest
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 import tempfile
 from PyOpenWorm.command import POW, UnreadableGraphException
 import os
@@ -58,3 +62,9 @@ class CommandTest(unittest.TestCase):
         with self.assertRaises(UnreadableGraphException):
             self.cut.graph_accessor_finder = lambda url: None
             self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
+
+    def test_fetch_graph_with_accessor_success(self):
+        m = Mock()
+        self.cut.graph_accessor_finder = lambda url: m
+        self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
+        m.assert_called_with()
