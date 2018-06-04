@@ -23,8 +23,7 @@ class ContextTest(_DataTest):
         a = ctx1(A)(ident='a')
         b = ctx2(B)(ident='b')
         a.a(b)
-        expected = (URIRef('b'), URIRef(
-            'http://openworm.org/entities/B/b'), URIRef('a'))
+        expected = (URIRef('b'), URIRef('http://openworm.org/entities/B/b'), URIRef('a'))
         self.assertIn(expected, list(ctx1.contents_triples()))
 
     def test_defined(self):
@@ -97,8 +96,7 @@ class ContextTest(_DataTest):
         ctx.add_import(ctx2_1)
         ctx3 = Context(ident='http://example.com/context_3')
         ctx3.add_import(ctx)
-        final_ctx = Context(
-            ident='http://example.com/context_1', imported=(ctx3,))
+        final_ctx = Context(ident='http://example.com/context_1', imported=(ctx3,))
         self.assertEqual(len(final_ctx.save_imports()), 4)
 
     def test_init_len(self):

@@ -57,8 +57,7 @@ class ContextMeta(ContextualizableClass):
         if context is None:
             return self
         ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta(self.__name__, (self,), dict(
-            class_context=context.identifier))
+        res = ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
         return res
 
     def __call__(self, *args, **kwargs):
@@ -81,11 +80,9 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         super(Context, self).__init__(**kwargs)
 
         if key is not None and ident is not None:
-            raise Exception(
-                "Only one of 'key' or 'ident' can be given to Context")
+            raise Exception("Only one of 'key' or 'ident' can be given to Context")
         if key is not None and base_namespace is None:
-            raise Exception(
-                "If 'key' is given, then 'base_namespace' must also be given to Context")
+            raise Exception("If 'key' is given, then 'base_namespace' must also be given to Context")
 
         if not isinstance(ident, rdflib.term.URIRef) \
            and isinstance(ident, (str, text_type)):
