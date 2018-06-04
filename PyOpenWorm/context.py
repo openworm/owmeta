@@ -153,9 +153,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                 ctx.save_imports(graph)
         return graph
 
-    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=set([])):
+    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
         self.tripcnt = 0
         self.defcnt = 0
+        if seen is None:
+            seen = set([])
         if id(self) in seen:
             return
         seen.add(id(self))
