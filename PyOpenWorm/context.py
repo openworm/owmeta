@@ -226,7 +226,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return self._rdf_object
 
     def __bool__(self):
-        return len(self._imported_contexts) != 0
+        return True
     __nonzero__ = __bool__
 
     def __len__(self):
