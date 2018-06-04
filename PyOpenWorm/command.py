@@ -110,8 +110,8 @@ class POW(object):
     _init_store = _conf
 
     def clone(self, url=None, update_existing_config=False):
-        """
-        Clone a data store
+        """Clone a data store
+
         Parameters
         ----------
         url : str

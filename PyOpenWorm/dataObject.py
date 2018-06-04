@@ -182,7 +182,7 @@ def contextualized_data_object(context, obj):
 
 class ContextualizableList(Contextualizable, list):
 
-    def __init__(self, context=None):
+    def __init__(self, context):
         self._context = context
 
     def contextualize(self, context):
@@ -239,7 +239,7 @@ def UnionProperty(*args, **kwargs):
 
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
-                                        IdMixin(object, hashfunc=hashlib.md5),
+                                        IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
                                         DataUser,
                                         Contextualizable)):
@@ -292,12 +292,15 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         return res
 
     def __init__(self, **kwargs):
-        if type(self).properties_are_init_args:
+        ot = type(self)
+        pc = ot._property_classes
+        paia = ot.properties_are_init_args
+        if paia:
             property_args = [(key, val) for key, val in ((k, kwargs.pop(k, None))
-                                                         for k in self._property_classes)
+                                                         for k in pc)
                              if val is not None]
         super(BaseDataObject, self).__init__(**kwargs)
-        self.properties = ContextualizableList(context=self.context)
+        self.properties = ContextualizableList(self.context)
         self.owner_properties = []
 
         self.po_cache = None
@@ -305,11 +308,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         self._variable = None
 
-        for k, v in self._property_classes.items():
+        for k, v in pc.items():
             if not v.lazy:
                 self.attach_property(v, name='_pow_' + k)
 
-        if type(self).properties_are_init_args:
+        if paia:
             for k, v in property_args:
                 getattr(self, k)(v)
 
@@ -578,9 +581,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         return owner.attach_property(cls._create_property_class(*args, **kwargs))
 
     def attach_property(self, c, name=None):
-        # using object.__getattribute__ to skip the logic of
-        # ContextualizableClass::__getattribute__ for faster access
-        ctxd_pclass = object.__getattribute__(c, 'contextualize_class')(self.context)
+        ctxd_pclass = c.contextualize_class(self.context)
         res = ctxd_pclass(owner=self,
                           conf=self.conf,
                           resolver=_Resolver.get_instance())

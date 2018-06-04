@@ -120,6 +120,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return stmt
 
     def clear(self):
+        """ Clears values set *in all contexts* """
         self._hdf = None
         for x in self._v:
             assert self in x.object.owner_properties

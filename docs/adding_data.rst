@@ -80,7 +80,7 @@ Future capabilities:
             worms.add(w)
     l = list(worms)
 
-  It's not difficult logic, but it's 8 extra lines of code for a conceptually
+  It's not difficult logic, but it's 8 extra lines of code for a, conceptually,
   very simple query.
 
 * Also, queries like::

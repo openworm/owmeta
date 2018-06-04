@@ -121,10 +121,11 @@ One way to accomplish this would be to leverage GitHub's fork and pull model
 with the data as well as the code.  This would require two things:
 
 - Instead of remote hosting of data, data is local to each copy of the library
-within a local database
+  within a local database
+
 - A serialization method dumps a new copy of the data out to a flat file
-enabling all users of the library to contribute their modifications to the data
-back to the PyOpenWorm project via GitHub.
+  enabling all users of the library to contribute their modifications to the data
+  back to the PyOpenWorm project via GitHub.
 
 A follow on to #2 is that the serialization method would need to preserve the
 ordering of data elements and write in some plain text format so that a simple

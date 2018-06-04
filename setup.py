@@ -87,7 +87,6 @@ setup(
         'libneuroml',
         'networkx==1.9',
         'numpydoc>=0.7.0',
-        'sphinxcontrib-apidoc',
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.2.0',
