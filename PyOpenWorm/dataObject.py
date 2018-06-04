@@ -559,7 +559,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
             c = type(property_class_name,
-                     (InversePropertyMixin,) + tuple(classes),
+                     tuple(classes),
                      props)
             c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)

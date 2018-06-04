@@ -272,7 +272,8 @@ class PropertyCountMixin(object):
         return sum(1 for _ in super(PropertyCountMixin, self).get())
 
 
-class ObjectProperty (_ContextualizingPropertySetMixin,
+class ObjectProperty (InversePropertyMixin,
+                      _ContextualizingPropertySetMixin,
                       ObjectPropertyMixin,
                       PropertyCountMixin,
                       RealSimpleProperty):
