@@ -20,7 +20,7 @@ class POW(object):
         self.store_name = 'worm.db'
         """ The file name of the database store """
 
-        self.config_file = 'default.conf'
+        self.config_file = 'pow.conf'
         """ The config file name """
 
         self.graph_accessor_finder = None
