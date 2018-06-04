@@ -226,6 +226,9 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                 self.context)(ident=self.identifier)
         return self._rdf_object
 
+    def __len__(self):
+        return len(self._statements)
+
     def __call__(self, o=None, *args, **kwargs):
         """
         Parameters
