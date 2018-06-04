@@ -1,6 +1,6 @@
 import rdflib
 from rdflib.term import URIRef
-from unittest.mock import MagicMock
+from unittest.mock import Mock
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
 from .DataTestTemplate import _DataTest
@@ -106,37 +106,35 @@ class ContextTest(_DataTest):
     def test_len(self):
         ident_uri = 'http://example.com/context_1'
         ctx = Context(ident=ident_uri)
-        ctx.add_import(Context(ident=ident_uri))
-        for i in range(0, 5):
+        for i in range(5):
             ctx.add_statement(create_mock_statement(ident_uri, i))
         self.assertEqual(len(ctx), 5)
 
     def test_add_remove_statement(self):
         ident_uri = 'http://example.com/context_1'
         ctx = Context(ident=ident_uri)
-        stmt1 = create_mock_statement(ident_uri, 1)
-        stmt2 = create_mock_statement(ident_uri, 2)
-        stmt3 = create_mock_statement(ident_uri, 3)
-        stmt4 = create_mock_statement(ident_uri, 4)
-        [ctx.add_statement(stmt) for stmt in [stmt1, stmt2, stmt3, stmt4]]
-        ctx.remove_statement(stmt2)
-        self.assertTrue(len(list(ctx.contents_triples())), 3)
+        stmt_to_remove = create_mock_statement(ident_uri, 42)
+        for i in range(5):
+            ctx.add_statement(create_mock_statement(ident_uri, i))
+        ctx.add_statement(stmt_to_remove)
+        ctx.remove_statement(stmt_to_remove)
+        self.assertEqual(len(ctx), 5)
 
-    def test_add_bad_statement(self):
+    def test_add_statement_with_different_context(self):
         ctx = Context(ident='http://example.com/context_1')
         stmt1 = create_mock_statement('http://example.com/context_2', 1)
         with self.assertRaises(ValueError):
             ctx.add_statement(stmt1)
 
     def test_contents_triples(self):
+        res_wanted = []
         ident_uri = 'http://example.com/context_1'
         ctx = Context(ident=ident_uri)
-        stmt1 = create_mock_statement(ident_uri, 1)
-        stmt2 = create_mock_statement(ident_uri, 2)
-        stmt3 = create_mock_statement(ident_uri, 3)
-        stmt4 = create_mock_statement(ident_uri, 4)
-        [ctx.add_statement(stmt) for stmt in [stmt1, stmt2, stmt3, stmt4]]
-        self.assertTrue(all(ctx.contents_triples()))
+        for i in range(5):
+            stmt = create_mock_statement(ident_uri, i)
+            ctx.add_statement(stmt)
+            res_wanted.append(stmt.to_triple())
+        self.assertEqual(list(ctx.contents_triples()), res_wanted)
 
     def test_clear(self):
         ident_uri = 'http://example.com/context_1'
@@ -144,7 +142,7 @@ class ContextTest(_DataTest):
         for i in range(5):
             ctx.add_statement(create_mock_statement(ident_uri, i))
         ctx.clear()
-        self.assertEqual(len(list(ctx.contents_triples())), 0)
+        self.assertEqual(len(ctx), 0)
 
     def test_save_context(self):
         ident_uri = 'http://example.com/context_1'
@@ -152,7 +150,6 @@ class ContextTest(_DataTest):
         for i in range(5):
             ctx.add_statement(create_mock_statement(ident_uri, i))
         graph = ctx.save_context(set())
-        self.assertEqual(ctx.tripcnt, 5)
         self.assertEqual(len(graph), 5)
 
     def test_save_context_with_inline_imports(self):
@@ -181,7 +178,7 @@ class ContextTest(_DataTest):
     def test_init_bool(self):
         ident_uri = 'http://example.com/context_1'
         ctx = Context(ident=ident_uri)
-        self.assertFalse(ctx)
+        self.assertTrue(ctx)
 
     def test_bool(self):
         ctx = Context(ident='http://example.com/context_1')
@@ -191,7 +188,7 @@ class ContextTest(_DataTest):
 
 
 def create_mock_statement(ident_uri, stmt_id):
-    statement = MagicMock()
+    statement = Mock()
     statement.context.identifier = rdflib.term.URIRef(ident_uri)
     statement.to_triple.return_value = (True, stmt_id, -stmt_id)
     return statement
