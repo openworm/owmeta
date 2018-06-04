@@ -57,7 +57,8 @@ class ContextMeta(ContextualizableClass):
         if context is None:
             return self
         ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
+        res = ctxd_meta(self.__name__, (self,), dict(
+            class_context=context.identifier))
         return res
 
     def __call__(self, *args, **kwargs):
@@ -80,9 +81,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         super(Context, self).__init__(**kwargs)
 
         if key is not None and ident is not None:
-            raise Exception("Only one of 'key' or 'ident' can be given to Context")
+            raise Exception(
+                "Only one of 'key' or 'ident' can be given to Context")
         if key is not None and base_namespace is None:
-            raise Exception("If 'key' is given, then 'base_namespace' must also be given to Context")
+            raise Exception(
+                "If 'key' is given, then 'base_namespace' must also be given to Context")
 
         if not isinstance(ident, rdflib.term.URIRef) \
            and isinstance(ident, (str, text_type)):
@@ -100,7 +103,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         else:
             raise Exception(self)
 
-        self._contents = dict()
         self._statements = []
         self._set_buffer_size = 10000
         self._imported_contexts = list(imported)
@@ -111,10 +113,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
         self.tripcnt = 0
         self.defcnt = 0
-
-    def size(self):
-        return len(self._contents) + sum(x.size()
-                                         for x in self._imported_contexts)
 
     def contents(self):
         return (x for x in self._statements)
@@ -147,11 +145,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             yield x
 
     def save_imports(self, graph=None):
-        if graph is None:
-            try:
-                graph = self.conf['rdf.graph']
-            except KeyError:
-                raise Exception('No graph was given and configuration has no graph')
+        graph = graph if graph is not None else self._create_rdf_graph()
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
@@ -162,19 +156,13 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                 ctx.save_imports(graph)
         return graph
 
-    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
+    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=set([])):
         self.tripcnt = 0
         self.defcnt = 0
-        if seen is None:
-            seen = set([])
         if id(self) in seen:
             return
         seen.add(id(self))
-        if graph is None:
-            try:
-                graph = self.conf['rdf.graph']
-            except KeyError:
-                raise Exception('No graph was given and configuration has no graph')
+        graph = graph if graph is not None else self._create_rdf_graph()
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
@@ -203,6 +191,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
+        return graph
 
     def get_target_graph(self, graph):
         res = graph
@@ -233,7 +222,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             # statement defined in some other context which specifically holds
             # context metadata.
             from PyOpenWorm.contextDataObject import ContextDataObject
-            self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
+            self._rdf_object = ContextDataObject.contextualize(
+                self.context)(ident=self.identifier)
         return self._rdf_object
 
     def __call__(self, o=None, *args, **kwargs):
@@ -296,6 +286,13 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     def stored(self):
         return QueryContext(graph=self.load_graph_from_configured_store(),
                             ident=self.identifier)
+
+    def _create_rdf_graph(self):
+        try:
+            return self.conf['rdf.graph']
+        except KeyError:
+            raise Exception(
+                'No graph was given and configuration has no graph')
 
 
 class QueryContext(Context):
