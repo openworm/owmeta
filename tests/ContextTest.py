@@ -1,10 +1,12 @@
 import rdflib
 from rdflib.term import URIRef
-from unittest.mock import Mock
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
 from .DataTestTemplate import _DataTest
-
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
 
 class ContextTest(_DataTest):
     def test_inverse_property_context(self):
@@ -175,20 +177,9 @@ class ContextTest(_DataTest):
         graph = last_ctx.save_context(set(), True)
         self.assertEqual(len(graph), 5)
 
-    def test_init_bool(self):
-        ident_uri = 'http://example.com/context_1'
-        ctx = Context(ident=ident_uri)
-        self.assertTrue(ctx)
-
-    def test_bool(self):
-        ctx = Context(ident='http://example.com/context_1')
-        ctx2 = Context(ident='http://example.com/context_2')
-        ctx.add_import(ctx2)
-        self.assertTrue(ctx)
-
 
 def create_mock_statement(ident_uri, stmt_id):
-    statement = Mock()
+    statement = MagicMock()
     statement.context.identifier = rdflib.term.URIRef(ident_uri)
     statement.to_triple.return_value = (True, stmt_id, -stmt_id)
     return statement
