@@ -115,7 +115,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return (x for x in self._statements)
 
     def clear(self):
-        self._statements.clear()
+        del self._statements[:]
 
     def add_import(self, context):
         self._imported_contexts.append(context)
