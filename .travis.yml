@@ -11,7 +11,9 @@ install:
 - pow init_graph
 script:
 - python setup.py test --addopts "--verbose -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- mv .coverage .coverage-functional
 - python setup.py test --addopts "--verbose -m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- coverage combine .coverage-functional .coverage 
 after_script:
 - coveralls
 after_success:
