@@ -136,7 +136,8 @@ class ContextTest(_DataTest):
             stmt = create_mock_statement(ident_uri, i)
             ctx.add_statement(stmt)
             res_wanted.append(stmt.to_triple())
-        self.assertEqual(list(ctx.contents_triples()), res_wanted)
+        for triples in ctx.contents_triples():
+            self.assertTrue(triples in res_wanted)
 
     def test_clear(self):
         ident_uri = 'http://example.com/context_1'
@@ -147,14 +148,16 @@ class ContextTest(_DataTest):
         self.assertEqual(len(ctx), 0)
 
     def test_save_context(self):
+        graph = set()
         ident_uri = 'http://example.com/context_1'
         ctx = Context(ident=ident_uri)
         for i in range(5):
             ctx.add_statement(create_mock_statement(ident_uri, i))
-        graph = ctx.save_context(set())
+        ctx.save_context(graph)
         self.assertEqual(len(graph), 5)
 
     def test_save_context_with_inline_imports(self):
+        graph = set()
         ident_uri = 'http://example.com/context_1'
         ident_uri2 = 'http://example.com/context_2'
         ident_uri2_1 = 'http://example.com/context_2_1'
@@ -174,7 +177,7 @@ class ContextTest(_DataTest):
         ctx2_1.add_statement(create_mock_statement(ident_uri2_1, 2.1))
         ctx3.add_statement(create_mock_statement(ident_uri3, 3))
         last_ctx.add_statement(create_mock_statement(ident_uri4, 4))
-        graph = last_ctx.save_context(set(), True)
+        last_ctx.save_context(graph, True)
         self.assertEqual(len(graph), 5)
 
 
