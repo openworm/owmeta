@@ -190,7 +190,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
-        return graph
 
     def get_target_graph(self, graph):
         res = graph
@@ -221,8 +220,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             # statement defined in some other context which specifically holds
             # context metadata.
             from PyOpenWorm.contextDataObject import ContextDataObject
-            self._rdf_object = ContextDataObject.contextualize(
-                self.context)(ident=self.identifier)
+            self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
         return self._rdf_object
 
     def __bool__(self):
