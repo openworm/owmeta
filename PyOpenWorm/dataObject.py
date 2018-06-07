@@ -24,8 +24,9 @@ from yarom.mapper import FCN
 from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
+from .inverse_property import InversePropertyMixin, InverseProperty
 
-from .simpleProperty import ObjectProperty, DatatypeProperty, UnionProperty
+import PyOpenWorm.simpleProperty as SP
 
 __all__ = [
     "BaseDataObject",
@@ -42,7 +43,31 @@ DataObjectTypes = dict()
 PropertyTypes = dict()
 RDFTypeTable = dict()
 DataObjectsParents = dict()
-InverseProperties = dict()
+
+This = object()
+""" A reference to be used in class-level property declarations to denote the
+    class currently being defined. For example::
+
+        >>> class Person(DataObject):
+        ...     parent = ObjectProperty(value_type=This,
+        ...                             inverse_of=(This, 'child'))
+        ...     child = ObjectProperty(value_type=This)
+"""
+
+
+def mp(c, k):
+    ak = '_pow_' + k
+    if c.lazy:
+        def getter(target):
+            attr = getattr(target, ak, None)
+            if attr is None:
+                attr = target.attach_property(c, name=ak)
+            return attr
+    else:
+        def getter(target):
+            return getattr(target, ak)
+
+    return property(getter)
 
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
@@ -61,6 +86,18 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
         if not hasattr(self, 'base_namespace') or self.base_namespace is None:
             self.base_namespace = ContextMappedClass._find_base_namespace(dct, bases)
+
+        self._property_classes = dict()
+        for b in bases:
+            d = getattr(b, '_property_classes', None)
+            if d:
+                self._property_classes.update(d)
+
+        for k, v in dct.items():
+            if isinstance(v, PThunk):
+                c = v(self, k)
+                self._property_classes[k] = c
+                setattr(self, k, mp(c, k))
 
     @classmethod
     def _find_class_context(cls, dct, bases):
@@ -145,7 +182,7 @@ def contextualized_data_object(context, obj):
 
 class ContextualizableList(Contextualizable, list):
 
-    def __init__(self, context=None):
+    def __init__(self, context):
         self._context = context
 
     def contextualize(self, context):
@@ -154,13 +191,55 @@ class ContextualizableList(Contextualizable, list):
         return res
 
     def decontextualize(self):
-        res = type(self)()
+        res = type(self)(None)
         res += list(x.decontextualize() for x in self)
         return res
 
 
+class PThunk(object):
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError()
+
+
+class CPThunk(PThunk):
+    def __init__(self, c):
+        self.c = c
+
+    def __call__(self, *args, **kwargs):
+        return self.c
+
+
+class APThunk(PThunk):
+    def __init__(self, t, args, kwargs):
+        self.t = t
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, cls, linkName):
+        return cls._create_property_class(linkName,
+                                          *self.args,
+                                          property_type=self.t,
+                                          **self.kwargs)
+
+    def __repr__(self):
+        return '{}({}, {})'.format(self.t, ',\n'.join(self.args),
+                                   ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
+
+
+def DatatypeProperty(*args, **kwargs):
+    return APThunk('DatatypeProperty', args, kwargs)
+
+
+def ObjectProperty(*args, **kwargs):
+    return APThunk('ObjectProperty', args, kwargs)
+
+
+def UnionProperty(*args, **kwargs):
+    return APThunk('UnionProperty', args, kwargs)
+
+
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
-                                        IdMixin(object, hashfunc=hashlib.md5),
+                                        IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
                                         DataUser,
                                         Contextualizable)):
@@ -184,6 +263,19 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
     _next_variable_int = 0
 
+    properties_are_init_args = True
+    ''' If true, then properties defined in the class body can be passed as
+        keyword arguments to __init__. For example::
+
+            >>> class A(DataObject):
+            ...     p = DatatypeProperty()
+
+            >>> A(p=5)
+
+        If the arguments are written explicitly into the __init__, then no
+        special processing is done.
+    '''
+
     def __new__(cls, *args, **kwargs):
         """ This is defined so that the __init__ method gets a contextualized
         instance, allowing for statements made in __init__ to be contextualized.
@@ -199,23 +291,32 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         return res
 
-    def __init__(self, rdfs_comment=None, rdfs_label=None, **kwargs):
+    def __init__(self, **kwargs):
+        ot = type(self)
+        pc = ot._property_classes
+        paia = ot.properties_are_init_args
+        if paia:
+            property_args = [(key, val) for key, val in ((k, kwargs.pop(k, None))
+                                                         for k in pc)
+                             if val is not None]
         super(BaseDataObject, self).__init__(**kwargs)
-        self.properties = ContextualizableList(context=self.context)
+        self.properties = ContextualizableList(self.context)
         self.owner_properties = []
 
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
-        self._variable = self.next_variable()
-        BaseDataObject.attach_property(self, RDFTypeProperty)
-        BaseDataObject.attach_property(self, RDFSCommentProperty)
-        BaseDataObject.attach_property(self, RDFSLabelProperty)
-        if rdfs_comment:
-            self.rdfs_comment = rdfs_comment
+        self._variable = None
 
-        if rdfs_label:
-            self.rdfs_label = rdfs_label
+        for k, v in pc.items():
+            if not v.lazy:
+                self.attach_property(v, name='_pow_' + k)
+
+        if paia:
+            for k, v in property_args:
+                getattr(self, k)(v)
+
+        self.attach_property(RDFTypeProperty)
 
     @property
     def conf(self):
@@ -238,7 +339,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     @classmethod
     def next_variable(cls):
         cls._next_variable_int += 1
-        return R.Variable('a' + cls.__name__ + '_' + str(DataObject._next_variable_int))
+        return R.Variable('a' + cls.__name__ + '_' + str(cls._next_variable_int))
 
     @property
     def context(self):
@@ -313,6 +414,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return
 
     def variable(self):
+        if self._variable is None:
+            self._variable = self.next_variable()
         return self._variable
 
     def __hash__(self):
@@ -328,7 +431,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 " Perhaps you misspelled the name of a Property?" %
                 (x, self))
 
-    def getOwners(self, property_class_name):
+    def get_owners(self, property_class_name):
         """ Return the owners along a property pointing to this object """
         res = []
         for x in self.owner_properties:
@@ -336,9 +439,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 res.append(x.owner)
         return res
 
-    # Must resolve, somehow, to a set of triples that we can manipulate
-    # For instance, one or more construct query could represent the object or
-    # the triples might be stored in memory.
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
         """ Attach a, possibly new, property to this class that has a simple
@@ -393,14 +493,17 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return _partial_property(cls._create_property, *args, property_type='UnionProperty', **kwargs)
 
     @classmethod
-    def _create_property(
+    def _create_property_class(
             cls,
             linkName,
-            owner,
             property_type,
             value_type=None,
             multiple=False,
-            link=None):
+            link=None,
+            lazy=True,
+            inverse_of=None,
+            **kwargs):
+
         # XXX This should actually get called for all of the properties when
         #     their owner classes are defined. The initialization, however,
         #     must happen with the owner object's creation
@@ -408,6 +511,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner_class_name = owner_class.__name__
         property_class_name = str(owner_class_name + "_" + linkName)
         _PropertyTypes_key = (cls, linkName)
+
+        if value_type is This:
+            value_type = owner_class
 
         if value_type is None:
             value_type = BaseDataObject
@@ -419,13 +525,13 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             klass = None
             if property_type == 'ObjectProperty':
                 value_rdf_type = value_type.rdf_type
-                klass = ObjectProperty
+                klass = SP.ObjectProperty
             elif property_type == 'DatatypeProperty':
                 value_rdf_type = False
-                klass = DatatypeProperty
+                klass = SP.DatatypeProperty
             elif property_type == 'UnionProperty':
                 value_rdf_type = False
-                klass = UnionProperty
+                klass = SP.UnionProperty
             else:
                 value_rdf_type = False
 
@@ -441,26 +547,16 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                          value_type=value_type,
                          owner_type=owner_class,
                          rdf_object=PropertyDataObject.contextualize(owner_class.definition_context)(ident=link),
-                         multiple=multiple)
+                         lazy=lazy,
+                         multiple=multiple,
+                         inverse_of=inverse_of,
+                         **kwargs)
 
-            if _PropertyTypes_key in InverseProperties:
-                ip = InverseProperties[_PropertyTypes_key]
-                if issubclass(cls, ip.lhs_class) and issubclass(value_type, ip.rhs_class):
-                    _class = ip.rhs_class
-                    _linkName = ip.rhs_linkName
-                elif issubclass(cls, ip.rhs_class) and issubclass(value_type, ip.lhs_class):
-                    _class = ip.lhs_class
-                    _linkName = ip.lhs_linkName
-                else:
-                    raise Exception("value_type {} for property ({}, {}) is"
-                                    " inconsistent with InverseProperty"
-                                    " declaration {}".format(value_type,
-                                                             owner_class,
-                                                             linkName, ip))
-                classes.insert(0, _InversePropertyMixin)
-
-                props['rhs_class'] = _class
-                props['rhs_linkName'] = _linkName
+            if inverse_of is not None:
+                invc = inverse_of[0]
+                if invc is This:
+                    invc = owner_class
+                InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
             c = type(property_class_name,
                      tuple(classes),
@@ -468,15 +564,31 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
-        return cls.attach_property(owner, c)
+        return c
 
-    @staticmethod
-    def attach_property(owner, c):
-        ctxd_pclass = c.contextualize(owner.context)
-        resolver = _Resolver.get_instance()
-        res = ctxd_pclass(owner=owner, conf=owner.conf, resolver=resolver)
-        owner.properties.append(res)
-        setattr(owner, c.linkName, res)
+    @classmethod
+    def _create_property(cls, *args, **kwargs):
+        owner = None
+        if len(args) == 2:
+            owner = args[1]
+            args = (args[0],)
+        else:
+            owner = kwargs.get('owner', None)
+            if owner is not None:
+                del kwargs['owner']
+        if owner is None:
+            raise TypeError('No owner')
+        return owner.attach_property(cls._create_property_class(*args, **kwargs))
+
+    def attach_property(self, c, name=None):
+        ctxd_pclass = c.contextualize_class(self.context)
+        res = ctxd_pclass(owner=self,
+                          conf=self.conf,
+                          resolver=_Resolver.get_instance())
+        self.properties.append(res)
+        if name is None:
+            name = c.linkName
+        setattr(self, name, res)
 
         return res
 
@@ -537,8 +649,25 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return self
 
 
+class RDFSCommentProperty(SP.DatatypeProperty):
+    link = R.RDFS['comment']
+    linkName = 'rdfs_comment'
+    owner_type = BaseDataObject
+    multiple = True
+    lazy = True
+
+
+class RDFSLabelProperty(SP.DatatypeProperty):
+    link = R.RDFS['label']
+    linkName = 'rdfs_label'
+    owner_type = BaseDataObject
+    multiple = True
+    lazy = True
+
+
 class DataObject(BaseDataObject):
-    pass
+    rdfs_comment = CPThunk(RDFSCommentProperty)
+    rdfs_label = CPThunk(RDFSLabelProperty)
 
 
 class DataObjectSingletonMeta(type(BaseDataObject)):
@@ -584,26 +713,13 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
         super(RDFSClass, self).__init__(ident=R.RDFS["Class"], *args, **kwargs)
 
 
-class RDFTypeProperty(ObjectProperty):
+class RDFTypeProperty(SP.ObjectProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
     value_type = RDFSClass
     owner_type = BaseDataObject
     multiple = True
-
-
-class RDFSCommentProperty(DatatypeProperty):
-    link = R.RDFS['comment']
-    linkName = 'rdfs_comment'
-    owner_type = BaseDataObject
-    multiple = True
-
-
-class RDFSLabelProperty(DatatypeProperty):
-    link = R.RDFS['label']
-    linkName = 'rdfs_label'
-    owner_type = BaseDataObject
-    multiple = True
+    lazy = False
 
 
 class RDFProperty(DataObjectSingleton):
@@ -772,46 +888,6 @@ class _Resolver(RDFTypeResolver):
                 oid,
                 deserialize_rdflib_term)
         return cls.instance
-
-
-class _InversePropertyMixin(object):
-    """
-    Mixin for inverse properties.
-
-    Augments RealSimpleProperty methods to update inverse properties as well
-    """
-
-    def set(self, other):
-        assert isinstance(other, self.rhs_class)
-        rhs_prop = getattr(other, self.rhs_linkName)
-        ctxd_rhs_prop = rhs_prop.contextualize(self.context)
-        super(_InversePropertyMixin, ctxd_rhs_prop).set(self.owner)
-        return super(_InversePropertyMixin, self).set(other)
-
-    def unset(self, other):
-        assert isinstance(other, self.rhs_class)
-        rhs_prop = getattr(other, self.rhs_linkName)
-        super(_InversePropertyMixin, rhs_prop).unset(self.owner)
-        super(_InversePropertyMixin, self).unset(other)
-
-
-class InverseProperty(object):
-
-    def __init__(self, lhs_class, lhs_linkName,
-                 rhs_class, rhs_linkName):
-        self.lhs_class = lhs_class
-        self.rhs_class = rhs_class
-
-        self.lhs_linkName = lhs_linkName
-        self.rhs_linkName = rhs_linkName
-        InverseProperties[(lhs_class, lhs_linkName)] = self
-        InverseProperties[(rhs_class, rhs_linkName)] = self
-
-    def __repr__(self):
-        return 'InverseProperty({},{},{},{})'.format(self.lhs_class,
-                                                     self.lhs_linkName,
-                                                     self.rhs_class,
-                                                     self.rhs_linkName)
 
 
 __yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject, RDFProperty,

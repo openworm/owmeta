@@ -13,7 +13,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   api
+   api/modules
    userdocs
    devdocs
 

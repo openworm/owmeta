@@ -1,11 +1,15 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
+import rdflib as R
+import six
+import warnings
+
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, RDFTypeTable
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
-import rdflib as R
+
 from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
@@ -31,10 +35,11 @@ class DataObjectTest(_DataTest):
         u = r.uploader()
         self.assertEqual(self.config['user.email'], u)
 
-    def test_object_from_id(self):
-        print(RDFTypeTable)
+    def test_object_from_id_type_0(self):
         g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
+
+    def test_object_from_id_type_1(self):
         g = DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
 
@@ -51,3 +56,57 @@ class DataObjectTest(_DataTest):
         self.assertRegexpMatches(repr(DataObject(ident="http://example.com")),
                                  r"DataObject\(ident=rdflib\.term\.URIRef\("
                                  r"u?[\"']http://example.com[\"']\)\)")
+
+    def test_properties_are_init_args(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+        a = A(a=5)
+        self.assertEqual(5, a.a())
+
+    def test_properties_are_init_args_subclass_override(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            b = DatatypeProperty()
+            properties_are_init_args = False
+
+        if six.PY2:
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                B(a=5)
+                self.assertTrue(len(w) > 0 and issubclass(w[0].category, DeprecationWarning))
+        else:
+            with self.assertRaises(TypeError):
+                B(a=5)
+
+    def test_properties_are_init_args_subclass_parent_unchanged(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            b = DatatypeProperty()
+            properties_are_init_args = False
+
+        a = A(a=5)
+        self.assertEqual(5, a.a())
+
+    def test_properties_are_init_args_subclass_explicit(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            properties_are_init_args = True
+
+        class B(A):
+            def __init__(self, a=None, **kw):
+                super(B, self).__init__(**kw)
+                pass
+
+        b = B(a=5)
+        self.assertIsNone(b.a())
+
+    def test_rdfs_comment_property(self):
+        a = DataObject(rdfs_comment='Hello')
+        self.assertIn('Hello', a.rdfs_comment())

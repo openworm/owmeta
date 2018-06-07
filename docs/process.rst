@@ -12,7 +12,7 @@ Interface
 Access is through a Python library which communicates with the database. This
 library serves the function of providing an object oriented view on the database
 that can be accessed through the Python scripts commonly used in the project.
-The :ref:`draft api <api>` is described separately.
+The :ref:`api <pow_module>` is described separately.
 
 Data modelling
 --------------
@@ -99,7 +99,7 @@ A technique called RDF reification allows us to annotate arbitrary facts in our
 database with additional information. This technique allows for the addition of
 structured citation data to facts in the database as well as annotations for
 tracking responsibility for uploads to the database. Further details for the
-attachment of evidence using this technique are given in the :ref:`draft api <api>`.
+attachment of evidence using this technique are given in the :ref:`api <pow_module>`.
 
 In line with current practices for communication through the source code
 management platform, Github, we would like to track responsibility for new
@@ -121,10 +121,11 @@ One way to accomplish this would be to leverage GitHub's fork and pull model
 with the data as well as the code.  This would require two things:
 
 - Instead of remote hosting of data, data is local to each copy of the library
-within a local database
+  within a local database
+
 - A serialization method dumps a new copy of the data out to a flat file
-enabling all users of the library to contribute their modifications to the data
-back to the PyOpenWorm project via GitHub.
+  enabling all users of the library to contribute their modifications to the data
+  back to the PyOpenWorm project via GitHub.
 
 A follow on to #2 is that the serialization method would need to preserve the
 ordering of data elements and write in some plain text format so that a simple

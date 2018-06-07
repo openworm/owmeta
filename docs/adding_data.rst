@@ -9,7 +9,7 @@ So, you've got some biological data about the worm and you'd like to save it in
 You've come to the right place!
 
 A few biological entities (e.g., Cell, Neuron, Muscle, Worm) are pre-coded into
-|pow|. The full list is available in the :ref:`API <api>`.
+|pow|. The full list is available in the :ref:`API <pow_module>`.
 If these entities already cover your use-case, then all you need to do is add
 values for the appropriate fields and save them. If you have data already loaded
 into your database, then you can load objects from it::
@@ -55,8 +55,8 @@ individually. This isn't too difficult to achieve.
 Future capabilities:
 
 * Adding propositional logic to support making statements about all entities
-matching some conditions without needing to ``load()`` and ``save()`` them from
-the database.
+  matching some conditions without needing to ``load()`` and ``save()`` them
+  from the database.
 * Statements like::
 
     ctx = Context(ident='http://example.org/c-briggsae')
@@ -80,7 +80,7 @@ the database.
             worms.add(w)
     l = list(worms)
 
-  It's not difficult logic, but it's 8 extra lines of code for a conceptually
+  It's not difficult logic, but it's 8 extra lines of code for a, conceptually,
   very simple query.
 
 * Also, queries like::

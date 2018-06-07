@@ -78,7 +78,5 @@ class BibtexTest(_DataTest):
           note = "\url{http://example.org/01} \url{http://example.org/02}"
         }
         """
-        print(bibtex)
         bt = self.loads(bibtex)
-        print(bt)
         self.assertEqual(list(bt['url']), ['http://example.org/01', 'http://example.org/02'])

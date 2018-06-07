@@ -2,6 +2,8 @@
 #
 
 from setuptools import setup
+import distutils.cmd
+import distutils.log
 import os
 import sys
 
@@ -42,6 +44,31 @@ def excludes(base):
     return res
 
 
+class RegenerateAPIDocsCommand(distutils.cmd.Command):
+    """A custom command to run Pylint on all Python source files."""
+
+    description = 'build API docs'
+    user_options = [
+        # The format is (long option, short option, description).
+        # ('pylint-rcfile=', None, 'path to Pylint config file'),
+    ]
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        """Run command."""
+        self()
+
+    def __call__(self, *args, **kwargs):
+        import subprocess
+        os.putenv('SPHINX_APIDOC_OPTIONS', 'members,no-undoc-members,show-inheritance')
+        subprocess.call('sphinx-apidoc -M -f -e -d 2 -o docs/api PyOpenWorm'.split(' '))
+
+
 setup(
     name='PyOpenWorm',
     zip_safe=False,
@@ -59,7 +86,7 @@ setup(
         'isodate==0.5.0',
         'libneuroml',
         'networkx==1.9',
-        'numpydoc==0.5',
+        'numpydoc>=0.7.0',
         'persistent==4.0.8',
         'Pint',
         'pyparsing==2.2.0',
@@ -109,5 +136,6 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Topic :: Scientific/Engineering'
-    ]
+    ],
+    cmdclass={'build_apidoc': RegenerateAPIDocsCommand}
 )

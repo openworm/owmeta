@@ -3,6 +3,7 @@ import six
 from rdflib.term import URIRef
 from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
+from yarom.mapper import FCN
 from .context import Context
 from .dataObject import BaseDataObject
 
@@ -94,8 +95,19 @@ class DataSourceType(type(BaseDataObject)):
                     break
             else: # no 'break'
                 newdct[k] = v
-
+        if not getattr(self, '__doc__', None):
+            self.__doc__ = self._docstr()
         super(DataSourceType, self).__init__(name, bases, newdct)
+
+    def _docstr(self):
+        s = ''
+        for inf in self.__info_fields:
+            s += '{} : :class:`{}`'.format(inf.display_name, inf.property_type) + \
+                    ('\n    Attribute: `{}`'.format(inf.name if inf.property_name is None else inf.property_name)) + \
+                    (('\n\n    ' + inf.description) if inf.description else '') + \
+                    ('\n\n    Default value: {}'.format(inf.default_value) if inf.default_value is not None else '') + \
+                    '\n\n'
+        return s
 
     @property
     def info_fields(self):
@@ -251,7 +263,26 @@ class DataObjectContextDataSource(DataSource):
             self.context = Context()
 
 
-class BaseDataTranslator(BaseDataObject):
+def format_types(typ):
+    if isinstance(typ, type):
+        return ':class:`{}`'.format(FCN(typ))
+    else:
+        return ', '.join(':class:`{}`'.format(FCN(x)) for x in typ)
+
+
+class DataTransatorType(type(BaseDataObject)):
+    def __init__(self, name, bases, dct):
+        super(DataTransatorType, self).__init__(name, bases, dct)
+
+        if not getattr(self, '__doc__', None):
+            self.__doc__ = '''Input type(s): {}\n
+                              Output type(s): {}\n
+                              URI: {}'''.format(format_types(self.input_type),
+                                                format_types(self.output_type),
+                                                self.translator_identifier)
+
+
+class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
     """ Translates from a data source to PyOpenWorm objects """
 
     input_type = DataSource
