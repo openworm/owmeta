@@ -1,4 +1,5 @@
-from os.path import exists, abspath, join as pth_join, dirname
+from os.path import exists, abspath, join as pth_join, dirname, isabs
+from os import makedirs
 import json
 import logging
 
@@ -26,12 +27,38 @@ class POW(object):
         self.graph_accessor_finder = None
         """ Callable that returns a graph accessor when given a URL for the graph """
 
+        self.powdir = '.pow'
+
     # Imports, other than those from the standard library, are included in each
     # method separately since, eventually, each method should be independent of
     # the others to the extent that you may even choose not to install
     # dependencies for commands which are not used.  This should permit a
     # generic handler for ImportError wherein a dependency is only installed
     # when needed. This should also reduce load times for each command
+
+    @property
+    def config_file(self):
+        if isabs(self._config_file):
+            return self._config_file
+        return pth_join(self.powdir, self._config_file)
+
+    @config_file.setter
+    def config_file(self, val):
+        self._config_file = val
+
+    @property
+    def store_name(self):
+        if isabs(self._store_name):
+            return self._store_name
+        return pth_join(self.powdir, self._store_name)
+
+    @store_name.setter
+    def store_name(self, val):
+        self._store_name = val
+
+    def _ensure_powdir(self):
+        if not exists(self.powdir):
+            makedirs(self.powdir)
 
     def init(self, update_existing_config=False):
         """
@@ -47,6 +74,7 @@ class POW(object):
             If True, updates the existing config file to point to the given
             file for the store configuration
         """
+        self._ensure_powdir()
         store_fname = abspath(self.store_name)
         if not exists(self.config_file):
             with open(self._default_config(), 'r') as f:
