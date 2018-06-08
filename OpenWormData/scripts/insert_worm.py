@@ -192,13 +192,15 @@ def infer():
     print ("filled in with inferred data")
 
 
-def do_insert(ident, config="default.conf", logging=False):
+def do_insert(ident, config="default.conf", logging=False, imports_context_ident=None):
 
     CTX = Context(ident=ident + '-data', imported=(P.CONTEXT,))
 
     EVCTX = Context(ident=ident + '-evidence', imported=(P.CONTEXT,))
 
     IWCTX = Context(ident=ident, imported=(CTX, EVCTX))
+
+    imports_context = Context(ident=imports_context_ident)
 
     sources = init_sources()
     extras = init_extra_sources()
@@ -238,13 +240,12 @@ def do_insert(ident, config="default.conf", logging=False):
 
                 print('Result: {}'.format(res))
                 if isinstance(res, DataWithEvidenceDataSource):
-                    res.data_context.save_context(inline_imports=True)
-                    res.data_context.save_imports()
-                    res.evidence_context.save_context(inline_imports=True)
-                    res.evidence_context.save_imports()
+                    res.data_context.save_context(inline_imports=True, assume_unchanged=True)
+                    res.data_context.save_imports(imports_context)
+                    res.evidence_context.save_context(inline_imports=True, assume_unchanged=True)
+                    res.evidence_context.save_imports(imports_context)
                     for ctx in res.contexts:
-                        ctx.save_context(inline_imports=True)
-                        ctx.save_imports()
+                        raise Exception()
 
                 if res:
                     if res.key:
@@ -259,7 +260,7 @@ def do_insert(ident, config="default.conf", logging=False):
         # attach_neuromlfiles_to_channel()
 
         t1 = time()
-        print("Saving %d objects..." % IWCTX.size())
+        print("Saving data...")
         graph = P.config('rdf.graph')
         for src in data_sources_by_key.values():
             if isinstance(src, DataWithEvidenceDataSource):
@@ -268,11 +269,12 @@ def do_insert(ident, config="default.conf", logging=False):
                 EVCTX.add_import(src.evidence_context)
                 for ctx in src.contexts:
                     IWCTX.add_import(ctx)
-        IWCTX.save_context(graph, inline_imports=True)
-        IWCTX.save_imports(graph)
-
-        print("Saved %d objects." % IWCTX.defcnt)
-        print("Saved %d triples." % IWCTX.tripcnt)
+        IWCTX.save_context(graph, assume_unchanged=True)
+        IWCTX.save_imports(imports_context)
+        imports_context.save_context(graph)
+        print('imports context size', len(imports_context))
+        print('imports top ten', list(zip(range(10), imports_context.contents_triples())))
+        print("Saved %d triples." % IWCTX.triples_saved)
         t2 = time()
 
         print("Serializing...")

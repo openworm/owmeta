@@ -13,7 +13,6 @@ from .contextualize import (BaseContextualizable,
                             ContextualizableClass,
                             ContextualizingProxy,
                             contextualize_metaclass)
-from .context_common import CONTEXT_IMPORTS
 from yarom.mapper import FCN
 from six.moves.urllib.parse import quote
 from six import text_type
@@ -108,8 +107,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self.mapper = mapper
         self.base_namespace = base_namespace
 
-        self.tripcnt = 0
-        self.defcnt = 0
+        self._change_counter = 0
+        self._triples_saved = 0
+
+        self._saves = set()
 
     def contents(self):
         return (x for x in self._statements)
@@ -125,10 +126,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             raise ValueError("Cannot add statements from a different context")
         self._graph = None
         self._statements.append(stmt)
+        self._change_counter += 1
 
     def remove_statement(self, stmt):
         self._graph = None
         self._statements.remove(stmt)
+        self._change_counter += 1
 
     def add_object(self, o):
         pass
@@ -141,36 +144,36 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         for x in self._imported_contexts:
             yield x
 
-    def save_imports(self, graph=None):
-        graph = graph if graph is not None else self._create_rdf_graph()
+    def save_imports(self, context):
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
                     and not isinstance(ctx.identifier, rdflib.term.BNode):
-                graph.add((self.identifier,
-                           CONTEXT_IMPORTS,
-                           ctx.identifier))
-                ctx.save_imports(graph)
-        return graph
+                context(self.rdf_object).imports(ctx.rdf_object)
+                ctx.save_imports(context)
 
-    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None):
-        self.tripcnt = 0
-        self.defcnt = 0
+    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None, assume_unchanged=False):
         if seen is None:
             seen = set([])
+
         if id(self) in seen:
             return
+
         seen.add(id(self))
-        graph = graph if graph is not None else self._create_rdf_graph()
+
+        graph = graph if graph is not None else self._retreive_configured_graph()
+
+        if assume_unchanged and (id(graph), self._change_counter) in self._saves:
+            return
+
+        self._triples_saved = 0
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
         if inline_imports:
             for ctx in self._imported_contexts:
-                ctx.save_context(graph, inline_imports, False, seen)
-                self.tripcnt += ctx.tripcnt
-                self.defcnt += ctx.defcnt
+                ctx.save_context(graph, inline_imports, False, seen, assume_unchanged)
 
         if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
@@ -178,18 +181,40 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
                     graph.bind(c.__name__, c.rdf_namespace)
 
         if isinstance(graph, set):
-            graph.update(self.contents_triples())
+            graph.update(self._save_context_triples())
         else:
             ctx_graph = self.get_target_graph(graph)
             ctx_graph.addN((s, p, o, ctx_graph)
                            for s, p, o
-                           in self.contents_triples()
-                           if not (isinstance(s, Variable) or
-                                   isinstance(p, Variable) or
-                                   isinstance(o, Variable)))
+                           in self._save_context_triples())
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
+        self._saves.add((id(graph), self._change_counter))
+
+    @property
+    def triples_saved(self):
+        return self._triples_saved_helper()
+
+    def _triples_saved_helper(self, seen=None):
+        if seen is None:
+            seen = set([])
+        if id(self) in seen:
+            return 0
+        seen.add(id(self))
+        res = self._triples_saved
+        for ctx in self._imported_contexts:
+            res += ctx._triples_saved_helper(seen)
+        return res
+
+    def _save_context_triples(self):
+        for x in self._statements:
+            t = x.to_triple()
+            if not (isinstance(t[0], Variable) or
+                    isinstance(t[2], Variable) or
+                    isinstance(t[1], Variable)):
+                self._triples_saved += 1
+                yield t
 
     def get_target_graph(self, graph):
         res = graph
@@ -202,26 +227,18 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
     def contents_triples(self):
         for x in self._statements:
-            self.tripcnt += 1
-            try:
-                yield x.to_triple()
-            except Exception as e:
-                raise e
+            yield x.to_triple()
 
     def contextualize(self, context):
         return ContextualizingProxy(context, self)
 
     @property
     def rdf_object(self):
-        if self._rdf_object is None:
-            # XXX: This is a hack that works for `Evidence.asserts(a.b(c))`
-            # since we have to define the Context's RDF type *somewhere*.
-            # Really though, A context's rdf_object should have its type
-            # statement defined in some other context which specifically holds
-            # context metadata.
+       if self._rdf_object is None:
             from PyOpenWorm.contextDataObject import ContextDataObject
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
-        return self._rdf_object
+
+       return self._rdf_object.contextualize(self.context)
 
     def __bool__(self):
         return True
@@ -291,7 +308,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return QueryContext(graph=self.load_graph_from_configured_store(),
                             ident=self.identifier)
 
-    def _create_rdf_graph(self):
+    def _retreive_configured_graph(self):
         try:
             return self.conf['rdf.graph']
         except KeyError:
