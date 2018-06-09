@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from .dataObject import DatatypeProperty, ObjectProperty
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 from .muscle import Muscle
 from .cell import Cell
 from .biology import BiologyType
@@ -19,6 +19,9 @@ class Worm(BiologyType):
 
     scientific_name = DatatypeProperty()
     ''' Scientific name for the organism '''
+
+    name = Alias(scientific_name)
+    ''' Alias to `scientific_name` '''
 
     muscle = ObjectProperty(value_type=Muscle, multiple=True)
     ''' A type of muscle which is in the worm '''

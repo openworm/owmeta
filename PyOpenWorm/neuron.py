@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from wrapt import ObjectProxy
 from .pProperty import Property
-from .dataObject import DatatypeProperty
+from .dataObject import DatatypeProperty, Alias
 from .cell import Cell
 from .connection import Connection
 
@@ -89,7 +89,7 @@ class Neuron(Cell):
     neuropeptide = DatatypeProperty(multiple=True)
     ''' Name of the gene corresponding to the neuropeptide produced by this neuron '''
 
-    receptors = receptor
+    receptors = Alias(receptor)
     ''' Alias to receptor '''
 
     def __init__(self, name=False, **kwargs):

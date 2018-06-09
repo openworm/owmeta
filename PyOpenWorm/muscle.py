@@ -1,6 +1,6 @@
 from .cell import Cell
 from .neuron import Neuron
-from .dataObject import DatatypeProperty, ObjectProperty
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 
 
 class Muscle(Cell):
@@ -25,11 +25,11 @@ class Muscle(Cell):
 
     class_context = Cell.class_context
 
-    neurons = ObjectProperty(value_type=Neuron, multiple=True)
+    innervatedBy = ObjectProperty(value_type=Neuron, multiple=True)
     ''' Neurons synapsing with this muscle '''
 
-    innervatedBy = neurons
-    ''' Alias to neurons '''
+    neurons = Alias(innervatedBy)
+    ''' Alias to innervatedBy '''
 
     receptors = DatatypeProperty(multiple=True)
     ''' Receptor types expressed by this type of muscle '''

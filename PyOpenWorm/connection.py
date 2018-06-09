@@ -44,8 +44,20 @@ class Connection(BiologyType):
     termination = DatatypeProperty()
     ''' Where the connection terminates. Inferred from type of post_cell at initialization '''
 
-    def __init__(self, syntype=None, termination=None, **kwargs):
-        super(Connection, self).__init__(**kwargs)
+    def __init__(self,
+                 pre_cell=None,
+                 post_cell=None,
+                 number=None,
+                 syntype=None,
+                 synclass=None,
+                 termination=None,
+                 **kwargs):
+        super(Connection, self).__init__(pre_cell=pre_cell,
+                                         post_cell=post_cell,
+                                         number=number,
+                                         syntype=syntype,
+                                         synclass=synclass,
+                                         **kwargs)
 
         if isinstance(termination, six.string_types):
             termination = termination.lower()

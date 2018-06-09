@@ -81,6 +81,9 @@ class Channel(BiologyType):
     model = ObjectProperty(value_type=ChannelModel)
     ''' Get experimental models of this ion channel '''
 
+    def __init__(self, name=None, **kwargs):
+        super(Channel, self).__init__(name=name, **kwargs)
+
     @property
     def defined(self):
         return super(Channel, self).defined or self.name.has_defined_value()

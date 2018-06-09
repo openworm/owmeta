@@ -24,7 +24,7 @@ from yarom.mapper import FCN
 from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
-from .inverse_property import InversePropertyMixin, InverseProperty
+from .inverse_property import InverseProperty
 
 import PyOpenWorm.simpleProperty as SP
 
@@ -98,6 +98,11 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 c = v(self, k)
                 self._property_classes[k] = c
                 setattr(self, k, mp(c, k))
+
+        for k, v in dct.items():
+            if isinstance(v, Alias):
+                setattr(self, k, getattr(self, v.target.result.linkName))
+                self._property_classes[k] = v.target.result
 
     @classmethod
     def _find_class_context(cls, dct, bases):
@@ -197,33 +202,49 @@ class ContextualizableList(Contextualizable, list):
 
 
 class PThunk(object):
+    def __init__(self):
+        self.result = None
+
     def __call__(self, *args, **kwargs):
         raise NotImplementedError()
 
 
 class CPThunk(PThunk):
     def __init__(self, c):
+        super(CPThunk, self).__init__()
         self.c = c
 
     def __call__(self, *args, **kwargs):
+        self.result = self.c
         return self.c
 
 
 class APThunk(PThunk):
     def __init__(self, t, args, kwargs):
+        super(APThunk, self).__init__()
         self.t = t
         self.args = args
         self.kwargs = kwargs
 
     def __call__(self, cls, linkName):
-        return cls._create_property_class(linkName,
-                                          *self.args,
-                                          property_type=self.t,
-                                          **self.kwargs)
+        if self.result is None:
+            self.result = cls._create_property_class(linkName,
+                                                     *self.args,
+                                                     property_type=self.t,
+                                                     **self.kwargs)
+        return self.result
 
     def __repr__(self):
         return '{}({}, {})'.format(self.t, ',\n'.join(self.args),
                                    ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
+
+
+class Alias(object):
+    def __init__(self, target):
+        self.target = target
+
+    def __repr__(self):
+        return 'Alias(' + repr(self.target) + ')'
 
 
 def DatatypeProperty(*args, **kwargs):

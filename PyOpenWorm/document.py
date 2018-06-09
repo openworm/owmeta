@@ -5,7 +5,7 @@ import re
 import logging
 from yarom.graphObject import IdentifierMissingException
 from .context import Context
-from .dataObject import DataObject, DatatypeProperty
+from .dataObject import DataObject, DatatypeProperty, Alias
 
 from PyOpenWorm import bibtex as BIB
 
@@ -67,7 +67,7 @@ class Document(BaseDocument):
     wbid = DatatypeProperty()
     ''' An ID from WormBase.org that points to a record, optional '''
 
-    wormbaseid = wbid
+    wormbaseid = Alias(wbid)
     ''' An alias to `wbid` '''
 
     pmid = DatatypeProperty()
@@ -76,7 +76,7 @@ class Document(BaseDocument):
     year = DatatypeProperty()
     ''' The year (e.g., publication year) of the document '''
 
-    date = year
+    date = Alias(year)
     ''' Alias to year '''
 
     title = DatatypeProperty()
