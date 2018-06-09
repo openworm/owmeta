@@ -48,9 +48,9 @@ NEURON_EXPRESSION_DATA_SOURCE = "Modified celegans db dump.csv"
 ADDITIONAL_EXPR_DATA_DIR = 'expression_data'
 
 
-def aux_data(s):
+def aux_data():
     d = get_library_location('OpenWormData')
-    return os.path.join(d, 'aux_data', s)
+    return os.path.join(d, 'aux_data')
 
 
 # TODO: Make PersonDataTranslators and Document/Website DataSource for the
@@ -61,42 +61,42 @@ def init_sources():
         WormbaseTextMatchCSVDataSource(
             key='WormbaseTextMatchCSVChannelNeuronDataSource',
             cell_type=Neuron,
-            csv_file_name=aux_data(CHANNEL_NEURON_SOURCE),
+            csv_file_name=CHANNEL_NEURON_SOURCE,
             initial_cell_column=101),
         WormbaseTextMatchCSVDataSource(
             key='WormbaseTextMatchCSVChannelMuscleDataSource',
             cell_type=Muscle,
-            csv_file_name=aux_data(CHANNEL_MUSCLE_SOURCE),
+            csv_file_name=CHANNEL_MUSCLE_SOURCE,
             initial_cell_column=6),
         WormbaseIonChannelCSVDataSource(
             key='WormbaseIonChannelCSVDataSource',
-            csv_file_name=aux_data(IONCHANNEL_SOURCE)),
+            csv_file_name=IONCHANNEL_SOURCE),
         NeuronCSVDataSource(
             key='WormAtlasNeuronTypesSource',
-            csv_file_name=aux_data(NEURON_EXPRESSION_DATA_SOURCE),
-            bibtex_files=[aux_data('bibtex_files/altun2009.bib'),
-                          aux_data('bibtex_files/WormAtlas.bib')]),
+            csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
+            bibtex_files=['bibtex_files/altun2009.bib',
+                          'bibtex_files/WormAtlas.bib']),
         WormBaseCSVDataSource(
             key='WormBaseCSVDataSource',
-            csv_file_name=aux_data(CELL_NAMES_SOURCE),
+            csv_file_name=CELL_NAMES_SOURCE,
             description="CSV converted from this Google Spreadsheet: "
                         "https://docs.google.com/spreadsheets/d/"
                         "1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1"),
         WormAtlasCellListDataSource(
             key='WormAtlasCellList',
-            csv_file_name=aux_data(LINEAGE_LIST_LOC),
+            csv_file_name=LINEAGE_LIST_LOC,
             description="CSV converted from this Google Spreadsheet: "
                         "https://docs.google.com/spreadsheets/d/"
                         "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit"),
         ConnectomeCSVDataSource(
             key='EmmonsConnectomeCSVDataSource',
-            csv_file_name=aux_data(CONNECTOME_SOURCE))
+            csv_file_name=CONNECTOME_SOURCE)
     ]
 
 
 def init_extra_sources():
     res = []
-    for root, _, filenames in os.walk(aux_data(ADDITIONAL_EXPR_DATA_DIR)):
+    for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR):
         for filename in sorted(filenames):
             if filename.lower().endswith('.csv'):
                 name = 'NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0]
@@ -192,26 +192,29 @@ def infer():
     print ("filled in with inferred data")
 
 
-def do_insert(ident, config="default.conf", logging=False, imports_context_ident=None):
-
-    CTX = Context(ident=ident + '-data', imported=(P.CONTEXT,))
-
-    EVCTX = Context(ident=ident + '-evidence', imported=(P.CONTEXT,))
-
-    IWCTX = Context(ident=ident, imported=(CTX, EVCTX))
-
-    imports_context = Context(ident=imports_context_ident)
+def do_insert(ident, config="default.conf", logging=False, imports_context_ident=None, basedir=aux_data()):
 
     sources = init_sources()
     extras = init_extra_sources()
     data_sources_by_key = {x.key: x for x in sources + extras}
     trans_map = init_translators() + init_extra_neuron_data_translators(extras)
     P.connect(configFile=config, do_logging=logging)
+    P.config()
+
+    CTX = Context(ident=ident + '-data', imported=(P.CONTEXT,), conf=P.config())
+
+    EVCTX = Context(ident=ident + '-evidence', imported=(P.CONTEXT,), conf=P.config())
+
+    IWCTX = Context(ident=ident, imported=(CTX, EVCTX), conf=P.config())
+
+    imports_context = Context(ident=imports_context_ident, conf=P.config())
+
     try:
         t0 = time()
         translators = dict()
         remaining = list(trans_map)
         last_remaining = None
+        saved_contexts = set([])
         while remaining != last_remaining:
             next_remaining = []
             for t in remaining:
@@ -236,13 +239,18 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
 
                 print('\n'.join('Input({}/{}): {}'.format(i + 1, len(sources), s) for i, s in enumerate(sources)))
                 print('Translating with {}'.format(translator))
-                res = translator(*sources, output_key=output_key)
+                orig_wd = os.getcwd()
+                os.chdir(basedir)
+                try:
+                    res = translator(*sources, output_key=output_key)
+                finally:
+                    os.chdir(orig_wd)
 
                 print('Result: {}'.format(res))
                 if isinstance(res, DataWithEvidenceDataSource):
-                    res.data_context.save_context(inline_imports=True, assume_unchanged=True)
+                    res.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
                     res.data_context.save_imports(imports_context)
-                    res.evidence_context.save_context(inline_imports=True, assume_unchanged=True)
+                    res.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
                     res.evidence_context.save_imports(imports_context)
                     for ctx in res.contexts:
                         raise Exception()
@@ -269,11 +277,10 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
                 EVCTX.add_import(src.evidence_context)
                 for ctx in src.contexts:
                     IWCTX.add_import(ctx)
-        IWCTX.save_context(graph, assume_unchanged=True)
+        IWCTX.save_context(graph, saved_contexts=saved_contexts)
         IWCTX.save_imports(imports_context)
         imports_context.save_context(graph)
         print('imports context size', len(imports_context))
-        print('imports top ten', list(zip(range(10), imports_context.contents_triples())))
         print("Saved %d triples." % IWCTX.triples_saved)
         t2 = time()
 

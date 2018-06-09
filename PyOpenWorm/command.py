@@ -7,10 +7,6 @@ import logging
 L = logging.getLogger(__name__)
 
 
-# XXX: How should we handle arguments that apply to many different commands,
-# but which don't belong to a sub-command??
-
-
 class POW(object):
     """
     Attributes set on this object parameterize commands, but they are not

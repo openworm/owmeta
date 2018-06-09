@@ -110,8 +110,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self._change_counter = 0
         self._triples_saved = 0
 
-        self._saves = set()
-
     def contents(self):
         return (x for x in self._statements)
 
@@ -144,36 +142,36 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         for x in self._imported_contexts:
             yield x
 
-    def save_imports(self, context):
+    def save_imports(self, context, *args, **kwargs):
+        self.declare_imports(context)
+        context.save_context(*args, **kwargs)
+
+    def declare_imports(self, context):
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
                     and not isinstance(ctx.identifier, rdflib.term.BNode):
                 context(self.rdf_object).imports(ctx.rdf_object)
-                ctx.save_imports(context)
+                ctx.declare_imports(context)
 
-    def save_context(self, graph=None, inline_imports=False, autocommit=True, seen=None, assume_unchanged=False):
-        if seen is None:
-            seen = set([])
+    def save_context(self, graph=None, inline_imports=False, autocommit=True, saved_contexts=None):
+        if saved_contexts is None:
+            saved_contexts = set([])
 
-        if id(self) in seen:
+        if (self._change_counter, id(self)) in saved_contexts:
             return
 
-        seen.add(id(self))
+        saved_contexts.add((self._change_counter, id(self)))
 
-        graph = graph if graph is not None else self._retreive_configured_graph()
-
-        if assume_unchanged and (id(graph), self._change_counter) in self._saves:
-            return
-
-        self._triples_saved = 0
+        if graph is None:
+            graph = self._retreive_configured_graph()
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
         if inline_imports:
             for ctx in self._imported_contexts:
-                ctx.save_context(graph, inline_imports, False, seen, assume_unchanged)
+                ctx.save_context(graph, inline_imports, False, saved_contexts)
 
         if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
@@ -190,7 +188,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
-        self._saves.add((id(graph), self._change_counter))
 
     @property
     def triples_saved(self):
@@ -208,6 +205,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return res
 
     def _save_context_triples(self):
+        self._triples_saved = 0
         for x in self._statements:
             t = x.to_triple()
             if not (isinstance(t[0], Variable) or
