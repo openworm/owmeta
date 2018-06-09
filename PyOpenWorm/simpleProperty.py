@@ -114,7 +114,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if not self.multiple:
             self.clear()
 
-        stmt = self._insert_value(v, self.context)
+        stmt = self._insert_value(v)
         if self.context is not None:
             self.context.add_statement(stmt)
         return stmt
@@ -165,7 +165,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self._remove_value(v)
         return results
 
-    def _insert_value(self, v, ctx=None):
+    def _insert_value(self, v):
         stmt = Statement(self.owner, self, v, self.context)
         self._hdf = None
         self._v.append(stmt)

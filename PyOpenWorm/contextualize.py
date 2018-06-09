@@ -192,7 +192,6 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                             wrapped = get_wrapped(self) if wrapped is None else wrapped
                             return k.__get__(wrapped, type(wrapped))
                         else:
-                            wrapped = get_wrapped(self) if wrapped is None else wrapped
                             return k.__get__(self, type(self))
                 else:
                     try:
