@@ -94,13 +94,14 @@ def init_sources():
     ]
 
 
-def init_extra_sources():
+def init_extra_sources(basedir):
     res = []
-    for root, _, filenames in os.walk(ADDITIONAL_EXPR_DATA_DIR):
+    for root, _, filenames in os.walk(os.path.join(basedir, ADDITIONAL_EXPR_DATA_DIR)):
         for filename in sorted(filenames):
             if filename.lower().endswith('.csv'):
                 name = 'NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0]
-                res.append(NeuronCSVDataSource(csv_file_name=os.path.join(root, filename), key=name))
+                relpath = os.path.relpath(os.path.join(root, filename), basedir)
+                res.append(NeuronCSVDataSource(csv_file_name=relpath, key=name))
 
     return res
 
@@ -195,7 +196,7 @@ def infer():
 def do_insert(ident, config="default.conf", logging=False, imports_context_ident=None, basedir=aux_data()):
 
     sources = init_sources()
-    extras = init_extra_sources()
+    extras = init_extra_sources(basedir)
     data_sources_by_key = {x.key: x for x in sources + extras}
     trans_map = init_translators() + init_extra_neuron_data_translators(extras)
     P.connect(configFile=config, do_logging=logging)

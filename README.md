@@ -207,7 +207,7 @@ See what neurons express a given neuropeptide::
 ```python
 >>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
-PyOpenWorm.statement.Statement(subj=Neuron(ident=?aNeuron_...), prop=PyOpenWorm.neuron.Neuron_neuropeptide(owner=Neuron(ident=?aNeuron_...)), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('INS-26')), context=PyOpenWorm.context.QueryContext(ident="http://openworm.org/entities/bio#worm0-data"))
+PyOpenWorm.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=PyOpenWorm.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('INS-26')), context=PyOpenWorm.context.QueryContext(ident="http://openworm.org/entities/bio#worm0-data"))
 
 >>> sorted(x.name() for x in n.load())
 ['ASEL', 'ASER', 'ASIL', 'ASIR']
