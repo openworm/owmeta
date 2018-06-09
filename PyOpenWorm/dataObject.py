@@ -498,6 +498,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             linkName,
             property_type,
             value_type=None,
+            value_rdf_type=None,
             multiple=False,
             link=None,
             lazy=True,
@@ -515,6 +516,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if value_type is This:
             value_type = owner_class
 
+        if isinstance(value_type, six.text_type):
+            value_type = owner_class.mapper.load_class(value_type)
+
         if value_type is None:
             value_type = BaseDataObject
 
@@ -524,16 +528,17 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         else:
             klass = None
             if property_type == 'ObjectProperty':
-                value_rdf_type = value_type.rdf_type
+                if value_type is not None and value_rdf_type is None:
+                    value_rdf_type = value_type.rdf_type
                 klass = SP.ObjectProperty
             elif property_type == 'DatatypeProperty':
-                value_rdf_type = False
+                value_rdf_type = None
                 klass = SP.DatatypeProperty
             elif property_type == 'UnionProperty':
-                value_rdf_type = False
+                value_rdf_type = None
                 klass = SP.UnionProperty
             else:
-                value_rdf_type = False
+                value_rdf_type = None
 
             if link is None:
                 if owner_class.rdf_namespace is None:

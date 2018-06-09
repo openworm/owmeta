@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from PyOpenWorm.dataObject import InverseProperty
-from PyOpenWorm.muscle import Muscle
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.biology import BiologyType
-from PyOpenWorm.network import Network
+from .dataObject import DatatypeProperty, ObjectProperty
+from .muscle import Muscle
+from .cell import Cell
+from .biology import BiologyType
+from .network import Network
 
 
 class Worm(BiologyType):
@@ -13,29 +13,24 @@ class Worm(BiologyType):
     """
     A representation of the whole worm.
 
-    All worms with the same name are considered to be the same object.
-
-    Attributes
-    ----------
-    neuron_network : ObjectProperty
-        The neuron network of the worm
-    muscle : ObjectProperty
-        Muscles of the worm
-
     """
 
     class_context = BiologyType.class_context
 
+    scientific_name = DatatypeProperty()
+    ''' Scientific name for the organism '''
+
+    muscle = ObjectProperty(value_type=Muscle, multiple=True)
+    ''' A type of muscle which is in the worm '''
+
+    cell = ObjectProperty(value_type=Cell)
+    ''' A cell in the worm '''
+
+    neuron_network = ObjectProperty(value_type=Network, inverse_of=(Network, 'worm'))
+    ''' The neuron network of the worm '''
+
     def __init__(self, scientific_name=False, **kwargs):
         super(Worm, self).__init__(**kwargs)
-        self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty(
-            "muscle",
-            owner=self,
-            value_type=Muscle,
-            multiple=True)
-        Worm.ObjectProperty("cell", owner=self, value_type=Cell)
-        Worm.ObjectProperty("neuron_network", owner=self, value_type=Network)
 
         if scientific_name:
             self.scientific_name(scientific_name)
@@ -96,11 +91,12 @@ class Worm(BiologyType):
         return self.rdf
 
     def defined_augment(self):
+        ''' True if the name is defined '''
         return self.name.has_defined_value()
 
     def identifier_augment(self, *args, **kwargs):
+        ''' Result is derived from the name property '''
         return self.make_identifier(self.name.defined_values[0])
 
 
-InverseProperty(Worm, 'neuron_network', Network, 'worm')
 __yarom_mapped_classes__ = (Worm,)

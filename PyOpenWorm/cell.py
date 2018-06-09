@@ -3,9 +3,10 @@ from __future__ import print_function
 from string import Template
 import neuroml
 
-from PyOpenWorm.channel import Channel
-from PyOpenWorm.biology import BiologyType
+from .channel import Channel
+from .biology import BiologyType
 from .dataObject import DatatypeProperty, ObjectProperty, This
+from .cell_common import CELL_RDF_TYPE
 
 __all__ = ["Cell"]
 
@@ -73,6 +74,8 @@ class Cell(BiologyType):
     """
 
     class_context = BiologyType.class_context
+
+    rdf_type = CELL_RDF_TYPE
 
     divisionVolume = DatatypeProperty()
     ''' The volume of the cell at division
