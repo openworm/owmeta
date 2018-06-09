@@ -4,12 +4,16 @@ try:
 except ImportError:
     from mock import Mock
 import tempfile
-from PyOpenWorm.command import POW, UnreadableGraphException
 import os
-from os.path import exists, abspath
+from os.path import exists, abspath, join as pth_join
 import shutil
 import json
 from rdflib.term import URIRef
+from pytest import mark
+import git
+
+from PyOpenWorm.git_repo import GitRepoProvider
+from PyOpenWorm.command import POW, UnreadableGraphException
 
 
 class BaseTest(unittest.TestCase):
@@ -91,12 +95,21 @@ class CommandTest(BaseTest):
         self.assertIn(q, self.cut._conf()['rdf.graph'])
 
 
+@mark.inttest
 class GitCommandTest(BaseTest):
 
     def test_init(self):
         """ A git directory should be created when we use the .git repository
            provider
         """
-        self.cut.repository_proivder =
+        self.cut.repository_proivder = GitRepoProvider()
         self.cut.init()
+        self.assertTrue(exists(pth_join(self.cut.powdir, '.git')))
 
+    def test_init_tracks_config(self):
+        """ A git directory should be created when we use the .git repository
+           provider
+        """
+        self.cut.repository_proivder = GitRepoProvider()
+        self.cut.init()
+        pth_join(self.cut.powdir, '.git')

@@ -28,13 +28,16 @@ class POW(object):
         """ Callable that returns a graph accessor when given a URL for the graph """
 
         self.powdir = '.pow'
+        """
+        The base director for PyOpenWorm files. The repository provider's files
+        also go under here
+        """
 
-    # Imports, other than those from the standard library, are included in each
-    # method separately since, eventually, each method should be independent of
-    # the others to the extent that you may even choose not to install
-    # dependencies for commands which are not used.  This should permit a
-    # generic handler for ImportError wherein a dependency is only installed
-    # when needed. This should also reduce load times for each command
+        self.repository_proivder = None
+        """
+        The provider of the repository logic (cloning, initializing,
+        committing, checkouts)
+        """
 
     @property
     def config_file(self):
@@ -90,6 +93,11 @@ class POW(object):
                 json.dump(conf, f)
 
         self._init_store()
+        self._init_repository()
+
+    def _init_repository(self):
+        if self.repository_proivder is not None:
+            self.repository_proivder.init(base=self.powdir)
 
     def fetch_graph(self, url):
         """
