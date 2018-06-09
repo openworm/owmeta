@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 import six
 
 
-from PyOpenWorm.biology import BiologyType
-from PyOpenWorm.cell import Cell
+from .biology import BiologyType
+from .cell import Cell
+from .dataObject import DatatypeProperty, ObjectProperty
 
 __all__ = ['Connection']
 
@@ -23,30 +24,25 @@ class Termination:
 
 class Connection(BiologyType):
 
-    """Connection between Cells
-
-    Parameters
-    ----------
-    pre_cell : string, Muscle or Neuron, optional
-        The pre-synaptic cell
-    post_cell : string, Muscle or Neuron, optional
-        The post-synaptic cell
-    number : int, optional
-        The weight of the connection
-    syntype : {'gapJunction', 'send'}, optional
-        The kind of synaptic connection. 'gapJunction' indicates
-        a gap junction and 'send' a chemical synapse
-    synclass : string, optional
-        The kind of Neurotransmitter (if any) sent between `pre_cell` and
-        `post_cell`
-
-    Attributes
-    ----------
-    termination : {'neuron', 'muscle'}
-        Where the connection terminates. Inferred from type of post_cell
-    """
-
     class_context = BiologyType.class_context
+
+    post_cell = ObjectProperty(value_type=Cell)
+    ''' The post-synaptic cell '''
+
+    pre_cell = ObjectProperty(value_type=Cell)
+    ''' The pre-synaptic cell '''
+
+    number = DatatypeProperty()
+    ''' The weight of the connection '''
+
+    synclass = DatatypeProperty()
+    ''' The kind of Neurotransmitter (if any) sent between `pre_cell` and `post_cell` '''
+
+    syntype = DatatypeProperty()
+    ''' The kind of synaptic connection. 'gapJunction' indicates a gap junction and 'send' a chemical synapse '''
+
+    termination = DatatypeProperty()
+    ''' Where the connection terminates. Inferred from type of post_cell at initialization '''
 
     def __init__(self,
                  pre_cell=None,
@@ -56,25 +52,12 @@ class Connection(BiologyType):
                  synclass=None,
                  termination=None,
                  **kwargs):
-        super(Connection, self).__init__(**kwargs)
-
-        Connection.ObjectProperty('post_cell', owner=self, value_type=Cell)
-        Connection.ObjectProperty('pre_cell', owner=self, value_type=Cell)
-
-        Connection.DatatypeProperty('number', owner=self)
-        Connection.DatatypeProperty('synclass', owner=self)
-        Connection.DatatypeProperty('syntype', owner=self)
-        Connection.DatatypeProperty('termination', owner=self)
-
-        if isinstance(pre_cell, Cell):
-            self.pre_cell(pre_cell)
-        elif pre_cell is not None:
-            raise ValueError("PyOpenWorm.cell.Cell objects should be passed in for pre_cell")
-
-        if isinstance(post_cell, Cell):
-            self.post_cell(post_cell)
-        elif post_cell is not None:
-            raise ValueError("PyOpenWorm.cell.Cell objects should be passed in for post_cell")
+        super(Connection, self).__init__(pre_cell=pre_cell,
+                                         post_cell=post_cell,
+                                         number=number,
+                                         syntype=syntype,
+                                         synclass=synclass,
+                                         **kwargs)
 
         if isinstance(termination, six.string_types):
             termination = termination.lower()
@@ -83,22 +66,12 @@ class Connection(BiologyType):
             elif termination in ('muscle', Termination.Muscle):
                 self.termination(Termination.Muscle)
 
-        if isinstance(number, int):
-            self.number(int(number))
-        elif number is not None:
-            raise Exception(
-                "Connection number must be an int, given %s" %
-                number)
-
         if isinstance(syntype, six.string_types):
             syntype = syntype.lower()
             if syntype in ('send', SynapseType.Chemical):
                 self.syntype(SynapseType.Chemical)
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
-
-        if isinstance(synclass, six.string_types):
-            self.synclass(synclass)
 
     @property
     def defined(self):

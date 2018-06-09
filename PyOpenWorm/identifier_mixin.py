@@ -1,3 +1,4 @@
+from __future__ import print_function
 from rdflib.term import URIRef
 from six.moves.urllib.parse import quote
 import hashlib
@@ -21,8 +22,8 @@ def IdMixin(typ=object, hashfunc=None):
         to 'object'
     hashfunc : function
         The function to use for encoding data provided to make_identifier.
-        Should return an object can ``.encode()`` to a :class:`bytes` (a.k.a.
-        :class:`str` in Python 2).  Defaults to `hashlib.md5`
+        Should return an object can ``.encode()`` to a :py:class:`bytes` (a.k.a.
+        :py:class:`str` in Python 2).  Defaults to :py:func:`hashlib.sha224`
     """
     res = _IdMixins.get((id(typ), hashfunc), None)
     if res is None:

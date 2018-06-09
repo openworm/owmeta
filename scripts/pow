@@ -17,7 +17,9 @@ options = parser.parse_args()
 
 if options.subparser == 'init_graph':
     from OpenWormData.scripts.insert_worm import do_insert
-    do_insert("http://openworm.org/entities/bio#worm0", config=options.config)
+    do_insert("http://openworm.org/entities/bio#worm0",
+              config=options.config,
+              imports_context_ident="http://openworm.org/data/imports")
 elif options.subparser == 'list_contexts':
     from PyOpenWorm.data import Data
     dat = Data.open(options.config)

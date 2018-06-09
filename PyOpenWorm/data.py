@@ -1,7 +1,5 @@
 from __future__ import print_function
 import sqlite3
-import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue
 import hashlib
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
@@ -12,6 +10,7 @@ import os
 import traceback
 import logging
 from .utils import grouper
+from .configure import Configureable, Configure, ConfigValue
 
 __all__ = [
     "Data",
@@ -333,7 +332,7 @@ def modification_date(filename):
     return datetime.datetime.fromtimestamp(t)
 
 
-class RDFSource(Configureable, PyOpenWorm.ConfigValue):
+class RDFSource(Configureable, ConfigValue):
 
     """ Base class for data sources.
 

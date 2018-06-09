@@ -163,10 +163,11 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+PyOpenWorm.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=PyOpenWorm.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('AB alaaapalr')), context=PyOpenWorm.context.Context(ident="http://example.org/data/context"))
+
 
 >>> e.supports(dctx.rdf_object)
-PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+PyOpenWorm.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83')), prop=PyOpenWorm.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=PyOpenWorm.context.Context(ident="http://example.org/evidence/context"))
 
 >>> dctx.save_context()
 >>> evctx.save_context()
@@ -194,7 +195,7 @@ object of that type and calling `load()`::
 ...     w = cctx.Worm()
 ...     net = cctx.Network()
 ...     w.neuron_network(net)
-PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+PyOpenWorm.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b')), prop=PyOpenWorm.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://openworm.org/entities/Network/ad33294553d7aae0c3c3f4ab331a295a1')), context=PyOpenWorm.context.QueryContext(ident="http://openworm.org/entities/bio#worm0-data"))
 
 ...     neur = cctx.Neuron()
 ...     neur.count()
@@ -206,7 +207,7 @@ See what neurons express a given neuropeptide::
 ```python
 >>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
-PyOpenWorm.simpleProperty._ContextualizableLazyProxy(...)
+PyOpenWorm.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=PyOpenWorm.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('INS-26')), context=PyOpenWorm.context.QueryContext(ident="http://openworm.org/entities/bio#worm0-data"))
 
 >>> sorted(x.name() for x in n.load())
 ['ASEL', 'ASER', 'ASIL', 'ASIR']

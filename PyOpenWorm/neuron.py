@@ -1,12 +1,11 @@
 from __future__ import print_function
 
 from wrapt import ObjectProxy
-from PyOpenWorm.pProperty import Property
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.connection import Connection
+from .pProperty import Property
+from .dataObject import DatatypeProperty, Alias
+from .cell import Cell
+from .connection import Connection
 
-
-# XXX: Should we specify somewhere whether we have NetworkX or something else?
 
 class NeuronProxy(ObjectProxy):
 
@@ -64,16 +63,6 @@ class Neuron(Cell):
 
     Attributes
     ----------
-    type : DatatypeProperty
-        The neuron type (i.e., sensory, interneuron, motor)
-    receptor : DatatypeProperty
-        The receptor types associated with this neuron
-    innexin : DatatypeProperty
-        Innexin types associated with this neuron
-    neurotransmitter : DatatypeProperty
-        Neurotransmitters associated with this neuron
-    neuropeptide : DatatypeProperty
-        Name of the gene corresponding to the neuropeptide produced by this neuron
     neighbor : Property
         Get neurons connected to this neuron if called with no arguments, or
         with arguments, state that neuronName is a neighbor of this Neuron
@@ -85,6 +74,24 @@ class Neuron(Cell):
 
     class_context = Cell.class_context
 
+    type = DatatypeProperty(multiple=True)
+    ''' The neuron type (i.e., sensory, interneuron, motor) '''
+
+    receptor = DatatypeProperty(multiple=True)
+    ''' The receptor types associated with this neuron '''
+
+    innexin = DatatypeProperty(multiple=True)
+    ''' Innexin types associated with this neuron '''
+
+    neurotransmitter = DatatypeProperty(multiple=True)
+    ''' Neurotransmitters associated with this neuron '''
+
+    neuropeptide = DatatypeProperty(multiple=True)
+    ''' Name of the gene corresponding to the neuropeptide produced by this neuron '''
+
+    receptors = Alias(receptor)
+    ''' Alias to receptor '''
+
     def __init__(self, name=False, **kwargs):
         super(Neuron, self).__init__(name=name, **kwargs)
         # Get neurons connected to this neuron
@@ -92,14 +99,7 @@ class Neuron(Cell):
         # Get connections from this neuron
         ConnectionProperty(owner=self)
 
-        Neuron.DatatypeProperty("type", self, multiple=True)
-        Neuron.DatatypeProperty("receptor", self, multiple=True)
-        Neuron.DatatypeProperty("innexin", self, multiple=True)
-        Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
-        Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
-        ### Aliases ###
         self.get_neighbors = self.neighbor
-        self.receptors = self.receptor
 
     def contextualize(self, context):
         res = super(Neuron, self).contextualize(context)
