@@ -1,9 +1,12 @@
+import rdflib
 from rdflib.term import URIRef
-from rdflib.graph import ConjunctiveGraph
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
 from .DataTestTemplate import _DataTest
-
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
 
 class ContextTest(_DataTest):
     def test_inverse_property_context(self):
@@ -97,3 +100,89 @@ class ContextTest(_DataTest):
         ctx3.add_import(ctx)
         final_ctx = Context(ident='http://example.com/context_1', imported=(ctx3,))
         self.assertEqual(len(final_ctx.save_imports()), 4)
+
+    def test_init_len(self):
+        ctx = Context(ident='http://example.com/context_1')
+        self.assertEqual(len(ctx), 0)
+
+    def test_len(self):
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        for i in range(5):
+            ctx.add_statement(create_mock_statement(ident_uri, i))
+        self.assertEqual(len(ctx), 5)
+
+    def test_add_remove_statement(self):
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        stmt_to_remove = create_mock_statement(ident_uri, 42)
+        for i in range(5):
+            ctx.add_statement(create_mock_statement(ident_uri, i))
+        ctx.add_statement(stmt_to_remove)
+        ctx.remove_statement(stmt_to_remove)
+        self.assertEqual(len(ctx), 5)
+
+    def test_add_statement_with_different_context(self):
+        ctx = Context(ident='http://example.com/context_1')
+        stmt1 = create_mock_statement('http://example.com/context_2', 1)
+        with self.assertRaises(ValueError):
+            ctx.add_statement(stmt1)
+
+    def test_contents_triples(self):
+        res_wanted = []
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        for i in range(5):
+            stmt = create_mock_statement(ident_uri, i)
+            ctx.add_statement(stmt)
+            res_wanted.append(stmt.to_triple())
+        for triples in ctx.contents_triples():
+            self.assertTrue(triples in res_wanted)
+
+    def test_clear(self):
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        for i in range(5):
+            ctx.add_statement(create_mock_statement(ident_uri, i))
+        ctx.clear()
+        self.assertEqual(len(ctx), 0)
+
+    def test_save_context(self):
+        graph = set()
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        for i in range(5):
+            ctx.add_statement(create_mock_statement(ident_uri, i))
+        ctx.save_context(graph)
+        self.assertEqual(len(graph), 5)
+
+    def test_save_context_with_inline_imports(self):
+        graph = set()
+        ident_uri = 'http://example.com/context_1'
+        ident_uri2 = 'http://example.com/context_2'
+        ident_uri2_1 = 'http://example.com/context_2_1'
+        ident_uri3 = 'http://example.com/context_3'
+        ident_uri4 = 'http://example.com/context_4'
+        ctx = Context(ident=ident_uri)
+        ctx2 = Context(ident=ident_uri2)
+        ctx2_1 = Context(ident=ident_uri2_1)
+        ctx.add_import(ctx2)
+        ctx.add_import(ctx2_1)
+        ctx3 = Context(ident=ident_uri3)
+        ctx3.add_import(ctx)
+        last_ctx = Context(ident=ident_uri4)
+        last_ctx.add_import(ctx3)
+        ctx.add_statement(create_mock_statement(ident_uri, 1))
+        ctx2.add_statement(create_mock_statement(ident_uri2, 2))
+        ctx2_1.add_statement(create_mock_statement(ident_uri2_1, 2.1))
+        ctx3.add_statement(create_mock_statement(ident_uri3, 3))
+        last_ctx.add_statement(create_mock_statement(ident_uri4, 4))
+        last_ctx.save_context(graph, True)
+        self.assertEqual(len(graph), 5)
+
+
+def create_mock_statement(ident_uri, stmt_id):
+    statement = MagicMock()
+    statement.context.identifier = rdflib.term.URIRef(ident_uri)
+    statement.to_triple.return_value = (True, stmt_id, -stmt_id)
+    return statement
