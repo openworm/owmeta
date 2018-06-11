@@ -3,9 +3,10 @@ from __future__ import print_function
 from string import Template
 import neuroml
 
-from PyOpenWorm.dataObject import InverseProperty
-from PyOpenWorm.channel import Channel
-from PyOpenWorm.biology import BiologyType
+from .channel import Channel
+from .biology import BiologyType
+from .dataObject import DatatypeProperty, ObjectProperty, This
+from .cell_common import CELL_RDF_TYPE
 
 __all__ = ["Cell"]
 
@@ -58,6 +59,7 @@ def _dict_merge(d1, d2):
 
 
 class Cell(BiologyType):
+
     """
     A biological cell.
 
@@ -65,52 +67,52 @@ class Cell(BiologyType):
 
     Parameters
     -----------
-    name : string
+    name : str
         The name of the cell
-    lineageName : string
+    lineageName : str
         The lineageName of the cell
-        Example::
+    """
 
-            >>> c = Cell(name="ADAL")
-            >>> c.lineageName() # Returns ["AB plapaaaapp"]
+    class_context = BiologyType.class_context
 
-    Attributes
-    ----------
-    name : DatatypeProperty
-        The 'adult' name of the cell typically used by biologists when discussing C. elegans
-    lineageName : DatatypeProperty
-        The lineageName of the cell
+    rdf_type = CELL_RDF_TYPE
 
-    description : DatatypeProperty
-        A description of the cell
-    divisionVolume : DatatypeProperty
-        When called with no argument, return the volume of the cell at division
-        during development.
+    divisionVolume = DatatypeProperty()
+    ''' The volume of the cell at division
 
-        When called with an argument, set the volume of the cell at division
         Example::
 
             >>> v = Quantity("600","(um)^3")
             >>> c = Cell(lineageName="AB plapaaaap")
             >>> c.divisionVolume(v)
-    """
+    '''
 
-    class_context = BiologyType.class_context
+    name = DatatypeProperty()
+    ''' The 'adult' name of the cell typically used by biologists when discussing C. elegans '''
+    wormbaseID = DatatypeProperty()
 
-    def __init__(self, name=False, lineageName=False, **kwargs):
+    description = DatatypeProperty()
+    ''' A description of the cell '''
+
+    channel = ObjectProperty(value_type=Channel,
+                             multiple=True,
+                             inverse_of=(Channel, 'appearsIn'))
+
+    lineageName = DatatypeProperty()
+    ''' The lineageName of the cell
+        Example::
+
+            >>> c = Cell(name="ADAL")
+            >>> c.lineageName() # Returns ["AB plapaaaapp"]
+    '''
+
+    synonym = DatatypeProperty(multiple=True)
+    daughterOf = ObjectProperty(value_type=This,
+                                inverse_of=(This, 'parentOf'))
+    parentOf = ObjectProperty(value_type=This, multiple=True)
+
+    def __init__(self, name=None, lineageName=None, **kwargs):
         super(Cell, self).__init__(**kwargs)
-
-        Cell.DatatypeProperty('lineageName', owner=self)
-        Cell.DatatypeProperty('name', owner=self)
-        Cell.DatatypeProperty('divisionVolume', owner=self)
-        Cell.DatatypeProperty('description', owner=self)
-        Cell.DatatypeProperty('wormbaseID', owner=self)
-        Cell.DatatypeProperty('synonym', owner=self, multiple=True)
-        Cell.ObjectProperty('channel', owner=self, multiple=True,
-                            value_type=Channel)
-        self.daughterOf = Cell.ObjectProperty(value_type=Cell)
-        self.parentOf = Cell.ObjectProperty(value_type=Cell, multiple=True)
-
         if name:
             self.name(name)
 
@@ -201,6 +203,4 @@ class Cell(BiologyType):
         return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
 
 
-InverseProperty(Cell, 'channel', Channel, 'appearsIn')
-InverseProperty(Cell, 'daughterOf', Cell, 'parentOf')
 __yarom_mapped_classes__ = (Cell,)

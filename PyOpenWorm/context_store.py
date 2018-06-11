@@ -19,6 +19,7 @@ class ContextStore(Store):
         ----------
             context : PyOpenWorm.context.Context
                 context
+
         """
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
@@ -95,6 +96,7 @@ class ContextStore(Store):
         context given.
 
         :param context: a graph instance to query or None
+
         """
         if self._memory_store is None:
             raise Exception("Database has not been opened")

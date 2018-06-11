@@ -1,5 +1,5 @@
 import rdflib
-from rdflib.term import URIRef
+from rdflib.term import URIRef, Variable
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
 from .DataTestTemplate import _DataTest
@@ -7,6 +7,7 @@ try:
     from unittest.mock import MagicMock
 except ImportError:
     from mock import MagicMock
+
 
 class ContextTest(_DataTest):
     def test_inverse_property_context(self):
@@ -78,19 +79,22 @@ class ContextTest(_DataTest):
         ctx = Context(ident='http://example.com/context_1')
         self.assertEqual(len(list(ctx.imports)), 0)
 
-    def test_create_graph(self):
+    def test_zero_imports(self):
+        ctx0 = Context(ident='http://example.com/context_0')
         ctx = Context(ident='http://example.com/context_1')
-        graph = ctx.save_imports()
-        self.assertEqual(len(graph), 0)
+        ctx.save_imports(ctx0)
+        self.assertEqual(len(ctx0), 0)
 
     def test_save_import(self):
+        ctx0 = Context(ident='http://example.com/context_0')
         ctx = Context(ident='http://example.com/context_1')
         new_ctx = Context(ident='http://example.com/context_1')
         ctx.add_import(new_ctx)
-        create_graph = ctx.save_imports()
-        self.assertEqual(create_graph, ctx.save_imports())
+        ctx.save_imports(ctx0)
+        self.assertEqual(len(ctx0), 1)
 
     def test_add_import(self):
+        ctx0 = Context(ident='http://example.com/context_0')
         ctx = Context(ident='http://example.com/context_1')
         ctx2 = Context(ident='http://example.com/context_2')
         ctx2_1 = Context(ident='http://example.com/context_2_1')
@@ -99,7 +103,8 @@ class ContextTest(_DataTest):
         ctx3 = Context(ident='http://example.com/context_3')
         ctx3.add_import(ctx)
         final_ctx = Context(ident='http://example.com/context_1', imported=(ctx3,))
-        self.assertEqual(len(final_ctx.save_imports()), 4)
+        final_ctx.save_imports(ctx0)
+        self.assertEqual(len(ctx0), 4)
 
     def test_init_len(self):
         ctx = Context(ident='http://example.com/context_1')
@@ -180,6 +185,58 @@ class ContextTest(_DataTest):
         last_ctx.save_context(graph, True)
         self.assertEqual(len(graph), 5)
 
+    def test_triples_saved(self):
+        graph = set()
+        ident_uri = 'http://example.com/context_1'
+        ident_uri2 = 'http://example.com/context_2'
+        ident_uri2_1 = 'http://example.com/context_2_1'
+        ident_uri3 = 'http://example.com/context_3'
+        ident_uri4 = 'http://example.com/context_4'
+        ctx = Context(ident=ident_uri)
+        ctx2 = Context(ident=ident_uri2)
+        ctx2_1 = Context(ident=ident_uri2_1)
+        ctx.add_import(ctx2)
+        ctx.add_import(ctx2_1)
+        ctx3 = Context(ident=ident_uri3)
+        ctx3.add_import(ctx)
+        last_ctx = Context(ident=ident_uri4)
+        last_ctx.add_import(ctx3)
+        ctx.add_statement(create_mock_statement(ident_uri, 1))
+        ctx2.add_statement(create_mock_statement(ident_uri2, 2))
+        ctx2_1.add_statement(create_mock_statement(ident_uri2_1, 2.1))
+        ctx3.add_statement(create_mock_statement(ident_uri3, 3))
+        last_ctx.add_statement(create_mock_statement(ident_uri4, 4))
+        last_ctx.save_context(graph, True)
+        self.assertEqual(last_ctx.triples_saved, 5)
+
+    def test_triples_saved_noundef_triples_counted(self):
+        graph = set()
+        ident_uri = 'http://example.com/context_1'
+        ctx = Context(ident=ident_uri)
+        statement = MagicMock()
+        statement.context.identifier = rdflib.term.URIRef(ident_uri)
+        statement.to_triple.return_value = (Variable('var'), 1, 2)
+        ctx.add_statement(statement)
+        ctx.save_context(graph)
+        self.assertEqual(ctx.triples_saved, 0)
+
+    def test_triples_saved_multi(self):
+        graph = set()
+        ident_uri = 'http://example.com/context_1'
+        ident_uri1 = 'http://example.com/context_11'
+        ident_uri2 = 'http://example.com/context_12'
+        ctx = Context(ident=ident_uri)
+        ctx1 = Context(ident=ident_uri1)
+        ctx2 = Context(ident=ident_uri2)
+        ctx2.add_import(ctx)
+        ctx1.add_import(ctx2)
+        ctx1.add_import(ctx)
+
+        ctx.add_statement(create_mock_statement(ident_uri, 1))
+        ctx1.add_statement(create_mock_statement(ident_uri1, 3))
+        ctx2.add_statement(create_mock_statement(ident_uri2, 2))
+        ctx1.save_context(graph, inline_imports=True)
+        self.assertEqual(ctx1.triples_saved, 3)
 
 def create_mock_statement(ident_uri, stmt_id):
     statement = MagicMock()

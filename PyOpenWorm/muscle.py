@@ -1,5 +1,6 @@
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.neuron import Neuron
+from .cell import Cell
+from .neuron import Neuron
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 
 
 class Muscle(Cell):
@@ -20,21 +21,18 @@ class Muscle(Cell):
     neurons : ObjectProperty
         Neurons synapsing with this muscle
     receptors : DatatypeProperty
-        Get a list of receptors for this muscle if called with no arguments,
-        or state that this muscle has the given receptor type if called with
-        an argument
     """
 
     class_context = Cell.class_context
 
-    def __init__(self, name=False, **kwargs):
-        super(Muscle, self).__init__(name=name, **kwargs)
-        self.innervatedBy = Muscle.ObjectProperty(
-            "neurons",
-            owner=self,
-            value_type=Neuron,
-            multiple=True)
-        Muscle.DatatypeProperty("receptors", owner=self, multiple=True)
+    innervatedBy = ObjectProperty(value_type=Neuron, multiple=True)
+    ''' Neurons synapsing with this muscle '''
+
+    neurons = Alias(innervatedBy)
+    ''' Alias to innervatedBy '''
+
+    receptors = DatatypeProperty(multiple=True)
+    ''' Receptor types expressed by this type of muscle '''
 
 
 __yarom_mapped_classes__ = (Muscle,)
