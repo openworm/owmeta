@@ -5,17 +5,18 @@ import unittest
 import rdflib
 
 class RDFLibTest(unittest.TestCase):
-    """Tests RDFLib, our backend library that interfaces with the database as an
-       RDF graph."""
+    """'Learning tests' for  RDFLib, our backend library that interfaces with the database as an RDF graph."""
 
     @classmethod
     def setUpClass(cls):
         cls.ns = {"ns1" : "http://example.org/"}
+
     def test_uriref_not_url(self):
         try:
             rdflib.URIRef("daniel@example.com")
         except Exception:
             self.fail("Doesn't actually fail...which is weird")
+
     def test_uriref_not_id(self):
         """ Test that rdflib throws up a warning when we do something bad """
         import six

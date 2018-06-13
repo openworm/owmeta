@@ -11,8 +11,10 @@ from PyOpenWorm.worm import Worm
 from PyOpenWorm.evidence import Evidence
 
 
+# XXX: This could probably just be one test at this point -- iterate over all contexts and check for an
+# Evidence:supports triple
 class EvidenceCoverageTest(_DataTest):
-
+    ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
         PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")

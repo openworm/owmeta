@@ -3,40 +3,29 @@ from os import makedirs
 import json
 import logging
 
+from .command_util import IVar
+
 
 L = logging.getLogger(__name__)
 
 
 class POW(object):
     """
-    Attributes set on this object parameterize commands, but they are not
-    to be changed by the commands
+    High-level commands for working with PyOpenWorm data
     """
 
-    def __init__(self):
-        self.store_name = 'worm.db'
-        """ The file name of the database store """
+    graph_accessor_finder = IVar(doc='The file name of the database store')
 
-        self.config_file = 'pow.conf'
-        """ The config file name """
+    powdir = IVar('.pow',
+                  doc='The base directory for PyOpenWorm files.'
+                      ' The repository provider\'s files also go under here')
 
-        self.graph_accessor_finder = None
-        """ Callable that returns a graph accessor when given a URL for the graph """
+    repository_proivder = IVar(doc='The provider of the repository logic'
+                                   ' (cloning, initializing, committing, checkouts)')
 
-        self.powdir = '.pow'
-        """
-        The base director for PyOpenWorm files. The repository provider's files
-        also go under here
-        """
-
-        self.repository_proivder = None
-        """
-        The provider of the repository logic (cloning, initializing,
-        committing, checkouts)
-        """
-
-    @property
+    @IVar.property('pow.conf', value_type=str)
     def config_file(self):
+        ''' The config file name '''
         if isabs(self._config_file):
             return self._config_file
         return pth_join(self.powdir, self._config_file)
@@ -45,7 +34,7 @@ class POW(object):
     def config_file(self, val):
         self._config_file = val
 
-    @property
+    @IVar.property('worm.db')
     def store_name(self):
         if isabs(self._store_name):
             return self._store_name
@@ -173,6 +162,17 @@ class POW(object):
     def translate(self, translator, output_key=None, *data_sources, **named_data_sources):
         """
         Do a translation with the named translator and inputs
+
+        Parameters
+        ----------
+        translator : str
+            Translator identifier
+        output_key : str
+            Output identifier
+        *data_sources : str
+            Input data sources
+        **named_data_sources : str
+            Named input data sources
         """
 
     def reconstitute(self, data_source):

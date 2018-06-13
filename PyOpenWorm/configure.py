@@ -61,7 +61,12 @@ NO_DEFAULT = object()
 
 class Configure(object):
 
-    """ A simple configuration object.  Enables setting and getting key-value pairs"""
+    """
+    A simple configuration object.  Enables setting and getting key-value pairs
+
+    Unlike a `dict`, Configure objects will execute a function when retrieving values to enable deferred computation of
+    seldom-used configuration values. In addition, entries in a `Configure` can be aliased to one another.
+    """
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 

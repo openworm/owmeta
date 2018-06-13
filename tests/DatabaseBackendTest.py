@@ -16,9 +16,7 @@ from .GraphDBInit import delete_zodb_data_store, make_graph, has_bsddb
 
 
 class DatabaseBackendTest(unittest.TestCase):
-    """Integration tests that ensure basic functioning of the database
-      backend and connection.
-    """
+    ''' Integration tests for the database backend '''
     def test_namespace_manager(self):
         c = Configure()
         c['rdf.source'] = 'default'
