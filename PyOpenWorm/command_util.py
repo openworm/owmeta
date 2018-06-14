@@ -40,6 +40,16 @@ class IVar(object):
         return wrapper
 
 
+class SubCommand(object):
+
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.__doc__ = getattr(cmd, '__doc__', '')
+
+    def __get__(self, target, typ=None):
+        return self.cmd(target)
+
+
 class PropertyIVar(IVar):
     def __init__(self, *args, **kwargs):
         super(PropertyIVar, self).__init__(*args, **kwargs)

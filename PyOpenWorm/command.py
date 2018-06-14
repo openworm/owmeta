@@ -1,12 +1,47 @@
-from os.path import exists, abspath, join as pth_join, dirname, isabs
-from os import makedirs
+from __future__ import print_function
+from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
+from os import makedirs, mkdir
+import hashlib
+import shutil
 import json
 import logging
 
-from .command_util import IVar
+from .command_util import IVar, SubCommand
 
 
 L = logging.getLogger(__name__)
+
+
+class POWSource(object):
+    ''' Commands for working with DataSource objects '''
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    # Commands specific to sources
+    def create(self, kind, key, *args, **kwargs):
+        """
+        Create the source and add it to the graph.
+
+        Arguments are determined by the type of the data source
+
+        Parameters
+        ----------
+        kind : rdflib.term.URIRef
+            The kind of source to create
+        key : str
+            The key, a unique name for the source
+        """
+
+    def list(self, context=None):
+        """
+        List known sources
+        """
+
+    def list_kinds(self):
+        """
+        List kinds of sources
+        """
 
 
 class POW(object):
@@ -14,7 +49,7 @@ class POW(object):
     High-level commands for working with PyOpenWorm data
     """
 
-    graph_accessor_finder = IVar(doc='The file name of the database store')
+    graph_accessor_finder = IVar(doc='Finds an RDFLib graph from the given URL')
 
     powdir = IVar('.pow',
                   doc='The base directory for PyOpenWorm files.'
@@ -22,6 +57,8 @@ class POW(object):
 
     repository_proivder = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
+
+    source = SubCommand(POWSource)
 
     @IVar.property('pow.conf', value_type=str)
     def config_file(self):
@@ -36,6 +73,7 @@ class POW(object):
 
     @IVar.property('worm.db')
     def store_name(self):
+        ''' The file name of the database store '''
         if isabs(self._store_name):
             return self._store_name
         return pth_join(self.powdir, self._store_name)
@@ -91,6 +129,11 @@ class POW(object):
     def fetch_graph(self, url):
         """
         Fetch a graph
+
+        Parameters
+        ----------
+        url : str
+            URL for the graph
         """
         res = self._obtain_graph_accessor(url)
         if not res:
@@ -141,6 +184,9 @@ class POW(object):
         ----------
         url : str
             URL of the data store to clone
+        update_existing_config : bool
+            If True, updates the existing config file to point to the given
+            file for the store configuration
         """
         # TODO: As a first cut
         # 1) should download a file at the given URL
@@ -201,7 +247,33 @@ class POW(object):
 
     def commit(self):
         """
+        Write the graph to the local repository
         """
+        from rdflib import plugin
+        from rdflib.serializer import Serializer
+        g = self._conf()['rdf.graph']
+
+        graphs_base = pth_join(self.powdir, 'graphs')
+        if exists(graphs_base):
+            shutil.rmtree(graphs_base)
+
+        mkdir(graphs_base)
+        ctx_data = []
+        for x in g.contexts():
+            ident = x.identifier
+            hs = hashlib.sha256(ident.encode()).hexdigest()
+            fname = pth_join(graphs_base, hs + '.nt')
+            i = 1
+            while exists(fname):
+                fname = pth_join(graphs_base, hs + '-' + i + '.nt')
+                i += 1
+            ctx_data.append((hs, relpath(fname, graphs_base), ident))
+            serializer = plugin.get('nt', Serializer)(sorted(x))
+            with open(fname, 'wb') as gfile:
+                serializer.serialize(gfile)
+        with open(pth_join(graphs_base, '.index'), 'w') as index_file:
+            for l in sorted(ctx_data):
+                print(*l, file=index_file)
 
     def diff(self):
         """
@@ -217,33 +289,6 @@ class POW(object):
 
     def tag(self):
         """
-        """
-
-
-class POWSource(object):
-    # Commands specific to sources
-    def create(self, kind, key, *args, **kwargs):
-        """
-        Create the source and add it to the graph.
-
-        Arguments are determined by the type of the data source
-
-        Parameters
-        ----------
-        kind : rdflib.term.URIRef
-            The kind of source to create
-        key : str
-            The key, a unique name for the source
-        """
-
-    def list(self, context=None):
-        """
-        List known sources
-        """
-
-    def list_kinds(self):
-        """
-        List kinds of sources
         """
 
 
