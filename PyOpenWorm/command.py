@@ -69,16 +69,20 @@ class POW(object):
                 default = json.load(f)
                 with open(self.config_file, 'w') as of:
                     default['rdf.store_conf'] = store_fname
-                    json.dump(default, of)
+                    self._write_config(default, of)
         elif update_existing_config:
             with open(self.config_file, 'r+') as f:
                 conf = json.load(f)
                 conf['rdf.store_conf'] = store_fname
                 f.seek(0)
-                json.dump(conf, f)
+                self._write_config(conf, f)
 
         self._init_store()
         self._init_repository()
+
+    def _write_config(self, conf, dest):
+        json.dump(conf, dest, sort_keys=True, indent=4, separators=(',', ': '))
+        dest.write('\n')
 
     def _init_repository(self):
         if self.repository_proivder is not None:
@@ -177,8 +181,12 @@ class POW(object):
 
     def reconstitute(self, data_source):
         """
-        Recreate a data source by executing the chain of translators that went
-        into making it.
+        Recreate a data source by executing the chain of translators that went into making it.
+
+        Parameters
+        ----------
+        data_source : str
+            Identifier for the data source to reconstitute
         """
 
     def _package_path(self):

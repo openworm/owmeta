@@ -16,7 +16,6 @@ class IVar(object):
 
     @classmethod
     def property(cls, wrapped=None, *args, **kwargs):
-        print(wrapped, args, kwargs)
         if wrapped is not None and \
                 callable(wrapped) and \
                 len(args) == 0 and \
