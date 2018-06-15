@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/PLNL> <http://openworm.org/entities/Cell/name> "PLNL" .
+<http://openworm.org/entities/Neuron/PLNL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PLNL> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/PLNL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PLNL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PLNL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PLNR> <http://openworm.org/entities/Cell/name> "PLNR" .
+<http://openworm.org/entities/Neuron/PLNR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PLNR> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/PLNR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PLNR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PLNR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

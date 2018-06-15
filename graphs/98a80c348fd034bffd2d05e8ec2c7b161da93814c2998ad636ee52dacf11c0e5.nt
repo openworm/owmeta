@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/M5> <http://openworm.org/entities/Cell/name> "M5" .
+<http://openworm.org/entities/Neuron/M5> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-1" .
+<http://openworm.org/entities/Neuron/M5> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/M5> <http://openworm.org/entities/Neuron/receptor> "GLR-8" .
+<http://openworm.org/entities/Neuron/M5> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/M5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,4 @@
+worm.db
+worm.db.index
+worm.db.lock
+worm.db.tmp

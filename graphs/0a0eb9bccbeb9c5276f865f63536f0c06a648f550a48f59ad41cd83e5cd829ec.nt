@@ -1,0 +1,8 @@
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Cell/name> "PVT" .
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Neuron/receptor> "SER-1" .
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Neuron/receptor> "SER-4" .
+<http://openworm.org/entities/Neuron/PVT> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVT> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

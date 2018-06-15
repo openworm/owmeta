@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/AVJL> <http://openworm.org/entities/Cell/name> "AVJL" .
+<http://openworm.org/entities/Neuron/AVJL> <http://openworm.org/entities/Neuron/receptor> "GLR-1" .
+<http://openworm.org/entities/Neuron/AVJL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVJL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AVJR> <http://openworm.org/entities/Cell/name> "AVJR" .
+<http://openworm.org/entities/Neuron/AVJR> <http://openworm.org/entities/Neuron/receptor> "GLR-1" .
+<http://openworm.org/entities/Neuron/AVJR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVJR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

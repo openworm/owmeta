@@ -1,0 +1,16 @@
+<http://openworm.org/entities/Neuron/SABD> <http://openworm.org/entities/Cell/name> "SABD" .
+<http://openworm.org/entities/Neuron/SABD> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SABD> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/SABD> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SABD> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SABVL> <http://openworm.org/entities/Cell/name> "SABVL" .
+<http://openworm.org/entities/Neuron/SABVL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SABVL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/SABVL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SABVL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SABVR> <http://openworm.org/entities/Cell/name> "SABVR" .
+<http://openworm.org/entities/Neuron/SABVR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SABVR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/SABVR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SABVR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

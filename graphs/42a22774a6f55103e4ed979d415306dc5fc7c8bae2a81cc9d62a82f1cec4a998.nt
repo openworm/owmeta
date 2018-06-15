@@ -1,0 +1,16 @@
+<http://openworm.org/entities/Neuron/DVA> <http://openworm.org/entities/Cell/name> "DVA" .
+<http://openworm.org/entities/Neuron/DVA> <http://openworm.org/entities/Neuron/receptor> "EGL-6" .
+<http://openworm.org/entities/Neuron/DVA> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/HSNL> <http://openworm.org/entities/Cell/name> "HSNL" .
+<http://openworm.org/entities/Neuron/HSNL> <http://openworm.org/entities/Neuron/receptor> "EGL-6" .
+<http://openworm.org/entities/Neuron/HSNL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/HSNR> <http://openworm.org/entities/Cell/name> "HSNR" .
+<http://openworm.org/entities/Neuron/HSNR> <http://openworm.org/entities/Neuron/receptor> "EGL-6" .
+<http://openworm.org/entities/Neuron/HSNR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SDQL> <http://openworm.org/entities/Cell/name> "SDQL" .
+<http://openworm.org/entities/Neuron/SDQL> <http://openworm.org/entities/Neuron/receptor> "EGL-6" .
+<http://openworm.org/entities/Neuron/SDQL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SDQR> <http://openworm.org/entities/Cell/name> "SDQR" .
+<http://openworm.org/entities/Neuron/SDQR> <http://openworm.org/entities/Neuron/receptor> "EGL-6" .
+<http://openworm.org/entities/Neuron/SDQR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

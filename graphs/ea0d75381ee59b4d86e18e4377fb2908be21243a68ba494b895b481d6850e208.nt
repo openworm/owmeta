@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/SMBDL> <http://openworm.org/entities/Cell/name> "SMBDL" .
+<http://openworm.org/entities/Neuron/SMBDL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SMBDL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SMBDL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SMBDR> <http://openworm.org/entities/Cell/name> "SMBDR" .
+<http://openworm.org/entities/Neuron/SMBDR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SMBDR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SMBDR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SMBVL> <http://openworm.org/entities/Cell/name> "SMBVL" .
+<http://openworm.org/entities/Neuron/SMBVL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SMBVL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SMBVL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/SMBVR> <http://openworm.org/entities/Cell/name> "SMBVR" .
+<http://openworm.org/entities/Neuron/SMBVR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/SMBVR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/SMBVR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

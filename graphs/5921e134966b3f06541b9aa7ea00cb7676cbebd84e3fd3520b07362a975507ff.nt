@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/ASKL> <http://openworm.org/entities/Cell/name> "ASKL" .
+<http://openworm.org/entities/Neuron/ASKL> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/ASKL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/ASKR> <http://openworm.org/entities/Cell/name> "ASKR" .
+<http://openworm.org/entities/Neuron/ASKR> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/ASKR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

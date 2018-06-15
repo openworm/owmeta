@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Cell/name> "I1L" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/receptor> "GLR-7" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/receptor> "GLR-8" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/I1L> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/I1L> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Cell/name> "I1R" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/receptor> "GLR-7" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/receptor> "GLR-8" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/I1R> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/I1R> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

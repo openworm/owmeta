@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/ADAL> <http://openworm.org/entities/Cell/name> "ADAL" .
+<http://openworm.org/entities/Neuron/ADAL> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-8" .
+<http://openworm.org/entities/Neuron/ADAL> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/ADAL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/ADAL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/ADAL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/ADAR> <http://openworm.org/entities/Cell/name> "ADAR" .
+<http://openworm.org/entities/Neuron/ADAR> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-8" .
+<http://openworm.org/entities/Neuron/ADAR> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/ADAR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/ADAR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/ADAR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

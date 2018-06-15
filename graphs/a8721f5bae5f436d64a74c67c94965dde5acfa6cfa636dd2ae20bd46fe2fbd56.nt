@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/RIPL> <http://openworm.org/entities/Cell/name> "RIPL" .
+<http://openworm.org/entities/Neuron/RIPL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIPL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIPR> <http://openworm.org/entities/Cell/name> "RIPR" .
+<http://openworm.org/entities/Neuron/RIPR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIPR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

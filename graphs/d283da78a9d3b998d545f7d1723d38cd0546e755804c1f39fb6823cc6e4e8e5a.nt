@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/RIGL> <http://openworm.org/entities/Cell/name> "RIGL" .
+<http://openworm.org/entities/Neuron/RIGL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIGL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIGL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIGR> <http://openworm.org/entities/Cell/name> "RIGR" .
+<http://openworm.org/entities/Neuron/RIGR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIGR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIGR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

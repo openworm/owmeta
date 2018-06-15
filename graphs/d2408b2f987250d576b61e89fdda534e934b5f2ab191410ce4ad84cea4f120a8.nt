@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/RICL> <http://openworm.org/entities/Cell/name> "RICL" .
+<http://openworm.org/entities/Neuron/RICL> <http://openworm.org/entities/Neuron/neurotransmitter> "Octopamine" .
+<http://openworm.org/entities/Neuron/RICL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RICR> <http://openworm.org/entities/Cell/name> "RICR" .
+<http://openworm.org/entities/Neuron/RICR> <http://openworm.org/entities/Neuron/neurotransmitter> "Octopamine" .
+<http://openworm.org/entities/Neuron/RICR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Cell/name> "RIML" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/neurotransmitter> "Tyramine" .
+<http://openworm.org/entities/Neuron/RIML> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Cell/name> "RIMR" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/neurotransmitter> "Tyramine" .
+<http://openworm.org/entities/Neuron/RIMR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

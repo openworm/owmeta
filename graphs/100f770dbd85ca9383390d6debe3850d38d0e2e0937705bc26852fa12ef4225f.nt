@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Cell/name> "ASJL" .
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Neuron/receptor> "SRE-1" .
+<http://openworm.org/entities/Neuron/ASJL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/ASJL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Cell/name> "ASJR" .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Neuron/receptor> "SRE-1" .
+<http://openworm.org/entities/Neuron/ASJR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/ASJR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

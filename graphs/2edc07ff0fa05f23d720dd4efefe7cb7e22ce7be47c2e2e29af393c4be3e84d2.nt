@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/RIBL> <http://openworm.org/entities/Cell/name> "RIBL" .
+<http://openworm.org/entities/Neuron/RIBL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIBL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIBR> <http://openworm.org/entities/Cell/name> "RIBR" .
+<http://openworm.org/entities/Neuron/RIBR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIBR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

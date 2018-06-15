@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Cell/name> "LUAL" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/receptor> "GLR-5" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/LUAL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/LUAL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Cell/name> "LUAR" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/receptor> "GLR-5" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/LUAR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/LUAR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

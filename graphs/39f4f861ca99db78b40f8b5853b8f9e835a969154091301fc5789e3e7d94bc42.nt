@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/PVQL> <http://openworm.org/entities/Cell/name> "PVQL" .
+<http://openworm.org/entities/Neuron/PVQL> <http://openworm.org/entities/Neuron/receptor> "SER-1" .
+<http://openworm.org/entities/Neuron/PVQL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PVQR> <http://openworm.org/entities/Cell/name> "PVQR" .
+<http://openworm.org/entities/Neuron/PVQR> <http://openworm.org/entities/Neuron/receptor> "SER-1" .
+<http://openworm.org/entities/Neuron/PVQR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

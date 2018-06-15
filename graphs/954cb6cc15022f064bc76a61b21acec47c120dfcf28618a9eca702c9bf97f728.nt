@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/AIAL> <http://openworm.org/entities/Cell/name> "AIAL" .
+<http://openworm.org/entities/Neuron/AIAL> <http://openworm.org/entities/Neuron/receptor> "NPR-11" .
+<http://openworm.org/entities/Neuron/AIAL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AIAR> <http://openworm.org/entities/Cell/name> "AIAR" .
+<http://openworm.org/entities/Neuron/AIAR> <http://openworm.org/entities/Neuron/receptor> "NPR-11" .
+<http://openworm.org/entities/Neuron/AIAR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AIYL> <http://openworm.org/entities/Cell/name> "AIYL" .
+<http://openworm.org/entities/Neuron/AIYL> <http://openworm.org/entities/Neuron/receptor> "NPR-11" .
+<http://openworm.org/entities/Neuron/AIYL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AIYR> <http://openworm.org/entities/Cell/name> "AIYR" .
+<http://openworm.org/entities/Neuron/AIYR> <http://openworm.org/entities/Neuron/receptor> "NPR-11" .
+<http://openworm.org/entities/Neuron/AIYR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

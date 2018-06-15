@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Cell/name> "BDUL" .
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-15" .
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Neuron/receptor> "GLR-8" .
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/BDUL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/BDUL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Cell/name> "BDUR" .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-15" .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Neuron/receptor> "GLR-8" .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/BDUR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/BDUR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

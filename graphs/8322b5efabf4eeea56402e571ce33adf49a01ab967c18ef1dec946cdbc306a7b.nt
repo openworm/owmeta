@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/AVHL> <http://openworm.org/entities/Cell/name> "AVHL" .
+<http://openworm.org/entities/Neuron/AVHL> <http://openworm.org/entities/Neuron/receptor> "GGR-1" .
+<http://openworm.org/entities/Neuron/AVHL> <http://openworm.org/entities/Neuron/receptor> "GLR-4" .
+<http://openworm.org/entities/Neuron/AVHL> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/AVHL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVHL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AVHR> <http://openworm.org/entities/Cell/name> "AVHR" .
+<http://openworm.org/entities/Neuron/AVHR> <http://openworm.org/entities/Neuron/receptor> "GGR-1" .
+<http://openworm.org/entities/Neuron/AVHR> <http://openworm.org/entities/Neuron/receptor> "GLR-4" .
+<http://openworm.org/entities/Neuron/AVHR> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/AVHR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVHR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

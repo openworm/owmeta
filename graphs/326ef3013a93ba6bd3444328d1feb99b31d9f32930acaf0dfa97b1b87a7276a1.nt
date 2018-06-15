@@ -1,0 +1,4 @@
+<http://openworm.org/entities/Neuron/DVA> <http://openworm.org/entities/Cell/name> "DVA" .
+<http://openworm.org/entities/Neuron/DVA> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-12" .
+<http://openworm.org/entities/Neuron/DVA> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,4 @@
+<http://openworm.org/entities/Neuron/RIR> <http://openworm.org/entities/Cell/name> "RIR" .
+<http://openworm.org/entities/Neuron/RIR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

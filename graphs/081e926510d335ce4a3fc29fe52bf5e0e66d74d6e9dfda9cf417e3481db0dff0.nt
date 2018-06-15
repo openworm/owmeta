@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Cell/name> "M2L" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-18" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-21" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/M2L> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/M2L> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Cell/name> "M2R" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-18" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-21" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/M2R> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/M2R> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

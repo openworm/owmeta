@@ -1,0 +1,8 @@
+<http://openworm.org/entities/Evidence/ac3a144a833f63ac58ba35b554b109845> <http://openworm.org/entities/Evidence/reference> <http://openworm.org/entities/Website/wormbase> .
+<http://openworm.org/entities/Evidence/ac3a144a833f63ac58ba35b554b109845> <http://openworm.org/entities/Evidence/supports> <http://openworm.org/entities/data_sources/DataWithEvidenceDataSource#Muscles/context_for?document=http://openworm.org/entities/Website/wormbase> .
+<http://openworm.org/entities/Evidence/ac3a144a833f63ac58ba35b554b109845> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Evidence> .
+<http://openworm.org/entities/Website/wormbase> <http://openworm.org/entities/Website/title> "WormBase" .
+<http://openworm.org/entities/Website/wormbase> <http://openworm.org/entities/Website/url> "http://Wormbase.org" .
+<http://openworm.org/entities/Website/wormbase> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Website> .
+<http://openworm.org/entities/Website/wormbase> <http://www.w3.org/2000/01/rdf-schema#comment> "WormBase" .
+

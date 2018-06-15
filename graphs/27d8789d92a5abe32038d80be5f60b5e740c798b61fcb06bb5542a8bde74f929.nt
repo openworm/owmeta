@@ -1,0 +1,6 @@
+<http://openworm.org/entities/Neuron/AVL> <http://openworm.org/entities/Cell/name> "AVL" .
+<http://openworm.org/entities/Neuron/AVL> <http://openworm.org/entities/Neuron/neurotransmitter> "GABA" .
+<http://openworm.org/entities/Neuron/AVL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/AVL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

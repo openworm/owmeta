@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/AIYL> <http://openworm.org/entities/Cell/name> "AIYL" .
+<http://openworm.org/entities/Neuron/AIYL> <http://openworm.org/entities/Neuron/receptor> "CKR-2" .
+<http://openworm.org/entities/Neuron/AIYL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AIYR> <http://openworm.org/entities/Cell/name> "AIYR" .
+<http://openworm.org/entities/Neuron/AIYR> <http://openworm.org/entities/Neuron/receptor> "CKR-2" .
+<http://openworm.org/entities/Neuron/AIYR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

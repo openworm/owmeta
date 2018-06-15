@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/ASEL> <http://openworm.org/entities/Cell/name> "ASEL" .
+<http://openworm.org/entities/Neuron/ASEL> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/ASEL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/ASER> <http://openworm.org/entities/Cell/name> "ASER" .
+<http://openworm.org/entities/Neuron/ASER> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/ASER> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

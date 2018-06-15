@@ -1,0 +1,10 @@
+<http://openworm.org/entities/Neuron/M1> <http://openworm.org/entities/Cell/name> "M1" .
+<http://openworm.org/entities/Neuron/M1> <http://openworm.org/entities/Neuron/receptor> "SER-4" .
+<http://openworm.org/entities/Neuron/M1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Cell/name> "RIML" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/receptor> "SER-4" .
+<http://openworm.org/entities/Neuron/RIML> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Cell/name> "RIMR" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/receptor> "SER-4" .
+<http://openworm.org/entities/Neuron/RIMR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

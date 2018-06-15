@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/PHCL> <http://openworm.org/entities/Cell/name> "PHCL" .
+<http://openworm.org/entities/Neuron/PHCL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/PHCL> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/PHCL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PHCL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PHCR> <http://openworm.org/entities/Cell/name> "PHCR" .
+<http://openworm.org/entities/Neuron/PHCR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/PHCR> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/PHCR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PHCR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

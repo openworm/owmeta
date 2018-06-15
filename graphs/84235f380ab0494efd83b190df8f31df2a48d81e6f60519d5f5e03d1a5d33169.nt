@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/BAGL> <http://openworm.org/entities/Cell/name> "BAGL" .
+<http://openworm.org/entities/Neuron/BAGL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/BAGL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/BAGL> <http://openworm.org/entities/Neuron/receptor> "GCY-33" .
+<http://openworm.org/entities/Neuron/BAGL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/BAGL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/BAGR> <http://openworm.org/entities/Cell/name> "BAGR" .
+<http://openworm.org/entities/Neuron/BAGR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/BAGR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/BAGR> <http://openworm.org/entities/Neuron/receptor> "GCY-33" .
+<http://openworm.org/entities/Neuron/BAGR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/BAGR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

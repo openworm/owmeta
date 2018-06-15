@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/URBL> <http://openworm.org/entities/Cell/name> "URBL" .
+<http://openworm.org/entities/Neuron/URBL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/URBL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/URBL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/URBR> <http://openworm.org/entities/Cell/name> "URBR" .
+<http://openworm.org/entities/Neuron/URBR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/URBR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/URBR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Cell/name> "AWCL" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/receptor> "STR-2" .
+<http://openworm.org/entities/Neuron/AWCL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWCL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Cell/name> "AWCR" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/receptor> "STR-2" .
+<http://openworm.org/entities/Neuron/AWCR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWCR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

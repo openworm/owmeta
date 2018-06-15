@@ -1,0 +1,8 @@
+<http://openworm.org/entities/Document/Sulston83> <http://openworm.org/entities/Document/author> "Sulston et al." .
+<http://openworm.org/entities/Document/Sulston83> <http://openworm.org/entities/Document/date> "1983" .
+<http://openworm.org/entities/Document/Sulston83> <http://openworm.org/entities/Document/year> "1983" .
+<http://openworm.org/entities/Document/Sulston83> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Document> .
+<http://openworm.org/entities/Evidence/Sulston83> <http://openworm.org/entities/Evidence/reference> <http://openworm.org/entities/Document/Sulston83> .
+<http://openworm.org/entities/Evidence/Sulston83> <http://openworm.org/entities/Evidence/supports> <http://example.org/data/context> .
+<http://openworm.org/entities/Evidence/Sulston83> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Evidence> .
+

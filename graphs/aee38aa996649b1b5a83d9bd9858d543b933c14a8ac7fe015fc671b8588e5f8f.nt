@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Cell/name> "ALNL" .
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Neuron/receptor> "LGC-55" .
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/ALNL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/ALNL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Cell/name> "ALNR" .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Neuron/receptor> "DOP-1" .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Neuron/receptor> "LGC-55" .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/ALNR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/ALNR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

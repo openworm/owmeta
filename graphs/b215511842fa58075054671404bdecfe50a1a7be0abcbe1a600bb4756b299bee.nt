@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/PVCL> <http://openworm.org/entities/Cell/name> "PVCL" .
+<http://openworm.org/entities/Neuron/PVCL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PVCL> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/PVCL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVCL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PVCR> <http://openworm.org/entities/Cell/name> "PVCR" .
+<http://openworm.org/entities/Neuron/PVCR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PVCR> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/PVCR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVCR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

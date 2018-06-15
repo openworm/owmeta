@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/I5> <http://openworm.org/entities/Cell/name> "I5" .
+<http://openworm.org/entities/Neuron/I5> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/I5> <http://openworm.org/entities/Neuron/neurotransmitter> "Serotonin" .
+<http://openworm.org/entities/Neuron/I5> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/I5> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/I5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

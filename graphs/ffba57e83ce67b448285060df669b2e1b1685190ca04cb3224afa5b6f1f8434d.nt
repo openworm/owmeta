@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/PVPL> <http://openworm.org/entities/Cell/name> "PVPL" .
+<http://openworm.org/entities/Neuron/PVPL> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PVPL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVPL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PVPR> <http://openworm.org/entities/Cell/name> "PVPR" .
+<http://openworm.org/entities/Neuron/PVPR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/PVPR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVPR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

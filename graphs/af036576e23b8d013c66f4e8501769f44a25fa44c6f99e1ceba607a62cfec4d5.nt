@@ -1,0 +1,12 @@
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Cell/name> "PVM" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "GAR-1" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "MEC-10" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "MEC-2" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "MEC-4" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "MEC-6" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "MEC-9" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/receptor> "UNC-8" .
+<http://openworm.org/entities/Neuron/PVM> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PVM> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

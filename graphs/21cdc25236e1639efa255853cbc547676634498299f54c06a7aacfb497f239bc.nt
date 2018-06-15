@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Cell/name> "RIML" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/neuropeptide> "Tyramine" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIML> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/RIML> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Cell/name> "RIMR" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/neuropeptide> "Tyramine" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/neurotransmitter> "Acetylcholine" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIMR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/RIMR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

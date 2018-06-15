@@ -1,0 +1,7 @@
+<http://openworm.org/entities/Neuron/HSNL> <http://openworm.org/entities/Cell/name> "HSNL" .
+<http://openworm.org/entities/Neuron/HSNL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/HSNL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/HSNR> <http://openworm.org/entities/Cell/name> "HSNR" .
+<http://openworm.org/entities/Neuron/HSNR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-1" .
+<http://openworm.org/entities/Neuron/HSNR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

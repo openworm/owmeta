@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/PDEL> <http://openworm.org/entities/Cell/name> "PDEL" .
+<http://openworm.org/entities/Neuron/PDEL> <http://openworm.org/entities/Neuron/neurotransmitter> "Dopamine" .
+<http://openworm.org/entities/Neuron/PDEL> <http://openworm.org/entities/Neuron/receptor> "DOP-2" .
+<http://openworm.org/entities/Neuron/PDEL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PDEL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PDER> <http://openworm.org/entities/Cell/name> "PDER" .
+<http://openworm.org/entities/Neuron/PDER> <http://openworm.org/entities/Neuron/neurotransmitter> "Dopamine" .
+<http://openworm.org/entities/Neuron/PDER> <http://openworm.org/entities/Neuron/receptor> "DOP-2" .
+<http://openworm.org/entities/Neuron/PDER> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/PDER> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

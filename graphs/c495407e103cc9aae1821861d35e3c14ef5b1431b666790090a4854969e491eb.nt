@@ -1,0 +1,10 @@
+<http://openworm.org/entities/Neuron/NSML> <http://openworm.org/entities/Cell/name> "NSML" .
+<http://openworm.org/entities/Neuron/NSML> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/NSML> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/NSML> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/NSML> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/NSMR> <http://openworm.org/entities/Cell/name> "NSMR" .
+<http://openworm.org/entities/Neuron/NSMR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-13" .
+<http://openworm.org/entities/Neuron/NSMR> <http://openworm.org/entities/Neuron/receptor> "DOP-3" .
+<http://openworm.org/entities/Neuron/NSMR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

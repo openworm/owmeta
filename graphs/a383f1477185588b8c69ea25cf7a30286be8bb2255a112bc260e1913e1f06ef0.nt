@@ -1,0 +1,6 @@
+<http://openworm.org/entities/Neuron/AVM> <http://openworm.org/entities/Cell/name> "AVM" .
+<http://openworm.org/entities/Neuron/AVM> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/AVM> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/AVM> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AVM> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

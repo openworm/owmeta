@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Cell/name> "AWBL" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-9" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/receptor> "AEX-2" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/receptor> "STR-1" .
+<http://openworm.org/entities/Neuron/AWBL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWBL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Cell/name> "AWBR" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-3" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-9" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/receptor> "AEX-2" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/receptor> "DAF-11" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/receptor> "STR-1" .
+<http://openworm.org/entities/Neuron/AWBR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWBR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

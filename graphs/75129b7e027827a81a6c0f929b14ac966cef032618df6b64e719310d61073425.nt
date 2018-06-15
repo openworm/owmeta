@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/AVKL> <http://openworm.org/entities/Cell/name> "AVKL" .
+<http://openworm.org/entities/Neuron/AVKL> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-1" .
+<http://openworm.org/entities/Neuron/AVKL> <http://openworm.org/entities/Neuron/receptor> "GLR-5" .
+<http://openworm.org/entities/Neuron/AVKL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVKL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AVKR> <http://openworm.org/entities/Cell/name> "AVKR" .
+<http://openworm.org/entities/Neuron/AVKR> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-1" .
+<http://openworm.org/entities/Neuron/AVKR> <http://openworm.org/entities/Neuron/receptor> "GLR-5" .
+<http://openworm.org/entities/Neuron/AVKR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/AVKR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/PVNL> <http://openworm.org/entities/Cell/name> "PVNL" .
+<http://openworm.org/entities/Neuron/PVNL> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/PVNL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVNL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/PVNL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/PVNR> <http://openworm.org/entities/Cell/name> "PVNR" .
+<http://openworm.org/entities/Neuron/PVNR> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/PVNR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVNR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/PVNR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Cell/name> "AWAL" .
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Neuron/receptor> "OCR-1" .
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Neuron/receptor> "OCR-2" .
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Neuron/receptor> "ODR-10" .
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/AWAL> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWAL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Cell/name> "AWAR" .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Neuron/receptor> "OCR-1" .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Neuron/receptor> "OCR-2" .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Neuron/receptor> "ODR-10" .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Neuron/receptor> "OSM-9" .
+<http://openworm.org/entities/Neuron/AWAR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AWAR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

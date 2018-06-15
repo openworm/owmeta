@@ -1,0 +1,13 @@
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Cell/name> "AQR" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-25" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-32" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-34" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-35" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-36" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "GCY-37" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "NLP-37" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/receptor> "NPR-1" .
+<http://openworm.org/entities/Neuron/AQR> <http://openworm.org/entities/Neuron/type> "sensory" .
+<http://openworm.org/entities/Neuron/AQR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

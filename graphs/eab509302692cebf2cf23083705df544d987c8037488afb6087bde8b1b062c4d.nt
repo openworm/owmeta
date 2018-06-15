@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/RMGL> <http://openworm.org/entities/Cell/name> "RMGL" .
+<http://openworm.org/entities/Neuron/RMGL> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/RMGL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RMGL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RMGR> <http://openworm.org/entities/Cell/name> "RMGR" .
+<http://openworm.org/entities/Neuron/RMGR> <http://openworm.org/entities/Neuron/neuropeptide> "PDF-1" .
+<http://openworm.org/entities/Neuron/RMGR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RMGR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

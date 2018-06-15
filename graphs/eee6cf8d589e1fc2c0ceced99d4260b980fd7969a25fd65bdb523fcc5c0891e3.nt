@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/RIFL> <http://openworm.org/entities/Cell/name> "RIFL" .
+<http://openworm.org/entities/Neuron/RIFL> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/RIFL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIFL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIFR> <http://openworm.org/entities/Cell/name> "RIFR" .
+<http://openworm.org/entities/Neuron/RIFR> <http://openworm.org/entities/Neuron/receptor> "PDFR-1" .
+<http://openworm.org/entities/Neuron/RIFR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIFR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,8 @@
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Cell/name> "ALA" .
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Neuron/neuropeptide> "FLP-7" .
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Neuron/receptor> "ACR-13" .
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Neuron/receptor> "ACR-4" .
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Neuron/receptor> "SRA-10" .
+<http://openworm.org/entities/Neuron/ALA> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/ALA> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

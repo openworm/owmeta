@@ -1,0 +1,9 @@
+<http://openworm.org/entities/Neuron/RIVL> <http://openworm.org/entities/Cell/name> "RIVL" .
+<http://openworm.org/entities/Neuron/RIVL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIVL> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/RIVL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIVR> <http://openworm.org/entities/Cell/name> "RIVR" .
+<http://openworm.org/entities/Neuron/RIVR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIVR> <http://openworm.org/entities/Neuron/type> "motor" .
+<http://openworm.org/entities/Neuron/RIVR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,5 @@
+<http://openworm.org/entities/Neuron/PVR> <http://openworm.org/entities/Cell/name> "PVR" .
+<http://openworm.org/entities/Neuron/PVR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/PVR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/PVR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,15 @@
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Cell/name> "CANL" .
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-10" .
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-15" .
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Neuron/receptor> "GGR-2" .
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/CANL> <http://openworm.org/entities/Neuron/type> "unknown" .
+<http://openworm.org/entities/Neuron/CANL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Cell/name> "CANR" .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-10" .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Neuron/neuropeptide> "NLP-15" .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Neuron/receptor> "GGR-2" .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Neuron/receptor> "SER-2" .
+<http://openworm.org/entities/Neuron/CANR> <http://openworm.org/entities/Neuron/type> "unknown" .
+<http://openworm.org/entities/Neuron/CANR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

@@ -1,0 +1,11 @@
+<http://openworm.org/entities/Neuron/RIAL> <http://openworm.org/entities/Cell/name> "RIAL" .
+<http://openworm.org/entities/Neuron/RIAL> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIAL> <http://openworm.org/entities/Neuron/receptor> "SER-1" .
+<http://openworm.org/entities/Neuron/RIAL> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIAL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+<http://openworm.org/entities/Neuron/RIAR> <http://openworm.org/entities/Cell/name> "RIAR" .
+<http://openworm.org/entities/Neuron/RIAR> <http://openworm.org/entities/Neuron/neurotransmitter> "Glutamate" .
+<http://openworm.org/entities/Neuron/RIAR> <http://openworm.org/entities/Neuron/receptor> "SER-1" .
+<http://openworm.org/entities/Neuron/RIAR> <http://openworm.org/entities/Neuron/type> "interneuron" .
+<http://openworm.org/entities/Neuron/RIAR> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
+

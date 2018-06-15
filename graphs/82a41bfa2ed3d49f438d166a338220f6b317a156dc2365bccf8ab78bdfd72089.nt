@@ -1,0 +1,17 @@
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Cook, S." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Emmons, S." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Hall, D." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Jarrell, T." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Nguyen, K." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Wang, Y." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/author> "Yakolev, M." .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/title> "Whole-animal C. elegans connectomes" .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/uri> "http://abstracts.genetics-gsa.org/cgi-bin/celegans15s/wsrch15.pl?author=emmons&sort=ptimes&sbutton=Detail&absno=155110844&sid=668862" .
+<http://openworm.org/entities/Document/emmons2015> <http://openworm.org/entities/Document/year> "2015"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://openworm.org/entities/Document/emmons2015> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Document> .
+<http://openworm.org/entities/Document/emmons2015> <http://www.w3.org/2000/01/rdf-schema#comment> "Data related by personal communication" .
+<http://openworm.org/entities/Evidence/emmons2015> <http://openworm.org/entities/Evidence/reference> <http://openworm.org/entities/Document/emmons2015> .
+<http://openworm.org/entities/Evidence/emmons2015> <http://openworm.org/entities/Evidence/supports> <http://openworm.org/entities/translators/NeuronConnectomeCSVTranslator/emmons2015-context> .
+<http://openworm.org/entities/Evidence/emmons2015> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Evidence> .
+<http://openworm.org/entities/translators/NeuronConnectomeCSVTranslator/emmons2015-context> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/schema/Context> .
+
