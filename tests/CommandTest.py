@@ -11,8 +11,10 @@ import json
 from rdflib.term import URIRef
 from pytest import mark
 
+import git
 from PyOpenWorm.git_repo import GitRepoProvider
 from PyOpenWorm.command import POW, UnreadableGraphException
+from PyOpenWorm.command_util import IVar, PropertyIVar, SubCommand
 
 
 class BaseTest(unittest.TestCase):
@@ -27,7 +29,7 @@ class BaseTest(unittest.TestCase):
         shutil.rmtree(self.testdir)
 
 
-class CommandTest(BaseTest):
+class POWTest(BaseTest):
 
     def test_init_default_creates_store(self):
         self.cut.init()
@@ -114,6 +116,90 @@ class CommandTest(BaseTest):
         self.assertIn(q, self.cut._conf()['rdf.graph'])
 
 
+class IVarTest(unittest.TestCase):
+
+    def test_property_doc(self):
+
+        class A(object):
+            @IVar.property
+            def p(self):
+                return 0
+
+        self.assertEqual('', A.p.__doc__)
+
+    def test_property_doc_no_args(self):
+
+        class A(object):
+            @IVar.property()
+            def p(self):
+                return 0
+        self.assertEqual('', A.p.__doc__)
+
+    def test_property_doc_match(self):
+
+        class A(object):
+            @IVar.property(doc='this')
+            def p(self):
+                return 0
+        self.assertEqual('this', A.p.__doc__)
+
+    def test_property_docstring_doc(self):
+
+        class A(object):
+            @IVar.property()
+            def p(self):
+                'this'
+                return 0
+        self.assertEqual('this', A.p.__doc__)
+
+    def test_property_multiple_docs(self):
+
+        class A(object):
+            @IVar.property(doc='that')
+            def p(self):
+                'this'
+                return 0
+        self.assertEqual('this', A.p.__doc__)
+
+    def test_property_doc_strip(self):
+
+        class A(object):
+            @IVar.property(doc='   this   ')
+            def p(self):
+                return 0
+        self.assertEqual('this', A.p.__doc__)
+
+    def test_property_doc_strip_docstring(self):
+
+        class A(object):
+            @IVar.property
+            def p(self):
+                '    this '
+                return 0
+        self.assertEqual('this', A.p.__doc__)
+
+
+class IVarPropertyTest(unittest.TestCase):
+
+    def test_set_setter(self):
+        iv = PropertyIVar()
+        iv.value_setter = lambda target, val: None
+        class A(object):
+            p = iv
+        a = A()
+        a.p = 3
+
+    def test_set_setter2(self):
+        iv = PropertyIVar()
+        class A(object):
+            p = iv
+        a = A()
+        with self.assertRaises(AttributeError):
+            a.p = 3
+
+
+
+
 @mark.inttest
 class GitCommandTest(BaseTest):
 
@@ -187,6 +273,42 @@ class GitCommandTest(BaseTest):
         for x in os.walk('.'):
             print(x)
         self.assertTrue(exists(self.cut.store_name), msg=self.cut.store_name)
+
+    def test_reset_resets_add(self):
+        self.cut.init()
+
+        self._add_to_graph()
+        # dirty up the index
+        repo = git.Repo(self.cut.powdir)
+        f = p(self.cut.powdir, 'something')
+        with open(f, 'w'):
+            pass
+
+        self.cut.commit('Commit Message 1')
+
+        repo.index.add(['something'])
+
+        self.cut.commit('Commit Message 2')
+
+        self.assertNotIn('something', [x[0] for x in repo.index.entries])
+
+    def test_reset_resets_remove(self):
+        self.cut.init()
+
+        self._add_to_graph()
+        # dirty up the index
+        repo = git.Repo(self.cut.powdir)
+        f = p(self.cut.powdir, 'something')
+        with open(f, 'w'):
+            pass
+
+        self.cut.commit('Commit Message 1')
+
+        repo.index.remove([p('graphs', 'index')])
+
+        self.cut.commit('Commit Message 2')
+
+        self.assertIn(p('graphs', 'index'), [x[0] for x in repo.index.entries])
 
     def _add_to_graph(self):
         m = Mock()
