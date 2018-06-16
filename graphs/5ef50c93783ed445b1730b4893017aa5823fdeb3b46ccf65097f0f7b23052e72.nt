@@ -1,6 +1,6 @@
 <http://openworm.org/entities/Evidence/addf5c4db3a0903c92a844ed039d99369> <http://openworm.org/entities/Evidence/reference> "http://www.wormatlas.org/celllist.htm" .
 <http://openworm.org/entities/Evidence/addf5c4db3a0903c92a844ed039d99369> <http://openworm.org/entities/Evidence/supports> <http://openworm.org/entities/data_sources/DataWithEvidenceDataSource#a5525487ae6e0056c02c006f3b98aebfe/context_for?document=http://www.wormatlas.org/celllist.htm> .
 <http://openworm.org/entities/Evidence/addf5c4db3a0903c92a844ed039d99369> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Evidence> .
-"http://www.wormatlas.org/celllist.htm" <http://openworm.org/entities/Website/url> "http://www.wormatlas.org/celllist.htm" .
-"http://www.wormatlas.org/celllist.htm" <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Website> .
+<http://www.wormatlas.org/celllist.htm> <http://openworm.org/entities/Website/url> "http://www.wormatlas.org/celllist.htm" .
+<http://www.wormatlas.org/celllist.htm> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Website> .
 
