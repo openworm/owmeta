@@ -23,17 +23,11 @@ class ExpressionPattern(BiologyType):
             self.wormbaseid(wormbaseid)
             self.wormbaseURL(R.URIRef("http://www.wormbase.org/species/all/expr_pattern/" + wormbaseid))
 
-    @property
-    def defined(self):
-        return super(ExpressionPattern, self).defined \
-                or self.wormbaseid.has_defined_value()
+    def defined_augment(self):
+        return self.wormbaseid.has_defined_value()
 
-    @property
-    def identifier(self):
-        if super(ExpressionPattern, self).defined:
-            return super(ExpressionPattern, self).identifier
-        else:
-            return self.make_identifier(self.wormbaseid.defined_values[0])
+    def identifier_augment(self):
+        return self.make_identifier(self.wormbaseid.defined_values[0])
 
 
 class Channel(BiologyType):
@@ -85,17 +79,11 @@ class Channel(BiologyType):
     def __init__(self, name=None, **kwargs):
         super(Channel, self).__init__(name=name, **kwargs)
 
-    @property
-    def defined(self):
-        return super(Channel, self).defined or self.name.has_defined_value()
+    def defined_augment(self):
+        return self.name.has_defined_value()
 
-    @property
-    def identifier(self):
-        if super(Channel, self).defined:
-            return super(Channel, self).identifier
-        else:
-            # name is already set, so we can make an identifier from it
-            return self.make_identifier(self.name.defined_values[0])
+    def identifier_augment(self):
+        return self.make_identifier(self.name.defined_values[0])
 
 
 __yarom_mapped_classes__ = (Channel, ExpressionPattern)
