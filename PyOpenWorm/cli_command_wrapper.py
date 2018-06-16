@@ -41,7 +41,6 @@ class CLIArgMapper(object):
     def __init__(self):
         self.mappings = dict()
         self.methodname = None
-        self.runfunc = None
         self.runners = dict()
         ''' Mapping from subcommand names to functions which run for them '''
 
@@ -59,8 +58,6 @@ class CLIArgMapper(object):
 
         if self.methodname:
             runmethod = self.runners.get(self.methodname, None)
-        elif self.runfunc:
-            runmethod = self.runfunc
 
         if runmethod is None:
             if callable(runner):
@@ -68,7 +65,7 @@ class CLIArgMapper(object):
             else:
                 self.argparser.print_help(file=sys.stderr)
                 print(file=sys.stderr)
-                raise CLIUserError("")
+                raise CLIUserError('Please specify a sub-command')
 
         for k, v in iattrs.items():
             setattr(runner, k, v)
@@ -119,9 +116,9 @@ class CLIAppendAction(CLIStoreAction):
         setattr(namespace, self.dest, items)
 
 
-class CLISubCommandMethodAction(argparse._SubParsersAction):
+class CLISubCommandAction(argparse._SubParsersAction):
     def __init__(self, mapper, *args, **kwargs):
-        super(CLISubCommandMethodAction, self).__init__(*args, **kwargs)
+        super(CLISubCommandAction, self).__init__(*args, **kwargs)
         self.mapper = mapper
 
     def __call__(self, *args, **kwargs):
@@ -131,7 +128,7 @@ class CLISubCommandMethodAction(argparse._SubParsersAction):
                              ' set.'.format(self.dest, self.mapper.methodname))
 
         self.mapper.methodname = args[2][0]
-        super(CLISubCommandMethodAction, self).__call__(*args, **kwargs)
+        super(CLISubCommandAction, self).__call__(*args, **kwargs)
 
 
 def _ensure_value(namespace, name, value):
@@ -177,7 +174,7 @@ class CLICommandWrapper(object):
         if parser is None:
             parser = argparse.ArgumentParser()
         self.mapper.argparser = parser
-        sp = parser.add_subparsers(dest='subparser', mapper=self.mapper, action=CLISubCommandMethodAction)
+        sp = parser.add_subparsers(dest='subparser', mapper=self.mapper, action=CLISubCommandAction)
         for key, val in vars(self.runner).items():
             if not key.startswith('_'):
                 parser.add_argument('--' + key, help=key.__doc__)
@@ -258,4 +255,4 @@ class CLICommandWrapper(object):
         try:
             self.mapper.apply(self.runner)
         except CLIUserError as e:
-            print(e)
+            print(e, file=sys.stderr)
