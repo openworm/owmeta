@@ -5,12 +5,11 @@ except ImportError:
     from mock import Mock
 import tempfile
 import os
-from os.path import exists, abspath, join as pth_join
+from os.path import exists, join as p
 import shutil
 import json
 from rdflib.term import URIRef
 from pytest import mark
-import git
 
 from PyOpenWorm.git_repo import GitRepoProvider
 from PyOpenWorm.command import POW, UnreadableGraphException
@@ -18,7 +17,7 @@ from PyOpenWorm.command import POW, UnreadableGraphException
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        self.testdir = tempfile.mkdtemp(prefix=__name__)
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
         self.startdir = os.getcwd()
         os.chdir(self.testdir)
         self.cut = POW()
@@ -32,21 +31,15 @@ class CommandTest(BaseTest):
 
     def test_init_default_creates_store(self):
         self.cut.init()
-        self.assertTrue(exists('.pow/worm.db'), msg='worm.db is created')
+        self.assertTrue(exists(p('.pow', 'worm.db')), msg='worm.db is created')
 
     def test_init_default_creates_config(self):
         self.cut.init()
-        self.assertTrue(exists('.pow/pow.conf'), msg='pow.conf is created')
-
-    def test_init_default_store_name_is_absolute(self):
-        self.cut.init()
-        with open('.pow/pow.conf', 'r') as f:
-            conf = json.load(f)
-            self.assertTrue(conf['rdf.store_conf'].startswith('/'), msg="DB Store is absolute")
+        self.assertTrue(exists(p('.pow', 'pow.conf')), msg='pow.conf is created')
 
     def test_init_default_store_config_file_exists_no_change(self):
         os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
+        with open(p('.pow', 'pow.conf'), 'w') as f:
             f.write('{}')
 
         self.cut.init()
@@ -61,7 +54,7 @@ class CommandTest(BaseTest):
         self.cut.init(update_existing_config=True)
         with open('.pow/pow.conf', 'r') as f:
             conf = json.load(f)
-            self.assertEqual(conf['rdf.store_conf'], abspath('.pow/worm.db'), msg='path is updated')
+            self.assertEqual(conf['rdf.store_conf'], p('.pow', 'worm.db'), msg='path is updated')
 
     def test_fetch_graph_no_accessor_finder(self):
         with self.assertRaises(Exception):
@@ -71,6 +64,32 @@ class CommandTest(BaseTest):
         with self.assertRaises(UnreadableGraphException):
             self.cut.graph_accessor_finder = lambda url: None
             self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
+
+    def test_init_fail_cleanup(self):
+        ''' If we fail on init, there shouldn't be a .pow leftover '''
+        self.cut.repository_provider = Mock()
+
+        def failed_init(*args, **kwargs): raise _TestException('Oh noes!')
+        self.cut.repository_provider.init.side_effect = failed_init
+        try:
+            self.cut.init()
+            self.fail("Should have failed init")
+        except _TestException:
+            pass
+        self.assertFalse(exists(self.cut.powdir), msg='powdir does not exist')
+
+    def test_clone_fail_cleanup(self):
+        ''' If we fail on clone, there shouldn't be a .pow leftover '''
+        self.cut.repository_provider = Mock()
+
+        def failed_clone(*args, **kwargs): raise _TestException('Oh noes!')
+        self.cut.repository_provider.clone.side_effect = failed_clone
+        try:
+            self.cut.clone('ignored')
+            self.fail("Should have failed clone")
+        except _TestException:
+            pass
+        self.assertFalse(exists(self.cut.powdir), msg='powdir does not exist')
 
     def test_fetch_graph_with_accessor_success(self):
         m = Mock()
@@ -98,18 +117,88 @@ class CommandTest(BaseTest):
 @mark.inttest
 class GitCommandTest(BaseTest):
 
+    def setUp(self):
+        super(GitCommandTest, self).setUp()
+        self.cut.repository_provider = GitRepoProvider()
+
     def test_init(self):
         """ A git directory should be created when we use the .git repository
            provider
         """
-        self.cut.repository_proivder = GitRepoProvider()
         self.cut.init()
-        self.assertTrue(exists(pth_join(self.cut.powdir, '.git')))
+        self.assertTrue(exists(p(self.cut.powdir, '.git')))
 
     def test_init_tracks_config(self):
-        """ A git directory should be created when we use the .git repository
-           provider
-        """
-        self.cut.repository_proivder = GitRepoProvider()
+        """ Test that the config file is tracked """
         self.cut.init()
-        pth_join(self.cut.powdir, '.git')
+        p(self.cut.powdir, '.git')
+
+    def test_clone_creates_git_dir(self):
+        self.cut.basedir = 'r1'
+        self.cut.init()
+
+        pd = self.cut.powdir
+
+        clone = 'r2'
+        self.cut.basedir = clone
+        self.cut.clone(pd)
+        self.assertTrue(exists('r2/.pow/.git'))
+
+    def test_clones_graphs(self):
+        self.cut.basedir = 'r1'
+        self.cut.init()
+
+        self._add_to_graph()
+        self.cut.commit('Commit Message')
+
+        pd = self.cut.powdir
+
+        clone = 'r2'
+        self.cut.basedir = clone
+        self.cut.clone(pd)
+        self.assertTrue(exists(p(self.cut.powdir, 'graphs', 'index')))
+
+    def test_clones_config(self):
+        self.cut.basedir = 'r1'
+        self.cut.init()
+
+        self._add_to_graph()
+        self.cut.commit('Commit Message')
+
+        pd = self.cut.powdir
+
+        clone = 'r2'
+        self.cut.basedir = clone
+        self.cut.clone(pd)
+        self.assertTrue(exists(self.cut.config_file))
+
+    def test_clone_creates_store(self):
+        self.cut.basedir = 'r1'
+        self.cut.init()
+
+        self._add_to_graph()
+        self.cut.commit('Commit Message')
+
+        pd = self.cut.powdir
+
+        clone = 'r2'
+        self.cut.basedir = clone
+        self.cut.clone(pd)
+        for x in os.walk('.'):
+            print(x)
+        self.assertTrue(exists(self.cut.store_name), msg=self.cut.store_name)
+
+    def _add_to_graph(self):
+        m = Mock()
+        q = (URIRef('http://example.org/s'),
+             URIRef('http://example.org/p'),
+             URIRef('http://example.org/o'),
+             URIRef('http://example.org/c'))
+        m().quads.return_value = [q]
+
+        self.cut.graph_accessor_finder = lambda url: m
+        self.cut.add_graph("http://example.org/ImAGraphYesSiree")
+
+
+class _TestException(Exception):
+    pass

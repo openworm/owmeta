@@ -27,3 +27,10 @@ class GitRepoProvider(object):
         if self._repo is None:
             self._repo = Repo(self.base)
         return self._repo
+
+    def clone(self, url, base):
+        Repo.clone_from(url, base)
+
+    @property
+    def is_dirty(self):
+        return self.repo().is_dirty()

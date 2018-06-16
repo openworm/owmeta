@@ -70,6 +70,7 @@ setup(
         'requests',
         'six==1.10.0',
         'SPARQLWrapper==1.6.2',
+        'tqdm',
         'transaction==1.4.4',
         'wrapt==1.10.11',
         'xlrd',

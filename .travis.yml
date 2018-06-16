@@ -8,7 +8,7 @@ before_install:
 - pip install --upgrade pytest>=3.4.0
 install:
 - python setup.py install
-- pow init_graph
+- pow clone git@github.com:openworm/OpenWormData.git
 script:
 - python setup.py test --addopts "--verbose -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
 - mv .coverage .coverage-functional
