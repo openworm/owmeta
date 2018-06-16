@@ -237,16 +237,19 @@ class POW(object):
         #
         # 9) and, finally, print some summary stats about the newly created
         # database like how many triples, contexts, total size downloaded, etc.
+        from tqdm import tqdm
         try:
             makedirs(self.powdir)
             print('Cloning...', file=sys.stderr)
-            self.repository_provider.clone(url, base=self.powdir)
+            with tqdm(file=sys.stderr) as progress:
+                self.repository_provider.clone(url, base=self.powdir, progress=progress)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()
             print('Deserializing...', file=sys.stderr)
             self._load_all_graphs()
-        except Exception as e:
+            print('Done!', file=sys.stderr)
+        except BaseException as e:
             self._ensure_no_powdir()
             raise e
 
@@ -256,15 +259,16 @@ class POW(object):
         idx_fname = pth_join(self.powdir, 'graphs', 'index')
         if exists(idx_fname):
             dest = self._conf()['rdf.graph']
-            with transaction.manager:
-                with open(idx_fname) as index_file:
-                    cnt = 0
+            with open(idx_fname) as index_file:
+                cnt = 0
+                for l in index_file:
+                    cnt += 1
+                index_file.seek(0)
+                with tqdm(total=cnt) as progress:
                     for l in index_file:
-                        cnt += 1
-                    index_file.seek(0)
-                    with tqdm(total=cnt) as progress:
-                        for l in index_file:
+                        with transaction.manager:
                             fname, ctx = l.strip().split(' ')
+                            progress.write(ctx)
                             with _BatchAddGraph(dest.get_context(ctx)) as g:
                                 g.parse(pth_join(self.powdir, 'graphs', fname), format='nt')
                                 progress.update(1)
