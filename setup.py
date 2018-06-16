@@ -2,8 +2,6 @@
 #
 
 from setuptools import setup
-import distutils.cmd
-import distutils.log
 import os
 import sys
 
@@ -102,7 +100,7 @@ setup(
     license='MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
     download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
-    scripts=['scripts/pow'],
+    entry_points={'console_scripts': ['pow = PyOpenWorm.cli:main']},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
