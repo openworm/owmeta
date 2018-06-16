@@ -408,7 +408,8 @@ class _BatchAddGraph(ObjectProxy):
         return self
 
     def __exit__(self, *exc):
-        self._self_graph.addN(self._self_batch)
+        if exc[0] is None:
+            self._self_graph.addN(self._self_batch)
 
 
 class UnreadableGraphException(Exception):
