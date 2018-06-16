@@ -1,6 +1,6 @@
 import rdflib as R
 
-from .dataObject import DatatypeProperty, ObjectProperty
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 from .channelworm import ChannelModel
 from .biology import BiologyType
 from .channel_common import CHANNEL_RDF_TYPE
@@ -12,10 +12,11 @@ class ExpressionPattern(BiologyType):
     class_context = BiologyType.class_context
 
     wormbaseid = DatatypeProperty()
+    wormbaseID = Alias(wormbaseid)
     wormbaseURL = DatatypeProperty()
     description = DatatypeProperty()
 
-    def __init__(self, wormbaseid=None, description=None, **kwargs):
+    def __init__(self, wormbaseid=None, **kwargs):
         super(ExpressionPattern, self).__init__(**kwargs)
 
         if wormbaseid:
