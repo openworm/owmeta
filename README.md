@@ -79,8 +79,17 @@ subdirectory. You can read it in by doing:
 
 ```python
 >>> import PyOpenWorm as P
->>> P.connect('PyOpenWorm/default.conf')
+>>> P.connect('readme.conf')
 
+```
+
+readme.conf:
+
+```json
+{
+    "rdf.source" : "ZODB",
+    "rdf.store_conf" : ".pow/worm.db"
+}
 ```
 
 Then you can try out a few things:

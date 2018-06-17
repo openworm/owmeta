@@ -20,10 +20,7 @@ class IVar(object):
                 callable(wrapped) and \
                 len(args) == 0 and \
                 len(kwargs) == 0: # we only got the wrapped. Just execute now.
-            res = PropertyIVar()
-            res.value_getter = wrapped
-            res.__doc__ = getattr(wrapped, '__doc__', '').strip()
-            return res
+            return _property_update(wrapped)
 
         first_arg = wrapped
         aargs = list(args)
@@ -33,11 +30,28 @@ class IVar(object):
                 args = [first_arg] + list(aargs)
             else:
                 args = aargs
-            res = PropertyIVar(*args, **kwargs)
-            res.value_getter = wrapped
-            res.__doc__ = wrapped.__doc__
-            return res
+            return _property_update(wrapped, *args, **kwargs)
         return wrapper
+
+
+def _property_update(wrapped, *args, **kwargs):
+    res = PropertyIVar(*args, **kwargs)
+    res.value_getter = wrapped
+    wrapped_doc = getattr(wrapped, '__doc__', None)
+    if wrapped_doc:
+        res.__doc__ = wrapped_doc
+    res.__doc__ = '' if res.__doc__ is None else res.__doc__.strip()
+    return res
+
+
+class SubCommand(object):
+
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.__doc__ = getattr(cmd, '__doc__', '')
+
+    def __get__(self, target, typ=None):
+        return self.cmd(target)
 
 
 class PropertyIVar(IVar):
@@ -63,13 +77,16 @@ class PropertyIVar(IVar):
         self.value_setter(target, value)
         self._have_set = True
 
-    def __get__(self, target, objectype=None):
+    def __get__(self, target, objecttype=None):
         ''' Executes the provided getter
 
         When the getter is first called, and when a setter is also defined, the setter will be called with the default
         value before the getter is called for the first time. _Even if the default_value is not set explicitly, the
         setter will still be called with 'None'._
         '''
+        if target is None:
+            return self
+
         if not self._have_set:
             self.value_setter(target, self.default_value)
         return self.value_getter(target)

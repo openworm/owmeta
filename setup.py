@@ -2,8 +2,6 @@
 #
 
 from setuptools import setup
-import distutils.cmd
-import distutils.log
 import os
 import sys
 
@@ -72,6 +70,7 @@ setup(
         'requests',
         'six==1.10.0',
         'SPARQLWrapper==1.6.2',
+        'tqdm',
         'transaction==1.4.4',
         'wrapt==1.10.11',
         'xlrd',
@@ -102,7 +101,7 @@ setup(
     license='MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
     download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
-    scripts=['scripts/pow'],
+    entry_points={'console_scripts': ['pow = PyOpenWorm.cli:main']},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',

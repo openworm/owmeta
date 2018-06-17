@@ -1,8 +1,10 @@
+from __future__ import print_function
+import sys
 import types
 import argparse
 import copy as _copy
 from numpydoc.docscrape import FunctionDoc
-from .command_util import IVar
+from .command_util import IVar, SubCommand
 
 
 # TODO: Create a class that can provide hints for processing (e.g., treat
@@ -15,6 +17,22 @@ METHOD_NARGS = 'METHOD_NARGS'
 METHOD_KWARGS = 'METHOD_KWARGS'
 
 
+class CLIUserError(Exception):
+    pass
+
+
+def _method_runner(runner, key):
+    def _f(*args, **kwargs):
+        getattr(runner, key)(*args, **kwargs)
+    return _f
+
+
+def _sc_runner(sub_mapper, sub_runner):
+    def _f():
+        sub_mapper.apply(sub_runner)
+    return _f
+
+
 class CLIArgMapper(object):
     '''
     Stores mappings for arguments and maps them back to the part of the object
@@ -23,6 +41,10 @@ class CLIArgMapper(object):
     def __init__(self):
         self.mappings = dict()
         self.methodname = None
+        self.runners = dict()
+        ''' Mapping from subcommand names to functions which run for them '''
+
+        self.argparser = None
 
     def apply(self, runner):
         iattrs = self.get(INSTANCE_ATTRIBUTE)
@@ -31,10 +53,19 @@ class CLIArgMapper(object):
         kvs += self.get(METHOD_NAMED_ARG).items()
         kwargs = {k: v for k, v in kvs}
         args = self.get(METHOD_NARGS).values()
-        runmethod = getattr(runner, self.methodname, runner)
+
+        runmethod = None
+
+        if self.methodname:
+            runmethod = self.runners.get(self.methodname, None)
 
         if runmethod is None:
-            runmethod = runner
+            if callable(runner):
+                runmethod = runner
+            else:
+                self.argparser.print_help(file=sys.stderr)
+                print(file=sys.stderr)
+                raise CLIUserError('Please specify a sub-command')
 
         for k, v in iattrs.items():
             setattr(runner, k, v)
@@ -85,9 +116,9 @@ class CLIAppendAction(CLIStoreAction):
         setattr(namespace, self.dest, items)
 
 
-class CLISubcommandAction(argparse._SubParsersAction):
+class CLISubCommandAction(argparse._SubParsersAction):
     def __init__(self, mapper, *args, **kwargs):
-        super(CLISubcommandAction, self).__init__(*args, **kwargs)
+        super(CLISubCommandAction, self).__init__(*args, **kwargs)
         self.mapper = mapper
 
     def __call__(self, *args, **kwargs):
@@ -97,7 +128,7 @@ class CLISubcommandAction(argparse._SubParsersAction):
                              ' set.'.format(self.dest, self.mapper.methodname))
 
         self.mapper.methodname = args[2][0]
-        super(CLISubcommandAction, self).__call__(*args, **kwargs)
+        super(CLISubCommandAction, self).__call__(*args, **kwargs)
 
 
 def _ensure_value(namespace, name, value):
@@ -112,39 +143,57 @@ class CLICommandWrapper(object):
         self.runner = runner
         self.mapper = CLIArgMapper() if mapper is None else mapper
 
-    def parser(self):
-        parser = argparse.ArgumentParser()
-        sp = parser.add_subparsers(dest='subparser', mapper=self.mapper, action=CLISubcommandAction)
+    def extract_args(self, val):
+        attr = getattr(val, '__doc__', '')
+        if not attr:
+            attr = ''
+        attr = attr.strip()
+        npdoc = FunctionDoc(val)
+        params = npdoc['Parameters']
+        lns = []
+        temp = ''
+        for ln in attr.split('\n'):
+            ln = ln.strip()
+            if ln:
+                temp += '\n' + ln
+            else:
+                if temp:
+                    lns.append(temp.strip())
+                temp = ''
+        if temp:
+            lns.append(temp.strip())
+        summary = lns[0] if len(lns) > 0 else ''
+        if params:
+            detail = '\n'.join(x for x in lns[:-1] if x)
+        else:
+            detail = '\n'.join(x for x in lns if x)
+
+        return summary, detail, params
+
+    def parser(self, parser=None):
+        if parser is None:
+            parser = argparse.ArgumentParser()
+        self.mapper.argparser = parser
         for key, val in vars(self.runner).items():
             if not key.startswith('_'):
                 parser.add_argument('--' + key, help=key.__doc__)
 
+        _sp = [None]
+
+        def sp():
+            if _sp[0] is None:
+                _sp[0] = parser.add_subparsers(dest='subparser', mapper=self.mapper,
+                                               action=CLISubCommandAction)
+            return _sp[0]
+
         for key, val in sorted(vars(type(self.runner)).items()):
             if not key.startswith('_'):
                 if isinstance(val, (types.FunctionType, types.MethodType)):
-                    attr = getattr(val, '__doc__', None)
-                    attr = attr.strip()
-                    npdoc = FunctionDoc(val)
-                    params = npdoc['Parameters']
-                    lns = []
-                    temp = ''
-                    for ln in attr.split('\n'):
-                        ln = ln.strip()
-                        if ln:
-                            temp += '\n' + ln
-                        else:
-                            if temp:
-                                lns.append(temp.strip())
-                            temp = ''
-                    if temp:
-                        lns.append(temp.strip())
-                    summary = lns[0] if len(lns) > 0 else ''
-                    if params:
-                        detail = '\n'.join(x for x in lns[:-1] if x)
-                    else:
-                        detail = '\n'.join(x for x in lns if x)
+                    summary, detail, params = self.extract_args(val)
 
-                    subparser = sp.add_parser(key, help=summary, description=detail)
+                    subparser = sp().add_parser(key, help=summary, description=detail)
+
+                    self.mapper.runners[key] = _method_runner(self.runner, key)
                     for param in params:
                         action = CLIStoreAction
                         if param[1] == 'bool':
@@ -177,6 +226,15 @@ class CLICommandWrapper(object):
                                         action=CLIStoreAction,
                                         key=INSTANCE_ATTRIBUTE,
                                         mapper=self.mapper)
+                elif isinstance(val, SubCommand):
+                    summary, detail, params = self.extract_args(val)
+                    sub_runner = getattr(self.runner, key)
+                    sub_mapper = CLIArgMapper()
+
+                    self.mapper.runners[key] = _sc_runner(sub_mapper, sub_runner)
+
+                    subparser = sp().add_parser(key, help=summary, description=detail)
+                    type(self)(sub_runner, sub_mapper).parser(subparser)
                 elif isinstance(val, IVar):
                     doc = getattr(val, '__doc__', None)
                     if val.default_value:
@@ -201,4 +259,7 @@ class CLICommandWrapper(object):
         commands specified therein
         '''
         self.parser().parse_args(args=args)
-        self.mapper.apply(self.runner)
+        try:
+            self.mapper.apply(self.runner)
+        except CLIUserError as e:
+            print(e, file=sys.stderr)
