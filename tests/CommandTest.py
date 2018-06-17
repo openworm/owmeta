@@ -14,7 +14,7 @@ from pytest import mark
 import git
 from PyOpenWorm.git_repo import GitRepoProvider
 from PyOpenWorm.command import POW, UnreadableGraphException
-from PyOpenWorm.command_util import IVar, PropertyIVar, SubCommand
+from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
 class BaseTest(unittest.TestCase):
