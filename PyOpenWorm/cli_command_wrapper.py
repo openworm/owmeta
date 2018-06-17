@@ -4,17 +4,21 @@ import types
 import argparse
 import copy as _copy
 from numpydoc.docscrape import FunctionDoc
+from yarom.mapper import FCN
 from .command_util import IVar, SubCommand
 
 
 # TODO: Create a class that can provide hints for processing (e.g., treat
 # positional arguments to this method as positional arguments on the command
 # line)
+# TODO: Use `inspect` module for getting argument names so we aren't depending on docstrings
+# TODO: Abstract numpydoc out into a hints provider
+from .cli_common import (INSTANCE_ATTRIBUTE,
+                         METHOD_NAMED_ARG,
+                         METHOD_NARGS,
+                         METHOD_KWARGS)
 
-INSTANCE_ATTRIBUTE = 'INSTANCE_ATTRIBUTE'
-METHOD_NAMED_ARG = 'METHOD_NAMED_ARG'
-METHOD_NARGS = 'METHOD_NARGS'
-METHOD_KWARGS = 'METHOD_KWARGS'
+from .cli_hints import CLI_HINTS
 
 
 class CLIUserError(Exception):
@@ -142,6 +146,7 @@ class CLICommandWrapper(object):
     def __init__(self, runner, mapper=None):
         self.runner = runner
         self.mapper = CLIArgMapper() if mapper is None else mapper
+        self.hints = CLI_HINTS.get(FCN(type(runner)))
 
     def extract_args(self, val):
         attr = getattr(val, '__doc__', '')
@@ -189,6 +194,7 @@ class CLICommandWrapper(object):
         for key, val in sorted(vars(type(self.runner)).items()):
             if not key.startswith('_'):
                 if isinstance(val, (types.FunctionType, types.MethodType)):
+                    sc_hints = self.hints.get(key) if self.hints else None
                     summary, detail, params = self.extract_args(val)
 
                     subparser = sp().add_parser(key, help=summary, description=detail)
@@ -215,7 +221,12 @@ class CLICommandWrapper(object):
                                                    mapper=self.mapper,
                                                    help=desc)
                         else:
-                            subparser.add_argument('--' + arg,
+                            args_hints = None if sc_hints is None else sc_hints.get((METHOD_NAMED_ARG, arg))
+                            names = None if args_hints is None else args_hints.get('names')
+
+                            if names is None:
+                                names = ['--' + arg]
+                            subparser.add_argument(*names,
                                                    action=action,
                                                    key=METHOD_NAMED_ARG,
                                                    mapper=self.mapper,

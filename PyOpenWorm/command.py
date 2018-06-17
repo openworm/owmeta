@@ -6,7 +6,6 @@ import hashlib
 import shutil
 import json
 import logging
-from wrapt import ObjectProxy
 
 from .command_util import IVar, SubCommand
 
@@ -217,46 +216,30 @@ class POW(object):
             If True, updates the existing config file to point to the given
             file for the store configuration
         """
-        # TODO: As a first cut
-        # 1) should download a file at the given URL
-        #
-        # 2) verify that it's an RDF graph
-        #
-        # 3) init a git repo
-        #
-        # 4) rewrite the serialization as an nquads (setting the clone url as
-        # the default context)
-        #
-        # 5) add the nquads serialization to the git repo
-        #
-        # 6) commit to the git repo
-        #
-        # 7) do a similar thing to POW::init for initializing the database
-        #
-        # 8) add the contents of the nquads to the new database
-        #
-        # 9) and, finally, print some summary stats about the newly created
-        # database like how many triples, contexts, total size downloaded, etc.
         from tqdm import tqdm
         try:
             makedirs(self.powdir)
             print('Cloning...', file=sys.stderr)
-            with tqdm(file=sys.stderr) as progress:
+            with tqdm(file=sys.stderr, unit=' objects', miniters=0) as progress:
                 self.repository_provider.clone(url, base=self.powdir, progress=progress)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()
             print('Deserializing...', file=sys.stderr)
-            self._load_all_graphs()
+            with tqdm(unit=' ctx', file=sys.stderr) as ctx_prog, \
+                    tqdm(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
+                self._load_all_graphs(ctx_prog, trip_prog)
             print('Done!', file=sys.stderr)
         except BaseException as e:
             self._ensure_no_powdir()
             raise e
 
-    def _load_all_graphs(self):
+    def _load_all_graphs(self, progress, trip_prog):
         import transaction
-        from tqdm import tqdm
+        from rdflib import plugin
+        from rdflib.parser import Parser, create_input_source
         idx_fname = pth_join(self.powdir, 'graphs', 'index')
+        triples_read = 0
         if exists(idx_fname):
             dest = self._conf()['rdf.graph']
             with open(idx_fname) as index_file:
@@ -264,14 +247,19 @@ class POW(object):
                 for l in index_file:
                     cnt += 1
                 index_file.seek(0)
-                with tqdm(total=cnt) as progress:
+                progress.total = cnt
+                with transaction.manager:
                     for l in index_file:
-                        with transaction.manager:
-                            fname, ctx = l.strip().split(' ')
-                            progress.write(ctx)
-                            with _BatchAddGraph(dest.get_context(ctx)) as g:
-                                g.parse(pth_join(self.powdir, 'graphs', fname), format='nt')
-                                progress.update(1)
+                        fname, ctx = l.strip().split(' ')
+                        parser = plugin.get('nt', Parser)()
+                        with open(pth_join(self.powdir, 'graphs', fname), 'rb') as f, \
+                                _BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
+                            parser.parse(create_input_source(f), g)
+                        progress.update(1)
+                        triples_read += g.count
+                        trip_prog.update(g.count)
+                    progress.write('Finalizing writes to database...')
+        progress.write('Loaded {:,} triples'.format(triples_read))
 
     def translate(self, translator, output_key=None, *data_sources, **named_data_sources):
         """
@@ -383,25 +371,24 @@ class POW(object):
         """
 
 
-class _BatchAddGraph(ObjectProxy):
+class _BatchAddGraph(object):
     ''' Wrapper around graph that turns calls to 'add' into calls to 'addN' '''
     def __init__(self, graph, batchsize=1000, *args, **kwargs):
-        super(_BatchAddGraph, self).__init__(graph, *args, **kwargs)
-        self._self_graph = graph
-        self._self_g = (graph,)
-        self._self_batchsize = batchsize
+        self.graph = graph
+        self.g = (graph,)
+        self.batchsize = batchsize
         self.reset()
 
     def reset(self):
-        self._self_batch = []
-        self._self_count = 0
+        self.batch = []
+        self.count = 0
 
     def add(self, triple):
-        if self._self_count > 0 and self._self_count % self._self_batchsize == 0:
-            self._self_graph.addN(self.batch)
-            self._self_batch = []
-        self._self_count += 1
-        self._self_batch.append(triple + self._self_g)
+        if self.count > 0 and self.count % self.batchsize == 0:
+            self.graph.addN(self.batch)
+            self.batch = []
+        self.count += 1
+        self.batch.append(triple + self.g)
 
     def __enter__(self):
         self.reset()
@@ -409,7 +396,7 @@ class _BatchAddGraph(ObjectProxy):
 
     def __exit__(self, *exc):
         if exc[0] is None:
-            self._self_graph.addN(self._self_batch)
+            self.graph.addN(self.batch)
 
 
 class UnreadableGraphException(Exception):
