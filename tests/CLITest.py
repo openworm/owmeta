@@ -82,10 +82,10 @@ class CLICommandWrapperTest(unittest.TestCase):
     def test_subcommand_sc(self):
         class S(object):
             def __init__(self, parent):
-                self.parent = parent
+                self._parent = parent
 
             def __call__(self):
-                self.parent.i = 1
+                self._parent.i = 1
 
         class A(object):
             def __init__(self):

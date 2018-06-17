@@ -174,17 +174,24 @@ class CLICommandWrapper(object):
         if parser is None:
             parser = argparse.ArgumentParser()
         self.mapper.argparser = parser
-        sp = parser.add_subparsers(dest='subparser', mapper=self.mapper, action=CLISubCommandAction)
         for key, val in vars(self.runner).items():
             if not key.startswith('_'):
                 parser.add_argument('--' + key, help=key.__doc__)
+
+        _sp = [None]
+
+        def sp():
+            if _sp[0] is None:
+                _sp[0] = parser.add_subparsers(dest='subparser', mapper=self.mapper,
+                                               action=CLISubCommandAction)
+            return _sp[0]
 
         for key, val in sorted(vars(type(self.runner)).items()):
             if not key.startswith('_'):
                 if isinstance(val, (types.FunctionType, types.MethodType)):
                     summary, detail, params = self.extract_args(val)
 
-                    subparser = sp.add_parser(key, help=summary, description=detail)
+                    subparser = sp().add_parser(key, help=summary, description=detail)
 
                     self.mapper.runners[key] = _method_runner(self.runner, key)
                     for param in params:
@@ -226,7 +233,7 @@ class CLICommandWrapper(object):
 
                     self.mapper.runners[key] = _sc_runner(sub_mapper, sub_runner)
 
-                    subparser = sp.add_parser(key, help=summary, description=detail)
+                    subparser = sp().add_parser(key, help=summary, description=detail)
                     type(self)(sub_runner, sub_mapper).parser(subparser)
                 elif isinstance(val, IVar):
                     doc = getattr(val, '__doc__', None)
