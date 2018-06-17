@@ -1,6 +1,6 @@
 import unittest
 
-from PyOpenWorm.command_util import SubCommand
+from PyOpenWorm.command_util import SubCommand, IVar
 from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
 from six import StringIO
 from contextlib import contextmanager
@@ -99,6 +99,36 @@ class CLICommandWrapperTest(unittest.TestCase):
         cm.mapper.apply(a)
 
         self.assertEqual(a.i, 1)
+
+    def test_ivar_default_str(self):
+        class A(object):
+            p = IVar(3)
+        a = A()
+        cm = CLICommandWrapper(a)
+        parser = cm.parser()
+        with noexit(), stdout() as out:
+            parser.parse_args(['sc', '--help'])
+        self.assertIn('3', out.getvalue())
+
+    def test_ivar_default_append(self):
+        class A(object):
+            p = IVar(3, doc='TEST_STRING')
+        a = A()
+        cm = CLICommandWrapper(a)
+        parser = cm.parser()
+        with noexit(), stdout() as out:
+            parser.parse_args(['sc', '--help'])
+        self.assertIn('3', out.getvalue())
+
+    def test_ivar_default_append_doc(self):
+        class A(object):
+            p = IVar(3, doc='TEST_STRING')
+        a = A()
+        cm = CLICommandWrapper(a)
+        parser = cm.parser()
+        with noexit(), stdout() as out:
+            parser.parse_args(['sc', '--help'])
+        self.assertIn('TEST_STRING', out.getvalue())
 
 
 @contextmanager

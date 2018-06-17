@@ -12,7 +12,7 @@ from rdflib.term import URIRef
 from pytest import mark
 
 import git
-from PyOpenWorm.git_repo import GitRepoProvider
+from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import POW, UnreadableGraphException
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
@@ -178,12 +178,19 @@ class IVarTest(unittest.TestCase):
                 return 0
         self.assertEqual('this', A.p.__doc__)
 
+    def test_ivar_default(self):
+        class A(object):
+            p = IVar(3)
+
+        self.assertEqual(A().p, 3)
+
 
 class IVarPropertyTest(unittest.TestCase):
 
     def test_set_setter(self):
         iv = PropertyIVar()
         iv.value_setter = lambda target, val: None
+
         class A(object):
             p = iv
         a = A()
@@ -191,13 +198,12 @@ class IVarPropertyTest(unittest.TestCase):
 
     def test_set_setter2(self):
         iv = PropertyIVar()
+
         class A(object):
             p = iv
         a = A()
         with self.assertRaises(AttributeError):
             a.p = 3
-
-
 
 
 @mark.inttest
@@ -320,6 +326,38 @@ class GitCommandTest(BaseTest):
 
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
+
+
+class CloneProgressTest(unittest.TestCase):
+    def setUp(self):
+        self.pr = Mock()
+        self.pr.n = 0
+        self.cp = _CloneProgress(self.pr)
+
+    def test_progress(self):
+        self.cp(1, 10)
+        self.pr.update.assert_called_with(10)
+
+    def test_progress_reset(self):
+        self.pr.n = 3
+        self.cp(2, 10)
+        self.pr.update.assert_called_with(10)
+
+    def test_progress_not_reset(self):
+        self.pr.n = 5
+        self.cp(0, 10)
+        self.pr.update.assert_called_with(5)
+
+    def test_progress_total(self):
+        self.cp(0, 1, 11)
+        self.assertEqual(self.pr.total, 11)
+
+    def test_progress_no_unit(self):
+        def f():
+            raise AttributeError()
+        pr = Mock()
+        pr.unit.side_effect = f
+        _CloneProgress(pr)
 
 
 class _TestException(Exception):
