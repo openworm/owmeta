@@ -1,4 +1,0 @@
-<http://openworm.org/entities/Neuron/AVDL> <http://openworm.org/entities/Cell/lineageName> "AB alaaapalr" .
-<http://openworm.org/entities/Neuron/AVDL> <http://openworm.org/entities/Cell/name> "AVDL" .
-<http://openworm.org/entities/Neuron/AVDL> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
-
