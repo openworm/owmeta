@@ -223,9 +223,9 @@ class CLICommandWrapper(object):
                         else:
                             args_hints = None if sc_hints is None else sc_hints.get((METHOD_NAMED_ARG, arg))
                             names = None if args_hints is None else args_hints.get('names')
-
                             if names is None:
                                 names = ['--' + arg]
+
                             subparser.add_argument(*names,
                                                    action=action,
                                                    key=METHOD_NAMED_ARG,

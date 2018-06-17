@@ -287,6 +287,19 @@ class POW(object):
             Identifier for the data source to reconstitute
         """
 
+    def serialize(self, destination, format='nquads'):
+        '''
+        Serialize the graph to a file
+
+        Parameters
+        ----------
+        destination : file or str
+            A file-like object to write the file to or a file name
+        format : str
+            Serialization format (ex, 'n3', 'nquads')
+        '''
+        self._conf()['rdf.graph'].serialize(destination, format=format)
+
     def _package_path(self):
         """
         Get the package path

@@ -12,5 +12,13 @@ CLI_HINTS = {
                 'names': ['url'],
             },
         },
+        'serialize': {
+            (METHOD_NAMED_ARG, 'destination'): {
+                'names': ['--destination', '-w']
+            },
+            (METHOD_NAMED_ARG, 'format'): {
+                'names': ['--format', '-f']
+            },
+        },
     },
 }
