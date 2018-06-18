@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=dev)](https://travis-ci.org/openworm/PyOpenWorm/builds)
-[![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.org/en/latest)
-[Join the Slack chat](https://openworm.slack.com/messages/C02EPNMP1/) [![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)  [![Coverage Status](https://coveralls.io/repos/github/openworm/PyOpenWorm/badge.svg?branch=dev)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
+[![Docs](https://readthedocs.org/projects/pow-doc/badge/?version=latest)](https://pow-doc.readthedocs.io/en/latest)
+[![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)  [![Coverage Status](https://coveralls.io/repos/github/openworm/PyOpenWorm/badge.svg?branch=dev)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
 
 PyOpenWorm
 ===========
@@ -266,10 +266,15 @@ Finally, when you're done accessing the database, be sure to disconnect from it:
 ```
 
 More examples can be found
-[here](http://pyopenworm.readthedocs.org/en/latest/making_dataObjects.html) and
+[here](http://pow-doc.readthedocs.org/en/latest/making_dataObjects.html) and
 [here](https://github.com/openworm/PyOpenWorm/tree/master/examples).
 
 Documentation
 -------------
 
-Further documentation [is available online](http://pyopenworm.readthedocs.org).
+Further documentation [is available online](http://pow-doc.readthedocs.org).
+
+Questions?
+----------
+[Join the Slack chat](https://openworm.slack.com/messages/C02EPNMP1/) for
+clarification, to ask questions, or just to say, 'Hi'.
