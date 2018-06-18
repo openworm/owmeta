@@ -2,11 +2,12 @@ import rdflib
 from rdflib.term import URIRef, Variable
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
+from PyOpenWorm.context_store import ContextStore
 from .DataTestTemplate import _DataTest
 try:
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, Mock
 except ImportError:
-    from mock import MagicMock
+    from mock import MagicMock, Mock
 
 
 class ContextTest(_DataTest):
@@ -104,7 +105,6 @@ class ContextTest(_DataTest):
         ctx3.add_import(ctx)
         final_ctx = Context(ident='http://example.com/context_1', imported=(ctx3,))
         final_ctx.save_imports(ctx0)
-        print(list(ctx0.contents_triples()))
         self.assertEqual(len(ctx0), 4)
 
     def test_init_len(self):
@@ -238,6 +238,61 @@ class ContextTest(_DataTest):
         ctx2.add_statement(create_mock_statement(ident_uri2, 2))
         ctx1.save_context(graph, inline_imports=True)
         self.assertEqual(ctx1.triples_saved, 3)
+
+
+class ContextStoreTest(_DataTest):
+
+    def test_query(self):
+        rdf_type = 'http://example.org/A'
+        ctxid = URIRef('http://example.com/context_1')
+        ctx = Mock()
+        graph = Mock()
+        graph.store.triples.side_effect = ([], [((URIRef('anA0'), rdflib.RDF.type, rdf_type), (ctxid,))],)
+        ctx.conf = {'rdf.graph': graph}
+
+        ctx.contents_triples.return_value = [(URIRef('anA'), rdflib.RDF.type, rdf_type)]
+        ctx.identifier = ctxid
+        ctx.imports = []
+        store = ContextStore(ctx, include_stored=True)
+        self.assertEqual(set([URIRef('anA'), URIRef('anA0')]),
+                         set(x[0][0] for x in store.triples((None, rdflib.RDF.type, rdf_type))))
+
+    def test_contexts_staged_ignores_stored(self):
+        ctxid0 = URIRef('http://example.com/context_0')
+        ctxid1 = URIRef('http://example.com/context_1')
+        ctx = Mock()
+        graph = Mock()
+        graph.store.triples.side_effect = [[((None, None, ctxid0), ())], []]
+        ctx.conf = {'rdf.graph': graph}
+        ctx.contents_triples.return_value = ()
+        ctx.identifier = ctxid1
+        ctx.imports = []
+        store = ContextStore(ctx)
+        self.assertNotIn(ctxid0, set(store.contexts()))
+
+    def test_contexts_combined(self):
+        ctxid0 = URIRef('http://example.com/context_0')
+        ctxid1 = URIRef('http://example.com/context_1')
+        ctx = Mock()
+        graph = Mock()
+        graph.store.triples.side_effect = [[((None, None, ctxid0), ())], []]
+        ctx.conf = {'rdf.graph': graph}
+        ctx.contents_triples.return_value = ()
+        ctx.identifier = ctxid1
+        ctx.imports = []
+        store = ContextStore(ctx, include_stored=True)
+        self.assertEqual(set([ctxid0, ctxid1]),
+                         set(store.contexts()))
+
+    def test_len_fail(self):
+        ctx = Mock()
+        graph = Mock()
+        ctx.conf = {'rdf.graph': graph}
+        ctx.contents_triples.return_value = ()
+        ctx.imports = []
+        store = ContextStore(ctx, include_stored=True)
+        with self.assertRaises(NotImplementedError):
+            len(store)
 
 
 def create_mock_statement(ident_uri, stmt_id):

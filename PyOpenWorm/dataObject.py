@@ -137,6 +137,9 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return res
 
     def after_mapper_module_load(self, mapper):
+        self.init_rdf_type_object()
+
+    def init_rdf_type_object(self):
         if self is not TypeDataObject:
             if self.definition_context is None:
                 raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(

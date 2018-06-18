@@ -194,7 +194,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
     def _triples_saved_helper(self, seen=None):
         if seen is None:
-            seen = set([])
+            seen = set()
         if id(self) in seen:
             return 0
         seen.add(id(self))
@@ -231,11 +231,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
     @property
     def rdf_object(self):
-       if self._rdf_object is None:
+        if self._rdf_object is None:
             from PyOpenWorm.contextDataObject import ContextDataObject
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
 
-       return self._rdf_object.contextualize(self.context)
+        return self._rdf_object.contextualize(self.context)
 
     def __bool__(self):
         return True
@@ -309,8 +309,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         try:
             return self.conf['rdf.graph']
         except KeyError:
-            raise Exception(
-                'No graph was given and configuration has no graph')
+            raise Exception('No graph was given and configuration has no graph')
 
 
 class QueryContext(Context):
