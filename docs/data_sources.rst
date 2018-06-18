@@ -47,17 +47,32 @@ Neurons
 .. _csv2: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormBase.csv
 .. _tsv1: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv
 
-Gene expression data below, additional to that extracted from WormAtlas concerning receptors, neuropeptides, neurotransmitters and innexins are parsed by `this method <https://github.com/openworm/PyOpenWorm/blob/4eb25df267ce385053f746ceb66e74d9c616403f/OpenWormData/scripts/insert_worm.py#L217>`_:
+Gene expression data below, additional to that extracted from WormAtlas
+concerning receptors, neuropeptides, neurotransmitters and innexins are parsed
+by `this method
+<https://github.com/openworm/PyOpenWorm/blob/4eb25df267ce385053f746ceb66e74d9c616403f/OpenWormData/scripts/insert_worm.py#L217>`_:
 
-- Monoamine secretors and receptors, neuropeptide secretors and receptors [4]_: Dynamic version on `this google spreadsheet <https://docs.google.com/spreadsheets/d/1kCxOOKu1wAREa9VbBiWVVHh-GEC3kJk0A3YVEipPKcc/edit#gid=0>`_. Staged in `this csv file <https://github.com/openworm/PyOpenWorm/blob/27647748981fe0fe135b8aa39191c0e32579c923/OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv>`_.
+- Monoamine secretors and receptors, neuropeptide secretors and receptors [4]_:
+  Dynamic version on `this google spreadsheet
+  <https://docs.google.com/spreadsheets/d/1kCxOOKu1wAREa9VbBiWVVHh-GEC3kJk0A3YVEipPKcc/edit#gid=0>`_.
+  Staged in `this csv file
+  <https://github.com/openworm/PyOpenWorm/blob/27647748981fe0fe135b8aa39191c0e32579c923/OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv>`_.
 
 Muscle cells
 ------------
 
-- Muscle names [2]_: Extracted from WormBase.  Dynamic version on `this google spreadsheet <gs1_>`_.  Staged in `this csv file <csv2_>`_.  Parsed by `this method <m11_>`_.
-- Cell descriptions [1]_: Extracted from WormAtlas.org.  Dynamic version on `this google spreadsheet <gs2_>`_.  Staged in `this tsv file <tsv1_>`_.  Parsed by `this method <m5_>`_.
-- Lineage names [1]_: Extracted from WormAtlas.org.  Dynamic version on `this google spreadsheet <gs2_>`_.  Staged in `this tsv file <tsv1_>`_.  Parsed by `this method <m5_>`_.
-- Neurons that innervate each muscle [3]_: Extracted from data personally communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by `this method <m12_>`_.
+- Muscle names [2]_: Extracted from WormBase.  Dynamic version on `this google
+  spreadsheet <gs1_>`_.  Staged in `this csv file <csv2_>`_.  Parsed by `this
+  method <m11_>`_.
+- Cell descriptions [1]_: Extracted from WormAtlas.org.  Dynamic version on
+  `this google spreadsheet <gs2_>`_.  Staged in `this tsv file <tsv1_>`_.
+  Parsed by `this method <m5_>`_.
+- Lineage names [1]_: Extracted from WormAtlas.org.  Dynamic version on `this
+  google spreadsheet <gs2_>`_.  Staged in `this tsv file <tsv1_>`_.  Parsed by
+  `this method <m5_>`_.
+- Neurons that innervate each muscle [3]_: Extracted from data personally
+  communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by
+  `this method <m12_>`_.
 
 .. _csv3: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv
 .. _m11: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L44
@@ -66,20 +81,25 @@ Muscle cells
 Connectome
 ----------
 
-- Gap junctions between neurons [3]_: Extracted from data personally communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by `this method <m13_>`_.
-- Synapses between neurons [3]_: Extracted from data personally communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by `this method <m13_>`_.
+- Gap junctions between neurons [3]_: Extracted from data personally
+  communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by
+  `this method <m13_>`_.
+- Synapses between neurons [3]_: Extracted from data personally communicated by
+  S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by `this method
+  <m13_>`_.
 
 .. _m13: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L423
 
 Curation note
 ^^^^^^^^^^^^^
 
-There was another source of C. *elegans* connectome data that was created
-by members of the OpenWorm project that has since been retired. The history of this spreadsheet is
-mostly contained in
-`this forum post <https://groups.google.com/forum/#!topic/openworm-discuss/G9wKoR8N-l0/discussion>`_
-We decided to use the Emmons data set [3]_ as the authoritative source
-for connectome data, as it is the very latest version and updated version of the C. *elegans* connectome that we are familiar with.
+There was another source of *C. elegans* connectome data that was created by
+members of the OpenWorm project that has since been retired. The history of
+this spreadsheet is mostly contained in `this forum post
+<https://groups.google.com/forum/#!topic/openworm-discuss/G9wKoR8N-l0/discussion>`_
+We decided to use the Emmons data set [3]_ as the authoritative source for
+connectome data, as it is the very latest version and updated version of the
+*C. elegans* connectome that we are familiar with.
 
 ----------
 
