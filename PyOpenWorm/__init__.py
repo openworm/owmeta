@@ -43,7 +43,7 @@ Notes:
 """
 
 from __future__ import print_function
-__version__ = '0.7.1'
+__version__ = '0.8.0'
 __author__ = 'Stephen Larson'
 
 import sys
@@ -236,12 +236,9 @@ def connect(configFile=False,
         conf = loadConfig(configFile)
     else:
         conf = Data({
-            "connectomecsv": "OpenWormData/aux_data/connectome.csv",
-            "neuronscsv": "OpenWormData/aux_data/neurons.csv",
             "rdf.source": "ZODB",
             "rdf.store": "ZODB",
             "rdf.store_conf": get_data('worm.db'),
-            "user.email": "jerry@cn.com",
             "rdf.upload_block_statement_count": 50
         })
 
