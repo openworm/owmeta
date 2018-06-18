@@ -75,7 +75,7 @@ class Worm(BiologyType):
             96
 
         :returns: A set of all muscles
-        :rtype: :class:`set`
+        :rtype: :py:class:`set`
          """
         return set(x for x in self._muscles_helper())
 
