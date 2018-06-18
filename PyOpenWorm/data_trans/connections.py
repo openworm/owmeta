@@ -2,17 +2,17 @@ import re
 import traceback
 import csv
 
-from PyOpenWorm.utils import normalize_cell_name
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.context import Context
-from PyOpenWorm.document import Document
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.muscle import Muscle
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
-from PyOpenWorm.datasource import GenericTranslation
+from ..utils import normalize_cell_name
+from ..connection import Connection
+from ..cell import Cell
+from ..context import Context
+from ..document import Document
+from ..evidence import Evidence
+from ..neuron import Neuron
+from ..muscle import Muscle
+from ..worm import Worm
+from ..network import Network
+from ..datasource import GenericTranslation
 
 from .csv_ds import CSVDataTranslator, CSVDataSource
 from .common_data import TRANS_NS
@@ -237,4 +237,7 @@ def changed_muscle(x):
 def expand_muscle(ctx, name):
     return ctx(Muscle)(name + 'L'), ctx(Muscle)(name + 'R')
 
-__yarom_mapped_classes__ = (ConnectomeCSVDataSource, NeuronConnectomeCSVTranslator)
+
+__yarom_mapped_classes__ = (ConnectomeCSVDataSource,
+                            NeuronConnectomeCSVTranslation,
+                            NeuronConnectomeCSVTranslator)

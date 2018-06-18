@@ -250,7 +250,6 @@ class Data(Configure):
     @classmethod
     def open(cls, file_name):
         """ Load a file into a new Data instance storing configuration in a JSON format """
-        # Configureable.default = Configure.open(file_name)
         return cls(conf=Configure.open(file_name))
 
     def openDatabase(self):

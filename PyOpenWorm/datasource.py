@@ -5,7 +5,7 @@ from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
-from .dataObject import BaseDataObject
+from .dataObject import BaseDataObject, ObjectProperty
 
 
 class Informational(object):
@@ -175,12 +175,11 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
 
             # Make the POW property
-            # To break it down, we set the name to the info name since that's
-            # how we access the info on this object, but the inf.property_name
-            # (which may or may not be the same as the name) also gets the POW
-            # property by the normal semantics of DataObject.
             #
-            # Kludge? Elegant solution to a stupid problem? You decide!
+            # We set the name for the property to the inf.name since that's how we access the info on this object, but
+            # the inf.property_name is used for the linkName so that the property's URI is generated based on that name.
+            # This allows to set an attribute named inf.property_name on self while still having access to the property
+            # through inf.name.
             setattr(self,
                     inf.name,
                     getattr(inf.cls, inf.property_type)(owner=self,
@@ -219,11 +218,7 @@ class Translation(BaseDataObject):
     source to a translation.
     """
 
-    def __init__(self, translator=None, **kwargs):
-        super(Translation, self).__init__(**kwargs)
-        Translation.ObjectProperty('translator', owner=self)
-        if translator is not None:
-            self.translator(translator)
+    translator = ObjectProperty()
 
     def defined_augment(self):
         return self.translator.has_defined_value() and self.translator.onedef().defined
@@ -237,12 +232,7 @@ class GenericTranslation(Translation):
     A generic translation that just has sources in order
     """
 
-    def __init__(self, source=None, **kwargs):
-        super(GenericTranslation, self).__init__(**kwargs)
-        self.source = GenericTranslation.ObjectProperty(multiple=True)
-
-        if source is not None:
-            self.source(source)
+    source = ObjectProperty(multiple=True)
 
     def defined_augment(self):
         return super(GenericTranslation, self).defined_augment() and \
@@ -341,7 +331,7 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
 
 class DataTranslator(BaseDataTranslator):
     """
-    A specialization with the GenericTranslation translation type that adds
+    A specialization with the :class:`GenericTranslation` translation type that adds
     sources for the translation automatically when a new output is made
     """
 
@@ -357,14 +347,8 @@ class DataTranslator(BaseDataTranslator):
 class PersonDataTranslator(BaseDataTranslator):
     """ A person who was responsible for carrying out the translation of a data source """
 
-    def __init__(self, person):
-        """
-        Parameters
-        ----------
-        person : PyOpenWorm.dataObject.DataObject
-            The person responsible for carrying out the translation.
-        """
-        self.person = person
+    person = ObjectProperty(multiple=True)
+    ''' A person responsible for carrying out the translation. '''
 
     # No translate impl is provided here since this is intended purely as a descriptive object
 

@@ -529,9 +529,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             inverse_of=None,
             **kwargs):
 
-        # XXX This should actually get called for all of the properties when
-        #     their owner classes are defined. The initialization, however,
-        #     must happen with the owner object's creation
         owner_class = cls
         owner_class_name = owner_class.__name__
         property_class_name = str(owner_class_name + "_" + linkName)
@@ -900,9 +897,6 @@ class PropertyDataObject(DataObject):
     """
     rdf_type = R.RDF['Property']
     class_context = URIRef('http://openworm.org/schema')
-
-    def __init__(self, *args, **kwargs):
-        super(PropertyDataObject, self).__init__(*args, **kwargs)
 
 
 class _Resolver(RDFTypeResolver):

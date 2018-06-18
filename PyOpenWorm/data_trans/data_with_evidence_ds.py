@@ -1,17 +1,19 @@
 from rdflib.namespace import Namespace
-from PyOpenWorm.context import Context
-from PyOpenWorm.datasource import Informational, DataSource
-from PyOpenWorm import CONTEXT
+from ..context import Context
+from ..datasource import Informational, DataSource
+from .. import CONTEXT
 from .common_data import DS_NS
 
 
 class DataWithEvidenceDataSource(DataSource):
     evidence_context_property = Informational(display_name='Evidence context',
                                               property_name='evidence_context',
-                                              description='The context in which evidence for the "Data context" is defined')
+                                              description='The context in which evidence'
+                                                          ' for the "Data context" is defined')
     data_context_property = Informational(display_name='Data context',
                                           property_name='data_context',
-                                          description='The context in which primary data for this data source is defined')
+                                          description='The context in which primary data'
+                                                      ' for this data source is defined')
 
     rdf_namespace = Namespace(DS_NS['DataWithEvidenceDataSource#'])
 
