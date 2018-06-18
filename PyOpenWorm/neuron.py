@@ -164,6 +164,14 @@ class Neighbor(Property):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
         self._conntype = Connection.contextualize(self.owner.context)
+        self.context = self.owner.context
+
+    def contextualize(self, context):
+        res = type(self)(owner=self.owner)
+        res._conns = self._conns
+        res._conntype = Connection.contextualize(context)
+        res.context = context
+        return res
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
@@ -178,12 +186,17 @@ class Neighbor(Property):
         """
         if len(self._conns) > 0:
             for c in self._conns:
-                for post in c.post_cell.get():
-                    yield post
+                if c.context == self.context:
+                    for post in c.post_cell.get():
+                        yield post
         else:
-            c = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
-            for r in c.load():
+            conn = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
+            for r in conn.load():
                 yield r.post_cell()
+
+    def count(self, **kwargs):
+        conntype = self._conntype.contextualize(self.context)
+        return conntype(pre_cell=self.owner, **kwargs).count()
 
     @property
     def defined_values(self):
@@ -236,17 +249,27 @@ class ConnectionProperty(Property):
            list of Connection
         """
         c = []
+        ct = self._conntype.contextualize(self.context)
         if pre_post_or_either == 'pre':
-            c.append(self._conntype(pre_cell=self.owner, **kwargs))
+            c.append(ct(pre_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'post':
-            c.append(self._conntype(post_cell=self.owner, **kwargs))
+            c.append(ct(post_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'either':
-            c.append(self._conntype(pre_cell=self.owner, **kwargs))
-            c.append(self._conntype(post_cell=self.owner, **kwargs))
+            c.append(ct(pre_cell=self.owner, **kwargs))
+            c.append(ct(post_cell=self.owner, **kwargs))
 
         for x in c:
             for r in x.load():
                 yield r
+        for x in self._conns:
+            if x.defined and x.context == self.context:
+                yield x
+
+    def contextualize(self, context):
+        res = type(self)(owner=self.owner)
+        res._conns = self._conns
+        res.context = context
+        return res
 
     @property
     def values(self):

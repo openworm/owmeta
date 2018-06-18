@@ -1,43 +1,32 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.biology import BiologyType
+from .dataObject import ObjectProperty, Alias
+from .connection import Connection
+from .neuron import Neuron
+from .biology import BiologyType
+from .worm_common import WORM_RDF_TYPE
 
 
 class Network(BiologyType):
 
-    """A network of neurons
-
-    Attributes
-    -----------
-    neuron
-        Returns a set of all Neuron objects in the network
-    synapse
-        Returns a set of all synapses in the network
-    """
+    """ A network of neurons """
 
     class_context = BiologyType.class_context
 
+    synapse = ObjectProperty(value_type=Connection, multiple=True)
+    ''' Returns a set of all synapses in the network '''
+
+    neuron = ObjectProperty(value_type=Neuron, multiple=True)
+    ''' Returns a set of all Neuron objects in the network '''
+
+    worm = ObjectProperty(value_rdf_type=WORM_RDF_TYPE)
+
+    synapses = Alias(synapse)
+    neurons = Alias(neuron)
+
     def __init__(self, worm=None, **kwargs):
         super(Network, self).__init__(**kwargs)
-        self.synapses = Network.ObjectProperty(
-            'synapse',
-            owner=self,
-            value_type=Connection,
-            multiple=True)
-        self.neurons = Network.ObjectProperty(
-            'neuron',
-            owner=self,
-            value_type=Neuron,
-            multiple=True)
-        from PyOpenWorm.worm import Worm
-        Network.ObjectProperty(
-            'worm',
-            owner=self,
-            value_type=Worm,
-            multiple=False)
 
         if worm is not None:
             self.worm(worm)
@@ -81,25 +70,6 @@ class Network(BiologyType):
         :rtype: PyOpenWorm.neuron.Neuron
         """
         return Neuron.contextualize(self.context)(name=name, conf=self.conf)
-
-    def _synapses_csv(self):
-        """
-        Get all synapses into CSV
-
-        :returns: A generator of Connection objects
-        :rtype: generator
-        """
-        for n, nbrs in self['nx'].adjacency_iter():
-            for nbr, eattr in nbrs.items():
-                yield Connection(n,
-                                 nbr,
-                                 int(eattr['weight']),
-                                 eattr['synapse'],
-                                 eattr['neurotransmitter'],
-                                 conf=self.conf)
-
-    def as_networkx(self):
-        return self['nx']
 
     def sensory(self):
         """
@@ -154,8 +124,6 @@ class Network(BiologyType):
 
     def defined_augment(self):
         return self.worm.has_defined_value()
-
-    # def neuroml(self):
 
 
 __yarom_mapped_classes__ = (Network,)

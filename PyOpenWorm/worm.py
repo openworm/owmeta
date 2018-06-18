@@ -6,16 +6,16 @@ from .muscle import Muscle
 from .cell import Cell
 from .biology import BiologyType
 from .network import Network
+from .worm_common import WORM_RDF_TYPE
 
 
 class Worm(BiologyType):
 
-    """
-    A representation of the whole worm.
-
-    """
+    """ A representation of the whole worm """
 
     class_context = BiologyType.class_context
+
+    rdf_type = WORM_RDF_TYPE
 
     scientific_name = DatatypeProperty()
     ''' Scientific name for the organism '''
