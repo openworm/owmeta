@@ -1,182 +1,64 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from __future__ import absolute_import
-import sys
-from six.moves import range
-sys.path.insert(0, ".")
-import unittest
-from PyOpenWorm.evidence import Evidence, EvidenceError
+from .DataTestTemplate import _DataTest
+from PyOpenWorm.evidence import Evidence
 from PyOpenWorm.dataObject import DataObject
 
-from .DataTestTemplate import _DataTest
 
 class EvidenceTest(_DataTest):
-
-    @unittest.skip("Post alpha")
-    def test_bibtex_init(self):
-        bibtex = u"""@ARTICLE{Cesar2013,
-          author = {Jean César},
-          title = {An amazing title},
-          year = {2013},
-          month = jan,
-          volume = {12},
-          pages = {12--23},
-          journal = {Nice Journal},
-          abstract = {This is an abstract. This line should be long enough to test
-             multilines...},
-          comments = {A comment},
-          keywords = {keyword1, keyword2},
-        }
-        """
-        self.assertEqual(u"Jean César", next(Evidence(bibtex=bibtex).author()))
-
-    def test_pubmed_init1(self):
-        """
-        A pubmed uri
-        """
-        uri = "http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract"
-        self.assertIn(u"Frédéric MY", list(Evidence(pmid=uri).author()))
-
-    def test_pubmed_init2(self):
-        """
-        A pubmed id
-        """
-        pmid = "24098140"
-        self.assertIn(u"Frédéric MY", list(Evidence(pmid=pmid).author()))
-
-    def test_pubmed_multiple_authors_list(self):
-        """
-        When multiple authors are on a paper, all of their names should be returned in an iterator. Publication order not necessarily preserved
-        """
-        pmid = "24098140"
-        alist = [
-            u"Frédéric MY",
-            "Lundin VF",
-            "Whiteside MD",
-            "Cueva JG",
-            "Tu DK",
-            "Kang SY",
-            "Singh H",
-            "Baillie DL",
-            "Hutter H",
-            "Goodman MB",
-            "Brinkman FS",
-            "Leroux MR"]
-        self.assertEqual(set(alist), set(Evidence(pmid=pmid).author()))
-
-    @unittest.skip("Fix later")
-    def test_doi_init_fail_on_request_prefix(self):
-        """
-        Requesting only the prefix
-        """
-        with self.assertRaises(EvidenceError):
-            Evidence(doi='http://dx.doi.org/10.1126')
-
-    @unittest.skip("Fix later")
-    def test_doi_init_fail_on_request_suffix(self):
-        """
-        Requesting only the prefix
-        """
-        with self.assertRaises(EvidenceError):
-            Evidence(doi='http://dx.doi.org/s00454-010-9273-0')
-
-    def test_wormbase_init(self):
-        """ Initialize with wormbase source """
-        # Wormbase lacks anything beyond the author,date format for a lot of
-        # papers
-        self.assertIn(
-            u'Frederic et al., 2013',
-            list(
-                Evidence(
-                    wormbase="WBPaper00044287").author()))
-
-    def test_wormbase_year(self):
-        """ Just make sure we can extract something without crashing """
-        for i in range(600, 610):
-            wbid = 'WBPaper00044' + str(i)
-            e = Evidence(wormbase=wbid)
-            e.year()
+    ctx_classes = (Evidence,)
 
     def test_asserts(self):
         """
         Asserting something should allow us to get it back.
         """
-        e = Evidence(key='WBPaper00044600', wormbase='WBPaper00044600')
-        r = DataObject(key="relationship")
-        e.asserts(r)
-        e.save()
-        l = list(e.asserts())
-        self.assertIn(r, l)
+        e = Evidence(key='WBPaper00044600')
+        r = DataObject(key="context_data_object")
+        e.supports(r)
+        s = list(e.supports.get())
+        self.assertIn(r, s)
 
     def test_asserts_query(self):
         """ Show that we can store the evidence on an object and later retrieve it """
-        e = Evidence(key="a", author='tom@cn.com')
+        e = self.ctx.Evidence(key="a")
         r = DataObject(key="relationship")
-        e.asserts(r)
-        e.save()
-        e0 = Evidence()
-        e0.asserts(r)
+        e.supports(r)
+        self.save()
+        e0 = self.ctx.Evidence()
+        e0.supports(r)
         s = list(e0.load())
-        author = s[0].author.one()
-        self.assertIn('tom@cn.com', author)
+        self.assertIn(e, s)
 
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields
             distinct results """
         r = DataObject(key='relationship')
+        ar = DataObject(key='aref')
+        br = DataObject(key='bref')
 
-        e = Evidence(key="a", author='tom@cn.com')
-        e.asserts(r)
-        e.save()
+        e = self.ctx.Evidence(key="a", reference=ar)
+        e.supports(r)
+        self.save()
 
-        e1 = Evidence(key="b", year=1999)
-        e1.asserts(r)
-        e1.save()
+        e1 = self.ctx.Evidence(key="b", reference=br)
+        e1.supports(r)
+        self.save()
 
         e0 = Evidence()
-        e0.asserts(r)
+        e0.supports(r)
         for x in e0.load():
-            a = x.author.one()
-            y = x.year()
+            lar = x.reference.one()
+            lbr = x.reference.one()
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
             if x.idl == e1.idl:
-                self.assertEqual(y, 1999)
+                self.assertEqual(lbr, br)
             elif x.idl == e.idl:
-                self.assertEqual(a, 'tom@cn.com')
+                self.assertEqual(lar, ar)
             else:
                 self.fail("Unknown object returned from load")
 
-    def test_asserts_query_multiple_author_matches(self):
-        """ Show that setting the evidence with distinct objects yields
-        distinct results even if there are matching values """
-        e = Evidence(key="k", author='tom@cn.com')
-        r = DataObject(key="a_statement")
-        e.asserts(r)
-        e.save()
-
-        e1 = Evidence(key="j", author='tom@cn.com')
-        e1.asserts(r)
-        e1.save()
-
-        e0 = Evidence()
-        e0.asserts(r)
-        self.assertEqual(2, len(list(e0.load())))
-
-    def test_evidence_retrieves_instead_of_overwrites(self):
-        """
-        Test that creating a new Evidence with the same attributes of an
-        already-saved Evidence does not overwrite the previous Evidence,
-        but instead retrieves it.
-        """
-        e = Evidence(key="NBK", author='Rodney Dangerfield', title="Natural Born Killers")
-        r = DataObject(key='Dangerfields_dramatic_range')
-        e.asserts(r)
-        e.save()
-
-        e1 = Evidence(author='Rodney Dangerfield')
-        facts = list(e1.asserts())
-        self.assertIn(r, facts)
 
 class Issue211EvidenceTest(_DataTest):
     """
@@ -186,35 +68,27 @@ class Issue211EvidenceTest(_DataTest):
 
     """
 
+    ctx_classes = (Evidence,)
+
     def setUp(self):
         super(Issue211EvidenceTest, self).setUp()
-        self.e1 = Evidence()
-        self.e2 = Evidence()
+        self.e1 = self.ctx.Evidence()
+        self.e2 = self.ctx.Evidence()
 
         c = DataObject(key=23)
-        self.e1.asserts(c)
-        self.e2.asserts(c)
-        self.evs = Evidence()
-        self.evs.asserts(c)
+        self.e1.supports(c)
+        self.e2.supports(c)
+        self.evs = self.context.stored(Evidence)()
+        self.evs.supports(c)
 
         self.expected_ids = set(['777', '888'])
 
     def assertEvidences(self, prop):
-        getattr(self.e1, prop)('777')
-        getattr(self.e2, prop)('888')
-        self.e1.save()
-        self.e2.save()
-        loaded_ids = set(getattr(self.evs, prop).get())
+        self.e1.reference(DataObject(ident='777'))
+        self.e2.reference(DataObject(ident='888'))
+        self.save()
+        loaded_ids = set(str(x.identifier) for x in self.evs.reference.get())
         self.assertTrue(self.expected_ids.issubset(loaded_ids))
 
-    def test_multiple_pmid_evidence_for_single_fact(self):
-        self.assertEvidences('pmid')
-
-    def test_multiple_doi_evidence_for_single(self):
-        self.assertEvidences('doi')
-
-    def test_multiple_wbid_evidence_for_single(self):
-        self.assertEvidences('wbid')
-
-    def test_multiple_uri_evidence_for_single(self):
-        self.assertEvidences('uri')
+    def test_references(self):
+        self.assertEvidences('reference')

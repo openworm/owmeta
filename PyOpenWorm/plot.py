@@ -1,4 +1,4 @@
-from PyOpenWorm import DataObject
+from PyOpenWorm.dataObject import DataObject
 
 
 class Plot(DataObject):
@@ -18,7 +18,7 @@ class Plot(DataObject):
     """
 
     def __init__(self, data=False, *args, **kwargs):
-        DataObject.__init__(self, **kwargs)
+        super(Plot, self).__init__(*args, **kwargs)
         Plot.DatatypeProperty('_data_string', self, multiple=False)
 
         if data:
@@ -68,3 +68,6 @@ class Plot(DataObject):
             return self._to_list(self._data_string())
         else:
             raise AttributeError('You must call "set_data" first.')
+
+
+__yarom_mapped_classes__ = (Plot,)

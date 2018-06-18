@@ -1,58 +1,39 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from .dataObject import DataObject
+
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 from .muscle import Muscle
 from .cell import Cell
+from .biology import BiologyType
 from .network import Network
-from .simpleProperty import ObjectProperty
 
 
-class NeuronNetworkProperty(ObjectProperty):
-    value_type = Network
-    linkName = 'neuron_network'
-    multiple = False
-    property_type = 'ObjectProperty'
-
-    def __init__(self, **kwargs):
-        super(NeuronNetworkProperty, self).__init__(**kwargs)
-        self.link = self.owner.rdf_namespace[self.linkName]
-
-    def set(self, v):
-        super(NeuronNetworkProperty, self).set(v)
-        if isinstance(v, Network) and isinstance(self.owner, Worm):
-            v.worm(self.owner)
-
-    @property
-    def value_rdf_type(self):
-        return Network.rdf_type
-
-
-class Worm(DataObject):
+class Worm(BiologyType):
 
     """
     A representation of the whole worm.
 
-    All worms with the same name are considered to be the same object.
-
-    Attributes
-    ----------
-    neuron_network : ObjectProperty
-        The neuron network of the worm
-    muscle : ObjectProperty
-        Muscles of the worm
-
     """
+
+    class_context = BiologyType.class_context
+
+    scientific_name = DatatypeProperty()
+    ''' Scientific name for the organism '''
+
+    name = Alias(scientific_name)
+    ''' Alias to `scientific_name` '''
+
+    muscle = ObjectProperty(value_type=Muscle, multiple=True)
+    ''' A type of muscle which is in the worm '''
+
+    cell = ObjectProperty(value_type=Cell)
+    ''' A cell in the worm '''
+
+    neuron_network = ObjectProperty(value_type=Network, inverse_of=(Network, 'worm'))
+    ''' The neuron network of the worm '''
 
     def __init__(self, scientific_name=False, **kwargs):
         super(Worm, self).__init__(**kwargs)
-        self.name = Worm.DatatypeProperty("scientific_name", owner=self)
-        Worm.ObjectProperty(
-            "muscle",
-            owner=self,
-            value_type=Muscle,
-            multiple=True)
-        Worm.ObjectProperty("cell", owner=self, value_type=Cell)
-        self.attach_property(self, NeuronNetworkProperty)
 
         if scientific_name:
             self.scientific_name(scientific_name)
@@ -94,7 +75,7 @@ class Worm(DataObject):
             96
 
         :returns: A set of all muscles
-        :rtype: set
+        :rtype: :class:`set`
          """
         return set(x for x in self._muscles_helper())
 
@@ -112,18 +93,13 @@ class Worm(DataObject):
 
         return self.rdf
 
-    def defined(self):
-        return super(Worm,self).defined or self.name.has_defined_value()
+    def defined_augment(self):
+        ''' True if the name is defined '''
+        return self.name.has_defined_value()
 
-    def identifier(self, *args, **kwargs):
-        # If the DataObject identifier isn't variable, then self is a specific
-        # object and this identifier should be returned. Otherwise, if our name
-        # attribute is _already_ set, then we can get the identifier from it and
-        # return that. Otherwise, there's no telling from here what our identifier
-        # should be, so the variable identifier (from DataObject.identifier() must
-        # be returned
+    def identifier_augment(self, *args, **kwargs):
+        ''' Result is derived from the name property '''
+        return self.make_identifier(self.name.defined_values[0])
 
-        if super(Worm, self).defined:
-            return super(Worm,self).identifier()
-        else:
-            return self.make_identifier(self.name.defined_values[0])
+
+__yarom_mapped_classes__ = (Worm,)

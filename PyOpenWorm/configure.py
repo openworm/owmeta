@@ -1,12 +1,13 @@
 from __future__ import print_function
-# a class for modules that need outside objects to parameterize their behavior (because what are generics?)
-# Modules inherit from this class and use their
-# self['expected_configured_property']
-
-
 from __future__ import absolute_import
 from __future__ import unicode_literals
 import six
+from pkg_resources import Requirement, resource_filename
+import json
+import re
+from os import environ
+
+
 class ConfigValue(object):
 
     """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
@@ -32,7 +33,7 @@ class _C(ConfigValue):
         return str(self.v)
 
     def __repr__(self):
-        return str(self.v)
+        return repr(self.v)
 
 
 class BadConf(Exception):
@@ -55,9 +56,17 @@ class _link(ConfigValue):
         return self.conf[self.members[0]]
 
 
+NO_DEFAULT = object()
+
+
 class Configure(object):
 
-    """ A simple configuration object.  Enables setting and getting key-value pairs"""
+    """
+    A simple configuration object.  Enables setting and getting key-value pairs
+
+    Unlike a `dict`, Configure objects will execute a function when retrieving values to enable deferred computation of
+    seldom-used configuration values. In addition, entries in a `Configure` can be aliased to one another.
+    """
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
@@ -81,6 +90,9 @@ class Configure(object):
     def __getitem__(self, pname):
         return self._properties[pname].get()
 
+    def __delitem__(self, pname):
+        del self._properties[pname]
+
     def __iter__(self):
         return iter(self._properties)
 
@@ -88,17 +100,17 @@ class Configure(object):
         """ Call link() with the names of configuration values that should
         always be the same to link them together
         """
-        l = _link(names, self)
+        link = _link(names, self)
         for n in names:
-            self._properties[n] = l
+            self._properties[n] = link
 
     def __contains__(self, thing):
         return (thing in self._properties)
 
     def __str__(self):
         return "{\n"+(",\n".join(
-            "\"%s\" : \"%s\"" %
-            (k, self._properties[k]) for k in self._properties)) + "\n}"
+            "\"%s\" : %s" %
+            (k, repr(self._properties[k])) for k in self._properties)) + "\n}"
 
     def __len__(self):
         return len(self._properties)
@@ -111,23 +123,32 @@ class Configure(object):
         :param file_name: configuration file encoded as JSON
         :return: a Configure object with the configuration taken from the JSON file
         """
-        import json
 
-        f = open(file_name)
-        c = Configure()
-        d = json.load(f)
-        for k in d:
-            value = d[k]
-            if isinstance(value, six.string_types):
-                if value.startswith("BASE/"):
-                    from pkg_resources import Requirement, resource_filename
-                    value = value[4:]
-                    value = resource_filename(
-                        Requirement.parse('PyOpenWorm'),
-                        value)
-                    d[k] = value
-            c[k] = _C(d[k])
-        f.close()
+        with open(file_name) as f:
+            c = Configure()
+            d = json.load(f)
+            for k in d:
+                value = d[k]
+                if isinstance(value, six.string_types):
+                    def matchf(md):
+                        match = md.group(1)
+                        valid_var_name = re.match(r'^[A-Za-z_]', match)
+                        if valid_var_name:
+                            res = environ.get(match, None)
+                            res = None if res == '' else res
+                        else:
+                            raise ValueError("'%s' is an invalid env-var name\n"
+                                             "Env-var names must be alphnumeric "
+                                             "and start with either a letter or '_'" % match)
+                        return res
+                    res = re.sub(r'\$([A-Za-z0-9_]+)', matchf, value)
+                    res = None if res == '' else res
+                    d[k] = res
+                    if value.startswith("BASE/"):
+                        value = value[4:]
+                        value = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                        d[k] = value
+                c[k] = _C(d[k])
         c['configure.file_location'] = file_name
         return c
 
@@ -145,7 +166,7 @@ class Configure(object):
                 self[x] = other[x]
         return self
 
-    def get(self, pname, default=False):
+    def get(self, pname, default=NO_DEFAULT):
         """
         Get some parameter value out by asking for a key
 
@@ -155,20 +176,38 @@ class Configure(object):
         """
         if pname in self._properties:
             return self._properties[pname].get()
-        elif default:
+        elif default is not NO_DEFAULT:
             return default
         else:
             raise KeyError(pname)
 
 
+class ImmutableConfigure(Configure):
+    def __setitem__(self, k, v):
+        raise TypeError('\'{}\' object does not support item assignment'.format(repr(type(self))))
+
+
 class Configureable(object):
 
     """ An object which can accept configuration.  A base class intended to be subclassed. """
-    conf = Configure()
-    default = conf
+    default = ImmutableConfigure()
 
-    def __init__(self, conf=False):
-        pass
+    def __init__(self, conf=None, **kwargs):
+        super(Configureable, self).__init__(**kwargs)
+        if conf is not None:
+            if conf is self:
+                raise ValueError('The \'conf\' of a Configureable cannot be itself')
+            self.__conf = conf
+        else:
+            self.__conf = Configureable.default
+
+    @property
+    def conf(self):
+        return self.__conf
+
+    @conf.setter
+    def conf(self, conf):
+        self.__conf = conf
 
     def __getitem__(self, k):
         """
@@ -189,7 +228,7 @@ class Configureable(object):
         """
         self.conf[k] = v
 
-    def get(self, pname, default=False):
+    def get(self, pname, default=None):
         """
         The getter for the configuration
 
@@ -197,4 +236,6 @@ class Configureable(object):
         :param default: True if you want the default value, False if you don't (default)
         :return: Returns the configuration value corresponding to the key pname.
         """
+        if self.conf is self:
+            raise ValueError('The \'conf\' of a Configureable cannot be itself')
         return self.conf.get(pname, default)

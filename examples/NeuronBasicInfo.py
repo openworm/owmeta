@@ -15,16 +15,24 @@ declared the variable `adal`.
 from __future__ import print_function
 from __future__ import absolute_import
 import PyOpenWorm as P
+from PyOpenWorm.worm import Worm
+from PyOpenWorm.context import Context
+from OpenWormData import BIO_ENT_NS
 import os
 print(os.getcwd())
 P.connect('default.conf')
+
+
 def get_names(it):
     res = []
     for x in it:
         res.append(x.name())
     return res
 
-w = P.Worm()
+
+ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+
+w = ctx(Worm)()
 net = w.neuron_network()
 print("Retrieving names...")
 inter = get_names(net.interneurons())
@@ -42,18 +50,21 @@ tri = motint & set(sensory)
 motint_no_tri = motint - tri
 sensint_no_tri = sensint - tri
 sensmot_no_tri = sensmot - tri
+
+
 def pp_set(title, s):
     print(title)
     print("="*(len(title)))
     print(" ".join(s))
     print()
 
-pp_set("Sensory only neurons",sens_only)
-pp_set("Interneurons (not mechanosensory, etc.)",inter_only)
-pp_set("Motor only neurons",motor_only)
-pp_set("Sensory-motor neurons",sensmot)
-pp_set("Sensory and interneuron?",sensint)
-pp_set("Motor and interneuron?",motint)
-pp_set("Sensory-motor less tri-functional",sensmot_no_tri)
-pp_set("Motor and interneuron less tri-functional",motint_no_tri)
-pp_set("Sensory and interneuron less tri-functional",sensint_no_tri)
+
+pp_set("Sensory only neurons", sens_only)
+pp_set("Interneurons (not mechanosensory, etc.)", inter_only)
+pp_set("Motor only neurons", motor_only)
+pp_set("Sensory-motor neurons", sensmot)
+pp_set("Sensory and interneuron?", sensint)
+pp_set("Motor and interneuron?", motint)
+pp_set("Sensory-motor less tri-functional", sensmot_no_tri)
+pp_set("Motor and interneuron less tri-functional", motint_no_tri)
+pp_set("Sensory and interneuron less tri-functional", sensint_no_tri)

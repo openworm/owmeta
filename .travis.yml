@@ -2,15 +2,24 @@ language: python
 python:
 - '2.7'
 - '3.4'
+- '3.6'
+before_install:
+- pip install coveralls
+- pip install --upgrade pytest>=3.4.0
 install:
 - python setup.py install
+- pow clone https://github.com/openworm/OpenWormData.git
 script:
-
-- ./codespeed-submit.sh
-- py.test --cov=PyOpenWorm --ignore=tests/InferenceTest.py
-
-after_success:
+- python setup.py test --addopts "--verbose -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- mv .coverage .coverage-functional
+- python setup.py test --addopts "--verbose -m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
+- coverage combine .coverage-functional .coverage 
+after_script:
 - coveralls
+after_success:
+- "./codespeed-submit.sh"
 env:
   global:
-    secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
+  - secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
+  - secure: YAH6uIq7iO/ufKMUyN3xpKjDqvrJ2yFXmUi7txYaKfqfN+5fW3H/GbnTFXiRVfmNU52c6PlXtcYzllzkJZY0UTkSqt8amMbHyS52JdLhJwMcch4ddDEd0NllMH7XCmGtfqN0E3EF4yHP4EnXqO/HV1VRmwCDRHHMn8c0rl/iqXc=
+

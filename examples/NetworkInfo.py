@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-import PyOpenWorm as P
 """
 Get information about the network.
 
@@ -15,31 +12,41 @@ Try running this script and see what it prints out. It takes a while to run
 because there are so many connections, so feel free to comment out some of the
 neuron names in the arbitrary list declared further below.
 """
+from __future__ import absolute_import
+from __future__ import print_function
+import PyOpenWorm as P
+from PyOpenWorm.worm import Worm
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.context import Context
+from OpenWormData import BIO_ENT_NS
+
 
 print("Connecting to the database...")
 P.connect('default.conf')
 
+ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+
 #Get the worm object.
-worm = P.Worm()
+worm = ctx(Worm)()
 
 #Extract the network object from the worm object.
 net = worm.neuron_network()
 
 #Make a list of some arbitrary neuron names.
-some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR"]
+some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR", "DD5"]
 
 #Go through our list and get the neuron object associated with each name.
 #Store these in another list.
-some_neurons = [P.Neuron(name) for name in some_neuron_names]
+some_neurons = [ctx(Neuron)(name) for name in some_neuron_names]
 
 print("Going through our list of neurons:")
 for neuron in some_neurons:
-    print("Checking connectivity of %s"%neuron.name())
+    print("Checking connectivity of %s" % neuron.name())
 
     #Go through all synapses in the network.
     #Note that we can go through all connection objects (even gap junctions) by
     #using `net.synapses()` and a for loop, as below.
-    conns = {'pre':{"E":[], "I":[]}, 'post':{"E":[], "I":[]}, 'gap':set()}
+    conns = {'pre': {"E": [], "I": []}, 'post': {"E": [], "I": []}, 'gap': set()}
     for s in neuron.connection.get('either'):
         #Below we print different things depending on the connections we find.
         #If the neuron we are currently looking at from our list is the pre or
@@ -78,3 +85,4 @@ for neuron in some_neurons:
     print(conns["post"]["I"])
     print("Gap junction neighbors")
     print(conns["gap"])
+    print()

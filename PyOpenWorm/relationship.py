@@ -9,11 +9,16 @@ class Relationship(DataObject):
         For SimpleProperty objects, this acts like a RDF Reified triple.
         """
 
+    class_context = 'http://openworm.org/schema'
+
     def __init__(self, s=None, p=None, o=None, **kwargs):
         super(Relationship, self).__init__(**kwargs)
-        Relationship.DatatypeProperty('subject', owner=self, multiple=False)
-        Relationship.DatatypeProperty('property', owner=self, multiple=False)
-        Relationship.DatatypeProperty('object', owner=self, multiple=False)
+        Relationship.ObjectProperty('subject', owner=self, multiple=False)
+        Relationship.ObjectProperty('property', owner=self, multiple=False)
+        Relationship.UnionProperty('object', owner=self, multiple=False)
+
+        Relationship.DatatypeProperty('certainty', owner=self, multiple=False)
+
         if s is not None:
             self.subject(s)
         if p is not None:
@@ -21,22 +26,17 @@ class Relationship(DataObject):
         if o is not None:
             self.object(o)
 
-    @property
-    def defined(self):
-        return (super(Relationship, self).defined or
-                (self.subject.has_defined_value() and
-                    self.property.has_defined_value() and
-                    self.object.has_defined_value()))
+    def defined_augment(self):
+        return (self.subject.has_defined_value() and
+                self.property.has_defined_value() and
+                self.object.has_defined_value())
 
-    def identifier(self):
-        if super(Relationship, self).defined:
-            return super(Relationship, self).identifier()
-        else:
-            data = (self.subject,
-                    self.property,
-                    self.object)
-            data = "".join(x.defined_values[0].identifier().n3() for x in data)
-            return self.make_identifier(data)
+    def identifier_augment(self):
+        data = (self.subject,
+                self.property,
+                self.object)
+        data = "".join(x.defined_values[0].identifier.n3() for x in data)
+        return self.make_identifier(data)
 
     def __repr__(self):
         s = "Relationship("
@@ -49,3 +49,6 @@ class Relationship(DataObject):
                 flip = True
         s += ")"
         return s
+
+
+__yarom_mapped_classes__ = (Relationship,)

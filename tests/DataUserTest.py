@@ -1,9 +1,8 @@
 from __future__ import absolute_import
-import sys
 from six.moves import range
-sys.path.insert(0, ".")
 import unittest
-from PyOpenWorm import (DataUser, Configureable, BadConf, Configure)
+from PyOpenWorm.data import DataUser
+from PyOpenWorm.configure import (Configureable, BadConf, Configure)
 import rdflib
 import rdflib as R
 
@@ -14,11 +13,10 @@ class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
-        c = Configureable.conf
-        Configureable.conf = False
-        with self.assertRaises(BadConf):
-            DataUser()
-        Configureable.conf = c
+        c = Configureable.default
+        Configureable.default = False
+        DataUser()
+        Configureable.default = c
 
     def test_init_no_config_with_default(self):
         """ Should suceed if the default configuration is a Data object """
@@ -28,15 +26,16 @@ class DataUserTest(_DataTest):
         """ Should suceed if the default configuration is a Data object """
         DataUser(conf=False)
 
+    @unittest.expectedFailure
     def test_init_config_no_Data(self):
         """ Should fail if given a non-Data configuration """
         # XXX: This test touches some machinery in
         # PyOpenWorm/__init__.py. Feel like it's a bad test
-        tmp = Configureable.conf
-        Configureable.conf = Configure()
+        tmp = Configureable.default
+        Configureable.default = Configure()
         with self.assertRaises(BadConf):
             DataUser()
-        Configureable.conf = tmp
+        Configureable.default = tmp
 
     @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):

@@ -1,6 +1,4 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0, ".")
 import unittest
 import os
 import subprocess as SP
@@ -26,8 +24,8 @@ class ExampleRunnerTest(unittest.TestCase):
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
             stat = SP.call(["python", example_file_name],
-                    stdout=out,
-                    stderr=out)
+                           stdout=out,
+                           stderr=out)
             out.seek(0)
             self.assertEqual(
                 0,
@@ -44,7 +42,6 @@ class ExampleRunnerTest(unittest.TestCase):
         # XXX: No `synclass' is given, so all neurons are called `excitatory'
         self.execfile("NetworkInfo.py")
 
-    @unittest.expectedFailure
     def test_run_morpho(self):
         self.execfile("morpho.py")
 

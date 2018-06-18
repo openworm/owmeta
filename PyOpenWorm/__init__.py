@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
+.. _pow_module:
+
 PyOpenWorm
 ==========
 
 OpenWorm Unified Data Abstract Layer.
 
-An introduction to PyOpenWorm can be found in the README on our `Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
+An introduction to PyOpenWorm can be found in the README on our
+`Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
 
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
@@ -37,23 +40,6 @@ Notes:
   objects are created by querying the database; these may be made out-of-date in that case.
 
 - ``a : {x_0,...,x_n}`` means ``a`` could have the value of any one of ``x_0`` through ``x_n``
-
-Classes
--------
-
-.. automodule:: PyOpenWorm.experiment
-.. automodule:: PyOpenWorm.channel
-.. automodule:: PyOpenWorm.evidence
-.. automodule:: PyOpenWorm.network
-.. automodule:: PyOpenWorm.neuron
-.. automodule:: PyOpenWorm.worm
-.. automodule:: PyOpenWorm.muscle
-.. automodule:: PyOpenWorm.connection
-.. automodule:: PyOpenWorm.relationship
-.. automodule:: PyOpenWorm.dataObject
-.. automodule:: PyOpenWorm.data
-.. automodule:: PyOpenWorm.cell
-.. automodule:: PyOpenWorm.configure
 """
 
 from __future__ import print_function
@@ -63,26 +49,16 @@ __author__ = 'Stephen Larson'
 import sys
 import os
 
-# For re-export
-from .configure import Configure, Configureable, ConfigValue, BadConf
-from .data import Data, DataUser, propertyTypes
-from .dataObject import DataObject
-from .pProperty import Property
-from .simpleProperty import SimpleProperty
-from .cell import Cell
-from .network import Network
-from .neuron import Neuron
-from .worm import Worm
-from .relationship import Relationship
-from .evidence import Evidence, EvidenceError
-from .muscle import Muscle
-from .quantity import Quantity
-from .my_neuroml import NeuroML
-from .connection import Connection
-from .experiment import Experiment
-from .channel import Channel
-from .channelworm import ChannelModel, PatchClampExperiment
-from .plot import Plot
+BASE_SCHEMA_URL = 'http://openworm.org/schema'
+
+# The c extensions are incompatible with our code...
+os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
+
+from .configure import Configureable
+from .context import Context
+import yarom
+from yarom.mapper import Mapper
+from PyOpenWorm.import_override import Overrider
 
 __import__('__main__').connected = False
 __all__ = [
@@ -92,31 +68,50 @@ __all__ = [
     "disconnect",
     "connect",
     "config",
-    "Configure",
-    "Configureable",
-    "ConfigValue",
-    "BadConf",
-    "Data",
-    "DataObject",
-    "DataUser",
-    "propertyTypes",
-    "Property",
-    "SimpleProperty",
-    "Cell",
-    "Network",
-    "Neuron",
-    "Worm",
-    "Relationship",
-    "EvidenceError",
-    "Muscle",
-    "Quantity",
-    "NeuroML",
-    "Connection",
-    "Experiment",
-    "Channel",
-    "ChannelModel",
-    "PatchClampExperiment",
-    "Plot"]
+    ]
+
+# Base class names is empty because we won't be adding any objects to the
+# context automatically
+mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                  'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+# An "empty" context, that serves as the default when no context is defined
+DEF_CTX = Context(mapper=mapper)
+
+RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
+                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                      mapper=mapper)
+
+RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
+                       imported=(RDF_CONTEXT,),
+                       base_namespace='http://www.w3.org/2000/01/rdf-schema#',
+                       mapper=mapper)
+
+
+BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
+                       ident=BASE_SCHEMA_URL,
+                       base_namespace=BASE_SCHEMA_URL + '#',
+                       mapper=mapper)
+
+SCI_CTX = Context(imported=(BASE_CONTEXT,),
+                  ident=BASE_SCHEMA_URL + '/sci',
+                  base_namespace=BASE_SCHEMA_URL + '/sci#',
+                  mapper=mapper)
+
+SCI_BIO_CTX = Context(imported=(SCI_CTX,),
+                      ident=BASE_SCHEMA_URL + '/sci/bio',
+                      base_namespace=BASE_SCHEMA_URL + '/sci/bio#',
+                      mapper=mapper)
+
+CONTEXT = Context(imported=(SCI_BIO_CTX,),
+                  ident=BASE_SCHEMA_URL + '/bio',
+                  base_namespace=BASE_SCHEMA_URL + '/bio#',
+                  mapper=mapper)
+
+yarom.MAPPER = CONTEXT.mapper
+overrider = Overrider(yarom.MAPPER)
+overrider.wrap_import()
+overrider.install_excepthook()
+
 
 def get_data(path):
     # get a resource from the installed package location
@@ -139,15 +134,16 @@ def config(key=None):
     :return: the instance of the Configure class currently operating.
     """
     if key is None:
-        return Configureable.conf
+        return Configureable.default
     else:
-        return Configureable.conf[key]
+        return Configureable.default[key]
 
 
 def loadConfig(f):
     """ Load configuration for the module. """
-    Configureable.conf = Data.open(f)
-    return Configureable.conf
+    from .data import Data
+    Configureable.default = Data.open(f)
+    return Configureable.default
 
 
 def disconnect(c=False):
@@ -158,7 +154,7 @@ def disconnect(c=False):
         return
 
     if not c:
-        c = Configureable.conf
+        c = Configureable.default
 
     if c:
         c.closeDatabase()
@@ -199,8 +195,8 @@ def loadData(
                 if data_file_time < db_file_time:
                     return
         except Exception as e:
-            logging.exception("Failed to determine if the serialized data file is older than the binary database. The data"
-                            " file will be reloaded. Reason: {}".format(e.message))
+            logging.exception("Failed to determine if the serialized data file is older than the binary database."
+                              " The data file will be reloaded. Reason: {}".format(e.message))
     sys.stderr.write(
         "[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
@@ -222,6 +218,7 @@ def connect(configFile=False,
     """
     import logging
     import atexit
+    from .data import Data
     m = __import__('__main__')
     if m.connected:
         print ("PyOpenWorm already connected")
@@ -234,47 +231,25 @@ def connect(configFile=False,
         if not isinstance(conf, Data):
             # Initializes a Data object with
             # the Configureable.conf
-            Configureable.conf = Data(conf)
-        else:
-            Configureable.conf = conf
+            conf = Data(conf)
     elif configFile:
-        loadConfig(configFile)
+        conf = loadConfig(configFile)
     else:
-        Configureable.conf = Data({
-            "connectomecsv" : "OpenWormData/aux_data/connectome.csv",
-            "neuronscsv" : "OpenWormData/aux_data/neurons.csv",
-            "rdf.source" : "ZODB",
-            "rdf.store" : "ZODB",
-            "rdf.store_conf" : get_data('worm.db'),
-            "user.email" : "jerry@cn.com",
-            "rdf.upload_block_statement_count" : 50
+        conf = Data({
+            "connectomecsv": "OpenWormData/aux_data/connectome.csv",
+            "neuronscsv": "OpenWormData/aux_data/neurons.csv",
+            "rdf.source": "ZODB",
+            "rdf.store": "ZODB",
+            "rdf.store_conf": get_data('worm.db'),
+            "user.email": "jerry@cn.com",
+            "rdf.upload_block_statement_count": 50
         })
 
-    Configureable.conf.openDatabase()
-    logging.info("Connected to database")
+    Configureable.default = conf
+    conf.openDatabase()
+    logging.getLogger('PyOpenWorm').info("Connected to database")
 
-    # have to register the right one to disconnect...
     atexit.register(disconnect)
-
-    # This takes all the classes that we want to store metadata in the database
-    #  and lets our data handling system know about them.
-    #  Should add new classes here if they need to be tracked!
-    DataObject.register()
-    Network.register()
-    Cell.register()
-    Neuron.register()
-    Worm.register()
-    Evidence.register()
-    Muscle.register()
-    Connection.register()
-    SimpleProperty.register()
-    Property.register()
-    Relationship.register()
-    Channel.register()
-    ChannelModel.register()
-    Experiment.register()
-    PatchClampExperiment.register()
-    Plot.register()
 
     m.connected = True
     if data:

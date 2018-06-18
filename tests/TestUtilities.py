@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
+
 
 def findSkippedTests():
     skippedTest = '@unittest.skip'
@@ -11,7 +13,7 @@ def findSkippedTests():
     # expected failures.
 
     for fname in os.listdir('.'):
-        if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+        if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
             with open(fname) as f:
                 count = False
                 for line in f:
@@ -28,30 +30,30 @@ def findSkippedTests():
 # Function to list function names in test suite so we can quickly see \
 # which ones do not adhere to the proper naming convention.
 def listFunctionNames():
-        for fname in os.listdir('.'):
-            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
-                with open(fname) as f:
-                    count = False
-                    for line in f:
-                        check = line.strip()[4:8]
-                        if 'def ' in line and check != 'test' and check != '__in':
-                            print(line.strip() + ' in file ' + fname)
-                            count = True
+    for fname in os.listdir('.'):
+        if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
+            with open(fname) as f:
+                count = False
+                for line in f:
+                    check = line.strip()[4:8]
+                    if 'def ' in line and check != 'test' and check != '__in':
+                        print(line.strip() + ' in file ' + fname)
+                        count = True
 
-                    if count:
-                        print('\n')
-                        count = False
+                if count:
+                    print('\n')
+                    count = False
 
 # Add function to find dummy tests, i.e. ones that are simply marked pass.
 # TODO: improve this to list function names
 def findDummyTests():
         for fname in os.listdir('.'):
-            if os.path.isfile(fname) and fname[-3:] == ".py" and fname != 'TestUtilities.py':
+            if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
                 with open(fname) as f:
                     count = False
                     for line in f:
                         if 'pass' in line:
-                            print('dummy test' + ' in file ' + fname)
+                            print('dummy test in file ' + fname)
                             count = True
 
                     if count:

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-import PyOpenWorm as P
 
-from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.connection import Connection
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.biology import BiologyType
 
 
-class Network(DataObject):
+class Network(BiologyType):
 
     """A network of neurons
 
@@ -17,23 +18,29 @@ class Network(DataObject):
         Returns a set of all synapses in the network
     """
 
-    def __init__(self, **kwargs):
+    class_context = BiologyType.class_context
+
+    def __init__(self, worm=None, **kwargs):
         super(Network, self).__init__(**kwargs)
         self.synapses = Network.ObjectProperty(
             'synapse',
             owner=self,
-            value_type=P.Connection,
+            value_type=Connection,
             multiple=True)
         self.neurons = Network.ObjectProperty(
             'neuron',
             owner=self,
-            value_type=P.Neuron,
+            value_type=Neuron,
             multiple=True)
+        from PyOpenWorm.worm import Worm
         Network.ObjectProperty(
             'worm',
             owner=self,
-            value_type=P.Worm,
+            value_type=Worm,
             multiple=False)
+
+        if worm is not None:
+            self.worm(worm)
 
     def neuron_names(self):
         """
@@ -42,7 +49,7 @@ class Network(DataObject):
         Example::
 
             # Grabs the representation of the neuronal network
-            >>> net = P.Worm().get_neuron_network()
+            >>> net = Worm().get_neuron_network()
 
             #NOTE: This is a VERY slow operation right now
             >>> len(set(net.neuron_names()))
@@ -51,8 +58,7 @@ class Network(DataObject):
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        for x in self.neurons():
-            yield x.name()
+        return set(x.name() for x in self.neuron())
 
     def aneuron(self, name):
         """
@@ -61,7 +67,7 @@ class Network(DataObject):
         Example::
 
             # Grabs the representation of the neuronal network
-            >>> net = P.Worm().get_neuron_network()
+            >>> net = Worm().get_neuron_network()
 
             # Grab a specific neuron
             >>> aval = net.aneuron('AVAL')
@@ -72,10 +78,9 @@ class Network(DataObject):
 
         :param name: Name of a c. elegans neuron
         :returns: Neuron corresponding to the name given
-        :rtype: PyOpenWorm.Neuron
+        :rtype: PyOpenWorm.neuron.Neuron
         """
-        n = P.Neuron(name=name, conf=self.conf)
-        return n
+        return Neuron.contextualize(self.context)(name=name, conf=self.conf)
 
     def _synapses_csv(self):
         """
@@ -86,12 +91,12 @@ class Network(DataObject):
         """
         for n, nbrs in self['nx'].adjacency_iter():
             for nbr, eattr in nbrs.items():
-                yield P.Connection(n,
-                                   nbr,
-                                   int(eattr['weight']),
-                                   eattr['synapse'],
-                                   eattr['neurotransmitter'],
-                                   conf=self.conf)
+                yield Connection(n,
+                                 nbr,
+                                 int(eattr['weight']),
+                                 eattr['synapse'],
+                                 eattr['neurotransmitter'],
+                                 conf=self.conf)
 
     def as_networkx(self):
         return self['nx']
@@ -104,12 +109,13 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        # TODO: make sure these belong to *this* Network
-        n = P.Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('sensory')
 
-        for x in n.load():
-            yield x
+        self.neuron.set(n)
+        res = list(n.load())
+        self.neuron.unset(n)
+        return res
 
     def interneurons(self):
         """
@@ -119,12 +125,13 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        # TODO: make sure these belong to *this* Network
-        n = P.Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('interneuron')
 
-        for x in n.load():
-            yield x
+        self.neuron.set(n)
+        res = list(n.load())
+        self.neuron.unset(n)
+        return res
 
     def motor(self):
         """
@@ -134,21 +141,21 @@ class Network(DataObject):
         :rtype: iter(Neuron)
         """
 
-        # TODO: make sure these belong to *this* Network
-        n = P.Neuron()
+        n = Neuron.contextualize(self.context)()
         n.type('motor')
 
-        for x in n.load():
-            yield x
+        self.neuron.set(n)
+        res = list(n.load())
+        self.neuron.unset(n)
+        return res
 
-    def identifier(self, *args, **kwargs):
-        if super(Network, self).defined:
-            return super(Network, self).identifier()
-        else:
-            return self.make_identifier(self.worm.defined_values[0])
+    def identifier_augment(self):
+        return self.make_identifier(self.worm.defined_values[0].identifier.n3())
 
-    @property
-    def defined(self):
-        return super(Network, self).defined or self.worm.has_defined_value()
+    def defined_augment(self):
+        return self.worm.has_defined_value()
 
     # def neuroml(self):
+
+
+__yarom_mapped_classes__ = (Network,)

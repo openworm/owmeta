@@ -1,9 +1,27 @@
 from __future__ import print_function
-import PyOpenWorm as P
-from PyOpenWorm import Cell
+
+from wrapt import ObjectProxy
+from .pProperty import Property
+from .dataObject import DatatypeProperty, Alias
+from .cell import Cell
+from .connection import Connection
 
 
-# XXX: Should we specify somewhere whether we have NetworkX or something else?
+class NeuronProxy(ObjectProxy):
+
+    def __init__(self, neighbor, connection, *args):
+        super(NeuronProxy, self).__init__(*args)
+        self._self_neighbor = neighbor
+        self._self_connection = connection
+
+    @property
+    def neighbor(self):
+        return self._self_neighbor
+
+    @property
+    def connection(self):
+        return self._self_connection
+
 
 class Neuron(Cell):
 
@@ -45,16 +63,6 @@ class Neuron(Cell):
 
     Attributes
     ----------
-    type : DatatypeProperty
-        The neuron type (i.e., sensory, interneuron, motor)
-    receptor : DatatypeProperty
-        The receptor types associated with this neuron
-    innexin : DatatypeProperty
-        Innexin types associated with this neuron
-    neurotransmitter : DatatypeProperty
-        Neurotransmitters associated with this neuron
-    neuropeptide : DatatypeProperty
-        Name of the gene corresponding to the neuropeptide produced by this neuron
     neighbor : Property
         Get neurons connected to this neuron if called with no arguments, or
         with arguments, state that neuronName is a neighbor of this Neuron
@@ -64,21 +72,42 @@ class Neuron(Cell):
 
     """
 
+    class_context = Cell.class_context
+
+    type = DatatypeProperty(multiple=True)
+    ''' The neuron type (i.e., sensory, interneuron, motor) '''
+
+    receptor = DatatypeProperty(multiple=True)
+    ''' The receptor types associated with this neuron '''
+
+    innexin = DatatypeProperty(multiple=True)
+    ''' Innexin types associated with this neuron '''
+
+    neurotransmitter = DatatypeProperty(multiple=True)
+    ''' Neurotransmitters associated with this neuron '''
+
+    neuropeptide = DatatypeProperty(multiple=True)
+    ''' Name of the gene corresponding to the neuropeptide produced by this neuron '''
+
+    receptors = Alias(receptor)
+    ''' Alias to receptor '''
+
     def __init__(self, name=False, **kwargs):
         super(Neuron, self).__init__(name=name, **kwargs)
         # Get neurons connected to this neuron
         Neighbor(owner=self)
         # Get connections from this neuron
-        Connection(owner=self)
+        ConnectionProperty(owner=self)
 
-        Neuron.DatatypeProperty("type", self, multiple=True)
-        Neuron.DatatypeProperty("receptor", self, multiple=True)
-        Neuron.DatatypeProperty("innexin", self, multiple=True)
-        Neuron.DatatypeProperty("neurotransmitter", self, multiple=True)
-        Neuron.DatatypeProperty("neuropeptide", self, multiple=True)
-        ### Aliases ###
         self.get_neighbors = self.neighbor
-        self.receptors = self.receptor
+
+    def contextualize(self, context):
+        res = super(Neuron, self).contextualize(context)
+        if hasattr(self, 'neighbor'):
+            res = NeuronProxy(self.neighbor.contextualize(context),
+                              self.connection.contextualize(context),
+                              res)
+        return res
 
     def GJ_degree(self):
         """Get the degree of this neuron for gap junction edges only
@@ -128,12 +157,13 @@ class Neuron(Cell):
         """
 
 
-class Neighbor(P.Property):
+class Neighbor(Property):
     multiple = True
 
     def __init__(self, **kwargs):
         super(Neighbor, self).__init__('neighbor', **kwargs)
         self._conns = []
+        self._conntype = Connection.contextualize(self.owner.context)
 
     def get(self, **kwargs):
         """Get a list of neighboring neurons.
@@ -151,7 +181,7 @@ class Neighbor(P.Property):
                 for post in c.post_cell.get():
                     yield post
         else:
-            c = P.Connection(pre_cell=self.owner, **kwargs)
+            c = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
             for r in c.load():
                 yield r.post_cell()
 
@@ -164,7 +194,7 @@ class Neighbor(P.Property):
         return []
 
     def set(self, other, **kwargs):
-        c = P.Connection(pre_cell=self.owner, post_cell=other, **kwargs)
+        c = self._conntype(pre_cell=self.owner, post_cell=other, **kwargs)
         self._conns.append(c)
         return c
 
@@ -174,7 +204,7 @@ class Neighbor(P.Property):
                 yield x
 
 
-class Connection(P.Property):
+class ConnectionProperty(Property):
 
     """A representation of the connection between neurons. Either a gap junction
     or a chemical synapse
@@ -186,29 +216,34 @@ class Connection(P.Property):
     multiple = True
 
     def __init__(self, **kwargs):
-        super(Connection, self).__init__('connection', **kwargs)
+        super(ConnectionProperty, self).__init__('connection', **kwargs)
         self._conns = []
+        self._conntype = Connection.contextualize(self.owner.context)
 
     def get(self, pre_post_or_either='pre', **kwargs):
         """Get a list of connections associated with the owning neuron.
 
            Parameters
            ----------
-           type: What kind of junction to look for.
-                        0=all, 1=gap junctions only, 2=all chemical synapses
-                        3=incoming chemical synapses, 4=outgoing chemical synapses
+           pre_post_or_either: str
+               What kind of connection to look for.
+               'pre': Owner is the source of the connection
+               'post': Owner is the destination of the connection
+               'either': Owner is either the source or destination of the connection
+
            Returns
            -------
            list of Connection
         """
         c = []
         if pre_post_or_either == 'pre':
-            c.append(P.Connection(pre_cell=self.owner, **kwargs))
+            c.append(self._conntype(pre_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'post':
-            c.append(P.Connection(post_cell=self.owner, **kwargs))
+            c.append(self._conntype(post_cell=self.owner, **kwargs))
         elif pre_post_or_either == 'either':
-            c.append(P.Connection(pre_cell=self.owner, **kwargs))
-            c.append(P.Connection(post_cell=self.owner, **kwargs))
+            c.append(self._conntype(pre_cell=self.owner, **kwargs))
+            c.append(self._conntype(post_cell=self.owner, **kwargs))
+
         for x in c:
             for r in x.load():
                 yield r
@@ -217,54 +252,18 @@ class Connection(P.Property):
     def values(self):
         return []
 
-    def count(self, pre_post_or_either='pre', syntype=None, *args, **kwargs):
-        """Get a list of connections associated with the owning neuron.
+    def count(self, pre_post_or_either='pre', *args, **kwargs):
+        c = []
+        conntype = self._conntype.contextualize(self.context)
+        if pre_post_or_either == 'pre':
+            c.append(conntype(pre_cell=self.owner, **kwargs))
+        elif pre_post_or_either == 'post':
+            c.append(conntype(post_cell=self.owner, **kwargs))
+        elif pre_post_or_either == 'either':
+            c.append(conntype(pre_cell=self.owner, **kwargs))
+            c.append(conntype(post_cell=self.owner, **kwargs))
 
-           Parameters
-           ----------
-           See parameters for PyOpenWorm.connection.Connection
-
-           Returns
-           -------
-           int
-               The number of connections matching the paramters given
-        """
-        options = dict()
-        options["pre"] = """
-                     ?x c:pre_cell <%s> .
-                     """ % self.owner.identifier()
-        options["post"] = """
-                      ?x c:post_cell <%s> .
-                      """ % self.owner.identifier()
-        options["either"] = " { %s } UNION { %s } . " % (
-            options['post'],
-            options['pre'])
-
-        if syntype is not None:
-            if syntype.lower() == 'gapjunction':
-                syntype = 'gapJunction'
-            syntype_pattern = \
-                "FILTER( EXISTS {" \
-                "?x c:syntype  \"" + syntype + \
-                "\" . }) ."
-        else:
-            syntype_pattern = ''
-
-        q = """
-        prefix ow: <http://openworm.org/entities/>
-        prefix c: <http://openworm.org/entities/Connection/>
-        prefix sp: <http://openworm.org/entities/SimpleProperty/>
-        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        SELECT (COUNT(?x) as ?count) WHERE {
-         %s
-         %s
-        }
-        """ % (options[pre_post_or_either], syntype_pattern)
-
-        res = 0
-        for x in self.conf['rdf.graph'].query(q):
-            res = x['count']
-        return int(res)
+        return sum(x.count() for x in c)
 
     def set(self, conn, **kwargs):
         """Add a connection associated with the owner Neuron
@@ -278,10 +277,13 @@ class Connection(P.Property):
            -------
            A PyOpenWorm.neuron.Connection
         """
-        assert(isinstance(conn, P.Connection))
+        assert(isinstance(conn, self._conntype))
         self._conns.append(conn)
 
     def triples(self, **kwargs):
         for c in self._conns:
             for x in c.triples(**kwargs):
                 yield x
+
+
+__yarom_mapped_classes__ = (Neuron,)

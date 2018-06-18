@@ -1,128 +1,89 @@
-from .pProperty import Property
+import rdflib as R
+
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 from .channelworm import ChannelModel
-from .dataObject import DataObject
+from .biology import BiologyType
+from .channel_common import CHANNEL_RDF_TYPE
+from .cell_common import CELL_RDF_TYPE
 
 
-# XXX: Why is this not an ObjectProperty?
-class Models(Property):
-    multiple = True
+class ExpressionPattern(BiologyType):
 
-    def __init__(self, **kwargs):
-        Property.__init__(self, 'models', **kwargs)
-        self._models = []
+    class_context = BiologyType.class_context
 
-    def get(self, **kwargs):
-        """
-        Get a list of models for this channel
+    wormbaseid = DatatypeProperty()
+    wormbaseID = Alias(wormbaseid)
+    wormbaseURL = DatatypeProperty()
+    description = DatatypeProperty()
 
-        Parameters
-        ----------
-        None
+    def __init__(self, wormbaseid=None, **kwargs):
+        super(ExpressionPattern, self).__init__(**kwargs)
 
-        Returns
-        -------
-        set of ChannelModel
-        """
+        if wormbaseid:
+            self.wormbaseid(wormbaseid)
+            self.wormbaseURL(R.URIRef("http://www.wormbase.org/species/all/expr_pattern/" + wormbaseid))
 
-        if len(self._models) > 0:
-            for m in self._models:
-                yield m
-        else:
-            # make a dummy ChannelModel so we can load from db to memory
-            c = ChannelModel()
-            for m in c.load():
-                self._models.append(m)
-            # call `get()` again to yield ChannelModels the user asked for
-            if len(self._models) > 0:
-                self.get()
+    def defined_augment(self):
+        return self.wormbaseid.has_defined_value()
 
-    @property
-    def values(self):
-        return self._models
-
-    def set(self, m, **kwargs):
-        """
-        Add a model to this Channel
-
-        Parameters
-        ----------
-        m : ChannelModel
-            The model to be added (instance of ChannelModel class)
-
-        Returns
-        -------
-        The ChannelModel being inserted (this is a side-effect)
-        """
-
-        self._models.append(m)
-        return m
-
-    def triples(self, **kwargs):
-        for c in self._models:
-            for x in c.triples(**kwargs):
-                yield x
+    def identifier_augment(self):
+        return self.make_identifier(self.wormbaseid.defined_values[0])
 
 
-class Channel(DataObject):
+class Channel(BiologyType):
     """
     A biological ion channel.
 
     Attributes
     ----------
     Models : Property
-        Get experimental models of this ion channel
-    subfamily : DatatypeProperty
-        Ion channel's subfamily
-    name : DatatypeProperty
-        Ion channel's name
-    description : DatatypeProperty
-        A description of the ion channel
-    gene_name : DatatypeProperty
-        Name of the gene that codes for this ion channel
-    gene_WB_ID : DatatypeProperty
-        Wormbase ID of the encoding gene
-    gene_class : DatatypeProperty
-        Classification of the encoding gene
-    proteins : DatatypeProperty
-        Proteins associated with this channel
-    expression_pattern : DatatypeProperty
-
     """
 
-    def __init__(self, name=False, **kwargs):
-        DataObject.__init__(self, **kwargs)
-        # Get Models of this Channel
-        Models(owner=self)
-        Channel.DatatypeProperty('subfamily', owner=self)
-        Channel.DatatypeProperty('description', owner=self)
-        Channel.DatatypeProperty('name', self)
-        Channel.DatatypeProperty('description', self)
-        Channel.DatatypeProperty('gene_name', self)
-        Channel.DatatypeProperty('gene_WB_ID', self)
-        Channel.DatatypeProperty('expression_pattern', self)
-        Channel.DatatypeProperty('proteins', self, multiple=True)
-        # TODO: assert this in the adapter instead
-        # Channel.DatatypeProperty('description_evidences', self)
-        # TODO: assert this in the adapter instead
-        # Channel.DatatypeProperty('expression_evidences', self)
+    class_context = BiologyType.class_context
+    rdf_type = CHANNEL_RDF_TYPE
 
-        if name:
-            self.name(name)
+    subfamily = DatatypeProperty()
+    ''' Ion channel's subfamily '''
 
-    def appearsIn(self):
-        """
-        TODO: Implement this method.
-        Return a list of Cells that this ion channel appears in.
-        """
-        pass
+    name = DatatypeProperty()
+    ''' Ion channel's name '''
 
-    @property
-    def defined(self):
-        return super(Channel, self).defined or self.name.has_defined_value()
+    description = DatatypeProperty()
+    ''' A description of the ion channel '''
 
-    def identifier(self):
-        if super(Channel, self).defined:
-            return super(Channel, self).identifier()
-        else:
-            # name is already set, so we can make an identifier from it
-            return self.make_identifier(self.name.defined_values[0])
+    gene_name = DatatypeProperty()
+    ''' Name of the gene that codes for this ion channel '''
+
+    gene_class = DatatypeProperty()
+    ''' Classification of the encoding gene '''
+
+    gene_WB_ID = DatatypeProperty()
+    ''' Wormbase ID of the encoding gene '''
+
+    expression_pattern = ObjectProperty(multiple=True,
+                                        value_type=ExpressionPattern)
+    ''' A pattern of expression of this cell within an organism '''
+
+    neuroml_file = DatatypeProperty()
+    ''' A NeuroML describing a model of this ion channel '''
+
+    proteins = DatatypeProperty(multiple=True)
+    ''' Proteins associated with this channel '''
+
+    appearsIn = ObjectProperty(multiple=True, value_rdf_type=CELL_RDF_TYPE)
+    ''' Cell types in which the ion channel has been expressed '''
+
+    model = ObjectProperty(value_type=ChannelModel)
+    ''' Get experimental models of this ion channel '''
+
+    def __init__(self, name=None, **kwargs):
+        super(Channel, self).__init__(name=name, **kwargs)
+
+    def defined_augment(self):
+        return self.name.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(self.name.defined_values[0])
+
+
+__yarom_mapped_classes__ = (Channel, ExpressionPattern)

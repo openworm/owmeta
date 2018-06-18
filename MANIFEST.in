@@ -1,2 +1,2 @@
-recursive-include OpenWormData *
-include post_install.py
+recursive-include OpenWormData/aux_data *
+include PyOpenWorm/default.conf

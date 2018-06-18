@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
-from PyOpenWorm import Plot, DataUser
-
 from .DataTestTemplate import _DataTest
+
+from PyOpenWorm.plot import Plot
+from PyOpenWorm.data import DataUser
+
 
 class PlotTest(_DataTest):
 
@@ -35,7 +35,6 @@ class PlotTest(_DataTest):
         """
         Can we retrieve the data we input?
         """
-        ary = [[1,2],[3,4]]
+        ary = [[1, 2], [3, 4]]
         pl = Plot(data=ary)
         assert pl.get_data() == ary
-

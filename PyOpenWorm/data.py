@@ -1,19 +1,6 @@
 from __future__ import print_function
-# A consolidation of the data sources for the project
-# includes:
-# NetworkX!
-# RDFlib!
-# Other things!
-#
-# Works like Configure:
-# Inherit from the DataUser class to access data of all kinds (listed above)
-
 import sqlite3
-import networkx as nx
-import PyOpenWorm
-from PyOpenWorm import Configureable, Configure, ConfigValue, BadConf
 import hashlib
-import csv
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
@@ -21,8 +8,9 @@ import datetime
 import transaction
 import os
 import traceback
-import logging as L
+import logging
 from .utils import grouper
+from .configure import Configureable, Configure, ConfigValue
 
 __all__ = [
     "Data",
@@ -35,21 +23,31 @@ __all__ = [
     "DefaultSource",
     "ZODBSource"]
 
+L = logging.getLogger(__name__)
+
+
+_B_UNSET = object()
+
 
 class _B(ConfigValue):
 
     def __init__(self, f):
-        self.v = False
+        self.v = _B_UNSET
         self.f = f
 
     def get(self):
-        if not self.v:
+        if self.v is _B_UNSET:
             self.v = self.f()
 
         return self.v
 
     def invalidate(self):
-        self.v = False
+        self.v = None
+
+    def __repr__(self):
+        if self.v is _B_UNSET:
+            return 'Thunk of ' + repr(self.f)
+        return repr(self.v)
 
 
 ZERO = datetime.timedelta(0)
@@ -71,15 +69,6 @@ class _UTC(datetime.tzinfo):
 
 utc = _UTC()
 
-propertyTypes = {"send": 'http://openworm.org/entities/356',
-                 "Neuropeptide": 'http://openworm.org/entities/354',
-                 "Receptor": 'http://openworm.org/entities/361',
-                 "is a": 'http://openworm.org/entities/1515',
-                 "neuromuscular junction": 'http://openworm.org/entities/1516',
-                 "Innexin": 'http://openworm.org/entities/355',
-                 "Neurotransmitter": 'http://openworm.org/entities/313',
-                 "gap junction": 'http://openworm.org/entities/357'}
-
 
 class DataUser(Configureable):
 
@@ -88,18 +77,19 @@ class DataUser(Configureable):
     Classes which use the database should inherit from DataUser.
     """
 
-    def __init__(self, **kwargs):
-        super(DataUser, self).__init__(**kwargs)
-        if not isinstance(self.conf, Data):
-            raise BadConf("Not a Data instance: " + str(self.conf))
+    def __init__(self, *args, **kwargs):
+        super(DataUser, self).__init__(*args, **kwargs)
+        self.__base_namespace = None
 
     @property
     def base_namespace(self):
+        if self.__base_namespace is not None:
+            return self.__base_namespace
         return self.conf['rdf.namespace']
 
     @base_namespace.setter
-    def base_namespace_set(self, value):
-        self.conf['rdf.namespace'] = value
+    def base_namespace(self, value):
+        self.__base_namespace = value
 
     @property
     def rdf(self):
@@ -107,11 +97,7 @@ class DataUser(Configureable):
 
     @property
     def namespace_manager(self):
-        return self.conf['rdf.namespace_manager']
-
-    @rdf.setter
-    def rdf(self, value):
-        self.conf['rdf.graph'] = value
+        return self.conf.get('rdf.namespace_manager', None)
 
     def _remove_from_store(self, g):
         # Note the assymetry with _add_to_store. You must add actual elements, but deletes
@@ -147,11 +133,13 @@ class DataUser(Configureable):
         else:
             gr = self.conf['rdf.graph']
             if self.conf['rdf.source'] == 'ZODB':
+                transaction.commit()
                 transaction.begin()
             for x in g:
                 gr.add(x)
             if self.conf['rdf.source'] == 'ZODB':
                 transaction.commit()
+                transaction.begin()
 
         # infer from the added statements
         # self.infer()
@@ -202,7 +190,6 @@ class DataUser(Configureable):
         self._remove_from_store_by_query(graph)
 
     def _remove_from_store_by_query(self, q):
-        import logging as L
         s = " DELETE WHERE {" + q + " } "
         L.debug("deleting. s = " + s)
         self.conf['rdf.graph'].update(s)
@@ -228,38 +215,49 @@ class DataUser(Configureable):
         return n
 
 
-class Data(Configure, Configureable):
+class Data(Configure):
 
     """
     Provides configuration for access to the database.
 
-    Usally doesn't need to be accessed directly
+    Usually doesn't need to be accessed directly
     """
 
-    def __init__(self, conf=False):
-        Configure.__init__(self)
-        Configureable.__init__(self)
-        # We copy over all of the configuration that we were given
-        if conf:
+    def __init__(self, conf=None, **kwargs):
+        """
+        Parameters
+        ----------
+        conf : Configure
+            A Configure object
+        """
+        super(Data, self).__init__(**kwargs)
+
+        if conf is not None:
             self.copy(conf)
         else:
-            self.copy(Configureable.conf)
+            self.copy(Configureable.default)
         self.namespace = Namespace("http://openworm.org/entities/")
-        self.molecule_namespace = Namespace(
-            "http://openworm.org/entities/molecules/")
-        self['nx'] = _B(self._init_networkX)
+        self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['rdf.namespace'] = self.namespace
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
 
     @classmethod
+    def load(cls, file_name):
+        """ Load a file into a new Data instance storing configuration in a JSON format """
+        return cls.open(file_name)
+
+    @classmethod
     def open(cls, file_name):
-        """ Open a file storing configuration in a JSON format """
-        Configureable.conf = Configure.open(file_name)
-        return cls()
+        """ Load a file into a new Data instance storing configuration in a JSON format """
+        # Configureable.default = Configure.open(file_name)
+        return cls(conf=Configure.open(file_name))
 
     def openDatabase(self):
-        """ Open a the configured database """
+        self.init_database()
+
+    def init_database(self):
+        """ Open the configured database """
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
         self.source.open()
@@ -297,12 +295,9 @@ class Data(Configure, Configureable):
 
     def _init_rdf_graph(self):
         # Set these in case they were left out
-        c = self.conf
-        self['rdf.source'] = c['rdf.source'] = c.get('rdf.source', 'default')
-        self['rdf.store'] = c['rdf.store'] = c.get('rdf.store', 'default')
-        self['rdf.store_conf'] = c['rdf.store_conf'] = c.get(
-            'rdf.store_conf',
-            'default')
+        self['rdf.source'] = self.get('rdf.source', 'default')
+        self['rdf.store'] = self.get('rdf.store', 'default')
+        self['rdf.store_conf'] = self.get('rdf.store_conf', 'default')
 
         # XXX:The conf=self can probably be removed
         self.sources = {'sqlite': SQLiteSource,
@@ -312,7 +307,7 @@ class Data(Configure, Configureable):
                         'trix': TrixSource,
                         'serialization': SerializationSource,
                         'zodb': ZODBSource}
-        source = self.sources[self['rdf.source'].lower()]()
+        source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
 
         self.link('semantic_net_new', 'semantic_net', 'rdf.graph')
@@ -325,37 +320,11 @@ class Data(Configure, Configureable):
                 hashlib.sha224(
                     str(data)).hexdigest()])
 
-    def _init_networkX(self):
-        g = nx.DiGraph()
+    def __setitem__(self, k, v):
+        return Configure.__setitem__(self, k, v)
 
-        # Neuron table
-        csvfile = open(self.conf['neuronscsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            neurontype = ""
-            # Detects neuron function
-            if "sensory" in row[1].lower():
-                neurontype += "sensory"
-            if "motor" in row[1].lower():
-                neurontype += "motor"
-            if "interneuron" in row[1].lower():
-                neurontype += "interneuron"
-            if len(neurontype) == 0:
-                neurontype = "unknown"
-
-            if len(row[0]) > 0:  # Only saves valid neuron names
-                g.add_node(row[0], ntype=neurontype)
-
-        # Connectome table
-        csvfile = open(self.conf['connectomecsv'])
-
-        reader = csv.reader(csvfile, delimiter=';', quotechar='|')
-        for row in reader:
-            g.add_edge(row[0], row[1], weight=row[3])
-            g[row[0]][row[1]]['synapse'] = row[2]
-            g[row[0]][row[1]]['neurotransmitter'] = row[4]
-        return g
+    def __getitem__(self, k):
+        return Configure.__getitem__(self, k)
 
 
 def modification_date(filename):
@@ -363,7 +332,7 @@ def modification_date(filename):
     return datetime.datetime.fromtimestamp(t)
 
 
-class RDFSource(Configureable, PyOpenWorm.ConfigValue):
+class RDFSource(Configureable, ConfigValue):
 
     """ Base class for data sources.
 

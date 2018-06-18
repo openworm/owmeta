@@ -2,14 +2,18 @@ PyOpenWorm Tests
 ================
 
 Run tests by executing the following from your command line.
-  $ py.test
+
+    $ py.test
+
+To run only tests which integrate with components outside of PyOpenWorm's control (e.g., web services) run this command:
+
+    $ py.test -m 'inttest'
+
+or, to exclude such tests:
+
+    $ py.test -m 'not inttest'
 
 This directory contains the unit and integration tests for PyOpenWorm.
-
-The main test file is test.py.  
-
-test.py itself contains many tests, but also imports tests from additional files
-in this directory:
 
 * ConfigureTest.py - Tests for the Configure class, which provides
   functionality to modules to allow outside objects to parameterize their

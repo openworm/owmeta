@@ -1,65 +1,80 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-import sys
-sys.path.insert(0,".")
-import unittest
-import neuroml
-import neuroml.writers as writers
-import PyOpenWorm
-from PyOpenWorm import *
-import networkx
-import rdflib
-import rdflib as R
-import pint as Q
-import os
-import subprocess as SP
-import subprocess
-import tempfile
-import doctest
-import requests
-
-from glob import glob
-
-from .GraphDBInit import *
 
 from .DataTestTemplate import _DataTest
+import PyOpenWorm
+from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.document import Document
+from PyOpenWorm.website import Website
+from PyOpenWorm.context import Context
+from six.moves.urllib.parse import urlparse
+import pytest
 
+import re
+
+# Regular expressions copied from:
+# https://www.crossref.org/blog/dois-and-matching-regular-expressions/
+DOI_REGEXEN = [re.compile(x, re.I) for x in (r'^10.\d{4,9}/[-._;()/:A-Z0-9]+$',
+                                             r'^10.1002/\S+$')]
+
+
+@pytest.mark.inttest
 class EvidenceQualityTests(_DataTest):
-    @unittest.expectedFailure
+    '''
+    Tests for the quality of evidence. As distinct from coverage, these test things like whether accession information
+    is included and usable, whether certain fields are properly formatted, etc.
+    '''
+
+    def setUp(self):
+        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.g = PyOpenWorm.config("rdf.graph")
+        self.context = Context()
+        self.qctx = self.context.stored
+
+    def tearDown(self):
+        PyOpenWorm.disconnect()
+
     def test_has_valid_resource(self):
         """Checks if the object has either a valid DOI or URL"""
-        ev = Evidence()
-        allEvidence = list(ev.load())
-        evcheck = []
+        ev = self.qctx(Evidence)()
+        allEvidence = set(ev.load())
+        qualityEvidence = set()
         for evobj in allEvidence:
-            if evobj.doi():
-                doi = evobj.doi()
-                val = requests.get('http://dx.doi.org/' + doi)
-                evcheck.append(val.status_code == 200)
+            ref = evobj.reference()
+            if isinstance(ref, Document):
+                doi = ref.doi()
+                if doi:
+                    for pat in DOI_REGEXEN:
+                        if pat.match(doi):
+                            qualityEvidence.add(evobj)
+                            break
+                    else: # no break
+                        continue
 
-            elif evobj.url():
-                url = evobj.url()
-                val = requests.get(url)
-                evcheck.append(val.status_code == 200)
+                urls = ref.uri.get()
+                good_uris = True
+                for uri in urls:
+                    parsed = urlparse(uri)
+                    if not parsed.scheme or not parsed.netloc:
+                        good_uris = False
+                        break
 
-            else:
-                evcheck.append(False)
+                if not good_uris:
+                    continue
+            elif isinstance(ref, Website):
+                urls = ref.url.get()
+                urls = list(urls)
+                print(urls)
+                good_uris = True
+                for uri in urls:
+                    parsed = urlparse(uri)
+                    if not parsed.scheme or not parsed.netloc:
+                        good_uris = False
+                        break
 
-        self.assertTrue(False not in evcheck)
+                if not good_uris:
+                    continue
+            qualityEvidence.add(evobj)
 
-    @unittest.expectedFailure
-    def test_resource_alignment(self):
-        """Checks that DOI and URL fields are aligned,
-        when both are present"""
-        ev = Evidence()
-        allEvidence = list(ev.load())
-        evcheck = []
-        for evobj in allEvidence:
-            if evobj.doi() and evobj.url():
-                doi = evobj.doi()
-                doival = requests.get('http://dx.doi.org/' + doi)
-                url = evobj.url()
-                urlval = requests.get(url)
-                evcheck.append(doival.status_code == urlval.status_code)
-
-        self.assertTrue(False not in evcheck)
+        self.assertSetEqual(allEvidence, qualityEvidence,
+                            msg='\n'.join(str(x.reference()) for x in (allEvidence - qualityEvidence)))

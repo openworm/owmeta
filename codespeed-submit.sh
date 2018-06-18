@@ -8,7 +8,9 @@ echo "Branch: $BRANCH"
 echo "Environment: $ENV"
 echo "Commit: $COMMIT"
 echo "User: $OWCS_USERNAME"
+URL=${OWCS_URL:-https://owcs.pythonanywhere.com/}
 
-py.test $@ --cov=PyOpenWorm --code-speed-submit="https://owcs.pythonanywhere.com/" \
+py.test $@ --code-speed-submit="$URL" \
     --environment="$ENV" --branch="$BRANCH" --commit="$COMMIT" \
-    --password=${OWCS_KEY} --username=$OWCS_USERNAME ./tests/ProfileTest.py
+    --project=PyOpenWorm --password=${OWCS_KEY} --username=$OWCS_USERNAME \
+    ./tests/ProfileTest.py

@@ -2,7 +2,13 @@ from __future__ import print_function
 from __future__ import absolute_import
 import unittest
 import traceback
-from PyOpenWorm import *
+from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.configure import Configureable
+from PyOpenWorm.dataObject import DataObject, values
+from PyOpenWorm.neuron import Neuron
+from PyOpenWorm.connection import Connection
+from PyOpenWorm.simpleProperty import DatatypeProperty
+from PyOpenWorm import connect, disconnect
 from six.moves import range
 
 
@@ -34,7 +40,7 @@ class IntegrationTest(unittest.TestCase):
 
         # Declare a connection between them
         c = Connection(n1, n2, number=1)
-        c_id = c.identifier()
+        c_id = c.identifier
         # Attach some evidence for the connection
         e = Evidence(author="Danny Glover")
         e.asserts(c)
@@ -42,7 +48,7 @@ class IntegrationTest(unittest.TestCase):
         e.save()
         e = Evidence(author="Danny Glover")
         r = e.asserts()
-        ids = set(x.identifier() for x in r)
+        ids = set(x.identifier for x in r)
         self.assertIn(c_id, ids)
 
     def test_get_evidence(self):
