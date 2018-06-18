@@ -1,7 +1,7 @@
 from __future__ import print_function
 from types import ModuleType
 import rdflib
-from rdflib.term import Variable
+from rdflib.term import Variable, URIRef
 from rdflib.graph import ConjunctiveGraph
 import wrapt
 from .data import DataUser
@@ -56,8 +56,7 @@ class ContextMeta(ContextualizableClass):
         if context is None:
             return self
         ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
-        return res
+        return ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
 
     def __call__(self, *args, **kwargs):
         o = super(ContextMeta, self).__call__(*args, **kwargs)
@@ -83,16 +82,16 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         if key is not None and base_namespace is None:
             raise Exception("If 'key' is given, then 'base_namespace' must also be given to Context")
 
-        if not isinstance(ident, rdflib.term.URIRef) \
+        if not isinstance(ident, URIRef) \
            and isinstance(ident, (str, text_type)):
-            ident = rdflib.term.URIRef(ident)
+            ident = URIRef(ident)
 
         if not isinstance(base_namespace, rdflib.namespace.Namespace) \
            and isinstance(base_namespace, (str, text_type)):
             base_namespace = rdflib.namespace.Namespace(base_namespace)
 
         if ident is None and key is not None:
-            ident = rdflib.URIRef(base_namespace[quote(key)])
+            ident = URIRef(base_namespace[quote(key)])
 
         if not hasattr(self, 'identifier'):
             self.identifier = ident
