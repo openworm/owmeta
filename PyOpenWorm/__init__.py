@@ -9,7 +9,7 @@ PyOpenWorm
 OpenWorm Unified Data Abstract Layer.
 
 An introduction to PyOpenWorm can be found in the README on our
-`Github page <https://github.com/openworm/PyOpenWorm/tree/alpha0.5#readme>`_.
+`Github page <https://github.com/openworm/PyOpenWorm>`_.
 
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
