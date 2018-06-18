@@ -8,11 +8,8 @@ from yarom.mapper import FCN
 from .command_util import IVar, SubCommand
 
 
-# TODO: Create a class that can provide hints for processing (e.g., treat
-# positional arguments to this method as positional arguments on the command
-# line)
 # TODO: Use `inspect` module for getting argument names so we aren't depending on docstrings
-# TODO: Abstract numpydoc out into a hints provider
+# TODO: Abstract numpydoc out into a hints provider (also implement a hints provider)
 from .cli_common import (INSTANCE_ATTRIBUTE,
                          METHOD_NAMED_ARG,
                          METHOD_NARGS,
@@ -135,8 +132,11 @@ class CLISubCommandAction(argparse._SubParsersAction):
         super(CLISubCommandAction, self).__call__(*args, **kwargs)
 
 
+NOT_SET = object()
+
+
 def _ensure_value(namespace, name, value):
-    if getattr(namespace, name, None) is None:
+    if getattr(namespace, name, NOT_SET) is NOT_SET:
         setattr(namespace, name, value)
     return getattr(namespace, name)
 
@@ -149,31 +149,38 @@ class CLICommandWrapper(object):
         self.hints = CLI_HINTS.get(FCN(type(runner)))
 
     def extract_args(self, val):
-        attr = getattr(val, '__doc__', '')
-        if not attr:
-            attr = ''
-        attr = attr.strip()
+        docstring = getattr(val, '__doc__', '')
+        if not docstring:
+            docstring = ''
+        docstring = docstring.strip()
         npdoc = FunctionDoc(val)
         params = npdoc['Parameters']
-        lns = []
+        paragraphs = self._split_paras(docstring)
+        if (len(paragraphs) == 1 and not params) or len(paragraphs) > 1:
+            summary = paragraphs[0]
+        else:
+            summary = ''
+        if params: # Assuming the Parameters section is the last 'paragraph'
+            paragraphs = paragraphs[:-1]
+        detail = '\n'.join(x for x in paragraphs if x)
+
+        return summary, detail, params
+
+    def _split_paras(self, docstring):
+        paragraphs = []
         temp = ''
-        for ln in attr.split('\n'):
+        for ln in docstring.split('\n'):
             ln = ln.strip()
             if ln:
                 temp += '\n' + ln
             else:
                 if temp:
-                    lns.append(temp.strip())
+                    paragraphs.append(temp.strip())
                 temp = ''
         if temp:
-            lns.append(temp.strip())
-        summary = lns[0] if len(lns) > 0 else ''
-        if params:
-            detail = '\n'.join(x for x in lns[:-1] if x)
-        else:
-            detail = '\n'.join(x for x in lns if x)
+            paragraphs.append(temp.strip())
 
-        return summary, detail, params
+        return paragraphs
 
     def parser(self, parser=None):
         if parser is None:
