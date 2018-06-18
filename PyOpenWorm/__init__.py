@@ -15,7 +15,7 @@ Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
 will query against the database for the value or values that are related to ``a`` through ``B``;
 on the other hand, ``a.B(c)``, the Update form, will add a statement to the database that ``a``
-relates to ``c`` through ``B``. For the Update form, a Relationship object describing the
+relates to ``c`` through ``B``. For the Update form, a Statement object describing the
 relationship stated is returned as a side-effect of the update.
 
 The Update form can also be accessed through the set() method of a Property and the Query form through the get()
@@ -29,17 +29,6 @@ and::
 
 The get() method also allows for parameterizing the query in ways specific to the Property.
 
-Relationship objects are key to the :class:`Evidence class <.Evidence>` for sourcing statements.
-Relationships can themselves be members in a relationship, allowing for fairly complex hierarchical statements to
-be made about entities.
-
-Notes:
-
-- Of course, when these methods communicate with an external database, they may fail due to the database being
-  unavailable and the user should be notified if a connection cannot be established in a reasonable time. Also, some
-  objects are created by querying the database; these may be made out-of-date in that case.
-
-- ``a : {x_0,...,x_n}`` means ``a`` could have the value of any one of ``x_0`` through ``x_n``
 """
 
 from __future__ import print_function
