@@ -1,4 +1,4 @@
-from PyOpenWorm.dataObject import DataObject
+from .dataObject import DataObject, DatatypeProperty
 
 
 class Plot(DataObject):
@@ -17,9 +17,10 @@ class Plot(DataObject):
         # [[1, 2], [3, 4]]
     """
 
-    def __init__(self, data=False, *args, **kwargs):
+    _data_string = DatatypeProperty()
+
+    def __init__(self, data=None, *args, **kwargs):
         super(Plot, self).__init__(*args, **kwargs)
-        Plot.DatatypeProperty('_data_string', self, multiple=False)
 
         if data:
             self.set_data(data)
@@ -36,6 +37,9 @@ class Plot(DataObject):
         Converts from internal serlialized string
         to a 2D list.
         """
+        if input_string is None:
+            return None
+
         out_list = []
         for pair_string in input_string.split('|'):
             pair_as_list = pair_string \
@@ -64,10 +68,7 @@ class Plot(DataObject):
         """
         Get the data stored for this plot.
         """
-        if self._data_string():
-            return self._to_list(self._data_string())
-        else:
-            raise AttributeError('You must call "set_data" first.')
+        return self._to_list(self._data_string())
 
 
 __yarom_mapped_classes__ = (Plot,)

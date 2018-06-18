@@ -2,17 +2,9 @@ from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 
 from PyOpenWorm.plot import Plot
-from PyOpenWorm.data import DataUser
 
 
 class PlotTest(_DataTest):
-
-    def test_DataUser(self):
-        """
-        Test that the Plot object is a DataUser object as well.
-        """
-        do = Plot('', conf=self.config)
-        self.assertTrue(isinstance(do, DataUser))
 
     def test_no_data_error(self):
         """
@@ -20,8 +12,7 @@ class PlotTest(_DataTest):
         do get_data with no data?
         """
         pl = Plot()
-        with self.assertRaises(AttributeError):
-            pl.get_data()
+        self.assertIsNone(pl.get_data())
 
     def test_incorrect_input_error(self):
         """
