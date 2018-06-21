@@ -98,7 +98,6 @@ class Property(with_metaclass(PropertyMeta, Contextualizable, DataUser)):
             self.set(*args, **kwargs)
             return self
         else:
-            print('About to get', id(self), self, self.context)
             r = self.get(*args, **kwargs)
             if self.multiple:
                 return set(r)
