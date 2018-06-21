@@ -184,7 +184,12 @@ class CLICommandWrapper(object):
 
     def parser(self, parser=None):
         if parser is None:
-            parser = argparse.ArgumentParser()
+            doc = getattr(self.runner, '__doc__', None)
+            if doc:
+                cmd_summary, _, _ = self.extract_args(self.runner)
+            else:
+                cmd_summary = None
+            parser = argparse.ArgumentParser(description=cmd_summary)
         self.mapper.argparser = parser
         for key, val in vars(self.runner).items():
             if not key.startswith('_'):
