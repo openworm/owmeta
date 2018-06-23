@@ -284,8 +284,8 @@ class ConnectionProperty(Property):
         elif pre_post_or_either == 'post':
             res += conntype(post_cell=self.owner, **kwargs).count()
         elif pre_post_or_either == 'either':
-            res += conntype(pre_cell=self.owner, **kwargs) + \
-                    conntype(post_cell=self.owner, **kwargs)
+            res += conntype(pre_cell=self.owner, **kwargs).count() + \
+                    conntype(post_cell=self.owner, **kwargs).count()
 
         return res
 
