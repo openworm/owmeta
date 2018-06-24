@@ -28,6 +28,7 @@ from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
+from .rdf_query_util import goq_hop_scorer
 
 import PyOpenWorm.simpleProperty as SP
 
@@ -516,11 +517,13 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             super(BaseDataObject, self).__setattr__(name, val)
 
     def count(self):
-        return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
+        return len(GraphObjectQuerier(self, self.rdf, parallel=False,
+                                      hop_scorer=goq_hop_scorer)())
 
     def load(self):
         g = ZeroOrMoreTQLayer(self._zomifier, self.rdf)
-        idents = GraphObjectQuerier(self, g, parallel=False)()
+        idents = GraphObjectQuerier(self, g, parallel=False,
+                                    hop_scorer=goq_hop_scorer)()
         if idents:
             choices = self.rdf.triples_choices((list(idents),
                                                 R.RDF['type'],

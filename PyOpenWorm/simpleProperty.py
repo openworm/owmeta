@@ -22,6 +22,7 @@ from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
 from .inverse_property import InversePropertyMixin
+from .rdf_query_util import goq_hop_scorer
 
 L = logging.getLogger(__name__)
 
@@ -182,7 +183,8 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         else:
             v = Variable("var" + str(id(self)))
             self._insert_value(v)
-            results = GraphObjectQuerier(v, self.rdf, parallel=False)()
+            results = GraphObjectQuerier(v, self.rdf, parallel=False,
+                                         hop_scorer=goq_hop_scorer)()
             self._remove_value(v)
         return results
 
