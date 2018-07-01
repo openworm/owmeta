@@ -15,7 +15,7 @@ class Informational(object):
                  property_name=None, also=()):
         self.name = name
         self._property_name = property_name
-        self.display_name = name if display_name is None else display_name
+        self._display_name = display_name
         self.default_value = default_value
         self.description = description
         self._value = value
@@ -33,6 +33,14 @@ class Informational(object):
         """
 
         self.cls = None
+
+    @property
+    def display_name(self):
+        return self._display_name if self._display_name is not None else self.name
+
+    @display_name.setter
+    def display_name(self, val):
+        self._display_name = val
 
     @property
     def property_name(self):
