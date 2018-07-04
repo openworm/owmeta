@@ -2,6 +2,7 @@ from itertools import chain
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
+from yarom.rdfUtils import transitive_lookup
 
 from .context_common import CONTEXT_IMPORTS
 
@@ -145,17 +146,7 @@ class RDFContextStore(Store):
 
     def __init_contexts(self):
         if self.__store is not None and self.__context_transitive_imports is None:
-            imports = set()
-            border = set([self.__context.identifier])
-            while border:
-                new_border = set()
-                for b in border:
-                    itr = self.__store.triples((b, CONTEXT_IMPORTS, None),
-                                               context=self.__imports_graph)
-                    for t in itr:
-                        new_border.add(t[0][2])
-                imports |= border
-                border = new_border
+            imports = transitive_lookup(self.__store, self.__context.identifier, CONTEXT_IMPORTS, self.__imports_graph)
             self.__context_transitive_imports = imports
 
     def triples(self, pattern, context=None):

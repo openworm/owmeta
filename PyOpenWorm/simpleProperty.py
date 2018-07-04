@@ -15,7 +15,8 @@ from yarom.propertyMixins import (ObjectPropertyMixin,
 from yarom.mapper import FCN
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
-                                      contextualize_helper)
+                                      contextualize_helper,
+                                      decontextualize_helper)
 from PyOpenWorm.context import Context
 from PyOpenWorm.statement import Statement
 import itertools
@@ -90,6 +91,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._hdf = None
         return contextualize_helper(context, self)
 
+    def decontextualize(self):
+        self._hdf = None
+        return decontextualize_helper(self)
+
     def has_value(self):
         for x in self._v:
             if x.context == self.context:
@@ -134,7 +139,9 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     @property
     def values(self):
-        return tuple(x.object for x in self._v if x.context == self.context)
+        return tuple(x.object.contextualize(self.context) if self.context else x.object.decontextualize()
+                     for x in self._v
+                     if x.context == self.context)
 
     @property
     def rdf(self):

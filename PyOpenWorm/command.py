@@ -1,11 +1,13 @@
 from __future__ import print_function
 import sys
+import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
 from os import makedirs, mkdir
 import hashlib
 import shutil
 import json
 import logging
+from tempfile import TemporaryDirectory
 
 from .command_util import IVar, SubCommand
 
@@ -45,6 +47,20 @@ class POWSource(object):
         """
 
 
+class POWTranslator(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+    def list(self, context=None):
+        '''
+        List translator types
+        '''
+        from PyOpenWorm.datasource import DataTranslator
+        dt = DataTranslator.contextualize(context)(conf=self._parent._conf())
+        for x in dt.load():
+            print(x.identifier)
+
+
 class POW(object):
     """
     High-level commands for working with PyOpenWorm data
@@ -52,13 +68,14 @@ class POW(object):
 
     graph_accessor_finder = IVar(doc='Finds an RDFLib graph from the given URL')
 
-    basedir = IVar('.',
-                   doc='The base directory. powdir is resolved against this base')
+    basedir = IVar('.', doc='The base directory. powdir is resolved against this base')
 
     repository_provider = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
 
     source = SubCommand(POWSource)
+
+    translator = SubCommand(POWTranslator)
 
     @IVar.property('.pow', doc='The base directory for PyOpenWorm files.'
                                ' The repository provider\'s files also go under here')
@@ -261,7 +278,7 @@ class POW(object):
                     progress.write('Finalizing writes to database...')
         progress.write('Loaded {:,} triples'.format(triples_read))
 
-    def translate(self, translator, output_key=None, *data_sources, **named_data_sources):
+    def translate(self, translator, imports_context_ident, output_key=None, *data_sources, **named_data_sources):
         """
         Do a translation with the named translator and inputs
 
@@ -269,6 +286,8 @@ class POW(object):
         ----------
         translator : str
             Translator identifier
+        imports_context_ident : str
+            Identifier for the imports context. All imports go in here
         output_key : str
             Output identifier
         *data_sources : str
@@ -276,6 +295,30 @@ class POW(object):
         **named_data_sources : str
             Named input data sources
         """
+        from PyOpenWorm.context import Context
+        imports_context = Context(ident=imports_context_ident, conf=self._conf())
+        translator_class = self._lookup_translator(translator)
+        translator = translator_class()
+        positional_sources = [self._lookup_source(src) for src in data_sources]
+        named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
+        saved_contexts = set([])
+        with TemporaryDirectory(prefix='pow-translate') as d:
+            orig_wd = os.getcwd()
+            os.chdir(d.name)
+            try:
+                self._unpack_context(d.name)
+                res = translator(*positional_sources, output_key=output_key, **named_sources)
+                res.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
+                res.data_context.save_imports(imports_context)
+                res.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
+                res.evidence_context.save_imports(imports_context)
+            finally:
+                os.chdir(orig_wd)
+
+    def _lookup_translator(self, source):
+        from PyOpenWorm.datasource import DataTranslator
+        self._rdf
+
 
     def reconstitute(self, data_source):
         """
@@ -316,6 +359,10 @@ class POW(object):
         '''
         for c in self._conf()['rdf.graph'].contexts():
             print(c.identifier)
+
+    @property
+    def _rdf(self):
+        return self._conf()['rdf.graph']
 
     def commit(self, message):
         """
