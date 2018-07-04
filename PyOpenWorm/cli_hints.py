@@ -12,6 +12,11 @@ CLI_HINTS = {
                 'names': ['url'],
             },
         },
+        'translate': {
+            (METHOD_NAMED_ARG, 'translator'): {
+                'names': ['translator']
+            },
+        },
         'serialize': {
             (METHOD_NAMED_ARG, 'destination'): {
                 'names': ['--destination', '-w']

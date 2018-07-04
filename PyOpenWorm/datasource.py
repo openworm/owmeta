@@ -289,18 +289,11 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
     translator_identifier = None
     translation_type = Translation
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         if self.translator_identifier is not None:
-            super(BaseDataTranslator, self).__init__(ident=self.translator_identifier)
+            super(BaseDataTranslator, self).__init__(ident=self.translator_identifier, **kwargs)
         else:
-            super(BaseDataTranslator, self).__init__()
-
-    def get_data_objects(self, data_source):
-        """ Override this to change how data objects are generated """
-        if not isinstance(data_source, self.input_type):
-            return set([])
-        else:
-            return self.translate(data_source)
+            super(BaseDataTranslator, self).__init__(**kwargs)
 
     def __call__(self, *args, **kwargs):
         self.output_key = kwargs.pop('output_key', None)
@@ -336,6 +329,14 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
             res.contextualize(self.context).source(s)
 
         return res
+
+
+class OneOrMore(object):
+    def __init__(self, source_type):
+        self.source_type = source_type
+
+    def __repr__(self):
+        return FCN(type(self)) + '(' + repr(self.source_type) + ')'
 
 
 class DataTranslator(BaseDataTranslator):

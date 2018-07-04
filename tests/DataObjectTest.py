@@ -5,6 +5,8 @@ import rdflib as R
 import six
 import warnings
 
+from yarom.mapper import FCN
+
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
@@ -136,3 +138,15 @@ class DataObjectTest(_DataTest):
             owner = Mock()
             getattr(DataObject, property_classmethod)(owner=owner, linkName="")
             owner.attach_property.assert_called_once()
+
+    def test_load_unloaded_subtype(self):
+        ident = R.URIRef('http://openworm.org/entities/TDO01')
+        rdftype = R.RDF['type']
+        sc = R.RDFS['subClassOf']
+        tdo = R.URIRef('http://openworm.org/entities/TDO')
+        trips = [(ident, rdftype, tdo),
+                 (tdo, sc, DataObject.rdf_type)]
+        for tr in trips:
+            self.TestConfig['rdf.graph'].add(tr)
+        o = list(DataObject(ident=ident).load())
+        self.assertEqual('tests.tmod.tdo.TDO', FCN(type(o[0])))

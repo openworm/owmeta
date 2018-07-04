@@ -15,6 +15,10 @@ class DataWithEvidenceDataSource(DataSource):
                                           description='The context in which primary data'
                                                       ' for this data source is defined')
 
+    combined_context_property = Informational(display_name='Combined context',
+                                              property_name='combined_context',
+                                              description='Context importing both the data and evidence contexts')
+
     rdf_namespace = Namespace(DS_NS['DataWithEvidenceDataSource#'])
 
     def __init__(self, *args, **kwargs):
@@ -25,8 +29,13 @@ class DataWithEvidenceDataSource(DataSource):
         self.evidence_context = Context.contextualize(self.context)(ident=self.identifier + '-evidence',
                                                                     imported=(CONTEXT,))
 
+        self.combined_context = Context.contextualize(self.context)(ident=self.identifier,
+                                                                    imported=(self.data_context,
+                                                                              self.evidence_context))
+
         self.data_context_property(self.data_context.rdf_object)
         self.evidence_context_property(self.evidence_context.rdf_object)
+        self.combined_context_property(self.combined_context.rdf_object)
 
         self.__ad_hoc_contexts = dict()
 

@@ -16,11 +16,13 @@ from .contextualize import (Contextualizable,
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
-                               GraphObjectQuerier)
-from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
+                               GraphObjectQuerier,
+                               ZeroOrMoreTQLayer)
+from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term, UP
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
 from yarom.mapper import FCN
+from yarom.go_modifiers import ZeroOrMore
 from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
@@ -68,6 +70,12 @@ def mp(c, k):
             return getattr(target, ak)
 
     return property(getter)
+
+
+class SubClassModifier(ZeroOrMore):
+
+    def __init__(self, rdf_type):
+        super(SubClassModifier, self).__init__(rdf_type, R.RDFS.subClassOf, UP)
 
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
@@ -415,7 +423,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
 
     def load(self):
-        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
+        g = ZeroOrMoreTQLayer(self._zomifier, self.rdf)
+        idents = GraphObjectQuerier(self, g, parallel=False)()
         if idents:
             choices = self.rdf.triples_choices((list(idents),
                                                 R.RDF['type'],
@@ -429,6 +438,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 yield oid(ident, the_type, self.context)
         else:
             return
+
+    def _zomifier(self, rdf_type):
+        if type(self).rdf_type == rdf_type:
+            r = SubClassModifier(rdf_type)
+            return r
 
     def variable(self):
         if self._variable is None:
@@ -722,6 +736,9 @@ class RDFTypeProperty(SP.ObjectProperty):
     multiple = True
     lazy = False
 
+    def get(self):
+        super
+
 
 class RDFProperty(DataObjectSingleton):
 
@@ -827,7 +844,7 @@ class _Resolver(RDFTypeResolver):
     @classmethod
     def get_instance(cls):
         if cls.instance is None:
-            cls.instance = RDFTypeResolver(
+            cls.instance = cls(
                 BaseDataObject.rdf_type,
                 get_most_specific_rdf_type,
                 oid,
