@@ -1,2 +1,11 @@
+<http://openworm.org/entities/PythonClassDescription/a5bb4c5ebfb4800738de439d0e106b95d> <http://openworm.org/entities/ClassDescription/module> <http://openworm.org/entities/PythonModule/PyOpenWorm.dataObject> .
+<http://openworm.org/entities/PythonClassDescription/a5bb4c5ebfb4800738de439d0e106b95d> <http://openworm.org/entities/PythonClassDescription/name> "RDFSClass" .
+<http://openworm.org/entities/PythonClassDescription/a5bb4c5ebfb4800738de439d0e106b95d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/PythonClassDescription> .
+<http://openworm.org/entities/PythonModule/PyOpenWorm.dataObject> <http://openworm.org/entities/PythonModule/name> "PyOpenWorm.dataObject" .
+<http://openworm.org/entities/PythonModule/PyOpenWorm.dataObject> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/PythonModule> .
+<http://openworm.org/entities/RegistryEntry/aca4f14b13c433779ce06a2ba66bc2519> <http://openworm.org/entities/RegistryEntry/class_description> <http://openworm.org/entities/PythonClassDescription/a5bb4c5ebfb4800738de439d0e106b95d> .
+<http://openworm.org/entities/RegistryEntry/aca4f14b13c433779ce06a2ba66bc2519> <http://openworm.org/entities/RegistryEntry/rdf_class> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://openworm.org/entities/RegistryEntry/aca4f14b13c433779ce06a2ba66bc2519> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/RegistryEntry> .
 <http://www.w3.org/2000/01/rdf-schema#Class> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://www.w3.org/2000/01/rdf-schema#Class> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2000/01/rdf-schema#Resource> .
 
