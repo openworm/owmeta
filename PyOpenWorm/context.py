@@ -13,7 +13,7 @@ from .contextualize import (BaseContextualizable,
                             ContextualizableClass,
                             ContextualizingProxy,
                             contextualize_metaclass)
-from yarom.mapper import FCN
+from yarom.utils import FCN
 from six.moves.urllib.parse import quote
 from six import text_type
 import six
@@ -103,6 +103,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self._imported_contexts = list(imported)
         self._rdf_object = None
         self._graph = None
+        # XXX: Is this a hack? Sure feels like one...
+        if mapper is None:
+            from PyOpenWorm import CONTEXT
+            mapper = CONTEXT.mapper
         self.mapper = mapper
         self.base_namespace = base_namespace
 

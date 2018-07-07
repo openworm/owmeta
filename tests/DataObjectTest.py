@@ -5,7 +5,7 @@ import rdflib as R
 import six
 import warnings
 
-from yarom.mapper import FCN
+from yarom.utils import FCN
 
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
@@ -140,13 +140,30 @@ class DataObjectTest(_DataTest):
             owner.attach_property.assert_called_once()
 
     def test_load_unloaded_subtype(self):
+        from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
+        from PyOpenWorm.class_registry import RegistryEntry
+
         ident = R.URIRef('http://openworm.org/entities/TDO01')
         rdftype = R.RDF['type']
         sc = R.RDFS['subClassOf']
         tdo = R.URIRef('http://openworm.org/entities/TDO')
+        pm = R.URIRef('http://example.com/pymod')
+        pcd = R.URIRef('http://example.com/pycd')
+        re = R.URIRef('http://example.com/re')
+        g = R.ConjunctiveGraph()
+        ctx = g.get_context(self.context.identifier)
+        self.TestConfig['rdf.graph'] = g
         trips = [(ident, rdftype, tdo),
-                 (tdo, sc, DataObject.rdf_type)]
+                 (tdo, sc, DataObject.rdf_type),
+                 (pm, rdftype, PythonModule.rdf_type),
+                 (pm, PythonModule.name.link, R.Literal('tests.tmod.tdo')),
+                 (pcd, PythonClassDescription.name.link, R.Literal('TDO')),
+                 (pcd, rdftype, PythonClassDescription.rdf_type),
+                 (pcd, PythonClassDescription.module.link, pm),
+                 (re, rdftype, RegistryEntry.rdf_type),
+                 (re, RegistryEntry.rdf_class.link, tdo),
+                 (re, RegistryEntry.class_description.link, pcd),]
         for tr in trips:
-            self.TestConfig['rdf.graph'].add(tr)
-        o = list(DataObject(ident=ident).load())
+            ctx.add(tr)
+        o = list(self.context.stored(DataObject)(ident=ident).load())
         self.assertEqual('tests.tmod.tdo.TDO', FCN(type(o[0])))

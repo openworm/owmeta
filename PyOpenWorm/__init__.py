@@ -46,7 +46,7 @@ os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 from .configure import Configureable
 from .context import Context
 import yarom
-from yarom.mapper import Mapper
+from .mapper import Mapper
 from PyOpenWorm.import_override import Overrider
 
 __import__('__main__').connected = False
