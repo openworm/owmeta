@@ -32,7 +32,7 @@ The get() method also allows for parameterizing the query in ways specific to th
 """
 
 from __future__ import print_function
-__version__ = '0.8.2'
+__version__ = '0.9.0'
 __author__ = 'Stephen Larson'
 
 import sys

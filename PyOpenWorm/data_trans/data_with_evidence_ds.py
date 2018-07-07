@@ -28,7 +28,6 @@ class DataWithEvidenceDataSource(DataSource):
         self.data_context_property(self.data_context.rdf_object)
         self.evidence_context_property(self.evidence_context.rdf_object)
 
-        self.contexts = []
         self.__ad_hoc_contexts = dict()
 
     def data_context_for(self, **kwargs):
