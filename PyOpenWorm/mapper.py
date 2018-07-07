@@ -322,7 +322,8 @@ class Mapper(with_metaclass(MapperMeta, object)):
                 self.base_classes[full_class_name] = cls
             if isinstance(cls, type) and self.add_class(cls):
                 res.append(cls)
-        return res
+
+        return sorted(res, key=_ClassOrderable, reverse=True)
 
     def _merged_base_classes(self):
         ret = tuple(self.base_classes.values())

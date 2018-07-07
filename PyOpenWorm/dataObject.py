@@ -163,7 +163,13 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
                     self, self.rdf_type))
             L.debug('Creating rdf_type_object for {} in {}'.format(self, self.definition_context))
-            self.rdf_type_object = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
+            rdto = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
+            rdto.attach_property(RDFSSubClassOfProperty)
+            for par in self.__bases__:
+                prdto = getattr(par, 'rdf_type_object', None)
+                if prdto is not None:
+                    rdto.rdfs_subclassof_property.set(prdto)
+            self.rdf_type_object = rdto
         else:
             self.rdf_type_object = None
 
@@ -209,7 +215,7 @@ def contextualized_data_object(context, obj):
         for p in ops:
             if p.context == context:
                 new_ops.append(p)
-        ctxd_owner_props = ContextFilteringList(context, res.owner_properties)
+        ctxd_owner_props = res.owner_properties.contextualize(context)
         res.add_attr_override('owner_properties', ctxd_owner_props)
     return res
 
@@ -231,16 +237,21 @@ class ContextualizableList(Contextualizable, list):
 
 
 class ContextFilteringList(Contextualizable, list):
-    def __init__(self, context, truelist):
+    def __init__(self, context):
         self._context = context
-        self._tl = truelist
-        self += list(x for x in truelist if x.context == context)
+
+    def __iter__(self):
+        for x in super(ContextFilteringList, self).__iter__():
+            if self._context is None or x.context == self._context:
+                yield x
 
     def contextualize(self, context):
-        return type(self)(context, self._tl)
+        res = type(self)(context)
+        res += self
+        return res
 
     def decontextualize(self):
-        return self._tl
+        return list(super(ContextFilteringList, self).__iter__())
 
 
 class PThunk(object):
@@ -364,7 +375,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                              if val is not None]
         super(BaseDataObject, self).__init__(**kwargs)
         self.properties = ContextualizableList(self.context)
-        self.owner_properties = []
+        self.owner_properties = ContextFilteringList(self.context)
 
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
@@ -788,7 +799,7 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
 
 class RDFSSubClassOfProperty(SP.ObjectProperty):
     link = R.RDFS.subClassOf
-    linkName = 'rdf_subClassOf_property'
+    linkName = 'rdfs_subclassof_property'
     value_type = RDFSClass
     owner_type = RDFSClass
     multiple = True
@@ -975,4 +986,4 @@ class _Resolver(RDFTypeResolver):
 
 
 __yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject, RDFProperty,
-                            values, PropertyDataObject)
+                            RDFSSubClassOfProperty, values, PropertyDataObject)
