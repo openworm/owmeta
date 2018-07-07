@@ -7,7 +7,8 @@ from itertools import groupby
 import six
 import hashlib
 
-import PyOpenWorm
+import PyOpenWorm # noqa
+from PyOpenWorm import DEF_CTX
 from PyOpenWorm.contextualize import (Contextualizable,
                                       ContextualizableClass,
                                       contextualize_metaclass,
@@ -57,6 +58,15 @@ This = object()
 """
 
 
+class PropertyProperty(property):
+    def __init__(self, cls, *args):
+        super(PropertyProperty, self).__init__(*args)
+        self._cls = cls
+
+    def __getattr__(self, attr):
+        return getattr(self._cls, attr)
+
+
 def mp(c, k):
     ak = '_pow_' + k
     if c.lazy:
@@ -69,7 +79,7 @@ def mp(c, k):
         def getter(target):
             return getattr(target, ak)
 
-    return property(getter)
+    return PropertyProperty(c, getter)
 
 
 class SubClassModifier(ZeroOrMore):
@@ -132,7 +142,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 if hasattr(b, 'base_namespace') and b.base_namespace is not None:
                     base_ns = b.base_namespace
                     break
-
         return base_ns
 
     def contextualize_class_augment(self, context):
@@ -142,6 +151,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         res = ctxd_meta(self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
                                                      rdf_type=self.rdf_type,
                                                      class_context=context.identifier))
+        res.__module__ = self.__module__
         return res
 
     def after_mapper_module_load(self, mapper):
@@ -193,6 +203,14 @@ def contextualized_data_object(context, obj):
         res.add_attr_override('properties', cprop)
         for p in cprop:
             res.add_attr_override(p.linkName, p)
+
+        ops = res.owner_properties
+        new_ops = []
+        for p in ops:
+            if p.context == context:
+                new_ops.append(p)
+        ctxd_owner_props = ContextFilteringList(context, res.owner_properties)
+        res.add_attr_override('owner_properties', ctxd_owner_props)
     return res
 
 
@@ -210,6 +228,19 @@ class ContextualizableList(Contextualizable, list):
         res = type(self)(None)
         res += list(x.decontextualize() for x in self)
         return res
+
+
+class ContextFilteringList(Contextualizable, list):
+    def __init__(self, context, truelist):
+        self._context = context
+        self._tl = truelist
+        self += list(x for x in truelist if x.context == context)
+
+    def contextualize(self, context):
+        return type(self)(context, self._tl)
+
+    def decontextualize(self):
+        return self._tl
 
 
 class PThunk(object):
@@ -433,9 +464,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         g = ZeroOrMoreTQLayer(self._zomifier, self.rdf)
         idents = GraphObjectQuerier(self, g, parallel=False)()
         if idents:
+            print('self.rdf', self.rdf)
             choices = self.rdf.triples_choices((list(idents),
                                                 R.RDF['type'],
                                                 None))
+            print('chtahetushaoethtusanh', choices)
             grouped_type_triples = groupby(choices, lambda x: x[0])
             for ident, type_triples in grouped_type_triples:
                 types = set()
@@ -753,6 +786,15 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
         super(RDFSClass, self).__init__(ident=R.RDFS["Class"], *args, **kwargs)
 
 
+class RDFSSubClassOfProperty(SP.ObjectProperty):
+    link = R.RDFS.subClassOf
+    linkName = 'rdf_subClassOf_property'
+    value_type = RDFSClass
+    owner_type = RDFSClass
+    multiple = True
+    lazy = False
+
+
 class RDFTypeProperty(SP.ObjectProperty):
     link = R.RDF['type']
     linkName = "rdf_type_property"
@@ -760,9 +802,6 @@ class RDFTypeProperty(SP.ObjectProperty):
     owner_type = BaseDataObject
     multiple = True
     lazy = False
-
-    def get(self):
-        super
 
 
 class RDFProperty(DataObjectSingleton):
@@ -803,7 +842,8 @@ def oid(identifier_or_rdf_type, rdf_type=None, context=None):
 
     c = None
     try:
-        c = PyOpenWorm.CONTEXT.mapper.RDFTypeTable[rdf_type]
+        qctx = DEF_CTX if context is None else context
+        c = qctx.mapper.resolve_class(rdf_type)
     except KeyError:
         c = BaseDataObject
     L.debug("oid: making a {} with ident {}".format(c, identifier))
@@ -884,17 +924,21 @@ class values(DataObject):
         return self.make_identifier(self.group_name)
 
 
-def get_most_specific_rdf_type(types):
+def get_most_specific_rdf_type(types, context=None):
     """ Gets the most specific rdf_type.
 
     Returns the URI corresponding to the lowest in the DataObject class
     hierarchy from among the given URIs.
     """
-    mapper = PyOpenWorm.CONTEXT.mapper
+    if context is None:
+        context = DEF_CTX
+    mapper = context.mapper
     most_specific_types = tuple(mapper.base_classes.values())
     for x in types:
         try:
-            class_object = mapper.RDFTypeTable[x]
+            class_object = mapper.resolve_class(x)
+            if class_object is None:
+                raise KeyError()
             if issubclass(class_object, most_specific_types):
                 most_specific_types = (class_object,)
         except KeyError:

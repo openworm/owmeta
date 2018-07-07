@@ -1,4 +1,4 @@
-from .dataObject import DataObject, ObjectProperty
+from .dataObject import DataObject, ObjectProperty, DatatypeProperty
 
 
 class Module(DataObject):
@@ -39,5 +39,8 @@ class RegistryEntry(DataObject):
     class_description = ObjectProperty(value_type=ClassDescription)
     ''' The description of the class '''
 
-    rdf_class = ObjectProperty()
+    rdf_class = DatatypeProperty()
     ''' The RDF type for the class '''
+
+
+__yarom_mapped_classes__ = (RegistryEntry, ModuleAccess, ClassDescription, Module)

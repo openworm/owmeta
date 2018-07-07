@@ -89,7 +89,11 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def contextualize_augment(self, context):
         self._hdf = None
-        return contextualize_helper(context, self)
+        res = contextualize_helper(context, self)
+        if res is not self:
+            cowner = context(res.owner)
+            res.add_attr_override('owner', cowner)
+        return res
 
     def decontextualize(self):
         self._hdf = None
@@ -139,9 +143,21 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     @property
     def values(self):
-        return tuple(x.object.contextualize(self.context) if self.context else x.object.decontextualize()
-                     for x in self._v
-                     if x.context == self.context)
+        return tuple(self._values_helper())
+
+    def _values_helper(self):
+        # print('self.context =', self.context)
+        for x in self._v:
+            if x.context == self.context:
+                # print('_values_helper', x)
+                # XXX: decontextualzing default context here??
+                if self.context is not None:
+                    yield self.context(x.object)
+                elif isinstance(x.object, Contextualizable):
+                    # print('decontextualizing', x.object)
+                    yield x.object.decontextualize()
+                else:
+                    yield x.object
 
     @property
     def rdf(self):

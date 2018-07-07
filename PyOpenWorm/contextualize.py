@@ -348,7 +348,9 @@ def contextualize_helper(context, obj, noneok=False):
                                           (ContextualizingProxy,),
                                           pclass_dct,
                                           type(obj.__class__))
-    return newtyp(context, obj)
+    res = newtyp(context, obj)
+    obj._contexts[context] = res
+    return res
 
 
 class proxy_to_X(object):
