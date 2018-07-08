@@ -80,7 +80,10 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-    ] + (['zodbpickle==1.0'] if PY2 else []),
+    ] + (['zodbpickle==1.0', 'backports.tempfile==1.0'] if PY2 else []),
+    dependency_links=[
+        'git://github.com/mwatts15/yarom.git@openworm/PyOpenWorm-364#egg=yarom-0.11.0.post',
+    ],
     version=version,
     packages=['PyOpenWorm',
               'PyOpenWorm.data_trans',
