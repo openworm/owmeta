@@ -14,7 +14,7 @@ class PythonModule(Module):
         return self.name.has_defined_value()
 
     def identifier_augment(self):
-        return self.make_identifier_direct(self.name.defined_values[0].identifier)
+        return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
 
 
 class PyPIPackage(ModuleAccess):
