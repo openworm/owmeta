@@ -85,10 +85,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         super(RealSimpleProperty, self).__init__(**kwargs)
         self._v = []
         self.owner = owner
-        self._hdf = None
+        self._hdf = dict()
 
     def contextualize_augment(self, context):
-        self._hdf = None
+        self._hdf[context] = None
         res = contextualize_helper(context, self)
         if res is not self:
             cowner = context(res.owner)
@@ -96,7 +96,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return res
 
     def decontextualize(self):
-        self._hdf = None
+        self._hdf[self.context] = None
         return decontextualize_helper(self)
 
     def has_value(self):
@@ -106,11 +106,12 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return False
 
     def has_defined_value(self):
-        if self._hdf is not None:
-            return self._hdf
+        hdf = self._hdf.get(self.context)
+        if hdf is not None:
+            return hdf
         for x in self._v:
             if x.context == self.context and x.object.defined:
-                self._hdf = True
+                self._hdf[self.context] = True
                 return True
         return False
 
@@ -130,7 +131,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def clear(self):
         """ Clears values set *in all contexts* """
-        self._hdf = None
+        self._hdf = dict()
         for x in self._v:
             assert self in x.object.owner_properties
             x.object.owner_properties.remove(self)
@@ -146,15 +147,12 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return tuple(self._values_helper())
 
     def _values_helper(self):
-        # print('self.context =', self.context)
         for x in self._v:
             if x.context == self.context:
-                # print('_values_helper', x)
                 # XXX: decontextualzing default context here??
                 if self.context is not None:
                     yield self.context(x.object)
                 elif isinstance(x.object, Contextualizable):
-                    # print('decontextualizing', x.object)
                     yield x.object.decontextualize()
                 else:
                     yield x.object
@@ -190,7 +188,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def _insert_value(self, v):
         stmt = Statement(self.owner, self, v, self.context)
-        self._hdf = None
+        self._hdf[self.context] = None
         self._v.append(stmt)
         if self not in v.owner_properties:
             v.owner_properties.append(self)
@@ -198,7 +196,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def _remove_value(self, v):
         assert self in v.owner_properties
-        self._hdf = None
+        self._hdf[self.context] = None
         v.owner_properties.remove(self)
         self._v.remove(Statement(self.owner, self, v, self.context))
 

@@ -87,6 +87,9 @@ class SubClassModifier(ZeroOrMore):
     def __init__(self, rdf_type):
         super(SubClassModifier, self).__init__(rdf_type, R.RDFS.subClassOf, UP)
 
+    def __repr__(self):
+        return FCN(type(self)) + '(' + repr(self.identifier) + ')'
+
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
@@ -170,6 +173,55 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 if prdto is not None:
                     rdto.rdfs_subclassof_property.set(prdto)
             self.rdf_type_object = rdto
+
+            # These imports have to come after the rdf_type_object is set on these types. Basically, the evaluation goes
+            # like this:
+            #
+            # >after_mapper_module_load BaseDataObject
+            # init_rdf_type_object BaseDataObject
+            #   >after_mapper_module_load RegistryEntry
+            #   init_rdf_type_object RegistryEntry
+            #     >after_mapper_module_load PythonModule
+            #     init_rdf_type_object PythonModule
+            #     <after_mapper_module_load done PythonModule
+            #
+            #     >after_mapper_module_load PythonClassDescription
+            #     init_rdf_type_object PythonClassDescription
+            #     <after_mapper_module_load done PythonClassDescription
+            #
+            #     >after_mapper_module_load PyPIPackage
+            #     init_rdf_type_object PyPIPackage
+            #     <after_mapper_module_load done PyPIPackage
+            #
+            #   <after_mapper_module_load done RegistryEntry
+            #
+            #   >after_mapper_module_load ModuleAccess
+            #   init_rdf_type_object ModuleAccess
+            #   <after_mapper_module_load done ModuleAccess
+            #
+            #   >after_mapper_module_load Module
+            #   init_rdf_type_object Module
+            #   <after_mapper_module_load done Module
+            #
+            #   >after_mapper_module_load ClassDescription
+            #   init_rdf_type_object ClassDescription
+            #   <after_mapper_module_load done ClassDescription
+            # <after_mapper_module_load done BaseDataObject
+
+            from PyOpenWorm.class_registry import RegistryEntry
+            from PyOpenWorm.python_class_registry import PythonClassDescription, PythonModule
+
+            re = RegistryEntry.contextualize(self.definition_context)()
+            cd = PythonClassDescription.contextualize(self.definition_context)()
+
+            mo = PythonModule.contextualize(self.definition_context)()
+            mo.name(self.__module__)
+
+            cd.module(mo)
+            cd.name(self.__name__)
+
+            re.rdf_class(self.rdf_type)
+            re.class_description(cd)
         else:
             self.rdf_type_object = None
 
@@ -408,7 +460,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf.get('rdf.graph', None)
+            try:
+                return self.conf['rdf.graph']
+            except KeyError:
+                raise Exception('No rdf graph in the conf %s' % self.conf)
 
     @classmethod
     def next_variable(cls):
@@ -475,17 +530,15 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         g = ZeroOrMoreTQLayer(self._zomifier, self.rdf)
         idents = GraphObjectQuerier(self, g, parallel=False)()
         if idents:
-            print('self.rdf', self.rdf)
             choices = self.rdf.triples_choices((list(idents),
                                                 R.RDF['type'],
                                                 None))
-            print('chtahetushaoethtusanh', choices)
             grouped_type_triples = groupby(choices, lambda x: x[0])
             for ident, type_triples in grouped_type_triples:
                 types = set()
                 for __, __, rdf_type in type_triples:
                     types.add(rdf_type)
-                the_type = get_most_specific_rdf_type(types)
+                the_type = get_most_specific_rdf_type(types, self.context)
                 yield oid(ident, the_type, self.context)
         else:
             return
@@ -854,7 +907,7 @@ def oid(identifier_or_rdf_type, rdf_type=None, context=None):
     c = None
     try:
         qctx = DEF_CTX if context is None else context
-        c = qctx.mapper.resolve_class(rdf_type)
+        c = qctx.resolve_class(rdf_type)
     except KeyError:
         c = BaseDataObject
     L.debug("oid: making a {} with ident {}".format(c, identifier))
@@ -947,7 +1000,7 @@ def get_most_specific_rdf_type(types, context=None):
     most_specific_types = tuple(mapper.base_classes.values())
     for x in types:
         try:
-            class_object = mapper.resolve_class(x)
+            class_object = context.resolve_class(x)
             if class_object is None:
                 raise KeyError()
             if issubclass(class_object, most_specific_types):

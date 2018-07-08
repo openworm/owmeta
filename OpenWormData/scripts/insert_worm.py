@@ -56,53 +56,53 @@ def aux_data():
 # TODO: Make PersonDataTranslators and Document/Website DataSource for the
 # documents these come from. Need to verify who made the translation from the
 # website / document
-def init_sources():
+def init_sources(context):
+    c = context
     return [
-        WormbaseTextMatchCSVDataSource(
+        c(WormbaseTextMatchCSVDataSource)(
             key='WormbaseTextMatchCSVChannelNeuronDataSource',
             cell_type=Neuron,
             csv_file_name=CHANNEL_NEURON_SOURCE,
             initial_cell_column=101),
-        WormbaseTextMatchCSVDataSource(
+        c(WormbaseTextMatchCSVDataSource)(
             key='WormbaseTextMatchCSVChannelMuscleDataSource',
             cell_type=Muscle,
             csv_file_name=CHANNEL_MUSCLE_SOURCE,
             initial_cell_column=6),
-        WormbaseIonChannelCSVDataSource(
+        c(WormbaseIonChannelCSVDataSource)(
             key='WormbaseIonChannelCSVDataSource',
             csv_file_name=IONCHANNEL_SOURCE),
-        NeuronCSVDataSource(
+        c(NeuronCSVDataSource)(
             key='WormAtlasNeuronTypesSource',
             csv_file_name=NEURON_EXPRESSION_DATA_SOURCE,
             bibtex_files=['bibtex_files/altun2009.bib',
                           'bibtex_files/WormAtlas.bib']),
-        WormBaseCSVDataSource(
+        c(WormBaseCSVDataSource)(
             key='WormBaseCSVDataSource',
             csv_file_name=CELL_NAMES_SOURCE,
             description="CSV converted from this Google Spreadsheet: "
                         "https://docs.google.com/spreadsheets/d/"
                         "1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1"),
-        WormAtlasCellListDataSource(
+        c(WormAtlasCellListDataSource)(
             key='WormAtlasCellList',
             csv_file_name=LINEAGE_LIST_LOC,
             description="CSV converted from this Google Spreadsheet: "
                         "https://docs.google.com/spreadsheets/d/"
                         "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit"),
-        ConnectomeCSVDataSource(
+        c(ConnectomeCSVDataSource)(
             key='EmmonsConnectomeCSVDataSource',
             csv_file_name=CONNECTOME_SOURCE)
     ]
 
 
-def init_extra_sources(basedir):
+def init_extra_sources(basedir, context):
     res = []
     for root, _, filenames in os.walk(os.path.join(basedir, ADDITIONAL_EXPR_DATA_DIR)):
         for filename in sorted(filenames):
             if filename.lower().endswith('.csv'):
                 name = 'NeuronCSVExpressionDataSource_' + os.path.basename(filename).rsplit('.', 1)[0]
                 relpath = os.path.relpath(os.path.join(root, filename), basedir)
-                res.append(NeuronCSVDataSource(csv_file_name=relpath, key=name))
-
+                res.append(context(NeuronCSVDataSource)(csv_file_name=relpath, key=name))
     return res
 
 
@@ -193,12 +193,11 @@ def infer():
     print ("filled in with inferred data")
 
 
-def do_insert(ident, config="default.conf", logging=False, imports_context_ident=None, basedir=aux_data()):
+def do_insert(ident, config="default.conf", logging=False,
+              imports_context_ident=None,
+              sources_and_translators_context=None,
+              basedir=aux_data()):
 
-    sources = init_sources()
-    extras = init_extra_sources(basedir)
-    data_sources_by_key = {x.key: x for x in sources + extras}
-    trans_map = init_translators() + init_extra_neuron_data_translators(extras)
     P.connect(configFile=config, do_logging=logging)
     P.config()
 
@@ -208,7 +207,14 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
 
     IWCTX = Context(ident=ident, imported=(CTX, EVCTX), conf=P.config())
 
-    imports_context = Context(ident=imports_context_ident, conf=P.config())
+    ST_CONTEXT = Context(ident=sources_and_translators_context, imported=(P.BASE_CONTEXT,), conf=P.config())
+
+    imports_context = Context(ident=imports_context_ident, imported=(P.BASE_CONTEXT,), conf=P.config())
+
+    sources = init_sources(ST_CONTEXT)
+    extras = init_extra_sources(basedir, ST_CONTEXT)
+    trans_map = init_translators() + init_extra_neuron_data_translators(extras)
+    data_sources_by_key = {x.key: x for x in sources + extras}
 
     try:
         t0 = time()
@@ -235,7 +241,7 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
                     output_key = None
                 translator = translators.get(translator_class, None)
                 if not translator:
-                    translator = translator_class()
+                    translator = ST_CONTEXT(translator_class)()
                     translators[translator_class] = translator
 
                 print('\n'.join('Input({}/{}): {}'.format(i + 1, len(sources), s) for i, s in enumerate(sources)))
@@ -253,8 +259,6 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
                     res.data_context.save_imports(imports_context)
                     res.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
                     res.evidence_context.save_imports(imports_context)
-                    for ctx in res.contexts:
-                        raise Exception()
 
                 if res:
                     if res.key:
@@ -277,9 +281,11 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
                 CTX.add_import(src.data_context)
                 EVCTX.add_import(src.evidence_context)
         IWCTX.save_context(graph, saved_contexts=saved_contexts)
-        IWCTX.save_imports(imports_context)
+        IWCTX.save_imports(imports_context, graph)
+        ST_CONTEXT.save_context(graph)
+        ST_CONTEXT.save_imports(imports_context, graph)
         print('imports context size', len(imports_context))
-        print("Saved %d triples." % IWCTX.triples_saved)
+        print("Saved %d triples." % (IWCTX.triples_saved + ST_CONTEXT.triples_saved))
         t2 = time()
 
         print("Serializing...")
@@ -312,4 +318,9 @@ if __name__ == '__main__':
     (options, _) = parser.parse_args()
     OPTIONS = options
 
-    do_insert("http://openworm.org/entities/bio#worm0", config=options.config, logging=options.do_logging)
+    do_insert("http://openworm.org/entities/bio#worm0",
+              imports_context_ident='http://openworm.org/data/imports',
+              # This is a general context
+              sources_and_translators_context='http://openworm.org/data',
+              config=options.config,
+              logging=options.do_logging)

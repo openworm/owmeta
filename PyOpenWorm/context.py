@@ -315,6 +315,27 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         except KeyError:
             raise Exception('No graph was given and configuration has no graph')
 
+    def resolve_class(self, uri):
+        # look up the class in the registryCache
+        c = self.mapper.RDFTypeTable.get(uri)
+        if c is None:
+            # otherwise, attempt to load into the cache by
+            # reading the RDF graph.
+            from PyOpenWorm.python_class_registry import PythonClassDescription
+            from PyOpenWorm.class_registry import RegistryEntry
+
+            re = self(RegistryEntry)()
+            re.rdf_class(uri)
+            cd = self(PythonClassDescription)()
+            re.class_description(cd)
+            for cd_l in cd.load():
+                class_name = cd_l.name()
+                moddo = cd_l.module()
+                mod = self.mapper.load_module(moddo.name())
+                c = getattr(mod, class_name)
+                break
+        return c
+
 
 class QueryContext(Context):
     def __init__(self, graph, *args, **kwargs):

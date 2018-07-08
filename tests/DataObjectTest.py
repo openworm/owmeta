@@ -11,6 +11,8 @@ from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
+from PyOpenWorm.context import Context
+from PyOpenWorm import BASE_CONTEXT
 
 from .GraphDBInit import make_graph
 
@@ -114,6 +116,11 @@ class DataObjectTest(_DataTest):
         self.assertIn('Hello', a.rdfs_comment())
 
     def test_load_unloaded_subtype(self):
+        '''
+        This test actually combines a few different features:
+            - loading a module from a ClassDescription
+            - resolving subclasses from superclasses
+        '''
         from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
         from PyOpenWorm.class_registry import RegistryEntry
 
@@ -136,8 +143,25 @@ class DataObjectTest(_DataTest):
                  (pcd, PythonClassDescription.module.link, pm),
                  (re, rdftype, RegistryEntry.rdf_type),
                  (re, RegistryEntry.rdf_class.link, tdo),
-                 (re, RegistryEntry.class_description.link, pcd),]
+                 (re, RegistryEntry.class_description.link, pcd)]
         for tr in trips:
             ctx.add(tr)
         o = list(self.context.stored(DataObject)(ident=ident).load())
         self.assertEqual('tests.tmod.tdo.TDO', FCN(type(o[0])))
+
+    def test_save_load_subtype(self):
+
+        class A(DataObject):
+            class_context = self.context.identifier
+        self.context.mapper.process_class(A)
+
+        self.context.add_import(BASE_CONTEXT)
+        m = Context(ident='http://example.org/ctx', imported=(self.context,))
+        im = Context(ident='http://example.org/ctxim', imported=(self.context,))
+        co = Context(ident='http://example.org/ctxb', imported=(m, im))
+        m(A)(ident='http://example.org/anA')
+        co.save_imports(im)
+        co.save_context(inline_imports=True)
+
+        o = list(m.stored(DataObject)(ident='http://example.org/anA').load())
+        self.assertIsInstance(o[0], A)

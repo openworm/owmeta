@@ -18,7 +18,8 @@ class GitRepoProvider(object):
         self.repo().index.remove(files, r=recursive)
 
     def reset(self):
-        self.repo().index.reset()
+        from git.refs.head import HEAD
+        HEAD(self.repo()).reset(working_tree=True)
 
     def commit(self, msg):
         self.repo().index.commit(msg)
