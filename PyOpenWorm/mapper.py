@@ -205,27 +205,6 @@ class Mapper(with_metaclass(MapperMeta, object)):
             del self.MappedClasses[cname]
         self.class_ordering = self._compute_class_ordering()
 
-    def resolve_class(self, uri):
-        # look up the class in the registryCache
-        c = self.RDFTypeTable.get(uri)
-        if c is None:
-            # otherwise, attempt to load into the cache by
-            # reading the RDF graph.
-            pcr = self.load_module('PyOpenWorm.python_class_registry')
-            cr = self.load_module('PyOpenWorm.class_registry')
-
-            re = cr.RegistryEntry()
-            re.rdf_class(uri)
-            cd = pcr.PythonClassDescription()
-            re.class_description(cd)
-            for cd_l in cd.load():
-                class_name = cd_l.name()
-                moddo = cd_l.module()
-                mod = self.load_module(moddo.name())
-                c = getattr(mod, class_name)
-                break
-        return c
-
     def load_module(self, module_name):
         """ Loads the module. """
         module = self.lookup_module(module_name)
@@ -246,7 +225,7 @@ class Mapper(with_metaclass(MapperMeta, object)):
         if module_name is None:
             module_name = module.__name__
 
-        L.log(5, "%sLOADING %s", ' ' * self.mapdepth, module_name)
+        L.debug("%sLOADING %s", ' ' * self.mapdepth, module_name)
         self.mapdepth += 1
         old_mapper = yarom.MAPPER
         yarom.MAPPER = self
@@ -269,6 +248,11 @@ class Mapper(with_metaclass(MapperMeta, object)):
             self.mapdepth -= 1
             yarom.MAPPER = old_mapper
         return module
+
+    def process_class(self, c):
+        self.add_class(c)
+        if hasattr(c, 'after_mapper_module_load'):
+            c.after_mapper_module_load(self)
 
     def lookup_module(self, module_name):
         m = self.modules.get(module_name, None)

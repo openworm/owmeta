@@ -10,6 +10,7 @@ import logging
 from tempfile import TemporaryDirectory
 
 from .command_util import IVar, SubCommand
+from .context import Context
 
 
 L = logging.getLogger(__name__)
@@ -56,9 +57,12 @@ class POWTranslator(object):
         List translator types
         '''
         from PyOpenWorm.datasource import DataTranslator
-        dt = DataTranslator.contextualize(context)(conf=self._parent._conf())
+        conf = self._parent._conf()
+        # TODO: Pull this string out of here...just dunno where it goes yet
+        ctx = Context(ident='http://openworm.org/data', conf=conf)
+        dt = ctx.stored(DataTranslator)(conf=conf)
         for x in dt.load():
-            print(x.identifier)
+            print(x)
 
 
 class POW(object):
@@ -113,6 +117,20 @@ class POW(object):
     def _ensure_powdir(self):
         if not exists(self.powdir):
             makedirs(self.powdir)
+
+    @IVar.property
+    def log_level(self):
+        '''
+        Log level
+        '''
+        return logging.getLevelName(logging.getLogger().getEffectiveLevel())
+
+    @log_level.setter
+    def log_level(self, level):
+        logging.basicConfig()
+        logging.getLogger().setLevel(getattr(logging, level))
+        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
+        # Tailoring for known loggers
 
     def init(self, update_existing_config=False):
         """
@@ -315,10 +333,10 @@ class POW(object):
             finally:
                 os.chdir(orig_wd)
 
-    def _lookup_translator(self, source):
+    def _lookup_translator(self, tname):
         from PyOpenWorm.datasource import DataTranslator
-        self._rdf
-
+        for x in DataTranslator(ident=tname).load():
+            return x
 
     def reconstitute(self, data_source):
         """
@@ -373,6 +391,11 @@ class POW(object):
         message : str
             commit message
         """
+        repo = self.repository_provider
+        self._serialize_graphs()
+        repo.commit(message)
+
+    def _serialize_graphs(self):
         from rdflib import plugin
         from rdflib.serializer import Serializer
         g = self._conf()['rdf.graph']
@@ -380,6 +403,10 @@ class POW(object):
 
         repo.base = self.powdir
         graphs_base = pth_join(self.powdir, 'graphs')
+
+        if repo.is_dirty:
+            repo.reset()
+
         if exists(graphs_base):
             repo.remove(['graphs'], recursive=True)
             shutil.rmtree(graphs_base)
@@ -407,16 +434,13 @@ class POW(object):
                 print(*l, file=index_file)
 
         files.append(index_fname)
-
-        if repo.is_dirty:
-            repo.reset()
         repo.add([relpath(f, self.powdir) for f in files] + [relpath(self.config_file, self.powdir),
                                                              'graphs'])
-        repo.commit(message)
 
     def diff(self):
         """
         """
+        self._serialize_graphs()
 
     def merge(self):
         """

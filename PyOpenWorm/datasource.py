@@ -6,7 +6,7 @@ from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
-from .dataObject import BaseDataObject, ObjectProperty
+from .dataObject import DataObject, ObjectProperty
 
 
 class Informational(object):
@@ -73,7 +73,7 @@ class DuplicateAlsoException(Exception):
     pass
 
 
-class DataSourceType(type(BaseDataObject)):
+class DataSourceType(type(DataObject)):
 
     """A type for DataSources
 
@@ -123,7 +123,7 @@ class DataSourceType(type(BaseDataObject)):
         return self.__info_fields
 
 
-class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
+class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     '''
     A source for data that can get translated into PyOpenWorm objects.
 
@@ -219,7 +219,7 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             return super(DataSource, self).__str__()
 
 
-class Translation(BaseDataObject):
+class Translation(DataObject):
     """
     Representation of the method by which a DataSource was translated and
     the sources of that translation.  Unlike the 'source' field attached to
@@ -269,7 +269,7 @@ def format_types(typ):
         return ', '.join(':class:`{}`'.format(FCN(x)) for x in typ)
 
 
-class DataTransatorType(type(BaseDataObject)):
+class DataTransatorType(type(DataObject)):
     def __init__(self, name, bases, dct):
         super(DataTransatorType, self).__init__(name, bases, dct)
 
@@ -281,7 +281,7 @@ class DataTransatorType(type(BaseDataObject)):
                                                 self.translator_identifier)
 
 
-class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
+class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
     """ Translates from a data source to PyOpenWorm objects """
 
     input_type = DataSource
@@ -290,7 +290,7 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
     translation_type = Translation
 
     def __init__(self, **kwargs):
-        if self.translator_identifier is not None:
+        if self.translator_identifier is not None and 'ident' not in kwargs:
             super(BaseDataTranslator, self).__init__(ident=self.translator_identifier, **kwargs)
         else:
             super(BaseDataTranslator, self).__init__(**kwargs)

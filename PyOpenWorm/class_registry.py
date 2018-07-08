@@ -42,5 +42,12 @@ class RegistryEntry(DataObject):
     rdf_class = DatatypeProperty()
     ''' The RDF type for the class '''
 
+    def defined_augment(self):
+        return self.class_description.has_defined_value() and self.rdf_class.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(self.class_description.defined_values[0].identifier.n3() +
+                                    self.rdf_class.defined_values[0].identifier.n3())
+
 
 __yarom_mapped_classes__ = (RegistryEntry, ModuleAccess, ClassDescription, Module)
