@@ -7,7 +7,10 @@ import hashlib
 import shutil
 import json
 import logging
-from tempfile import TemporaryDirectory
+try:
+    from tempfile import TemporaryDirectory
+except ImportError:
+    from backports.tempfile import TemporaryDirectory
 
 from .command_util import IVar, SubCommand
 from .context import Context
