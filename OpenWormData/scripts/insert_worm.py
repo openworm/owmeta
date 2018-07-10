@@ -61,12 +61,12 @@ def init_sources(context):
     return [
         c(WormbaseTextMatchCSVDataSource)(
             key='WormbaseTextMatchCSVChannelNeuronDataSource',
-            cell_type=Neuron,
+            cell_type=Neuron.rdf_type,
             csv_file_name=CHANNEL_NEURON_SOURCE,
             initial_cell_column=101),
         c(WormbaseTextMatchCSVDataSource)(
             key='WormbaseTextMatchCSVChannelMuscleDataSource',
-            cell_type=Muscle,
+            cell_type=Muscle.rdf_type,
             csv_file_name=CHANNEL_MUSCLE_SOURCE,
             initial_cell_column=6),
         c(WormbaseIonChannelCSVDataSource)(

@@ -192,7 +192,7 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
                     inf.name,
                     getattr(inf.cls, inf.property_type)(owner=self,
                                                         linkName=inf.property_name,
-                                                        multiple=True))
+                                                        multiple=inf.multiple))
             ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)
@@ -208,11 +208,13 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             sio = six.StringIO()
             print(self.__class__.__name__, file=sio)
             for info in self.info_fields.values():
-                print('    ' + info.display_name, end=': ', file=sio)
-                for val in getattr(self, info.name).defined_values:
-                    val_line_sep = '\n      ' + ' ' * len(info.display_name)
-                    print(val_line_sep.join(str(val).split('\n')), end=' ', file=sio)
-                print(file=sio)
+                attr = getattr(self, info.name)
+                if attr.has_defined_value():
+                    print('    ' + info.display_name, end=': ', file=sio)
+                    for val in sorted(attr.defined_values):
+                        val_line_sep = '\n      ' + ' ' * len(info.display_name)
+                        print(val_line_sep.join(str(val).split('\n')), end=' ', file=sio)
+                    print(file=sio)
             return sio.getvalue()
         except AttributeError:
             return super(DataSource, self).__str__()

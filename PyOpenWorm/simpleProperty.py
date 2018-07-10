@@ -338,9 +338,15 @@ class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimplePro
     def get(self):
         r = super(DatatypeProperty, self).get()
         s = set()
+        unhashables = []
         for x in self.defined_values:
-            s.add(self.resolver.deserializer(x.idl))
-        return itertools.chain(r, s)
+            val = self.resolver.deserializer(x.idl)
+            try:
+                s.add(val)
+            except TypeError as e:
+                unhashables.append(val)
+                L.info('Unhashable type: %s', e)
+        return itertools.chain(r, s, unhashables)
 
     def onedef(self):
         x = super(DatatypeProperty, self).onedef()

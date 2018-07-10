@@ -11,6 +11,7 @@ from ..network import Network
 from ..neuron import Neuron
 from ..website import Website
 from ..worm import Worm
+from ..datasource import Informational
 
 from .common_data import DS_NS, TRANS_NS
 from .csv_ds import CSVDataSource, CSVDataTranslator
@@ -20,18 +21,13 @@ from .data_with_evidence_ds import DataWithEvidenceDataSource
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
 
-    def __init__(self, cell_type, initial_cell_column, **kwargs):
-        """
-        Parameters
-        ----------
-        cell_type : type
-            The type of cell to generate
-        initial_cell_column : int
-            The index of the first column with a cell name
-        """
-        super(WormbaseTextMatchCSVDataSource, self).__init__(**kwargs)
-        self.cell_type = cell_type
-        self.initial_cell_column = initial_cell_column
+    initial_cell_column = Informational('Initial Cell Column',
+                                        description='The index of the first column with a cell name',
+                                        multiple=False)
+
+    cell_type = Informational('Cell Type',
+                              description='The type of cell to be produced',
+                              multiple=False)
 
 
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
@@ -93,8 +89,11 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
     translator_identifier = TRANS_NS.WormbaseTextMatchCSVTranslator
 
     def translate(self, data_source):
-        initcol = data_source.initial_cell_column
-        ctype = data_source.cell_type
+        initcol = data_source.initial_cell_column()
+        ctype = data_source.cell_type()
+
+        ctype = self.context.resolve_class(ctype)
+
         res = self.make_new_output((data_source,))
         try:
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
