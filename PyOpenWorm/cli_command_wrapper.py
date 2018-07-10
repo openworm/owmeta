@@ -146,7 +146,7 @@ class CLICommandWrapper(object):
     def __init__(self, runner, mapper=None):
         self.runner = runner
         self.mapper = CLIArgMapper() if mapper is None else mapper
-        self.hints = CLI_HINTS.get(FCN(type(runner)))
+        self.hints = CLI_HINTS.get(FCN(type(runner)), {})
 
     def extract_args(self, val):
         docstring = getattr(val, '__doc__', '')
@@ -192,7 +192,7 @@ class CLICommandWrapper(object):
             parser = argparse.ArgumentParser(description=cmd_summary)
         self.mapper.argparser = parser
         for key, val in vars(self.runner).items():
-            if not key.startswith('_'):
+            if not key.startswith('_') and key not in self.hints.get('IGNORE', ()):
                 parser.add_argument('--' + key, help=key.__doc__)
 
         _sp = [None]
@@ -204,7 +204,7 @@ class CLICommandWrapper(object):
             return _sp[0]
 
         for key, val in sorted(vars(type(self.runner)).items()):
-            if not key.startswith('_'):
+            if not key.startswith('_') and key not in self.hints.get('IGNORE', ()):
                 if isinstance(val, (types.FunctionType, types.MethodType)):
                     sc_hints = self.hints.get(key) if self.hints else None
                     summary, detail, params = self.extract_args(val)

@@ -44,6 +44,14 @@ class POWSource(object):
         """
         List known sources
         """
+        from PyOpenWorm.datasource import DataSource
+        conf = self._parent._conf()
+        # TODO: Pull this string out of here...just dunno where it goes yet
+        ctx = Context(ident='http://openworm.org/data', conf=conf)
+        dt = ctx.stored(DataSource)(conf=conf)
+        nm = self._parent._conf()['rdf.graph'].namespace_manager
+        for x in dt.load():
+            print(nm.normalizeUri(type(x).rdf_type), nm.normalizeUri(x.identifier))
 
     def list_kinds(self):
         """
@@ -84,9 +92,15 @@ class POW(object):
 
     translator = SubCommand(POWTranslator)
 
-    @IVar.property('.pow', doc='The base directory for PyOpenWorm files.'
-                               ' The repository provider\'s files also go under here')
+    def __init__(self):
+        self.progress_reporter = lambda *args, **kwargs: None
+        self.message = lambda *args, **kwargs: print(*args, **kwargs)
+
+    @IVar.property('.pow')
     def powdir(self):
+        '''
+        The base directory for PyOpenWorm files. The repository provider's files also go under here
+        '''
         if isabs(self._powdir):
             return self._powdir
         return pth_join(self.basedir, self._powdir)
@@ -134,6 +148,21 @@ class POW(object):
         logging.getLogger().setLevel(getattr(logging, level))
         logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
         # Tailoring for known loggers
+
+    def context(self, context=None):
+        '''
+        Read or set current target context for the repository
+        '''
+        ctx_file_name = abspath(pth_join(self.basedir, 'context'))
+        if context is not None:
+            with open(ctx_file_name, 'w') as f:
+                print(context, file=f)
+        else:
+            if not exists(ctx_file_name):
+                self.message('No context')
+                return
+            with open(ctx_file_name, 'r') as f:
+                self.message(f.read())
 
     def init(self, update_existing_config=False):
         """
@@ -254,18 +283,17 @@ class POW(object):
             If True, updates the existing config file to point to the given
             file for the store configuration
         """
-        from tqdm import tqdm
         try:
             makedirs(self.powdir)
             print('Cloning...', file=sys.stderr)
-            with tqdm(file=sys.stderr, unit=' objects', miniters=0) as progress:
+            with self.progress_reporter(file=sys.stderr, unit=' objects', miniters=0) as progress:
                 self.repository_provider.clone(url, base=self.powdir, progress=progress)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()
             print('Deserializing...', file=sys.stderr)
-            with tqdm(unit=' ctx', file=sys.stderr) as ctx_prog, \
-                    tqdm(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
+            with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
+                    self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
                 self._load_all_graphs(ctx_prog, trip_prog)
             print('Done!', file=sys.stderr)
         except BaseException as e:

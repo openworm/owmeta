@@ -533,7 +533,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 types = set()
                 for __, __, rdf_type in type_triples:
                     types.add(rdf_type)
-                the_type = get_most_specific_rdf_type(types, self.context)
+                the_type = get_most_specific_rdf_type(types,
+                                                      self.context,
+                                                      bases=(self.rdf_type,))
                 yield oid(ident, the_type, self.context)
         else:
             return
@@ -912,7 +914,7 @@ def disconnect():
     PropertyTypes.clear()
 
 
-def get_most_specific_rdf_type(types, context=None):
+def get_most_specific_rdf_type(types, context=None, bases=None):
     """ Gets the most specific rdf_type.
 
     Returns the URI corresponding to the lowest in the DataObject class
@@ -921,7 +923,11 @@ def get_most_specific_rdf_type(types, context=None):
     if context is None:
         context = DEF_CTX
     mapper = context.mapper
-    most_specific_types = tuple(mapper.base_classes.values())
+    if bases:
+        most_specific_types = tuple(context.resolve_class(x) for x in bases)
+    else:
+        most_specific_types = tuple(mapper.base_classes.values())
+
     for x in types:
         try:
             class_object = context.resolve_class(x)
