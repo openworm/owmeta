@@ -276,8 +276,6 @@ def do_insert(ident, config="default.conf", logging=False, imports_context_ident
                 print('saving', src)
                 CTX.add_import(src.data_context)
                 EVCTX.add_import(src.evidence_context)
-                for ctx in src.contexts:
-                    IWCTX.add_import(ctx)
         IWCTX.save_context(graph, saved_contexts=saved_contexts)
         IWCTX.save_imports(imports_context)
         print('imports context size', len(imports_context))

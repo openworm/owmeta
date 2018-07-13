@@ -100,7 +100,12 @@ class ContextStore(Store):
         """
         if self._memory_store is None:
             raise Exception("Database has not been opened")
-        return len(self._memory_store)
+        if self._store_store is None:
+            return len(self._memory_store)
+        else:
+            # We don't know which triples may overlap, so we can't return an accurate count without doing something
+            # expensive, so we just give up
+            raise NotImplementedError()
 
     def contexts(self, triple=None):
         """
@@ -113,7 +118,17 @@ class ContextStore(Store):
         """
         if self._memory_store is None:
             raise Exception("Database has not been opened")
-        return self._memory_store.contexts(triple)
+        seen = set()
+        rest = ()
+
+        if self._store_store is not None:
+            rest = self._store_store.contexts(triple)
+
+        for ctx in chain(self._memory_store.contexts(triple), rest):
+            if ctx in seen:
+                continue
+            seen.add(ctx)
+            yield ctx
 
 
 class RDFContextStore(Store):

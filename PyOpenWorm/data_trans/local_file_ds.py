@@ -1,5 +1,5 @@
 from rdflib.namespace import Namespace
-from PyOpenWorm.datasource import Informational, DataSource
+from ..datasource import Informational, DataSource
 from .common_data import DS_NS
 
 

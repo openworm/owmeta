@@ -97,7 +97,7 @@ class Contextualizable(BaseContextualizable):
     @context.setter
     def context(self, ctx):
         if isinstance(ctx, property):
-            raise Exception()
+            raise Exception('An attempt was made to set a property as the context. This is likely unintended')
         self.__context = ctx
 
 

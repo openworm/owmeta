@@ -3,6 +3,7 @@ from yarom.utils import slice_dict
 from .experiment import Experiment
 from .dataObject import DataObject, DatatypeProperty, ObjectProperty
 from .channel_common import CHANNEL_RDF_TYPE
+from . import SCI_BIO_CTX
 
 
 class PatchClampExperiment(Experiment):
@@ -54,7 +55,7 @@ class PatchClampExperiment(Experiment):
     type : DatatypeProperty
 
     """
-    class_context = 'http://openworm.org/schema/sci/bio'
+    class_context = SCI_BIO_CTX.identifier
 
     conditions = [
         'Ca_concentration',
@@ -115,7 +116,7 @@ class ChannelModel(DataObject):
         >>> ev.asserts(cm)
         >>> ev.save()
     """
-    class_context = 'http://openworm.org/schema/sci/bio'
+    class_context = SCI_BIO_CTX.identifier
 
     modelType = DatatypeProperty()
     ''' The type of model employed to describe a channel '''
@@ -133,7 +134,7 @@ class ChannelModel(DataObject):
         super(ChannelModel, self).__init__(*args, **kwargs)
 
         #Change modelType value to something from ChannelModelType class on init
-        if (isinstance(modelType, str)):
+        if isinstance(modelType, str):
             modelType = modelType.lower()
             if modelType in ('homology', ChannelModelType.homologyEstimate):
                 self.modelType(ChannelModelType.homologyEstimate)
@@ -150,8 +151,6 @@ class PatchClampChannelModel(ChannelModel):
 
 
 class HomologyChannelModel(ChannelModel):
-    #
-    # from PyOpenWorm.channel import Channel
     homolog = ObjectProperty(value_rdf_type=CHANNEL_RDF_TYPE)
 
     def __init__(self, **kwargs):

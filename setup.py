@@ -2,8 +2,6 @@
 #
 
 from setuptools import setup
-import distutils.cmd
-import distutils.log
 import os
 import sys
 
@@ -13,14 +11,14 @@ PyOpenWorm
 ===========
 
 A unified, simple data access library in Python for data, facts, and models of
-*C. elegans* anatomy for the [OpenWorm project](http://www.openworm.org)
+*C. elegans* anatomy for the `OpenWorm project <http://www.openworm.org>`_
 
 What does it do?
 ----------------
 
 Enables a simple Python API for asking various questions about the cells of the
 *C. elegans*, enabling the sharing of data about *C. elegans* for the purpose
-of building a [data-to-model pipeline](http://docs.openworm.org/en/latest/projects
+of building a `data-to-model pipeline <http://docs.openworm.org/en/latest/projects>`_
 for the OpenWorm project. In addition, it is a repository for various iterations
 of inferred / predicted data about *C. elegans*. Uncontroversial facts and
 inferred information are distinguished through the use of explicit Evidence
@@ -61,31 +59,28 @@ setup(
         'html5lib==0.999',
         'isodate==0.5.0',
         'lazy-object-proxy==1.2.1',
-        'libneuroml',
+        'libneuroml==0.2.18',
         'networkx==1.9',
         'numpydoc>=0.7.0',
         'persistent==4.0.8',
-        'Pint',
+        'Pint==0.8.1',
         'pow-store-zodb==0.0.3',
         'pyparsing==2.2.0',
         'rdflib>=4.1.2',
-        'requests',
+        'requests==2.18.4',
         'six==1.10.0',
         'SPARQLWrapper==1.6.2',
+        'tqdm==4.23.4',
         'transaction==1.4.4',
         'wrapt==1.10.11',
-        'xlrd',
-        'yarom',
+        'xlrd==1.1.0',
+        'yarom==0.11.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
     ] + (['zodbpickle==1.0'] if PY2 else []),
-    dependency_links=[
-        'git://github.com/NeuralEnsemble/libNeuroML.git#egg=libNeuroML',
-        'git://github.com/zopefoundation/ZODB.git#egg=ZODB'
-    ],
     version=version,
     packages=['PyOpenWorm',
               'PyOpenWorm.data_trans',
@@ -102,7 +97,7 @@ setup(
     license='MIT',
     url='http://PyOpenWorm.readthedocs.org/en/latest/',
     download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
-    scripts=['scripts/pow'],
+    entry_points={'console_scripts': ['pow = PyOpenWorm.cli:main']},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
@@ -111,6 +106,7 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering'
     ]
 )

@@ -56,12 +56,22 @@ class _link(ConfigValue):
         return self.conf[self.members[0]]
 
 
-NO_DEFAULT = object()
+class NO_DEFAULT(object):
+    def __repr__(self):
+        return 'NO_DEFAULT'
+
+
+NO_DEFAULT = NO_DEFAULT()
 
 
 class Configure(object):
 
-    """ A simple configuration object.  Enables setting and getting key-value pairs"""
+    """
+    A simple configuration object.  Enables setting and getting key-value pairs
+
+    Unlike a `dict`, Configure objects will execute a function when retrieving values to enable deferred computation of
+    seldom-used configuration values. In addition, entries in a `Configure` can be aliased to one another.
+    """
     # conf: is a configure instance to base this one on
     # dependencies are required for this class to be initialized (TODO)
 
@@ -127,6 +137,8 @@ class Configure(object):
                 if isinstance(value, six.string_types):
                     def matchf(md):
                         match = md.group(1)
+                        # Note: We already matched the rest of the string, so
+                        # we just need to check for the initial char here
                         valid_var_name = re.match(r'^[A-Za-z_]', match)
                         if valid_var_name:
                             res = environ.get(match, None)
@@ -163,14 +175,23 @@ class Configure(object):
 
     def get(self, pname, default=NO_DEFAULT):
         """
-        Get some parameter value out by asking for a key
+        Get some parameter value out by asking for a key.
+        Note that unlike :py:class:`dict`, if you don't specify a default, then a :py:exc:`KeyError` is raised
 
-        :param pname: they key of the value you want to return.
-        :param default: True if you want the default value, False if you don't (default)
-        :return: The value corresponding to the key in pname
+        Parameters
+        ----------
+        pname : str
+            they key of the value you want to return.
+        default : object
+            The default value to return if there's no entry for `pname`
+
+        Returns
+        -------
+        The value corresponding to the key
         """
-        if pname in self._properties:
-            return self._properties[pname].get()
+        val = self._properties.get(pname, None)
+        if val is not None:
+            return val.get()
         elif default is not NO_DEFAULT:
             return default
         else:
@@ -184,7 +205,7 @@ class ImmutableConfigure(Configure):
 
 class Configureable(object):
 
-    """ An object which can accept configuration.  A base class intended to be subclassed. """
+    """ An object which can accept configuration. A base class intended to be subclassed. """
     default = ImmutableConfigure()
 
     def __init__(self, conf=None, **kwargs):
@@ -225,11 +246,11 @@ class Configureable(object):
 
     def get(self, pname, default=None):
         """
-        The getter for the configuration
+        Gets a config value from this :class:`Configureable`'s `conf`
 
-        :param pname: The key to retreive the value of interest
-        :param default: True if you want the default value, False if you don't (default)
-        :return: Returns the configuration value corresponding to the key pname.
+        See Also
+        --------
+        Configure.get
         """
         if self.conf is self:
             raise ValueError('The \'conf\' of a Configureable cannot be itself')

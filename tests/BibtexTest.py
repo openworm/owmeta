@@ -1,3 +1,4 @@
+''' Tests for the bibtexparser wrapper and related utilities (e.g., translation into Document) '''
 from .DataTestTemplate import _DataTest
 from PyOpenWorm.bibtex import parse_bibtex_into_evidence, loads
 from os.path import dirname, abspath, join
@@ -8,7 +9,6 @@ from os.path import dirname, abspath, join
 
 
 class BibtexTest(_DataTest):
-
     def loads(self, s):
         for x in loads(s).entries:
             return x

@@ -20,6 +20,10 @@ DOI_REGEXEN = [re.compile(x, re.I) for x in (r'^10.\d{4,9}/[-._;()/:A-Z0-9]+$',
 
 @pytest.mark.inttest
 class EvidenceQualityTests(_DataTest):
+    '''
+    Tests for the quality of evidence. As distinct from coverage, these test things like whether accession information
+    is included and usable, whether certain fields are properly formatted, etc.
+    '''
 
     def setUp(self):
         PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')

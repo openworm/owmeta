@@ -12,11 +12,6 @@ import os
 
 
 class ConfigureTest(unittest.TestCase):
-    """
-    Tests for the Configure class, which provides
-      functionality to modules to allow outside objects to parameterize their
-      behavior
-    """
     def test_fake_config(self):
         """ Try to retrieve a config value that hasn't been set """
         with self.assertRaises(KeyError):

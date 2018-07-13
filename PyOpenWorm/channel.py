@@ -1,6 +1,6 @@
 import rdflib as R
 
-from .dataObject import DatatypeProperty, ObjectProperty
+from .dataObject import DatatypeProperty, ObjectProperty, Alias
 from .channelworm import ChannelModel
 from .biology import BiologyType
 from .channel_common import CHANNEL_RDF_TYPE
@@ -12,27 +12,22 @@ class ExpressionPattern(BiologyType):
     class_context = BiologyType.class_context
 
     wormbaseid = DatatypeProperty()
+    wormbaseID = Alias(wormbaseid)
     wormbaseURL = DatatypeProperty()
     description = DatatypeProperty()
 
-    def __init__(self, wormbaseid=None, description=None, **kwargs):
+    def __init__(self, wormbaseid=None, **kwargs):
         super(ExpressionPattern, self).__init__(**kwargs)
 
         if wormbaseid:
             self.wormbaseid(wormbaseid)
             self.wormbaseURL(R.URIRef("http://www.wormbase.org/species/all/expr_pattern/" + wormbaseid))
 
-    @property
-    def defined(self):
-        return super(ExpressionPattern, self).defined \
-                or self.wormbaseid.has_defined_value()
+    def defined_augment(self):
+        return self.wormbaseid.has_defined_value()
 
-    @property
-    def identifier(self):
-        if super(ExpressionPattern, self).defined:
-            return super(ExpressionPattern, self).identifier
-        else:
-            return self.make_identifier(self.wormbaseid.defined_values[0])
+    def identifier_augment(self):
+        return self.make_identifier(self.wormbaseid.defined_values[0])
 
 
 class Channel(BiologyType):
@@ -84,17 +79,11 @@ class Channel(BiologyType):
     def __init__(self, name=None, **kwargs):
         super(Channel, self).__init__(name=name, **kwargs)
 
-    @property
-    def defined(self):
-        return super(Channel, self).defined or self.name.has_defined_value()
+    def defined_augment(self):
+        return self.name.has_defined_value()
 
-    @property
-    def identifier(self):
-        if super(Channel, self).defined:
-            return super(Channel, self).identifier
-        else:
-            # name is already set, so we can make an identifier from it
-            return self.make_identifier(self.name.defined_values[0])
+    def identifier_augment(self):
+        return self.make_identifier(self.name.defined_values[0])
 
 
 __yarom_mapped_classes__ = (Channel, ExpressionPattern)

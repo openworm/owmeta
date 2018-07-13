@@ -26,7 +26,10 @@ class DocumentTest(_DataTest):
 
 @pytest.mark.inttest
 class DocumentElaborationTest(_DataTest):
-
+    '''
+    Tests for Document 'elaboration', the process of looking up documents from external resources by using their
+    identifiers and setting those values on the object
+    '''
     def test_pubmed_init1(self):
         """
         A pubmed uri

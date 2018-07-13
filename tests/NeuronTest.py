@@ -7,6 +7,7 @@ from .DataTestTemplate import _DataTest
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.cell import Cell
 from PyOpenWorm.connection import Connection
+from PyOpenWorm.context import Context
 
 
 class NeuronTest(_DataTest):
@@ -65,11 +66,52 @@ class NeuronTest(_DataTest):
         self.neur('AVAL').neighbor(p)
         self.assertEqual(1, p.count())
 
+    def test_neighbor_count_staged(self):
+        n = self.neur('AVAL')
+        n.neighbor(self.neur('PVCL'), syntype='send')
+        self.assertEqual(1, n.neighbor.count())
+
+    def test_neighbor_count_context_staged(self):
+        n = self.neur('AVAL')
+        n.neighbor(self.neur('PVCL'), syntype='send')
+        ctx1 = Context(ident='http://example.org/ctx1')
+        self.assertEqual(0, ctx1(n).neighbor.count())
+
     def test_connection_count(self):
         n = self.neur('AVAL')
         n.connection(self.ctx.Connection(n, self.neur('PVCL'), syntype='send'))
         self.save()
         self.assertEqual(1, self.neur('AVAL').connection.count())
+
+    def test_connection_count_staged(self):
+        n = self.neur('AVAL')
+        n.connection(self.ctx.Connection(n, self.neur('PVCL'), syntype='send'))
+        self.assertEqual(1, n.connection.count())
+
+    def test_neighbor_context(self):
+        n0 = self.ctx.Neuron(name='NEURON0')
+        n1 = self.ctx.Neuron(name='NEURON1')
+        ctx1 = Context(ident='http://example.org/ctx1')
+        n0.neighbor(n1)
+        self.assertEqual(set(), set(ctx1(n0).neighbor()))
+
+    def test_connection_get_staged(self):
+        n0 = self.ctx.Neuron(name='NEURON0')
+        n1 = self.ctx.Neuron(name='NEURON1')
+        n0.connection(self.ctx.Connection(pre_cell=n0, post_cell=n1, syntype='send'))
+        self.assertEqual(1, len(n0.connection()))
+
+    def test_connection_only_defined(self):
+        n0 = self.ctx.Neuron(name='NEURON0')
+        n0.connection(self.ctx.Connection())
+        self.assertEqual(0, len(n0.connection()))
+
+    def test_connection_context(self):
+        n0 = self.ctx.Neuron(name='NEURON0')
+        n1 = self.ctx.Neuron(name='NEURON1')
+        ctx1 = Context(ident='http://example.org/ctx1')
+        n0.connection(self.ctx.Connection(pre_cell=n0, post_cell=n1, syntype='send'))
+        self.assertEqual(set(), set(ctx1(n0).connection()))
 
     def test_init_from_lineage_name(self):
         c = self.ctx.Neuron(lineageName="AB plapaaaap", name="ADAL")

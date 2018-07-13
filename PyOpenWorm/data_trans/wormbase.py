@@ -77,7 +77,7 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
                         regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
                         matches = [regex.match(pat) for pat in patterns]
-                        patterns = [ctx.ExpressionPattern(wormbaseID=m.group(1),
+                        patterns = [ctx.ExpressionPattern(wormbaseid=m.group(1),
                                                           description=m.group(2))
                                     for m in matches if m is not None]
                         for pat in patterns:

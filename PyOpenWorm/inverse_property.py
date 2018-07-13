@@ -20,7 +20,6 @@ class InversePropertyMixin(object):
             rhs_cls, rhs_linkName = ip.other(*ip_key)
             assert isinstance(other, rhs_cls)
             rhs_prop = getattr(other.contextualize(self.context), rhs_linkName)
-            # ctxd_rhs_prop = rhs_prop.contextualize(self.context)
             super(InversePropertyMixin, rhs_prop).set(self.owner)
         return super(InversePropertyMixin, self).set(other)
 

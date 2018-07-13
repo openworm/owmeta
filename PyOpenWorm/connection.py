@@ -73,26 +73,18 @@ class Connection(BiologyType):
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
 
-    @property
-    def defined(self):
-        return super(Connection, self).defined or \
-            (self.pre_cell.has_defined_value() and
-             self.post_cell.has_defined_value() and
-             self.syntype.has_defined_value())
+    def defined_augment(self):
+        return (self.pre_cell.has_defined_value() and
+                self.post_cell.has_defined_value() and
+                self.syntype.has_defined_value())
 
-    @property
-    def identifier(self):
-        the_id = None
-        if super(Connection, self).defined:
-            the_id = super(Connection, self).identifier
-        else:
-            data = (self.pre_cell,
-                    self.post_cell,
-                    self.syntype)
-            data = tuple(x.defined_values[0].identifier.n3() for x in data)
-            data = "".join(data)
-            the_id = self.make_identifier(data)
-        return the_id
+    def identifier_augment(self):
+        data = (self.pre_cell,
+                self.post_cell,
+                self.syntype)
+        data = tuple(x.defined_values[0].identifier.n3() for x in data)
+        data = "".join(data)
+        return self.make_identifier(data)
 
     def __str__(self):
         nom = []

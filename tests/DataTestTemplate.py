@@ -41,7 +41,8 @@ class _DataTest(unittest.TestCase):
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
         PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
-        self.context = Context(ident='http://example.org/test-context', conf=self.TestConfig)
+        self.context = Context(ident='http://example.org/test-context',
+                               conf=self.TestConfig)
         typ = type(self)
         if hasattr(typ, 'ctx_classes'):
             if isinstance(dict, typ.ctx_classes):

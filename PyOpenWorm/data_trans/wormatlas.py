@@ -45,11 +45,6 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
         return res
 
     def translate(self, data_source, neurons_source):
-        # XXX: This wants a way to insert cells, then later, to insert neurons from the same set
-        # and have the later recoginzed as the former. Identifier matching limits us here. It would
-        # be best to establish owl:sameAs links to the super class (Cell) from the subclass (Neuron)
-        # at the sub-class insert and have a reasoner relate
-        # the two sets of inserts.
         res = self.make_new_output(sources=(data_source, neurons_source))
         try:
             net_q = neurons_source.data_context.query(Network)()
@@ -103,8 +98,6 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
 
             # TODO: Add data for other cells here. Requires relating named
             # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
-            # Also requires removing neurons and muscles from the list once
-            # they've been identified so they aren't stored twice
 
             print ("uploaded lineage and descriptions")
         except Exception:
