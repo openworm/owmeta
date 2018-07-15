@@ -127,15 +127,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
         return base_ns
 
-    def contextualize_class_augment(self, context):
-        if context is None:
-            return self
-        ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta(self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
-                                                     rdf_type=self.rdf_type,
-                                                     class_context=context.identifier))
-        return res
-
     def after_mapper_module_load(self, mapper):
         self.init_rdf_type_object()
 
