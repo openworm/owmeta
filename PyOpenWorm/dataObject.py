@@ -130,7 +130,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def contextualize_class_augment(self, context):
         if context is None:
             return self
-        #dct = dict(rdf_namespace=self.rdf_namespace, rdf_type=self.rdf_type, class_context=context.identifier)
+        dct = dict(rdf_namespace=self.rdf_namespace, rdf_type=self.rdf_type, class_context=context.identifier)
         #return super(ContextMappedClass, self).contextualize_class_augment(context, dct)
         ctxd_meta = contextualize_metaclass(context, self)
         res = ctxd_meta(self.__name__, (self,), dct)
