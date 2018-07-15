@@ -49,9 +49,35 @@ class POWSource(object):
         # TODO: Pull this string out of here...just dunno where it goes yet
         ctx = Context(ident='http://openworm.org/data', conf=conf)
         dt = ctx.stored(DataSource)(conf=conf)
-        nm = self._parent._conf()['rdf.graph'].namespace_manager
+        nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            print(nm.normalizeUri(type(x).rdf_type), nm.normalizeUri(x.identifier))
+            print(nm.normalizeUri(x.identifier))
+
+    def show(self, data_source):
+        '''
+        Parameters
+        ----------
+        data_source : str
+            The ID of the data source to show
+        '''
+        from rdflib.term import URIRef
+        from rdflib.namespace import is_ncname
+        from PyOpenWorm.datasource import DataSource
+
+        conf = self._parent._conf()
+        nm = conf['rdf.graph'].namespace_manager
+        parts = data_source.split(':')
+        if len(parts) > 1 and is_ncname(parts[1]):
+            for pref, ns in nm.namespaces():
+                if pref == parts[0]:
+                    data_source = URIRef(ns + parts[1])
+                    break
+        uri = URIRef(data_source)
+        print(uri)
+        ctx = Context(ident='http://openworm.org/data', conf=conf)
+        for x in ctx.stored(DataSource)(ident=uri).load():
+            x.fill()
+            print(x)
 
     def list_kinds(self):
         """
@@ -72,8 +98,9 @@ class POWTranslator(object):
         # TODO: Pull this string out of here...just dunno where it goes yet
         ctx = Context(ident='http://openworm.org/data', conf=conf)
         dt = ctx.stored(DataTranslator)(conf=conf)
+        nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            print(x)
+            print(nm.normalizeUri(x.identifier))
 
 
 class POW(object):

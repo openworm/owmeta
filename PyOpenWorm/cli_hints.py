@@ -27,4 +27,11 @@ CLI_HINTS = {
         },
         'IGNORE': ['message', 'progress_reporter']
     },
+    'PyOpenWorm.command.POWSource': {
+        'show': {
+            (METHOD_NAMED_ARG, 'data_source'): {
+                'names': ['data_source'],
+            },
+        },
+    },
 }
