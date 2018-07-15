@@ -4,13 +4,14 @@ import rdflib as R
 import logging
 from six import with_metaclass
 
-from yarom.graphObject import GraphObject, GraphObjectQuerier
+from yarom.graphObject import (GraphObject,
+                               GraphObjectQuerier,
+                               ZeroOrMoreTQLayer)
 
 from yarom.mappedProperty import MappedPropertyClass
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
-from yarom.propertyMixins import (ObjectPropertyMixin,
-                                  DatatypePropertyMixin,
+from yarom.propertyMixins import (DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from yarom.mapper import FCN
 from PyOpenWorm.data import DataUser
@@ -22,7 +23,8 @@ from PyOpenWorm.statement import Statement
 import itertools
 from lazy_object_proxy import Proxy
 from .inverse_property import InversePropertyMixin
-from .rdf_query_util import goq_hop_scorer
+from .rdf_query_util import goq_hop_scorer, load
+from .rdf_go_modifiers import SubClassModifier
 
 L = logging.getLogger(__name__)
 
@@ -87,6 +89,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._v = []
         self.owner = owner
         self._hdf = dict()
+        self.filling = False
 
     def contextualize_augment(self, context):
         self._hdf[context] = None
@@ -119,6 +122,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     def set(self, v):
         if v is None:
             raise ValueError('It is not permitted to declare a property to have value the None')
+
         if not hasattr(v, 'idl'):
             v = PropertyValue(v)
 
@@ -169,6 +173,20 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     def identifier(self):
         return self.link
 
+    def fill(self):
+        self.filling = True
+        try:
+            self.clear()
+            for val in self.get():
+                self.set(val)
+                fill = getattr(val, 'fill', True)
+                filling = getattr(val, 'filling', True)
+                print('filling val', type(val), id(val), val, val.filling)
+                if fill and not filling:
+                    fill()
+        finally:
+            self.filling = False
+
     def get(self):
         if self.rdf is None:
             return ()
@@ -183,7 +201,12 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         else:
             v = Variable("var" + str(id(self)))
             self._insert_value(v)
-            results = GraphObjectQuerier(v, self.rdf, parallel=False,
+
+            def _zomifier(rdf_type):
+                if getattr(self, 'value_rdf_type', None) == rdf_type:
+                    return SubClassModifier(rdf_type)
+            g = ZeroOrMoreTQLayer(_zomifier, self.rdf)
+            results = GraphObjectQuerier(v, g, parallel=False,
                                          hop_scorer=goq_hop_scorer)()
             self._remove_value(v)
         return results
@@ -297,13 +320,11 @@ class PropertyCountMixin(object):
 
 class ObjectProperty (InversePropertyMixin,
                       _ContextualizingPropertySetMixin,
-                      ObjectPropertyMixin,
                       PropertyCountMixin,
                       RealSimpleProperty):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, resolver=None, *args, **kwargs):
         super(ObjectProperty, self).__init__(*args, **kwargs)
-        self.resolver = OPResolver(self.context)
 
     def contextualize_augment(self, context):
         res = super(ObjectProperty, self).contextualize_augment(context)
@@ -320,7 +341,8 @@ class ObjectProperty (InversePropertyMixin,
         return super(ObjectProperty, self).set(v)
 
     def get(self):
-        r = super(ObjectProperty, self).get()
+        idents = super(ObjectProperty, self).get()
+        r = load(self.rdf, idents=idents, context=self.context)
         return itertools.chain(self.defined_values, r)
 
     @property

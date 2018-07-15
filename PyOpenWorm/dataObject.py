@@ -19,16 +19,16 @@ from yarom.graphObject import (GraphObject,
                                ComponentTripler,
                                GraphObjectQuerier,
                                ZeroOrMoreTQLayer)
-from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term, UP
+from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
 from yarom.mapper import FCN
-from yarom.go_modifiers import ZeroOrMore
+from .rdf_go_modifiers import SubClassModifier
 from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
-from .rdf_query_util import goq_hop_scorer
+from .rdf_query_util import goq_hop_scorer, get_most_specific_rdf_type, oid, load
 
 import PyOpenWorm.simpleProperty as SP
 
@@ -81,15 +81,6 @@ def mp(c, k):
             return getattr(target, ak)
 
     return PropertyProperty(c, getter)
-
-
-class SubClassModifier(ZeroOrMore):
-
-    def __init__(self, rdf_type):
-        super(SubClassModifier, self).__init__(rdf_type, R.RDFS.subClassOf, UP)
-
-    def __repr__(self):
-        return FCN(type(self)) + '(' + repr(self.identifier) + ')'
 
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
@@ -200,7 +191,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
             # <after_mapper_module_load done BaseDataObject
 
             from PyOpenWorm.class_registry import RegistryEntry
-            from PyOpenWorm.python_class_registry import PythonClassDescription, PythonModule
+            from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
 
             re = RegistryEntry.contextualize(self.definition_context)()
             cd = PythonClassDescription.contextualize(self.definition_context)()
@@ -433,6 +424,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
         self._variable = None
 
+        self.filling = False
         for k, v in pc.items():
             if not v.lazy:
                 self.attach_property(v, name='_pow_' + k)
@@ -521,29 +513,26 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                       hop_scorer=goq_hop_scorer)())
 
     def load(self):
-        g = ZeroOrMoreTQLayer(self._zomifier, self.rdf)
-        idents = GraphObjectQuerier(self, g, parallel=False,
-                                    hop_scorer=goq_hop_scorer)()
-        if idents:
-            choices = self.rdf.triples_choices((list(idents),
-                                                R.RDF['type'],
-                                                None))
-            grouped_type_triples = groupby(choices, lambda x: x[0])
-            for ident, type_triples in grouped_type_triples:
-                types = set()
-                for __, __, rdf_type in type_triples:
-                    types.add(rdf_type)
-                the_type = get_most_specific_rdf_type(types,
-                                                      self.context,
-                                                      bases=(self.rdf_type,))
-                yield oid(ident, the_type, self.context)
-        else:
-            return
+        # XXX: May need to rethink this refactor at some point...
+        for x in load(self.rdf,
+                      start=self,
+                      target_type=type(self).rdf_type,
+                      context=self.context):
+            yield x
+
+    def fill(self):
+        self.filling = True
+        try:
+            for p in self.properties:
+                print('filling property', p)
+                if not getattr(p, 'filling', True):
+                    p.fill()
+        finally:
+            self.filling = False
 
     def _zomifier(self, rdf_type):
         if type(self).rdf_type == rdf_type:
-            r = SubClassModifier(rdf_type)
-            return r
+            return SubClassModifier(rdf_type)
 
     def variable(self):
         if self._variable is None:
@@ -839,9 +828,11 @@ class RDFSSubClassOfProperty(SP.ObjectProperty):
 
 
 class RDFTypeProperty(SP.ObjectProperty):
+    # XXX: This class is special. It doesn't have its after_mapper_module_load called because that would mess up
+    # evaluation order for this module...
     link = R.RDF['type']
     linkName = "rdf_type_property"
-    value_type = RDFSClass
+    value_rdf_type = RDFSClass.rdf_type
     owner_type = BaseDataObject
     multiple = True
     lazy = False
@@ -857,50 +848,6 @@ class RDFProperty(DataObjectSingleton):
         super(RDFProperty, self).__init__(ident=R.RDF["Property"],
                                           *args,
                                           **kwargs)
-
-
-def oid(identifier_or_rdf_type, rdf_type=None, context=None):
-    """ Create an object from its rdf type
-
-    Parameters
-    ----------
-    identifier_or_rdf_type : :class:`str` or :class:`rdflib.term.URIRef`
-        If `rdf_type` is provided, then this value is used as the identifier
-        for the newly created object. Otherwise, this value will be the
-        :attr:`rdf_type` of the object used to determine the Python type and
-        the object's identifier will be randomly generated.
-    rdf_type : :class:`str`, :class:`rdflib.term.URIRef`, :const:`False`
-        If provided, this will be the :attr:`rdf_type` of the newly created
-        object.
-
-    Returns
-    -------
-       The newly created object
-
-    """
-    identifier = identifier_or_rdf_type
-    if rdf_type is None:
-        rdf_type = identifier_or_rdf_type
-        identifier = None
-
-    c = None
-    try:
-        qctx = DEF_CTX if context is None else context
-        c = qctx.resolve_class(rdf_type)
-    except KeyError:
-        c = BaseDataObject
-    L.debug("oid: making a {} with ident {}".format(c, identifier))
-
-    # if its our class name, then make our own object
-    # if there's a part after that, that's the property name
-    o = None
-    if context is not None:
-        c = context(c)
-    if identifier is not None:
-        o = c(ident=identifier)
-    else:
-        o = c()
-    return o
 
 
 def disconnect():
@@ -968,5 +915,5 @@ class _Resolver(RDFTypeResolver):
         return cls.instance
 
 
-__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject, RDFProperty,
-                            RDFSSubClassOfProperty, PropertyDataObject)
+__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
+                            RDFProperty, RDFSSubClassOfProperty, PropertyDataObject)
