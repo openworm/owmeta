@@ -13,6 +13,10 @@ from PyOpenWorm.connection import Connection
 from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
+#try:
+#    from unittest.mock import MagicMock, Mock
+#except ImportError:
+#    from mock import MagicMock, Mock
 
 
 class DataObjectTest(_DataTest):
@@ -110,3 +114,21 @@ class DataObjectTest(_DataTest):
     def test_rdfs_comment_property(self):
         a = DataObject(rdfs_comment='Hello')
         self.assertIn('Hello', a.rdfs_comment())
+
+    # def test_contextualize_class_augment(self):
+    #     ctx = Mock()
+    #     ctx.identifier = None
+    #     a = DataObject(rdfs_comment='Hello')
+    #     #print(a.__dict__)
+    #     res = a.contextualize_class_augment(ctx)
+    #     print(res.__dict__)
+    #     self.assertTrue(False)
+
+    def test_context_getter(self):
+        a = DataObject(rdfs_comment='Hello')
+        self.assertIsNone(a.context)
+
+    def test_context_setter(self):
+        a = DataObject(rdfs_comment='Hello')
+        a.context = 42
+        self.assertIsNone(a.context)
