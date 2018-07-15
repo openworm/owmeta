@@ -239,6 +239,16 @@ class ContextTest(_DataTest):
         ctx1.save_context(graph, inline_imports=True)
         self.assertEqual(ctx1.triples_saved, 3)
 
+    def test_context_getter(self):
+        ctx = Context(ident='http://example.com/context_1')
+        self.assertIsNone(ctx.context)
+
+    def test_context_setter(self):
+        ctx = Context(ident='http://example.com/context_1')
+        ctx.context = 42
+        self.assertIsNone(ctx.context)
+
+
 class ContextStoreTest(_DataTest):
 
     def test_query(self):

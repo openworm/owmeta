@@ -130,10 +130,10 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def contextualize_class_augment(self, context):
         if context is None:
             return self
+        dct = dict(rdf_namespace=self.rdf_namespace, rdf_type=self.rdf_type, class_context=context.identifier)
+        #return super(ContextMappedClass, self).contextualize_class_augment(context, dct)
         ctxd_meta = contextualize_metaclass(context, self)
-        res = ctxd_meta(self.__name__, (self,), dict(rdf_namespace=self.rdf_namespace,
-                                                     rdf_type=self.rdf_type,
-                                                     class_context=context.identifier))
+        res = ctxd_meta(self.__name__, (self,), dct)
         return res
 
     def after_mapper_module_load(self, mapper):
@@ -163,10 +163,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         else:
             o.rdf_type_property.set(self.rdf_type_object)
         return o
-
-    @property
-    def context(self):
-        return None
 
     @property
     def definition_context(self):
@@ -695,6 +691,10 @@ class RDFSLabelProperty(SP.DatatypeProperty):
 class DataObject(BaseDataObject):
     rdfs_comment = CPThunk(RDFSCommentProperty)
     rdfs_label = CPThunk(RDFSLabelProperty)
+
+    #def __new__(self, *args, **kwargs):
+    #    super(DataObject, self).__new__(*args, **kwargs)
+    #    print("Hellow wolrd")
 
 
 class DataObjectSingletonMeta(type(BaseDataObject)):

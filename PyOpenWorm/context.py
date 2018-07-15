@@ -44,14 +44,6 @@ Contexts = dict()
 
 
 class ContextMeta(ContextualizableClass):
-    @property
-    def context(self):
-        return None
-
-    @context.setter
-    def context(self, v):
-        pass
-
     def contextualize_class_augment(self, context):
         if context is None:
             return self
