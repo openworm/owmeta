@@ -191,6 +191,7 @@ def contextualized_data_object(context, obj):
 class ContextualizableList(Contextualizable, list):
 
     def __init__(self, context):
+        super(ContextualizableList, self).__init__()
         self._context = context
 
     def contextualize(self, context):
