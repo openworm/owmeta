@@ -692,9 +692,8 @@ class DataObject(BaseDataObject):
     rdfs_comment = CPThunk(RDFSCommentProperty)
     rdfs_label = CPThunk(RDFSLabelProperty)
 
-    #def __new__(self, *args, **kwargs):
-    #    super(DataObject, self).__new__(*args, **kwargs)
-    #    print("Hellow wolrd")
+    def __new__(self, *args, **kwargs):
+        super(DataObject, self).__new__(*args, **kwargs)
 
 
 class DataObjectSingletonMeta(type(BaseDataObject)):
