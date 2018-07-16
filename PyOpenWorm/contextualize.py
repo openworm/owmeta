@@ -264,13 +264,11 @@ class ContextualizableClass(type):
         self.__contexts[context] = ctxd
         return ctxd
 
-    def contextualize_class_augment(self, context, dct=None):
+    def contextualize_class_augment(self, context):
         if context is None:
             return self
-        #if dct is None:
-        dct = dict(class_context=context.identifier)
         _H = contextualize_metaclass(context, self)
-        res = _H(self.__name__, (self,), dct)
+        res = _H(self.__name__, (self,), dict(class_context=context.identifier))
         res.__module__ = self.__module__
         return res
 
