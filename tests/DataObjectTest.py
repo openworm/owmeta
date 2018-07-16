@@ -91,10 +91,6 @@ class DataObjectTest(_DataTest):
             a = DatatypeProperty()
             properties_are_init_args = True
 
-        class B(A):
-            b = DatatypeProperty()
-            properties_are_init_args = False
-
         a = A(a=5)
         self.assertEqual(5, a.a())
 
@@ -115,13 +111,6 @@ class DataObjectTest(_DataTest):
         a = DataObject(rdfs_comment='Hello')
         self.assertIn('Hello', a.rdfs_comment())
 
-    def test_contextualize_class_augment(self):
-        ctx = Mock()
-        ctx.identifier = None
-        a = DataObject(rdfs_comment='Hello')
-        res = a.contextualize_class_augment(ctx)
-        self.assertTrue(False)
-
     def test_context_getter(self):
         a = DataObject(rdfs_comment='Hello')
         self.assertIsNone(a.context)
@@ -129,4 +118,4 @@ class DataObjectTest(_DataTest):
     def test_context_setter(self):
         a = DataObject(rdfs_comment='Hello')
         a.context = 42
-        self.assertIsNone(a.context)
+        self.assertEquals(a.context, 42)
