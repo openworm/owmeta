@@ -119,3 +119,19 @@ class DataObjectTest(_DataTest):
         a = DataObject(rdfs_comment='Hello')
         a.context = 42
         self.assertEquals(a.context, 42)
+
+    # TODO: only test when raise here
+    def test_datatype_property(self):
+        print(DataObject(rdfs_comment='Hello').DatatypeProperty(dict()))
+        print(DataObject(rdfs_comment='Hello').UnionProperty(dict()))
+        self.assertFalse(True)
+
+    # TODO: only test when raise here
+    def test_object_property(self):
+        print(DataObject(rdfs_comment='Hello').ObjectProperty(dict()))
+        self.assertFalse(True)
+
+    # TODO: only test when raise here
+    def test_union_property(self):
+        print(DataObject(rdfs_comment='Hello').UnionProperty(dict()))
+        self.assertFalse(True)

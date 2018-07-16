@@ -170,6 +170,12 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self.__context
 
 
+def _make_property(cls, *args, property_type, **kwargs):
+    try:
+        return cls._create_property(*args, property_type=property_type, **kwargs)
+    except TypeError:
+        return _partial_property(cls._create_property, *args, property_type=property_type, **kwargs)
+
 class _partial_property(partial):
     pass
 
@@ -248,15 +254,15 @@ class Alias(object):
 
 
 def DatatypeProperty(*args, **kwargs):
-    return APThunk('DatatypeProperty', args, kwargs)
+    return APThunk(DatatypeProperty.__name__, args, kwargs)
 
 
 def ObjectProperty(*args, **kwargs):
-    return APThunk('ObjectProperty', args, kwargs)
+    return APThunk(ObjectProperty.__name__, args, kwargs)
 
 
 def UnionProperty(*args, **kwargs):
-    return APThunk('UnionProperty', args, kwargs)
+    return APThunk(UnionProperty.__name__, args, kwargs)
 
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
@@ -460,6 +466,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 res.append(x.owner)
         return res
 
+    # TODO: refacto this classmethod in only one method
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
         """ Attach a, possibly new, property to this class that has a simple
@@ -472,10 +479,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        try:
-            return cls._create_property(*args, property_type='DatatypeProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='DatatypeProperty', **kwargs)
+        return _make_property(cls, *args, property_type=DatatypeProperty.__name__, **kwargs)
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
@@ -491,10 +495,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         value_type : type
             The type of BaseDataObject for values of this property
         """
-        try:
-            return cls._create_property(*args, property_type='ObjectProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='ObjectProperty', **kwargs)
+        return _make_property(cls, *args, property_type=ObjectProperty.__name__, **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
@@ -508,10 +509,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        try:
-            return cls._create_property(*args, property_type='UnionProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='UnionProperty', **kwargs)
+        return _make_property(cls, *args, property_type=UnionProperty.__name__, **kwargs)
 
     @classmethod
     def _create_property_class(
@@ -545,14 +543,14 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             c = PropertyTypes[_PropertyTypes_key]
         else:
             klass = None
-            if property_type == 'ObjectProperty':
+            if property_type == ObjectProperty.__name__:
                 if value_type is not None and value_rdf_type is None:
                     value_rdf_type = value_type.rdf_type
                 klass = SP.ObjectProperty
-            elif property_type == 'DatatypeProperty':
+            elif property_type == DatatypeProperty.__name__:
                 value_rdf_type = None
                 klass = SP.DatatypeProperty
-            elif property_type == 'UnionProperty':
+            elif property_type == UnionProperty.__name__:
                 value_rdf_type = None
                 klass = SP.UnionProperty
             else:
