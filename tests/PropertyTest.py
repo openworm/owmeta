@@ -15,11 +15,6 @@ class PropertyTest(_DataTest):
         p = Property()
         self.assertIsNone(p.context)
 
-    def test_context_setter(self):
-        p = Property()
-        p.context = 42
-        self.assertEquals(p.context, 42)
-
     def test_values_property(self):
         p = Property()
         self.assertEquals(p.values, [])
