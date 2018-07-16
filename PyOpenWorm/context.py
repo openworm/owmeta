@@ -236,13 +236,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     def __len__(self):
         return len(self._statements)
 
-    def __bool__(self):
-        return True
-    __nonzero__ = __bool__
-
-    def __len__(self):
-        return len(self._statements)
-
     def __call__(self, o=None, *args, **kwargs):
         """
         Parameters
