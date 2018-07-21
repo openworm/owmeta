@@ -170,7 +170,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self.__context
 
 
-def _make_property(cls, *args, property_type, **kwargs):
+def _make_property(cls, property_type, *args, **kwargs):
     try:
         return cls._create_property(property_type=property_type, *args, **kwargs)
     except TypeError:
@@ -478,7 +478,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return _make_property(cls, *args, property_type=DatatypeProperty.__name__, **kwargs)
+        return _make_property(cls, DatatypeProperty.__name__, *args, **kwargs)
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
@@ -494,7 +494,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         value_type : type
             The type of BaseDataObject for values of this property
         """
-        return _make_property(cls, *args, property_type=ObjectProperty.__name__, **kwargs)
+        return _make_property(cls, ObjectProperty.__name__, *args, **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
@@ -508,7 +508,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return _make_property(cls, *args, property_type=UnionProperty.__name__, **kwargs)
+        return _make_property(cls, UnionProperty.__name__, *args, **kwargs)
 
     @classmethod
     def _create_property_class(
