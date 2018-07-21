@@ -172,9 +172,9 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
 def _make_property(cls, *args, property_type, **kwargs):
     try:
-        return cls._create_property(*args, property_type=property_type, **kwargs)
+        return cls._create_property(property_type=property_type, *args, **kwargs)
     except TypeError:
-        return _partial_property(cls._create_property, *args, property_type=property_type, **kwargs)
+        return _partial_property(cls._create_property, property_type=property_type, *args, **kwargs)
 
 class _partial_property(partial):
     pass
