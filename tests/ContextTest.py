@@ -246,7 +246,7 @@ class ContextTest(_DataTest):
     def test_context_setter(self):
         ctx = Context(ident='http://example.com/context_1')
         ctx.context = 42
-        self.assertIsNone(ctx.context)
+        self.assertEqual(ctx.context, 42)
 
 
 class ContextStoreTest(_DataTest):
