@@ -466,7 +466,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 res.append(x.owner)
         return res
 
-    # TODO: refacto this classmethod in only one method
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
         """ Attach a, possibly new, property to this class that has a simple

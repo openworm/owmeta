@@ -6,7 +6,7 @@ import six
 import warnings
 
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 
@@ -116,26 +116,24 @@ class DataObjectTest(_DataTest):
         self.assertIn('Hello', a.rdfs_comment())
 
     def test_context_getter(self):
-        a = DataObject(rdfs_comment='Hello')
+        a = DataObject()
         self.assertIsNone(a.context)
 
     def test_context_setter(self):
-        a = DataObject(rdfs_comment='Hello')
+        a = DataObject()
         a.context = 42
         self.assertEquals(a.context, 42)
 
-    # TODO: only test when raise here
-    def test_datatype_property(self):
-        print(DataObject(rdfs_comment='Hello').DatatypeProperty(dict()))
-        print(DataObject(rdfs_comment='Hello').UnionProperty(dict()))
-        self.assertFalse(True)
+    def test_dataobject_property_that_generate_partial_property(self):
+        for property_classmethod in dataobject_properties_methods():
+            partial_property = DataObject().__getattribute__(property_classmethod)(dict())
+            self.assertIsInstance(partial_property, _partial_property)
 
-    # TODO: only test when raise here
-    def test_object_property(self):
-        print(DataObject(rdfs_comment='Hello').ObjectProperty(dict()))
-        self.assertFalse(True)
+    def test_dataobject_property_that_return_owner(self):
+        for property_classmethod in dataobject_properties_methods():
+            owner = Mock()
+            DataObject().__getattribute__(property_classmethod)(owner=owner, linkName="")
+            owner.attach_property.assert_called_once()
 
-    # TODO: only test when raise here
-    def test_union_property(self):
-        print(DataObject(rdfs_comment='Hello').UnionProperty(dict()))
-        self.assertFalse(True)
+def dataobject_properties_methods():
+    return ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
