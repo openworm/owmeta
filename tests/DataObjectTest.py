@@ -91,6 +91,10 @@ class DataObjectTest(_DataTest):
             a = DatatypeProperty()
             properties_are_init_args = True
 
+        class B(A):
+            b = DatatypeProperty()
+            properties_are_init_args = False
+
         a = A(a=5)
         self.assertEqual(5, a.a())
 
