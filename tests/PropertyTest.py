@@ -40,7 +40,7 @@ class T(Property):
     def get(self):
         if self.b is not None:
             yield self.b
-        return self.b
+        yield self.b
 
     def set(self, b):
         self.b = b
