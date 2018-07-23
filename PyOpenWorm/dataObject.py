@@ -10,7 +10,6 @@ import hashlib
 import PyOpenWorm
 from PyOpenWorm.contextualize import (Contextualizable,
                                       ContextualizableClass,
-                                      contextualize_metaclass,
                                       contextualize_helper,
                                       decontextualize_helper)
 
@@ -846,15 +845,15 @@ class values(DataObject):
     """
 
     class_context = URIRef('http://openworm.org/schema')
+    value = UnionProperty()
+    add = Alias(value)
+    name = DatatypeProperty()
+    group_name = Alias(name)
 
-    def __init__(self, group_name, **kwargs):
-        super(values, self).__init__(self, **kwargs)
-        self.add = values.ObjectProperty('value', owner=self)
-        self.group_name = values.DatatypeProperty('name', owner=self)
-        self.name(group_name)
+    def defined_augment(self):
+        return self.group_name.has_defined_value()
 
-    @property
-    def identifier(self):
+    def identifier_augment(self):
         return self.make_identifier(self.group_name)
 
 
