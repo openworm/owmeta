@@ -31,7 +31,6 @@ __all__ = [
     "BaseDataObject",
     "ContextMappedClass",
     "DataObject",
-    "values",
     "DataObjectTypes",
     "RDFTypeTable",
     "DataObjectsParents"]
@@ -804,59 +803,6 @@ def disconnect():
     PropertyTypes.clear()
 
 
-class values(DataObject):
-
-    """
-    A convenience class for working with a collection of objects
-
-    Example::
-
-        v = values('unc-13 neurons and muscles')
-        n = P.Neuron()
-        m = P.Muscle()
-        n.receptor('UNC-13')
-        m.receptor('UNC-13')
-        for x in n.load():
-            v.value(x)
-        for x in m.load():
-            v.value(x)
-        # Save the group for later use
-        v.save()
-        ...
-        # get the list back
-        u = values('unc-13 neurons and muscles')
-        nm = list(u.value())
-
-
-    Parameters
-    ----------
-    group_name : string
-        A name of the group of objects
-
-    Attributes
-    ----------
-    name : DatatypeProperty
-        The name of the group of objects
-    value : ObjectProperty
-        An object in the group
-    add : ObjectProperty
-        an alias for ``value``
-
-    """
-
-    class_context = URIRef('http://openworm.org/schema')
-    value = UnionProperty()
-    add = Alias(value)
-    name = DatatypeProperty()
-    group_name = Alias(name)
-
-    def defined_augment(self):
-        return self.group_name.has_defined_value()
-
-    def identifier_augment(self):
-        return self.make_identifier(self.group_name)
-
-
 def get_most_specific_rdf_type(types):
     """ Gets the most specific rdf_type.
 
@@ -903,5 +849,5 @@ class _Resolver(RDFTypeResolver):
         return cls.instance
 
 
-__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject, RDFProperty,
-                            values, PropertyDataObject)
+__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
+                            RDFProperty, PropertyDataObject)
