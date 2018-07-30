@@ -567,7 +567,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 if owner_class.rdf_namespace is None:
                     raise Exception("{}.rdf_namespace is None".format(FCN(owner_class)))
                 link = owner_class.rdf_namespace[linkName]
-
+            print(PropertyDataObject)
+            print(PropertyDataObject.contextualize(owner_class.definition_context))
             props = dict(linkName=linkName,
                          link=link,
                          property_type=property_type,
