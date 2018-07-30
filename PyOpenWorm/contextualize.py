@@ -272,6 +272,15 @@ class ContextualizableClass(type):
         res.__module__ = self.__module__
         return res
 
+    @property
+    def context(self):
+        return None
+
+    @context.setter
+    def context(self, ctx):
+        pass
+
+
 def is_data_descriptor(k):
     return hasattr(k, '__get__') and hasattr(k, '__set__')
 
