@@ -19,8 +19,10 @@ except ImportError:
     from mock import MagicMock, Mock
 
 
-class DataObjectTest(_DataTest):
+DATAOBJECT_PROPERTIES = ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
 
+
+class DataObjectTest(_DataTest):
     def test_DataUser(self):
         do = DataObject()
         self.assertTrue(isinstance(do, DataUser))
@@ -125,15 +127,12 @@ class DataObjectTest(_DataTest):
         self.assertEquals(a.context, 42)
 
     def test_dataobject_property_that_generate_partial_property(self):
-        for property_classmethod in dataobject_properties_methods():
-            partial_property = DataObject().__getattribute__(property_classmethod)(dict())
+        for property_classmethod in DATAOBJECT_PROPERTIES:
+            partial_property = getattr(DataObject, property_classmethod)()
             self.assertIsInstance(partial_property, _partial_property)
 
     def test_dataobject_property_that_return_owner(self):
-        for property_classmethod in dataobject_properties_methods():
+        for property_classmethod in DATAOBJECT_PROPERTIES:
             owner = Mock()
-            DataObject().__getattribute__(property_classmethod)(owner=owner, linkName="")
+            getattr(DataObject, property_classmethod)(owner=owner, linkName="")
             owner.attach_property.assert_called_once()
-
-def dataobject_properties_methods():
-    return ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
