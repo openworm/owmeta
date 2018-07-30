@@ -165,6 +165,10 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return o
 
     @property
+    def context(self):
+        return None
+
+    @property
     def definition_context(self):
         """ Unlike self.context, definition_context isn't meant to be overriden """
         return self.__context
