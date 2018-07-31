@@ -39,6 +39,9 @@ __all__ = [
 
 L = logging.getLogger(__name__)
 
+
+OPENWORM_SCHEMA = 'http://openworm.org/schema'
+
 DataObjectTypes = dict()
 PropertyTypes = dict()
 RDFTypeTable = dict()
@@ -304,7 +307,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         Properties belonging to parents of this object
     """
     rdf_type = R.RDFS['Resource']
-    class_context = 'http://openworm.org/schema'
+    class_context = OPENWORM_SCHEMA
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     _next_variable_int = 0
@@ -695,7 +698,7 @@ class DataObjectSingletonMeta(type(BaseDataObject)):
 
 class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataObject)):
     instance = None
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
     def __init__(self, *args, **kwargs):
         if self._gettingInstance:
@@ -714,7 +717,7 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
 
 
 class TypeDataObject(BaseDataObject):
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
 
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
@@ -845,7 +848,7 @@ class values(DataObject):
 
     """
 
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
     def __init__(self, group_name, **kwargs):
         super(values, self).__init__(self, **kwargs)
@@ -887,7 +890,7 @@ class PropertyDataObject(DataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
 
 class _Resolver(RDFTypeResolver):
