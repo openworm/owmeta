@@ -472,12 +472,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 (x, self))
 
     def get_owners(self, property_class_name):
-        """ Return the owners along a property pointing to this object """
-        res = []
+        """ Return a generator of owners along a property pointing to this object """
         for x in self.owner_properties:
             if str(x.__class__.__name__) == str(property_class_name):
-                res.append(x.owner)
-        return res
+                yield x.owner
 
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
