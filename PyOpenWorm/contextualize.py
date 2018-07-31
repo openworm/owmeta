@@ -264,9 +264,6 @@ class ContextualizableClass(type):
         res.__module__ = self.__module__
         return res
 
-def is_data_descriptor(k):
-    return hasattr(k, '__get__') and hasattr(k, '__set__')
-
 
 def contextualized_new(ccls):
     def _helper(cls, *args, **kwargs):
