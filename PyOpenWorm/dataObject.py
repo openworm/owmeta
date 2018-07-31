@@ -407,10 +407,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self.po_cache = None
 
     def __repr__(self):
-        s = self.__class__.__name__ + "("
-        s += 'ident=' + repr(self.idl)
-        s += ")"
-        return s
+        return '{}(ident={})'.format(self.__class__.__name__, repr(self.idl))
 
     def id_is_variable(self):
         """ Is the identifier a variable? """
@@ -423,10 +420,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         k = self.idl
         if self.namespace_manager is not None:
             k = self.namespace_manager.normalizeUri(k)
-        s = self.__class__.__name__ + "("
-        s += str(k)
-        s += ")"
-        return s
+        return '{}({})'.format(self.__class__.__name__, k)
 
     def __eq__(self, other):
         """ This method should not be overridden by subclasses """
