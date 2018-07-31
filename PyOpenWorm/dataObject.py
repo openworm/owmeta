@@ -276,9 +276,8 @@ def _obtain_property_type(property_type, value_type, value_rdf_type):
             value_rdf_type = value_type.rdf_type
         _type = SP.ObjectProperty
     else:
-        property_types = ["DatatypeProperty", "UnionProperty"]
         value_rdf_type = None
-        for _property_type in property_types:
+        for _property_type in ("DatatypeProperty", "UnionProperty"):
             if property_type == _property_type:
                 _type = getattr(SP, _property_type)
                 break
