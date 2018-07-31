@@ -242,11 +242,10 @@ class ContextualizableClass(type):
         return res
 
     def __getattribute__(self, name):
-        if name in ('contextualize', 'contextualize_augment'):
-            if name == 'contextualize_augment':
-                name = 'contextualize_class_augment'
-            else:
-                name = 'contextualize_class'
+        if name == 'contextualize':
+            name = 'contextualize_class'
+        elif name == 'contextualize_augment':
+            name = 'contextualize_class_augment'
         return super(ContextualizableClass, self).__getattribute__(name)
 
     def contextualize_class(self, context):
