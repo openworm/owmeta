@@ -208,14 +208,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
             object.__setattr__(self, name, value)
         elif name == '__wrapped__':
             object.__setattr__(self, name, value)
-            try:
-                object.__delattr__(self, '__qualname__')
-            except AttributeError:
-                pass
-            try:
-                object.__setattr__(self, '__qualname__', value.__qualname__)
-            except AttributeError:
-                pass
+            object.__setattr__(self, '__qualname__', value.__qualname__)
         elif name == '__qualname__':
             setattr(get_wrapped(self), name, value)
             object.__setattr__(self, name, value)
