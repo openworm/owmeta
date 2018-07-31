@@ -574,7 +574,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                          value_rdf_type=value_rdf_type,
                          value_type=value_type,
                          owner_type=owner_class,
-                         rdf_object=PropertyDataObject.contextualize(owner_class.definition_context)(ident=link),
+                         rdf_object=getPropertyDataObject(owner_class)(ident=link),
                          lazy=lazy,
                          multiple=multiple,
                          inverse_of=inverse_of,
@@ -695,6 +695,9 @@ class DataObject(BaseDataObject):
     rdfs_comment = CPThunk(RDFSCommentProperty)
     rdfs_label = CPThunk(RDFSLabelProperty)
 
+
+def getPropertyDataObject(owner_class):
+    return PropertyDataObject.contextualize(owner_class.definition_context)
 
 class DataObjectSingletonMeta(type(BaseDataObject)):
     @property
