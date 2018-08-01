@@ -272,21 +272,6 @@ def UnionProperty(*args, **kwargs):
     return APThunk(UnionProperty.__name__, args, kwargs)
 
 
-def _obtain_property_type(property_type, value_type, value_rdf_type):
-    _type = None
-    if property_type == "ObjectProperty":
-        if value_type is not None and value_rdf_type is None:
-            value_rdf_type = value_type.rdf_type
-        _type = SP.ObjectProperty
-    else:
-        value_rdf_type = None
-        for _property_type in ("DatatypeProperty", "UnionProperty"):
-            if property_type == _property_type:
-                _type = getattr(SP, _property_type)
-                break
-    return _type, value_rdf_type
-
-
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                         IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
@@ -555,7 +540,16 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if _PropertyTypes_key in PropertyTypes:
             c = PropertyTypes[_PropertyTypes_key]
         else:
-            property_type, value_rdf_type = _obtain_property_type(property_type, value_type, value_rdf_type)
+            if property_type == "ObjectProperty":
+                if value_type is not None and value_rdf_type is None:
+                    value_rdf_type = value_type.rdf_type
+                property_type = SP.ObjectProperty
+            else:
+                value_rdf_type = None
+                for _property_type in ("DatatypeProperty", "UnionProperty"):
+                    if property_type == _property_type:
+                        property_type = getattr(SP, _property_type)
+                        break
 
             if link is None:
                 if owner_class.rdf_namespace is None:
