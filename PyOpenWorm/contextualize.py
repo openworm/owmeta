@@ -207,8 +207,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
         if name.startswith('_self_'):
             object.__setattr__(self, name, value)
         elif name == '__wrapped__':
-            # Setting __wrapped__ isn't a legitimate use case
-            raise AttributeError
+            raise AttributeError('Cannot set wrapped after initialization')
         elif name == '__qualname__':
             setattr(get_wrapped(self), name, value)
             object.__setattr__(self, name, value)

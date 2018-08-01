@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import six
 from rdflib.term import URIRef
 from rdflib.namespace import Namespace
