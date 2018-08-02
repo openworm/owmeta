@@ -529,16 +529,15 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if _PropertyTypes_key in PropertyTypes:
             c = PropertyTypes[_PropertyTypes_key]
         else:
+            klass = None
             if property_type == "ObjectProperty":
                 if value_type is not None and value_rdf_type is None:
                     value_rdf_type = value_type.rdf_type
-                property_type = SP.ObjectProperty
+                klass = SP.ObjectProperty
             else:
                 value_rdf_type = None
-                for _property_type in ("DatatypeProperty", "UnionProperty"):
-                    if property_type == _property_type:
-                        property_type = getattr(SP, _property_type)
-                        break
+                if property_type in ('DatatypeProperty', 'UnionProperty'):
+                    klass = getattr(SP, property_type)
 
             if link is None:
                 if owner_class.rdf_namespace is None:
@@ -563,7 +562,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                     invc = owner_class
                 InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
-            c = type(property_class_name, (property_type,), props)
+            c = type(property_class_name, (klass,), props)
             c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
