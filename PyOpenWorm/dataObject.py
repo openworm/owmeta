@@ -250,15 +250,15 @@ class Alias(object):
 
 
 def DatatypeProperty(*args, **kwargs):
-    return APThunk(DatatypeProperty.__name__, args, kwargs)
+    return APThunk('DatatypeProperty', args, kwargs)
 
 
 def ObjectProperty(*args, **kwargs):
-    return APThunk(ObjectProperty.__name__, args, kwargs)
+    return APThunk('ObjectProperty', args, kwargs)
 
 
 def UnionProperty(*args, **kwargs):
-    return APThunk(UnionProperty.__name__, args, kwargs)
+    return APThunk('UnionProperty', args, kwargs)
 
 
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
@@ -466,7 +466,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return _make_property(cls, DatatypeProperty.__name__, *args, **kwargs)
+        return _make_property(cls, 'DatatypeProperty', *args, **kwargs)
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
@@ -482,7 +482,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         value_type : type
             The type of BaseDataObject for values of this property
         """
-        return _make_property(cls, ObjectProperty.__name__, *args, **kwargs)
+        return _make_property(cls, 'ObjectProperty', *args, **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
@@ -496,7 +496,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        return _make_property(cls, UnionProperty.__name__, *args, **kwargs)
+        return _make_property(cls, 'UnionProperty', *args, **kwargs)
 
     @classmethod
     def _create_property_class(
