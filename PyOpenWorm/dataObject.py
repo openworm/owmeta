@@ -557,7 +557,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             classes = [klass]
             props = dict(linkName=linkName,
                          link=link,
-                         property_type=property_type,
                          value_rdf_type=value_rdf_type,
                          value_type=value_type,
                          owner_type=owner_class,
