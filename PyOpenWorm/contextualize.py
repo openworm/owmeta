@@ -241,6 +241,7 @@ class ContextualizableClass(type):
         return res
 
     def __getattribute__(self, name):
+        # This method is optimized to save a comparison in the common case
         if name in ('contextualize', 'contextualize_augment'):
             if name == 'contextualize_augment':
                 name = 'contextualize_class_augment'
@@ -263,10 +264,6 @@ class ContextualizableClass(type):
         res = _H(self.__name__, (self,), dict(class_context=context.identifier))
         res.__module__ = self.__module__
         return res
-
-
-def is_data_descriptor(k):
-    return hasattr(k, '__get__') and hasattr(k, '__set__')
 
 
 def contextualized_new(ccls):

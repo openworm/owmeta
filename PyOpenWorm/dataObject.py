@@ -37,6 +37,9 @@ __all__ = [
 
 L = logging.getLogger(__name__)
 
+
+OPENWORM_SCHEMA = 'http://openworm.org/schema'
+
 DataObjectTypes = dict()
 PropertyTypes = dict()
 RDFTypeTable = dict()
@@ -163,6 +166,12 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self.__context
 
 
+def _make_property(cls, property_type, *args, **kwargs):
+    try:
+        return cls._create_property(property_type=property_type, *args, **kwargs)
+    except TypeError:
+        return _partial_property(cls._create_property, property_type=property_type, *args, **kwargs)
+
 class _partial_property(partial):
     pass
 
@@ -180,6 +189,7 @@ def contextualized_data_object(context, obj):
 class ContextualizableList(Contextualizable, list):
 
     def __init__(self, context):
+        super(ContextualizableList, self).__init__()
         self._context = context
 
     def contextualize(self, context):
@@ -271,7 +281,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         Properties belonging to parents of this object
     """
     rdf_type = R.RDFS['Resource']
-    class_context = 'http://openworm.org/schema'
+    class_context = OPENWORM_SCHEMA
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     _next_variable_int = 0
@@ -373,10 +383,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self.po_cache = None
 
     def __repr__(self):
-        s = self.__class__.__name__ + "("
-        s += 'ident=' + repr(self.idl)
-        s += ")"
-        return s
+        return '{}(ident={})'.format(self.__class__.__name__, repr(self.idl))
 
     def id_is_variable(self):
         """ Is the identifier a variable? """
@@ -389,10 +396,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         k = self.idl
         if self.namespace_manager is not None:
             k = self.namespace_manager.normalizeUri(k)
-        s = self.__class__.__name__ + "("
-        s += str(k)
-        s += ")"
-        return s
+        return '{}({})'.format(self.__class__.__name__, k)
 
     def __eq__(self, other):
         """ This method should not be overridden by subclasses """
@@ -445,12 +449,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 (x, self))
 
     def get_owners(self, property_class_name):
-        """ Return the owners along a property pointing to this object """
-        res = []
+        """ Return a generator of owners along a property pointing to this object """
         for x in self.owner_properties:
             if str(x.__class__.__name__) == str(property_class_name):
-                res.append(x.owner)
-        return res
+                yield x.owner
 
     @classmethod
     def DatatypeProperty(cls, *args, **kwargs):
@@ -464,10 +466,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        try:
-            return cls._create_property(*args, property_type='DatatypeProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='DatatypeProperty', **kwargs)
+        return _make_property(cls, 'DatatypeProperty', *args, **kwargs)
 
     @classmethod
     def ObjectProperty(cls, *args, **kwargs):
@@ -483,10 +482,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         value_type : type
             The type of BaseDataObject for values of this property
         """
-        try:
-            return cls._create_property(*args, property_type='ObjectProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='ObjectProperty', **kwargs)
+        return _make_property(cls, 'ObjectProperty', *args, **kwargs)
 
     @classmethod
     def UnionProperty(cls, *args, **kwargs):
@@ -500,10 +496,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         owner : PyOpenWorm.dataObject.BaseDataObject
             The name of this property.
         """
-        try:
-            return cls._create_property(*args, property_type='UnionProperty', **kwargs)
-        except TypeError:
-            return _partial_property(cls._create_property, *args, property_type='UnionProperty', **kwargs)
+        return _make_property(cls, 'UnionProperty', *args, **kwargs)
 
     @classmethod
     def _create_property_class(
@@ -537,24 +530,20 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             c = PropertyTypes[_PropertyTypes_key]
         else:
             klass = None
-            if property_type == 'ObjectProperty':
+            if property_type == "ObjectProperty":
                 if value_type is not None and value_rdf_type is None:
                     value_rdf_type = value_type.rdf_type
                 klass = SP.ObjectProperty
-            elif property_type == 'DatatypeProperty':
-                value_rdf_type = None
-                klass = SP.DatatypeProperty
-            elif property_type == 'UnionProperty':
-                value_rdf_type = None
-                klass = SP.UnionProperty
             else:
                 value_rdf_type = None
+                if property_type in ('DatatypeProperty', 'UnionProperty'):
+                    klass = getattr(SP, property_type)
 
             if link is None:
                 if owner_class.rdf_namespace is None:
                     raise Exception("{}.rdf_namespace is None".format(FCN(owner_class)))
                 link = owner_class.rdf_namespace[linkName]
-            classes = [klass]
+
             props = dict(linkName=linkName,
                          link=link,
                          value_rdf_type=value_rdf_type,
@@ -572,9 +561,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                     invc = owner_class
                 InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
-            c = type(property_class_name,
-                     tuple(classes),
-                     props)
+            c = type(property_class_name, (klass,), props)
             c.__module__ = owner_class.__module__
             owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
@@ -692,7 +679,7 @@ class DataObjectSingletonMeta(type(BaseDataObject)):
 
 class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataObject)):
     instance = None
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
     def __init__(self, *args, **kwargs):
         if self._gettingInstance:
@@ -711,7 +698,7 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
 
 
 class TypeDataObject(BaseDataObject):
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
 
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
@@ -831,7 +818,7 @@ class PropertyDataObject(DataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
-    class_context = URIRef('http://openworm.org/schema')
+    class_context = URIRef(OPENWORM_SCHEMA)
 
 
 class _Resolver(RDFTypeResolver):
