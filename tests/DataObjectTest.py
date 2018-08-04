@@ -8,7 +8,7 @@ import warnings
 from yarom.utils import FCN
 
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.context import Context
@@ -17,10 +17,16 @@ from PyOpenWorm import BASE_CONTEXT
 from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
+try:
+    from unittest.mock import MagicMock, Mock
+except ImportError:
+    from mock import MagicMock, Mock
+
+
+DATAOBJECT_PROPERTIES = ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
 
 
 class DataObjectTest(_DataTest):
-
     def test_DataUser(self):
         do = DataObject()
         self.assertTrue(isinstance(do, DataUser))
@@ -165,3 +171,23 @@ class DataObjectTest(_DataTest):
 
         o = list(m.stored(DataObject)(ident='http://example.org/anA').load())
         self.assertIsInstance(o[0], A)
+
+    def test_context_getter(self):
+        a = DataObject()
+        self.assertIsNone(a.context)
+
+    def test_context_setter(self):
+        a = DataObject()
+        a.context = 42
+        self.assertEquals(a.context, 42)
+
+    def test_dataobject_property_that_generate_partial_property(self):
+        for property_classmethod in DATAOBJECT_PROPERTIES:
+            partial_property = getattr(DataObject, property_classmethod)()
+            self.assertIsInstance(partial_property, _partial_property)
+
+    def test_dataobject_property_that_return_owner(self):
+        for property_classmethod in DATAOBJECT_PROPERTIES:
+            owner = Mock()
+            getattr(DataObject, property_classmethod)(owner=owner, linkName="")
+            owner.attach_property.assert_called_once()

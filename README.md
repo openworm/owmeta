@@ -73,17 +73,22 @@ See INSTALL.md
 Quickstart
 -----------
 
-To get started, you'll need to connect to the database. If you cloned the
-repository from Github, then the database will be in the OpenWormData
-subdirectory. You can read it in by doing:
+To get started, you'll need to connect to a database. The OpenWorm database is
+currently hosted at `git@github.com:openworm/OpenWormData.git`. You can read it
+in by executing the following command line after installation:
 
+```bash
+pow clone git@github.com:openworm/OpenWormData.git
+```
+
+Then, in Python, from the same directory:
 ```python
 >>> import PyOpenWorm as P
 >>> P.connect('readme.conf')
 
 ```
 
-readme.conf:
+where `readme.conf` contains:
 
 ```json
 {

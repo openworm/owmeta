@@ -207,15 +207,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
         if name.startswith('_self_'):
             object.__setattr__(self, name, value)
         elif name == '__wrapped__':
-            object.__setattr__(self, name, value)
-            try:
-                object.__delattr__(self, '__qualname__')
-            except AttributeError:
-                pass
-            try:
-                object.__setattr__(self, '__qualname__', value.__qualname__)
-            except AttributeError:
-                pass
+            raise AttributeError('Cannot set wrapped after initialization')
         elif name == '__qualname__':
             setattr(get_wrapped(self), name, value)
             object.__setattr__(self, name, value)
@@ -249,6 +241,7 @@ class ContextualizableClass(type):
         return res
 
     def __getattribute__(self, name):
+        # This method is optimized to save a comparison in the common case
         if name in ('contextualize', 'contextualize_augment'):
             if name == 'contextualize_augment':
                 name = 'contextualize_class_augment'
@@ -271,10 +264,6 @@ class ContextualizableClass(type):
         res = _H(self.__name__, (self,), dict(class_context=context.identifier))
         res.__module__ = self.__module__
         return res
-
-
-def is_data_descriptor(k):
-    return hasattr(k, '__get__') and hasattr(k, '__set__')
 
 
 def contextualized_new(ccls):

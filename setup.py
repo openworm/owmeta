@@ -59,7 +59,7 @@ setup(
         'html5lib==0.999',
         'isodate==0.5.0',
         'lazy-object-proxy==1.2.1',
-        'libneuroml>=0.2.18',
+        'libneuroml',
         'networkx==1.9',
         'numpydoc>=0.7.0',
         'persistent==4.0.8',

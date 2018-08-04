@@ -33,7 +33,7 @@ For example, where *test_muscles*1 is a test in the *WormTest* suite of tests (s
 
 Optional
 --------
-There is an optional database storeage option called Sleepycat. You may encounter these issues if you pursue this option:
+There is an optional database storage option called Sleepycat. You may encounter these issues if you pursue this option:
 
 If your system does not come with bsddb, you will need to install it. On MacOSX, you can follow 
 [these instructions](http://stackoverflow.com/questions/16003224/installing-bsddb-package-python) for how to install 
