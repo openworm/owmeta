@@ -8,10 +8,11 @@ import six
 import hashlib
 
 import PyOpenWorm
-from PyOpenWorm.contextualize import (Contextualizable,
-                                      ContextualizableClass,
-                                      contextualize_helper,
-                                      decontextualize_helper)
+from . import BASE_SCHEMA_URL
+from .contextualize import (Contextualizable,
+                            ContextualizableClass,
+                            contextualize_helper,
+                            decontextualize_helper)
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -37,8 +38,6 @@ __all__ = [
 
 L = logging.getLogger(__name__)
 
-
-OPENWORM_SCHEMA = 'http://openworm.org/schema'
 
 DataObjectTypes = dict()
 PropertyTypes = dict()
@@ -172,6 +171,7 @@ def _make_property(cls, property_type, *args, **kwargs):
     except TypeError:
         return _partial_property(cls._create_property, property_type=property_type, *args, **kwargs)
 
+
 class _partial_property(partial):
     pass
 
@@ -281,7 +281,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         Properties belonging to parents of this object
     """
     rdf_type = R.RDFS['Resource']
-    class_context = OPENWORM_SCHEMA
+    class_context = BASE_SCHEMA_URL
     base_namespace = R.Namespace("http://openworm.org/entities/")
 
     _next_variable_int = 0
@@ -679,7 +679,7 @@ class DataObjectSingletonMeta(type(BaseDataObject)):
 
 class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataObject)):
     instance = None
-    class_context = URIRef(OPENWORM_SCHEMA)
+    class_context = URIRef(BASE_SCHEMA_URL)
 
     def __init__(self, *args, **kwargs):
         if self._gettingInstance:
@@ -698,7 +698,7 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
 
 
 class TypeDataObject(BaseDataObject):
-    class_context = URIRef(OPENWORM_SCHEMA)
+    class_context = URIRef(BASE_SCHEMA_URL)
 
 
 class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
@@ -818,7 +818,7 @@ class PropertyDataObject(DataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
-    class_context = URIRef(OPENWORM_SCHEMA)
+    class_context = URIRef(BASE_SCHEMA_URL)
 
 
 class _Resolver(RDFTypeResolver):
