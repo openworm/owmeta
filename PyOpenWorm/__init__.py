@@ -191,6 +191,14 @@ def loadData(
     config('rdf.graph').parse(data, format=dataFormat)
 
 
+class ConnectionFailError(Exception):
+    def __init__(self, cause, *args):
+        if args:
+            super(ConnectionFailError, self).__init__('PyOpenWorm connection failed: {}. {}'.format(cause, *args))
+        else:
+            super(ConnectionFailError, self).__init__('PyOpenWorm connection failed: {}'.format(cause))
+
+
 def connect(configFile=False,
             conf=False,
             do_logging=False,
@@ -207,7 +215,7 @@ def connect(configFile=False,
     """
     import logging
     import atexit
-    from .data import Data
+    from .data import Data, ZODBSourceOpenFailError
     m = __import__('__main__')
     if m.connected:
         print ("PyOpenWorm already connected")
@@ -232,7 +240,17 @@ def connect(configFile=False,
         })
 
     Configureable.default = conf
-    conf.openDatabase()
+    try:
+        conf.init_database()
+    except ZODBSourceOpenFailError as e:
+        # Special handling for a common user error with pow which, nonetheless,
+        # may be encontered when *not* using pow
+        if e.openstr.endswith('.pow/worm.db'):
+            raise ConnectionFailError(e, 'Perhaps you need to do a `pow clone`?')
+        raise ConnectionFailError(e)
+    except Exception as e:
+        raise ConnectionFailError(e)
+
     logging.getLogger('PyOpenWorm').info("Connected to database")
 
     atexit.register(disconnect)

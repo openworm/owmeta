@@ -29,6 +29,10 @@ L = logging.getLogger(__name__)
 _B_UNSET = object()
 
 
+class OpenFailError(Exception):
+    pass
+
+
 class _B(ConfigValue):
 
     def __init__(self, f):
@@ -259,7 +263,12 @@ class Data(Configure):
         """ Open the configured database """
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
-        self.source.open()
+        try:
+            self.source.open()
+        except OpenFailError as e:
+            L.error('Failed to open the data source because: %s', e)
+            raise
+
         nm = NamespaceManager(self['rdf.graph'])
         self['rdf.namespace_manager'] = nm
         self['rdf.graph'].namespace_manager = nm
@@ -577,6 +586,13 @@ class DefaultSource(RDFSource):
         self.graph.open(self.conf['rdf.store_conf'], create=True)
 
 
+class ZODBSourceOpenFailError(OpenFailError):
+    def __init__(self, openstr, *args):
+        super(ZODBSourceOpenFailError, self).__init__('Could not open the database file "{}"'.format(openstr),
+                                                      *args)
+        self.openstr = openstr
+
+
 class ZODBSource(RDFSource):
 
     """ Reads from and queries against a configured Zope Object Database.
@@ -601,7 +617,11 @@ class ZODBSource(RDFSource):
         self.path = self.conf['rdf.store_conf']
         openstr = os.path.abspath(self.path)
 
-        fs = FileStorage(openstr)
+        try:
+            fs = FileStorage(openstr)
+        except FileNotFoundError:
+            raise ZODBSourceOpenFailError(openstr)
+
         self.zdb = ZODB.DB(fs, cache_size=1600)
         self.conn = self.zdb.open()
         root = self.conn.root()
