@@ -3,6 +3,7 @@ import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
 from os import makedirs, mkdir
+from contextlib import contextmanager
 import hashlib
 import shutil
 import json
@@ -103,6 +104,23 @@ class POWTranslator(object):
             print(nm.normalizeUri(x.identifier))
 
 
+class _ProgressMock(object):
+
+    def __getattr__(self, name):
+        return type(self)()
+
+    def __call__(self, *args, **kwargs):
+        return type(self)()
+
+
+_PROGRESS_MOCK = _ProgressMock()
+
+
+@contextmanager
+def default_progress_reporter(*args, **kwargs):
+    yield _PROGRESS_MOCK
+
+
 class POW(object):
     """
     High-level commands for working with PyOpenWorm data
@@ -120,7 +138,7 @@ class POW(object):
     translator = SubCommand(POWTranslator)
 
     def __init__(self):
-        self.progress_reporter = lambda *args, **kwargs: None
+        self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
 
     @IVar.property('.pow')
