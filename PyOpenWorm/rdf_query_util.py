@@ -33,13 +33,20 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
                                          rdflib.RDF['type'],
                                          None))
         grouped_type_triples = groupby(choices, lambda x: x[0])
+        hit = False
         for ident, type_triples in grouped_type_triples:
+            hit = True
             types = set()
             for __, __, rdf_type in type_triples:
                 types.add(rdf_type)
             tt = () if target_type is None else (target_type,)
             the_type = get_most_specific_rdf_type(types, context, bases=tt)
             yield oid(ident, the_type, context)
+        if not hit:
+            for ident in idents:
+                tt = () if target_type is None else (target_type,)
+                the_type = get_most_specific_rdf_type((), context, bases=tt)
+                yield oid(ident, the_type, context)
     else:
         return
 
@@ -54,7 +61,9 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
         context = DEF_CTX
     mapper = context.mapper
     if bases:
-        most_specific_types = tuple(context.resolve_class(x) for x in bases)
+        most_specific_types = tuple(y for y in (context.resolve_class(x) for x in bases) if y is not None)
+        if not most_specific_types:
+            most_specific_types = tuple(mapper.base_classes.values())
     else:
         most_specific_types = tuple(mapper.base_classes.values())
 

@@ -181,7 +181,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
                 self.set(val)
                 fill = getattr(val, 'fill', True)
                 filling = getattr(val, 'filling', True)
-                print('filling val', type(val), id(val), val, val.filling)
                 if fill and not filling:
                     fill()
         finally:
@@ -203,7 +202,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             self._insert_value(v)
 
             def _zomifier(rdf_type):
-                if getattr(self, 'value_rdf_type', None) == rdf_type:
+                if rdf_type and getattr(self, 'value_rdf_type', None) == rdf_type:
                     return SubClassModifier(rdf_type)
             g = ZeroOrMoreTQLayer(_zomifier, self.rdf)
             results = GraphObjectQuerier(v, g, parallel=False,
