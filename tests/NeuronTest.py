@@ -115,5 +115,8 @@ class NeuronTest(_DataTest):
     def test_init_from_lineage_name(self):
         c = self.ctx.Neuron(lineageName="AB plapaaaap", name="ADAL")
         self.save()
-        c = self.context.query(Neuron)(lineageName="AB plapaaaap")
+        for x in self.TestConfig['rdf.graph'].quads((None, None, None, None)):
+            print(' '.join(y.n3() for y in x))
+        c = self.context.stored(Neuron)(lineageName="AB plapaaaap")
+        print(c.context)
         self.assertEqual(c.name(), 'ADAL')
