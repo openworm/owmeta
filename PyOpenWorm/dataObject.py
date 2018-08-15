@@ -525,14 +525,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             yield x
 
     def fill(self):
-        self.filling = True
-        try:
-            for p in self.properties:
-                print('filling property', p)
-                if not getattr(p, 'filling', True):
-                    p.fill()
-        finally:
-            self.filling = False
+        pass
 
     def _zomifier(self, rdf_type):
         if type(self).rdf_type == rdf_type:

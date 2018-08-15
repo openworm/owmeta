@@ -1,8 +1,8 @@
 from __future__ import print_function
 import sys
 import os
-from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
-from os import makedirs, mkdir
+from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath, normpath
+from os import makedirs, mkdir, listdir
 from contextlib import contextmanager
 import hashlib
 import shutil
@@ -18,6 +18,12 @@ from .context import Context
 
 
 L = logging.getLogger(__name__)
+
+DATA_CONTEXT_KEY = 'data_context_id'
+
+class ConfigMissingException(Exception):
+    def __init__(self, key):
+        self.key = key
 
 
 class POWSource(object):
@@ -48,7 +54,12 @@ class POWSource(object):
         from PyOpenWorm.datasource import DataSource
         conf = self._parent._conf()
         # TODO: Pull this string out of here...just dunno where it goes yet
-        ctx = Context(ident='http://openworm.org/data', conf=conf)
+        try:
+            data_context_id = conf[DATA_CONTEXT_KEY]
+        except KeyError:
+            raise ConfigMissingException(DATA_CONTEXT_KEY)
+
+        ctx = Context(ident=data_context_id, conf=conf)
         dt = ctx.stored(DataSource)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
@@ -77,7 +88,6 @@ class POWSource(object):
         print(uri)
         ctx = Context(ident='http://openworm.org/data', conf=conf)
         for x in ctx.stored(DataSource)(ident=uri).load():
-            x.fill()
             print(x)
 
     def list_kinds(self):
@@ -97,8 +107,7 @@ class POWTranslator(object):
         from PyOpenWorm.datasource import DataTranslator
         conf = self._parent._conf()
         # TODO: Pull this string out of here...just dunno where it goes yet
-        ctx = Context(ident='http://openworm.org/data', conf=conf)
-        dt = ctx.stored(DataTranslator)(conf=conf)
+        dt = self._parent._data_ctx.stored(DataTranslator)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
             print(nm.normalizeUri(x.identifier))
@@ -372,7 +381,8 @@ class POW(object):
                     progress.write('Finalizing writes to database...')
         progress.write('Loaded {:,} triples'.format(triples_read))
 
-    def translate(self, translator, imports_context_ident, output_key=None, *data_sources, **named_data_sources):
+    def translate(self, translator, imports_context_ident, output_key=None, translation_directory=None,
+                  data_sources=(), named_data_sources=None):
         """
         Do a translation with the named translator and inputs
 
@@ -384,23 +394,27 @@ class POW(object):
             Identifier for the imports context. All imports go in here
         output_key : str
             Output identifier
-        *data_sources : str
+        translation_directory : str
+            Directory holding files used in the translation, if needed
+        data_sources : list of str
             Input data sources
-        **named_data_sources : str
+        named_data_sources : dict
             Named input data sources
         """
+        if named_data_sources is None:
+            named_data_sources = dict()
         from PyOpenWorm.context import Context
         imports_context = Context(ident=imports_context_ident, conf=self._conf())
-        translator_class = self._lookup_translator(translator)
-        translator = translator_class()
+        translator = self._lookup_translator(translator)
         positional_sources = [self._lookup_source(src) for src in data_sources]
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
         saved_contexts = set([])
-        with TemporaryDirectory(prefix='pow-translate') as d:
+        with TemporaryDirectory(prefix='pow-translate.') as d:
             orig_wd = os.getcwd()
-            os.chdir(d.name)
+            os.chdir(d)
             try:
-                self._unpack_context(d.name)
+                if translation_directory:
+                    self._stage_translation_directory(normpath(pth_join(orig_wd, translation_directory)), d)
                 res = translator(*positional_sources, output_key=output_key, **named_sources)
                 res.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
                 res.data_context.save_imports(imports_context)
@@ -409,10 +423,35 @@ class POW(object):
             finally:
                 os.chdir(orig_wd)
 
+    def _stage_translation_directory(self, source_directory, target_directory):
+        print("TODO: Copying files into {} from {}".format(target_directory, source_directory))
+        # TODO: Add support for a selector based on a MANIFEST and/or ignore
+        # file to pass in as the 'ignore' option to copytree
+        for dirent in listdir(source_directory):
+            print('copying', pth_join(source_directory, dirent))
+            try:
+                shutil.copytree(pth_join(source_directory, dirent), pth_join(target_directory, dirent))
+            except OSError as e:
+                if e.errno == 20:
+                    shutil.copy2(pth_join(source_directory, dirent), pth_join(target_directory, dirent))
+
     def _lookup_translator(self, tname):
         from PyOpenWorm.datasource import DataTranslator
-        for x in DataTranslator(ident=tname).load():
+        for x in self._data_ctx.stored(DataTranslator)(ident=tname).load():
             return x
+
+    def _lookup_source(self, sname):
+        from PyOpenWorm.datasource import DataSource
+        for x in self._data_ctx.stored(DataSource)(ident=sname).load():
+            return x
+
+    @property
+    def _data_ctx(self):
+        conf = self._conf()
+        try:
+            return Context(ident=conf[DATA_CONTEXT_KEY], conf=conf)
+        except KeyError:
+            raise ConfigMissingException(DATA_CONTEXT_KEY)
 
     def reconstitute(self, data_source):
         """

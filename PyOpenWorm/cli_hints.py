@@ -16,6 +16,10 @@ CLI_HINTS = {
             (METHOD_NAMED_ARG, 'translator'): {
                 'names': ['translator']
             },
+            (METHOD_NAMED_ARG, 'data_sources'): {
+                'nargs': '*',
+                'names': ['data_sources'],
+            },
         },
         'serialize': {
             (METHOD_NAMED_ARG, 'destination'): {

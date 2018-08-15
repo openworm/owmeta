@@ -32,6 +32,7 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
         choices = graph.triples_choices((list(idents),
                                          rdflib.RDF['type'],
                                          None))
+        choices = list(choices)
         grouped_type_triples = groupby(choices, lambda x: x[0])
         hit = False
         for ident, type_triples in grouped_type_triples:

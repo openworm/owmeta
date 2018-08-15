@@ -212,7 +212,7 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
             n = ctx.Network()
             n.worm(w)
 
-            with open(data_source.csv_file_name.onedef()) as csvfile:
+            with open(data_source.csv_file_name.one()) as csvfile:
                 csvreader = csv.reader(csvfile)
 
                 for num, line in enumerate(csvreader):
