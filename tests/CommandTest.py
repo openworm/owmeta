@@ -1,8 +1,8 @@
 import unittest
 try:
-    from unittest.mock import Mock
+    from unittest.mock import MagicMock, Mock, patch
 except ImportError:
-    from mock import Mock
+    from mock import MagicMock, Mock, patch
 import tempfile
 import os
 from os.path import exists, join as p
@@ -10,10 +10,11 @@ import shutil
 import json
 from rdflib.term import URIRef
 from pytest import mark
+import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException
+from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -114,6 +115,38 @@ class POWTest(BaseTest):
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
+
+class POWTranslateTest(BaseTest):
+
+    def setUp(self):
+        super(POWTranslateTest, self).setUp()
+        os.mkdir('.pow')
+        with open('.pow/pow.conf', 'w') as f:
+            f.write('{"data_context_id": "http://example.org/data"}')
+
+    def test_translate_unknown_translator_message(self):
+        '''
+        Should exit with a message indicating the translator type
+        cannot be found in the graph
+        '''
+
+        translator = 'http://example.org/translator'
+        imports_context_ident = 'http://example.org/imports'
+        with self.assertRaisesRegexp(GenericUserError, re.escape(translator)):
+            self.cut.translate(translator, imports_context_ident)
+
+    def test_translate_unknown_source_message(self):
+        '''
+        Should exit with a message indicating the source type cannot
+        be found in the graph
+        '''
+
+        translator = 'http://example.org/translator'
+        source = 'http://example.org/source'
+        imports_context_ident = 'http://example.org/imports'
+        self.cut._lookup_translator = lambda *args, **kwargs: Mock()
+        with self.assertRaisesRegexp(GenericUserError, re.escape(source)):
+            self.cut.translate(translator, imports_context_ident, data_sources=(source,))
 
 
 class IVarTest(unittest.TestCase):
