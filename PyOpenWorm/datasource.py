@@ -322,6 +322,12 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
         finally:
             self.output_key = None
 
+    def __str__(self):
+        s = '''Input type(s): {}
+               Output type(s): {}'''.format(self.input_type,
+                                            self.output_type)
+        return '\n'.join(x.strip() for x in s.split('\n'))
+
     def translate(self, *args, **kwargs):
         '''
         Notionally, this method takes a data source, which is translated into
