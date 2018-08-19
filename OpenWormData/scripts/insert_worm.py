@@ -314,13 +314,30 @@ if __name__ == '__main__':
                       help="Enable log output")
     parser.add_option("-c", "--config", dest="config", default='default.conf',
                       help="Config file")
+    parser.add_option("-s", "--only-sources", action="store_true")
 
     (options, _) = parser.parse_args()
     OPTIONS = options
 
-    do_insert("http://openworm.org/entities/bio#worm0",
-              imports_context_ident='http://openworm.org/data/imports',
-              # This is a general context
-              sources_and_translators_context='http://openworm.org/data',
-              config=options.config,
-              logging=options.do_logging)
+    if options.only_sources:
+        sources_and_translators_context='http://openworm.org/data'
+        ST_CONTEXT = Context(ident=sources_and_translators_context, imported=(P.BASE_CONTEXT,), conf=P.config())
+        sources = init_sources(ST_CONTEXT)
+        extras = init_extra_sources(aux_data(), ST_CONTEXT)
+        data_sources_by_key = {x.key: x for x in sources + extras}
+        P.connect(configFile='.pow/pow.conf', do_logging=options.do_logging)
+        graph = P.config('rdf.graph')
+        print(P.config())
+        ST_CONTEXT.save_context(graph)
+        imports_context_ident = 'http://openworm.org/data/imports'
+        imports_context = Context(ident=imports_context_ident, imported=(P.BASE_CONTEXT,), conf=P.config())
+        for s in ST_CONTEXT.contents():
+            print(' '.join(x.identifier.n3() for x in s))
+        ST_CONTEXT.save_imports(imports_context, graph)
+    else:
+        do_insert("http://openworm.org/entities/bio#worm0",
+                  imports_context_ident='http://openworm.org/data/imports',
+                  # This is a general context
+                  sources_and_translators_context='http://openworm.org/data',
+                  config=options.config,
+                  logging=options.do_logging)

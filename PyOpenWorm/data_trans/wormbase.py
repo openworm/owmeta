@@ -101,7 +101,7 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with open(data_source.csv_file_name.onedef(), 'r') as f:
+            with open(data_source.csv_file_name.one(), 'r') as f:
                 reader = csv.reader(f, delimiter='\t')
                 header = self.skip_to_header(reader)
                 with doc_ctx(Channel=Channel, CType=ctype) as ctx:

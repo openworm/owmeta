@@ -205,16 +205,34 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
         return self.make_identifier(self.translation.defined_values[0].identifier.n3())
 
     def __str__(self):
+        return self.format_str(False)
+
+    def format_str(self, stored):
         try:
             sio = six.StringIO()
             print(self.__class__.__name__, file=sio)
             for info in self.info_fields.values():
                 attr = getattr(self, info.name)
-                if attr.has_defined_value():
+                if stored:
+                    attr_vals = list()
+                    for x in attr.get():
+                        if x not in attr_vals:
+                            attr_vals.append(x)
+                else:
+                    attr_vals = attr.defined_values
+                if attr_vals:
                     print('    ' + info.display_name, end=': ', file=sio)
-                    for val in sorted(attr.defined_values):
+                    for val in sorted(attr_vals):
                         val_line_sep = '\n      ' + ' ' * len(info.display_name)
-                        print(val_line_sep.join(str(val).split('\n')), end=' ', file=sio)
+                        if isinstance(val, DataSource):
+                            valstr = val.format_str(stored)
+                        elif isinstance(val, URIRef):
+                            valstr = val.n3()
+                        elif isinstance(val, six.string_types):
+                            valstr = repr(val)
+                        else:
+                            valstr = str(val)
+                        print(val_line_sep.join(valstr.split('\n')), end=' ', file=sio)
                     print(file=sio)
             return sio.getvalue()
         except AttributeError:

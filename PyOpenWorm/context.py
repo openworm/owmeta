@@ -167,7 +167,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         saved_contexts.add((self._change_counter, id(self)))
 
         if graph is None:
-            graph = self._retreive_configured_graph()
+            graph = self._retrieve_configured_graph()
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
@@ -309,7 +309,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return QueryContext(graph=self.load_graph_from_configured_store(),
                             ident=self.identifier)
 
-    def _retreive_configured_graph(self):
+    def _retrieve_configured_graph(self):
         try:
             return self.conf['rdf.graph']
         except KeyError:
