@@ -38,4 +38,11 @@ CLI_HINTS = {
             },
         },
     },
+    'PyOpenWorm.command.POWTranslator': {
+        'show': {
+            (METHOD_NAMED_ARG, 'translator'): {
+                'names': ['translator'],
+            },
+        },
+    },
 }

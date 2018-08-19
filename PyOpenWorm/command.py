@@ -73,23 +73,11 @@ class POWSource(object):
         data_source : str
             The ID of the data source to show
         '''
-        from rdflib.term import URIRef
-        from rdflib.namespace import is_ncname
         from PyOpenWorm.datasource import DataSource
 
-        conf = self._parent._conf()
-        nm = conf['rdf.graph'].namespace_manager
-        parts = data_source.split(':')
-        if len(parts) > 1 and is_ncname(parts[1]):
-            for pref, ns in nm.namespaces():
-                if pref == parts[0]:
-                    data_source = URIRef(ns + parts[1])
-                    break
-        uri = URIRef(data_source)
-        print(uri)
-        ctx = Context(ident='http://openworm.org/data', conf=conf)
-        for x in ctx.stored(DataSource)(ident=uri).load():
-            print(x.format_str(stored=True))
+        uri = self._parent._den3(data_source)
+        for x in self._parent._data_ctx.stored(DataSource)(ident=uri).load():
+            self._parent.message(x.format_str(stored=True))
 
     def list_kinds(self):
         """
@@ -111,6 +99,23 @@ class POWTranslator(object):
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
             self._parent.message(nm.normalizeUri(x.identifier))
+
+    def show(self, translator):
+        '''
+        Show a translator
+
+        Parameters
+        ----------
+        translator : str
+            The translator to show
+        '''
+        from PyOpenWorm.datasource import DataTranslator
+        conf = self._parent._conf()
+        uri = self._parent._den3(translator)
+        dt = self._parent._data_ctx.stored(DataTranslator)(ident=uri, conf=conf)
+        for x in dt.load():
+            self._parent.message(x)
+            return
 
 
 class POWNamespace(object):
@@ -282,6 +287,20 @@ class POW(object):
     def _init_repository(self):
         if self.repository_provider is not None:
             self.repository_provider.init(base=self.powdir)
+
+    def _den3(self, s):
+        from rdflib.namespace import is_ncname
+        from rdflib.term import URIRef
+        conf = self._conf()
+        nm = conf['rdf.graph'].namespace_manager
+        s = s.strip('<>')
+        parts = s.split(':')
+        if len(parts) > 1 and is_ncname(parts[1]):
+            for pref, ns in nm.namespaces():
+                if pref == parts[0]:
+                    s = URIRef(ns + parts[1])
+                    break
+        return URIRef(s)
 
     def fetch_graph(self, url):
         """
@@ -629,3 +648,4 @@ class InvalidGraphException(Exception):
 
 class GenericUserError(Exception):
     pass
+
