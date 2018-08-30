@@ -4,6 +4,7 @@
 
 PyOpenWorm
 ===========
+<img width="1207" alt="pyow_in_overview" src="https://user-images.githubusercontent.com/1573896/44875328-d92ec800-ac6b-11e8-9430-b29c834f518e.png">
 
 A data access layer in Python which integrates disparate structures and
 representations for *C. elegans* anatomy and physiology. Enables a simple
@@ -35,10 +36,10 @@ objects related to the *biological reality of the worm*, and forget about which
 representation is being used under the hood.  The worm itself has a unified
 sense of neurons, networks, muscles, ion channels, etc. and so should our code.
 
-Relationship to ChannelWorm
+Relationship to ChannelWorm2
 -----------------------------
-[ChannelWorm](https://github.com/openworm/ChannelWorm) is the sub-project of
-OpenWorm which houses ion channel models.  In the future, we expect ChannelWorm
+[ChannelWorm2](https://github.com/openworm/ChannelWorm2) is the sub-project of
+OpenWorm which houses ion channel models.  In the future, we expect ChannelWorm2
 to be a "consumer" of PyOpenWorm.  A PyOpenWorm database will house physical
 models, the digitized plots they are derived from (there is a Plot type in
 PyOpenWorm), and provide code to put those models into enumerated formats along
@@ -234,7 +235,7 @@ Modeling data
 --------------
 
 As described above, ultimately, ion channel models will be part of the
-ChannelWorm repository.  And as the project evolves, other models, such as for
+ChannelWorm2 repository.  And as the project evolves, other models, such as for
 reproduction and development, may be housed in their own repositories.  But for
 the time being, the PyOpenWorm repository contains specific models as well.
 These models will eventually be transferred to an appropriate and independent
