@@ -1,0 +1,40 @@
+- Translate the below into Github issues
+- Add an imports_context sub-command
+- Check the context sub-command works and add tests as needed
+- Add a "data save" command that accepts a python callable which takes a context object for the current data context as the target to state things in
+- Have the "data save" command return an n3 printout of the saved context
+- Add flags for "data save" for automatically adding certain classes of imports automatically:
+    - The definition_context of the class of an object
+    - The contexts of objects refered to in statements made in the callable
+- Add a specialized command for saving DataObject classes defined in a source file since: essentially this is equivalent to pow save 
+- Write documentation describing how you can substitute another class definition for objects defined in other contexts through manipulation of imports
+    - Essentially, you recontextualize an object created elsewhere and then add
+    the rdf:type triple, the class registry entries etc. For instance, if a
+    data set used one class for describing Neurons and you wanted to use
+    another, or the data source uses a different language from the one you want
+    to use, you can create the appropriate metadata to map to the types you
+    want for your use case.
+- Write documentation describing how the given context should have imports added to it in accordance with which objects are stated in the data context
+- Add validation of the statements added to the context by checking the contexts of all objects given in all statements and comparing against the imports listed
+- Add a `pow dist save` to save the current data context or an optionally provided context within the database (not necessarily related in any way to the current data context) 
+- Make the `pow dist save` take a working directory for files to package with the context (this is how sources will, when saved, have their data associated with them
+- Make the `pow dist save` pull the imports for a provided context from the current imports context
+- Have the dist make a structure akin to the current git directory structure (i.e., with an index and graphs directory) with the addition of a "manifest" paramaterizing the dist
+- Have the dist manifest include any directories within the dist which may at some point be changed (for greater forwards/backwards compat)
+- Have the dist use a well-known-name for the imports directory specified in the "manifest"
+- Include in the dist a mapping of contexts to any file data associated with them (i.e., in a subdirectory), linked in a similar fashion to the way graphs are in the index
+- Have the manifest specify a manifest version independent of the PyOpenWorm version for forwards/backwards compat
+- Make `pow dist load` that unpacks a dist created by `pow dist save`
+- Have `pow dist load` specify any values in the 
+- Describe in the documentation the repository which verifies imported contexts by downloading them or hashing them
+- Descirbe in the documentation potential "value-added" features that a repo may implement
+- Describe the motivation of breaking a reliance on a chain-of-trust for the total management of imports by the repository itself.
+- Mention in the documentation that a repository of data may indeed use multiple sources in an on-demand fashion and deploy a chain-of-trust as it chooses
+- Write a `pow source save` command as a special case of `pow data save` which 
+- Write a convenience function to both save a context and create a distribution for that context in one go
+- Make a component which accepts a context and generates a Python requirements list from all Python class registry entries
+- Note that a python package must be installed in a fashion accessible to pkg_resources in order to work with the requirements list feature
+- Consider distribution schemes that package Python code together with the data
+- Add a further specialization for saving data sources that either prompts for, or accepts on the command line, the fields for the data source
+- Write documentation describing the notion of the (current) data context and (current) imports context
+- Write (or reuse) a context accessor schema for acquiring RDF graphs from (possibly remote) resources
