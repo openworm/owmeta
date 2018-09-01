@@ -54,13 +54,7 @@ class POWSource(object):
         """
         from PyOpenWorm.datasource import DataSource
         conf = self._parent._conf()
-        # TODO: Pull this string out of here...just dunno where it goes yet
-        try:
-            data_context_id = conf[DATA_CONTEXT_KEY]
-        except KeyError:
-            raise ConfigMissingException(DATA_CONTEXT_KEY)
-
-        ctx = Context(ident=data_context_id, conf=conf)
+        ctx = self._parent._data_ctx()
         dt = ctx.stored(DataSource)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
@@ -138,6 +132,98 @@ class _ProgressMock(object):
         return type(self)()
 
 
+class POWConfig(object):
+    user = IVar(value_type=bool,
+                default_value=False,
+                doc='If set, configs are only for the user; otherwise, they \
+                       would be committed to the repository')
+
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    @IVar.property('user.conf', value_type=str)
+    def user_config_file(self):
+        ''' The user config file name '''
+        if isabs(self._user_config_file):
+            return self._user_config_file
+        return pth_join(self._parent.powdir, self._user_config_file)
+
+    @user_config_file.setter
+    def user_config_file(self, val):
+        self._user_config_file = val
+
+    def _get_config_file(self):
+        if self.user:
+            res = self.user_config_file
+        else:
+            res = self._parent.config_file
+
+        if not exists(res):
+            if self.user:
+                self._init_user_config_file()
+            else:
+                self._parent._init_config_file()
+        return res
+
+    def _init_user_config_file(self):
+        with open(self.user_config_file, 'w') as f:
+            write_config({}, f)
+
+    def get(self, key):
+        '''
+        Read a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r') as f:
+            ob = json.load(f)
+            return ob.get(key)
+
+
+    def set(self, key, value):
+        '''
+        Set a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        value : str
+            The value to set
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r+') as f:
+            ob = json.load(f)
+            f.seek(0)
+            try:
+                json_value = json.loads(value)
+            except json.decoder.JSONDecodeError:
+                json_value = value
+            ob[key] = json_value
+            write_config(ob, f)
+
+    def delete(self, key):
+        '''
+        Deletes a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r+') as f:
+            ob = json.load(f)
+            f.seek(0)
+            del ob[key]
+            write_config(ob, f)
+
+
 _PROGRESS_MOCK = _ProgressMock()
 
 
@@ -157,6 +243,8 @@ class POW(object):
 
     repository_provider = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
+
+    config = SubCommand(POWConfig)
 
     source = SubCommand(POWSource)
 
@@ -221,15 +309,15 @@ class POW(object):
         logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
         # Tailoring for known loggers
 
-    def context(self, context=None):
+    def context(self, context=None, user=False):
         '''
         Read or set current target context for the repository
         '''
         ctx_file_name = abspath(pth_join(self.basedir, 'context'))
         if context is not None:
-            with open(ctx_file_name, 'w') as f:
-                print(context, file=f)
+            self.config.set(DATA_CONTEXT_KEY, context)
         else:
+            self.config.set(DATA_CONTEXT_KEY, context)
             if not exists(ctx_file_name):
                 self.message('No context')
                 return
@@ -260,7 +348,7 @@ class POW(object):
                     conf['rdf.store_conf'] = relpath(abspath(self.store_name),
                                                      abspath(self.basedir))
                     f.seek(0)
-                    self._write_config(conf, f)
+                    write_config(conf, f)
 
             self._init_store()
             self._init_repository()
@@ -278,11 +366,7 @@ class POW(object):
             with open(self.config_file, 'w') as of:
                 default['rdf.store_conf'] = relpath(abspath(self.store_name),
                                                     abspath(self.basedir))
-                self._write_config(default, of)
-
-    def _write_config(self, conf, dest):
-        json.dump(conf, dest, sort_keys=True, indent=4, separators=(',', ': '))
-        dest.write('\n')
+                write_config(default, of)
 
     def _init_repository(self):
         if self.repository_provider is not None:
@@ -346,11 +430,26 @@ class POW(object):
         from PyOpenWorm.data import Data
         dat = getattr(self, '_dat', None)
         if not dat or self._dat_file != self.config_file:
-            dat = Data.open(self.config_file)
-            store_conf = dat.get('rdf.store_conf', None)
+            if not exists(self.config_file):
+                raise NoConfigFileError(self.config_file)
 
-            if store_conf and not isabs(store_conf):
-                dat['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
+
+            with open(self.config_file) as repo_config:
+                rc = json.load(repo_config)
+
+            if not exists(self.config.user_config_file):
+                uc = {}
+            else:
+                with open(self.config.user_config_file) as user_config:
+                    uc = json.load(user_config)
+
+            rc.update(uc)
+            print('uc', uc)
+            print('rc', rc)
+            store_conf = rc.get('rdf.store_conf', None)
+            if store_conf and isinstance(store_conf, str) and not isabs(store_conf):
+                rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
+            dat = Data.process_config(rc)
             dat.init_database()
             self._dat = dat
             self._dat_file = self.config_file
@@ -638,6 +737,12 @@ class _BatchAddGraph(object):
             self.graph.addN(self.batch)
 
 
+def write_config(ob, f):
+    json.dump(ob, f, sort_keys=True, indent=4, separators=(',', ': '))
+    f.write('\n')
+    f.truncate()
+
+
 class UnreadableGraphException(Exception):
     pass
 
@@ -647,5 +752,8 @@ class InvalidGraphException(Exception):
 
 
 class GenericUserError(Exception):
+    pass
+
+class NoConfigFileError(Exception):
     pass
 

@@ -14,7 +14,7 @@ import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError
+from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError, POWConfig
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -41,18 +41,13 @@ class POWTest(BaseTest):
         self.assertTrue(exists(p('.pow', 'pow.conf')), msg='pow.conf is created')
 
     def test_init_default_store_config_file_exists_no_change(self):
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
-            f.write('{}')
-
+        self._init_conf()
         self.cut.init()
         with open('.pow/pow.conf', 'r') as f:
             self.assertEqual('{}', f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            f.write('{}')
+        self._init_conf()
 
         self.cut.init(update_existing_config=True)
         with open('.pow/pow.conf', 'r') as f:
@@ -107,14 +102,23 @@ class POWTest(BaseTest):
              URIRef('http://example.org/o'),
              URIRef('http://example.org/c'))
         m().quads.return_value = [q]
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            json.dump({'rdf.store': 'default'}, f)
-            f.flush()
+        self._init_conf()
 
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
+
+    def _init_conf(self):
+        os.mkdir('.pow')
+        with open(p('.pow', 'pow.conf'), 'w') as f:
+            f.write('{}')
+
+    def test_user_config_in_main_config(self):
+        self._init_conf()
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
 
 class POWTranslateTest(BaseTest):
 
@@ -391,6 +395,58 @@ class CloneProgressTest(unittest.TestCase):
         pr = Mock()
         pr.unit.side_effect = f
         _CloneProgress(pr)
+
+
+class ConfigTest(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        self.startdir = os.getcwd()
+        os.chdir(self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
+
+    def test_set_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        cut = POWConfig(parent)
+        cut.set('key', 'null')
+        parent._init_config_file.assert_called()
+
+    def test_set_get_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        cut = POWConfig(parent)
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_new_user(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_user_object(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '{"smoop": "boop"}')
+        self.assertEqual(cut.get('key'), {'smoop': 'boop'})
 
 
 class _TestException(Exception):
