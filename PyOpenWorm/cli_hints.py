@@ -45,4 +45,24 @@ CLI_HINTS = {
             },
         },
     },
+    'PyOpenWorm.command.POWConfig': {
+        'set': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
+            },
+            (METHOD_NAMED_ARG, 'value'): {
+                'names': ['value'],
+            },
+        },
+        'get': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
+            },
+        },
+        'delete': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
+            },
+        },
+    },
 }

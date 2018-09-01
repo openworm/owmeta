@@ -1,6 +1,7 @@
 class IVar(object):
     '''
-    A descriptor for instance variables amended to provide some attributes like default values, value types, etc.
+    A descriptor for instance variables amended to provide some attributes like
+    default values, value types, etc.
     '''
     def __init__(self, default_value=None, doc=None, value_type=str, name=None):
         self.default_value = default_value

@@ -256,6 +256,11 @@ class Data(Configure):
         """ Load a file into a new Data instance storing configuration in a JSON format """
         return cls(conf=Configure.open(file_name))
 
+    @classmethod
+    def process_config(cls, config_dict):
+        """ Load a file into a new Data instance storing configuration in a JSON format """
+        return cls(conf=Configure.process_config(config_dict))
+
     def openDatabase(self):
         self.init_database()
 
