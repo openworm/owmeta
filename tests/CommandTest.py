@@ -14,7 +14,7 @@ import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError, POWConfig
+from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError, POWConfig, DATA_CONTEXT_KEY
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -118,6 +118,32 @@ class POWTest(BaseTest):
         self.cut.config.user = True
         self.cut.config.set('key', '10')
         self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_conifg_set_get(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.assertEqual(self.cut._conf()['key'], 11)
+
+    def test_user_conifg_set_get_override(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_context_set_config_get(self):
+        c = 'http://example.org/context'
+        self._init_conf()
+        self.cut.context(c)
+        self.assertEqual(self.cut.config.get(DATA_CONTEXT_KEY), c)
+
+    def test_context_set_user_override(self):
+        c = 'http://example.org/context'
+        d = 'http://example.org/context_override'
+        self._init_conf()
+        self.cut.context(d, user=True)
+        self.cut.context(c)
+        self.assertEqual(self.cut.context(), d)
 
 
 class POWTranslateTest(BaseTest):

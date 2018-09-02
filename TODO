@@ -1,5 +1,4 @@
 - Translate the below into Github issues
-- Add an imports_context sub-command
 - Check the context sub-command works and add tests as needed
 - Add a "data save" command that accepts a python callable which takes a context object for the current data context as the target to state things in
 - Have the "data save" command return an n3 printout of the saved context

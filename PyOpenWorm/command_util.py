@@ -10,7 +10,9 @@ class IVar(object):
         self.value_type = value_type
 
     def __get__(self, target, typ=None):
-        return getattr(target, self.name, self.default_value)
+        res =  getattr(target, self.name, self.default_value)
+        ha =  hasattr(target, self.name)
+        return res
 
     def __set__(self, target, value):
         setattr(target, self.name, value)

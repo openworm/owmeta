@@ -308,7 +308,4 @@ class CLICommandWrapper(object):
         commands specified therein
         '''
         self.parser().parse_args(args=args)
-        try:
-            return self.mapper.apply(self.runner)
-        except CLIUserError as e:
-            print(e, file=sys.stderr)
+        return self.mapper.apply(self.runner)
