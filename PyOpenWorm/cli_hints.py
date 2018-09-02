@@ -7,6 +7,18 @@ CLI_HINTS = {
                 'names': ['--message', '-m'],
             },
         },
+        'context': {
+            (METHOD_NAMED_ARG, 'context'): {
+                'nargs': '?',
+                'names': ['context'],
+            },
+        },
+        'imports_context': {
+            (METHOD_NAMED_ARG, 'context'): {
+                'nargs': '?',
+                'names': ['context'],
+            },
+        },
         'clone': {
             (METHOD_NAMED_ARG, 'url'): {
                 'names': ['url'],

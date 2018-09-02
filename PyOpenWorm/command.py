@@ -21,10 +21,7 @@ from .context import Context
 L = logging.getLogger(__name__)
 
 DATA_CONTEXT_KEY = 'data_context_id'
-
-class ConfigMissingException(Exception):
-    def __init__(self, key):
-        self.key = key
+IMPORTS_CONTEXT_KEY = 'imports_context_id'
 
 
 class POWSource(object):
@@ -58,7 +55,7 @@ class POWSource(object):
         dt = ctx.stored(DataSource)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            self._parent.message(nm.normalizeUri(x.identifier))
+            yield nm.normalizeUri(x.identifier)
 
     def show(self, data_source):
         '''
@@ -142,6 +139,9 @@ class POWConfig(object):
     def __init__(self, parent):
         self._parent = parent
 
+    def __setattr__(self, t, v):
+        super(POWConfig, self).__setattr__(t, v)
+
     @IVar.property('user.conf', value_type=str)
     def user_config_file(self):
         ''' The user config file name '''
@@ -154,6 +154,9 @@ class POWConfig(object):
         self._user_config_file = val
 
     def _get_config_file(self):
+        if not exists(self._parent.powdir):
+            raise POWDirMissingException(self._parent.powdir)
+
         if self.user:
             res = self.user_config_file
         else:
@@ -244,6 +247,10 @@ class POW(object):
     repository_provider = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
 
+    # N.B.: Sub-commands are created on-demand when you access the attribute,
+    # hence they do not, in any way, store attributes set on them. You must
+    # save the instance of the subcommand to a variable in order to make
+    # multiple statements including that sub-command
     config = SubCommand(POWConfig)
 
     source = SubCommand(POWSource)
@@ -312,17 +319,38 @@ class POW(object):
     def context(self, context=None, user=False):
         '''
         Read or set current target context for the repository
+
+        Parameters
+        ----------
+        context : str
+            The context to set
+        user : bool
+            If set, set the context only for the current user. Has no effect for retrieving the context
         '''
-        ctx_file_name = abspath(pth_join(self.basedir, 'context'))
         if context is not None:
-            self.config.set(DATA_CONTEXT_KEY, context)
+            config = self.config
+            config.user = user
+            config.set(DATA_CONTEXT_KEY, context)
         else:
-            self.config.set(DATA_CONTEXT_KEY, context)
-            if not exists(ctx_file_name):
-                self.message('No context')
-                return
-            with open(ctx_file_name, 'r') as f:
-                self.message(f.read())
+            return self._conf().get(DATA_CONTEXT_KEY)
+
+    def imports_context(self, context=None, user=False):
+        '''
+        Read or set current target imports context for the repository
+
+        Parameters
+        ----------
+        context : str
+            The context to set
+        user : bool
+            If set, set the context only for the current user. Has no effect for retrieving the context
+        '''
+        if context is not None:
+            config = self.config
+            config.user = user
+            config.set(IMPORTS_CONTEXT_KEY, context)
+        else:
+            return self._conf().get(IMPORTS_CONTEXT_KEY)
 
     def init(self, update_existing_config=False):
         """
@@ -436,7 +464,6 @@ class POW(object):
 
             with open(self.config_file) as repo_config:
                 rc = json.load(repo_config)
-
             if not exists(self.config.user_config_file):
                 uc = {}
             else:
@@ -444,8 +471,6 @@ class POW(object):
                     uc = json.load(user_config)
 
             rc.update(uc)
-            print('uc', uc)
-            print('rc', rc)
             store_conf = rc.get('rdf.store_conf', None)
             if store_conf and isinstance(store_conf, str) and not isabs(store_conf):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
@@ -470,17 +495,17 @@ class POW(object):
         """
         try:
             makedirs(self.powdir)
-            print('Cloning...', file=sys.stderr)
+            self.message('Cloning...', file=sys.stderr)
             with self.progress_reporter(file=sys.stderr, unit=' objects', miniters=0) as progress:
                 self.repository_provider.clone(url, base=self.powdir, progress=progress)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()
-            print('Deserializing...', file=sys.stderr)
+            self.message('Deserializing...', file=sys.stderr)
             with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
                     self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
                 self._load_all_graphs(ctx_prog, trip_prog)
-            print('Done!', file=sys.stderr)
+            self.message('Done!', file=sys.stderr)
         except BaseException as e:
             self._ensure_no_powdir()
             raise e
@@ -630,7 +655,7 @@ class POW(object):
         List contexts
         '''
         for c in self._conf()['rdf.graph'].contexts():
-            print(c.identifier)
+            yield c.identifier
 
     @property
     def _rdf(self):
@@ -743,17 +768,27 @@ def write_config(ob, f):
     f.truncate()
 
 
-class UnreadableGraphException(Exception):
-    pass
-
-
-class InvalidGraphException(Exception):
-    pass
-
-
 class GenericUserError(Exception):
+    ''' An error which should be reported to the user. Not necessarily an error that is the user's fault '''
+
+
+class InvalidGraphException(GenericUserError):
+    ''' Thrown when a graph cannot be translated due to formatting errors '''
+
+
+class UnreadableGraphException(GenericUserError):
+    ''' Thrown when a graph cannot be read due to it being missing, the active user lacking permissions, etc. '''
+
+
+class NoConfigFileError(GenericUserError):
     pass
 
-class NoConfigFileError(Exception):
+
+class POWDirMissingException(GenericUserError):
     pass
+
+
+class ConfigMissingException(GenericUserError):
+    def __init__(self, key):
+        self.key = key
 
