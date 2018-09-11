@@ -22,6 +22,7 @@ L = logging.getLogger(__name__)
 
 DATA_CONTEXT_KEY = 'data_context_id'
 IMPORTS_CONTEXT_KEY = 'imports_context_id'
+DEFAULT_SAVE_CALLABLE_NAME = 'pow_data'
 
 
 class POWSource(object):
@@ -89,7 +90,7 @@ class POWTranslator(object):
         dt = self._parent._data_ctx.stored(DataTranslator)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            self._parent.message(nm.normalizeUri(x.identifier))
+            yield nm.normalizeUri(x.identifier)
 
     def show(self, translator):
         '''
@@ -134,7 +135,6 @@ class POWConfig(object):
                 default_value=False,
                 doc='If set, configs are only for the user; otherwise, they \
                        would be committed to the repository')
-
 
     def __init__(self, parent):
         self._parent = parent
@@ -186,7 +186,6 @@ class POWConfig(object):
         with open(fname, 'r') as f:
             ob = json.load(f)
             return ob.get(key)
-
 
     def set(self, key, value):
         '''
@@ -315,6 +314,38 @@ class POW(object):
         logging.getLogger().setLevel(getattr(logging, level))
         logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
         # Tailoring for known loggers
+
+    def save(self, module, provider=None, context=None):
+        '''
+        Save the data in the given context
+
+        Parameters
+        ----------
+        module : str
+            Name of the module housing the provider
+        provider : str
+            Name of the provider, a callble that accepts a context object and adds statements to it. Can be a "dotted"
+            name indicating attribute accesses
+        context : str
+            The target context
+        '''
+        import importlib as IM
+        conf = self._conf()
+        if not context:
+            ctx = self._data_ctx
+        else:
+            ctx = Context(ident=context, conf=conf)
+
+        m = IM.import_module(module)
+        if not provider:
+            provider = DEFAULT_SAVE_CALLABLE_NAME
+        attr_chain = provider.split('.')
+        p = m
+        for x in attr_chain:
+            p = getattr(p, x)
+        p(ctx)
+        # validation of imports
+        ctx.save_context(graph=conf['rdf.graph'])
 
     def context(self, context=None, user=False):
         '''
@@ -461,7 +492,6 @@ class POW(object):
             if not exists(self.config_file):
                 raise NoConfigFileError(self.config_file)
 
-
             with open(self.config_file) as repo_config:
                 rc = json.load(repo_config)
             if not exists(self.config.user_config_file):
@@ -559,7 +589,6 @@ class POW(object):
         """
         if named_data_sources is None:
             named_data_sources = dict()
-        from PyOpenWorm.context import Context
         imports_context = Context(ident=imports_context_ident, conf=self._conf())
         translator_obj = self._lookup_translator(translator)
         if translator_obj is None:
@@ -618,14 +647,14 @@ class POW(object):
             raise ConfigMissingException(DATA_CONTEXT_KEY)
 
     def reconstitute(self, data_source):
-        """
+        '''
         Recreate a data source by executing the chain of translators that went into making it.
 
         Parameters
         ----------
         data_source : str
             Identifier for the data source to reconstitute
-        """
+        '''
 
     def serialize(self, destination, format='nquads'):
         '''
@@ -662,14 +691,14 @@ class POW(object):
         return self._conf()['rdf.graph']
 
     def commit(self, message):
-        """
+        '''
         Write the graph to the local repository
 
         Parameters
         ----------
         message : str
             commit message
-        """
+        '''
         repo = self.repository_provider
         self._serialize_graphs()
         repo.commit(message)
@@ -791,4 +820,3 @@ class POWDirMissingException(GenericUserError):
 class ConfigMissingException(GenericUserError):
     def __init__(self, key):
         self.key = key
-
