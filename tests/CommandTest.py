@@ -1,8 +1,8 @@
 import unittest
 try:
-    from unittest.mock import MagicMock, Mock, patch
+    from unittest.mock import Mock, ANY, patch
 except ImportError:
-    from mock import MagicMock, Mock, patch
+    from mock import Mock, ANY, patch
 import tempfile
 import os
 from os.path import exists, join as p
@@ -14,7 +14,8 @@ import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError, POWConfig, DATA_CONTEXT_KEY
+from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
+                                POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME)
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -108,10 +109,12 @@ class POWTest(BaseTest):
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
 
-    def _init_conf(self):
+    def _init_conf(self, conf=None):
+        if not conf:
+            conf = {}
         os.mkdir('.pow')
         with open(p('.pow', 'pow.conf'), 'w') as f:
-            f.write('{}')
+            json.dump(conf, f)
 
     def test_user_config_in_main_config(self):
         self._init_conf()
@@ -144,6 +147,39 @@ class POWTest(BaseTest):
         self.cut.context(d, user=True)
         self.cut.context(c)
         self.assertEqual(self.cut.context(), d)
+
+    def test_save_empty_attr_defaults(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', '', 'http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test', 'http://example.org/context')
+            im(ANY).test.assert_called()
+
+    def test_save_dotted_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test.test', 'http://example.org/context')
+            im(ANY).test.test.assert_called()
+
+    def test_save_no_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', context='http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_data_context(self):
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            with patch('PyOpenWorm.command.Context') as ctxc:
+                self.cut.save('tests.command_test_module')
+                ctxc.assert_called_with(ident=a, conf=ANY)
+                ctxc().save_context.assert_called()
 
 
 class POWTranslateTest(BaseTest):
@@ -437,6 +473,7 @@ class ConfigTest(unittest.TestCase):
     def test_set_new(self):
         parent = Mock()
         fname = p(self.testdir, 'test.conf')
+
         def f():
             with open(fname, 'w') as f:
                 f.write('{}\n')
@@ -449,6 +486,7 @@ class ConfigTest(unittest.TestCase):
     def test_set_get_new(self):
         parent = Mock()
         fname = p(self.testdir, 'test.conf')
+
         def f():
             with open(fname, 'w') as f:
                 f.write('{}\n')
@@ -473,6 +511,28 @@ class ConfigTest(unittest.TestCase):
         cut.user = True
         cut.set('key', '{"smoop": "boop"}')
         self.assertEqual(cut.get('key'), {'smoop': 'boop'})
+
+
+class POWSourceTest(unittest.TestCase):
+    def test_list(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = []
+        ps = POWSource(parent)
+        self.assertIsNone(next(ps.list(), None))
+
+    def test_list_(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        ps = POWSource(parent)
+        self.assertIsNotNone(next(ps.list(), None))
 
 
 class _TestException(Exception):
