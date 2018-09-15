@@ -332,17 +332,19 @@ class POW(object):
         import importlib as IM
         conf = self._conf()
         if not context:
-            ctx = self._data_ctx
+            ctx = _POWSaveContext(self._data_ctx)
         else:
-            ctx = Context(ident=context, conf=conf)
+            ctx = _POWSaveContext(Context(ident=context, conf=conf))
 
         m = IM.import_module(module)
+        print(m)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
         attr_chain = provider.split('.')
         p = m
         for x in attr_chain:
             p = getattr(p, x)
+        print(p)
         p(ctx)
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
@@ -763,6 +765,34 @@ class POW(object):
         """
 
 
+class _POWSaveContext(Context):
+
+    def __init__(self, backer):
+        self._backer = backer  #: Backing context
+        self._ctxids = set([self._backer.identifier])
+        self._unvalidated_statements = []
+
+    def add_import(self, ctx):
+        self._ctxids.add(ctx.identifier)
+        return self._backer.add_import(ctx)
+
+    def add_statement(self, stmt):
+        if not all(x in self._ctxids for x in
+                   (stmt.object.context.identifier,
+                    stmt.property.context.identifier,
+                    stmt.object.property.identifier)):
+            self._unvalidated_statements.append(stmt)
+        return self._backer.add_statement(stmt)
+
+    def __getattr__(self, name):
+        return getattr(self._backer, name)
+
+    def save_context(self, *args, **kwargs):
+        if self._unvalidated_statements:
+            raise StatementValidationError(list(self._unvalidated_statements))
+        return self._backer.save_context(*args, **kwargs)
+
+
 class _BatchAddGraph(object):
     ''' Wrapper around graph that turns calls to 'add' into calls to 'addN' '''
     def __init__(self, graph, batchsize=1000, *args, **kwargs):
@@ -814,6 +844,10 @@ class NoConfigFileError(GenericUserError):
 
 
 class POWDirMissingException(GenericUserError):
+    pass
+
+
+class StatementValidationError(GenericUserError):
     pass
 
 

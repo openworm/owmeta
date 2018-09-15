@@ -14,7 +14,7 @@ import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
+from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
                                 POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME)
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
@@ -180,6 +180,42 @@ class POWTest(BaseTest):
                 self.cut.save('tests.command_test_module')
                 ctxc.assert_called_with(ident=a, conf=ANY)
                 ctxc().save_context.assert_called()
+
+    def test_save_validates_imports_fail(self):
+        # add a statement with an object in another context
+        # don't import context
+        # expect exception
+        with self.assertRaises(StatementValidationError):
+            a = 'http://example.org/mdc'
+            self._init_conf({DATA_CONTEXT_KEY: a})
+            with patch('importlib.import_module') as im:
+                def f(ctx):
+                    stmt = Mock()
+                    stmt.context.identifier = URIRef(a)
+                    ctx.add_statement(stmt)
+                im().test = f
+                self.cut.save('tests', 'test')
+
+    def test_save_validates_import_before_success(self):
+        # import context
+        # add a statement with an object in another context
+        # validation should succeed
+        pass
+
+    def test_save_validates_import_after_success(self):
+        # add a statement with an object in another context
+        # import context
+        # validation should succeed
+        pass
+
+    def test_save_validates_additional_context_saved_fails(self):
+        # add a statement with an object in another context
+        # define a context using the 'context factory' provided by the context with that context ID
+        # validation should not succeed
+        #
+        # Usually don't test non-specified interactions, but this one seems relevant to clearly show the separation of
+        # these features
+        pass
 
 
 class POWTranslateTest(BaseTest):
@@ -479,6 +515,7 @@ class ConfigTest(unittest.TestCase):
                 f.write('{}\n')
         parent._init_config_file.side_effect = f
         parent.config_file = fname
+        parent.powdir = self.testdir
         cut = POWConfig(parent)
         cut.set('key', 'null')
         parent._init_config_file.assert_called()
@@ -492,6 +529,7 @@ class ConfigTest(unittest.TestCase):
                 f.write('{}\n')
         parent._init_config_file.side_effect = f
         parent.config_file = fname
+        parent.powdir = self.testdir
         cut = POWConfig(parent)
         cut.set('key', '1')
         self.assertEqual(cut.get('key'), 1)
