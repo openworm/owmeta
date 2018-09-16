@@ -7,6 +7,18 @@ CLI_HINTS = {
                 'names': ['--message', '-m'],
             },
         },
+        'context': {
+            (METHOD_NAMED_ARG, 'context'): {
+                'nargs': '?',
+                'names': ['context'],
+            },
+        },
+        'imports_context': {
+            (METHOD_NAMED_ARG, 'context'): {
+                'nargs': '?',
+                'names': ['context'],
+            },
+        },
         'clone': {
             (METHOD_NAMED_ARG, 'url'): {
                 'names': ['url'],
@@ -42,6 +54,26 @@ CLI_HINTS = {
         'show': {
             (METHOD_NAMED_ARG, 'translator'): {
                 'names': ['translator'],
+            },
+        },
+    },
+    'PyOpenWorm.command.POWConfig': {
+        'set': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
+            },
+            (METHOD_NAMED_ARG, 'value'): {
+                'names': ['value'],
+            },
+        },
+        'get': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
+            },
+        },
+        'delete': {
+            (METHOD_NAMED_ARG, 'key'): {
+                'names': ['key'],
             },
         },
     },

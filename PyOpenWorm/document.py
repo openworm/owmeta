@@ -82,8 +82,6 @@ class Document(BaseDocument):
     title = DatatypeProperty()
     ''' The title of the document '''
 
-    properties_are_init_args = True
-
     def __init__(
             self,
             bibtex=None,

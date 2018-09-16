@@ -24,13 +24,13 @@ class CLIUserError(Exception):
 
 def _method_runner(runner, key):
     def _f(*args, **kwargs):
-        getattr(runner, key)(*args, **kwargs)
+        return getattr(runner, key)(*args, **kwargs)
     return _f
 
 
 def _sc_runner(sub_mapper, sub_runner):
     def _f():
-        sub_mapper.apply(sub_runner)
+        return sub_mapper.apply(sub_runner)
     return _f
 
 
@@ -77,7 +77,7 @@ class CLIArgMapper(object):
         for k, v in iattrs.items():
             setattr(runner, k, v)
 
-        runmethod(*args, **kwargs)
+        return runmethod(*args, **kwargs)
 
     def get(self, key):
         return {k[1]: self.mappings[k] for k in self.mappings if k[0] == key}
@@ -287,10 +287,13 @@ class CLICommandWrapper(object):
                             doc = 'Default is ' + repr(val.default_value)
                     # NOTE: we have a default value from the val, but we don't
                     # set it here -- IVars return the defaults ... by default
-                    parser.add_argument('--' + key, help=doc,
-                                        action=CLIStoreAction,
-                                        key=INSTANCE_ATTRIBUTE,
-                                        mapper=self.mapper)
+                    arg_kwargs = dict(help=doc,
+                                      action=CLIStoreAction,
+                                      key=INSTANCE_ATTRIBUTE,
+                                      mapper=self.mapper)
+                    if val.value_type == bool:
+                        arg_kwargs['action'] = CLIStoreTrueAction
+                    parser.add_argument('--' + key, **arg_kwargs)
 
         return parser
 
@@ -305,7 +308,4 @@ class CLICommandWrapper(object):
         commands specified therein
         '''
         self.parser().parse_args(args=args)
-        try:
-            self.mapper.apply(self.runner)
-        except CLIUserError as e:
-            print(e, file=sys.stderr)
+        return self.mapper.apply(self.runner)

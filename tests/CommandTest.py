@@ -1,8 +1,8 @@
 import unittest
 try:
-    from unittest.mock import MagicMock, Mock, patch
+    from unittest.mock import Mock, ANY, patch
 except ImportError:
-    from mock import MagicMock, Mock, patch
+    from mock import Mock, ANY, patch
 import tempfile
 import os
 from os.path import exists, join as p
@@ -14,7 +14,8 @@ import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException, GenericUserError
+from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
+                                POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME)
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -41,18 +42,13 @@ class POWTest(BaseTest):
         self.assertTrue(exists(p('.pow', 'pow.conf')), msg='pow.conf is created')
 
     def test_init_default_store_config_file_exists_no_change(self):
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
-            f.write('{}')
-
+        self._init_conf()
         self.cut.init()
         with open('.pow/pow.conf', 'r') as f:
             self.assertEqual('{}', f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            f.write('{}')
+        self._init_conf()
 
         self.cut.init(update_existing_config=True)
         with open('.pow/pow.conf', 'r') as f:
@@ -107,14 +103,84 @@ class POWTest(BaseTest):
              URIRef('http://example.org/o'),
              URIRef('http://example.org/c'))
         m().quads.return_value = [q]
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            json.dump({'rdf.store': 'default'}, f)
-            f.flush()
+        self._init_conf()
 
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
+
+    def _init_conf(self, conf=None):
+        if not conf:
+            conf = {}
+        os.mkdir('.pow')
+        with open(p('.pow', 'pow.conf'), 'w') as f:
+            json.dump(conf, f)
+
+    def test_user_config_in_main_config(self):
+        self._init_conf()
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_conifg_set_get(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.assertEqual(self.cut._conf()['key'], 11)
+
+    def test_user_conifg_set_get_override(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_context_set_config_get(self):
+        c = 'http://example.org/context'
+        self._init_conf()
+        self.cut.context(c)
+        self.assertEqual(self.cut.config.get(DATA_CONTEXT_KEY), c)
+
+    def test_context_set_user_override(self):
+        c = 'http://example.org/context'
+        d = 'http://example.org/context_override'
+        self._init_conf()
+        self.cut.context(d, user=True)
+        self.cut.context(c)
+        self.assertEqual(self.cut.context(), d)
+
+    def test_save_empty_attr_defaults(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', '', 'http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test', 'http://example.org/context')
+            im(ANY).test.assert_called()
+
+    def test_save_dotted_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test.test', 'http://example.org/context')
+            im(ANY).test.test.assert_called()
+
+    def test_save_no_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', context='http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_data_context(self):
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            with patch('PyOpenWorm.command.Context') as ctxc:
+                self.cut.save('tests.command_test_module')
+                ctxc.assert_called_with(ident=a, conf=ANY)
+                ctxc().save_context.assert_called()
+
 
 class POWTranslateTest(BaseTest):
 
@@ -391,6 +457,82 @@ class CloneProgressTest(unittest.TestCase):
         pr = Mock()
         pr.unit.side_effect = f
         _CloneProgress(pr)
+
+
+class ConfigTest(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        self.startdir = os.getcwd()
+        os.chdir(self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
+
+    def test_set_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        cut = POWConfig(parent)
+        cut.set('key', 'null')
+        parent._init_config_file.assert_called()
+
+    def test_set_get_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        cut = POWConfig(parent)
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_new_user(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_user_object(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '{"smoop": "boop"}')
+        self.assertEqual(cut.get('key'), {'smoop': 'boop'})
+
+
+class POWSourceTest(unittest.TestCase):
+    def test_list(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = []
+        ps = POWSource(parent)
+        self.assertIsNone(next(ps.list(), None))
+
+    def test_list_(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        ps = POWSource(parent)
+        self.assertIsNotNone(next(ps.list(), None))
 
 
 class _TestException(Exception):
