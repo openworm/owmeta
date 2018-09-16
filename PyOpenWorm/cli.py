@@ -16,20 +16,5 @@ def main():
         out = CLICommandWrapper(p).main()
     except (CLIUserError, GenericUserError) as e:
         print(e, file=sys.stderr)
-    import yarom
-    def default(o):
-        if isinstance(o, set):
-            return list(o)
-        else:
-            try:
-                return dict(o)
-            except (ValueError, TypeError):
-                try:
-                    return list(o)
-                except TypeError:
-                    raise
-
-            raise TypeError()
-
     if out is not None:
-        json.dump(out, sys.stdout, default=default, indent=2)
+        json.dump(out, sys.stdout, default=list, indent=2)
