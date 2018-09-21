@@ -577,6 +577,8 @@ class POWSourceTest(unittest.TestCase):
         # Mock the loading of DataObjects from the DataContext
         parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = [Mock()]
         ps = POWSource(parent)
+        parent._data_ctx().stored(ANY)(conf=ANY).load.assert_called()
+
         self.assertIsNotNone(next(ps.list(), None))
 
 
