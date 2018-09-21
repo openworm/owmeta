@@ -196,6 +196,13 @@ class POWTest(BaseTest):
                 im().test = f
                 self.cut.save('tests', 'test')
 
+    def test_save_returns_graph(self):
+        from rdflib.graph import Graph
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsInstance(self.cut.save('tests', 'test'), Graph)
+
     def test_save_validates_import_before_success(self):
         # import context
         # add a statement with an object in another context

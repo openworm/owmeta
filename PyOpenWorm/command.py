@@ -52,7 +52,7 @@ class POWSource(object):
         """
         from PyOpenWorm.datasource import DataSource
         conf = self._parent._conf()
-        ctx = self._parent._data_ctx()
+        ctx = self._parent._data_ctx
         dt = ctx.stored(DataSource)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
@@ -337,17 +337,16 @@ class POW(object):
             ctx = _POWSaveContext(Context(ident=context, conf=conf))
 
         m = IM.import_module(module)
-        print(m)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
         attr_chain = provider.split('.')
         p = m
         for x in attr_chain:
             p = getattr(p, x)
-        print(p)
         p(ctx)
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
+        return ctx.rdf_graph()
 
     def context(self, context=None, user=False):
         '''
@@ -658,18 +657,40 @@ class POW(object):
             Identifier for the data source to reconstitute
         '''
 
-    def serialize(self, destination, format='nquads'):
+    def serialize(self, context=None, destination=None, format='nquads', whole_graph=False):
         '''
-        Serialize the graph to a file
+        Serialize the current data context or the one provided
 
         Parameters
         ----------
+        context : str
+            The context to save
         destination : file or str
-            A file-like object to write the file to or a file name
+            A file-like object to write the file to or a file name. If not provided, messages the result.
         format : str
             Serialization format (ex, 'n3', 'nquads')
+        whole_graph: bool
+            Serialize all contexts from all graphs (this probably isn't what you want)
         '''
-        self._conf()['rdf.graph'].serialize(destination, format=format)
+
+        retstr = False
+        if destination is None:
+            from six import BytesIO
+            retstr = True
+            destination = BytesIO()
+
+        if context is None:
+            ctx = self._data_ctx
+        else:
+            ctx = Context(ident=context, conf=self._conf())
+
+        if whole_graph:
+            self._conf()['rdf.graph'].serialize(destination, format=format)
+        else:
+            ctx.stored.rdf_graph().serialize(destination, format=format)
+
+        if retstr:
+            self.message(destination.getvalue().decode(encoding='utf-8'))
 
     def _package_path(self):
         """
