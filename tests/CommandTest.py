@@ -565,7 +565,7 @@ class POWSourceTest(unittest.TestCase):
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = []
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = []
         ps = POWSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
@@ -575,9 +575,8 @@ class POWSourceTest(unittest.TestCase):
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx().stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
         ps = POWSource(parent)
-        parent._data_ctx().stored(ANY)(conf=ANY).load.assert_called()
 
         self.assertIsNotNone(next(ps.list(), None))
 
