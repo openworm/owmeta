@@ -346,7 +346,7 @@ class POW(object):
         p(ctx)
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
-        return ctx.rdf_graph()
+        return ctx.identifier
 
     def context(self, context=None, user=False):
         '''

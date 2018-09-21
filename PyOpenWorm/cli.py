@@ -26,6 +26,15 @@ class NSHandler(object):
         self.opts['output_mode'] = ns.output_mode
 
 
+class JSONSerializer(object):
+    def __call__(self, o):
+        from rdflib.graph import Graph
+        if isinstance(o, Graph):
+            return 'eventually, we will use something like JSON-LD'
+        else:
+            return list(o)
+
+
 def main():
     p = POW()
     p.message = print
@@ -42,7 +51,7 @@ def main():
 
     if out is not None:
         if output_mode == 'json':
-            json.dump(out, sys.stdout, default=list, indent=2)
+            json.dump(out, sys.stdout, default=JSONSerializer(), indent=2)
         elif output_mode == 'text':
             if isinstance(out, dict):
                 for k, v in out.items():
