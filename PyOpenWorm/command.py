@@ -9,6 +9,7 @@ import shutil
 import json
 import logging
 import errno
+from six import string_types
 try:
     from tempfile import TemporaryDirectory
 except ImportError:
@@ -204,7 +205,7 @@ class POWConfig(object):
             f.seek(0)
             try:
                 json_value = json.loads(value)
-            except json.decoder.JSONDecodeError:
+            except ValueError:
                 json_value = value
             ob[key] = json_value
             write_config(ob, f)
@@ -412,9 +413,9 @@ class POW(object):
 
             self._init_store()
             self._init_repository()
-        except Exception as e:
+        except Exception:
             self._ensure_no_powdir()
-            raise e
+            raise
 
     def _ensure_no_powdir(self):
         if exists(self.powdir):
@@ -503,7 +504,7 @@ class POW(object):
 
             rc.update(uc)
             store_conf = rc.get('rdf.store_conf', None)
-            if store_conf and isinstance(store_conf, str) and not isabs(store_conf):
+            if store_conf and isinstance(store_conf, string_types) and not isabs(store_conf):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
             dat = Data.process_config(rc)
             dat.init_database()
