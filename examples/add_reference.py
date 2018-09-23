@@ -15,7 +15,7 @@ from PyOpenWorm.data import Data
 from PyOpenWorm.context import Context
 
 # Create dummy database configuration.
-d = Data({'rdf.source': 'ZODB'})
+d = Data()
 
 # Connect to database with dummy configuration
 P.connect(conf=d)
@@ -45,8 +45,7 @@ evctx.save_context()
 
 # What does my evidence object contain?
 for e_i in evctx.stored(Evidence)().load():
-    print(e_i.reference())
-    print(e_i.supports())
+    print(e_i.reference(), e_i.supports())
 
 # Disconnect from the database.
 P.disconnect()
