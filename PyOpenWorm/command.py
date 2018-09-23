@@ -346,7 +346,7 @@ class POW(object):
         p(ctx)
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
-        return ctx.identifier
+        return ctx.created_contexts()
 
     def context(self, context=None, user=False):
         '''
@@ -788,30 +788,45 @@ class POW(object):
 
 class _POWSaveContext(Context):
 
-    def __init__(self, backer):
+    def __init__(self, backer, ):
         self._backer = backer  #: Backing context
-        self._ctxids = set([self._backer.identifier])
+        self._imported_ctx_ids = set([self._backer.identifier])
+        self._created_ctxs = set()
         self._unvalidated_statements = []
 
     def add_import(self, ctx):
-        self._ctxids.add(ctx.identifier)
+        self._imported_ctx_ids.add(ctx.identifier)
+        # Remove unvalidated statements which had this new context as the one they are missing
+        self._unvalidated_statements = [p for p in self._unvalidated_statements if p[0] != ctx.identifier]
         return self._backer.add_import(ctx)
 
     def add_statement(self, stmt):
-        if not all(x in self._ctxids for x in
-                   (stmt.object.context.identifier,
-                    stmt.property.context.identifier,
-                    stmt.object.property.identifier)):
-            self._unvalidated_statements.append(stmt)
+        stmt_tuple = (stmt.subject, stmt.property, stmt.object)
+        for p in ((x.context.identifier, stmt) for x in stmt_tuple
+                  if x.context.identifier not in self._imported_ctx_ids):
+            self._unvalidated_statements.append(p)
         return self._backer.add_statement(stmt)
 
     def __getattr__(self, name):
         return getattr(self._backer, name)
 
     def save_context(self, *args, **kwargs):
+        for c in self._created_ctxs:
+            c.save_context(*args, **kwargs)
         if self._unvalidated_statements:
             raise StatementValidationError(list(self._unvalidated_statements))
         return self._backer.save_context(*args, **kwargs)
+
+    def created_contexts(self):
+        for ctx in self._created_ctxs:
+            for cctx in ctx.created_contexts():
+                yield cctx
+        yield self
+
+    def new_context(self, ctx_id):
+        res = self(type(self))(self(Context)(ident=ctx_id, conf=self.conf))
+        self._created_ctxs.add(res)
+        return res
 
 
 class _BatchAddGraph(object):

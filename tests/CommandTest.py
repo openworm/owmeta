@@ -1,8 +1,8 @@
 import unittest
 try:
-    from unittest.mock import Mock, ANY, patch
+    from unittest.mock import MagicMock, Mock, ANY, patch
 except ImportError:
-    from mock import Mock, ANY, patch
+    from mock import MagicMock, Mock, ANY, patch
 import tempfile
 import os
 from os.path import exists, join as p
@@ -196,24 +196,82 @@ class POWTest(BaseTest):
                 im().test = f
                 self.cut.save('tests', 'test')
 
-    def test_save_returns_graph(self):
-        from rdflib.graph import Graph
+    def test_save_returns_something(self):
         a = 'http://example.org/mdc'
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
-            self.assertIsInstance(self.cut.save('tests', 'test'), Graph)
+            self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
 
-    def test_save_validates_import_before_success(self):
-        # import context
-        # add a statement with an object in another context
-        # validation should succeed
-        pass
+    def test_save_returns_context(self):
+        from PyOpenWorm.context import Context
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsInstance(next(self.cut.save('tests', 'test')), Context)
+
+    def test_save_returns_created_contexts(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                ctx.new_context(b)
+
+            im().test.side_effect = f
+            self.assertEqual(set(x.identifier for x in self.cut.save('tests', 'test')), {URIRef(a), URIRef(b)})
+
+    def test_save_saves_new_context(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        c = []
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im, \
+                patch('PyOpenWorm.command.Context'), \
+                patch('PyOpenWorm.context.Context'):
+            def f(ctx):
+                c.append(ctx.new_context(b))
+
+            im().test.side_effect = f
+            self.cut.save('tests', 'test')
+            c[0]._backer.save_context.assert_called()
+
+    def test_save_validates_object_context_import_before_success(self):
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                stmt = MagicMock(name='stmt')
+                new_ctx = Mock(name='new_ctx')
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_import(new_ctx)
+                ctx.add_statement(stmt)
+            im().test = f
+            self.cut.save('tests', 'test')
 
     def test_save_validates_import_after_success(self):
-        # add a statement with an object in another context
-        # import context
-        # validation should succeed
-        pass
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                stmt = MagicMock(name='stmt')
+                new_ctx = Mock(name='new_ctx')
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_statement(stmt)
+                ctx.add_import(new_ctx)
+            im().test = f
+            self.cut.save('tests', 'test')
 
     def test_save_validates_additional_context_saved_fails(self):
         # add a statement with an object in another context

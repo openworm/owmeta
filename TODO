@@ -35,3 +35,4 @@
 - Add a further specialization for saving data sources that either prompts for, or accepts on the command line, the fields for the data source
 - Write documentation describing the notion of the (current) data context and (current) imports context
 - Write (or reuse) a context accessor schema for acquiring RDF graphs from (possibly remote) resources
+- Allow to abbreviate names based on the context. Not necessarily prefixes
