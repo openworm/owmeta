@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 import json
 from tqdm import tqdm
+import six
 from .cli_command_wrapper import CLICommandWrapper, CLIUserError
 from .command import POW, GenericUserError
 from .git_repo import GitRepoProvider
@@ -56,6 +57,8 @@ def main():
             if isinstance(out, dict):
                 for k, v in out.items():
                     print(k, v)
+            elif isinstance(out, six.string_types):
+                print(out)
             else:
                 try:
                     for x in out:

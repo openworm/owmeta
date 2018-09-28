@@ -196,6 +196,24 @@ class POWTest(BaseTest):
                 im().test = f
                 self.cut.save('tests', 'test')
 
+    def test_save_validates_with_no_context_on_object(self):
+        # add a statement with an uncontextualized object (e.g., a literal)
+        # doesn't fail
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                stmt = Mock()
+                stmt.object.context = None
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+                ctx.add_statement(stmt)
+            im().test = f
+            self.cut.save('tests', 'test')
+
     def test_save_returns_something(self):
         a = 'http://example.org/mdc'
         self._init_conf({DATA_CONTEXT_KEY: a})

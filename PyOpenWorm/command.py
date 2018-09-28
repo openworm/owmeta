@@ -804,7 +804,7 @@ class _POWSaveContext(Context):
     def add_statement(self, stmt):
         stmt_tuple = (stmt.subject, stmt.property, stmt.object)
         for p in ((x.context.identifier, stmt) for x in stmt_tuple
-                  if x.context.identifier not in self._imported_ctx_ids):
+                  if x.context is not None and x.context.identifier not in self._imported_ctx_ids):
             self._unvalidated_statements.append(p)
         return self._backer.add_statement(stmt)
 
