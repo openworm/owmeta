@@ -22,7 +22,7 @@ from yarom.graphObject import (GraphObject,
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
-from yarom.mapper import FCN
+from yarom.utils import FCN
 from .rdf_go_modifiers import SubClassModifier
 from .data import DataUser
 from .context import Contexts

@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath, normpath
@@ -9,7 +9,10 @@ import shutil
 import json
 import logging
 import errno
+from collections import namedtuple
 from six import string_types
+import itertools
+
 try:
     from tempfile import TemporaryDirectory
 except ImportError:
@@ -332,14 +335,14 @@ class POW(object):
         '''
         import importlib as IM
         conf = self._conf()
-        if not context:
-            ctx = _POWSaveContext(self._data_ctx)
-        else:
-            ctx = _POWSaveContext(Context(ident=context, conf=conf))
 
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
+        if not context:
+            ctx = _POWSaveContext(self._data_ctx, m)
+        else:
+            ctx = _POWSaveContext(Context(ident=context, conf=conf), m)
         attr_chain = provider.split('.')
         p = m
         for x in attr_chain:
@@ -789,7 +792,8 @@ class POW(object):
 
 class _POWSaveContext(Context):
 
-    def __init__(self, backer, ):
+    def __init__(self, backer, user_module=None):
+        self._user_mod = user_module
         self._backer = backer  #: Backing context
         self._imported_ctx_ids = set([self._backer.identifier])
         self._created_ctxs = set()
@@ -803,9 +807,12 @@ class _POWSaveContext(Context):
 
     def add_statement(self, stmt):
         stmt_tuple = (stmt.subject, stmt.property, stmt.object)
-        for p in ((x.context.identifier, stmt) for x in stmt_tuple
+        for p in (UnimportedContextRecord(x.context.identifier, i, stmt) for i, x in enumerate(stmt_tuple)
                   if x.context is not None and x.context.identifier not in self._imported_ctx_ids):
-            self._unvalidated_statements.append(p)
+            from inspect import getouterframes, currentframe
+            self._unvalidated_statements.append(SaveValidationFailureRecord(self._user_mod,
+                                                                            getouterframes(currentframe()),
+                                                                            p))
         return self._backer.add_statement(stmt)
 
     def __getattr__(self, name):
@@ -884,8 +891,52 @@ class POWDirMissingException(GenericUserError):
     pass
 
 
+class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['user_module',
+                                                                             'stack',
+                                                                             'validation_record'])):
+
+    def filtered_stack(self):
+        umfile = getattr(self.user_module, '__file__', None)
+        if umfile.endswith('pyc'):
+            umfile = umfile[:-3] + 'py'
+
+        def accept(frame):
+            from PyOpenWorm import __file__
+            pymodfile = dirname(__file__)
+            return not frame[1].startswith(pymodfile)
+
+        def reject(frame):
+            # Skip all of the PyOpenWorm frames. Assume we did everything right
+            from PyOpenWorm import __file__
+            pymodfile = dirname(__file__)
+            return frame[1].startswith(pymodfile)
+
+        return itertools.takewhile(accept, itertools.dropwhile(reject, self.stack))
+
+    def __str__(self):
+        from traceback import format_list
+        stack = format_list([x[1:4] + (''.join(x[4]).strip(),) for x in self.filtered_stack()])
+        fmt = '{}\n Traceback (most recent call last, PyOpenWorm frames omitted):\n {}'
+        res = fmt.format(self.validation_record, '\n '.join(''.join(s for s in stack if s).split('\n')))
+        return res.strip()
+
+
+class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):
+    def __str__(self):
+        from yarom.rdfUtils import triple_to_n3
+        trip = self.statement.to_triple()
+        fmt = 'Missing import of context {} for {} of statement "{}"'
+        return fmt.format(self.context.n3(),
+                          trip[self.node_index].n3(),
+                          triple_to_n3(trip))
+
+
 class StatementValidationError(GenericUserError):
-    pass
+    def __init__(self, statements):
+        msgfmt = '{} invalid statements were found:\n{}'
+        msg = msgfmt.format(len(statements), '\n'.join(str(x) for x in statements))
+        super(StatementValidationError, self).__init__(msg)
+        self.statements = statements
 
 
 class ConfigMissingException(GenericUserError):

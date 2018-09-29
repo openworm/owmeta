@@ -47,7 +47,12 @@ def main():
         out = CLICommandWrapper(p).main(argument_callback=additional_args,
                                         argument_namespace_callback=ns_handler)
     except (CLIUserError, GenericUserError) as e:
-        print(e, file=sys.stderr)
+        s = str(e)
+        if not s:
+            from yarom.utils import FCN
+            # In case someone forgets to add a helpful message for their user error
+            s = 'Received error: ' + FCN(type(e))
+        print(s, file=sys.stderr)
     output_mode = ns_handler.output_mode
 
     if out is not None:
