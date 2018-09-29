@@ -25,6 +25,11 @@ For example, where *test_muscles1* is a test in the *WormTest* suite of tests (s
 
     python setup.py test --addopts "-k test_muscles1"
 
+Python 2 support
+----------------
+Python 2.7 will be supported in PyOpenWorm through Python 2.7 end-of-life in 2020. Subsequent to that, any regressions for 2.7-based applications will only be fixed for the sake of OpenWorm projects.
+
+
 Uninstall
 ----------
 
