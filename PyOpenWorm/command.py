@@ -801,7 +801,7 @@ class _POWSaveContext(Context):
     def add_import(self, ctx):
         self._imported_ctx_ids.add(ctx.identifier)
         # Remove unvalidated statements which had this new context as the one they are missing
-        self._unvalidated_statements = [p for p in self._unvalidated_statements if p[0] != ctx.identifier]
+        self._unvalidated_statements = [p for p in self._unvalidated_statements if p[2][0] != ctx.identifier]
         return self._backer.add_import(ctx)
 
     def add_statement(self, stmt):
@@ -915,7 +915,7 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
             lastum = 0
             res = []
             for i, f in enumerate(frames):
-                if f[1].startswith(umfile):
+                if umfile and f[1].startswith(umfile):
                     lastum = i
                 if start:
                     res.append(f)

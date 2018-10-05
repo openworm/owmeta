@@ -190,7 +190,7 @@ class POWTest(BaseTest):
             self._init_conf({DATA_CONTEXT_KEY: a})
             with patch('importlib.import_module') as im:
                 def f(ctx):
-                    stmt = Mock()
+                    stmt = MagicMock()
                     stmt.context.identifier = URIRef(a)
                     ctx.add_statement(stmt)
                 im().test = f
@@ -236,13 +236,15 @@ class POWTest(BaseTest):
     def test_save_validates_import_after_success(self):
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/new_ctx')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ctx):
                 stmt = MagicMock(name='stmt')
                 new_ctx = Mock(name='new_ctx')
+                new_ctx.identifier = k
                 stmt.to_triple.return_value = (s, s, s)
-                stmt.object.context.identifier = new_ctx.identifier
+                stmt.object.context.identifier = k
                 stmt.property.context.identifier = URIRef(a)
                 stmt.subject.context.identifier = URIRef(a)
                 stmt.context.identifier = URIRef(a)
@@ -267,7 +269,6 @@ class POWTest(BaseTest):
                 new_ctx = ctx.new_context('http://example.org/nctx')
                 stmt = MagicMock(name='stmt')
                 stmt.to_triple.return_value = (s, s, s)
-                new_ctx.identifier = 'http://example.org/nctx'
                 stmt.object.context.identifier = new_ctx.identifier
                 stmt.property.context.identifier = URIRef(a)
                 stmt.subject.context.identifier = URIRef(a)
@@ -280,7 +281,23 @@ class POWTest(BaseTest):
 
     def test_save_validation_fail_in_parent_precludes_save(self):
         # Test that if validation fails in the parent, no other valid contexts are saved
-        pass
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                new_ctx = ctx.new_context('http://example.org/nctx')
+                stmt = MagicMock(name='stmt')
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_statement(stmt)
+            im().test = f
+            with self.assertRaises(StatementValidationError):
+                self.cut.save('tests', 'test')
 
     def test_save_validation_fail_in_created_context_precludes_save(self):
         # Test that if validation fails in the parent, no other valid contexts are saved
