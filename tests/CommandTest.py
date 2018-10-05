@@ -214,45 +214,6 @@ class POWTest(BaseTest):
             im().test = f
             self.cut.save('tests', 'test')
 
-    def test_save_returns_something(self):
-        a = 'http://example.org/mdc'
-        self._init_conf({DATA_CONTEXT_KEY: a})
-        with patch('importlib.import_module'):
-            self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
-
-    def test_save_returns_context(self):
-        from PyOpenWorm.context import Context
-        a = 'http://example.org/mdc'
-        self._init_conf({DATA_CONTEXT_KEY: a})
-        with patch('importlib.import_module'):
-            self.assertIsInstance(next(self.cut.save('tests', 'test')), Context)
-
-    def test_save_returns_created_contexts(self):
-        a = 'http://example.org/mdc'
-        b = 'http://example.org/smoo'
-        self._init_conf({DATA_CONTEXT_KEY: a})
-        with patch('importlib.import_module') as im:
-            def f(ctx):
-                ctx.new_context(b)
-
-            im().test.side_effect = f
-            self.assertEqual(set(x.identifier for x in self.cut.save('tests', 'test')), {URIRef(a), URIRef(b)})
-
-    def test_save_saves_new_context(self):
-        a = 'http://example.org/mdc'
-        b = 'http://example.org/smoo'
-        c = []
-        self._init_conf({DATA_CONTEXT_KEY: a})
-        with patch('importlib.import_module') as im, \
-                patch('PyOpenWorm.command.Context'), \
-                patch('PyOpenWorm.context.Context'):
-            def f(ctx):
-                c.append(ctx.new_context(b))
-
-            im().test.side_effect = f
-            self.cut.save('tests', 'test')
-            c[0]._backer.save_context.assert_called()
-
     def test_save_validates_object_context_import_before_success(self):
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
@@ -299,6 +260,45 @@ class POWTest(BaseTest):
         # Usually don't test non-specified interactions, but this one seems relevant to clearly show the separation of
         # these features
         pass
+
+    def test_save_returns_something(self):
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
+
+    def test_save_returns_context(self):
+        from PyOpenWorm.context import Context
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsInstance(next(self.cut.save('tests', 'test')), Context)
+
+    def test_save_returns_created_contexts(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                ctx.new_context(b)
+
+            im().test.side_effect = f
+            self.assertEqual(set(x.identifier for x in self.cut.save('tests', 'test')), {URIRef(a), URIRef(b)})
+
+    def test_save_saves_new_context(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        c = []
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im, \
+                patch('PyOpenWorm.command.Context'), \
+                patch('PyOpenWorm.context.Context'):
+            def f(ctx):
+                c.append(ctx.new_context(b))
+
+            im().test.side_effect = f
+            self.cut.save('tests', 'test')
+            c[0]._backer.save_context.assert_called()
 
 
 class POWTranslateTest(BaseTest):

@@ -1,5 +1,4 @@
 - Translate the below into Github issues
-- Have the "data save" command return an n3 printout of the saved context [ Decided not to do this...we'll just return the contexts saved so you can view them later ]
 - Add flags for "data save" for automatically adding certain classes of imports automatically:
     - The definition_context of the class of an object
     - The contexts of objects refered to in statements made in the callable

@@ -818,11 +818,18 @@ class _POWSaveContext(Context):
     def __getattr__(self, name):
         return getattr(self._backer, name)
 
+    def validate(self):
+        unvalidated = []
+        for c in self._created_ctxs:
+            unvalidated += c._unvalidated_statements
+        unvalidated += self._unvalidated_statements
+        if unvalidated:
+            raise StatementValidationError(unvalidated)
+
     def save_context(self, *args, **kwargs):
+        self.validate()
         for c in self._created_ctxs:
             c.save_context(*args, **kwargs)
-        if self._unvalidated_statements:
-            raise StatementValidationError(list(self._unvalidated_statements))
         return self._backer.save_context(*args, **kwargs)
 
     def created_contexts(self):
