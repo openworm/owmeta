@@ -11,7 +11,6 @@ import logging
 import errno
 from collections import namedtuple
 from six import string_types
-import itertools
 
 try:
     from tempfile import TemporaryDirectory
@@ -904,21 +903,27 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
 
     def filtered_stack(self):
         umfile = getattr(self.user_module, '__file__', None)
-        if umfile.endswith('pyc'):
+        if umfile and umfile.endswith('pyc'):
             umfile = umfile[:-3] + 'py'
+        ourfile = __file__
 
-        def accept(frame):
-            from PyOpenWorm import __file__
-            pymodfile = dirname(__file__)
-            return not frame[1].startswith(pymodfile)
+        if ourfile.endswith('pyc'):
+            ourfile = ourfile[:-3] + 'py'
 
-        def reject(frame):
-            # Skip all of the PyOpenWorm frames. Assume we did everything right
-            from PyOpenWorm import __file__
-            pymodfile = dirname(__file__)
-            return frame[1].startswith(pymodfile)
+        def find_last_user_frame(frames):
+            start = False
+            lastum = 0
+            res = []
+            for i, f in enumerate(frames):
+                if f[1].startswith(umfile):
+                    lastum = i
+                if start:
+                    res.append(f)
+                if not start and f[1].startswith(ourfile):
+                    start = True
+            return res[:lastum]
 
-        return itertools.takewhile(accept, itertools.dropwhile(reject, self.stack))
+        return find_last_user_frame(self.stack)
 
     def __str__(self):
         from traceback import format_list

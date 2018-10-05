@@ -661,3 +661,6 @@ class ZODBSource(RDFSource):
         self.conn.close()
         self.zdb.close()
         self.graph = False
+
+def test(f):
+    f()

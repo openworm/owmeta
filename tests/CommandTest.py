@@ -259,6 +259,31 @@ class POWTest(BaseTest):
         #
         # Usually don't test non-specified interactions, but this one seems relevant to clearly show the separation of
         # these features
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                new_ctx = ctx.new_context('http://example.org/nctx')
+                stmt = MagicMock(name='stmt')
+                stmt.to_triple.return_value = (s, s, s)
+                new_ctx.identifier = 'http://example.org/nctx'
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_statement(stmt)
+            im().test = f
+            with self.assertRaises(StatementValidationError):
+                self.cut.save('tests', 'test')
+
+    def test_save_validation_fail_in_parent_precludes_save(self):
+        # Test that if validation fails in the parent, no other valid contexts are saved
+        pass
+
+    def test_save_validation_fail_in_created_context_precludes_save(self):
+        # Test that if validation fails in the parent, no other valid contexts are saved
         pass
 
     def test_save_returns_something(self):
