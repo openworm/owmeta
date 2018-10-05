@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 try:
     from unittest.mock import MagicMock, Mock, ANY, patch
@@ -280,28 +281,89 @@ class POWTest(BaseTest):
                 self.cut.save('tests', 'test')
 
     def test_save_validation_fail_in_parent_precludes_save(self):
-        # Test that if validation fails in the parent, no other valid contexts are saved
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/unknown_ctx')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            def f(ctx):
-                new_ctx = ctx.new_context('http://example.org/nctx')
-                stmt = MagicMock(name='stmt')
-                stmt.to_triple.return_value = (s, s, s)
-                stmt.object.context.identifier = new_ctx.identifier
-                stmt.property.context.identifier = URIRef(a)
-                stmt.subject.context.identifier = URIRef(a)
-                stmt.context.identifier = URIRef(a)
+            with patch('PyOpenWorm.command.Context') as ctxc:
 
-                ctx.add_statement(stmt)
-            im().test = f
-            with self.assertRaises(StatementValidationError):
-                self.cut.save('tests', 'test')
+                data_context = Mock()
+                data_context.identifier = URIRef(a)
+
+                ctxk = Mock()
+                ctxk.identifier = k
+
+                ctxc.side_effect = [data_context, ctxk]
+
+                def f(ctx):
+                    ctx.new_context('this value doesnt matter')
+                    stmt = MagicMock(name='stmt')
+                    stmt.to_triple.return_value = (s, s, s)
+
+                    stmt.object.context.identifier = URIRef(a)
+                    stmt.property.context.identifier = k
+                    stmt.subject.context.identifier = URIRef(a)
+                    stmt.context.identifier = URIRef(a)
+
+                    ctx.add_statement(stmt)
+
+                im().test = f
+
+                try:
+                    self.cut.save('tests', 'test')
+                    self.fail('Should have errored')
+                except StatementValidationError:
+                    data_context.save_context.assert_not_called()
+                    ctxk.save_context.assert_not_called()
 
     def test_save_validation_fail_in_created_context_precludes_save(self):
         # Test that if validation fails in the parent, no other valid contexts are saved
-        pass
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/created_context')
+        v = URIRef('http://example.org/unknown_context')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            with patch('PyOpenWorm.command.Context') as ctxc:
+
+                data_context = Mock()
+                data_context.identifier = URIRef(a)
+
+                ctxk = Mock()
+                ctxk.identifier = k
+
+                ctxc.side_effect = [data_context, ctxk]
+
+                def f(ctx):
+                    new_ctx = ctx.new_context('this value doesnt matter')
+                    stmt = MagicMock(name='stmt')
+                    stmt.to_triple.return_value = (s, s, s)
+
+                    stmt.object.context.identifier = URIRef(a)
+                    stmt.property.context.identifier = URIRef(a)
+                    stmt.subject.context.identifier = URIRef(a)
+                    stmt.context.identifier = URIRef(a)
+                    ctx.add_statement(stmt)
+
+                    stmt1 = MagicMock(name='stmt')
+                    stmt1.to_triple.return_value = (s, s, s)
+
+                    stmt1.object.context.identifier = k
+                    stmt1.property.context.identifier = v
+                    stmt1.subject.context.identifier = k
+                    stmt1.context.identifier = k
+
+                    new_ctx.add_statement(stmt1)
+
+                im().test = f
+
+                try:
+                    self.cut.save('tests', 'test')
+                    self.fail('Should have errored')
+                except StatementValidationError:
+                    data_context.save_context.assert_not_called()
+                    ctxk.save_context.assert_not_called()
 
     def test_save_returns_something(self):
         a = 'http://example.org/mdc'
