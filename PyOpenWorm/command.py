@@ -536,13 +536,23 @@ class POW(object):
                 self._init_config_file()
             self._init_store()
             self.message('Deserializing...', file=sys.stderr)
-            with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
-                    self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
-                self._load_all_graphs(ctx_prog, trip_prog)
+            self._regenerate_database()
             self.message('Done!', file=sys.stderr)
         except BaseException as e:
             self._ensure_no_powdir()
             raise e
+
+    def regendb(self):
+        from glob import glob
+        for g in glob(self.store_name + '*'):
+            self.message('unlink', g)
+            self.unlink(g)
+        self._regenerate_database()
+
+    def _regenerate_database(self):
+        with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
+                self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
+            self._load_all_graphs(ctx_prog, trip_prog)
 
     def _load_all_graphs(self, progress, trip_prog):
         import transaction
