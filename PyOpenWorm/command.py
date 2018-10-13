@@ -440,7 +440,7 @@ class POW(object):
         from rdflib.term import URIRef
         conf = self._conf()
         nm = conf['rdf.graph'].namespace_manager
-        s = s.strip('<>')
+        s = s.strip(u'<>')
         parts = s.split(':')
         if len(parts) > 1 and is_ncname(parts[1]):
             for pref, ns in nm.namespaces():
