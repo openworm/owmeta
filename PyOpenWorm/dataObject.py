@@ -3,27 +3,23 @@ from functools import partial
 import rdflib as R
 from rdflib.term import URIRef
 import logging
-from itertools import groupby
 import six
 import hashlib
 
 import PyOpenWorm # noqa
-from . import DEF_CTX, BASE_SCHEMA_URL
+from . import BASE_SCHEMA_URL
 from .contextualize import (Contextualizable,
                             ContextualizableClass,
-                            contextualize_metaclass,
                             contextualize_helper,
                             decontextualize_helper)
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
-                               GraphObjectQuerier,
-                               ZeroOrMoreTQLayer)
+                               GraphObjectQuerier)
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
 from yarom.utils import FCN
-from .rdf_go_modifiers import SubClassModifier
 from .data import DataUser
 from .context import Contexts
 from .identifier_mixin import IdMixin
@@ -512,9 +508,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         return len(GraphObjectQuerier(self, self.rdf, parallel=False,
                                       hop_scorer=goq_hop_scorer)())
 
-    def load(self):
+    def load(self, graph=None):
         # XXX: May need to rethink this refactor at some point...
-        for x in load(self.rdf,
+        for x in load(self.rdf if graph is None else graph,
                       start=self,
                       target_type=type(self).rdf_type,
                       context=self.context):
@@ -522,10 +518,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
     def fill(self):
         pass
-
-    def _zomifier(self, rdf_type):
-        if type(self).rdf_type == rdf_type:
-            return SubClassModifier(rdf_type)
 
     def variable(self):
         if self._variable is None:
@@ -852,36 +844,6 @@ def disconnect():
     RDFTypeTable.clear()
     DataObjectsParents.clear()
     PropertyTypes.clear()
-
-
-def get_most_specific_rdf_type(types, context=None, bases=None):
-    """ Gets the most specific rdf_type.
-
-    Returns the URI corresponding to the lowest in the DataObject class
-    hierarchy from among the given URIs.
-    """
-    if context is None:
-        context = DEF_CTX
-    mapper = context.mapper
-    if bases:
-        most_specific_types = tuple(context.resolve_class(x) for x in bases)
-    else:
-        most_specific_types = tuple(mapper.base_classes.values())
-
-    for x in types:
-        try:
-            class_object = context.resolve_class(x)
-            if class_object is None:
-                raise KeyError()
-            if issubclass(class_object, most_specific_types):
-                most_specific_types = (class_object,)
-        except KeyError:
-            L.warning(
-                """A Python class corresponding to the type URI "{}" couldn't be found.
-            You may want to import the module containing the class as well as
-            add additional type annotations in order to resolve your objects to
-            a more precise type.""".format(x))
-    return most_specific_types[0].rdf_type
 
 
 class PropertyDataObject(DataObject):
