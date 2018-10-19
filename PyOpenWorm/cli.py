@@ -37,7 +37,10 @@ class JSONSerializer(object):
 
 
 def main():
+    import logging
+    logging.basicConfig()
     p = POW()
+    p.log_level = 'WARN'
     p.message = print
     p.progress_reporter = tqdm
     p.repository_provider = GitRepoProvider()

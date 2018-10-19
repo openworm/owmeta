@@ -313,10 +313,11 @@ class POW(object):
 
     @log_level.setter
     def log_level(self, level):
-        logging.basicConfig()
-        logging.getLogger().setLevel(getattr(logging, level))
-        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
+        logging.getLogger().setLevel(getattr(logging, level.upper()))
         # Tailoring for known loggers
+
+        # Generally, too verbose for the user
+        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
 
     def save(self, module, provider=None, context=None):
         '''
