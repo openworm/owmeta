@@ -49,14 +49,29 @@ class POWSource(object):
             The key, a unique name for the source
         """
 
-    def list(self, context=None):
+    def list(self, context=None, kind=None):
         """
         List known sources
+
+        Parameters
+        ----------
+        kind : str
+            Only list sources of this kind
+        context : str
+            The context to query for sources
         """
-        from PyOpenWorm.datasource import DataSource
+        from .datasource import DataSource
         conf = self._parent._conf()
-        ctx = self._parent._data_ctx
-        dt = ctx.stored(DataSource)(conf=conf)
+        if context is not None:
+            ctx = self._make_ctx(context)
+        else:
+            ctx = self._parent._data_ctx
+        if kind is None:
+            kind = DataSource.rdf_type
+        kind_uri = self._parent._den3(kind)
+
+        dst = ctx.stored(ctx.stored.resolve_class(kind_uri))
+        dt = dst(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
             yield nm.normalizeUri(x.identifier)
@@ -78,6 +93,20 @@ class POWSource(object):
         """
         List kinds of sources
         """
+        from .datasource import DataSource
+        from .dataObject import TypeDataObject, RDFSSubClassOfProperty
+        from yarom.graphObject import ZeroOrMoreTQLayer
+        from .rdf_query_util import zomifier
+        conf = self._parent._conf()
+        ctx = self._parent._data_ctx
+        rdfto = ctx.stored(DataSource.rdf_type_object)
+        sc = ctx.stored(TypeDataObject)()
+        sc.attach_property(RDFSSubClassOfProperty)
+        sc.rdfs_subclassof_property(rdfto)
+        nm = conf['rdf.graph'].namespace_manager
+        g = ZeroOrMoreTQLayer(zomifier(DataSource.rdf_type), ctx.stored.rdf_graph())
+        for x in sc.load(graph=g):
+            yield nm.normalizeUri(x.identifier)
 
 
 class POWTranslator(object):
@@ -660,6 +689,9 @@ class POW(object):
             return Context(ident=conf[DATA_CONTEXT_KEY], conf=conf)
         except KeyError:
             raise ConfigMissingException(DATA_CONTEXT_KEY)
+
+    def _make_ctx(self, ctxid):
+        return Context(ident=ctxid, conf=self._conf())
 
     def reconstitute(self, data_source):
         '''

@@ -15,7 +15,7 @@ def goq_hop_scorer(hop):
     return 0
 
 
-def _zomifier(target_type):
+def zomifier(target_type):
     def helper(rdf_type):
         if target_type == rdf_type:
             return SubClassModifier(rdf_type)
@@ -25,7 +25,7 @@ def _zomifier(target_type):
 def load(graph, start=None, target_type=None, context=None, idents=None):
     L.debug("load: graph %s start %s target_type %s context %s", graph, start, target_type, context)
     if idents is None:
-        g = ZeroOrMoreTQLayer(_zomifier(target_type), graph)
+        g = ZeroOrMoreTQLayer(zomifier(target_type), graph)
         idents = GraphObjectQuerier(start, g, parallel=False,
                                     hop_scorer=goq_hop_scorer)()
     if idents:
@@ -77,14 +77,14 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
                 most_specific_types = (class_object,)
         except KeyError:
             L.warning(
-                """A Python class corresponding to the type URI "{}" couldn't be found.
+                """A Python class corresponding to the type URI <{}> couldn't be found.
             You may want to import the module containing the class as well as
             add additional type annotations in order to resolve your objects to
             a more precise type.""".format(x))
     return most_specific_types[0].rdf_type
 
 
-def oid(identifier_or_rdf_type, rdf_type=None, context=None, base_type=None):
+def oid(identifier_or_rdf_type=None, rdf_type=None, context=None, base_type=None):
     """
     Create an object from its rdf type
 

@@ -277,7 +277,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return repr(self)
 
     def __repr__(self):
-        return '{}(ident="{}")'.format(FCN(type(self)), getattr(self, 'identifier', '???'))
+        ident = getattr(self, 'identifier', '???')
+        if ident is None:
+            identpart = ''
+        else:
+            identpart = 'ident="{}"'.format(ident)
+        return '{}({})'.format(FCN(type(self)), identpart)
 
     def load_graph_from_configured_store(self):
         return ConjunctiveGraph(store=RDFContextStore(self))
