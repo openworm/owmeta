@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="0.0" y="256.0">tuple</node>
+    <node x="16.5" y="0.0">typing.Sequence</node>
+    <node x="50.0" y="710.0">PyOpenWorm.simpleProperty.POCache</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty.POCache" target="tuple">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="202.0" />
+    </edge>
+    <edge source="tuple" target="typing.Sequence">
+      <point x="0.0" y="-202.0" />
+      <point x="0.0" y="103.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="137.5" y="95.0" />
+  <SelectedNodes>
+    <node>tuple</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

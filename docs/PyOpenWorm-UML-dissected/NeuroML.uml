@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="20.0" y="0.0">PyOpenWorm.configure.Configureable</node>
+    <node x="0.0" y="257.0">PyOpenWorm.data.DataUser</node>
+    <node x="28.5" y="646.0">PyOpenWorm.my_neuroml.NeuroML</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.my_neuroml.NeuroML" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-48.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="136.0" y="95.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.configure.Configureable</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

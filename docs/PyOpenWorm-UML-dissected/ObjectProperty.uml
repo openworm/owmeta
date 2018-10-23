@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="0.0" y="0.0">type</node>
+    <node x="489.0" y="734.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="30.0" y="1387.5">PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin</node>
+    <node x="447.5" y="422.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="861.5" y="411.0">PyOpenWorm.configure.Configureable</node>
+    <node x="1195.0" y="1398.5">ObjectPropertyMixin</node>
+    <node x="476.0" y="1057.0">PyOpenWorm.simpleProperty.RealSimpleProperty</node>
+    <node x="668.25" y="1820.0">PyOpenWorm.simpleProperty.ObjectProperty</node>
+    <node x="841.5" y="668.0">PyOpenWorm.data.DataUser</node>
+    <node x="83.5" y="433.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+    <node x="833.0" y="1387.5">PyOpenWorm.simpleProperty.PropertyCountMixin</node>
+    <node x="54.0" y="778.0">PyOpenWorm.simpleProperty.ContextMappedPropertyClass</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="39.0" y="-81.5" />
+      <point x="863.25" y="1790.0" />
+      <point x="1004.0" y="1790.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.simpleProperty.ContextMappedPropertyClass">
+      <point x="-112.33333333333326" y="-356.5" />
+      <point x="532.1666666666667" y="1032.0" />
+      <point x="255.5" y="1032.0" />
+      <point x="0.0" y="59.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="ObjectPropertyMixin">
+      <point x="117.0" y="-81.5" />
+      <point x="941.25" y="1800.0" />
+      <point x="1274.5" y="1800.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="-117.0" y="-81.5" />
+      <point x="707.25" y="1800.0" />
+      <point x="243.0" y="1800.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="-39.0" y="-81.5" />
+      <point x="785.25" y="1790.0" />
+      <point x="644.5" y="1790.0" />
+      <point x="0.0" y="356.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="0.0" y="-59.5" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.data.DataUser">
+      <point x="112.33333333333337" y="-356.5" />
+      <point x="756.8333333333334" y="1032.0" />
+      <point x="998.5" y="1032.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="0.0" y="-356.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7767857142857143" x="662.0" y="175.0" />
+  <SelectedNodes>
+    <node>type</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

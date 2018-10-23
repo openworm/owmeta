@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/simpleProperty.py</OriginalElement>
+  <nodes>
+    <node x="2930.7250000000004" y="682.0">PyOpenWorm.simpleProperty.OPResolver</node>
+    <node x="940.9750000000001" y="1970.5">PyOpenWorm.simpleProperty.PropertyCountMixin</node>
+    <node x="1796.475" y="1427.0">PyOpenWorm.simpleProperty.ContextMappedPropertyClass</node>
+    <node x="16.5" y="2641.0">typing.Sequence</node>
+    <node x="1709.85" y="1082.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+    <node x="0.0" y="2897.0">tuple</node>
+    <node x="50.0" y="3351.0">PyOpenWorm.simpleProperty.POCache</node>
+    <node x="2193.725" y="660.0">PyOpenWorm.configure.Configureable</node>
+    <node x="404.91336805555557" y="2433.0">PyOpenWorm.simpleProperty.ObjectProperty</node>
+    <node x="574.0" y="2641.0">typing.Container</node>
+    <node x="0.0" y="748.5">ObjectPropertyMixin</node>
+    <node x="1215.4750000000001" y="748.5">UnionPropertyMixin</node>
+    <node x="2558.225" y="1383.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="1435.7835603632461" y="583.0">type</node>
+    <node x="494.97500000000014" y="1970.5">PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin</node>
+    <node x="2981.7250000000004" y="1948.0">PyOpenWorm.simpleProperty._ContextualizableLazyProxy</node>
+    <node x="115.97500000000014" y="1959.5">PyOpenWorm.inverse_property.InversePropertyMixin</node>
+    <node x="2004.725" y="748.5">MappedPropertyClass</node>
+    <node x="3515.7250000000004" y="748.5">DatatypePropertyMixin</node>
+    <node x="822.0" y="2641.0">typing.Sized</node>
+    <node x="2490.225" y="1904.0">PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory</node>
+    <node x="616.0" y="2743.0">typing._Collection</node>
+    <node x="2516.725" y="671.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="2131.6633680555556" y="1640.0">PyOpenWorm.simpleProperty.RealSimpleProperty</node>
+    <node x="2173.725" y="994.0">PyOpenWorm.data.DataUser</node>
+    <node x="1318.85" y="1027.0">abc.ABCMeta</node>
+    <node x="3328.7250000000004" y="737.5">typing.Reversible</node>
+    <node x="3239.7250000000004" y="748.5">Proxy</node>
+    <node x="963.7580128205119" y="2488.5">PyOpenWorm.simpleProperty.UnionProperty</node>
+    <node x="420.0" y="2641.0">typing.Iterable</node>
+    <node x="1934.6255475427345" y="0.0">object</node>
+    <node x="2817.5752270299126" y="2466.5">PyOpenWorm.simpleProperty.DatatypeProperty</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="typing._Collection" target="typing.Container">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.POCache" target="tuple">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="202.0" />
+    </edge>
+    <edge source="UnionPropertyMixin" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="1293.4750000000001" y="553.0" />
+      <point x="2036.0486244658114" y="553.0" />
+      <point x="-45.076923076923094" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="0.0" y="-81.5" />
+      <point x="560.9133680555556" y="2413.0" />
+      <point x="601.4750000000001" y="2413.0" />
+      <point x="-106.5" y="26.0" />
+    </edge>
+    <edge source="ObjectPropertyMixin" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="79.5" y="513.0" />
+      <point x="1945.8947783119652" y="513.0" />
+      <point x="-135.23076923076928" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="0.0" y="-48.0" />
+      <point x="2981.0752270299126" y="2373.0" />
+      <point x="2412.4967013888886" y="2373.0" />
+      <point x="112.33333333333326" y="356.5" />
+    </edge>
+    <edge source="Proxy" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="3274.2250000000004" y="533.0" />
+      <point x="2171.279393696581" y="533.0" />
+      <point x="90.15384615384619" y="246.5" />
+    </edge>
+    <edge source="MappedPropertyClass" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="2089.225" y="563.0" />
+      <point x="2081.1255475427342" y="563.0" />
+      <point x="0.0" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="112.33333333333326" y="-356.5" />
+      <point x="2412.4967013888886" y="1615.0" />
+      <point x="2610.0583333333334" y="1615.0" />
+      <point x="-103.66666666666674" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-97.5" y="-48.5" />
+      <point x="3079.2250000000004" y="1615.0" />
+      <point x="2817.3916666666664" y="1615.0" />
+      <point x="103.66666666666652" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.simpleProperty.ContextMappedPropertyClass">
+      <point x="-112.33333333333326" y="-356.5" />
+      <point x="2187.830034722222" y="1615.0" />
+      <point x="1997.975" y="1615.0" />
+      <point x="0.0" y="59.5" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Iterable">
+      <point x="-48.0" y="-15.0" />
+      <point x="640.0" y="2718.0" />
+      <point x="487.0" y="2718.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="DatatypePropertyMixin">
+      <point x="109.0" y="-48.0" />
+      <point x="3090.0752270299126" y="2413.0" />
+      <point x="3602.7250000000004" y="2413.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="ObjectPropertyMixin">
+      <point x="-124.80000000000018" y="-81.5" />
+      <point x="436.1133680555554" y="2413.0" />
+      <point x="79.5" y="2413.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="123.59999999999991" y="-26.0" />
+      <point x="1241.8580128205117" y="2413.0" />
+      <point x="2300.1633680555556" y="2413.0" />
+      <point x="0.0" y="356.5" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InversePropertyMixin" target="object">
+      <point x="0.0" y="-37.0" />
+      <point x="295.47500000000014" y="523.0" />
+      <point x="1968.4332398504268" y="523.0" />
+      <point x="-112.69230769230762" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.BaseContextualizable" target="object">
+      <point x="0.0" y="-92.5" />
+      <point x="2713.725" y="553.0" />
+      <point x="2126.2024706196576" y="553.0" />
+      <point x="45.076923076923094" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="-61.799999999999955" y="-26.0" />
+      <point x="1056.458012820512" y="2373.0" />
+      <point x="814.4750000000001" y="2373.0" />
+      <point x="106.5" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="2330.725" y="563.0" />
+      <point x="2103.664009081196" y="563.0" />
+      <point x="22.538461538461434" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="Proxy">
+      <point x="97.5" y="-48.5" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-356.5" />
+      <point x="2300.1633680555556" y="1615.0" />
+      <point x="2330.725" y="1615.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="type" target="object">
+      <point x="0.0" y="-180.5" />
+      <point x="1691.2835603632461" y="563.0" />
+      <point x="2058.587086004273" y="563.0" />
+      <point x="-22.53846153846166" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="MappedPropertyClass">
+      <point x="100.75" y="-59.5" />
+      <point x="2098.725" y="1358.0" />
+      <point x="2089.225" y="1358.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="0.0" y="-26.0" />
+      <point x="1118.2580128205118" y="2393.0" />
+      <point x="1111.9750000000001" y="2393.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="tuple" target="typing.Sequence">
+      <point x="0.0" y="-202.0" />
+      <point x="0.0" y="103.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="62.40000000000009" y="-81.5" />
+      <point x="623.3133680555557" y="2393.0" />
+      <point x="997.9750000000001" y="2393.0" />
+      <point x="-114.0" y="26.0" />
+    </edge>
+    <edge source="DatatypePropertyMixin" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="3602.7250000000004" y="513.0" />
+      <point x="2216.3563167735037" y="513.0" />
+      <point x="135.23076923076928" y="246.5" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Sized">
+      <point x="48.0" y="-15.0" />
+      <point x="736.0" y="2718.0" />
+      <point x="888.0" y="2718.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-81.5" />
+      <point x="1881.85" y="969.0" />
+      <point x="1819.0335603632461" y="969.0" />
+      <point x="127.75" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.inverse_property.InversePropertyMixin">
+      <point x="-62.40000000000009" y="-81.5" />
+      <point x="498.5133680555555" y="2403.0" />
+      <point x="205.72500000000014" y="2403.0" />
+      <point x="-89.75" y="37.0" />
+    </edge>
+    <edge source="typing.Reversible" target="object">
+      <point x="-1.1368683772161603E-13" y="-26.0" />
+      <point x="3412.2250000000004" y="523.0" />
+      <point x="2193.817855235042" y="523.0" />
+      <point x="112.69230769230762" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="707.9750000000001" y="533.0" />
+      <point x="1990.9717013888883" y="533.0" />
+      <point x="-90.15384615384619" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="124.80000000000018" y="-81.5" />
+      <point x="685.7133680555557" y="2403.0" />
+      <point x="2187.830034722222" y="2403.0" />
+      <point x="-112.33333333333326" y="356.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.inverse_property.InversePropertyMixin">
+      <point x="-123.59999999999991" y="-26.0" />
+      <point x="994.658012820512" y="2383.0" />
+      <point x="385.22500000000014" y="2383.0" />
+      <point x="89.75" y="37.0" />
+    </edge>
+    <edge source="abc.ABCMeta" target="type">
+      <point x="0.0" y="-136.5" />
+      <point x="1504.35" y="969.0" />
+      <point x="1563.5335603632461" y="969.0" />
+      <point x="-127.75" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="0.0" y="-92.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="-109.0" y="-48.0" />
+      <point x="2872.0752270299126" y="2383.0" />
+      <point x="1225.9750000000001" y="2383.0" />
+      <point x="114.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.OPResolver" target="object">
+      <point x="0.0" y="-81.5" />
+      <point x="3075.2250000000004" y="543.0" />
+      <point x="2148.740932158119" y="543.0" />
+      <point x="67.61538461538453" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="UnionPropertyMixin">
+      <point x="61.799999999999955" y="-26.0" />
+      <point x="1180.058012820512" y="2393.0" />
+      <point x="1293.4750000000001" y="2393.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.PropertyCountMixin" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="1111.9750000000001" y="543.0" />
+      <point x="2013.51016292735" y="543.0" />
+      <point x="-67.61538461538453" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="-100.75" y="-59.5" />
+      <point x="1897.225" y="1358.0" />
+      <point x="1881.85" y="1358.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.3140794223826715" x="1651.9999999999998" y="372.5" />
+  <SelectedNodes>
+    <node>PyOpenWorm.simpleProperty.DatatypeProperty</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

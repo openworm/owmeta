@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="68.0" y="235.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="26.5" y="0.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="0.0" y="492.0">PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="0.0" y="-92.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="223.5" y="95.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.contextualize.Contextualizable</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

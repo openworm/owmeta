@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/configure.py</OriginalElement>
+  <nodes>
+    <node x="807.1022727272727" y="675.5">PyOpenWorm.configure.ConfigValue</node>
+    <node x="63.0" y="1101.0">PyOpenWorm.configure.BadConf</node>
+    <node x="135.5" y="965.5">Exception</node>
+    <node x="386.0" y="543.0">PyOpenWorm.configure.Configure</node>
+    <node x="1088.1022727272727" y="675.5">PyOpenWorm.configure.NO_DEFAULT</node>
+    <node x="0.0" y="620.0">BaseException</node>
+    <node x="945.0" y="910.0">PyOpenWorm.configure._C</node>
+    <node x="1378.102272727273" y="598.0">PyOpenWorm.configure.Configureable</node>
+    <node x="382.0" y="954.5">PyOpenWorm.configure.ImmutableConfigure</node>
+    <node x="712.0" y="921.0">PyOpenWorm.configure._link</node>
+    <node x="785.5" y="0.0">object</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.configure.ConfigValue" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="937.6022727272727" y="523.0" />
+      <point x="932.0" y="523.0" />
+      <point x="0.0" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure._link" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-59.5" />
+      <point x="818.5" y="885.0" />
+      <point x="872.3522727272727" y="885.0" />
+      <point x="-65.25" y="26.0" />
+    </edge>
+    <edge source="Exception" target="BaseException">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="BaseException" target="object">
+      <point x="0.0" y="-81.5" />
+      <point x="183.0" y="513.0" />
+      <point x="814.8" y="513.0" />
+      <point x="-117.20000000000005" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.ImmutableConfigure" target="PyOpenWorm.configure.Configure">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="158.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configure" target="object">
+      <point x="0.0" y="-158.5" />
+      <point x="537.0" y="523.0" />
+      <point x="873.4" y="523.0" />
+      <point x="-58.60000000000002" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.BadConf" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="1515.102272727273" y="513.0" />
+      <point x="1049.2" y="513.0" />
+      <point x="117.20000000000005" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.NO_DEFAULT" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="1223.1022727272727" y="523.0" />
+      <point x="990.6" y="523.0" />
+      <point x="58.60000000000002" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure._C" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-70.5" />
+      <point x="1045.5" y="885.0" />
+      <point x="1002.8522727272727" y="885.0" />
+      <point x="65.25" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.703030303030303" x="732.5" y="135.0" />
+  <SelectedNodes>
+    <node>object</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

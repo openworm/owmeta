@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="505.0" y="874.5">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="0.0" y="600.0">list</node>
+    <node x="463.5" y="310.5">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="91.5" y="256.0">typing.MutableSequence</node>
+    <node x="292.5" y="1406.0">PyOpenWorm.dataObject.ContextualizableList</node>
+    <node x="71.5" y="0.0">typing.Sequence</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.dataObject.ContextualizableList" target="list">
+      <point x="-79.5" y="-59.5" />
+      <point x="372.0" y="1381.0" />
+      <point x="242.5" y="1381.0" />
+      <point x="0.0" y="378.0" />
+    </edge>
+    <edge source="list" target="typing.MutableSequence">
+      <point x="0.0" y="-378.0" />
+      <point x="0.0" y="147.0" />
+    </edge>
+    <edge source="typing.MutableSequence" target="typing.Sequence">
+      <point x="0.0" y="-147.0" />
+      <point x="0.0" y="103.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextualizableList" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="79.5" y="-59.5" />
+      <point x="531.0" y="1381.0" />
+      <point x="660.5" y="1381.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="273.5" y="135.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.contextualize.Contextualizable</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

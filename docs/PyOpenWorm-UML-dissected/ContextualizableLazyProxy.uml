@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="41.5" y="235.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="0.0" y="0.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="107.0" y="492.0">PyOpenWorm.simpleProperty._ContextualizableLazyProxy</node>
+    <node x="372.5" y="323.5">Proxy</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-97.5" y="-48.5" />
+      <point x="204.5" y="467.0" />
+      <point x="197.0" y="467.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="Proxy">
+      <point x="97.5" y="-48.5" />
+      <point x="399.5" y="467.0" />
+      <point x="407.0" y="467.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="235.5" y="95.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.contextualize.Contextualizable</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

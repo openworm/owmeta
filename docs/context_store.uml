@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/context_store.py</OriginalElement>
+  <nodes>
+    <node x="5.5" y="1189.0">PyOpenWorm.context_store.ContextStoreException</node>
+    <node x="709.75" y="822.0">PyOpenWorm.context_store.RDFContextStore</node>
+    <node x="666.375" y="609.5">Store</node>
+    <node x="135.5" y="932.5">Exception</node>
+    <node x="336.625" y="0.0">object</node>
+    <node x="0.0" y="543.0">BaseException</node>
+    <node x="259.75" y="756.0">PyOpenWorm.context_store.ContextStore</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.context_store.RDFContextStore" target="Store">
+      <point x="-107.75" y="-125.5" />
+      <point x="817.5" y="731.0" />
+      <point x="716.625" y="731.0" />
+      <point x="16.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStoreException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.RDFContextStore" target="object">
+      <point x="107.75" y="-125.5" />
+      <point x="1033.0" y="731.0" />
+      <point x="925.5138888888889" y="731.0" />
+      <point x="925.5138888888889" y="513.0" />
+      <point x="593.0" y="513.0" />
+      <point x="109.875" y="246.5" />
+    </edge>
+    <edge source="Exception" target="BaseException">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStore" target="object">
+      <point x="-107.5" y="-191.5" />
+      <point x="367.25" y="731.0" />
+      <point x="447.7638888888889" y="731.0" />
+      <point x="447.7638888888889" y="523.0" />
+      <point x="446.5" y="523.0" />
+      <point x="-36.625" y="246.5" />
+    </edge>
+    <edge source="BaseException" target="object">
+      <point x="0.0" y="-81.5" />
+      <point x="183.0" y="523.0" />
+      <point x="373.25" y="523.0" />
+      <point x="-109.875" y="246.5" />
+    </edge>
+    <edge source="Store" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="699.875" y="523.0" />
+      <point x="519.75" y="523.0" />
+      <point x="36.625" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStore" target="Store">
+      <point x="107.5" y="-191.5" />
+      <point x="582.25" y="731.0" />
+      <point x="683.125" y="731.0" />
+      <point x="-16.75" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="438.5" y="135.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.context_store.ContextStore</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

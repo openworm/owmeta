@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="105.5" y="0.0">type</node>
+    <node x="1062.0" y="235.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="1020.5" y="0.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="681.5" y="0.0">PyOpenWorm.configure.Configureable</node>
+    <node x="146.5" y="890.0">PyOpenWorm.simpleProperty.DatatypeProperty</node>
+    <node x="661.5" y="257.0">PyOpenWorm.data.DataUser</node>
+    <node x="0.0" y="477.5">MappedPropertyClass</node>
+    <node x="189.0" y="411.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+    <node x="154.5" y="1036.0">PyOpenWorm.dataObject.RDFSLabelProperty</node>
+    <node x="0.0" y="788.0">PyOpenWorm.simpleProperty.PropertyCountMixin</node>
+    <node x="362.0" y="799.0">DatatypePropertyMixin</node>
+    <node x="21.25" y="624.0">PyOpenWorm.simpleProperty.ContextMappedPropertyClass</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="-81.75" y="-48.0" />
+      <point x="228.25" y="865.0" />
+      <point x="171.0" y="865.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFSLabelProperty" target="PyOpenWorm.simpleProperty.DatatypeProperty">
+      <point x="0.0" y="-70.0" />
+      <point x="0.0" y="48.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="DatatypePropertyMixin">
+      <point x="81.75" y="-48.0" />
+      <point x="391.75" y="865.0" />
+      <point x="449.0" y="865.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="100.75" y="-59.5" />
+      <point x="323.5" y="599.0" />
+      <point x="361.0" y="599.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="MappedPropertyClass">
+      <point x="-100.75" y="-59.5" />
+      <point x="122.0" y="599.0" />
+      <point x="84.5" y="599.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.75" x="329.0" y="290.0" />
+  <SelectedNodes>
+    <node>type</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

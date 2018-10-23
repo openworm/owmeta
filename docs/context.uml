@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/context.py</OriginalElement>
+  <nodes>
+    <node x="0.0" y="553.0">type</node>
+    <node x="1913.0" y="1030.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="93.5" y="1353.0">PyOpenWorm.context.ContextMeta</node>
+    <node x="815.1203007518798" y="0.0">object</node>
+    <node x="1145.9755639097743" y="2548.0">PyOpenWorm.context.QueryContext</node>
+    <node x="815.5" y="630.0">PyOpenWorm.configure.Configureable</node>
+    <node x="1109.5" y="586.0">PyOpenWorm.context.ContextContextManager</node>
+    <node x="1871.5" y="641.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="83.5" y="1052.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+    <node x="1462.5" y="707.5">PyOpenWorm.import_contextualizer.ImportContextualizer</node>
+    <node x="479.5" y="1063.0">PyOpenWorm.context.ModuleProxy</node>
+    <node x="540.5" y="718.5">ObjectProxy</node>
+    <node x="795.5" y="964.0">PyOpenWorm.data.DataUser</node>
+    <node x="778.9755639097745" y="1521.0">PyOpenWorm.context.Context</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="381.0000000000001" y="-488.5" />
+      <point x="1667.9755639097746" y="1496.0" />
+      <point x="2068.5" y="1496.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.context.ContextMeta">
+      <point x="-380.9999999999999" y="-488.5" />
+      <point x="905.9755639097746" y="1496.0" />
+      <point x="255.5" y="1496.0" />
+      <point x="0.0" y="59.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.import_contextualizer.ImportContextualizer">
+      <point x="127.00000000000011" y="-488.5" />
+      <point x="1413.9755639097746" y="1496.0" />
+      <point x="1657.0" y="1496.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.ModuleProxy" target="ObjectProxy">
+      <point x="-74.0" y="-70.5" />
+      <point x="553.5" y="939.0" />
+      <point x="595.0" y="939.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.ContextContextManager" target="object">
+      <point x="0.0" y="-147.5" />
+      <point x="1276.0" y="533.0" />
+      <point x="1003.4774436090227" y="533.0" />
+      <point x="41.85714285714289" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.QueryContext" target="PyOpenWorm.context.Context">
+      <point x="1.1368683772161603E-13" y="-48.5" />
+      <point x="0.0" y="488.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.import_contextualizer.ImportContextualizer" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="1657.0" y="523.0" />
+      <point x="1045.3345864661655" y="523.0" />
+      <point x="83.71428571428578" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.ContextMeta" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="0.0" y="-59.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.BaseContextualizable" target="object">
+      <point x="0.0" y="-92.5" />
+      <point x="2068.5" y="513.0" />
+      <point x="1087.1917293233082" y="513.0" />
+      <point x="125.57142857142844" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.ModuleProxy" target="object">
+      <point x="74.0" y="-70.5" />
+      <point x="701.5" y="939.0" />
+      <point x="660.0" y="939.0" />
+      <point x="660.0" y="533.0" />
+      <point x="919.7631578947369" y="533.0" />
+      <point x="-41.85714285714289" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="952.5" y="533.0" />
+      <point x="961.6203007518798" y="533.0" />
+      <point x="0.0" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.data.DataUser">
+      <point x="-126.99999999999989" y="-488.5" />
+      <point x="1159.9755639097746" y="1496.0" />
+      <point x="952.5" y="1496.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="ObjectProxy" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="595.0" y="523.0" />
+      <point x="877.906015037594" y="523.0" />
+      <point x="-83.71428571428578" y="246.5" />
+    </edge>
+    <edge source="type" target="object">
+      <point x="0.0" y="-180.5" />
+      <point x="255.5" y="513.0" />
+      <point x="836.0488721804513" y="513.0" />
+      <point x="-125.57142857142844" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.5191447041272998" x="995.5" y="225.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.context.Context</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

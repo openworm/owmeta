@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/command_util.py</OriginalElement>
+  <nodes>
+    <node x="535.0" y="587.0">PyOpenWorm.command_util.SubCommand</node>
+    <node x="0.0" y="543.0">PyOpenWorm.command_util.IVar</node>
+    <node x="111.0" y="800.0">PyOpenWorm.command_util.PropertyIVar</node>
+    <node x="324.25" y="0.0">object</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.command_util.SubCommand" target="object">
+      <point x="0.0" y="-59.5" />
+      <point x="684.0" y="518.0" />
+      <point x="544.0" y="518.0" />
+      <point x="73.25" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.command_util.PropertyIVar" target="PyOpenWorm.command_util.IVar">
+      <point x="0.0" y="-92.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.command_util.IVar" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="257.5" y="518.0" />
+      <point x="397.5" y="518.0" />
+      <point x="-73.25" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="290.5" y="95.0" />
+  <SelectedNodes>
+    <node>object</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

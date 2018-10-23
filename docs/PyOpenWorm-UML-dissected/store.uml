@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="451.0" y="80.0">PyOpenWorm.context_store.ContextStore</node>
+    <node x="407.25" y="0.0">Store</node>
+    <node x="0.0" y="146.0">PyOpenWorm.context_store.RDFContextStore</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.context_store.RDFContextStore" target="Store">
+      <point x="0.0" y="-125.5" />
+      <point x="215.5" y="55.0" />
+      <point x="424.0" y="55.0" />
+      <point x="-16.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStore" target="Store">
+      <point x="0.0" y="-191.5" />
+      <point x="666.0" y="55.0" />
+      <point x="457.5" y="55.0" />
+      <point x="16.75" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="316.0" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.context_store.ContextStore</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="70.0" y="191.0">PyOpenWorm.dataObject._partial_property</node>
+    <node x="0.0" y="0.0">functools.partial</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.dataObject._partial_property" target="functools.partial">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="70.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="148.5" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.dataObject._partial_property</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

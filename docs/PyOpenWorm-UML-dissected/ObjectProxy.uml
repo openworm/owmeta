@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="676.0" y="124.0">PyOpenWorm.neuron.NeuronProxy</node>
+    <node x="453.5" y="0.0">ObjectProxy</node>
+    <node x="360.0" y="124.0">PyOpenWorm.context.ModuleProxy</node>
+    <node x="0.0" y="80.0">PyOpenWorm.contextualize.ContextualizingProxy</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.neuron.NeuronProxy" target="ObjectProxy">
+      <point x="0.0" y="-70.5" />
+      <point x="833.0" y="55.0" />
+      <point x="544.3333333333334" y="55.0" />
+      <point x="36.33333333333337" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizingProxy" target="ObjectProxy">
+      <point x="0.0" y="-114.5" />
+      <point x="170.0" y="55.0" />
+      <point x="471.6666666666667" y="55.0" />
+      <point x="-36.333333333333314" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.ModuleProxy" target="ObjectProxy">
+      <point x="0.0" y="-70.5" />
+      <point x="0.0" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="443.0" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.neuron.NeuronProxy</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

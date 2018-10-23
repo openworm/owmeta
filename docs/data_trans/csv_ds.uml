@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/data_trans/csv_ds.py</OriginalElement>
+  <nodes>
+    <node x="1349.2390350877195" y="2751.5">PyOpenWorm.data_trans.csv_ds.CSVDataTranslator</node>
+    <node x="440.37500000000006" y="866.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="169.11403508771934" y="2605.5">PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource</node>
+    <node x="655.4495614035088" y="0.0">object</node>
+    <node x="1562.3311403508774" y="609.0">PyOpenWorm.datasource.DataTransatorType</node>
+    <node x="180.83114035087726" y="1189.0">PyOpenWorm.dataObject.BaseDataObject</node>
+    <node x="197.61403508771934" y="2730.0">PyOpenWorm.data_trans.csv_ds.CSVDataSource</node>
+    <node x="1363.7390350877195" y="2282.0">PyOpenWorm.datasource.BaseDataTranslator</node>
+    <node x="840.3750000000001" y="543.0">PyOpenWorm.configure.Configureable</node>
+    <node x="398.875" y="554.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="820.3750000000001" y="800.0">PyOpenWorm.data.DataUser</node>
+    <node x="0.0" y="576.0">PyOpenWorm.datasource.DataSourceType</node>
+    <node x="1205.280701754386" y="822.0">PyOpenWorm.dataObject.ContextMappedClass</node>
+    <node x="231.61403508771934" y="2304.0">PyOpenWorm.datasource.DataSource</node>
+    <node x="1401.7390350877195" y="2605.0">PyOpenWorm.datasource.DataTranslator</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator" target="PyOpenWorm.datasource.DataTranslator">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="37.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.dataObject.ContextMappedClass">
+      <point x="509.33333333333337" y="-521.5" />
+      <point x="1454.1644736842106" y="1164.0" />
+      <point x="1367.780701754386" y="1164.0" />
+      <point x="0.0" y="147.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-509.33333333333314" y="-521.5" />
+      <point x="435.4978070175441" y="1164.0" />
+      <point x="595.875" y="1164.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.BaseDataTranslator" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="-90.75" y="-136.5" />
+      <point x="1454.4890350877195" y="2257.0" />
+      <point x="1326.8311403508774" y="2257.0" />
+      <point x="382.0000000000001" y="521.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataSourceType" target="object">
+      <point x="0.0" y="-70.5" />
+      <point x="148.5" y="513.0" />
+      <point x="692.0745614035088" y="513.0" />
+      <point x="-109.875" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource" target="PyOpenWorm.datasource.DataSource">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="114.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.data.DataUser">
+      <point x="1.1368683772161603E-13" y="-521.5" />
+      <point x="944.8311403508774" y="1164.0" />
+      <point x="977.3750000000001" y="1164.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataSource" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="66.75" y="-114.5" />
+      <point x="431.86403508771934" y="2257.0" />
+      <point x="562.8311403508773" y="2257.0" />
+      <point x="-382.0" y="521.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.BaseDataTranslator" target="PyOpenWorm.datasource.DataTransatorType">
+      <point x="90.75" y="-136.5" />
+      <point x="1635.9890350877195" y="2257.0" />
+      <point x="1719.3311403508774" y="2257.0" />
+      <point x="0.0" y="37.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataSource" target="PyOpenWorm.datasource.DataSourceType">
+      <point x="-66.75" y="-114.5" />
+      <point x="298.36403508771934" y="2257.0" />
+      <point x="148.5" y="2257.0" />
+      <point x="0.0" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataTranslator" target="PyOpenWorm.datasource.BaseDataTranslator">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="136.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.BaseContextualizable" target="object">
+      <point x="0.0" y="-92.5" />
+      <point x="595.875" y="523.0" />
+      <point x="765.3245614035088" y="523.0" />
+      <point x="-36.625" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.csv_ds.CSVDataSource" target="PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource">
+      <point x="0.0" y="-59.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataTransatorType" target="object">
+      <point x="0.0" y="-37.5" />
+      <point x="1719.3311403508774" y="513.0" />
+      <point x="911.8245614035088" y="513.0" />
+      <point x="109.875" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="977.3750000000001" y="523.0" />
+      <point x="838.5745614035088" y="523.0" />
+      <point x="36.625" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.717032967032967" x="708.0" y="255.08429118773944" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

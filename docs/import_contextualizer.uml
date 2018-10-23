@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/import_contextualizer.py</OriginalElement>
+  <nodes>
+    <node x="0.0" y="543.0">PyOpenWorm.import_contextualizer.ImportContextualizer</node>
+    <node x="48.0" y="0.0">object</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.import_contextualizer.ImportContextualizer" target="object">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="194.5" y="55.0" />
+  <SelectedNodes>
+    <node>object</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

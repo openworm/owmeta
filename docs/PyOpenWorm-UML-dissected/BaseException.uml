@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="298.0" y="344.0">PyOpenWorm.cli_command_wrapper.CLIUserError</node>
+    <node x="2403.0" y="344.0">PyOpenWorm.document.WormbaseRetrievalException</node>
+    <node x="1837.0" y="0.0">BaseException</node>
+    <node x="40.0" y="344.0">PyOpenWorm.data.OpenFailError</node>
+    <node x="1395.0" y="344.0">PyOpenWorm.configure.BadConf</node>
+    <node x="1034.0" y="344.0">PyOpenWorm.datasource.DuplicateAlsoException</node>
+    <node x="1972.5" y="213.0">Exception</node>
+    <node x="2791.0" y="344.0">PyOpenWorm.evidence.EvidenceError</node>
+    <node x="3078.0" y="333.0">PyOpenWorm.ConnectionFailError</node>
+    <node x="659.0" y="344.0">PyOpenWorm.context_store.ContextStoreException</node>
+    <node x="0.0" y="435.0">PyOpenWorm.data.ZODBSourceOpenFailError</node>
+    <node x="2031.0" y="344.0">PyOpenWorm.document.PubmedRetrievalException</node>
+    <node x="3343.0" y="344.0">PyOpenWorm.inverse_property.InversePropertyException</node>
+    <node x="3751.0" y="344.0">PyOpenWorm.command.InvalidGraphException</node>
+    <node x="1655.0" y="344.0">PyOpenWorm.command.UnreadableGraphException</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.context_store.ContextStoreException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="836.5" y="283.0" />
+      <point x="1992.2916666666667" y="283.0" />
+      <point x="-27.708333333333258" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.command.UnreadableGraphException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1833.0" y="313.0" />
+      <point x="2016.0416666666667" y="313.0" />
+      <point x="-3.9583333333332575" y="15.0" />
+    </edge>
+    <edge source="Exception" target="BaseException">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.document.WormbaseRetrievalException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2587.0" y="303.0" />
+      <point x="2031.875" y="303.0" />
+      <point x="11.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.command.InvalidGraphException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="3913.5" y="263.0" />
+      <point x="2063.541666666667" y="263.0" />
+      <point x="43.54166666666674" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.evidence.EvidenceError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2924.5" y="293.0" />
+      <point x="2039.7916666666667" y="293.0" />
+      <point x="19.791666666666742" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.ConnectionFailError" target="Exception">
+      <point x="0.0" y="-26.0" />
+      <point x="3200.5" y="283.0" />
+      <point x="2047.7083333333333" y="283.0" />
+      <point x="27.708333333333258" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InversePropertyException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="3537.0" y="273.0" />
+      <point x="2055.625" y="273.0" />
+      <point x="35.625" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.PubmedRetrievalException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2207.0" y="313.0" />
+      <point x="2023.9583333333333" y="313.0" />
+      <point x="3.9583333333332575" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIUserError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="468.5" y="273.0" />
+      <point x="1984.375" y="273.0" />
+      <point x="-35.625" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure.BadConf" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1515.0" y="303.0" />
+      <point x="2008.125" y="303.0" />
+      <point x="-11.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DuplicateAlsoException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1204.5" y="293.0" />
+      <point x="2000.2083333333333" y="293.0" />
+      <point x="-19.791666666666742" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.ZODBSourceOpenFailError" target="PyOpenWorm.data.OpenFailError">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.OpenFailError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="159.0" y="263.0" />
+      <point x="1976.4583333333333" y="263.0" />
+      <point x="-43.54166666666674" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.2548828125" x="2038.0" y="155.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.cli_command_wrapper.CLIUserError</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

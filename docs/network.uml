@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/network.py</OriginalElement>
+  <nodes>
+    <node x="640.0" y="2406.0">PyOpenWorm.biology.BiologyType</node>
+    <node x="962.5" y="866.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="261.9999999999999" y="822.0">PyOpenWorm.dataObject.ContextMappedClass</node>
+    <node x="633.0" y="2282.0">PyOpenWorm.dataObject.DataObject</node>
+    <node x="607.0" y="800.0">PyOpenWorm.data.DataUser</node>
+    <node x="921.0" y="554.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="624.0" y="2508.0">PyOpenWorm.network.Network</node>
+    <node x="627.0" y="543.0">PyOpenWorm.configure.Configureable</node>
+    <node x="794.4999999999999" y="0.0">object</node>
+    <node x="0.0" y="1189.0">PyOpenWorm.dataObject.BaseDataObject</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.network.Network" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.dataObject.ContextMappedClass">
+      <point x="-509.33333333333326" y="-521.5" />
+      <point x="254.66666666666674" y="1164.0" />
+      <point x="424.4999999999999" y="1164.0" />
+      <point x="0.0" y="147.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-521.5" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.biology.BiologyType" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="509.33333333333326" y="-521.5" />
+      <point x="1273.3333333333333" y="1164.0" />
+      <point x="1118.0" y="1164.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.BaseContextualizable" target="object">
+      <point x="-5.6843418860808015E-14" y="-92.5" />
+      <point x="1118.0" y="518.0" />
+      <point x="1014.25" y="518.0" />
+      <point x="73.25" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="764.0" y="518.0" />
+      <point x="867.7499999999999" y="518.0" />
+      <point x="-73.25" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="-5.6843418860808015E-14" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObject" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="521.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7849056603773585" x="474.0" y="255.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.dataObject.BaseDataObject</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

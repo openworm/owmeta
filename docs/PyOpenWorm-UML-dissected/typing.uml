@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="306.0" y="0.0">typing.Container</node>
+    <node x="148.0" y="102.0">typing._Collection</node>
+    <node x="0.0" y="0.0">typing.Iterable</node>
+    <node x="154.0" y="0.0">typing.Sized</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="typing._Collection" target="typing.Container">
+      <point x="48.0" y="-15.0" />
+      <point x="268.0" y="77.0" />
+      <point x="420.0" y="77.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Sized">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Iterable">
+      <point x="-48.0" y="-15.0" />
+      <point x="172.0" y="77.0" />
+      <point x="67.0" y="77.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="204.5" y="55.0" />
+  <SelectedNodes>
+    <node>typing.Container</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="270.0" y="147.0">PyOpenWorm.dataObject.APThunk</node>
+    <node x="139.5" y="0.0">PyOpenWorm.dataObject.PThunk</node>
+    <node x="0.0" y="180.0">PyOpenWorm.dataObject.CPThunk</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.dataObject.APThunk" target="PyOpenWorm.dataObject.PThunk">
+      <point x="0.0" y="-92.5" />
+      <point x="395.0" y="122.0" />
+      <point x="320.25" y="122.0" />
+      <point x="60.25" y="48.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.CPThunk" target="PyOpenWorm.dataObject.PThunk">
+      <point x="0.0" y="-59.5" />
+      <point x="125.0" y="122.0" />
+      <point x="199.75" y="122.0" />
+      <point x="-60.25" y="48.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="260.0" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.dataObject.APThunk</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

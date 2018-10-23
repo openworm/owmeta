@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="111.0" y="257.0">PyOpenWorm.command_util.PropertyIVar</node>
+    <node x="0.0" y="0.0">PyOpenWorm.command_util.IVar</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.command_util.PropertyIVar" target="PyOpenWorm.command_util.IVar">
+      <point x="0.0" y="-92.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="144.5" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.command_util.PropertyIVar</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

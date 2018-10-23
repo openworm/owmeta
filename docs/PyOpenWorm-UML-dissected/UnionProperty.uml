@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="606.525" y="1409.0">PyOpenWorm.simpleProperty.UnionProperty</node>
+    <node x="1209.025" y="323.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="538.0" y="976.5">PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin</node>
+    <node x="1167.525" y="11.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="1581.525" y="0.0">PyOpenWorm.configure.Configureable</node>
+    <node x="1363.0" y="646.0">PyOpenWorm.simpleProperty.RealSimpleProperty</node>
+    <node x="1561.525" y="257.0">PyOpenWorm.data.DataUser</node>
+    <node x="984.0" y="965.5">PyOpenWorm.inverse_property.InversePropertyMixin</node>
+    <node x="0.0" y="976.5">PyOpenWorm.simpleProperty.PropertyCountMixin</node>
+    <node x="362.0" y="987.5">UnionPropertyMixin</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="123.59999999999991" y="-26.0" />
+      <point x="884.6249999999999" y="1389.0" />
+      <point x="1531.5" y="1389.0" />
+      <point x="0.0" y="356.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="UnionPropertyMixin">
+      <point x="-61.799999999999955" y="-26.0" />
+      <point x="699.225" y="1379.0" />
+      <point x="440.0" y="1379.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="0.0" y="-26.0" />
+      <point x="761.025" y="1389.0" />
+      <point x="751.0" y="1389.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.data.DataUser">
+      <point x="84.25" y="-356.5" />
+      <point x="1615.75" y="621.0" />
+      <point x="1718.525" y="621.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.inverse_property.InversePropertyMixin">
+      <point x="61.799999999999955" y="-26.0" />
+      <point x="822.8249999999999" y="1379.0" />
+      <point x="1163.5" y="1379.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-84.25" y="-356.5" />
+      <point x="1447.25" y="621.0" />
+      <point x="1364.525" y="621.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="-123.60000000000002" y="-26.0" />
+      <point x="637.425" y="1389.0" />
+      <point x="171.0" y="1389.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.6069767441860465" x="850.0" y="135.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.simpleProperty.UnionProperty</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

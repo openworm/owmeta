@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/git_repo.py</OriginalElement>
+  <nodes>
+    <node x="0.0" y="620.0">PyOpenWorm.git_repo._CloneProgress</node>
+    <node x="476.0" y="543.0">PyOpenWorm.git_repo.GitRepoProvider</node>
+    <node x="277.5" y="0.0">object</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.git_repo._CloneProgress" target="object">
+      <point x="0.0" y="-59.5" />
+      <point x="228.0" y="518.0" />
+      <point x="350.75" y="518.0" />
+      <point x="-73.25" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.git_repo.GitRepoProvider" target="object">
+      <point x="0.0" y="-136.5" />
+      <point x="620.0" y="518.0" />
+      <point x="497.25" y="518.0" />
+      <point x="73.25" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="285.0" y="55.0" />
+  <SelectedNodes>
+    <node>object</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

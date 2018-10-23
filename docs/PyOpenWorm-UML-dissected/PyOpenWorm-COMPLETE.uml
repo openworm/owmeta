@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="2427.500000000001" y="570.0">PyOpenWorm.dataObject.RDFTypeProperty</node>
+    <node x="4509.75" y="180.0">PyOpenWorm.pProperty.PropertyMeta</node>
+    <node x="298.0" y="1035.0">PyOpenWorm.cli_command_wrapper.CLIUserError</node>
+    <node x="3354.5116942719164" y="180.0">PyOpenWorm.context.ContextMeta</node>
+    <node x="12942.0" y="835.0">PyOpenWorm.connection.SynapseType</node>
+    <node x="2609.395833333334" y="0.0">type</node>
+    <node x="7733.416666666667" y="760.0">PyOpenWorm.muscle.Muscle</node>
+    <node x="7959.0" y="915.0">PyOpenWorm.command_util.PropertyIVar</node>
+    <node x="10862.0" y="835.0">PyOpenWorm.channelworm.ChannelModelType</node>
+    <node x="13265.0" y="835.0">PyOpenWorm.contextualize.proxy_to_X</node>
+    <node x="25.5" y="470.0">PyOpenWorm.data.TrixSource</node>
+    <node x="1379.0" y="1035.0">PyOpenWorm.document.WormbaseRetrievalException</node>
+    <node x="7872.916666666667" y="660.0">PyOpenWorm.cell.Cell</node>
+    <node x="8914.583333333334" y="660.0">PyOpenWorm.channel.Channel</node>
+    <node x="5260.916666666667" y="660.0">PyOpenWorm.data_trans.connections.NeuronConnectomeCSVTranslation</node>
+    <node x="6311.0" y="915.0">PyOpenWorm.dataObject.APThunk</node>
+    <node x="4332.75" y="995.0">PyOpenWorm.cli_command_wrapper.CLIStoreAction</node>
+    <node x="11603.0" y="835.0">PyOpenWorm.command_util.SubCommand</node>
+    <node x="6936.0" y="915.0">PyOpenWorm.data.Data</node>
+    <node x="5702.0" y="915.0">PyOpenWorm.context_store.ContextStore</node>
+    <node x="3069.8250000000003" y="470.0">PyOpenWorm.simpleProperty.UnionProperty</node>
+    <node x="10913.532149758455" y="570.0">PyOpenWorm.bibtex.BibTexDataSource</node>
+    <node x="13964.083333333334" y="760.0">PyOpenWorm.data_trans.connections.NeuronConnectomeCSVTranslator</node>
+    <node x="1287.0" y="340.0">PyOpenWorm.data.ZODBSource</node>
+    <node x="318.0" y="1190.0">PyOpenWorm.configure.NO_DEFAULT</node>
+    <node x="6613.416666666667" y="570.0">PyOpenWorm.channelworm.ChannelModel</node>
+    <node x="8924.255364044171" y="180.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="11211.532149758455" y="570.0">PyOpenWorm.data_trans.data_with_evidence_ds.DataWithEvidenceDataSource</node>
+    <node x="4912.0" y="1075.0">PyOpenWorm.cli_command_wrapper.CLISubCommandAction</node>
+    <node x="3079.0000000000005" y="340.0">PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin</node>
+    <node x="9883.334725672881" y="180.0">list</node>
+    <node x="8909.255364044171" y="80.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="3627.5116942719164" y="180.0">PyOpenWorm.import_contextualizer.ImportContextualizer</node>
+    <node x="13508.083333333334" y="760.0">PyOpenWorm.data_trans.neuron_data.NeuronCSVDataTranslator</node>
+    <node x="6606.0" y="915.0">PyOpenWorm.configure.ImmutableConfigure</node>
+    <node x="794.4375000000009" y="80.0">abc.ABCMeta</node>
+    <node x="11568.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.MuscleWormBaseCSVTranslator</node>
+    <node x="989.0000000000009" y="80.0">PyOpenWorm.configure.Configureable</node>
+    <node x="2003.75" y="835.0">BaseException</node>
+    <node x="5873.916666666667" y="660.0">PyOpenWorm.website.Website</node>
+    <node x="2159.0" y="340.0">ObjectPropertyMixin</node>
+    <node x="8714.416666666666" y="760.0">PyOpenWorm.data_trans.neuron_data.NeuronCSVDataSource</node>
+    <node x="7435.0" y="835.0">typing.Container</node>
+    <node x="7545.416666666667" y="570.0">PyOpenWorm.experiment.Experiment</node>
+    <node x="7985.5" y="835.0">PyOpenWorm.command_util.IVar</node>
+    <node x="1802.0" y="340.0">PyOpenWorm.simpleProperty.RealSimpleProperty</node>
+    <node x="6117.916666666667" y="660.0">PyOpenWorm.document.Document</node>
+    <node x="12528.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.NeuronWormBaseCSVTranslator</node>
+    <node x="12877.044665286405" y="660.0">PyOpenWorm.data_trans.csv_ds.CSVDataTranslator</node>
+    <node x="9615.973614561772" y="660.0">PyOpenWorm.data_trans.csv_ds.CSVDataSource</node>
+    <node x="5432.666666666667" y="570.0">PyOpenWorm.plot.Plot</node>
+    <node x="6180.5" y="835.0">PyOpenWorm.dataObject.PThunk</node>
+    <node x="10008.834725672881" y="340.0">PyOpenWorm.simpleProperty._ContextualizableLazyProxy</node>
+    <node x="4561.166666666667" y="470.0">PyOpenWorm.neuron.Neighbor</node>
+    <node x="11946.0" y="835.0">PyOpenWorm.command._BatchAddGraph</node>
+    <node x="9587.473614561772" y="570.0">PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource</node>
+    <node x="8085.833333333335" y="80.0">MappedClass</node>
+    <node x="0.0" y="340.0">PyOpenWorm.data.SerializationSource</node>
+    <node x="3803.5000000000005" y="470.0">PyOpenWorm.documentContext.DocumentContext</node>
+    <node x="13289.794665286405" y="570.0">PyOpenWorm.datasource.PersonDataTranslator</node>
+    <node x="2412.0" y="1190.0">PyOpenWorm.command.POW</node>
+    <node x="10460.834725672881" y="80.0">tuple</node>
+    <node x="7288.0" y="915.0">typing._Collection</node>
+    <node x="9816.334725672881" y="80.0">typing.MutableSequence</node>
+    <node x="323.449194271916" y="180.0">PyOpenWorm.data._B</node>
+    <node x="633.0" y="1190.0">PyOpenWorm.connection.Termination</node>
+    <node x="1009.0" y="340.0">PyOpenWorm.data.SleepyCatSource</node>
+    <node x="759.8694478951038" y="470.0">PyOpenWorm.simpleProperty.DatatypeProperty</node>
+    <node x="4248.875" y="470.0">PyOpenWorm.context.QueryContext</node>
+    <node x="947.0" y="1190.0">PyOpenWorm.command.POWSource</node>
+    <node x="6389.916666666667" y="660.0">PyOpenWorm.channelworm.HomologyChannelModel</node>
+    <node x="13588.0" y="835.0">PyOpenWorm.git_repo.GitRepoProvider</node>
+    <node x="4772.916666666667" y="660.0">PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataTranslation</node>
+    <node x="10490.0" y="835.0">PyOpenWorm.inverse_property.InverseProperty</node>
+    <node x="2422.000000000001" y="470.0">PyOpenWorm.simpleProperty.ObjectProperty</node>
+    <node x="4809.166666666667" y="470.0">PyOpenWorm.neuron.ConnectionProperty</node>
+    <node x="12982.794665286405" y="570.0">PyOpenWorm.datasource.DataTranslator</node>
+    <node x="12046.083333333334" y="760.0">PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataTranslator</node>
+    <node x="4121.0" y="1075.0">PyOpenWorm.cli_command_wrapper.CLIStoreTrueAction</node>
+    <node x="40.0" y="1035.0">PyOpenWorm.data.OpenFailError</node>
+    <node x="3701.0000000000005" y="340.0">PyOpenWorm.documentContext.DocumentContextMeta</node>
+    <node x="11130.1875" y="340.0">PyOpenWorm.datasource.DataSourceType</node>
+    <node x="4800.75" y="180.0">PyOpenWorm.data.DataUser</node>
+    <node x="11065.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.WormbaseIonChannelCSVTranslator</node>
+    <node x="6929.416666666667" y="570.0">PyOpenWorm.collections.Bag</node>
+    <node x="1552.0" y="1190.0">PyOpenWorm.statement.Statement</node>
+    <node x="3836.0" y="1035.0">PyOpenWorm.configure.BadConf</node>
+    <node x="9711.0" y="835.0">PyOpenWorm.cli_command_wrapper.CLIArgMapper</node>
+    <node x="5973.916666666667" y="570.0">PyOpenWorm.document.BaseDocument</node>
+    <node x="8203.416666666666" y="760.0">PyOpenWorm.data_trans.wormbase.WormbaseIonChannelCSVDataSource</node>
+    <node x="5011.5" y="995.0">argparse._SubParsersAction</node>
+    <node x="3067.0" y="1035.0">PyOpenWorm.datasource.DuplicateAlsoException</node>
+    <node x="13910.0" y="835.0">PyOpenWorm.datasource.Informational</node>
+    <node x="2675.0" y="1190.0">typing.Reversible</node>
+    <node x="2700.0000000000005" y="340.0">PyOpenWorm.inverse_property.InversePropertyMixin</node>
+    <node x="10266.834725672881" y="180.0">Proxy</node>
+    <node x="512.449194271916" y="180.0">PyOpenWorm.configure._link</node>
+    <node x="8650.834725672881" y="570.0">PyOpenWorm.dataObject.RDFProperty</node>
+    <node x="1672.916666666666" y="80.0">MappedPropertyClass</node>
+    <node x="8620.0" y="835.0">datetime.tzinfo</node>
+    <node x="4211.625" y="340.0">PyOpenWorm.context.Context</node>
+    <node x="12617.0" y="835.0">PyOpenWorm.import_override.Overrider</node>
+    <node x="513.4375000000009" y="80.0">PyOpenWorm.configure.ConfigValue</node>
+    <node x="5652.5" y="835.0">Store</node>
+    <node x="10136.083333333334" y="760.0">PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataSource</node>
+    <node x="2018.75" y="915.0">Exception</node>
+    <node x="5124.166666666667" y="470.0">PyOpenWorm.datasource.Translation</node>
+    <node x="1253.0" y="1190.0">PyOpenWorm.context.ModuleProxy</node>
+    <node x="9670.834725672881" y="340.0">PyOpenWorm.dataObject.ContextualizableList</node>
+    <node x="1849.0" y="1190.0">PyOpenWorm.document.EmptyRes</node>
+    <node x="1767.0" y="1035.0">PyOpenWorm.evidence.EvidenceError</node>
+    <node x="2802.0" y="1035.0">PyOpenWorm.ConnectionFailError</node>
+    <node x="6041.0" y="915.0">PyOpenWorm.dataObject.CPThunk</node>
+    <node x="8833.834725672881" y="340.0">PyOpenWorm.dataObject.DataObjectSingletonMeta</node>
+    <node x="582.1194478951038" y="570.0">PyOpenWorm.dataObject.RDFSCommentProperty</node>
+    <node x="4523.0" y="1075.0">PyOpenWorm.cli_command_wrapper.CLIAppendAction</node>
+    <node x="7617.0" y="915.0">PyOpenWorm.dataObject._partial_property</node>
+    <node x="7892.251392339549" y="470.0">PyOpenWorm.dataObject.TypeDataObject</node>
+    <node x="760.761694271916" y="180.0">PyOpenWorm.data.RDFSource</node>
+    <node x="1541.0" y="340.0">PyOpenWorm.data.DefaultSource</node>
+    <node x="8941.834725672881" y="570.0">PyOpenWorm.dataObject.RDFSClass</node>
+    <node x="4661.0" y="835.0">argparse._AttributeHolder</node>
+    <node x="659.0" y="1035.0">PyOpenWorm.context_store.ContextStoreException</node>
+    <node x="4127.75" y="80.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+    <node x="6906.916666666667" y="470.0">PyOpenWorm.dataObject.DataObject</node>
+    <node x="2144.0" y="1190.0">PyOpenWorm.dataObject.Alias</node>
+    <node x="10598.083333333334" y="760.0">PyOpenWorm.data_trans.connections.ConnectomeCSVDataSource</node>
+    <node x="5100.666666666667" y="570.0">PyOpenWorm.datasource.GenericTranslation</node>
+    <node x="8822.0" y="835.0">PyOpenWorm.contextualize._ContextualzingProxyMetaType</node>
+    <node x="8590.0" y="915.0">PyOpenWorm.data._UTC</node>
+    <node x="13009.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.WormbaseTextMatchCSVTranslator</node>
+    <node x="9203.834725672881" y="340.0">PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory</node>
+    <node x="940.1194478951038" y="570.0">PyOpenWorm.dataObject.RDFSLabelProperty</node>
+    <node x="8349.0" y="835.0">RDFTypeResolver</node>
+    <node x="8768.834725672881" y="470.0">PyOpenWorm.dataObject.DataObjectSingleton</node>
+    <node x="7900.083333333335" y="180.0">PyOpenWorm.dataObject.ContextMappedClass</node>
+    <node x="0.0" y="1115.0">PyOpenWorm.data.ZODBSourceOpenFailError</node>
+    <node x="2430.0" y="1035.0">PyOpenWorm.document.PubmedRetrievalException</node>
+    <node x="6770.5" y="835.0">PyOpenWorm.configure.Configure</node>
+    <node x="9629.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.WormbaseTextMatchCSVDataSource</node>
+    <node x="12283.0" y="835.0">PyOpenWorm.simpleProperty.OPResolver</node>
+    <node x="6509.321042098004" y="340.0">PyOpenWorm.my_neuroml.NeuroML</node>
+    <node x="8378.24407004831" y="570.0">PyOpenWorm.biology.BiologyType</node>
+    <node x="7163.0" y="835.0">typing.Iterable</node>
+    <node x="3428.0" y="1035.0">PyOpenWorm.inverse_property.InversePropertyException</node>
+    <node x="7166.416666666667" y="570.0">PyOpenWorm.contextDataObject.ContextDataObject</node>
+    <node x="742.0" y="340.0">PyOpenWorm.data.SPARQLSource</node>
+    <node x="7305.0" y="835.0">typing.Sized</node>
+    <node x="8152.916666666667" y="660.0">PyOpenWorm.network.Network</node>
+    <node x="7916.584725672883" y="340.0">PyOpenWorm.dataObject.BaseDataObject</node>
+    <node x="2338.0" y="340.0">PyOpenWorm.simpleProperty.PropertyCountMixin</node>
+    <node x="13252.044665286405" y="660.0">PyOpenWorm.bibtex.BibTexDataTranslator</node>
+    <node x="6768.916666666667" y="660.0">PyOpenWorm.channelworm.PatchClampChannelModel</node>
+    <node x="0.0" y="1190.0">PyOpenWorm.git_repo._CloneProgress</node>
+    <node x="8021.526597653559" y="570.0">PyOpenWorm.evidence.Evidence</node>
+    <node x="5627.666666666667" y="570.0">PyOpenWorm.dataObject.PropertyDataObject</node>
+    <node x="8619.916666666666" y="660.0">PyOpenWorm.connection.Connection</node>
+    <node x="10132.834725672881" y="0.0">typing.Sequence</node>
+    <node x="10355.834725672881" y="180.0">PyOpenWorm.simpleProperty.POCache</node>
+    <node x="9186.083333333334" y="760.0">PyOpenWorm.data_trans.wormbase.WormBaseCSVDataSource</node>
+    <node x="5364.0" y="915.0">PyOpenWorm.context_store.RDFContextStore</node>
+    <node x="9270.0" y="835.0">PyOpenWorm.cli_command_wrapper.CLICommandWrapper</node>
+    <node x="13047.044665286405" y="470.0">PyOpenWorm.datasource.BaseDataTranslator</node>
+    <node x="485.0" y="340.0">PyOpenWorm.data.SQLiteSource</node>
+    <node x="1034.0" y="1035.0">PyOpenWorm.command.InvalidGraphException</node>
+    <node x="9159.583333333334" y="660.0">PyOpenWorm.channel.ExpressionPattern</node>
+    <node x="13127.794665286405" y="340.0">PyOpenWorm.datasource.DataTransatorType</node>
+    <node x="3525.0000000000005" y="340.0">UnionPropertyMixin</node>
+    <node x="4692.0" y="915.0">argparse.Action</node>
+    <node x="291.0" y="340.0">DatatypePropertyMixin</node>
+    <node x="7966.416666666667" y="760.0">PyOpenWorm.neuron.Neuron</node>
+    <node x="102.44919427191599" y="180.0">PyOpenWorm.configure._C</node>
+    <node x="11233.0" y="835.0">PyOpenWorm.context.ContextContextManager</node>
+    <node x="1656.666666666666" y="180.0">PyOpenWorm.simpleProperty.ContextMappedPropertyClass</node>
+    <node x="11750.532149758455" y="570.0">PyOpenWorm.datasource.DataObjectContextDataSource</node>
+    <node x="11078.4375" y="470.0">PyOpenWorm.datasource.DataSource</node>
+    <node x="7698.0" y="835.0">functools.partial</node>
+    <node x="8401.916666666666" y="660.0">PyOpenWorm.worm.Worm</node>
+    <node x="4695.416666666667" y="340.0">PyOpenWorm.pProperty.Property</node>
+    <node x="10105.0" y="835.0">PyOpenWorm.contextualize.ContextualizingProxy</node>
+    <node x="2054.0" y="1035.0">PyOpenWorm.command.UnreadableGraphException</node>
+    <node x="7501.916666666667" y="660.0">PyOpenWorm.channelworm.PatchClampExperiment</node>
+    <node x="8293.0" y="915.0">PyOpenWorm.dataObject._Resolver</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.website.Website" target="PyOpenWorm.document.BaseDocument">
+      <point x="0.0" y="-15.0" />
+      <point x="5985.916666666667" y="640.0" />
+      <point x="6044.416666666667" y="640.0" />
+      <point x="-70.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.ZODBSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="1404.0" y="310.0" />
+      <point x="926.511694271916" y="310.0" />
+      <point x="55.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStoreException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="836.5" y="985.0" />
+      <point x="2038.5416666666667" y="985.0" />
+      <point x="-27.708333333333258" y="15.0" />
+    </edge>
+    <edge source="Exception" target="BaseException">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFProperty" target="PyOpenWorm.dataObject.DataObjectSingleton">
+      <point x="0.0" y="-15.0" />
+      <point x="8786.334725672881" y="550.0" />
+      <point x="8848.834725672881" y="550.0" />
+      <point x="-80.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.import_contextualizer.ImportContextualizer">
+      <point x="-27.875" y="-15.0" />
+      <point x="4295.25" y="230.0" />
+      <point x="3822.0116942719164" y="230.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.connections.NeuronConnectomeCSVTranslation" target="PyOpenWorm.datasource.GenericTranslation">
+      <point x="0.0" y="-15.0" />
+      <point x="5506.416666666667" y="640.0" />
+      <point x="5334.666666666667" y="640.0" />
+      <point x="78.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.pProperty.PropertyMeta">
+      <point x="-80.33333333333303" y="-15.0" />
+      <point x="4735.583333333334" y="250.0" />
+      <point x="4645.25" y="250.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.SerializationSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="135.5" y="310.0" />
+      <point x="779.178360938583" y="310.0" />
+      <point x="-92.08333333333337" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InversePropertyException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="3622.0" y="975.0" />
+      <point x="2101.875" y="975.0" />
+      <point x="35.625" y="15.0" />
+    </edge>
+    <edge source="argparse.Action" target="argparse._AttributeHolder">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.Data" target="PyOpenWorm.configure.Configure">
+      <point x="0.0" y="-15.0" />
+      <point x="7027.0" y="890.0" />
+      <point x="6955.75" y="890.0" />
+      <point x="61.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.plot.Plot" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="5520.166666666667" y="520.0" />
+      <point x="6921.472222222223" y="520.0" />
+      <point x="-116.44444444444434" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-97.5" y="-15.0" />
+      <point x="10106.334725672881" y="300.0" />
+      <point x="9213.041078329885" y="300.0" />
+      <point x="133.28571428571377" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="DatatypePropertyMixin">
+      <point x="-109.0" y="-15.0" />
+      <point x="814.3694478951038" y="450.0" />
+      <point x="378.0" y="450.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.MuscleWormBaseCSVTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="11797.083333333334" y="720.0" />
+      <point x="12953.116093857834" y="720.0" />
+      <point x="-101.42857142857065" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="-123.59999999999991" y="-15.0" />
+      <point x="3100.7250000000004" y="410.0" />
+      <point x="2082.833333333334" y="410.0" />
+      <point x="112.33333333333348" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFSCommentProperty" target="PyOpenWorm.simpleProperty.DatatypeProperty">
+      <point x="0.0" y="-15.0" />
+      <point x="751.1194478951038" y="550.0" />
+      <point x="841.6194478951038" y="550.0" />
+      <point x="-81.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure.BadConf" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="3956.0" y="965.0" />
+      <point x="2109.791666666667" y="965.0" />
+      <point x="43.54166666666674" y="15.0" />
+    </edge>
+    <edge source="typing.MutableSequence" target="typing.Sequence">
+      <point x="0.0" y="-15.0" />
+      <point x="9909.334725672881" y="55.0" />
+      <point x="10167.084725672881" y="55.0" />
+      <point x="-34.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.SPARQLSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="865.5" y="320.0" />
+      <point x="852.845027605249" y="320.0" />
+      <point x="-18.41666666666663" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.bibtex.BibTexDataTranslator" target="PyOpenWorm.datasource.DataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="13401.044665286405" y="640.0" />
+      <point x="13198.044665286405" y="640.0" />
+      <point x="71.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channel.ExpressionPattern" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="9303.583333333334" y="620.0" />
+      <point x="8605.577403381643" y="620.0" />
+      <point x="103.33333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.neuron_data.NeuronCSVDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="8922.416666666666" y="730.0" />
+      <point x="9699.723614561772" y="730.0" />
+      <point x="-83.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.ZODBSourceOpenFailError" target="PyOpenWorm.data.OpenFailError">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="MappedPropertyClass">
+      <point x="-100.75" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.TrixSource" target="PyOpenWorm.data.SerializationSource">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.WormBaseCSVDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="9397.583333333334" y="740.0" />
+      <point x="9755.556947895104" y="740.0" />
+      <point x="-27.91666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.bibtex.BibTexDataSource" target="PyOpenWorm.datasource.DataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="11052.532149758455" y="550.0" />
+      <point x="11178.5625" y="550.0" />
+      <point x="-33.375" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.collections.Bag" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.command.UnreadableGraphException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2232.0" y="1015.0" />
+      <point x="2070.208333333333" y="1015.0" />
+      <point x="3.9583333333332575" y="15.0" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Sized">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channel.Channel" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="9027.083333333334" y="630.0" />
+      <point x="8564.24407004831" y="630.0" />
+      <point x="62.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DefaultSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="1661.5" y="300.0" />
+      <point x="963.345027605249" y="300.0" />
+      <point x="92.08333333333337" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFSLabelProperty" target="PyOpenWorm.simpleProperty.DatatypeProperty">
+      <point x="0.0" y="-15.0" />
+      <point x="1095.6194478951038" y="550.0" />
+      <point x="1005.1194478951038" y="550.0" />
+      <point x="81.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.inverse_property.InversePropertyMixin">
+      <point x="62.40000000000009" y="-15.0" />
+      <point x="2640.4000000000015" y="440.0" />
+      <point x="2789.7500000000005" y="440.0" />
+      <point x="-89.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-15.0" />
+      <point x="4906.25" y="140.0" />
+      <point x="1193.000000000001" y="140.0" />
+      <point x="68.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._StatementContextRDFObjectFactory" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="0.0" y="-15.0" />
+      <point x="9427.334725672881" y="320.0" />
+      <point x="9124.183935472742" y="320.0" />
+      <point x="44.42857142857065" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.worm.Worm" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="8500.916666666666" y="640.0" />
+      <point x="8481.577403381643" y="640.0" />
+      <point x="-20.66666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.SQLiteSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="603.5" y="320.0" />
+      <point x="816.011694271916" y="320.0" />
+      <point x="-55.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIUserError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="468.5" y="975.0" />
+      <point x="2030.625" y="975.0" />
+      <point x="-35.625" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data._B" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-15.0" />
+      <point x="407.949194271916" y="160.0" />
+      <point x="611.3125000000009" y="160.0" />
+      <point x="-32.625" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="UnionPropertyMixin">
+      <point x="123.60000000000036" y="-15.0" />
+      <point x="3347.9250000000006" y="450.0" />
+      <point x="3603.0000000000005" y="450.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataSource" target="PyOpenWorm.datasource.DataSourceType">
+      <point x="66.75" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject._partial_property" target="functools.partial">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.csv_ds.CSVDataSource" target="PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFSClass" target="PyOpenWorm.dataObject.DataObjectSingleton">
+      <point x="0.0" y="-15.0" />
+      <point x="9071.334725672881" y="550.0" />
+      <point x="9008.834725672881" y="550.0" />
+      <point x="80.0" y="15.0" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Container">
+      <point x="48.0" y="-15.0" />
+      <point x="7408.0" y="890.0" />
+      <point x="7503.5" y="890.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="list" target="typing.MutableSequence">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.POCache" target="tuple">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.connections.ConnectomeCSVDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="10821.583333333334" y="720.0" />
+      <point x="9923.056947895104" y="720.0" />
+      <point x="139.58333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIStoreAction" target="argparse.Action">
+      <point x="0.0" y="-15.0" />
+      <point x="4509.75" y="970.0" />
+      <point x="4725.0" y="970.0" />
+      <point x="-33.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="10357.083333333334" y="730.0" />
+      <point x="9867.223614561772" y="730.0" />
+      <point x="83.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="97.33333333333394" y="-15.0" />
+      <point x="8159.918059006217" y="320.0" />
+      <point x="9079.755364044171" y="320.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="124.80000000000018" y="-15.0" />
+      <point x="2702.800000000001" y="450.0" />
+      <point x="3185.5000000000005" y="450.0" />
+      <point x="-106.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cell.Cell" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="7957.416666666667" y="630.0" />
+      <point x="8398.910736714975" y="630.0" />
+      <point x="-103.33333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextualizableList" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-79.5" y="-15.0" />
+      <point x="9750.334725672881" y="310.0" />
+      <point x="9168.612506901314" y="310.0" />
+      <point x="88.85714285714312" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource" target="PyOpenWorm.datasource.DataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="9783.473614561772" y="540.0" />
+      <point x="11111.8125" y="540.0" />
+      <point x="-100.125" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="ObjectPropertyMixin">
+      <point x="-62.40000000000009" y="-15.0" />
+      <point x="2515.6000000000004" y="430.0" />
+      <point x="2238.5" y="430.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure.ImmutableConfigure" target="PyOpenWorm.configure.Configure">
+      <point x="0.0" y="-15.0" />
+      <point x="6761.0" y="890.0" />
+      <point x="6832.25" y="890.0" />
+      <point x="-61.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.BaseDataTranslator" target="PyOpenWorm.datasource.DataTransatorType">
+      <point x="79.25" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.ConnectionProperty" target="PyOpenWorm.pProperty.Property">
+      <point x="0.0" y="-15.0" />
+      <point x="4956.666666666667" y="450.0" />
+      <point x="4876.166666666667" y="450.0" />
+      <point x="60.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.connection.Connection" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="8753.416666666666" y="640.0" />
+      <point x="8522.910736714975" y="640.0" />
+      <point x="20.66666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty._ContextualizingPropertySetMixin">
+      <point x="61.80000000000018" y="-15.0" />
+      <point x="3286.1250000000005" y="440.0" />
+      <point x="3398.5000000000005" y="440.0" />
+      <point x="106.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-15.0" />
+      <point x="1970.5" y="260.0" />
+      <point x="4821.85" y="260.0" />
+      <point x="-84.39999999999964" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure._C" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-15.0" />
+      <point x="202.94919427191599" y="150.0" />
+      <point x="546.0625000000009" y="150.0" />
+      <point x="-97.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="-61.80000000000018" y="-15.0" />
+      <point x="3162.525" y="400.0" />
+      <point x="2623.0" y="400.0" />
+      <point x="114.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="0.0" y="-15.0" />
+      <point x="2578.000000000001" y="420.0" />
+      <point x="2509.0" y="420.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextMappedClass" target="MappedClass">
+      <point x="81.25" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextMappedClass" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="-81.25" y="-15.0" />
+      <point x="7981.333333333335" y="130.0" />
+      <point x="4428.75" y="130.0" />
+      <point x="129.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObjectSingleton" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="-80.0" y="-15.0" />
+      <point x="8848.834725672881" y="450.0" />
+      <point x="8086.918059006217" y="450.0" />
+      <point x="24.33333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.ConnectionFailError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2924.5" y="995.0" />
+      <point x="2086.041666666667" y="995.0" />
+      <point x="19.791666666666742" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.muscle.Muscle" target="PyOpenWorm.cell.Cell">
+      <point x="0.0" y="-15.0" />
+      <point x="7839.916666666667" y="740.0" />
+      <point x="7915.166666666667" y="740.0" />
+      <point x="-42.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ObjectProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="-124.80000000000018" y="-15.0" />
+      <point x="2453.2000000000007" y="440.0" />
+      <point x="1970.5" y="440.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.HomologyChannelModel" target="PyOpenWorm.channelworm.ChannelModel">
+      <point x="0.0" y="-15.0" />
+      <point x="6569.416666666667" y="640.0" />
+      <point x="6687.416666666667" y="640.0" />
+      <point x="-74.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObject" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="7037.916666666667" y="450.0" />
+      <point x="7989.584725672883" y="450.0" />
+      <point x="-73.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.command_util.PropertyIVar" target="PyOpenWorm.command_util.IVar">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.data.DataUser">
+      <point x="-97.33333333333394" y="-15.0" />
+      <point x="7965.251392339549" y="270.0" />
+      <point x="4990.65" y="270.0" />
+      <point x="84.39999999999964" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.CPThunk" target="PyOpenWorm.dataObject.PThunk">
+      <point x="0.0" y="-15.0" />
+      <point x="6166.0" y="890.0" />
+      <point x="6240.75" y="890.0" />
+      <point x="-60.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DuplicateAlsoException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="3237.5" y="985.0" />
+      <point x="2093.958333333333" y="985.0" />
+      <point x="27.708333333333258" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataTranslation" target="PyOpenWorm.datasource.GenericTranslation">
+      <point x="0.0" y="-15.0" />
+      <point x="5006.916666666667" y="640.0" />
+      <point x="5178.666666666667" y="640.0" />
+      <point x="-78.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.PatchClampChannelModel" target="PyOpenWorm.channelworm.ChannelModel">
+      <point x="0.0" y="-15.0" />
+      <point x="6953.416666666667" y="640.0" />
+      <point x="6835.416666666667" y="640.0" />
+      <point x="74.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.RDFContextStore" target="Store">
+      <point x="0.0" y="-15.0" />
+      <point x="5523.0" y="890.0" />
+      <point x="5669.25" y="890.0" />
+      <point x="-16.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContext" target="PyOpenWorm.context.Context">
+      <point x="87.5" y="-15.0" />
+      <point x="4066.0000000000005" y="450.0" />
+      <point x="4267.375" y="450.0" />
+      <point x="-55.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.evidence.Evidence" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="8139.526597653559" y="530.0" />
+      <point x="7125.25" y="530.0" />
+      <point x="87.33333333333303" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.WormbaseRetrievalException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1563.0" y="1005.0" />
+      <point x="2054.375" y="1005.0" />
+      <point x="-11.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.TypeDataObject" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="-24.33333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.evidence.EvidenceError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1900.5" y="1015.0" />
+      <point x="2062.291666666667" y="1015.0" />
+      <point x="-3.9583333333332575" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="PyOpenWorm.simpleProperty.RealSimpleProperty">
+      <point x="0.0" y="-15.0" />
+      <point x="923.3694478951038" y="440.0" />
+      <point x="1858.166666666666" y="440.0" />
+      <point x="-112.33333333333348" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject._Resolver" target="RDFTypeResolver">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="112.33333333333348" y="-15.0" />
+      <point x="2082.833333333334" y="290.0" />
+      <point x="8946.469649758457" y="290.0" />
+      <point x="-133.28571428571377" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextualizableList" target="list">
+      <point x="79.5" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.RealSimpleProperty" target="PyOpenWorm.simpleProperty.ContextMappedPropertyClass">
+      <point x="-112.33333333333348" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContextMeta" target="PyOpenWorm.context.ContextMeta">
+      <point x="0.0" y="-15.0" />
+      <point x="3891.0000000000005" y="250.0" />
+      <point x="3417.7616942719164" y="250.0" />
+      <point x="-63.25" y="15.0" />
+    </edge>
+    <edge source="typing._Collection" target="typing.Iterable">
+      <point x="-48.0" y="-15.0" />
+      <point x="7312.0" y="890.0" />
+      <point x="7224.0" y="890.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataTranslator" target="PyOpenWorm.datasource.BaseDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="-79.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.NeuronWormBaseCSVTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="12758.583333333334" y="740.0" />
+      <point x="13054.544665286405" y="740.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty._ContextualizableLazyProxy" target="Proxy">
+      <point x="97.5" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="80.33333333333303" y="-15.0" />
+      <point x="4896.25" y="310.0" />
+      <point x="9035.3267926156" y="310.0" />
+      <point x="-44.42857142857065" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.OpenFailError" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="159.0" y="965.0" />
+      <point x="2022.7083333333333" y="965.0" />
+      <point x="-43.54166666666674" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator" target="PyOpenWorm.datasource.DataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="-71.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.network.Network" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-15.0" />
+      <point x="8267.416666666668" y="640.0" />
+      <point x="8440.24407004831" y="640.0" />
+      <point x="-62.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="83.625" y="-15.0" />
+      <point x="4406.75" y="300.0" />
+      <point x="8990.898221187028" y="300.0" />
+      <point x="-88.85714285714312" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.SleepyCatSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-15.0" />
+      <point x="1138.0" y="320.0" />
+      <point x="889.678360938583" y="320.0" />
+      <point x="18.41666666666663" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.neuron_data.NeuronCSVDataTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="13726.083333333334" y="730.0" />
+      <point x="13155.973236714975" y="730.0" />
+      <point x="101.42857142857065" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.WormbaseIonChannelCSVTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="11306.583333333334" y="710.0" />
+      <point x="12902.401808143548" y="710.0" />
+      <point x="-152.14285714285688" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.Neuron" target="PyOpenWorm.cell.Cell">
+      <point x="0.0" y="-15.0" />
+      <point x="8074.916666666667" y="740.0" />
+      <point x="7999.666666666667" y="740.0" />
+      <point x="42.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.Translation" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="5256.666666666667" y="440.0" />
+      <point x="7940.918059006217" y="440.0" />
+      <point x="-121.66666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObjectSingleton" target="PyOpenWorm.dataObject.DataObjectSingletonMeta">
+      <point x="80.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.UnionProperty" target="PyOpenWorm.inverse_property.InversePropertyMixin">
+      <point x="0.0" y="-15.0" />
+      <point x="3224.3250000000003" y="390.0" />
+      <point x="2969.2500000000005" y="390.0" />
+      <point x="89.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.my_neuroml.NeuroML" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-15.0" />
+      <point x="6637.821042098004" y="280.0" />
+      <point x="4948.450000000001" y="280.0" />
+      <point x="42.19999999999982" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContext" target="PyOpenWorm.documentContext.DocumentContextMeta">
+      <point x="-87.5" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="abc.ABCMeta" target="type">
+      <point x="0.0" y="-15.0" />
+      <point x="852.9375000000009" y="55.0" />
+      <point x="2624.645833333334" y="55.0" />
+      <point x="-15.25" y="15.0" />
+    </edge>
+    <edge source="argparse._SubParsersAction" target="argparse.Action">
+      <point x="0.0" y="-15.0" />
+      <point x="5115.5" y="970.0" />
+      <point x="4791.0" y="970.0" />
+      <point x="33.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.WormbaseTextMatchCSVDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="9872.583333333334" y="740.0" />
+      <point x="9811.390281228436" y="740.0" />
+      <point x="27.91666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataSource" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="-66.75" y="-15.0" />
+      <point x="11145.1875" y="440.0" />
+      <point x="8135.584725672883" y="440.0" />
+      <point x="73.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.WormbaseTextMatchCSVTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="13248.583333333334" y="740.0" />
+      <point x="13105.258951000691" y="740.0" />
+      <point x="50.714285714286234" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.connections.NeuronConnectomeCSVTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="14206.583333333334" y="720.0" />
+      <point x="13206.687522429262" y="720.0" />
+      <point x="152.14285714285688" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.RDFSource" target="PyOpenWorm.configure.ConfigValue">
+      <point x="-55.25" y="-15.0" />
+      <point x="816.011694271916" y="160.0" />
+      <point x="741.8125000000009" y="160.0" />
+      <point x="97.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormbase.WormbaseIonChannelCSVDataSource" target="PyOpenWorm.data_trans.csv_ds.CSVDataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="8448.916666666666" y="720.0" />
+      <point x="9643.890281228436" y="720.0" />
+      <point x="-139.58333333333394" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.PatchClampExperiment" target="PyOpenWorm.experiment.Experiment">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLISubCommandAction" target="argparse._SubParsersAction">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.PropertyMeta" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="0.0" y="-15.0" />
+      <point x="4645.25" y="160.0" />
+      <point x="4342.75" y="160.0" />
+      <point x="43.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.command.InvalidGraphException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="1196.5" y="995.0" />
+      <point x="2046.4583333333333" y="995.0" />
+      <point x="-19.791666666666742" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.QueryContext" target="PyOpenWorm.context.Context">
+      <point x="0.0" y="-15.0" />
+      <point x="55.75" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.Document" target="PyOpenWorm.document.BaseDocument">
+      <point x="0.0" y="-15.0" />
+      <point x="6243.916666666667" y="640.0" />
+      <point x="6185.416666666667" y="640.0" />
+      <point x="70.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure._link" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-15.0" />
+      <point x="618.949194271916" y="160.0" />
+      <point x="676.5625000000009" y="160.0" />
+      <point x="32.625" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.BaseDocument" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="6114.916666666667" y="540.0" />
+      <point x="6979.694444444444" y="540.0" />
+      <point x="-58.222222222222626" y="15.0" />
+    </edge>
+    <edge source="tuple" target="typing.Sequence">
+      <point x="0.0" y="-15.0" />
+      <point x="10493.334725672881" y="55.0" />
+      <point x="10235.584725672881" y="55.0" />
+      <point x="34.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIStoreTrueAction" target="PyOpenWorm.cli_command_wrapper.CLIStoreAction">
+      <point x="0.0" y="-15.0" />
+      <point x="4312.0" y="1050.0" />
+      <point x="4421.25" y="1050.0" />
+      <point x="-88.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.GenericTranslation" target="PyOpenWorm.datasource.Translation">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.PersonDataTranslator" target="PyOpenWorm.datasource.BaseDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="13454.794665286405" y="550.0" />
+      <point x="13284.794665286405" y="550.0" />
+      <point x="79.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.Neighbor" target="PyOpenWorm.pProperty.Property">
+      <point x="0.0" y="-15.0" />
+      <point x="4675.166666666667" y="450.0" />
+      <point x="4755.666666666667" y="450.0" />
+      <point x="-60.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.PropertyDataObject" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="5785.166666666667" y="530.0" />
+      <point x="6950.583333333334" y="530.0" />
+      <point x="-87.33333333333303" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.dataObject.ContextMappedClass">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.biology.BiologyType" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="8502.24407004831" y="520.0" />
+      <point x="7154.361111111111" y="520.0" />
+      <point x="116.44444444444434" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.context.ContextMeta">
+      <point x="-83.625" y="-15.0" />
+      <point x="4239.5" y="240.0" />
+      <point x="3544.2616942719164" y="240.0" />
+      <point x="63.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-15.0" />
+      <point x="4299.75" y="55.0" />
+      <point x="2655.145833333334" y="55.0" />
+      <point x="15.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data._UTC" target="datetime.tzinfo">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-15.0" />
+      <point x="4815.916666666667" y="280.0" />
+      <point x="4906.25" y="280.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.BaseDataTranslator" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="-79.25" y="-15.0" />
+      <point x="13126.294665286405" y="430.0" />
+      <point x="8184.251392339549" y="430.0" />
+      <point x="121.66666666666606" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.datasource.DataObjectContextDataSource" target="PyOpenWorm.datasource.DataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="11942.532149758455" y="540.0" />
+      <point x="11312.0625" y="540.0" />
+      <point x="100.125" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.ChannelModel" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="6761.416666666667" y="550.0" />
+      <point x="7008.805555555556" y="550.0" />
+      <point x="-29.111111111111313" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.APThunk" target="PyOpenWorm.dataObject.PThunk">
+      <point x="0.0" y="-15.0" />
+      <point x="6436.0" y="890.0" />
+      <point x="6361.25" y="890.0" />
+      <point x="60.25" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.wormatlas.WormAtlasCellListDataTranslator" target="PyOpenWorm.data_trans.csv_ds.CSVDataTranslator">
+      <point x="0.0" y="-15.0" />
+      <point x="12277.083333333334" y="730.0" />
+      <point x="13003.830379572119" y="730.0" />
+      <point x="-50.714285714286234" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIAppendAction" target="PyOpenWorm.cli_command_wrapper.CLIStoreAction">
+      <point x="0.0" y="-15.0" />
+      <point x="4707.5" y="1050.0" />
+      <point x="4598.25" y="1050.0" />
+      <point x="88.5" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.DatatypeProperty" target="PyOpenWorm.simpleProperty.PropertyCountMixin">
+      <point x="109.0" y="-15.0" />
+      <point x="1032.3694478951038" y="450.0" />
+      <point x="2395.0" y="450.0" />
+      <point x="-114.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.RDFTypeProperty" target="PyOpenWorm.simpleProperty.ObjectProperty">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.PubmedRetrievalException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="2606.0" y="1005.0" />
+      <point x="2078.125" y="1005.0" />
+      <point x="11.875" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.RDFSource" target="PyOpenWorm.configure.Configureable">
+      <point x="55.25" y="-15.0" />
+      <point x="926.511694271916" y="160.0" />
+      <point x="1057.000000000001" y="160.0" />
+      <point x="-68.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.ContextMeta" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="0.0" y="-15.0" />
+      <point x="3481.0116942719164" y="160.0" />
+      <point x="4256.75" y="160.0" />
+      <point x="-43.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.experiment.Experiment" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="7677.416666666667" y="540.0" />
+      <point x="7096.13888888889" y="540.0" />
+      <point x="58.222222222222626" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextDataObject.ContextDataObject" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-15.0" />
+      <point x="7345.916666666667" y="550.0" />
+      <point x="7067.027777777778" y="550.0" />
+      <point x="29.111111111111313" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.simpleProperty.ContextMappedPropertyClass" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="100.75" y="-15.0" />
+      <point x="1958.916666666666" y="150.0" />
+      <point x="4170.75" y="150.0" />
+      <point x="-129.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.data.DataUser">
+      <point x="27.875" y="-15.0" />
+      <point x="4351.0" y="270.0" />
+      <point x="4864.050000000001" y="270.0" />
+      <point x="-42.19999999999982" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.data_trans.data_with_evidence_ds.DataWithEvidenceDataSource" target="PyOpenWorm.datasource.DataSource">
+      <point x="0.0" y="-15.0" />
+      <point x="11471.032149758455" y="550.0" />
+      <point x="11245.3125" y="550.0" />
+      <point x="33.375" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.context_store.ContextStore" target="Store">
+      <point x="0.0" y="-15.0" />
+      <point x="5849.0" y="890.0" />
+      <point x="5702.75" y="890.0" />
+      <point x="16.75" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.1" x="6186.0" y="1138.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.dataObject.RDFTypeProperty</node>
+  </SelectedNodes>
+  <Categories />
+</Diagram>
+

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/neuron.py</OriginalElement>
+  <nodes>
+    <node x="1548.0" y="1585.0">PyOpenWorm.pProperty.Property</node>
+    <node x="1510.3657407407409" y="866.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="1654.8055555555557" y="2304.0">PyOpenWorm.neuron.ConnectionProperty</node>
+    <node x="1406.8055555555557" y="2282.0">PyOpenWorm.neuron.Neighbor</node>
+    <node x="628.4583333333333" y="0.0">object</node>
+    <node x="625.5" y="3184.0">PyOpenWorm.neuron.Neuron</node>
+    <node x="1841.3657407407409" y="910.0">PyOpenWorm.pProperty.PropertyMeta</node>
+    <node x="633.0" y="2392.5">PyOpenWorm.dataObject.DataObject</node>
+    <node x="0.0" y="1189.0">PyOpenWorm.dataObject.BaseDataObject</node>
+    <node x="366.1157407407409" y="899.0">PyOpenWorm.neuron.NeuronProxy</node>
+    <node x="807.5833333333333" y="543.0">PyOpenWorm.configure.Configureable</node>
+    <node x="561.0" y="2729.0">PyOpenWorm.cell.Cell</node>
+    <node x="640.0" y="2627.0">PyOpenWorm.biology.BiologyType</node>
+    <node x="1468.8657407407409" y="554.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="436.1157407407409" y="631.5">ObjectProxy</node>
+    <node x="787.5833333333333" y="800.0">PyOpenWorm.data.DataUser</node>
+    <node x="21.115740740740875" y="822.0">PyOpenWorm.dataObject.ContextMappedClass</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.neuron.Neighbor" target="PyOpenWorm.pProperty.Property">
+      <point x="0.0" y="-147.5" />
+      <point x="1520.8055555555557" y="2257.0" />
+      <point x="1638.5" y="2257.0" />
+      <point x="-90.5" y="125.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.dataObject.ContextMappedClass">
+      <point x="-509.33333333333326" y="-521.5" />
+      <point x="254.66666666666674" y="1169.0" />
+      <point x="183.61574074074088" y="1169.0" />
+      <point x="0.0" y="147.5" />
+    </edge>
+    <edge source="PyOpenWorm.biology.BiologyType" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.Neuron" target="PyOpenWorm.cell.Cell">
+      <point x="0.0" y="-180.5" />
+      <point x="0.0" y="202.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="509.33333333333326" y="-521.5" />
+      <point x="1273.3333333333333" y="1169.0" />
+      <point x="1588.1157407407409" y="1169.0" />
+      <point x="-77.75" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.data.DataUser">
+      <point x="-120.66666666666674" y="-125.5" />
+      <point x="1608.3333333333333" y="1159.0" />
+      <point x="1023.0833333333333" y="1159.0" />
+      <point x="78.5" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.pProperty.PropertyMeta">
+      <point x="120.66666666666674" y="-125.5" />
+      <point x="1849.6666666666667" y="1169.0" />
+      <point x="1976.8657407407409" y="1169.0" />
+      <point x="0.0" y="59.5" />
+    </edge>
+    <edge source="PyOpenWorm.cell.Cell" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-202.5" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObject" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="521.5" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.NeuronProxy" target="object">
+      <point x="78.5" y="-70.5" />
+      <point x="601.6157407407409" y="775.0" />
+      <point x="555.6157407407409" y="775.0" />
+      <point x="555.6157407407409" y="523.0" />
+      <point x="738.3333333333333" y="523.0" />
+      <point x="-36.625" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.data.DataUser">
+      <point x="0.0" y="-521.5" />
+      <point x="764.0" y="1169.0" />
+      <point x="866.0833333333333" y="1169.0" />
+      <point x="-78.5" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.BaseContextualizable" target="object">
+      <point x="0.0" y="-92.5" />
+      <point x="1665.8657407407409" y="513.0" />
+      <point x="884.8333333333333" y="513.0" />
+      <point x="109.875" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.ConnectionProperty" target="PyOpenWorm.pProperty.Property">
+      <point x="0.0" y="-125.5" />
+      <point x="1848.3055555555557" y="2257.0" />
+      <point x="1819.5" y="2257.0" />
+      <point x="90.5" y="125.5" />
+    </edge>
+    <edge source="PyOpenWorm.configure.Configureable" target="object">
+      <point x="0.0" y="-103.5" />
+      <point x="944.5833333333333" y="523.0" />
+      <point x="811.5833333333333" y="523.0" />
+      <point x="36.625" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.pProperty.Property" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="0.0" y="-125.5" />
+      <point x="1729.0" y="1169.0" />
+      <point x="1743.6157407407409" y="1169.0" />
+      <point x="77.75" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.NeuronProxy" target="ObjectProxy">
+      <point x="-78.5" y="-70.5" />
+      <point x="444.6157407407409" y="775.0" />
+      <point x="490.6157407407409" y="775.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="ObjectProxy" target="object">
+      <point x="0.0" y="-15.0" />
+      <point x="490.6157407407409" y="513.0" />
+      <point x="665.0833333333333" y="513.0" />
+      <point x="-109.875" y="246.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.6700898587933247" x="769.0000000000001" y="295.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.dataObject.ContextMappedClass</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

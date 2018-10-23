@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="25.5" y="693.0">PyOpenWorm.data.TrixSource</node>
+    <node x="1087.0" y="458.0">PyOpenWorm.data.ZODBSource</node>
+    <node x="522.5" y="0.0">PyOpenWorm.configure.Configureable</node>
+    <node x="0.0" y="513.0">PyOpenWorm.data.SerializationSource</node>
+    <node x="809.0" y="513.0">PyOpenWorm.data.SleepyCatSource</node>
+    <node x="816.5" y="77.5">PyOpenWorm.configure.ConfigValue</node>
+    <node x="692.75" y="257.0">PyOpenWorm.data.RDFSource</node>
+    <node x="548.0" y="513.0">PyOpenWorm.data.DefaultSource</node>
+    <node x="1345.0" y="513.0">PyOpenWorm.data.SPARQLSource</node>
+    <node x="291.0" y="513.0">PyOpenWorm.data.SQLiteSource</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.data.RDFSource" target="PyOpenWorm.configure.ConfigValue">
+      <point x="55.25" y="-70.5" />
+      <point x="858.5" y="232.0" />
+      <point x="947.0" y="232.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.ZODBSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-92.5" />
+      <point x="1206.0" y="428.0" />
+      <point x="858.5" y="428.0" />
+      <point x="55.25" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.SleepyCatSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-37.5" />
+      <point x="938.0" y="438.0" />
+      <point x="821.6666666666666" y="438.0" />
+      <point x="18.41666666666663" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DefaultSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-37.5" />
+      <point x="668.5" y="438.0" />
+      <point x="784.8333333333334" y="438.0" />
+      <point x="-18.41666666666663" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.SQLiteSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-37.5" />
+      <point x="409.5" y="428.0" />
+      <point x="748.0" y="428.0" />
+      <point x="-55.25" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.RDFSource" target="PyOpenWorm.configure.Configureable">
+      <point x="-55.25" y="-70.5" />
+      <point x="748.0" y="232.0" />
+      <point x="659.5" y="232.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.SPARQLSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-37.5" />
+      <point x="1468.5" y="418.0" />
+      <point x="895.3333333333334" y="418.0" />
+      <point x="92.08333333333337" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.TrixSource" target="PyOpenWorm.data.SerializationSource">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="37.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.SerializationSource" target="PyOpenWorm.data.RDFSource">
+      <point x="0.0" y="-37.5" />
+      <point x="135.5" y="418.0" />
+      <point x="711.1666666666666" y="418.0" />
+      <point x="-92.08333333333337" y="70.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.6492537313432836" x="794.0" y="140.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.data.TrixSource</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

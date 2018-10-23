@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm/inverse_property.py</OriginalElement>
+  <nodes>
+    <node x="856.0000000000001" y="598.5">PyOpenWorm.inverse_property.InversePropertyMixin</node>
+    <node x="146.5" y="778.0">Exception</node>
+    <node x="469.9999999999999" y="0.0">object</node>
+    <node x="11.0" y="554.0">BaseException</node>
+    <node x="0.0" y="858.0">PyOpenWorm.inverse_property.InversePropertyException</node>
+    <node x="397.0" y="543.0">PyOpenWorm.inverse_property.InverseProperty</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Exception" target="BaseException">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="BaseException" target="object">
+      <point x="0.0" y="-81.5" />
+      <point x="194.0" y="518.0" />
+      <point x="518.8333333333333" y="518.0" />
+      <point x="-97.66666666666669" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InversePropertyMixin" target="object">
+      <point x="0.0" y="-37.0" />
+      <point x="1035.5" y="518.0" />
+      <point x="714.1666666666666" y="518.0" />
+      <point x="97.66666666666674" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InverseProperty" target="object">
+      <point x="-1.1368683772161603E-13" y="-92.5" />
+      <point x="0.0" y="246.5" />
+    </edge>
+    <edge source="PyOpenWorm.inverse_property.InversePropertyException" target="Exception">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="491.5" y="135.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.inverse_property.InverseProperty</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

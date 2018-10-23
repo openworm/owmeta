@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="1172.681818181818" y="778.5">PyOpenWorm.context.ContextMeta</node>
+    <node x="1079.181818181818" y="0.0">type</node>
+    <node x="355.4999999999999" y="734.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="313.9999999999999" y="422.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="686.4999999999999" y="811.5">PyOpenWorm.import_contextualizer.ImportContextualizer</node>
+    <node x="20.0" y="411.0">PyOpenWorm.configure.Configureable</node>
+    <node x="880.0" y="2084.0">PyOpenWorm.documentContext.DocumentContext</node>
+    <node x="1225.681818181818" y="1519.5">PyOpenWorm.documentContext.DocumentContextMeta</node>
+    <node x="0.0" y="668.0">PyOpenWorm.data.DataUser</node>
+    <node x="188.0" y="1057.0">PyOpenWorm.context.Context</node>
+    <node x="1162.681818181818" y="433.0">PyOpenWorm.contextualize.ContextualizableClass</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="-127.00000000000011" y="-488.5" />
+      <point x="568.9999999999999" y="1032.0" />
+      <point x="510.9999999999999" y="1032.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContext" target="PyOpenWorm.context.Context">
+      <point x="-87.5" y="-59.5" />
+      <point x="967.5" y="2059.0" />
+      <point x="696.0" y="2059.0" />
+      <point x="0.0" y="488.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.context.ContextMeta">
+      <point x="380.9999999999999" y="-488.5" />
+      <point x="1077.0" y="1032.0" />
+      <point x="1253.681818181818" y="1032.0" />
+      <point x="-81.0" y="59.0" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContextMeta" target="PyOpenWorm.context.ContextMeta">
+      <point x="0.0" y="-26.0" />
+      <point x="81.0" y="59.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.ContextualizableClass" target="type">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="180.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.import_contextualizer.ImportContextualizer">
+      <point x="126.99999999999989" y="-488.5" />
+      <point x="822.9999999999999" y="1032.0" />
+      <point x="880.9999999999999" y="1032.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.context.ContextMeta" target="PyOpenWorm.contextualize.ContextualizableClass">
+      <point x="0.0" y="-59.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.context.Context" target="PyOpenWorm.data.DataUser">
+      <point x="-381.0000000000001" y="-488.5" />
+      <point x="314.9999999999999" y="1032.0" />
+      <point x="157.0" y="1032.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.documentContext.DocumentContext" target="PyOpenWorm.documentContext.DocumentContextMeta">
+      <point x="87.5" y="-59.5" />
+      <point x="1142.5" y="2059.0" />
+      <point x="1415.681818181818" y="2059.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7068381855111713" x="728.5" y="175.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.context.ContextMeta</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

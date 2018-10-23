@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="330.0" y="367.0">PyOpenWorm.data.Data</node>
+    <node x="0.0" y="532.5">PyOpenWorm.configure.ImmutableConfigure</node>
+    <node x="167.0" y="0.0">PyOpenWorm.configure.Configure</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.configure.ImmutableConfigure" target="PyOpenWorm.configure.Configure">
+      <point x="0.0" y="-26.0" />
+      <point x="155.0" y="342.0" />
+      <point x="242.5" y="342.0" />
+      <point x="-75.5" y="158.5" />
+    </edge>
+    <edge source="PyOpenWorm.data.Data" target="PyOpenWorm.configure.Configure">
+      <point x="0.0" y="-191.5" />
+      <point x="481.0" y="342.0" />
+      <point x="393.5" y="342.0" />
+      <point x="75.5" y="158.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="256.0" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.data.Data</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

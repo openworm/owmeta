@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="573.0" y="502.0">PyOpenWorm.cli_command_wrapper.CLIStoreAction</node>
+    <node x="1754.5" y="726.0">PyOpenWorm.cli_command_wrapper.CLISubCommandAction</node>
+    <node x="345.0" y="726.0">PyOpenWorm.cli_command_wrapper.CLIStoreTrueAction</node>
+    <node x="1029.0" y="469.0">argparse._SubParsersAction</node>
+    <node x="801.0" y="748.5">PyOpenWorm.cli_command_wrapper.CLIAppendAction</node>
+    <node x="1277.5" y="0.0">argparse._AttributeHolder</node>
+    <node x="0.0" y="124.0">argparse.Action</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="argparse.Action" target="argparse._AttributeHolder">
+      <point x="0.0" y="-147.5" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIAppendAction" target="PyOpenWorm.cli_command_wrapper.CLIStoreAction">
+      <point x="0.0" y="-26.0" />
+      <point x="1019.0" y="701.0" />
+      <point x="900.0" y="701.0" />
+      <point x="109.0" y="70.5" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIStoreAction" target="argparse.Action">
+      <point x="0.0" y="-70.5" />
+      <point x="791.0" y="444.0" />
+      <point x="687.25" y="444.0" />
+      <point x="-687.25" y="147.5" />
+    </edge>
+    <edge source="argparse._SubParsersAction" target="argparse.Action">
+      <point x="0.0" y="-103.5" />
+      <point x="1958.0" y="444.0" />
+      <point x="2061.75" y="444.0" />
+      <point x="687.25" y="147.5" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLISubCommandAction" target="argparse._SubParsersAction">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.cli_command_wrapper.CLIStoreTrueAction" target="PyOpenWorm.cli_command_wrapper.CLIStoreAction">
+      <point x="0.0" y="-48.5" />
+      <point x="563.0" y="701.0" />
+      <point x="682.0" y="701.0" />
+      <point x="-109.0" y="70.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.8571428571428571" x="599.0" y="135.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.cli_command_wrapper.CLIStoreAction</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

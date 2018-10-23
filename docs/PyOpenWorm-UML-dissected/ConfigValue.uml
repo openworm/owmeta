@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="221.0" y="102.0">PyOpenWorm.data._B</node>
+    <node x="410.0" y="124.0">PyOpenWorm.configure._link</node>
+    <node x="175.0" y="0.0">PyOpenWorm.configure.ConfigValue</node>
+    <node x="0.0" y="113.0">PyOpenWorm.configure._C</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.configure._link" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-59.5" />
+      <point x="516.5" y="77.0" />
+      <point x="392.5" y="77.0" />
+      <point x="87.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.data._B" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.configure._C" target="PyOpenWorm.configure.ConfigValue">
+      <point x="0.0" y="-70.5" />
+      <point x="100.5" y="77.0" />
+      <point x="218.5" y="77.0" />
+      <point x="-87.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="311.5" y="55.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.data._B</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+

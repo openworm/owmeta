@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/Users/mikes/Documents/Eclipseworkspace/Openworm/PyOpenWorm-biocom/PyOpenWorm</OriginalElement>
+  <nodes>
+    <node x="2644.0" y="2736.5">PyOpenWorm.muscle.Muscle</node>
+    <node x="4147.0" y="2160.0">PyOpenWorm.channel.Channel</node>
+    <node x="2415.0" y="2149.0">PyOpenWorm.cell.Cell</node>
+    <node x="2152.75" y="323.0">PyOpenWorm.contextualize.Contextualizable</node>
+    <node x="194.5" y="1894.0">PyOpenWorm.channelworm.ChannelModel</node>
+    <node x="2111.25" y="11.0">PyOpenWorm.contextualize.BaseContextualizable</node>
+    <node x="1493.75" y="0.0">PyOpenWorm.configure.Configureable</node>
+    <node x="2126.0" y="2281.0">PyOpenWorm.website.Website</node>
+    <node x="903.5" y="1916.0">PyOpenWorm.experiment.Experiment</node>
+    <node x="1251.0" y="2138.0">PyOpenWorm.document.Document</node>
+    <node x="4392.175925925925" y="1883.0">PyOpenWorm.plot.Plot</node>
+    <node x="1912.25" y="88.5">MappedClass</node>
+    <node x="0.0" y="2314.0">PyOpenWorm.channelworm.HomologyChannelModel</node>
+    <node x="1473.75" y="257.0">PyOpenWorm.data.DataUser</node>
+    <node x="4726.175925925925" y="1883.0">PyOpenWorm.collections.Bag</node>
+    <node x="1828.5" y="1938.5">PyOpenWorm.document.BaseDocument</node>
+    <node x="1838.5" y="1739.0">PyOpenWorm.dataObject.DataObject</node>
+    <node x="1807.75" y="279.0">PyOpenWorm.dataObject.ContextMappedClass</node>
+    <node x="4124.175925925925" y="1949.5">PyOpenWorm.biology.BiologyType</node>
+    <node x="3040.297222222222" y="1927.5">PyOpenWorm.contextDataObject.ContextDataObject</node>
+    <node x="5144.0" y="2182.0">PyOpenWorm.network.Network</node>
+    <node x="1205.5" y="646.0">PyOpenWorm.dataObject.BaseDataObject</node>
+    <node x="379.0" y="2314.0">PyOpenWorm.channelworm.PatchClampChannelModel</node>
+    <node x="1510.25" y="1894.0">PyOpenWorm.evidence.Evidence</node>
+    <node x="568.5" y="1938.5">PyOpenWorm.dataObject.PropertyDataObject</node>
+    <node x="2841.0" y="2215.0">PyOpenWorm.connection.Connection</node>
+    <node x="4446.0" y="2248.0">PyOpenWorm.channel.ExpressionPattern</node>
+    <node x="2347.0" y="2615.0">PyOpenWorm.neuron.Neuron</node>
+    <node x="4786.0" y="2182.0">PyOpenWorm.worm.Worm</node>
+    <node x="880.0" y="2303.0">PyOpenWorm.channelworm.PatchClampExperiment</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="PyOpenWorm.website.Website" target="PyOpenWorm.document.BaseDocument">
+      <point x="0.0" y="-70.5" />
+      <point x="2260.5" y="2118.0" />
+      <point x="2040.0" y="2118.0" />
+      <point x="70.5" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.evidence.Evidence" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-81.5" />
+      <point x="1628.25" y="1863.0" />
+      <point x="1940.3888888888887" y="1863.0" />
+      <point x="-29.111111111111313" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.PatchClampExperiment" target="PyOpenWorm.experiment.Experiment">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="59.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.contextualize.Contextualizable">
+      <point x="509.3333333333335" y="-521.5" />
+      <point x="2478.8333333333335" y="621.0" />
+      <point x="2308.25" y="621.0" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.document.Document" target="PyOpenWorm.document.BaseDocument">
+      <point x="0.0" y="-213.5" />
+      <point x="1678.5" y="2118.0" />
+      <point x="1899.0" y="2118.0" />
+      <point x="-70.5" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.cell.Cell" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-202.5" />
+      <point x="2618.0" y="2108.0" />
+      <point x="4144.842592592592" y="2108.0" />
+      <point x="-103.33333333333348" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.plot.Plot" target="PyOpenWorm.dataObject.DataObject">
+      <point x="-2.2737367544323206E-13" y="-92.5" />
+      <point x="4549.175925925925" y="1843.0" />
+      <point x="2056.8333333333335" y="1843.0" />
+      <point x="87.33333333333348" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.connection.Connection" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-136.5" />
+      <point x="3484.0" y="2118.0" />
+      <point x="4186.175925925925" y="2118.0" />
+      <point x="-62.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.document.BaseDocument" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.channel.ExpressionPattern" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-103.5" />
+      <point x="4606.0" y="2108.0" />
+      <point x="4268.842592592592" y="2108.0" />
+      <point x="20.666666666666515" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.network.Network" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-169.5" />
+      <point x="5284.0" y="2088.0" />
+      <point x="4351.509259259259" y="2088.0" />
+      <point x="103.33333333333348" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.ContextMappedClass" target="MappedClass">
+      <point x="0.0" y="-147.5" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="PyOpenWorm.collections.Bag" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-92.5" />
+      <point x="4834.675925925925" y="1833.0" />
+      <point x="2085.9444444444443" y="1833.0" />
+      <point x="116.44444444444434" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.PropertyDataObject" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-37.0" />
+      <point x="726.0" y="1843.0" />
+      <point x="1882.1666666666665" y="1843.0" />
+      <point x="-87.33333333333348" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.dataObject.ContextMappedClass">
+      <point x="0.0" y="-521.5" />
+      <point x="0.0" y="147.5" />
+    </edge>
+    <edge source="PyOpenWorm.biology.BiologyType" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-26.0" />
+      <point x="4248.175925925925" y="1853.0" />
+      <point x="2027.7222222222222" y="1853.0" />
+      <point x="58.22222222222217" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.neuron.Neuron" target="PyOpenWorm.cell.Cell">
+      <point x="0.0" y="-180.5" />
+      <point x="2485.5" y="2590.0" />
+      <point x="2516.5" y="2590.0" />
+      <point x="-101.5" y="202.5" />
+    </edge>
+    <edge source="PyOpenWorm.channel.Channel" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-191.5" />
+      <point x="4286.5" y="2118.0" />
+      <point x="4227.509259259259" y="2118.0" />
+      <point x="-20.666666666666515" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.data.DataUser" target="PyOpenWorm.configure.Configureable">
+      <point x="0.0" y="-169.5" />
+      <point x="0.0" y="103.5" />
+    </edge>
+    <edge source="PyOpenWorm.muscle.Muscle" target="PyOpenWorm.cell.Cell">
+      <point x="0.0" y="-59.0" />
+      <point x="2750.5" y="2590.0" />
+      <point x="2719.5" y="2590.0" />
+      <point x="101.5" y="202.5" />
+    </edge>
+    <edge source="PyOpenWorm.contextualize.Contextualizable" target="PyOpenWorm.contextualize.BaseContextualizable">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="92.5" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.HomologyChannelModel" target="PyOpenWorm.channelworm.ChannelModel">
+      <point x="0.0" y="-37.5" />
+      <point x="179.5" y="2118.0" />
+      <point x="283.0" y="2118.0" />
+      <point x="-88.5" y="81.5" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.DataObject" target="PyOpenWorm.dataObject.BaseDataObject">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="521.5" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.ChannelModel" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-81.5" />
+      <point x="371.5" y="1833.0" />
+      <point x="1853.0555555555557" y="1833.0" />
+      <point x="-116.44444444444434" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.worm.Worm" target="PyOpenWorm.biology.BiologyType">
+      <point x="0.0" y="-169.5" />
+      <point x="4955.0" y="2098.0" />
+      <point x="4310.175925925925" y="2098.0" />
+      <point x="62.0" y="26.0" />
+    </edge>
+    <edge source="PyOpenWorm.dataObject.BaseDataObject" target="PyOpenWorm.data.DataUser">
+      <point x="-509.33333333333326" y="-521.5" />
+      <point x="1460.1666666666667" y="621.0" />
+      <point x="1630.75" y="621.0" />
+      <point x="0.0" y="169.5" />
+    </edge>
+    <edge source="PyOpenWorm.experiment.Experiment" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-59.5" />
+      <point x="1055.5" y="1853.0" />
+      <point x="1911.2777777777778" y="1853.0" />
+      <point x="-58.22222222222217" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.contextDataObject.ContextDataObject" target="PyOpenWorm.dataObject.DataObject">
+      <point x="0.0" y="-48.0" />
+      <point x="3219.797222222222" y="1863.0" />
+      <point x="1998.6111111111113" y="1863.0" />
+      <point x="29.111111111111313" y="37.0" />
+    </edge>
+    <edge source="PyOpenWorm.channelworm.PatchClampChannelModel" target="PyOpenWorm.channelworm.ChannelModel">
+      <point x="0.0" y="-37.5" />
+      <point x="563.5" y="2118.0" />
+      <point x="460.0" y="2118.0" />
+      <point x="88.5" y="81.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.29202797202797204" x="1777.5" y="270.0" />
+  <SelectedNodes>
+    <node>PyOpenWorm.muscle.Muscle</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
+
