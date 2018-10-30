@@ -162,6 +162,11 @@ class _ProgressMock(object):
         return type(self)()
 
 
+class POWDist(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+
 class POWConfig(object):
     user = IVar(value_type=bool,
                 default_value=False,

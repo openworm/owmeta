@@ -283,7 +283,9 @@ class DataObjectContextDataSource(DataSource):
 
 
 def format_types(typ):
-    if isinstance(typ, type):
+    if isinstance(typ, OneOrMore):
+        return ':class:`{}` (:class:`{}`)'.format(FCN(OneOrMore), FCN(typ.source_type))
+    elif isinstance(typ, type):
         return ':class:`{}`'.format(FCN(typ))
     else:
         return ', '.join(':class:`{}`'.format(FCN(x)) for x in typ)
@@ -358,6 +360,10 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
 
 
 class OneOrMore(object):
+    """
+    Wrapper for :class:`DataTranslator` input :class:`DataSource` types indicating that one or more of the wrapped type
+    must be provided to the translator
+    """
     def __init__(self, source_type):
         self.source_type = source_type
 

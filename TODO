@@ -27,7 +27,7 @@ for that context in one go
 - Make a component which accepts a context and generates a Python requirements
 list from all Python class registry entries
 
-- Note that a python package must be installed in a fashion accessible to
+- Note that a Python package must be installed in a fashion accessible to
 pkg_resources in order to work with the requirements list feature
 
 - Consider distribution schemes that package Python code together with the data
