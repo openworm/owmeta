@@ -1,6 +1,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+import hashlib
+
+import pytest
+
+
 excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
 
 
@@ -43,6 +48,22 @@ def listFunctionNames():
                 if count:
                     print('\n')
                     count = False
+
+
+def xfail_without_db():
+    db_path = os.path.join(
+        os.path.dirname(  # project root
+            os.path.dirname(  # test dir
+                os.path.realpath(__file__)  # this file
+            )
+        ),
+        ".pow",
+        "worm.db"
+    )
+    # todo: also hash db file?
+    if not os.path.isfile(db_path):
+        pytest.xfail("Database is not installed. Try \n\tpow clone https://github.com/openworm/OpenWormData.git")
+
 
 # Add function to find dummy tests, i.e. ones that are simply marked pass.
 # TODO: improve this to list function names
