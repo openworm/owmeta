@@ -3,6 +3,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 import unittest
 import itertools
+
+from .TestUtilities import xfail_without_db
 from .DataTestTemplate import _DataTest
 import PyOpenWorm
 from PyOpenWorm.context import Context
@@ -16,6 +18,7 @@ from PyOpenWorm.evidence import Evidence
 class EvidenceCoverageTest(_DataTest):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
+        xfail_without_db()
         PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")
         self.context = Context()

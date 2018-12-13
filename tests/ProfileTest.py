@@ -6,8 +6,11 @@ from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm import connect, disconnect
 
+from .TestUtilities import xfail_without_db
+
 
 def setup():
+    xfail_without_db()
     connect(configFile='tests/data_integrity_test.conf')
 
 
