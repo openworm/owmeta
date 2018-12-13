@@ -1,0 +1,34 @@
+pytest>=3.4.0
+pytest-cov==2.5.1
+pytest-runner
+discover==0.4.0
+mock==2.0.0; python_version < '3.0'
+bibtexparser==1.0.1
+BTrees==4.0.8
+decorator==3.4.0
+gitpython>=2.1.1
+html5lib==0.999
+isodate==0.5.0
+lazy-object-proxy==1.2.1
+libneuroml
+networkx==1.9
+numpydoc>=0.7.0
+persistent==4.0.8
+Pint==0.8.1
+pow-store-zodb==0.0.3
+pyparsing==2.2.0
+rdflib>=4.1.2
+requests==2.18.4
+six==1.10.0
+SPARQLWrapper==1.6.2
+tqdm==4.23.4
+transaction==1.4.4
+wrapt==1.10.11
+xlrd==1.1.0
+yarom==0.11.0
+zc.lockfile==1.1.0
+ZConfig==3.0.4
+zdaemon==4.0.0
+zodb==4.1.0
+zope.interface==4.1.1
+zodbpickle==1.0; python_version < '3.0'
