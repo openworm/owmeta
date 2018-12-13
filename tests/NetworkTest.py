@@ -47,10 +47,12 @@ class NetworkTest(_DataTest):
             self.assertIsInstance(x, Connection)
             break
 
-    @unittest.skip('not implemented')
     def test_as_networkx(self):
         """Test that as_networkx returns the correct type."""
-        self.assertTrue(isinstance(self.net.as_networkx(), networkx.DiGraph))
+        g = self.net.as_networkx()
+        self.assertTrue(isinstance(g, networkx.OrderedMultiDiGraph))
+        self.assertEqual(len(g.nodes), 451)
+        self.assertEqual(len(g.edges), 7319)
 
     def test_interneurons(self):
         n0 = self.ctx.Neuron(name='TestNeuron0')
