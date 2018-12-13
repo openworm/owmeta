@@ -3,6 +3,17 @@
 Testing in PyOpenWorm
 =====================
 
+Preparing for tests
+-------------------
+
+PyOpenWorm should be installed like::
+
+    python setup.py develop
+
+The default database should be populated like::
+
+    pow clone https://github.com/openworm/OpenWormData.git
+
 Running tests
 -------------
 Tests should be run via setup.py like::
