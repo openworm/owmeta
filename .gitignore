@@ -47,3 +47,6 @@ snakefood
 # api docs are generated but housed in the docs/ directory with the handwritten
 # kind
 docs/api
+
+# pow clone'd databases
+.pow/
