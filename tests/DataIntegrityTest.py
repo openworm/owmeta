@@ -144,12 +144,12 @@ class DataIntegrityTest(unittest.TestCase):
                          "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
+        """ Get the number of gap junctions from a representation """
         # was 81 -- now retunring 44 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').GJ_degree(), 44)
 
     def test_neuron_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
+        """ Get the number of chemical synapses from a representation """
         # was 187 -- now returning 105 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').Syn_degree(), 105)
 

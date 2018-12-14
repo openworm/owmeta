@@ -60,7 +60,6 @@ setup(
         'isodate==0.5.0',
         'lazy-object-proxy==1.2.1',
         'libneuroml',
-        'networkx==1.9',
         'numpydoc>=0.7.0',
         'persistent==4.0.8',
         'Pint==0.8.1',
