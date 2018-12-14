@@ -103,7 +103,7 @@ class DataIntegrityTest(unittest.TestCase):
                     ?n <http://openworm.org/entities/Cell/name> {name}
                 }} LIMIT 5
                 """.format(name=R.Literal(n).n3()))
-            results[n] = (len(qres.result), [x[0] for x in qres.result])
+            results[n] = (len(qres), [x[0] for x in qres])
 
         # If there is not only one result back, then there is more than one RDF
         # node.
@@ -144,12 +144,12 @@ class DataIntegrityTest(unittest.TestCase):
                          "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
+        """ Get the number of gap junctions from a representation """
         # was 81 -- now retunring 44 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').GJ_degree(), 44)
 
     def test_neuron_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
+        """ Get the number of chemical synapses from a representation """
         # was 187 -- now returning 105 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').Syn_degree(), 105)
 
@@ -160,7 +160,7 @@ class DataIntegrityTest(unittest.TestCase):
                             ?o ?p ?s # for that type ?o, get its value ?v
                             }} LIMIT 10
                             """)
-        for row in qres.result:
+        for row in qres:
             print(row)
 
     # TODO: Revise this test to pull from the herm_full_edgelist.csv instead of NeuronConnect.xls
@@ -204,7 +204,7 @@ class DataIntegrityTest(unittest.TestCase):
 
         def ff(x):
             return str(x.value)
-        for line in qres.result:
+        for line in qres:
             t = list(map(ff, line))
             # Insert sample cell name into the result set after the fact
             t.insert(0, SAMPLE_CELL)
@@ -239,7 +239,7 @@ class DataIntegrityTest(unittest.TestCase):
                                # Filter out any ?pre_names or ?post_names that aren't literals
                                ############################################################
                                FILTER(isLiteral(?pre_name))}""".format(name=R.Literal(SAMPLE_CELL).n3()))
-        for line in qres.result:
+        for line in qres:
             t = list(map(ff, line))
             # Insert sample cell name into the result set after the fact
             t.insert(1, SAMPLE_CELL)
