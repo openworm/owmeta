@@ -1,7 +1,7 @@
 from __future__ import print_function, absolute_import
 import sys
 import os
-from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath, normpath
+from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
 from os import makedirs, mkdir, listdir
 from contextlib import contextmanager
 import hashlib
@@ -18,13 +18,13 @@ except ImportError:
     from backports.tempfile import TemporaryDirectory
 
 from .command_util import IVar, SubCommand
-from .context import Context
+from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from .capability import provide, is_capable
+from .capabilities import FilePathProvider
 
 
 L = logging.getLogger(__name__)
 
-DATA_CONTEXT_KEY = 'data_context_id'
-IMPORTS_CONTEXT_KEY = 'imports_context_id'
 DEFAULT_SAVE_CALLABLE_NAME = 'pow_data'
 
 
@@ -49,7 +49,7 @@ class POWSource(object):
             The key, a unique name for the source
         """
 
-    def list(self, context=None, kind=None):
+    def list(self, context=None, kind=None, full=False):
         """
         List known sources
 
@@ -59,6 +59,8 @@ class POWSource(object):
             Only list sources of this kind
         context : str
             The context to query for sources
+        full : bool
+            Whether to (attempt to) shorten the source URIs by using the namespace manager
         """
         from .datasource import DataSource
         conf = self._parent._conf()
@@ -74,7 +76,10 @@ class POWSource(object):
         dt = dst(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            yield nm.normalizeUri(x.identifier)
+            if full:
+                yield x.identifier
+            else:
+                yield nm.normalizeUri(x.identifier)
 
     def show(self, data_source):
         '''
@@ -113,16 +118,30 @@ class POWTranslator(object):
     def __init__(self, parent):
         self._parent = parent
 
-    def list(self, context=None):
+    def list(self, context=None, full=False):
         '''
         List translator types
+
+        Parameters
+        ----------
+        context : str
+            The root context to search
+        full : bool
+            Whether to (attempt to) shorten the source URIs by using the namespace manager
         '''
         from PyOpenWorm.datasource import DataTranslator
         conf = self._parent._conf()
-        dt = self._parent._data_ctx.stored(DataTranslator)(conf=conf)
+        if context is not None:
+            ctx = self._make_ctx(context)
+        else:
+            ctx = self._parent._data_ctx
+        dt = ctx.stored(DataTranslator)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            yield nm.normalizeUri(x.identifier)
+            if full:
+                yield x.identifier
+            else:
+                yield nm.normalizeUri(x.identifier)
 
     def show(self, translator):
         '''
@@ -298,6 +317,7 @@ class POW(object):
     def __init__(self):
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
+        self._data_source_directories = None
 
     @IVar.property('.pow')
     def powdir(self):
@@ -340,9 +360,7 @@ class POW(object):
 
     @IVar.property
     def log_level(self):
-        '''
-        Log level
-        '''
+        ''' Log level '''
         return logging.getLevelName(logging.getLogger().getEffectiveLevel())
 
     @log_level.setter
@@ -616,7 +634,7 @@ class POW(object):
                     progress.write('Finalizing writes to database...')
         progress.write('Loaded {:,} triples'.format(triples_read))
 
-    def translate(self, translator, imports_context_ident, output_key=None, translation_directory=None,
+    def translate(self, translator, output_key=None,
                   data_sources=(), named_data_sources=None):
         """
         Do a translation with the named translator and inputs
@@ -629,8 +647,6 @@ class POW(object):
             Identifier for the imports context. All imports go in here
         output_key : str
             Output identifier
-        translation_directory : str
-            Directory holding files used in the translation, if needed
         data_sources : list of str
             Input data sources
         named_data_sources : dict
@@ -638,30 +654,35 @@ class POW(object):
         """
         if named_data_sources is None:
             named_data_sources = dict()
-        imports_context = Context(ident=imports_context_ident, conf=self._conf())
         translator_obj = self._lookup_translator(translator)
         if translator_obj is None:
             raise GenericUserError('No translator for ' + translator)
 
-        graph = self._rdf
         positional_sources = [self._lookup_source(src) for src in data_sources]
         if None in positional_sources:
             raise GenericUserError('No source for ' + data_sources[positional_sources.index(None)])
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
-        saved_contexts = set([])
         with TemporaryDirectory(prefix='pow-translate.') as d:
             orig_wd = os.getcwd()
             os.chdir(d)
             try:
-                if translation_directory:
-                    self._stage_translation_directory(normpath(pth_join(orig_wd, translation_directory)), d)
                 res = translator_obj(*positional_sources, output_key=output_key, **named_sources)
-                res.data_context.save_context(inline_imports=True, graph=graph, saved_contexts=saved_contexts)
-                res.data_context.save_imports(imports_context, graph=graph)
-                res.evidence_context.save_context(inline_imports=True, graph=graph, saved_contexts=saved_contexts)
-                res.evidence_context.save_imports(imports_context, graph=graph)
+                res.commit()
             finally:
                 os.chdir(orig_wd)
+
+    @property
+    def _dsd(self):
+        self._load_data_source_directories()
+        return self._data_source_directories
+
+    def _load_data_source_directories(self):
+        if not self._data_source_directories:
+            dsd = dict()
+            dindex = open(pth_join(self.powdir, 'data_source_directories'))
+            for ds_id, dname in (x.split(' ', 1) for x in dindex):
+                dsd[ds_id] = dname.strip()
+            self._data_source_directories = dsd
 
     def _stage_translation_directory(self, source_directory, target_directory):
         self.message('Copying files into {} from {}'.format(target_directory, source_directory))
@@ -685,7 +706,13 @@ class POW(object):
     def _lookup_source(self, sname):
         from PyOpenWorm.datasource import DataSource
         for x in self._data_ctx.stored(DataSource)(ident=sname).load():
+            if is_capable(x):
+                provide(x, self._cap_provs)
             return x
+
+    @property
+    def _cap_provs(self):
+        return [DataSourceDirectoryProvider(self._dsd)]
 
     @property
     def _data_ctx(self):
@@ -979,6 +1006,28 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
         fmt = '{}\n Traceback (most recent call last, PyOpenWorm frames omitted):\n {}'
         res = fmt.format(self.validation_record, '\n '.join(''.join(s for s in stack if s).split('\n')))
         return res.strip()
+
+
+class DataSourceDirectoryProvider(FilePathProvider):
+    def __init__(self, dsd):
+        self._dsd = dsd
+
+    def __call__(self, ob):
+        ident = ob.identifier
+        try:
+            path = self._dsd[str(ident)]
+        except KeyError:
+            return None
+
+        return _DSDP(path)
+
+
+class _DSDP(FilePathProvider):
+    def __init__(self, path):
+        self._path = path
+
+    def file_path(self):
+        return self._path
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):

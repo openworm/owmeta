@@ -1,4 +1,5 @@
 from rdflib.namespace import Namespace
+from os.path import join as pth_join
 from contextlib import contextmanager
 from .common_data import DS_NS
 from .local_file_ds import LocalFileDataSource
@@ -30,7 +31,9 @@ class CSVDataTranslator(DataTranslator):
 
         @contextmanager
         def cm():
-            with open(source.csv_file_name.onedef()) as f:
+            rel_fname = source.csv_file_name.one()
+            fname = pth_join(source.basedir(), rel_fname)
+            with open(fname) as f:
                 reader = csv.reader(f, **params)
                 if skipheader:
                     next(reader)

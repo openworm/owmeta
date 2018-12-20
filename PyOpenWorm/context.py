@@ -19,6 +19,10 @@ from six import text_type
 import six
 
 
+DATA_CONTEXT_KEY = 'data_context_id'
+IMPORTS_CONTEXT_KEY = 'imports_context_id'
+
+
 class ModuleProxy(wrapt.ObjectProxy):
     def __init__(self, ctx, *args, **kwargs):
         super(ModuleProxy, self).__init__(*args, **kwargs)
@@ -145,17 +149,26 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         for x in self._imported_contexts:
             yield x
 
-    def save_imports(self, context, *args, **kwargs):
+    def save_imports(self, context=None, *args, **kwargs):
+        if not context:
+            ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
+            context = Context(ident=ctx_key, conf=self.conf)
         self.declare_imports(context)
         context.save_context(*args, **kwargs)
 
-    def declare_imports(self, context):
+    def declare_imports(self, context=None):
+        if not context:
+            ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
+            context = Context(ident=ctx_key, conf=self.conf)
+        self._declare_imports(context)
+
+    def _declare_imports(self, context):
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
                     and not isinstance(ctx.identifier, rdflib.term.BNode):
                 context(self.rdf_object).imports(ctx.rdf_object)
-                ctx.declare_imports(context)
+                ctx._declare_imports(context)
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, saved_contexts=None):
         if saved_contexts is None:
@@ -302,7 +315,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     @property
     def query(self):
         return QueryContext(graph=self.load_combined_graph(),
-                            ident=self.identifier)
+                            ident=self.identifier,
+                            conf=self.conf)
 
     @property
     def staged(self):
@@ -312,7 +326,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
     @property
     def stored(self):
         return QueryContext(graph=self.load_graph_from_configured_store(),
-                            ident=self.identifier)
+                            ident=self.identifier,
+                            conf=self.conf)
 
     def _retrieve_configured_graph(self):
         try:

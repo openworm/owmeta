@@ -198,6 +198,18 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             if v is not None:
                 ctxd_prop(v)
 
+    def commit(self):
+        '''
+        Commit the data source *locally*
+
+        This includes staging files such as they would be available for a translation. In general, a sub-class should
+        implement :meth:`commit_augment` rather than this method, or at least call this method via super
+
+        For example, if the data source produces a file, that file should be in
+        '''
+        # TODO: Copy the current configs...
+        self.commit_augment()
+
     def defined_augment(self):
         return self.translation.has_defined_value()
 
