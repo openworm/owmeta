@@ -21,6 +21,7 @@ from .command_util import IVar, SubCommand
 from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide, is_capable
 from .capabilities import FilePathProvider
+from .datasource_loader import DataSourceDirLoader, LoadFailed
 
 
 L = logging.getLogger(__name__)
@@ -678,7 +679,12 @@ class POW(object):
 
     def _load_data_source_directories(self):
         if not self._data_source_directories:
-            dsd = dict()
+            # The DSD holds mappings to data sources we've loaded before. In general, this allows the individual loaders
+            # to not worry about checking if they have loaded something before.
+
+            # XXX persist the dict
+            lclasses = [POWDirDataSourceDirLoader]
+            dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
             dindex = open(pth_join(self.powdir, 'data_source_directories'))
             for ds_id, dname in (x.split(' ', 1) for x in dindex):
                 dsd[ds_id] = dname.strip()
@@ -1008,6 +1014,35 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
         return res.strip()
 
 
+class _DSD(object):
+    def __init__(self, ds_dict, base_directory, loader_classes):
+        self._dsdict = ds_dict
+        self._base_directory = base_directory
+        self._lclasses = loader_classes
+
+    def __getitem__(self, dsid):
+        try:
+            return self._dsdict[dsid]
+        except KeyError:
+            res = self._load_data_source(dsid)
+            if res:
+                self._dsdict[dsid] = res
+                return res
+            raise
+
+    def _loaders(self):
+        for cls in self._lclasses:
+            nd = pth_join(self._base_directory, cls.dirkey)
+            if not exists(nd):
+                makedirs(nd)
+            yield cls(nd)
+
+    def _load_data_source(self, dsid):
+        for loader in self._loaders():
+            if loader.can_load(dsid):
+                return loader(dsid)
+
+
 class DataSourceDirectoryProvider(FilePathProvider):
     def __init__(self, dsd):
         self._dsd = dsd
@@ -1028,6 +1063,65 @@ class _DSDP(FilePathProvider):
 
     def file_path(self):
         return self._path
+
+
+class POWDirDataSourceDirLoader(DataSourceDirLoader):
+    def __init__(self, basedir):
+        self._basedir = basedir
+        self._idx_fname = pth_join(self._basedir, 'index')
+        self._index = dict()
+
+    def _load_index(self):
+        with os.scandir(self._basedir) as dirents:
+            dentdict = {de.name: de for de in dirents}
+            with open(self._idx_fname) as f:
+                for l in f:
+                    dsid, dname = l.split(' ')
+                    dname = dname.strip()
+                    if self._index_dir_entry_is_bad(dname, dentdict.get(dname)):
+                        continue
+
+                    self._index[dsid] = dname
+
+    def _index_dir_entry_is_bad(self, dname, de):
+        if not de:
+            msg = "There is no directory entry for {} in {}"
+            L.warn(msg.format(dname, self._basedir), exc_info=True)
+            return True
+
+        if not de.is_dir():
+            msg = "The directory entry for {} in {} is not a directory"
+            L.warn(msg.format(dname, self._basedir))
+            return True
+
+        return False
+
+    def _ensure_index_loaded(self):
+        if not self._index:
+            self._load_index()
+
+    def can_load(self, ident):
+        try:
+            self._ensure_index_loaded()
+        except OSError as e:
+            # If the index file just happens not to be here since the repo doesn't have any data source directories,
+            # then we just can't load the data source's data, but for any other kind of error, something more exotic
+            # could be the cause, so let the caller handle it
+            if e.errno == 2: # FileNotFound
+                return False
+            raise
+        return ident in self._index
+
+    def load(self, ident):
+        try:
+            self._ensure_index_loaded()
+        except Exception as e:
+            raise LoadFailed(ident, self, "Failed to load the index: " + str(e))
+
+        try:
+            return self._index[ident]
+        except KeyError:
+            raise LoadFailed(ident, self, 'The given identifier is not in the index')
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):

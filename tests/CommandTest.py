@@ -6,6 +6,7 @@ except ImportError:
     from mock import MagicMock, Mock, ANY, patch
 import tempfile
 import os
+from os import listdir
 from os.path import exists, join as p
 import shutil
 import json
@@ -16,7 +17,9 @@ import re
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
-                                POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME)
+                                POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
+                                POWDirDataSourceDirLoader, _DSD)
+from PyOpenWorm.datasource_loader import LoadFailed
 from PyOpenWorm.command_util import IVar, PropertyIVar
 
 
@@ -749,7 +752,7 @@ class POWSourceTest(unittest.TestCase):
         ps = POWSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
-    def test_list_(self):
+    def test_list_with_entry(self):
         parent = Mock()
         dct = dict()
         dct['rdf.graph'] = Mock()
@@ -759,6 +762,100 @@ class POWSourceTest(unittest.TestCase):
         ps = POWSource(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
+
+
+class POWDSDLoaderNoIndex(unittest.TestCase):
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+
+    def tearDown(self):
+        shutil.rmtree(self.testdir)
+
+    def test_no_index_can_load_false(self):
+        "Test index of dsds doesn't exist yet -> should indicate with an exception"
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        self.assertFalse(cut.can_load(Mock()))
+
+    def test_no_index_load_failed(self):
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        with self.assertRaisesRegexp(LoadFailed, re.escape(self.testdir)):
+            cut.load(Mock())
+
+
+class POWDSDLoaderMissingDSD(unittest.TestCase):
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        with open(p(self.testdir, 'index'), 'w') as f:
+            print('dsdid1 dir1', file=f)
+            print('dsdid2 dir2', file=f)
+
+    def tearDown(self):
+        shutil.rmtree(self.testdir)
+
+    def test_dir_missing_can_load_false(self):
+        '''
+        If the directory pointed at by the index isn't there, then can_load should return false
+
+        It may take some non-trivial amount of time to do the directory listing and check each entry exists, but we
+        don't anticipate all that many in one repo
+        '''
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        self.assertFalse(cut.can_load('dsdid1'))
+
+    def test_dir_missing_load(self):
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        with self.assertRaises(LoadFailed):
+            cut.load('dsdid1')
+
+    def test_dir_removed_load_no_raise(self):
+        '''
+        The load method doesn't take responsibility for the directory existing, in general
+        '''
+        os.mkdir(p(self.testdir, 'dir1'))
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut.load('dsdid1')
+        os.rmdir(p(self.testdir, 'dir1'))
+        cut.load('dsdid1')
+
+
+class TestDSD(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        mc = [MagicMock()]
+        mc[0].dirkey = 'dirkey'
+        self.cut = _DSD(dict(), self.testdir, mc)
+        self.mc = mc
+
+    def test_dsd_create(self):
+        '''
+        Test directory for the dsdl doesn't exist yet AND loaders available
+            -> should create the dir
+        '''
+        self.cut['dirkey']
+        self.assertIn('dirkey', listdir(self.testdir))
+
+    def test_index_dir_exists(self):
+        '''
+        Test directory for the dsdl exists
+        '''
+        os.makedirs(p(self.testdir, 'dirkey'))
+        self.cut['dirkey']
+        self.assertIn('dirkey', listdir(self.testdir))
+
+    def test_no_loaders_key_error(self):
+        '''
+        Test no loaders can load the data source -> should present a key error
+        '''
+        self.mc[0]().can_load.return_value = False
+        with self.assertRaises(KeyError):
+            self.cut['not_there']
+
+    # Test multiple loaders are ordered by preference -> should pick the highest ordered
+    # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
+    # Test a loader that returns a directory outside of its assigned directory
+    # Test a loader that returns a non-existant file
+    # Test a loader that returns a non-directory
 
 
 class _TestException(Exception):

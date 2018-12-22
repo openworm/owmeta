@@ -207,8 +207,10 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
 
         For example, if the data source produces a file, that file should be in
         '''
-        # TODO: Copy the current configs...
         self.commit_augment()
+
+    def commit_augment():
+        pass
 
     def defined_augment(self):
         return self.translation.has_defined_value()

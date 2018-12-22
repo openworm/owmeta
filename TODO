@@ -21,6 +21,9 @@ chooses
 
 - Write a `pow source save` command as a special case of `pow data save` which 
 
+- Make `pow source save` allow to save a directory tree with a user-selected
+"data source directory saver" (e.g., a POWDataSourceDirectorySaver that saves
+
 - Write a convenience function to both save a context and create a distribution
 for that context in one go
 
