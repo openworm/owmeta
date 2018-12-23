@@ -3,12 +3,21 @@ import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
 from os import makedirs, mkdir, listdir, rename
+
+from contextlib import contextmanager
 try:
     from os import scandir
 except ImportError:
-    from scandir import scandir
+    from scandir import scandir as _scandir
 
-from contextlib import contextmanager
+    @contextmanager
+    def scandir(directory):
+        sd = _scandir(directory)
+        try:
+            yield sd
+        finally:
+            del sd
+
 import hashlib
 import shutil
 import json
@@ -1175,10 +1184,11 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
     def can_load(self, ident):
         try:
             self._ensure_index_loaded()
-        except OSError as e:
+        except (OSError, IOError) as e:
             # If the index file just happens not to be here since the repo doesn't have any data source directories,
             # then we just can't load the data source's data, but for any other kind of error, something more exotic
             # could be the cause, so let the caller handle it
+            #
             if e.errno == 2: # FileNotFound
                 return False
             raise

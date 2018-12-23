@@ -48,7 +48,7 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=[
         'pytest>=3.4.0',
-        'pytest-cov==2.5.1',
+        'pytest-cov>=2.5.1',
         'discover==0.4.0',
     ] + (['mock==2.0.0'] if PY2 else []),
     install_requires=[
