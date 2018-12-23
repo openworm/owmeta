@@ -79,7 +79,8 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-    ] + (['zodbpickle==1.0', 'backports.tempfile==1.0'] if PY2 else []),
+    ] + (['zodbpickle==1.0', 'backports.tempfile==1.0'] if PY2 else [])
+      + (['scandir'] if sys.version_info.major < 3 or sys.version_info.minor < 5 else []),
     version=version,
     packages=['PyOpenWorm',
               'PyOpenWorm.data_trans',
