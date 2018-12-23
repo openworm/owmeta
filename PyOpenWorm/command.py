@@ -1,32 +1,93 @@
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import sys
 import os
-from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath, normpath
-from os import makedirs, mkdir, listdir
+from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
+from os import makedirs, mkdir, listdir, rename
 from contextlib import contextmanager
 import hashlib
 import shutil
 import json
 import logging
 import errno
+from collections import namedtuple
+from six import string_types
+
 try:
     from tempfile import TemporaryDirectory
 except ImportError:
     from backports.tempfile import TemporaryDirectory
 
 from .command_util import IVar, SubCommand
-from .context import Context
+from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from .capability import provide, is_capable
+from .capabilities import FilePathProvider
+from .datasource_loader import DataSourceDirLoader, LoadFailed
 
 
 L = logging.getLogger(__name__)
 
-DATA_CONTEXT_KEY = 'data_context_id'
-IMPORTS_CONTEXT_KEY = 'imports_context_id'
 DEFAULT_SAVE_CALLABLE_NAME = 'pow_data'
+
+
+class POWSourceData(object):
+    ''' Commands for saving and loading data for DataSources '''
+    def __init__(self, parent):
+        self._source_command = parent
+        self._pow_command = parent._parent
+
+    def retrieve(self, source, archive='data.tar', archive_type=None):
+        '''
+        Retrieves the data for the source
+
+        Parameters
+        ----------
+        source : str
+            The source for data
+        archive : str
+            The file name of the archive. If this ends with an extension like
+            '.zip', and no `archive_type` argument is given, then an archive
+            will be created of that type. The archive name will *not* have any
+            extension appended in any case.
+        archive_type : str
+            The type of the archive to create.
+        '''
+        sid = self._pow_command._den3(source)
+        if not archive_type:
+            for ext in EXT_TO_ARCHIVE_FMT:
+                if archive.endswith(ext):
+                    archive_type = EXT_TO_ARCHIVE_FMT.get(ext)
+                    break
+
+        if not archive_type:
+            if ext:
+                msg = "The extension '{}', does not match any known archive format." \
+                        " Defaulting to TAR format"
+                L.warning(msg.format(ext))
+            archive_type = 'tar'
+
+        try:
+            dd = self._pow_command._dsd[sid]
+        except KeyError:
+            raise GenericUserError('Could not find data for {} ({})'.format(sid, source))
+
+        with self._pow_command._tempdir(prefix='pow-source-data-retrieve.') as d:
+            temp_archive = shutil.make_archive(pth_join(d, 'archive'), archive_type, dd)
+            rename(temp_archive, archive)
+
+
+EXT_TO_ARCHIVE_FMT = {
+    '.tar.bz2': 'bztar',
+    '.tar.gz': 'gztar',
+    '.tar.xz': 'xztar',
+    '.tar': 'tar',
+    '.zip': 'zip',
+}
 
 
 class POWSource(object):
     ''' Commands for working with DataSource objects '''
+
+    data = SubCommand(POWSourceData)
 
     def __init__(self, parent):
         self._parent = parent
@@ -46,17 +107,37 @@ class POWSource(object):
             The key, a unique name for the source
         """
 
-    def list(self, context=None):
+    def list(self, context=None, kind=None, full=False):
         """
         List known sources
+
+        Parameters
+        ----------
+        kind : str
+            Only list sources of this kind
+        context : str
+            The context to query for sources
+        full : bool
+            Whether to (attempt to) shorten the source URIs by using the namespace manager
         """
-        from PyOpenWorm.datasource import DataSource
+        from .datasource import DataSource
         conf = self._parent._conf()
-        ctx = self._parent._data_ctx()
-        dt = ctx.stored(DataSource)(conf=conf)
+        if context is not None:
+            ctx = self._make_ctx(context)
+        else:
+            ctx = self._parent._data_ctx
+        if kind is None:
+            kind = DataSource.rdf_type
+        kind_uri = self._parent._den3(kind)
+
+        dst = ctx.stored(ctx.stored.resolve_class(kind_uri))
+        dt = dst(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
-            yield nm.normalizeUri(x.identifier)
+            if full:
+                yield x.identifier
+            else:
+                yield nm.normalizeUri(x.identifier)
 
     def show(self, data_source):
         '''
@@ -75,6 +156,196 @@ class POWSource(object):
         """
         List kinds of sources
         """
+        from .datasource import DataSource
+        from .dataObject import TypeDataObject, RDFSSubClassOfProperty
+        from yarom.graphObject import ZeroOrMoreTQLayer
+        from .rdf_query_util import zomifier
+        conf = self._parent._conf()
+        ctx = self._parent._data_ctx
+        rdfto = ctx.stored(DataSource.rdf_type_object)
+        sc = ctx.stored(TypeDataObject)()
+        sc.attach_property(RDFSSubClassOfProperty)
+        sc.rdfs_subclassof_property(rdfto)
+        nm = conf['rdf.graph'].namespace_manager
+        g = ZeroOrMoreTQLayer(zomifier(DataSource.rdf_type), ctx.stored.rdf_graph())
+        for x in sc.load(graph=g):
+            yield nm.normalizeUri(x.identifier)
+
+
+class POWTranslator(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+    def list(self, context=None, full=False):
+        '''
+        List translator types
+
+        Parameters
+        ----------
+        context : str
+            The root context to search
+        full : bool
+            Whether to (attempt to) shorten the source URIs by using the namespace manager
+        '''
+        from PyOpenWorm.datasource import DataTranslator
+        conf = self._parent._conf()
+        if context is not None:
+            ctx = self._make_ctx(context)
+        else:
+            ctx = self._parent._data_ctx
+        dt = ctx.stored(DataTranslator)(conf=conf)
+        nm = conf['rdf.graph'].namespace_manager
+        for x in dt.load():
+            if full:
+                yield x.identifier
+            else:
+                yield nm.normalizeUri(x.identifier)
+
+    def show(self, translator):
+        '''
+        Show a translator
+
+        Parameters
+        ----------
+        translator : str
+            The translator to show
+        '''
+        from PyOpenWorm.datasource import DataTranslator
+        conf = self._parent._conf()
+        uri = self._parent._den3(translator)
+        dt = self._parent._data_ctx.stored(DataTranslator)(ident=uri, conf=conf)
+        for x in dt.load():
+            self._parent.message(x)
+            return
+
+
+class POWNamespace(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+    def list(self):
+        conf = self._parent._conf()
+        nm = conf['rdf.graph'].namespace_manager
+        for prefix, uri in nm.namespaces():
+            self._parent.message(prefix, uri.n3())
+
+
+class _ProgressMock(object):
+
+    def __getattr__(self, name):
+        return type(self)()
+
+    def __call__(self, *args, **kwargs):
+        return type(self)()
+
+
+class POWDist(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+
+class POWConfig(object):
+    user = IVar(value_type=bool,
+                default_value=False,
+                doc='If set, configs are only for the user; otherwise, they \
+                       would be committed to the repository')
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    def __setattr__(self, t, v):
+        super(POWConfig, self).__setattr__(t, v)
+
+    @IVar.property('user.conf', value_type=str)
+    def user_config_file(self):
+        ''' The user config file name '''
+        if isabs(self._user_config_file):
+            return self._user_config_file
+        return pth_join(self._parent.powdir, self._user_config_file)
+
+    @user_config_file.setter
+    def user_config_file(self, val):
+        self._user_config_file = val
+
+    def _get_config_file(self):
+        if not exists(self._parent.powdir):
+            raise POWDirMissingException(self._parent.powdir)
+
+        if self.user:
+            res = self.user_config_file
+        else:
+            res = self._parent.config_file
+
+        if not exists(res):
+            if self.user:
+                self._init_user_config_file()
+            else:
+                self._parent._init_config_file()
+        return res
+
+    def _init_user_config_file(self):
+        with open(self.user_config_file, 'w') as f:
+            write_config({}, f)
+
+    def get(self, key):
+        '''
+        Read a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r') as f:
+            ob = json.load(f)
+            return ob.get(key)
+
+    def set(self, key, value):
+        '''
+        Set a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        value : str
+            The value to set
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r+') as f:
+            ob = json.load(f)
+            f.seek(0)
+            try:
+                json_value = json.loads(value)
+            except ValueError:
+                json_value = value
+            ob[key] = json_value
+            write_config(ob, f)
+
+    def delete(self, key):
+        '''
+        Deletes a config value
+
+        Parameters
+        ----------
+        key : str
+            The configuration key
+        '''
+        fname = self._get_config_file()
+        with open(fname, 'r+') as f:
+            ob = json.load(f)
+            f.seek(0)
+            del ob[key]
+            write_config(ob, f)
+
+
+_PROGRESS_MOCK = _ProgressMock()
+
+
+@contextmanager
+def default_progress_reporter(*args, **kwargs):
+    yield _PROGRESS_MOCK
 
 
 class POWTranslator(object):
@@ -261,6 +532,7 @@ class POW(object):
     def __init__(self):
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
+        self._data_source_directories = None
 
     @IVar.property('.pow')
     def powdir(self):
@@ -303,17 +575,16 @@ class POW(object):
 
     @IVar.property
     def log_level(self):
-        '''
-        Log level
-        '''
+        ''' Log level '''
         return logging.getLevelName(logging.getLogger().getEffectiveLevel())
 
     @log_level.setter
     def log_level(self, level):
-        logging.basicConfig()
-        logging.getLogger().setLevel(getattr(logging, level))
-        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
+        logging.getLogger().setLevel(getattr(logging, level.upper()))
         # Tailoring for known loggers
+
+        # Generally, too verbose for the user
+        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
 
     def save(self, module, provider=None, context=None):
         '''
@@ -331,14 +602,14 @@ class POW(object):
         '''
         import importlib as IM
         conf = self._conf()
-        if not context:
-            ctx = self._data_ctx
-        else:
-            ctx = Context(ident=context, conf=conf)
 
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
+        if not context:
+            ctx = _POWSaveContext(self._data_ctx, m)
+        else:
+            ctx = _POWSaveContext(Context(ident=context, conf=conf), m)
         attr_chain = provider.split('.')
         p = m
         for x in attr_chain:
@@ -346,6 +617,7 @@ class POW(object):
         p(ctx)
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
+        return ctx.created_contexts()
 
     def context(self, context=None, user=False):
         '''
@@ -411,9 +683,9 @@ class POW(object):
 
             self._init_store()
             self._init_repository()
-        except Exception as e:
+        except Exception:
             self._ensure_no_powdir()
-            raise e
+            raise
 
     def _ensure_no_powdir(self):
         if exists(self.powdir):
@@ -436,7 +708,7 @@ class POW(object):
         from rdflib.term import URIRef
         conf = self._conf()
         nm = conf['rdf.graph'].namespace_manager
-        s = s.strip('<>')
+        s = s.strip(u'<>')
         parts = s.split(':')
         if len(parts) > 1 and is_ncname(parts[1]):
             for pref, ns in nm.namespaces():
@@ -502,7 +774,7 @@ class POW(object):
 
             rc.update(uc)
             store_conf = rc.get('rdf.store_conf', None)
-            if store_conf and isinstance(store_conf, str) and not isabs(store_conf):
+            if store_conf and isinstance(store_conf, string_types) and not isabs(store_conf):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
             dat = Data.process_config(rc)
             dat.init_database()
@@ -532,13 +804,23 @@ class POW(object):
                 self._init_config_file()
             self._init_store()
             self.message('Deserializing...', file=sys.stderr)
-            with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
-                    self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
-                self._load_all_graphs(ctx_prog, trip_prog)
+            self._regenerate_database()
             self.message('Done!', file=sys.stderr)
         except BaseException as e:
             self._ensure_no_powdir()
             raise e
+
+    def regendb(self):
+        from glob import glob
+        for g in glob(self.store_name + '*'):
+            self.message('unlink', g)
+            self.unlink(g)
+        self._regenerate_database()
+
+    def _regenerate_database(self):
+        with self.progress_reporter(unit=' ctx', file=sys.stderr) as ctx_prog, \
+                self.progress_reporter(unit=' triples', file=sys.stderr, leave=False) as trip_prog:
+            self._load_all_graphs(ctx_prog, trip_prog)
 
     def _load_all_graphs(self, progress, trip_prog):
         import transaction
@@ -567,7 +849,7 @@ class POW(object):
                     progress.write('Finalizing writes to database...')
         progress.write('Loaded {:,} triples'.format(triples_read))
 
-    def translate(self, translator, imports_context_ident, output_key=None, translation_directory=None,
+    def translate(self, translator, output_key=None,
                   data_sources=(), named_data_sources=None):
         """
         Do a translation with the named translator and inputs
@@ -580,8 +862,6 @@ class POW(object):
             Identifier for the imports context. All imports go in here
         output_key : str
             Output identifier
-        translation_directory : str
-            Directory holding files used in the translation, if needed
         data_sources : list of str
             Input data sources
         named_data_sources : dict
@@ -589,30 +869,49 @@ class POW(object):
         """
         if named_data_sources is None:
             named_data_sources = dict()
-        imports_context = Context(ident=imports_context_ident, conf=self._conf())
         translator_obj = self._lookup_translator(translator)
         if translator_obj is None:
             raise GenericUserError('No translator for ' + translator)
 
-        graph = self._rdf
         positional_sources = [self._lookup_source(src) for src in data_sources]
         if None in positional_sources:
             raise GenericUserError('No source for ' + data_sources[positional_sources.index(None)])
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
-        saved_contexts = set([])
-        with TemporaryDirectory(prefix='pow-translate.') as d:
+        with self._tempdir(prefix='pow-translate.') as d:
             orig_wd = os.getcwd()
             os.chdir(d)
             try:
-                if translation_directory:
-                    self._stage_translation_directory(normpath(pth_join(orig_wd, translation_directory)), d)
                 res = translator_obj(*positional_sources, output_key=output_key, **named_sources)
-                res.data_context.save_context(inline_imports=True, graph=graph, saved_contexts=saved_contexts)
-                res.data_context.save_imports(imports_context, graph=graph)
-                res.evidence_context.save_context(inline_imports=True, graph=graph, saved_contexts=saved_contexts)
-                res.evidence_context.save_imports(imports_context, graph=graph)
+                res.commit()
             finally:
                 os.chdir(orig_wd)
+
+    @contextmanager
+    def _tempdir(self, *args, **kwargs):
+        td = pth_join(self.powdir, 'temp')
+        if not exists(td):
+            makedirs(td, exist_ok=True)
+        kwargs['dir'] = td
+        with TemporaryDirectory(*args, **kwargs) as d:
+            yield d
+
+    @property
+    def _dsd(self):
+        self._load_data_source_directories()
+        return self._data_source_directories
+
+    def _load_data_source_directories(self):
+        if not self._data_source_directories:
+            # The DSD holds mappings to data sources we've loaded before. In general, this allows the individual loaders
+            # to not worry about checking if they have loaded something before.
+
+            # XXX persist the dict
+            lclasses = [POWDirDataSourceDirLoader]
+            dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
+            dindex = open(pth_join(self.powdir, 'data_source_directories'))
+            for ds_id, dname in (x.split(' ', 1) for x in dindex):
+                dsd[ds_id] = dname.strip()
+            self._data_source_directories = dsd
 
     def _stage_translation_directory(self, source_directory, target_directory):
         self.message('Copying files into {} from {}'.format(target_directory, source_directory))
@@ -636,7 +935,13 @@ class POW(object):
     def _lookup_source(self, sname):
         from PyOpenWorm.datasource import DataSource
         for x in self._data_ctx.stored(DataSource)(ident=sname).load():
+            if is_capable(x):
+                provide(x, self._cap_provs)
             return x
+
+    @property
+    def _cap_provs(self):
+        return [DataSourceDirectoryProvider(self._dsd)]
 
     @property
     def _data_ctx(self):
@@ -645,6 +950,9 @@ class POW(object):
             return Context(ident=conf[DATA_CONTEXT_KEY], conf=conf)
         except KeyError:
             raise ConfigMissingException(DATA_CONTEXT_KEY)
+
+    def _make_ctx(self, ctxid):
+        return Context(ident=ctxid, conf=self._conf())
 
     def reconstitute(self, data_source):
         '''
@@ -656,18 +964,40 @@ class POW(object):
             Identifier for the data source to reconstitute
         '''
 
-    def serialize(self, destination, format='nquads'):
+    def serialize(self, context=None, destination=None, format='nquads', whole_graph=False):
         '''
-        Serialize the graph to a file
+        Serialize the current data context or the one provided
 
         Parameters
         ----------
+        context : str
+            The context to save
         destination : file or str
-            A file-like object to write the file to or a file name
+            A file-like object to write the file to or a file name. If not provided, messages the result.
         format : str
             Serialization format (ex, 'n3', 'nquads')
+        whole_graph: bool
+            Serialize all contexts from all graphs (this probably isn't what you want)
         '''
-        self._conf()['rdf.graph'].serialize(destination, format=format)
+
+        retstr = False
+        if destination is None:
+            from six import BytesIO
+            retstr = True
+            destination = BytesIO()
+
+        if context is None:
+            ctx = self._data_ctx
+        else:
+            ctx = Context(ident=context, conf=self._conf())
+
+        if whole_graph:
+            self._conf()['rdf.graph'].serialize(destination, format=format)
+        else:
+            ctx.stored.rdf_graph().serialize(destination, format=format)
+
+        if retstr:
+            self.message(destination.getvalue().decode(encoding='utf-8'))
 
     def _package_path(self):
         """
@@ -763,6 +1093,60 @@ class POW(object):
         """
 
 
+class _POWSaveContext(Context):
+
+    def __init__(self, backer, user_module=None):
+        self._user_mod = user_module
+        self._backer = backer  #: Backing context
+        self._imported_ctx_ids = set([self._backer.identifier])
+        self._created_ctxs = set()
+        self._unvalidated_statements = []
+
+    def add_import(self, ctx):
+        self._imported_ctx_ids.add(ctx.identifier)
+        # Remove unvalidated statements which had this new context as the one they are missing
+        self._unvalidated_statements = [p for p in self._unvalidated_statements if p[2][0] != ctx.identifier]
+        return self._backer.add_import(ctx)
+
+    def add_statement(self, stmt):
+        stmt_tuple = (stmt.subject, stmt.property, stmt.object)
+        for p in (UnimportedContextRecord(x.context.identifier, i, stmt) for i, x in enumerate(stmt_tuple)
+                  if x.context is not None and x.context.identifier not in self._imported_ctx_ids):
+            from inspect import getouterframes, currentframe
+            self._unvalidated_statements.append(SaveValidationFailureRecord(self._user_mod,
+                                                                            getouterframes(currentframe()),
+                                                                            p))
+        return self._backer.add_statement(stmt)
+
+    def __getattr__(self, name):
+        return getattr(self._backer, name)
+
+    def validate(self):
+        unvalidated = []
+        for c in self._created_ctxs:
+            unvalidated += c._unvalidated_statements
+        unvalidated += self._unvalidated_statements
+        if unvalidated:
+            raise StatementValidationError(unvalidated)
+
+    def save_context(self, *args, **kwargs):
+        self.validate()
+        for c in self._created_ctxs:
+            c.save_context(*args, **kwargs)
+        return self._backer.save_context(*args, **kwargs)
+
+    def created_contexts(self):
+        for ctx in self._created_ctxs:
+            for cctx in ctx.created_contexts():
+                yield cctx
+        yield self
+
+    def new_context(self, ctx_id):
+        res = self(type(self))(self(Context)(ident=ctx_id, conf=self.conf))
+        self._created_ctxs.add(res)
+        return res
+
+
 class _BatchAddGraph(object):
     ''' Wrapper around graph that turns calls to 'add' into calls to 'addN' '''
     def __init__(self, graph, batchsize=1000, *args, **kwargs):
@@ -815,6 +1199,171 @@ class NoConfigFileError(GenericUserError):
 
 class POWDirMissingException(GenericUserError):
     pass
+
+
+class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['user_module',
+                                                                             'stack',
+                                                                             'validation_record'])):
+
+    def filtered_stack(self):
+        umfile = getattr(self.user_module, '__file__', None)
+        if umfile and umfile.endswith('pyc'):
+            umfile = umfile[:-3] + 'py'
+        ourfile = __file__
+
+        if ourfile.endswith('pyc'):
+            ourfile = ourfile[:-3] + 'py'
+
+        def find_last_user_frame(frames):
+            start = False
+            lastum = 0
+            res = []
+            for i, f in enumerate(frames):
+                if umfile and f[1].startswith(umfile):
+                    lastum = i
+                if start:
+                    res.append(f)
+                if not start and f[1].startswith(ourfile):
+                    start = True
+            return res[:lastum]
+
+        return find_last_user_frame(self.stack)
+
+    def __str__(self):
+        from traceback import format_list
+        stack = format_list([x[1:4] + (''.join(x[4]).strip(),) for x in self.filtered_stack()])
+        fmt = '{}\n Traceback (most recent call last, PyOpenWorm frames omitted):\n {}'
+        res = fmt.format(self.validation_record, '\n '.join(''.join(s for s in stack if s).split('\n')))
+        return res.strip()
+
+
+class _DSD(object):
+    def __init__(self, ds_dict, base_directory, loader_classes):
+        self._dsdict = ds_dict
+        self._base_directory = base_directory
+        self._lclasses = loader_classes
+
+    def __getitem__(self, dsid):
+        dsid = str(dsid)
+        try:
+            return self._dsdict[dsid]
+        except KeyError:
+            res = self._load_data_source(dsid)
+            if res:
+                self._dsdict[dsid] = res
+                return res
+            raise
+
+    def _loaders(self):
+        for cls in self._lclasses:
+            nd = pth_join(self._base_directory, cls.dirkey)
+            if not exists(nd):
+                makedirs(nd)
+            yield cls(nd)
+
+    def _load_data_source(self, dsid):
+        for loader in self._loaders():
+            if loader.can_load(dsid):
+                return loader(dsid)
+
+
+class DataSourceDirectoryProvider(FilePathProvider):
+    def __init__(self, dsd):
+        self._dsd = dsd
+
+    def __call__(self, ob):
+        ident = ob.identifier
+        try:
+            path = self._dsd[ident]
+        except KeyError:
+            return None
+
+        return _DSDP(path)
+
+
+class _DSDP(FilePathProvider):
+    def __init__(self, path):
+        self._path = path
+
+    def file_path(self):
+        return self._path
+
+
+class POWDirDataSourceDirLoader(DataSourceDirLoader):
+    def __init__(self, basedir):
+        super(POWDirDataSourceDirLoader, self).__init__(basedir)
+        self._idx_fname = pth_join(self._basedir, 'index')
+        self._index = dict()
+
+    def _load_index(self):
+        with os.scandir(self._basedir) as dirents:
+            dentdict = {de.name: de for de in dirents}
+            with open(self._idx_fname) as f:
+                for l in f:
+                    dsid, dname = l.split(' ')
+                    dname = dname.strip()
+                    if self._index_dir_entry_is_bad(dname, dentdict.get(dname)):
+                        continue
+
+                    self._index[dsid] = dname
+
+    def _index_dir_entry_is_bad(self, dname, de):
+        if not de:
+            msg = "There is no directory entry for {} in {}"
+            L.warn(msg.format(dname, self._basedir), exc_info=True)
+            return True
+
+        if not de.is_dir():
+            msg = "The directory entry for {} in {} is not a directory"
+            L.warn(msg.format(dname, self._basedir))
+            return True
+
+        return False
+
+    def _ensure_index_loaded(self):
+        if not self._index:
+            self._load_index()
+
+    def can_load(self, ident):
+        try:
+            self._ensure_index_loaded()
+        except OSError as e:
+            # If the index file just happens not to be here since the repo doesn't have any data source directories,
+            # then we just can't load the data source's data, but for any other kind of error, something more exotic
+            # could be the cause, so let the caller handle it
+            if e.errno == 2: # FileNotFound
+                return False
+            raise
+        return ident in self._index
+
+    def load(self, ident):
+        try:
+            self._ensure_index_loaded()
+        except Exception as e:
+            raise LoadFailed(ident, self, "Failed to load the index: " + str(e))
+
+        try:
+            return self._index[ident]
+        except KeyError:
+            raise LoadFailed(ident, self, 'The given identifier is not in the index')
+
+
+class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):
+    def __str__(self):
+        from yarom.rdfUtils import triple_to_n3
+        trip = self.statement.to_triple()
+        fmt = 'Missing import of context {} for {} of statement "{}"'
+        return fmt.format(self.context.n3(),
+                          trip[self.node_index].n3(),
+                          triple_to_n3(trip))
+
+
+class StatementValidationError(GenericUserError):
+    def __init__(self, statements):
+        msgfmt = '{} invalid statements were found:\n{}'
+        msg = msgfmt.format(len(statements), '\n'.join(str(x) for x in statements))
+        super(StatementValidationError, self).__init__(msg)
+        self.statements = statements
 
 
 class ConfigMissingException(GenericUserError):

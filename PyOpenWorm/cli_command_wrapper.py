@@ -258,7 +258,6 @@ class CLICommandWrapper(object):
                                 if nargs is not None:
                                     argument_args['nargs'] = nargs
 
-
                             subparser.add_argument(*names,
                                                    **argument_args)
                         argcount += 1
@@ -300,12 +299,25 @@ class CLICommandWrapper(object):
     def _arg_hints(self, sc_hints, atype, key):
         return None if sc_hints is None else sc_hints.get((atype, key))
 
-    def main(self, args=None):
+    def main(self, args=None, argument_callback=None, argument_namespace_callback=None):
         '''
         Runs in a manner suitable for being the 'main' method for a command
         line interface: parses arguments (as would be done with the result of
         `parser`) from sys.argv or the provided args list and executes the
         commands specified therein
+
+        Parameters
+        ----------
+        args : list
+            the argument list to parse. optional
+        argument_callback : callable
+            a callback to add additional arguments to the command line. optional
         '''
-        self.parser().parse_args(args=args)
+
+        parser = self.parser()
+        if argument_callback:
+            argument_callback(parser)
+        ns = parser.parse_args(args=args)
+        if argument_namespace_callback:
+            argument_namespace_callback(ns)
         return self.mapper.apply(self.runner)

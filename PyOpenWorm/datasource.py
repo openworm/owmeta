@@ -198,6 +198,20 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             if v is not None:
                 ctxd_prop(v)
 
+    def commit(self):
+        '''
+        Commit the data source *locally*
+
+        This includes staging files such as they would be available for a translation. In general, a sub-class should
+        implement :meth:`commit_augment` rather than this method, or at least call this method via super
+
+        For example, if the data source produces a file, that file should be in
+        '''
+        self.commit_augment()
+
+    def commit_augment():
+        pass
+
     def defined_augment(self):
         return self.translation.has_defined_value()
 
@@ -283,7 +297,9 @@ class DataObjectContextDataSource(DataSource):
 
 
 def format_types(typ):
-    if isinstance(typ, type):
+    if isinstance(typ, OneOrMore):
+        return ':class:`{}` (:class:`{}`)'.format(FCN(OneOrMore), FCN(typ.source_type))
+    elif isinstance(typ, type):
         return ':class:`{}`'.format(FCN(typ))
     else:
         return ', '.join(':class:`{}`'.format(FCN(x)) for x in typ)
@@ -358,6 +374,10 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
 
 
 class OneOrMore(object):
+    """
+    Wrapper for :class:`DataTranslator` input :class:`DataSource` types indicating that one or more of the wrapped type
+    must be provided to the translator
+    """
     def __init__(self, source_type):
         self.source_type = source_type
 

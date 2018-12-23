@@ -7,7 +7,6 @@ from datetime import datetime as DT
 import datetime
 import transaction
 import os
-import traceback
 import logging
 from .utils import grouper
 from .configure import Configureable, Configure, ConfigValue
@@ -624,7 +623,8 @@ class ZODBSource(RDFSource):
 
         try:
             fs = FileStorage(openstr)
-        except FileNotFoundError:
+        except IOError:
+            L.exception("Failed to create a FileStorage")
             raise ZODBSourceOpenFailError(openstr)
 
         self.zdb = ZODB.DB(fs, cache_size=1600)
@@ -639,8 +639,7 @@ class ZODBSource(RDFSource):
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
-            L.warning('Forced to abort transaction on ZODB store opening')
-            traceback.print_exc()
+            L.exception('Forced to abort transaction on ZODB store opening', exc_info=True)
             transaction.abort()
         transaction.begin()
         self.graph.open(self.path)
@@ -657,9 +656,11 @@ class ZODBSource(RDFSource):
             # catch commit exception and close db.
             # otherwise db would stay open and follow up tests
             # will detect the db in error state
-            traceback.print_exc()
-            L.warning('Forced to abort transaction on ZODB store closing')
+            L.warning('Forced to abort transaction on ZODB store closing', exc_info=True)
             transaction.abort()
         self.conn.close()
         self.zdb.close()
         self.graph = False
+
+def test(f):
+    f()

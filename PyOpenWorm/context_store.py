@@ -167,3 +167,7 @@ class RDFContextStore(Store):
             self.__init_contexts()
             for c in self.__context_transitive_imports:
                 yield c
+
+    def namespaces(self):
+        for x in self.__store.namespaces():
+            yield x

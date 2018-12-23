@@ -9,10 +9,7 @@ from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.context import Context
 
-from PyOpenWorm.utils import normalize_cell_name
 import rdflib as R
-from six.moves import map
-from six.moves import range
 import pytest
 
 
@@ -27,7 +24,7 @@ class DataIntegrityTest(unittest.TestCase):
     def setUpClass(cls):
         # grab the list of the names of the 302 neurons
 
-        csvfile = open('OpenWormData/aux_data/neurons.csv', 'r')
+        csvfile = open('tests/neurons.csv', 'r')
         reader = csv.reader(csvfile, delimiter=';', quotechar='|')
 
         # array that holds the names of the 302 neurons at class-level scope
@@ -78,8 +75,9 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_bentley_expr_data(self):
         """
-        This verifies that the data in OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv has
-        been incorporated, by checking that one of the novel receptor expression patterns is in the worm.
+        This verifies that the data in Bentley et. al (2016) receptor expression
+        has been incorporated, by checking that one of the novel receptor
+        expression patterns is in the worm.
         """
         va9 = self.qctx(Neuron)('VA9')
         self.assertIn('LGC-53', va9.receptors())
@@ -103,7 +101,7 @@ class DataIntegrityTest(unittest.TestCase):
                     ?n <http://openworm.org/entities/Cell/name> {name}
                 }} LIMIT 5
                 """.format(name=R.Literal(n).n3()))
-            results[n] = (len(qres.result), [x[0] for x in qres.result])
+            results[n] = (len(qres), [x[0] for x in qres])
 
         # If there is not only one result back, then there is more than one RDF
         # node.
@@ -144,12 +142,12 @@ class DataIntegrityTest(unittest.TestCase):
                          "Some neurons are missing a type: {}".format(set(self.neurons) - results))
 
     def test_neuron_GJ_degree(self):
-        """ Get the number of gap junctions from a networkx representation """
+        """ Get the number of gap junctions from a representation """
         # was 81 -- now retunring 44 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').GJ_degree(), 44)
 
     def test_neuron_Syn_degree(self):
-        """ Get the number of chemical synapses from a networkx representation """
+        """ Get the number of chemical synapses from a representation """
         # was 187 -- now returning 105 -- are we sure this is correct?
         self.assertEqual(self.qctx(Neuron)(name='AVAL').Syn_degree(), 105)
 
@@ -160,145 +158,8 @@ class DataIntegrityTest(unittest.TestCase):
                             ?o ?p ?s # for that type ?o, get its value ?v
                             }} LIMIT 10
                             """)
-        for row in qres.result:
+        for row in qres:
             print(row)
-
-    # TODO: Revise this test to pull from the herm_full_edgelist.csv instead of NeuronConnect.xls
-    @unittest.skip("deprecated because spreadsheet is no longer supposed to match")
-    def test_compare_to_xls(self):
-        """ Compare the PyOpenWorm connections to the data in the spreadsheet """
-        SAMPLE_CELL = 'AVAL'
-        xls_conns = set([])
-        pow_conns = set([])
-
-        # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE PRE SIDE
-        qres = self.g.query("""SELECT ?post_name ?type (STR(?num) AS ?numval) WHERE {{
-                               #############################################################
-                               # Find connections that have the ?pre_name as our passed in value
-                               #############################################################
-                               ?pre_cell <http://openworm.org/entities/Cell/name> {name}.
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre_cell.
-
-                               #############################################################
-                               # Find all the cells that are on the post side of those
-                               #  connections and bind their names to ?post_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post_cell.
-                               ?post_cell <http://openworm.org/entities/Cell/name> ?post_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?post_name))
-                               }}""".format(name=R.Literal(SAMPLE_CELL).n3()))
-
-        def ff(x):
-            return str(x.value)
-        for line in qres.result:
-            t = list(map(ff, line))
-            # Insert sample cell name into the result set after the fact
-            t.insert(0, SAMPLE_CELL)
-            pow_conns.add(tuple(t))
-
-        # QUERY TO GET ALL CONNECTIONS WHERE SAMPLE_CELL IS ON THE *POST* SIDE
-        qres = self.g.query("""SELECT ?pre_name ?type (STR(?num) AS ?numval) WHERE {
-                               #############################################################
-                               # Find connections that have the ?post_name as our passed in value
-                               #############################################################
-                               ?post_cell <http://openworm.org/entities/Cell/name> {name}.
-                               ?conn <http://openworm.org/entities/Connection/post_cell> ?post_cell.
-
-                               #############################################################
-                               # Find all the cells that are on the pre side of those
-                               #  connections and bind their names to ?pre_name
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/pre_cell> ?pre_cell.
-                               ?pre_cell <http://openworm.org/entities/Cell/name> ?pre_name.
-
-                               ############################################################
-                               # Go find the type of the connection and bind to ?type
-                               #############################################################
-                               ?conn <http://openworm.org/entities/Connection/syntype> ?type.
-
-                               ############################################################
-                               # Go find the number of the connection and bind to ?num
-                               ############################################################
-                               ?conn <http://openworm.org/entities/Connection/number> ?num.
-
-                               ############################################################
-                               # Filter out any ?pre_names or ?post_names that aren't literals
-                               ############################################################
-                               FILTER(isLiteral(?pre_name))}""".format(name=R.Literal(SAMPLE_CELL).n3()))
-        for line in qres.result:
-            t = list(map(ff, line))
-            # Insert sample cell name into the result set after the fact
-            t.insert(1, SAMPLE_CELL)
-            pow_conns.add(tuple(t))
-
-        # get connections from the sheet
-        import re
-        search_string = re.compile(r'\w+[0]+[1-9]+')
-        replace_string = re.compile(r'[0]+')
-
-        def normalize(name):
-            # normalize neuron names to match those used at other points
-            # see #137 for elaboration
-            # if there are zeroes in the middle of a name, remove them
-            if re.match(search_string, name):
-                name = replace_string.sub('', name)
-            return name
-
-        import xlrd
-        combining_dict = {}
-        # 's' is the workbook sheet
-        s = xlrd.open_workbook(
-            'OpenWormData/aux_data/NeuronConnect.xls').sheets()[0]
-        for row in range(1, s.nrows):
-            if s.cell(row, 2).value in ('S', 'Sp', 'EJ') and \
-                SAMPLE_CELL in [s.cell(row, 0).value,
-                                s.cell(row, 1).value]:
-                # we're not going to include 'receives' ('r', 'rp') since
-                # they're just the inverse of 'sends' also omitting 'nmj'
-                # for the time being (no model in db)
-                pre = normalize(s.cell(row, 0).value)
-                post = normalize(s.cell(row, 1).value)
-                num = int(s.cell(row, 3).value)
-                if s.cell(row, 2).value == 'EJ':
-                    syntype = 'gapJunction'
-                elif s.cell(row, 2).value in ('S', 'Sp'):
-                    syntype = 'send'
-
-                # add them to a dict to make sure sends ('s') and send-polys ('sp') are summed.
-                # keying by connection pairs as a string (e.g. 'sdql,aval,send').
-                # values are lists if the form [pre, post, number, syntype].
-                string_key = '{},{},{}'.format(pre, post, syntype)
-                if string_key in combining_dict.keys():
-                    # if key already there, add to number
-                    num += int(combining_dict[string_key][3])
-
-                combining_dict[string_key] = (
-                    str(pre),
-                    str(post),
-                    str(syntype),
-                    str(int(num)))
-
-        xls_conns = set(combining_dict.values())
-
-        # assert that these two sorted lists are the same
-        # using sorted lists because Set() removes multiples
-
-        self.maxDiff = None
-        self.assertEqual(sorted(pow_conns), sorted(xls_conns))
 
     def test_all_cells_have_wormbaseID(self):
         """ This test verifies that every cell has a Wormbase ID. """
@@ -336,49 +197,6 @@ class DataIntegrityTest(unittest.TestCase):
         net = self.qctx(Worm)().get_neuron_network()
         # XXX: The synapses contain some cells that aren't neurons
         self.assertEqual(7319, net.synapses.count())
-
-    @unittest.skip("Takes too long")
-    def test_connection_content_matches(self):
-        """ This test verifies that the content of each connection matches the
-        content in the source.
-
-        """
-        # XXX: Needs updates to match the name translations in insert_worm.py
-        ignored_cells = ['hyp', 'intestine']
-        synapse_tuples = set()   # set of tuple representation of synapses
-        csv_tuples = set()       # set of tuple representation of csv file
-
-        synapses = self.qctx(Worm)().get_neuron_network().synapses()
-        for synapse in synapses:
-            print(synapse)
-            if synapse.syntype() == 'send':
-                syn_type = 'chemical'
-            else:
-                syn_type = 'electrical'
-            pre = str(synapse.pre_cell().name())
-            post = str(synapse.post_cell().name())
-            syn_tuple = (pre,
-                         post,
-                         synapse.number(),
-                         syn_type)
-            synapse_tuples.add(syn_tuple)
-
-        # read csv file row by row
-        with open('OpenWormData/aux_data/herm_full_edgelist.csv', 'rb') as csvfile:
-            edge_reader = csv.reader(csvfile)
-            next(edge_reader)    # skip header row
-
-            for row in edge_reader:
-                source, target, weight, syn_type = map(str.strip, row)
-                # ignore rows where source or target is 'hyp' or 'intestine'
-                if source in ignored_cells or target in ignored_cells:
-                    continue
-                source = normalize_cell_name(source)
-                target = normalize_cell_name(target)
-                csv_tuple = (source, target, int(weight), syn_type)
-                csv_tuples.add(csv_tuple)
-
-        self.assertEqual(set(), csv_tuples - synapse_tuples)
 
     def test_number_neuron_to_neuron(self):
         """

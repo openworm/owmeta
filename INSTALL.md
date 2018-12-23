@@ -4,31 +4,36 @@ The recommended way to get PyOpenWorm is from [pip](http://pip.readthedocs.org/e
 
     pip install pyopenworm
 
-Alternatively, you can grab the contents from GitHub:
+Alternatively, you can grab the latest on the development branch from GitHub:
 
     git clone https://github.com/openworm/PyOpenWorm.git
     cd PyOpenWorm
     python setup.py install
-
-Uninstall
-----------
-
-    pip uninstall PyOpenWorm
 
 Running tests
 -------------
 
 After checking out the project, tests can be run from the command line in the root folder with::
 
-    py.test
+    python setup.py test
 
 You may also run individual test cases with::
 
-    py.test -k <NameOfTest>
+    python setup.py test --addopts "-k <NameOfTest>"
 
-For example, where *test_muscles*1 is a test in the *WormTest* suite of tests (see tests/WormTest.py)::
+For example, where *test_muscles1* is a test in the *WormTest* suite of tests (see tests/WormTest.py)::
 
-    py.test -k test_muscles1
+    python setup.py test --addopts "-k test_muscles1"
+
+Python 2 support
+----------------
+Python 2.7 will be supported in PyOpenWorm through Python 2.7 end-of-life in 2020. Subsequent to that, any regressions for 2.7-based applications will only be fixed for the sake of OpenWorm projects.
+
+
+Uninstall
+----------
+
+    pip uninstall PyOpenWorm
 
 
 Optional

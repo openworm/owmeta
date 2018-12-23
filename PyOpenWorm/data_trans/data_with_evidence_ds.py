@@ -25,9 +25,16 @@ class DataWithEvidenceDataSource(DataSource):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)
 
         self.data_context = Context.contextualize(self.context)(ident=self.identifier + '-data',
-                                                                imported=(CONTEXT,))
+                                                                imported=(CONTEXT,),
+                                                                conf=self.conf)
         self.evidence_context = Context.contextualize(self.context)(ident=self.identifier + '-evidence',
-                                                                    imported=(CONTEXT,))
+                                                                    imported=(CONTEXT,),
+                                                                    conf=self.conf)
+
+        self.combined_context = Context.contextualize(self.context)(ident=self.identifier,
+                                                                    imported=(self.data_context,
+                                                                              self.evidence_context),
+                                                                    conf=self.conf)
 
         self.combined_context = Context.contextualize(self.context)(ident=self.identifier,
                                                                     imported=(self.data_context,
@@ -52,6 +59,13 @@ class DataWithEvidenceDataSource(DataSource):
             self.__ad_hoc_contexts[key] = Context.contextualize(self.context)(ident=ctxid)
             res = self.__ad_hoc_contexts[key]
         return res
+
+    def commit_augment(self):
+        saved_contexts = set([])
+        self.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
+        self.data_context.save_imports()
+        self.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
+        self.evidence_context.save_imports()
 
 
 __yarom_mapped_classes__ = (DataWithEvidenceDataSource,)

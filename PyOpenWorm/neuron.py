@@ -133,16 +133,6 @@ class Neuron(Cell):
                 count += 1
         return count
 
-    def _type_networkX(self):
-        """Get type of this neuron (motor, interneuron, sensory)
-
-        Use the networkX representation as the source
-
-        :returns: the type
-        :rtype: str
-        """
-        return self['nx'].node[self.name.one()]['ntype']
-
     def get_incidents(self, type=0):
         """ Get neurons which synapse at this neuron """
         # Directed graph. Getting accessible _from_ this node

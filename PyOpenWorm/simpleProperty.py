@@ -45,6 +45,13 @@ class ContextMappedPropertyClass(MappedPropertyClass, ContextualizableClass):
         self._cmpc_context = newc
 
 
+class ContextualizedPropertyValue(PropertyValue):
+
+    @property
+    def context(self):
+        return None
+
+
 class _ContextualizableLazyProxy(Proxy, Contextualizable):
     """ Contextualizes its factory for execution """
     def contextualize(self, context):
@@ -124,7 +131,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
             raise ValueError('It is not permitted to declare a property to have value the None')
 
         if not hasattr(v, 'idl'):
-            v = PropertyValue(v)
+            v = ContextualizedPropertyValue(v)
 
         if not self.multiple:
             self.clear()
