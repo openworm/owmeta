@@ -1,0 +1,1357 @@
+Cell	Lineage Name	Description
+AB	P0.a	Embryonic founder cell
+ADAL	AB.plapaaaapp	Ring interneurons
+ADAR	AB.prapaaaapp	Ring interneurons
+ADEL	AB.plapaaaapa	Anterior deirid, sensory neuron, dopaminergic
+ADER	AB.prapaaaapa	Anterior deirid, sensory neuron, dopaminergic
+ADEshL	AB.arppaaaa	Anterior deirid sheath
+ADEshR	AB.arpppaaa	Anterior deirid sheath
+ADEsoL	H2L.aa	Anterior deirid socket
+ADEsoR	H2R.aa	Anterior deirid socket
+ADFL	AB.alpppppaa	Amphid neuron, prob. chemosensory
+ADFR	AB.praaappaa	Amphid neuron, prob. chemosensory
+ADLL	AB.alppppaad	Amphid neuron, prob. chemosensory
+ADLR	AB.praaapaad	Amphid neuron, prob. chemosensory
+AFDL	AB.alpppapav	Amphid finger cell, neuron associated with amphid sheath
+AFDR	AB.praaaapav	Amphid finger cell, neuron associated with amphid sheath
+AIAL	AB.plppaappa	Amphid interneuron
+AIAR	AB.prppaappa	Amphid interneuron
+AIBL	AB.plaapappa	Amphid interneuron
+AIBR	AB.praapappa	Amphid interneuron
+AIML	AB.plpaapppa	Ring interneuron
+AIMR	AB.prpaapppa	Ring interneuron
+AINL	AB.alaaaalal	Ring interneuron
+AINR	AB.alaapaaar	Ring interneuron
+AIYL	AB.plpapaaap	Amphid interneuron
+AIYR	AB.prpapaaap	Amphid interneuron
+AIZL	AB.plapaaapav	Amphid interneuron
+AIZR	AB.prapaaapav	Amphid interneuron
+ALA	AB.alapppaaa	Neuron, sends processes laterally and along dorsal cord
+ALML	AB.arppaappa	Anterior lateral microtubule cell, touch receptor
+ALMR	AB.arpppappa	Anterior lateral microtubule cell, touch receptor
+ALNL	AB.plapappppap	Neuron associated with ALM
+ALNR	AB.prapappppap	Neuron associated with ALM
+AMshL	AB.plaapaapp	Amphid sheath
+AMshR	AB.praapaapp	Amphid sheath
+AMsoL	AB.plpaapapa	Amphid socket
+AMsoR	AB.prpaapapa	Amphid sheath
+AQR	QR.ap	Neuron, basal body. not part of a sensillum, projects into ring
+AS1	P1.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS2	P2.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS3	P3.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS4	P4.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS5	P5.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS6	P6.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS7	P7.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS8	P8.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS9	P9.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS10	P10.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+AS11	P11.apa	Ventral cord motor neuron, innervates dorsal muscles, no ventral counterpart
+ASEL	AB.alppppppaa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASER	AB.praaapppaa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASGL	AB.plaapapap	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASGR	AB.praapapap	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASHL	AB.plpaappaa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASHR	AB.prpaappaa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASIL	AB.plaapapppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASIR	AB.praapapppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASJL	AB.alpppppppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASJR	AB.praaappppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASKL	AB.alpppapppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+ASKR	AB.praaaapppa	Amphid neurons, single ciliated endings, probably chemo-sensory; project into ring via commissure from ventral ganglion, make diverse synaptic connections in ring neuropil
+AUAL	AB.alpppppppp	Neuron, process runs with amphid processes but lacks ciliated ending
+AUAR	AB.praaappppp	Neuron, process runs with amphid processes but lacks ciliated ending
+AVAL	AB.alppaaapa	Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha
+AVAR	AB.alaappapa	Ventral cord interneuron, synapses onto VA, DA, and AS motor neurons; formerly called alpha
+AVBL	AB.plpaapaap	Ventral cord interneuron, synapses onto VB and DB motor neurons; formerly called beta
+AVBR	AB.prpaapaap	Ventral cord interneuron, synapses onto VB and DB motor neurons; formerly called beta
+AVDL	AB.alaaapalr	Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta
+AVDR	AB.alaaapprl	Ventral cord interneuron, synapses onto VA, DA, AS motorneurons; formerly called delta
+AVEL	AB.alpppaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord
+AVER	AB.praaaaaaa	Ventral cord interneuron, like AVD but outputs restrict-ed to anterior cord
+AVFL/R	P1.aaaa	Interneuron, processes in ventral cord and ring, few synapses
+AVFL/R	W.aaa	Interneuron, processes in ventral cord and ring, few synapses
+AVG	AB.prpapppap	Ventral cord interneuron, few synapses
+AVHL	AB.alapaaaaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring
+AVHR	AB.alappapaa	Neuron, mainly postsynaptic in ventral cord and presynaptic in the ring
+AVJL	AB.alapapppa	Neuron, synapses like AVHL/R
+AVJR	AB.alapppppa	Neuron, synapses like AVHL/R
+AVKL	AB.plpapapap	Ring and ventral cord interneuron
+AVKR	AB.prpapapap	Ring and ventral cord interneuron
+AVL	AB.prpappaap	Ring and ventral cord interneuron, few synapses
+AVM	QR.paa	Anterior ventral microtubule cell, touch receptor
+AWAL	AB.plaapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+AWAR	AB.praapapaa	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+AWBL	AB.alpppppap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+AWBR	AB.praaappap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+AWCL	AB.plpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+AWCR	AB.prpaaaaap	Amphid wing cells, neurons having ciliated sheet-like sensory endings closely associated with amphid sheath
+B	AB.prppppapa	Rectal cell, postembryonic blast cell in male
+BAGL	AB.alppappap	Neuron, ciliated ending in head, no supporting cells, associated with ILso
+BAGR	AB.arappppap	Neuron, ciliated ending in head, no supporting cells, associated with ILso
+BDUL	AB.arppaappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles
+BDUR	AB.arpppappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles
+C	P0.ppa	Embryonic founder cell
+CA1	P3.aapa	Male specific cell, not reconstructed
+CA2	P4.aapa	Male specific cell, not reconstructed
+CA3	P5.aapa	Male specific cell, not reconstructed
+CA4	P6.aapa	Male specific neuron, innervates dorsal muscles
+CA5	P7.aapa	Male specific neuron, innervates dorsal muscles
+CA6	P8.aapa	Male specific neuron, innervates dorsal muscles
+CA7	P9.aapa	Male specific neuron, innervates dorsal muscles
+CA8	P10.aapa	Male specific cell in ventral cord, neuron-like but lacks synapses
+CA9	P11.aapa	Male specific cell in ventral cord, neuron-like but lacks synapses
+CANL	AB.alapaaapa	Process runs along excretory canal, no synapses, essential for survival
+CANR	AB.alappappa	Process runs along excretory canal, no synapses, essential for survival
+CEMDL	AB.plaaaaaap	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.
+CEMDR	AB.arpapaaap	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.
+CEMVL	AB.plpaapapp	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.
+CEMVR	AB.prpaapapp	Male specific cephalic neurons (programmed cell death in hermaphrodite embryo) open to outside, possible function in male chemotaxis toward hermaphrodite.
+CEPDL	AB.plaaaaappa	Cephalic neurons, contain dopamine
+CEPDR	AB.arpapaappa	Cephalic neurons, contain dopamine
+CEPVL	AB.plpaappppa	Cephalic neurons, contain dopamine
+CEPVR	AB.prpaappppa	Cephalic neurons, contain dopamine
+CEPshDL	AB.arpaaaapp	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion
+CEPshDR	AB.arpaaapap	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion
+CEPshVL	AB.plpaaapap	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion
+CEPshVR	AB.prpaaapap	Cephalic sheath, sheet-like processes envelop neuropil of the ring and part of ventral ganglion
+CEPsoDL	AB.alapapppp	Cephalic socket
+CEPsoDR	AB.alapppppp	Cephalic socket
+CEPsoVL	AB.alppaappp	Cephalic socket
+CEPsoVR	AB.alaapappp	Cephalic socket
+CPO	P2.aap	Male specific cell in ventral cord, not reconstructed
+CP1	P3.aapp	Male specific cell in ventral cord, not reconstructed
+CP2	P4.aapp	Male specific cell in ventral cord, not reconstructed
+CP3	P5.aapp	Male specific cell in ventral cord, not reconstructed
+CP4	P6.aapp	Male specific motor neuron in ventral cord
+CP5	P7.aapp	Male specific motor neuron in ventral cord
+CP6	P8.aapp	Male specific motor neuron in ventral cord
+CP7	P9.aapp	Male specific motor neuron in ventral cord
+CP8	P10.aapp	Male specific interneuron, project into preanal ganglion
+CP9	P11.aapp	Male specific interneuron, project into preanal ganglion
+D	P0.pppa	Embryonic founder cell
+DA1	AB.prppapaap	Ventral cord motor neurons, innervate dorsal muscles
+DA2	AB.plppapapa	Ventral cord motor neurons, innervate dorsal muscles
+DA3	AB.prppapapa	Ventral cord motor neurons, innervate dorsal muscles
+DA4	AB.plppapapp	Ventral cord motor neurons, innervate dorsal muscles
+DA5	AB.prppapapp	Ventral cord motor neurons, innervate dorsal muscles
+DA6	AB.plpppaaap	Ventral cord motor neurons, innervate dorsal muscles
+DA7	AB.prpppaaap	Ventral cord motor neurons, innervate dorsal muscles
+DA8	AB.prpapappp	Ventral cord motor neurons, innervate dorsal muscles
+DA9	AB.plpppaaaa	Ventral cord motor neurons, innervate dorsal muscles
+DB1/3	AB.plpaaaapp	Ventral cord motor neurons, innervate dorsal muscles
+DB2	AB.arappappa	Ventral cord motor neurons, innervate dorsal muscles
+DB3/1	AB.prpaaaapp	Ventral cord motor neurons, innervate dorsal muscles
+DB4	AB.prpappapp	Ventral cord motor neurons, innervate dorsal muscles
+DB5	AB.plpapappp	Ventral cord motor neurons, innervate dorsal muscles
+DB6	AB.plppaappp	Ventral cord motor neurons, innervate dorsal muscles
+DB7	AB.prppaappp	Ventral cord motor neurons, innervate dorsal muscles
+DD1	AB.plppappap	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD2	AB.prppappap	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD3	AB.plppapppa	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD4	AB.prppapppa	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD5	AB.plppapppp	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD6	AB.prppapppp	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DVA	AB.prppppapp	Ring interneurons, cell bodies in dorsorectal ganglion
+DVB	K.p	Ring interneuron, cell body in dorsorectal ganglion, innervates rectal muscles
+DVC	C.aapaa	Ring interneurons, cell bodies in dorsorectal ganglion
+DVE	B.ppap	Male specific neuron, cell body in dorsorectal ganglion
+DVF	B.ppppa	Male specific neuron, cell body in dorsorectal ganglion
+DX1/2	F.lvda	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
+DX1/2	F.rvda	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
+DX3/4	U.laa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
+DX3/4	U.raa	Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
+E	P0.pap	Embryonic founder cell
+EF1/2	F.lvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
+EF1/2	F.rvda	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
+EF3/4	U.lap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
+EF3/4	U.rap	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
+F	AB.plppppapp	Rectal cell, blast cell in male
+FLPL	AB.plapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso
+FLPR	AB.prapaaapad	Neuron, ciliated ending in head, no supporting cells, associated with ILso
+GLRDL	MS.aaaaaal	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+GLRDR	MS.aaaaaar	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+GLRL	MS.apaaaad	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+GLRR	MS.ppaaaad	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+GLRVL	MS.apaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+GLRVR	MS.ppaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
+G1	AB.prpaaaapa	Postembryonic blast cell, excretory socket in embryo
+G2	AB.plapaapa	Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later
+HOL	AB.plaaappa	Seam hypodermal cell
+HOR	AB.arpapppa	Seam hypodermal cell
+H1L	AB.plaaappp	Seam hypodermal cell, postembryonic blast cell
+H1R	AB.arpapppp	Seam hypodermal cell, postembryonic blast cell
+H2L	AB.arppaaap	Seam hypodermal cell, postemb. blast cell, L1 deirid socket
+H2R	AB.arpppaap	Seam hypodermal cell, postemb. blast cell, L1 deirid socket
+HOA	P10.pppa	Neuron of hook sensillum, receptor anterior to cloaca in male
+HOB	P10.ppap	Neuron of hook sensillum, receptor anterior to cloaca in male
+HOsh	P10.ppppp	Sheath of hook sensillum, receptor anterior to cloaca in male
+HOso	P10.ppaa	Socket of hook sensillum, receptor anterior to cloaca in male
+HSNL	AB.plapppappa	Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic
+HSNR	AB.prapppappa	Herm. specific motor neurons (die in male embryo), innervate vulval muscles, serotonergic
+I1L	AB.alpapppaa	Pharyngeal interneurons: ant sensory, input from RIP
+I1R	AB.arapappaa	Pharyngeal interneurons: ant sensory, input from RIP
+I2L	AB.alpappaapa	Pharyngeal interneurons, ant sensory.
+I2R	AB.arapapaapa	Pharyngeal interneurons, ant sensory.
+I3	MS.aaaaapaa	Pharyngeal interneuron, ant sensory.
+I4	MS.aaaapaa	Pharyngeal interneuron.
+I5	AB.arapapapp	Pharyngeal interneuron, post sensory.
+I6	MS.paaapaa	Pharyngeal interneuron, post sensory.
+IL1DL	AB.alapappaaa	Inner labial neuron
+IL1DR	AB.alappppaaa	Inner labial neuron
+IL1L	AB.alapaappaa	Inner labial neuron
+IL1R	AB.alaappppaa	Inner labial neuron
+IL1VL	AB.alppapppaa	Inner labial neuron
+IL1VR	AB.arapppppaa	Inner labial neuron
+IL2DL	AB.alapappap	Inner labial neuron
+IL2DR	AB.alappppap	Inner labial neuron
+IL2L	AB.alapaappp	Inner labial neuron
+IL2R	AB.alaappppp	Inner labial neuron
+IL2VL	AB.alppapppp	Inner labial neuron
+IL2VR	AB.arapppppp	Inner labial neuron
+ILshDL	AB.alaaaparr	Inner labial sheath
+ILshDR	AB.alaaappll	Inner labial sheath
+ILshL	AB.alaaaalpp	Inner labial sheath
+ILshR	AB.alaapaapp	Inner labial sheath
+ILshVL	AB.alppapaap	Inner labial sheath
+ILshVR	AB.arapppaap	Inner labial sheath
+ILsoDL	AB.plaapaaap	Inner labial socket
+ILsoDR	AB.praapaaap	Inner labial socket
+ILsoL	AB.alaaapall	Inner labial socket
+ILsoR	AB.alaaapprr	Inner labial socket
+ILsoVL	AB.alppapapp	Inner labial socket
+ILsoVR	AB.arapppapp	Inner labial socket
+K	AB.plpapppaa	Rectal cell, postembryonic blast cell
+K'	AB.plpapppap	Rectal cell
+K.a	K.a	Rectal cell
+LUAL	AB.plpppaapap	Interneuron, short process in post ventral cord
+LUAR	AB.prpppaapap	Interneuron, short process in post ventral cord
+M	MS.apaap	Postembryonic mesoblast
+M1	MS.paapaaa	Pharyngeal motorneurons
+M2L	AB.araapappa	Pharyngeal motorneurons
+M2R	AB.araappppa	Pharyngeal motorneurons
+M3L	AB.araapappp	Pharyngeal sensory-motorneurons
+M3R	AB.araappppp	Pharyngeal sensory-motorneurons
+M4	MS.paaaaaa	Pharyngeal motorneurons
+M5	MS.paaapap	Pharyngeal motorneurons
+MCL	AB.alpaaappp	Pharyngeal neurons that synapse onto marginal cells
+MCR	AB.arapaappp	Pharyngeal neurons that synapse onto marginal cells
+MI	AB.araappaaa	Pharyngeal motor neuron/interneuron
+MS	P0.paa	Embryonic founder cell
+NSML	AB.araapapaav	Pharyngeal neurosecretory motorneuron, contain serotonin
+NSMR	AB.araapppaav	Pharyngeal neurosecretory motorneuron, contain serotonin
+OLLL	AB.alppppapaa	Lateral outer labial neurons
+OLLR	AB.praaapapaa	Lateral outer labial neurons
+OLLshL	AB.alpppaapd	Lateral outer labial sheath
+OLLshR	AB.praaaaapd	Lateral outer labial sheath
+OLLsoL	AB.alapaaapp	Lateral outer labial socket
+OLLsoR	AB.alappappp	Lateral outer labial socket
+OLQDL	AB.alapapapaa	Quadrant outer labial neuron
+OLQDR	AB.alapppapaa	Quadrant outer labial neuron
+OLQVL	AB.plpaaappaa	Quadrant outer labial neuron
+OLQVR	AB.prpaaappaa	Quadrant outer labial neuron
+OLQshDL	AB.arpaaaapa	Quadrant outer labial sheath
+OLQshSR	AB.arpaaapaa	Quadrant outer labial sheath
+OLQshVL	AB.alpppaaap	Quadrant outer labial sheath
+OLQshVR	AB.praaaaaap	Quadrant outer labial sheath
+OLQsoDL	AB.arpaaaaal	Quadrant outer labial socket
+OLQsoDR	AB.arpaaaaar	Quadrant outer labial socket
+OLQsoVL	AB.alppaaapp	Quadrant outer labial socket
+OLQsoVR	AB.alaappapp	Quadrant outer labial socket
+P0	Z	Single cell zygote
+P4	P0.pppp	Embryonic founder cell of germ line
+P1/2L	AB.plapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P1/2R	AB.prapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P3/4L	AB.plappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P3/4R	AB.prappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P5/6L	AB.plappaap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P5/6R	AB.prappaap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P7/8L	AB.plappapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P7/8R	AB.prappapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P9/10L	AB.plapapap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P9/10R	AB.prapapap	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P11	AB.plapappa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+P12	AB.prapappa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
+PCAL	Y.plppd	Sensory neuron of postcloacal sensilla in male
+PCAR	Y.prppd	Sensory neuron of postcloacal sensilla in male
+PCBL	Y.plpa	Neuron, ending is sheath of postcloacal sensilla in male
+PCBR	Y.prpa	Neuron, ending is sheath of postcloacal sensilla in male
+PCCL	B.arpaaa	Sensory neuron of postcloacal sensilla in male
+PCCR	B.alpaaa	Sensory neuron of postcloacal sensilla in male
+PChL	Y.plaa	Hypodermal cell of postcloacal sensilla in male
+PChR	Y.praa	Hypodermal cell of postcloacal sensilla in male
+PCshL	Y.plppv	Sheath of postcloacal sensilla in male
+PCshR	Y.prppv	Sheath of postcloacal sensilla in male
+PCsoL	Y.plap	Socket of postcloacal sensilla in male
+PCsoR	Y.prap	Socket of postcloacal sensilla in male
+PDA	AB.prpppaaaa	Motor neuron, process in dorsal cord, same as Y cell in hermaphrodite, Y.a in male
+PDB	P12.apa	Motor neuron, process in dorsal cord, cell body in pre-anal ganglion
+PDC	P11.papa	Male specific interneuron, preanal ganglion
+PDEL	V5L.paaa	Neuron, dopaminergic of postderid sensillum
+PDER	V5R.paaa	Neuron, dopaminergic of postderid sensillum
+PDEshL	V5L.papp	Sheath of PDE
+PDEshR	V5R.papp	Sheath of PDE
+PdEsoL	V5L.papa	Socket of PDE
+PdEsoR	V5R.papa	Socket of PDE
+PGA	P11.papp	Male specific interneuron, preanal ganglion
+PHAL	AB.plpppaapp	Phasmid neurons, probably chemosensory
+PHAR	AB.prpppaapp	Phasmid neurons, probably chemosensory
+PHBL	AB.plapppappp	Phasmid neurons, probably chemosensory
+PHBR	AB.prapppappp	Phasmid neurons, probably chemosensory
+PHCL	TL.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike
+PHCR	TR.pppaa	Neuron, striated rootlet in male, possibly sensory in tail spike
+PHshL	AB.plpppapaa	Phasmid sheath
+PHshR	AB.prpppapaa	Phasmid sheath
+PHso1L	TL.paa	Phasmid sockets
+PHso1R	TR.paa	Phasmid sockets
+PHso2L	TL.pap	Phasmid sockets
+PHso2R	TR.pap	Phasmid sockets
+PLML	AB.plapappppaa	Posterior lateral microtubule cell, touch receptor
+PLMR	AB.prapappppaa	Posterior lateral microtubule cell, touch receptor
+PLNL	TL.pppap	Interneuron, associated with PLM
+PLNR	TR.pppap	Interneuron, associated with PLM
+PQR	QL.ap	Neuron, basal body, not part of a sensillum, projects into preanal gangion
+PVCL	AB.plpppaapaa	Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta
+PVCR	AB.prpppaapaa	Ventral cord interneuron, cell body in lumbar ganglion, synapses onto VB andDB motor neurons, formerly called delta
+PVDL	V5L.paapa	Neuron, lateral process adjacent to excretory canal
+PVDR	V5R.paapa	Neuron, lateral process adjacent to excretory canal
+PVM	QL.paa	Posterior ventral microtuble cell, touch receptor
+PVNL	TL.appp	Interneuron/motor neuron, post. vent. cord, few synapses
+PVNR	TR.appp	Interneuron/motor neuron, post. vent. cord, few synapses
+PVPL	AB.plppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring
+PVPR	AB.prppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring
+PVQL	AB.plapppaaa	Interneuron, projects along ventral cord to ring
+PVQR	AB.prapppaaa	Interneuron, projects along ventral cord to ring
+PVR	C.aappv	Interneuron, projects along ventral cord to ring
+PVT	AB.plpappppa	Interneuron, projects along ventral cord to ring
+PVV	P11.paaa	Male specific motor neuron, ventral cord
+PVWL	TL.ppa	Interneuron, posterior ventral cord, few synapses
+PVWR	TR.ppa	Interneuron, posterior ventral cord, few synapses
+PVX	P12.aap	Male specific interneuron, postsynaptic in ring and ventral cord
+PVY	P11.paap	Male specific interneuron, postsynaptic in ring and ventral cord
+PVZ	P10.ppppa	Male specific motor neuron, ventral cord
+QL	AB.plapapaaa	Postembryonic neuroblast, migrates anteriorly
+QR	AB.prapapaaa	Postembryonic neuroblast, migrates posteriorly
+R1AL	V5L.pppppaaa, R1.aaa	Male sensory rays, neuron, striated rootlet
+R1AR	V5R.pppppaaa, R1.aaa	Male sensory rays, neuron, striated rootlet
+R1BL	V5L.pppppapa, R1.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R1BR	V5R.pppppapa, R1.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R1stL	V5L.pppppapp, R1.app	Male sensory rays, structural cell
+R1stR	V5R.pppppapp, R1.app	Male sensory rays, structural cell
+R2AL	V6L.papapaaa, R2.aaa	Male sensory rays, neuron, striated rootlet
+R2AR	V6R.papapaaa, R2.aaa	Male sensory rays, neuron, striated rootlet
+R2BL	V6L.papapapa, R2.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R2BR	V6R.papapapa, R2.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R2stL	V6L.papapapp, R2.app	Male sensory rays, structural cell
+R2stR	V6R.papapapp, R2.app	Male sensory rays, structural cell
+R3AL	V6L.papppaaa, R3.aaa	Male sensory rays, neuron, striated rootlet
+R3AR	V6R.papppaaa, R3.aaa	Male sensory rays, neuron, striated rootlet
+R3BL	V6L.papppapa, R3.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R3BR	V6R.papppapa, R3.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R3stL	V6L.papppapp, R3.app	Male sensory rays, structural cell
+R3stR	V6R.papppapp, R3.app	Male sensory rays, structural cell
+R4AL	V6L.pppapaaa, R4.aaa	Male sensory rays, neuron, striated rootlet
+R4AR	V6R.pppapaaa, R4.aaa	Male sensory rays, neuron, striated rootlet
+R4BL	V6L.pppapapa, R4.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R4BR	V6R.pppapapa, R4.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R4stL	V6L.pppapapp, R4.app	Male sensory rays, structural cell
+R4stR	V6R.pppapapp, R4.app	Male sensory rays, structural cell
+R5AL	V6L.pppppaaa, R5.aaa	Male sensory rays, neuron, striated rootlet
+R5AR	V6R.pppppaaa, R5.aaa	Male sensory rays, neuron, striated rootlet
+R5BL	V6L.pppppapa, R5.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R5BR	V6R.pppppapa, R5.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R5stL	V6L.pppppapp, R5.app	Male sensory rays, structural cell
+R5stR	V6R.pppppapp, R5.app	Male sensory rays, structural cell
+R6AL	V6L.ppppaaaa, R6.aaa	Male sensory rays, neuron, striated rootlet
+R6AR	V6R.ppppaaaa, R6.aaa	Male sensory rays, neuron, striated rootlet
+R6BL	V6L.ppppaapa, R6.apa	Male sensory rays, neuron, not darkly staining nor open to outside
+R6BR	V6R.ppppaapa, R6.apa	Male sensory rays, neuron, not darkly staining nor open to outside
+R6stL	V6L.ppppaapp, R6.app	Male sensory rays, structural cell
+R6stR	V6R.ppppaapp, R6.app	Male sensory rays, structural cell
+R7AL	TL.apappaaa, R7.aaa	Male sensory rays, neuron, striated rootlet
+R7AR	TR.apappaaa, R7.aaa	Male sensory rays, neuron, striated rootlet
+R7BL	TL.apappapa, R7.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R7BR	TR.apappapa, R7.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R7stL	TL.apappapp, R7.app	Male sensory rays, structural cell
+R7stR	TR.apappapp, R7.app	Male sensory rays, structural cell
+R8AL	TL.appaaaaa, R8.aaa	Male sensory rays, neuron, striated rootlet
+R8AR	TR.appaaaaa, R8.aaa	Male sensory rays, neuron, striated rootlet
+R8BL	TL.appaaapa, R8.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R8BR	TR.appaaapa, R8.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R8stL	TL.appaaapp, R8.app	Male sensory rays, structural cell
+R8stR	TR.appaaapp, R8.app	Male sensory rays, structural cell
+R9AL	TL.appapaaa, R9.aaa	Male sensory rays, neuron, striated rootlet
+R9AR	TR.appapaaa, R9.aaa	Male sensory rays, neuron, striated rootlet
+R9BL	TL.appapapa, R9.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R9BR	TR.appapapa, R9.apa	Male sensory rays, neuron, darkly staining tip, open to outside
+R9stL	TL.appapapp, R9.app	Male sensory rays, structural cell
+R9stR	TR.appapapp, R9.app	Male sensory rays, structural cell
+RIAL	AB.alapaapaa	Ring interneuron, many synapses
+RIAR	AB.alaapppaa	Ring interneuron, many synapses
+RIBL	AB.plpaappap	Ring interneuron
+RIBR	AB.prpaappap	Ring interneuron
+RICL	AB.plppaaaapp	Ring interneuron
+RICR	AB.prppaaaapp	Ring interneuron
+RID	AB.alappaapa	Ring interneuron, projects along dorsal cord
+RIFL	AB.plppapaaap	Ring interneuron
+RIFR	AB.prppapaaap	Ring interneuron
+RIGL	AB.plppappaa	Ring interneuron
+RIGR	AB.prppappaa	Ring interneuron
+RIH	AB.prpappaaa	Ring interneuron
+RIML	AB.plppaapap	Ring motor neuron
+RIMR	AB.prppaapap	Ring motor neuron
+RIPL	AB.alpapaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring
+RIPR	AB.prappaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring
+RIR	AB.prpapppaa	Ring interneuron
+RIS	AB.prpappapa	Ring interneuron
+RIVL	AB.plpaapaaa	Ring interneuron
+RIVR	AB.prpaapaaa	Ring interneuron
+RMDDL	AB.alpapapaa	Ring motor neuron/interneuron, many synapses
+RMDDR	AB.arappapaa	Ring motor neuron/interneuron, many synapses
+RMDL	AB.alpppapad	Ring motor neuron/interneuron, many synapses
+RMDR	AB.praaaapad	Ring motor neuron/interneuron, many synapses
+RMDVL	AB.alppapaaa	Ring motor neuron/interneuron, many synapses
+RMDVR	AB.arapppaaa	Ring motor neuron/interneuron, many synapses
+RMED	AB.alapppaap	Ring motor neuron
+RMEL	AB.alaaaarlp	Ring motor neuron
+RMER	AB.alaaaarrp	Ring motor neuron
+RMEV	AB.plpappaaa	Ring motor neuron
+RMFL	G2.al	Ring motor neuron/interneuron
+RMFR	G2.ar	Ring motor neuron/interneuron
+RMGL	AB.plapaaapp	Ring interneuron
+RMGR	AB.prapaaapp	Ring interneuron
+RMHL	G1.l	Ring motor neuron/interneuron
+RMHR	G1.r	Ring motor neuron/interneuron
+SAADL	AB.alppapapa	Ring interneuron, anteriorly projecting process that runs sublaterally
+SAADR	AB.arapppapa	Ring interneuron, anteriorly projecting process that runs sublaterally
+SAAVL	AB.plpaaaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally
+SAAVR	AB.prpaaaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally
+SABD	AB.plppapaap	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1
+SABVL	AB.plppapaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1
+SABVR	AB.prppapaaaa	Ring interneuron, anteriorly projecting process that runs sublaterally, synapses to anterior body muscles in L1
+SDQL	QL.pap	Post. lateral interneuron, process projects into ring
+SDQR	QR.pap	Ant. lateral interneuron, process projects into ring
+SIADL	AB.plpapaapa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIADR	AB.prpapaapa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIAVL	AB.plpapappa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIAVR	AB.prpapappa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIBDL	AB.plppaaaaa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIBDR	AB.prppaaaaa	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIBVL	AB.plpapaapp	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SIBVR	AB.prpapaapp	Receives a few synapses in the ring, has a posteriorly directed process that runs sublaterally
+SMBDL	AB.alpapapapp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMBDR	AB.arappapapp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMBVL	AB.alpapappp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMBVR	AB.arappappp	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMDDL	AB.plpapaaaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMDDR	AB.prpapaaaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMDVL	AB.alppappaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SMDVR	AB.arappppaa	Ring motor neuron/interneuron, has a posteriorly direct ed process that runs sublaterally
+SPCL	B.alpaap	Male specific sensory /motor neuron, innervates spicule protractor muscle
+SPCR	B.arpaap	Male specific sensory /motor neuron, innervates spicule protractor muscle
+SPDL	B.alpapaa	Sensory neuron of copulatory spicule in male, cilliated, open to outside at tip of spicule
+SPDR	B.arpapaa	Sensory neuron of copulatory spicule in male, cilliated, open to outside at tip of spicule
+SPVL	B.al/raalda	Sensory neuron of copulatory spicule in male, cilliated, open to outside at tip of spicule
+SPVR	B.al/raarda	Sensory neuron of copulatory spicule in male, cilliated, open to outside at tip of spicule
+SPshDL	B.alpapap	Sheath of male copulatory spicule
+SPshDR	B.arpapap	Sheath of male copulatory spicule
+SPshVL	B.al/raaldp	Sheath of male copulatory spicule
+SpshVR	B.al/raarda	Sheath of male copulatory spicule
+SPso1L	B.al/rpppl	Socket of male copulatory spicule
+SPso1R	B.al/rpppr	Socket of male copulatory spicule
+SPso2L	B.al/raald	Socket of male copulatory spicule
+SPso2R	B.al/raard	Socket of male copulatory spicule
+SPso3L	B.al/raalv	Socket of male copulatory spicule
+SPso3R	B.al/raarv	Socket of male copulatory spicule
+SPso4L	B.alpapp	Socket of male copulatory spicule
+SPso4r	B.arpapp	Socket of male copulatory spicule
+TL	AB.plappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1
+TR	AB.prappppp	Tail seam hypodermal cell, postembryonic blast cell, functions as phasmid socket in L1
+U	AB.plppppapa	Rectal cell, postembryonic blast cell in male
+URADL	AB.plaaaaaaa	Ring motor neuron
+URADR	AB.arpapaaaa	Ring motor neuron
+URAVL	AB.plpaaapaa	Ring motor neuron
+URAVR	AB.prpaaapaa	Ring motor neuron
+URBL	AB.plaapaapa	Neuron, presynaptic in ring, ending in head
+URBR	AB.praapaapa	Neuron, presynaptic in ring, ending in head
+URXL	AB.plaaaaappp	Ring interneuron
+URXR	AB.arpapaappp	Ring interneuron
+URYDL	AB.alapapapp	Neuron, presynaptic in ring, ending in head
+URYDR	AB.alapppapp	Neuron, presynaptic in ring, ending in head
+URYVL	AB.plpaaappp	Neuron, presynaptic in ring, ending in head
+URYVR	AB.prpaaappp	Neuron, presynaptic in ring, ending in head
+V1L	AB.arppapaa	Seam hypodermal cell, postembryonic blast cell
+V1R	AB.arppppaa	Seam hypodermal cell, postembryonic blast cell
+V2L	AB.arppapap	Seam hypodermal cell, postembryonic blast cell
+V2R	AB.arppppap	Seam hypodermal cell, postembryonic blast cell
+V3L	AB.plappapa	Seam hypodermal cell, postembryonic blast cell
+V3R	AB.prappapa	Seam hypodermal cell, postembryonic blast cell
+V4L	AB.arppappa	Seam hypodermal cell, postembryonic blast cell
+V4R	AB.arpppppa	Seam hypodermal cell, postembryonic blast cell
+V5L	AB.plapapaap	Seam hypodermal cell, postembryonic blast cell
+V5R	AB.prapapaap	Seam hypodermal cell, postembryonic blast cell
+V6L	AB.arppappp	Seam hypodermal cell, postembryonic blast cell
+V6R	AB.arpppppp	Seam hypodermal cell, postembryonic blast cell
+VA1	W.pa	Vent. cord motor neuron, innervates vent. body muscles
+VA2	P2.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA3	P3.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA4	P4.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA5	P5.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA6	P6.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA7	P7.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA8	P8.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA9	P9.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA10	P10.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA11	P11.aaaa	Vent. cord motor neuron, innervates vent. body muscles
+VA12	P12.aaaa	Vent. cord motor neuron, innervates vent. body muscles, but also interneuron in preanal ganglion
+VB1	P1.aaap	Vent. cord motor neuron, innervates vent. body muscles, also interneuron in ring
+VB2	W.aap	Vent. cord motor neuron, innervates vent. body muscles
+VB3	P2.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB4	P3.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB5	P4.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB6	P5.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB7	P6.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB8	P7.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB9	P8.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB10	P9.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VB11	P10.aaap	Vent. cord motor neuron, innervates vent. body muscles
+VC1	P3.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VC2	P4.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VC3	P5.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VC4	P6.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VC5	P7.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VC6	P8.aap	Hermaphrodite specific vent cord motor neuron innervates vulval muscles and vent body muscles
+VD1	W.pp	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD2	P1.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD3	P2.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD4	P3.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD5	P4.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD6	P5.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD7	P6.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD8	P7.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD9	P8.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD10	P9.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD11	P10.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD12	P11.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+VD13	P12.app	Vent cord motor neuron, innervates vent body muscles, probably reciprocal inhibitor
+W	AB.prapaapa	Postembryonic neuroblast, analogous to Pn.a cells
+XXXL	AB.plaaapaa	Embryonic head hypodermal cell
+XXXR	AB.arpappaa	Embryonic head hypodermal cell
+Y	AB.prpppaaaa	Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male
+Z1	MS.pppaap	Somatic gonad precursor cell
+Z2	P4.p	Germ line precursor cell
+Z3	P4.a	Germ line precursor cell
+Z4	MS.appaap	Somatic gonad precursor cell
+arc_ant	AB.araaapppa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arc_ant	AB.alpaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arc_ant	AB.alpapaapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.alpaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.alpaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.araaapaaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.araaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.araaappap	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+arcpost	AB.arapapapa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
+cc_DL	M.dlpa	Postembryonic coelomocyte in hermaphrodite
+cc_DR	M.drpa	Postembryonic coelomocyte in hermaphrodite
+cc_male_D	M.dlpappp	Single male postembryonic coelomocyte
+ccAL	MS.apapaaa	Embryonic coelomocytes
+ccAR	MS.ppapaaa	Embryonic coelomocytes
+ccPL	MS.apapaap	Embryonic coelomocytes
+ccPR	MS.ppapaap	Embryonic coelomocytes
+e1D	AB.araaaapap	Pharyngeal epithelial cells
+e1VL	AB.araaaaaaa	Pharyngeal epithelial cells
+e1VR	AB.araaaaapa	Pharyngeal epithelial cells
+e2DL	AB.alpaapaap	Pharyngeal epithelial cells
+e2DR	AB.araaapaap	Pharyngeal epithelial cells
+e2V	AB.alpappapa	Pharyngeal epithelial cells
+e3D	AB.araapaaaa	Pharyngeal epithelial cells
+e3VL	AB.alpaaaaaa	Pharyngeal epithelial cells
+e3VR	AB.arapaaaaa	Pharyngeal epithelial cells
+exc_cell	AB.plpappaap	Large H-shaped excretory cell
+exc_duct	AB.plpaaaapa	Excretory duct
+exc_gl_L	AB.plpapapaa	Excretory glands, fused, send processes to ring, open into excretory duct
+exc_gl_R	AB.prpapapaa	Excretory glands, fused, send processes to ring, open into excretory duct
+exc_socket	G2.p	Excretory socket, links duct to hypodermis
+g1AL	MS.aapaapaa	Pharyngeal gland cells
+g1AR	MS.papaapaa	Pharyngeal gland cells
+g1P	MS.aaaaapap	Pharyngeal gland cells
+g2L	MS.aapapaa	Pharyngeal gland cells
+g2R	MS.papapaa	Pharyngeal gland cells
+gon_herm_anch	Z1.ppp/Z4.aaa	Anchor cell, induces vulva, herm gonad
+gon_herm_dtc_A	Z1.aa	Anterior distal tip cell, inhibit meiosis in neighboring germ cells, lead gonad during morphogenesis, herm gonad
+gon_herm_dtc_B	Z4.pp	Posterior distal tip cell, inhibit meiosis in neighboring germ cells, lead gonad during morph
+gon_herm_dish_A	Z1.apa	Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad
+gon_herm_dish_A	Z1.paaa	Anterior epithelial sheaths of distal arms, no muscle fibers, herm gonad
+gon_herm_dish_P	Z4.pap	Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad
+gon_herm_dish_P	Z4.appp	Posterior epithelial sheaths of distal arms, no muscle fibers, herm gonad
+gon_herm_prsh_A	Z1.appaaa	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.appaap	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.appapa	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.appapp	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.paapaaa	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.paapaap	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.paapapa	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_A	Z1.paapapp	Anterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.paapaa	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.paapap	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.paappa	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.paappp	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.appapaa	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.appapap	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.appappa	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_prsh_P	Z4.appappp	Posterior epithelial sheaths of proximal arms, have muscle fibers
+gon_herm_spth_A	Z1.apppaaaa	Anterior spermathecae
+gon_herm_spth_A	Z1.apppaaap	Anterior spermathecae
+gon_herm_spth_A	Z1.apppaapa	Anterior spermathecae
+gon_herm_spth_A	Z1.apppaapp	Anterior spermathecae
+gon_herm_spth_A	Z1.apppapaa	Anterior spermathecae
+gon_herm_spth_A	Z1.apppapap	Anterior spermathecae
+gon_herm_spth_A	Z1.apppapp	Anterior spermathecae
+gon_herm_spth_A	Z1.appppa	Anterior spermathecae
+gon_herm_spth_A	Z1.appppp	Anterior spermathecae
+gon_herm_spth_A	Z1.paappaaaa	Anterior spermathecae
+gon_herm_spth_A	Z1.paappaaap	Anterior spermathecae
+gon_herm_spth_A	Z1.paappaapa	Anterior spermathecae
+gon_herm_spth_A	Z1.paappaapp	Anterior spermathecae
+gon_herm_spth_A	Z1.paappapaa	Anterior spermathecae
+gon_herm_spth_A	Z1.paappapap	Anterior spermathecae
+gon_herm_spth_A	Z1.paappapp	Anterior spermathecae
+gon_herm_spth_A	Z1.paapppa	Anterior spermathecae
+gon_herm_spth_A	Z1.paapppp	Anterior spermathecae
+gon_herm_spth_A	Z1.papaaad	Anterior spermathecae
+gon_herm_spth_A	Z1.papaaav	Anterior spermathecae
+gon_herm_spth_A	Z1.papaapv	Anterior spermathecae
+gon_herm_spth_A	Z4.apaaaad	Anterior spermathecae
+gon_herm_spth_A	Z4.apaaaav	Anterior spermathecae
+gon_herm_spth_A	Z4.apaaapv	Anterior spermathecae
+gon_herm_spth_P	Z4.paaaaa	Posterior spermathecae
+gon_herm_spth_P	Z4.paaaap	Posterior spermathecae
+gon_herm_spth_P	Z4.paaapaa	Posterior spermathecae
+gon_herm_spth_P	Z4.paaapapa	Posterior spermathecae
+gon_herm_spth_P	Z4.paaapapp	Posterior spermathecae
+gon_herm_spth_P	Z4.paaappaa	Posterior spermathecae
+gon_herm_spth_P	Z4.paaappap	Posterior spermathecae
+gon_herm_spth_P	Z4.paaapppa	Posterior spermathecae
+gon_herm_spth_P	Z4.paaapppp	Posterior spermathecae
+gon_herm_spth_P	Z4.appaaaa	Posterior spermathecae
+gon_herm_spth_P	Z4.appaaap	Posterior spermathecae
+gon_herm_spth_P	Z4.appaapaa	Posterior spermathecae
+gon_herm_spth_P	Z4.appaapapa	Posterior spermathecae
+gon_herm_spth_P	Z4.appaapapp	Posterior spermathecae
+gon_herm_spth_P	Z4.appaappaa	Posterior spermathecae
+gon_herm_spth_P	Z4.appaappap	Posterior spermathecae
+gon_herm_spth_P	Z4.appaapppa	Posterior spermathecae
+gon_herm_spth_P	Z4.appaapppp	Posterior spermathecae
+gon_herm_spth_P	Z4.apappav	Posterior spermathecae
+gon_herm_spth_P	Z4.apapppd	Posterior spermathecae
+gon_herm_spth_P	Z4.apapppv	Posterior spermathecae
+gon_herm_spth_P	Z1.papppav	Posterior spermathecae
+gon_herm_spth_P	Z1.pappppd	Posterior spermathecae
+gon_herm_spth_P	Z1.pappppv	Posterior spermathecae
+gon_herm_sujn_A	Z1.papaapd	Anterior spermathecal-uterine junction
+gon_herm_sujn_A	Z1.papapaaa	Anterior spermathecal-uterine junction
+gon_herm_sujn_A	Z1.ppaaaaa	Anterior spermathecal-uterine junction
+gon_herm_sujn_A	Z1.ppaaapa	Anterior spermathecal-uterine junction
+gon_herm_sujn_A	Z4.apaaapd	Anterior spermathecal-uterine junction
+gon_herm_sujn_A	Z4.apaapaaa	Anterior spermathecal-uterine junction
+gon_herm_sujn_P	Z1.pappappp	Posterior spermathecal-uterine junction
+gon_herm_sujn_P	Z1.papppad	Posterior spermathecal-uterine junction
+gon_herm_sujn_P	Z4.apapappp	Posterior spermathecal-uterine junction
+gon_herm_sujn_P	Z4.apappad	Posterior spermathecal-uterine junction
+gon_herm_sujn_P	Z4.aapppap	Posterior spermathecal-uterine junction
+gon_herm_sujn_P	Z4.aappppp	Posterior spermathecal-uterine junction
+gon_herm_dut	Z1.papapaap	Dorsal uterus
+gon_herm_dut	Z1.papapapa	Dorsal uterus
+gon_herm_dut	Z1.papapapp	Dorsal uterus
+gon_herm_dut	Z1.papappaa	Dorsal uterus
+gon_herm_dut	Z1.papappap	Dorsal uterus
+gon_herm_dut	Z1.papapppa	Dorsal uterus
+gon_herm_dut	Z1.papapppp	Dorsal uterus
+gon_herm_dut	Z1.pappaaaa	Dorsal uterus
+gon_herm_dut	Z1.pappaaap	Dorsal uterus
+gon_herm_dut	Z1.pappaapa	Dorsal uterus
+gon_herm_dut	Z1.pappaapp	Dorsal uterus
+gon_herm_dut	Z1.pappapaa	Dorsal uterus
+gon_herm_dut	Z1.pappapap	Dorsal uterus
+gon_herm_dut	Z1.pappappa	Dorsal uterus
+gon_herm_dut	Z4.apaapaap	Dorsal uterus
+gon_herm_dut	Z4.apaapapa	Dorsal uterus
+gon_herm_dut	Z4.apaapapp	Dorsal uterus
+gon_herm_dut	Z4.apaappaa	Dorsal uterus
+gon_herm_dut	Z4.apaappap	Dorsal uterus
+gon_herm_dut	Z4.apaapppa	Dorsal uterus
+gon_herm_dut	Z4.apaapppp	Dorsal uterus
+gon_herm_dut	Z4.apapaaaa	Dorsal uterus
+gon_herm_dut	Z4.apapaaap	Dorsal uterus
+gon_herm_dut	Z4.apapaapa	Dorsal uterus
+gon_herm_dut	Z4.apapaapp	Dorsal uterus
+gon_herm_dut	Z4.apapapaa	Dorsal uterus
+gon_herm_dut	Z4.apapapap	Dorsal uterus
+gon_herm_dut	Z4.apapappa	Dorsal uterus
+gon_herm_vut	Z1.ppaaaap	Ventral uterus
+gon_herm_vut	Z1.ppaaapp	Ventral uterus
+gon_herm_vut	Z1.ppaapaa	Ventral uterus
+gon_herm_vut	Z1.ppaapap	Ventral uterus
+gon_herm_vut	Z1.ppaappa	Ventral uterus
+gon_herm_vut	Z1.ppaappp	Ventral uterus
+gon_herm_vut	Z1.ppapaaa	Ventral uterus
+gon_herm_vut	Z1.ppapaap	Ventral uterus
+gon_herm_vut	Z1.ppapapa	Ventral uterus
+gon_herm_vut	Z1.ppapapp	Ventral uterus
+gon_herm_vut	Z1.ppappd	Ventral uterus
+gon_herm_vut	Z1.pppaad	Ventral uterus
+gon_herm_vut	Z1.pppaav	Ventral uterus
+gon_herm_vut	Z1.pppapd	Ventral uterus
+gon_herm_vut	Z1.pppapv	Ventral uterus
+gon_herm_vut	Z1.ppppad	Ventral uterus
+gon_herm_vut	Z1.ppppav	Ventral uterus
+gon_herm_vut	Z1.pppppaa	Ventral uterus
+gon_herm_vut	Z1.pppppap	Ventral uterus
+gon_herm_vut	Z1.ppppppa	Ventral uterus
+gon_herm_vut	Z1.ppppppp	Ventral uterus
+gon_herm_vut	Z4.aapaad	Ventral uterus
+gon_herm_vut	Z4.aapaav	Ventral uterus
+gon_herm_vut	Z4.aapapd	Ventral uterus
+gon_herm_vut	Z4.aapapv	Ventral uterus
+gon_herm_vut	Z4.aappaaa	Ventral uterus
+gon_herm_vut	Z4.aappaap	Ventral uterus
+gon_herm_vut	Z4.aappapa	Ventral uterus
+gon_herm_vut	Z4.aappapp	Ventral uterus
+gon_herm_vut	Z4.aapppaa	Ventral uterus
+gon_herm_vut	Z4.aappppa	Ventral uterus
+gon_herm_vut	Z1.ppaaaap	Ventral uterus
+gon_herm_vut	Z1.ppaaapp	Ventral uterus
+gon_herm_vut	Z1.ppaapaa	Ventral uterus
+gon_herm_vut	Z1.ppaapap	Ventral uterus
+gon_herm_vut	Z1.ppaappa	Ventral uterus
+gon_herm_vut	Z1.ppaappp	Ventral uterus
+gon_herm_vut	Z1.ppapad	Ventral uterus
+gon_herm_vut	Z1.ppapav	Ventral uterus
+gon_herm_vut	Z1.ppappd	Ventral uterus
+gon_herm_vut	Z1.ppappv	Ventral uterus
+gon_herm_vut	Z4.aaaaaaa	Ventral uterus
+gon_herm_vut	Z4.aaaaaap	Ventral uterus
+gon_herm_vut	Z4.aaaaapa	Ventral uterus
+gon_herm_vut	Z4.aaaaapp	Ventral uterus
+gon_herm_vut	Z4.aaaapd	Ventral uterus
+gon_herm_vut	Z4.aaaapv	Ventral uterus
+gon_herm_vut	Z4.aaapad	Ventral uterus
+gon_herm_vut	Z4.aaapav	Ventral uterus
+gon_herm_vut	Z4.aaappv	Ventral uterus
+gon_herm_vut	Z4.aaappd	Ventral uterus
+gon_herm_vut	Z4.aapaad	Ventral uterus
+gon_herm_vut	Z4.aapaav	Ventral uterus
+gon_herm_vut	Z4.aapapaa	Ventral uterus
+gon_herm_vut	Z4.aapapap	Ventral uterus
+gon_herm_vut	Z4.aapappa	Ventral uterus
+gon_herm_vut	Z4.aapappp	Ventral uterus
+gon_herm_vut	Z4.aappaaa	Ventral uterus
+gon_herm_vut	Z4.aappaap	Ventral uterus
+gon_herm_vut	Z4.aappppa	Ventral uterus
+gon_herm_vut	Z4.aappppp	Ventral uterus
+gon_herm_vut	Z4.aapppaa	Ventral uterus
+gon_herm_vut	Z4.aapppap	Ventral uterus
+gon_male_dtc	Z1.a	Distal tip cell, inhibits meiosis in nearby germ cells
+gon_male_dtc	Z1.p	Distal tip cell, inhibits meiosis in nearby grem cells
+gon_male_link	Z1.paa/Z4.aaa	Linker cell, leads gonad during morphogenesis and initiates union with cloaca
+gon_male_sves	Z1.ppaaaaa	Seminal vesicle, inner
+gon_male_sves	Z1.ppaaaap	Seminal vesicle, inner
+gon_male_sves	Z1.ppaaap	Seminal vesicle, inner
+gon_male_sves	Z1.ppaap	Seminal vesicle, inner
+gon_male_sves	Z1.ppap	Seminal vesicle, inner
+gon_male_sves	Z1.pppaaaa	Seminal vesicle, inner
+gon_male_sves	Z1.pppaaap	Seminal vesicle, inner
+gon_male_sves	Z1.pppaap	Seminal vesicle, inner
+gon_male_sves	Z1.pppap	Seminal vesicle, inner
+gon_male_sves	Z1.pppp	Seminal vesicle, inner
+gon_male_sves	Z1.pappp	Seminal vesicle, outer
+gon_male_sves	Z4.aaapp	Seminal vesicle, outer
+gon_male_sves	Z4.aappp	Seminal vesicle, outer
+gon_male_sves	Z4.apaaaaa	Seminal vesicle, inner
+gon_male_sves	Z4.apaaaap	Seminal vesicle, inner
+gon_male_sves	Z4.apaaap	Seminal vesicle, inner
+gon_male_sves	Z4.apaap	Seminal vesicle, inner
+gon_male_sves	Z4.apap	Seminal vesicle, inner
+gon_male_sves	Z4.appaaaa	Seminal vesicle, inner
+gon_male_sves	Z4.appaaap	Seminal vesicle, inner
+gon_male_sves	Z4.appaap	Seminal vesicle, inner
+gon_male_sves	Z4.appap	Seminal vesicle, inner
+gon_male_sves	Z4.appp	Seminal vesicle, inner
+gon_male_sves	Z1.paapp	Seminal vesicle, outer
+gon_male_vdef	Z1.papaaaa	Vas deferens
+gon_male_vdef	Z1.papaaap	Vas deferens
+gon_male_vdef	Z1.papaapaa	Vas deferens
+gon_male_vdef	Z1.papaapap	Vas deferens
+gon_male_vdef	Z1.papaappaa	Vas deferens
+gon_male_vdef	Z1.papaappap	Vas deferens
+gon_male_vdef	Z1.papaappp	Vas deferens
+gon_male_vdef	Z1.papapa	Vas deferens
+gon_male_vdef	Z1.papapp	Vas deferens
+gon_male_vdef	Z1.pappa	Vas deferens
+gon_male_vdef	Z4.aaaaaaa	Vas deferens
+gon_male_vdef	Z4.aaaaaap	Vas deferens
+gon_male_vdef	Z4.aaaaapaa	Vas deferens
+gon_male_vdef	Z4.aaaaapap	Vas deferens
+gon_male_vdef	Z4.aaaaappaa	Vas deferens
+gon_male_vdef	Z4.aaaaappap	Vas deferens
+gon_male_vdef	Z4.aaaaappp	Vas deferens
+gon_male_vdef	Z4.aaaapa	Vas deferens
+gon_male_vdef	Z4.aaaapp	Vas deferens
+gon_male_vdef	Z4.aaapa	Vas deferens
+gon_male_vdef	Z4.aapaaaa	Vas deferens
+gon_male_vdef	Z4.aapaaap	Vas deferens
+gon_male_vdef	Z4.aapaapaa	Vas deferens
+gon_male_vdef	Z4.aapaapap	Vas deferens
+gon_male_vdef	Z4.aapaappaa	Vas deferens
+gon_male_vdef	Z4.aapaappap	Vas deferens
+gon_male_vdef	Z4.aapaappp	Vas deferens
+gon_male_vdef	Z4.aapapa	Vas deferens
+gon_male_vdef	Z4.aapapp	Vas deferens
+gon_male_vdef	Z4.aappa	Vas deferens
+gon_male_vdef	Z1.paaaaaa	Vas deferens
+gon_male_vdef	Z1.paaaaap	Vas deferens
+gon_male_vdef	Z1.paaaapaa	Vas deferens
+gon_male_vdef	Z1.paaaapap	Vas deferens
+gon_male_vdef	Z1.paaaappaa	Vas deferens
+gon_male_vdef	Z1.paaaappap	Vas deferens
+gon_male_vdef	Z1.paaaappp	Vas deferens
+gon_male_vdef	Z1.paaapa	Vas deferens
+gon_male_vdef	Z1.paaapp	Vas deferens
+gon_male_vdef	Z1.paapa	Vas deferens
+hmc	MS.appaaa	Head mesodermal cell, function unknown
+hyp1	AB.alpaapppa	Cylindrical hypodermal syncytium in head
+hyp1	AB.araaapppp	Cylindrical hypodermal syncytium in head
+hyp1	AB.arappaapa	Cylindrical hypodermal syncytium in head
+hyp2	AB.alpaapppp	Cylindrical hypodermal syncytium in head
+hyp2	AB.alpapaaap	Cylindrical hypodermal syncytium in head
+hyp3	AB.plaapaaaa	Cylindrical hypodermal syncytium in head
+hyp3	AB.praapaaaa	Cylindrical hypodermal syncytium in head
+hyp4	AB.arpapapa	Cylindrical hypodermal syncytium in head
+hyp4	AB.plaappaa	Cylindrical hypodermal syncytium in head
+hyp4	AB.praappaa	Cylindrical hypodermal syncytium in head
+hyp5	AB.arpappap	Cylindrical hypodermal syncytium in head
+hyp5	AB.plaaapap	Cylindrical hypodermal syncytium in head
+hyp6	AB.arpaapaa	Cylindrical hypodermal syncytium in head
+hyp6	AB.arpapapp	Cylindrical hypodermal syncytium in head
+hyp6	AB.plaaaapa	Cylindrical hypodermal syncytium in head
+hyp6	AB.plaaaapp	Cylindrical hypodermal syncytium in head
+hyp6	AB.plaappap	Cylindrical hypodermal syncytium in head
+hyp6	AB.praappap	Cylindrical hypodermal syncytium in head
+hyp7	AB.arpaapap	Embryonic large hypodermal syncytium
+hyp7	AB.arpaappa	Embryonic large hypodermal syncytium
+hyp7	AB.arpaappp	Embryonic large hypodermal syncytium
+hyp7	AB.arppaapa	Embryonic large hypodermal syncytium
+hyp7	AB.arpppapa	Embryonic large hypodermal syncytium
+hyp7	AB.plaapppa	Embryonic large hypodermal syncytium
+hyp7	AB.plaapppp	Embryonic large hypodermal syncytium
+hyp7	AB.plappppa	Embryonic large hypodermal syncytium
+hyp7	AB.praapppa	Embryonic large hypodermal syncytium
+hyp7	AB.praapppp	Embryonic large hypodermal syncytium
+hyp7	AB.prappppa	Embryonic large hypodermal syncytium
+hyp7	C.aaaaa	Embryonic large hypodermal syncytium
+hyp7	C.aaaap	Embryonic large hypodermal syncytium
+hyp7	C.aaapa	Embryonic large hypodermal syncytium
+hyp7	C.aaapp	Embryonic large hypodermal syncytium
+hyp7	C.aappd	Embryonic large hypodermal syncytium
+hyp7	C.paaaa	Embryonic large hypodermal syncytium
+hyp7	C.paaap	Embryonic large hypodermal syncytium
+hyp7	C.paapa	Embryonic large hypodermal syncytium
+hyp7	C.paapp	Embryonic large hypodermal syncytium
+hyp7	C.papaa	Embryonic large hypodermal syncytium
+hyp7	C.papap	Embryonic large hypodermal syncytium
+hyp7	C.pappd	Embryonic large hypodermal syncytium
+hyp7	H1L.apa	Postembryonic large hypodermal syncytium
+hyp7	H1L.appa	Postembryonic large hypodermal syncytium
+hyp7	H1L.p	Postembryonic large hypodermal syncytium
+hyp7	H1R.apa	Postembryonic large hypodermal syncytium
+hyp7	H1R.appa	Postembryonic large hypodermal syncytium
+hyp7	H1R.p	Postembryonic large hypodermal syncytium
+hyp7	H2L.ap	Postembryonic large hypodermal syncytium
+hyp7	H2L.pa	Postembryonic large hypodermal syncytium
+hyp7	H2L.ppa	Postembryonic large hypodermal syncytium
+hyp7	H2L.pppa	Postembryonic large hypodermal syncytium
+hyp7	H2R.ap	Postembryonic large hypodermal syncytium
+hyp7	H2R.pa	Postembryonic large hypodermal syncytium
+hyp7	H2R.ppa	Postembryonic large hypodermal syncytium
+hyp7	H2R.pppa	Postembryonic large hypodermal syncytium
+hyp7	V1L.a	Postembryonic large hypodermal syncytium
+hyp7	V1L.paa	Postembryonic large hypodermal syncytium
+hyp7	V1L.papa	Postembryonic large hypodermal syncytium
+hyp7	V1L.pappa	Postembryonic large hypodermal syncytium
+hyp7	V1L.ppa	Postembryonic large hypodermal syncytium
+hyp7	V1L.pppa	Postembryonic large hypodermal syncytium
+hyp7	V1L.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V1R.a	Postembryonic large hypodermal syncytium
+hyp7	V1R.paa	Postembryonic large hypodermal syncytium
+hyp7	V1R.papa	Postembryonic large hypodermal syncytium
+hyp7	V1R.pappa	Postembryonic large hypodermal syncytium
+hyp7	V1R.ppa	Postembryonic large hypodermal syncytium
+hyp7	V1R.pppa	Postembryonic large hypodermal syncytium
+hyp7	V1R.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V2L.a	Postembryonic large hypodermal syncytium
+hyp7	V2L.paa	Postembryonic large hypodermal syncytium
+hyp7	V2L.papa	Postembryonic large hypodermal syncytium
+hyp7	V2L.pappa	Postembryonic large hypodermal syncytium
+hyp7	V2L.ppa	Postembryonic large hypodermal syncytium
+hyp7	V2L.pppa	Postembryonic large hypodermal syncytium
+hyp7	V2L.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V2R.a	Postembryonic large hypodermal syncytium
+hyp7	V2R.paa	Postembryonic large hypodermal syncytium
+hyp7	V2R.papa	Postembryonic large hypodermal syncytium
+hyp7	V2R.pappa	Postembryonic large hypodermal syncytium
+hyp7	V2R.ppa	Postembryonic large hypodermal syncytium
+hyp7	V2R.pppa	Postembryonic large hypodermal syncytium
+hyp7	V2R.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V3L.a	Postembryonic large hypodermal syncytium
+hyp7	V3L.paa	Postembryonic large hypodermal syncytium
+hyp7	V3L.papa	Postembryonic large hypodermal syncytium
+hyp7	V3L.pappa	Postembryonic large hypodermal syncytium
+hyp7	V3L.ppa	Postembryonic large hypodermal syncytium
+hyp7	V3L.pppa	Postembryonic large hypodermal syncytium
+hyp7	V3L.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V3R.a	Postembryonic large hypodermal syncytium
+hyp7	V3R.paa	Postembryonic large hypodermal syncytium
+hyp7	V3R.papa	Postembryonic large hypodermal syncytium
+hyp7	V3R.pappa	Postembryonic large hypodermal syncytium
+hyp7	V3R.ppa	Postembryonic large hypodermal syncytium
+hyp7	V3R.pppa	Postembryonic large hypodermal syncytium
+hyp7	V3R.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V4L.a	Postembryonic large hypodermal syncytium
+hyp7	V4L.paa	Postembryonic large hypodermal syncytium
+hyp7	V4L.papa	Postembryonic large hypodermal syncytium
+hyp7	V4L.pappa	Postembryonic large hypodermal syncytium
+hyp7	V4L.ppa	Postembryonic large hypodermal syncytium
+hyp7	V4L.pppa	Postembryonic large hypodermal syncytium
+hyp7	V4L.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V4R.a	Postembryonic large hypodermal syncytium
+hyp7	V4R.paa	Postembryonic large hypodermal syncytium
+hyp7	V4R.papa	Postembryonic large hypodermal syncytium
+hyp7	V4R.pappa	Postembryonic large hypodermal syncytium
+hyp7	V4R.ppa	Postembryonic large hypodermal syncytium
+hyp7	V4R.pppa	Postembryonic large hypodermal syncytium
+hyp7	V4R.ppppa	Postembryonic large hypodermal syncytium
+hyp7	V5L.a	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5L.ppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5L.pppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5L.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5R.a	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5R.ppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5R.pppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5R.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.a	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.paa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.papa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.pappa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.ppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.pppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6L.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.a	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.paa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.papa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.pappa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.ppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.pppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V6R.ppppa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TL.aa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TL.apaa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TL.apap	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TR.aa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TR.apaa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	TR.apap	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	V5L.a	Postembryonic large hypodermal syncytium, male
+hyp7	V5L.ppa	Postembryonic large hypodermal syncytium, male
+hyp7	V5L.pppaa	Postembryonic large hypodermal syncytium, male
+hyp7	V5L.pppapa	Postembryonic large hypodermal syncytium, male
+hyp7	V5L.ppppa	Postembryonic large hypodermal syncytium, male
+hyp7	V5R.a	Postembryonic large hypodermal syncytium, male
+hyp7	V5R.ppa	Postembryonic large hypodermal syncytium, male
+hyp7	V5R.pppa	Postembryonic large hypodermal syncytium, male
+hyp7	V5R.pppapa	Postembryonic large hypodermal syncytium, male
+hyp7	V5R.ppppa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.a	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.paa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.papaa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.pappa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.ppa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.pppaa	Postembryonic large hypodermal syncytium, male
+hyp7	V6L.ppppap	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.a	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.paa	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.papaa	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.pappa	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.ppa	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.pppaa	Postembryonic large hypodermal syncytium, male
+hyp7	V6R.ppppap	Postembryonic large hypodermal syncytium, male
+hyp7	TL.aa	Postembryonic large hypodermal syncytium, male
+hyp7	TL.apaa	Postembryonic large hypodermal syncytium, male
+hyp7	TL.apapa	Postembryonic large hypodermal syncytium, male
+hyp7	TL.apappp	Postembryonic large hypodermal syncytium, male
+hyp7	TL.appaap	Postembryonic large hypodermal syncytium, male
+hyp7	TL.appapp	Postembryonic large hypodermal syncytium, male
+hyp7	TR.aa	Postembryonic large hypodermal syncytium, male
+hyp7	TR.apaa	Postembryonic large hypodermal syncytium, male
+hyp7	TR.apapa	Postembryonic large hypodermal syncytium, male
+hyp7	TR.apappp	Postembryonic large hypodermal syncytium, male
+hyp7	TR.appaap	Postembryonic large hypodermal syncytium, male
+hyp7	TR.appapp	Postembryonic large hypodermal syncytium, male
+hyp7	P1.p	Postembryonic large hypodermal syncytium
+hyp7	P2.p	Postembryonic large hypodermal syncytium
+hyp7	P3.pa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P3.pp	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P4.pa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P4.pp	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P8.pa	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P8.pp	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P9.p	Postembryonic large hypodermal syncytium
+hyp7	P10.p	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P11.p	Postembryonic large hypodermal syncytium, hermaphrodite
+hyp7	P3.p	Postembryonic large hypodermal syncytium, male
+hyp7	P4.p	Postembryonic large hypodermal syncytium, male
+hyp7	P5.p	Postembryonic large hypodermal syncytium, male
+hyp7	P6.p	Postembryonic large hypodermal syncytium, male
+hyp7	P7.p	Postembryonic large hypodermal syncytium, male
+hyp7	P8.p	Postembryonic large hypodermal syncytium, male
+hyp7	P10.papa	Postembryonic large hypodermal syncytium, male
+hyp7	P10.paap	Postembryonic large hypodermal syncytium, male
+hyp7	P10.paaa	Postembryonic large hypodermal syncytium, male
+hyp8/9	AB.plpppapap	Tail ventral hypodermis
+hyp8/9	AB.prpppapap	Tail ventral hypodermis
+hyp10	AB.plppppppp	Tail ventral hypodermis
+hyp10	AB.prppppppp	Tail ventral hypodermis
+hyp11	C.pappv	Tail dorsal hypodermis
+hyp12	P12.pa	Preanal hypodermis
+hyp_hook	P10.papp	Hook of male
+hyp_hook	P11.ppaa	Hypodermis associated with hook sensillum of male
+hyp_hook	P11.ppap	Hypodermis associated with hook sensillum of male
+hyp_hook	P11.ppp	Hypodermis associated with hook sensillum of male
+int	E.alaad	Intestinal cell
+int	E.alaav	Intestinal cell
+int	E.alap	Intestinal cell
+int	E.alpa	Intestinal cell
+int	E.alpp	Intestinal cell
+int	E.araad	Intestinal cell
+int	E.araav	Intestinal cell
+int	E.arap	Intestinal cell
+int	E.arpa	Intestinal cell
+int	E.arpp	Intestinal cell
+int	E.plaa	Intestinal cell
+int	E.plap	Intestinal cell
+int	E.plpa	Intestinal cell
+int	E.plppa	Intestinal cell
+int	E.plppp	Intestinal cell
+int	E.praa	Intestinal cell
+int	E.prap	Intestinal cell
+int	E.prpa	Intestinal cell
+int	E.prppa	Intestinal cell
+int	E.prppp	Intestinal cell
+int	In.a	Postembryonic intestinal cell
+int	In.p	Postembryonic intestinal cell
+linker_killer	U.lp or U.rp	One of these cells, sometimes fused with U.l/ra, phagocytoses the male linker cell
+pm1DL	AB.araapaaap	Pharyngeal muscle cell
+pm1DR	AB.araappaap	Pharyngeal muscle cell
+pm1L	AB.araaaaaap	Pharyngeal muscle cell
+pm1R	AB.araaaaapp	Pharyngeal muscle cell
+pm1VL	AB.alpaaaapa	Pharyngeal muscle cell
+pm1VR	AB.araaaaapa	Pharyngeal muscle cell
+pm2DL	AB.araapaapa	Pharyngeal muscle cell
+pm2DR	AB.araappapa	Pharyngeal muscle cell
+pm2L	AB.alpaaapaa	Pharyngeal muscle cell
+pm2R	AB.arapaapaa	Pharyngeal muscle cell
+pm2VL	AB.alpaaaaap	Pharyngeal muscle cell
+pm2VR	AB.arapaaaap	Pharyngeal muscle cell
+pm3DL	MS.aaapaaa	Pharyngeal muscle cell
+pm3DR	MS.paaaapa	Pharyngeal muscle cell
+pm3L	AB.alpaapapp	Pharyngeal muscle cell
+pm3R	AB.arapaappa	Pharyngeal muscle cell
+pm3VL	AB.alpappppp	Pharyngeal muscle cell
+pm3VR	AB.arapapppp	Pharyngeal muscle cell
+pm4DL	MS.aaaaapp	Pharyngeal muscle cell
+pm4DR	MS.paaaapp	Pharyngeal muscle cell
+pm4L	MS.aaapaap	Pharyngeal muscle cell
+pm4R	AB.araaapapp	Pharyngeal muscle cell
+pm4VL	MS.aapaaaa	Pharyngeal muscle cell
+pm4VR	MS.papappp	Pharyngeal muscle cell
+pm5DL	MS.aaaapap	Pharyngeal muscle cell
+pm5DR	MS.paaappa	Pharyngeal muscle cell
+pm5L	AB.araapapap	Pharyngeal muscle cell
+pm5R	AB.araapppap	Pharyngeal muscle cell
+pm5VL	MS.aapaaap	Pharyngeal muscle cell
+pm5VR	MS.papaaap	Pharyngeal muscle cell
+pm6D	MS.paaappp	Pharyngeal muscle cell
+pm6VL	MS.aapappa	Pharyngeal muscle cell
+ppm6VR	MS.papappa	Pharyngeal muscle cell
+pm7D	MS.aaaappp	Pharyngeal muscle cell
+pm7VL	MS.aapaapp	Pharyngeal muscle cell
+pm7VR	MS.papaapp	Pharyngeal muscle cell
+pm8	MS.aaapapp	Pharyngeal muscle cell
+mc1DL	AB.alpaapapa	Pharyngeal marginal cell
+mc1DR	AB.araaapapa	Pharyngeal marginal cell
+mc1V	AB.alpappppa	Pharyngeal marginal cell
+mc2DL	AB.araapaapp	Pharyngeal marginal cell
+mc2DR	AB.araappapp	Pharyngeal marginal cell
+mc2V	AB.arapapppa	Pharyngeal marginal cell
+mc3DL	MS.aaapapa	Pharyngeal marginal cell
+mc3DR	MS.paapapa	Pharyngeal marginal cell
+mc3V	AB.alpappapp	Pharyngeal marginal cell
+mu_anal	AB.plpppppap	Anal depressor muscle
+mu_bod	AB.prpppppaa	Embryonic body wall muscle
+mu_bod	C.apaaaa	Embryonic body wall muscle
+mu_bod	C.apaaap	Embryonic body wall muscle
+mu_bod	C.apaapa	Embryonic body wall muscle
+mu_bod	C.apaapp	Embryonic body wall muscle
+mu_bod	C.apapaa	Embryonic body wall muscle
+mu_bod	C.apapap	Embryonic body wall muscle
+mu_bod	C.apappa	Embryonic body wall muscle
+mu_bod	C.apappp	Embryonic body wall muscle
+mu_bod	C.appaaa	Embryonic body wall muscle
+mu_bod	C.appaap	Embryonic body wall muscle
+mu_bod	C.appapa	Embryonic body wall muscle
+mu_bod	C.appapp	Embryonic body wall muscle
+mu_bod	C.apppaa	Embryonic body wall muscle
+mu_bod	C.apppap	Embryonic body wall muscle
+mu_bod	C.appppd	Embryonic body wall muscle
+mu_bod	C.appppv	Embryonic body wall muscle
+mu_bod	C.ppaaaa	Embryonic body wall muscle
+mu_bod	C.ppaaap	Embryonic body wall muscle
+mu_bod	C.ppaapa	Embryonic body wall muscle
+mu_bod	C.ppaapp	Embryonic body wall muscle
+mu_bod	C.ppapaa	Embryonic body wall muscle
+mu_bod	C.ppapap	Embryonic body wall muscle
+mu_bod	C.ppappa	Embryonic body wall muscle
+mu_bod	C.ppappp	Embryonic body wall muscle
+mu_bod	C.pppaaa	Embryonic body wall muscle
+mu_bod	C.pppaap	Embryonic body wall muscle
+mu_bod	C.pppapa	Embryonic body wall muscle
+mu_bod	C.pppapp	Embryonic body wall muscle
+mu_bod	C.ppppaa	Embryonic body wall muscle
+mu_bod	C.ppppap	Embryonic body wall muscle
+mu_bod	C.pppppd	Embryonic body wall muscle
+mu_bod	C.pppppv	Embryonic body wall muscle
+mu_bod	D.aaaa	Embryonic body wall muscle
+mu_bod	D.aaap	Embryonic body wall muscle
+mu_bod	D.aapa	Embryonic body wall muscle
+mu_bod	D.aapp	Embryonic body wall muscle
+mu_bod	D.apaa	Embryonic body wall muscle
+mu_bod	D.apap	Embryonic body wall muscle
+mu_bod	D.appaa	Embryonic body wall muscle
+mu_bod	D.appap	Embryonic body wall muscle
+mu_bod	D.apppa	Embryonic body wall muscle
+mu_bod	D.apppp	Embryonic body wall muscle
+mu_bod	D.paaa	Embryonic body wall muscle
+mu_bod	D.paap	Embryonic body wall muscle
+mu_bod	D.papa	Embryonic body wall muscle
+mu_bod	D.ppap	Embryonic body wall muscle
+mu_bod	D.ppaa	Embryonic body wall muscle
+mu_bod	D.ppap	Embryonic body wall muscle
+mu_bod	D.pppaa	Embryonic body wall muscle
+mu_bod	D.pppap	Embryonic body wall muscle
+mu_bod	D.ppppa	Embryonic body wall muscle
+mu_bod	D.ppppp	Embryonic body wall muscle
+mu_bod	MS.aapppaa	Embryonic body wall muscle
+mu_bod	MS.aapppap	Embryonic body wall muscle
+mu_bod	MS.aappppa	Embryonic body wall muscle
+mu_bod	MS.aappppp	Embryonic body wall muscle
+mu_bod	MS.apaaap	Embryonic body wall muscle
+mu_bod	MS.apapap	Embryonic body wall muscle
+mu_bod	MS.apappa	Embryonic body wall muscle
+mu_bod	MS.apappp	Embryonic body wall muscle
+mu_bod	MS.appapp	Embryonic body wall muscle
+mu_bod	MS.apppaa	Embryonic body wall muscle
+mu_bod	MS.apppap	Embryonic body wall muscle
+mu_bod	MS.appppa	Embryonic body wall muscle
+mu_bod	MS.appppp	Embryonic body wall muscle
+mu_bod	MS.pappaa	Embryonic body wall muscle
+mu_bod	MS.pappap	Embryonic body wall muscle
+mu_bod	MS.papppaa	Embryonic body wall muscle
+mu_bod	MS.papppap	Embryonic body wall muscle
+mu_bod	MS.pappppa	Embryonic body wall muscle
+mu_bod	MS.pappppp	Embryonic body wall muscle
+mu_bod	MS.ppaaap	Embryonic body wall muscle
+mu_bod	MS.ppapap	Embryonic body wall muscle
+mu_bod	MS.ppappa	Embryonic body wall muscle
+mu_bod	MS.ppappp	Embryonic body wall muscle
+mu_bod	MS.pppapp	Embryonic body wall muscle
+mu_bod	MS.ppppaa	Embryonic body wall muscle
+mu_bod	MS.ppppap	Embryonic body wall muscle
+mu_bod	MS.pppppa	Embryonic body wall muscle
+mu_bod	MS.pppppp	Embryonic body wall muscle
+mu_bod	M.dlaa	Postembryonic body wall muscle
+mu_bod	M.dlap	Postembryonic body wall muscle
+mu_bod	M.dlpp	Postembryonic body wall muscle
+mu_bod	M.draa	Postembryonic body wall muscle
+mu_bod	M.drap	Postembryonic body wall muscle
+mu_bod	M.drpp	Postembryonic body wall muscle
+mu_bod	M.vlaa	Postembryonic body wall muscle
+mu_bod	M.vlap	Postembryonic body wall muscle
+mu_bod	M.vlpap	Postembryonic body wall muscle
+mu_bod	M.vlpp	Postembryonic body wall muscle
+mu_bod	M.vraa	Postembryonic body wall muscle
+mu_bod	M.vrap	Postembryonic body wall muscle
+mu_bod	M.vrpap	Postembryonic body wall muscle
+mu_bod	M.vrpp	Postembryonic body wall muscle
+mu_int_L	AB.plpppppaa	Intestinal muscles, attach to intestine and body wall anterior to anus
+mu_int_R	MS.ppaapp	Intestinal muscles, attach to intestine and body wall anterior to anus
+mu_male_diag	M.dlpaaaap	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpaaapa	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpaaapp	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpaapaa	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpaapap	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpapaaa	Diagonal tail muscles in male body wall
+mu_male_diag	M.dlpapaap	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaaaap	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaaapa	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaaapp	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaapaa	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaappa	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpaapap	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpapaaa	Diagonal tail muscles in male body wall
+mu_male_diag	M.drpapaap	Diagonal tail muscles in male body wall
+mu_male_gub	M.dlpappap	Gubernaculum erector
+mu_male_gub	M.drpappap	Gubernaculum erector
+mu_male_gub	M.dlpapapa	Gubernaculum retractor
+mu_male_gub	M.drpapapa	Gubernaculum retractor
+mu_male_long	M.vlpaaaaa	Anterior outer longitudinal male muscle
+mu_male_long	M.vlpaaaap	Posterior outer longitudinal male muscle
+mu_male_long	M.vlpaaapa	Anterior inner longitudinal male muscle
+mu_male_long	M.vlpaaapp	Posterior inner longitudinal male muscle
+mu_male_long	M.vlpaapp	Caudal longitudinal male muscle
+mu_male_long	M.vrpaaaaa	Anterior outer longitudinal male muscle
+mu_male_long	M.vrpaaaap	Posterior outer longitudinal male muscle
+mu_male_long	M.vrpaaapa	Anterior inner longitudinal male muscle
+mu_male_long	M.vrpaaapp	Posterior inner longitudinal male muscle
+mu_male_long	M.vrpaapp	Caudal longitudinal male muscle
+mu_male_obliq	M.dlpapapp	Anterior oblique male muscle
+mu_male_obliq	M.dlpappaa	Posterior oblique male muscle
+mu_male_obliq	M.drpapapp	Anterior oblique male muscle
+mu_male_obliq	M.drpappap	Posterior oblique male muscle
+mu_male_spic	M.dlpaaaaa	Ventral spicule protractor, male
+mu_male_spic	M.dlpaappa	Ventral spicule retractor, male
+mu_male_spic	M.dlpaappp	Dorsal spicule retractor, male
+mu_male_spic	M.prpaaaaa	Ventral spicule protractor, male
+mu_male_spic	M.drpaappp	Ventral spicule protractor, male
+mu_male_spic	M.drpappaa	Dorsal spicule protractor, male
+mu_male_spic	M.vlpaapa	Dorsal spicule protractor, male
+mu_male_spic	M.vrpaapa	Dorsal spicule protractor, male
+mu_sph	AB.prpppppap	Sphincter muscle of intestino-rectal valve
+um2	M.vlpaaaaa	Uterine muscle 2
+um1	M.vlpaaaap	Uterine muscle 1
+um1	M.vlpaappa	Uterine muscle 1
+um2	M.vlpaappp	Uterine muscle 2
+um2	M.vrpaaaaa	Uterine muscle 2
+um1	M.vrpaaaap	Uterine muscle 1
+um1	M.vrpaappa	Uterine muscle 1
+um2	M.vrpaappp	Uterine muscle 2
+vm2	M.vlpaaapa	Vulval muscle 2
+vm1	M.vlpaaapp	Vulval muscle 1
+vm1	M.vlpaapaa	Vulval muscle 1
+vm2	M.vlpaapap	Vulval muscle 2
+vm2	M.vrpaaapa	Vulval muscle 2
+vm1	M.vrpaaapp	Vulval muscle 1
+vm1	M.vrpaapaa	Vulval muscle 1
+vm2	M.vrpaapap	Vulval muscle 2
+proct	B.alaalv/B.araalv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alaarv/B.araarv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alapaad	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alapapa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alapapp	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alappv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alppalv/B.arppalv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alppald/B.arppald	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alpparv/B.arpparv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alppl/B.arppl	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.alppr/B.arppr	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.arapaad	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.arapapa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.arapapp	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.arappv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.paa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.pap	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	B.pppa	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	F.lvv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+proct	F.rvv	Male proctodeum, union of intestine and vas deferens, contains copulatory spicules
+R1_hyp	V5.pppppp, R1.p	Ray 1 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam
+R2_hyp	V6.papapp, R2.p	Ray 2 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam
+R3_hyp	V6.papppp, R3.p	Male sensory ray 3 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam
+R4_hyp	V6.pppapp, R4.p	Male sensory ray 4 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam
+R5_hyp	V6.ppppap, R5.p	Male sensory ray 5 hypodermal cell, fuses with other ray hypodermal cells to form the tail seam
+R6_hyp	V6.pppppp, R6.p	Male sensory ray 6 hypodermal cell, fuses with hypodermal syncytium
+R7_hyp	T.apappp, R7.p	Male sensory ray 7 hypodermal cell, fuses with hypodermal syncytium
+R8_hyp	T.appaap, R8.p	Male sensory ray 8 hypodermal cell, fuses with hypodermal syncytium
+R9_hyp	T.appapp, R9.p	Male sensory ray 9 hypodermal cell, fuses with hypodermal syncytium
+rect_D	AB.plpappppp	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli
+rect_VL	AB.plppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli
+rect_VR	AB.prppppaap	Rectal epithelial cells, adjacent to intestino-rectal valve, have microvilli
+se	H1L.aa	Postembryonic seam hypodermal cells, make alae
+se	H1L.appp	Postembryonic seam hypodermal cells, make alae
+se	H1R.aa	Postembryonic seam hypodermal cells, make alae
+se	H1R.appp	Postembryonic seam hypodermal cells, make alae
+se	H2L.pppp	Postembryonic seam hypodermal cells, make alae
+se	H2R.pppp	Postembryonic seam hypodermal cells, make alae
+se	V1L.pappp	Postembryonic seam hypodermal cells, make alae
+se	V1L.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V1R.pappp	Postembryonic seam hypodermal cells, make alae
+se	V1R.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V2L.pappp	Postembryonic seam hypodermal cells, make alae
+se	V2L.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V2R.pappp	Postembryonic seam hypodermal cells, make alae
+se	V2R.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V3L.pappp	Postembryonic seam hypodermal cells, make alae
+se	V3L.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V3R.pappp	Postembryonic seam hypodermal cells, make alae
+se	V3R.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V4L.pappp	Postembryonic seam hypodermal cells, make alae
+se	V4L.ppppp	Postembryonic seam hypodermal cells, make alae
+se	V4R.pappp	Postembryonic seam hypodermal cells, make alae
+se	V4R.ppppp	Postembryonic seam hypodermal cells, make alae
+se_herm	V5L.ppppp	Postembryonic seam hypodermal cells, make alae
+se_herm	V5R.ppppp	Postembryonic seam hypodermal cells, make alae
+se_herm	V6L.pappp	Postembryonic seam hypodermal cells, make alae
+se_herm	V6L.ppppp	Postembryonic seam hypodermal cells, make alae
+se_herm	V6R.pappp	Postembryonic seam hypodermal cells, make alae
+se_herm	V6R.ppppp	Postembryonic seam hypodermal cells, make alae
+se_herm	TL.appa	Postembryonic seam hypodermal cells, make alae
+se_herm	TR.appa	Postembryonic seam hypodermal cells, make alae
+se_male	V5L.pppapp	Postembryonic seam hypodermal cells, make alae
+se_male	V5R.pppapp	Postembryonic seam hypodermal cells, make alae
+set	V5L.pppppp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V5R.pppppp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6L.papapp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6L.papppp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6L.pppapp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6L.pppppp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6R.papapp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6R.papppp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6R.pppapp	Mail tail seam, does not fuse with main seam, does not make alae
+set	V6R.pppppp	Mail tail seam, does not fuse with main seam, does not make alae
+spike	AB.plppppppa	Used during embryogenesis to make tail spike, then die
+spike	Ab.prppppppa	Used during embryogenesis to make tail spike, then die
+virL	AB.prpappppp	Intestino-rectal valve
+virR	AB.prpappppa	Intestino-rectal valve
+vpi1	MS.paapapp	Pharyngo-intestinal valve
+vpi2DL	MS.aapappp	Pharyngo-intestinal valve
+vpi2DR	MS.papappp	Pharyngo-intestinal valve
+vpi2V	MS.aappaa	Pharyngo-intestinal valve
+vpi3D	MS.aaappp	Pharyngo-intestinal valve
+vpi3V	MS.aappap	Pharyngo-intestinal valve
+vulva	P5.paaa	Hermaphrodite vulva
+vulva	P5.paap	Hermaphrodite vulva
+vulva	P5.papa	Hermaphrodite vulva
+vulva	P5.papp	Hermaphrodite vulva
+vulva	P5.ppal	Hermaphrodite vulva
+vulva	P5.ppar	Hermaphrodite vulva
+vulva	P5.ppp	Hermaphrodite vulva
+vulva	P6.paal	Hermaphrodite vulva
+vulva	P6.paar	Hermaphrodite vulva
+vulva	P6.papl	Hermaphrodite vulva
+vulva	P6.papr	Hermaphrodite vulva
+vulva	P6.ppal	Hermaphrodite vulva
+vulva	P6.ppar	Hermaphrodite vulva
+vulva	P6.pppl	Hermaphrodite vulva
+vulva	P6.pppr	Hermaphrodite vulva
+vulva	P7.paa	Hermaphrodite vulva
+vulva	P7.papl	Hermaphrodite vulva
+vulva	P7.papr	Hermaphrodite vulva
+vulva	P7.ppaa	Hermaphrodite vulva
+vulva	P7.ppap	Hermaphrodite vulva
+vulva	P7.pppa	Hermaphrodite vulva
+vulva	P7.pppp	Hermaphrodite vulva

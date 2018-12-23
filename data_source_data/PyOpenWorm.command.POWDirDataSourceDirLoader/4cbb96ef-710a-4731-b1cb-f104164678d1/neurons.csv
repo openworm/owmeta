@@ -1,0 +1,302 @@
+ADAL;Interneuron;AB.plapaaaapp
+ADAR;Interneuron;AB.prapaaaapp
+ADEL;Sensory neuron;AB.plapaaaapa
+ADER;Sensory neuron;AB.prapaaaapa
+ADFL;Sensory neuron (chemosensory);AB.alpppppaa
+ADFR;Sensory neuron (chemosensory);AB.praaappaa
+ADLL;Sensory neuron (chemosensory, odorsensory, nociceptive);AB.alppppaad
+ADLR;Sensory neuron (chemosensory, odorsensory, nociceptive);AB.praaapaad
+AFDL;Sensory neuron (thermosensory and CO2- sensory);AB.alpppapav
+AFDR;Sensory neuron (thermosensory and CO2- sensory);AB.praaaapav
+AIAL;Interneuron;AB.plppaappa
+AIAR;Interneuron;AB.prppaappa
+AIBL;Interneuron;AB.plaapappa
+AIBR;Interneuron;AB.praapappa
+AIML;Interneuron;AB.plpaapppa
+AIMR;Interneuron;AB.prpaapppa
+AINL;Interneuron;AB.alaaaalal
+AINR;Interneuron;AB.alaapaaar
+AIYL;Interneuron;AB.plpapaaap
+AIYR;Interneuron;AB.prpapaaap
+AIZL;Interneuron;AB.plapaaapav
+AIZR;Interneuron;AB.prapaaapav
+ALA;Interneuron;AB.alapppaaa
+ALML;Sensory neuron (Mechanosensory);AB.arppaappa
+ALMR;Sensory neuron (Mechanosensory);AB.arpppappa
+ALNL;Neuron with unknown function;AB.plapappppap
+ALNR;Neuron with unknown function;AB.prapappppap
+AQR;Putative sensory neuron (Oxygen sensor);QR.ap
+AS1;Motor neuron;P1.apa
+AS10;Motor neuron;P10.apa
+AS11;Motor neuron;P11.apa
+AS2;Motor neuron;P2.apa
+AS3;Motor neuron;P3.apa
+AS4;Motor neuron;P4.apa
+AS5;Motor neuron;P5.apa
+AS6;Motor neuron;P6.apa
+AS7;Motor neuron;P7.apa
+AS8;Motor neuron;P8.apa
+AS9;Motor neuron;P9.apa
+ASEL;Sensory neuron (Chemosensory);AB.alppppppaa
+ASER;Sensory neuron (Chemosensory);AB.praaapppaa
+ASGL;Sensory neuron (Chemosensory);AB.plaapapap
+ASGR;Sensory neuron (Chemosensory);AB.praapapap
+ASHL;Sensory neuron (Osmo-, mechano- and odorsensory, nociceptive);AB.plpaappaa
+ASHR;Sensory neuron (Osmo-, mechano- and odorsensory, nociceptive);AB.prpaappaa
+ASIL;Sensory neuron (Chemosensory, thermosensory);AB.plaapapppa
+ASIR;Sensory neuron (Chemosensory, thermosensory);AB.praapapppa
+ASJL;Sensory neuron;AB.alpppppppa
+ASJR;Sensory neuron;AB.praaappppa
+ASKL;Sensory neuron (Chemosensory);AB.alpppapppa
+ASKR;Sensory neuron (Chemosensory);AB.praaaapppa
+AUAL;Interneuron;AB.alpppppppp
+AUAR;Interneuron;AB.praaappppp
+AVAL;Interneuron;AB.alppaaapa
+AVAR;Interneuron;AB.alaappapa
+AVBL;Interneuron;AB.plpaapaap
+AVBR;Interneuron;AB.prpaapaap
+AVDL;Interneuron;AB.alaaapalr
+AVDR;Interneuron;AB.alaaapprl
+AVEL;Interneuron;AB.alpppaaaa
+AVER;Interneuron;AB.praaaaaaa
+AVFL;Interneuron;W.aaa
+AVFR;Interneuron;P1.aaaa
+AVG;Interneuron;AB.prpapppap
+AVHL;Interneuron;AB.alapaaaaa
+AVHR;Interneuron;AB.alappapaa
+AVJL;Interneuron;AB.alapapppa
+AVJR;Interneuron;AB.alapppppa
+AVKL;Interneuron;AB.plpapapap
+AVKR;Interneuron;AB.prpapapap
+AVL;Polymodal (Interneuron/motor neuron);AB.prpappaap
+AVM;Sensory neuron (Mechanosensory);QR.paa
+AWAL;Sensory neuron (Odorsensory);AB.plaapapaa
+AWAR;Sensory neuron (Odorsensory);AB.praapapaa
+AWBL;Sensory neuron (Odorsensory);AB.alpppppap
+AWBR;Sensory neuron (Odorsensory);AB.praaappap
+AWCL;Sensory neuron (Odorsensory and thermosensory);AB.plpaaaaap
+AWCR;Sensory neuron (Odorsensory and thermosensory);AB.prpaaaaap
+BAGL;Sensory neuron;AB.alppappap
+BAGR;Sensory neuron;AB.arappppap
+BDUL;Interneuron;AB.arppaappp
+BDUR;Interneuron;AB.arpppappp
+CANL;Neuron with unknown function.;AB.alapaaapa
+CANR;Neuron with unknown function.;AB.alappappa
+CEPDL;Sensory neuron (Putative Mechanosensory);AB.plaaaaappa
+CEPDR;Sensory neuron (Putative Mechanosensory);AB.arpapaappa
+CEPVL;Sensory neuron (Putative Mechanosensory);AB.plpaappppa
+CEPVR;Sensory neuron (Putative Mechanosensory);AB.prpaappppa
+DA1;Motor neuron;AB.prppapaap
+DA2;Motor neuron;AB.plppapapa
+DA3;Motor neuron;AB.prppapapa
+DA4;Motor neuron;AB.plppapapp
+DA5;Motor neuron;AB.prppapapp
+DA6;Motor neuron;AB.plpppaaap
+DA7;Motor neuron;AB.prpppaaap
+DA8;Motor neuron;AB.prpapappp
+DA9;Motor neuron;AB.plpppaaaa
+DB1;Ventral cord motor neuron;AB.plpaaaapp
+DB2;Ventral cord motor neuron;AB.arappappa
+DB3;Ventral cord motor neuron;AB.prpaaaapp
+DB4;Ventral cord motor neuron;AB.prpappapp
+DB5;Ventral cord motor neuron;AB.plpapappp
+DB6;Ventral cord motor neuron;AB.plppaappp
+DB7;Ventral cord motor neuron;AB.prppaappp
+DD1;Motor neuron;AB.plppappap
+DD2;Motor neuron;AB.prppappap
+DD3;Motor neuron;AB.plppapppa
+DD4;Motor neuron;AB.prppapppa
+DD5;Motor neuron;AB.plppapppp
+DD6;Motor neuron;AB.prppapppp
+DVA;Interneuron, stretch sensitive sensory neuron;AB.prppppapp
+DVB;Polymodal (Motor neuron/interneuron);K.p
+DVC;Interneuron;C.aapaa
+FLPL;"Sensory neuron (Mechanosensory) (name originally derived from 'FLAP')";AB.plapaaapad
+FLPR;"Sensory neuron (Mechanosensory) (name originally derived from 'FLAP')";AB.prapaaapad
+HSNL;Motor neuron;AB.plapppappa
+HSNR;Motor neuron;AB.prapppappa
+I1L;Pharyngeal interneuron;AB.alpapppaa
+I1R;Pharyngeal interneuron;AB.arapappaa
+I2L;Pharyngeal interneuron;AB.alpappaapa
+I2R;Pharyngeal interneuron;AB.arapapaapa
+I3;Pharyngeal Interneuron;MS.aaaaapaa
+I4;Pharyngeal interneuron;MS.aaaapaa
+I5;Pharyngeal interneuron (can also be a sensory neuron or both);AB.arapapapp
+I6;Pharyngeal interneuron;MS.paaapaa
+IL1DL;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.alapappaaa
+IL1DR;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.alappppaaa
+IL1L;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.alapaappaa
+IL1R;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.alaappppaa
+IL1VL;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.alppapppaa
+IL1VR;All polymodal: [Sensory neuron (Mechanosensory), Motor neuron, Interneuron];AB.arapppppaa
+IL2DL;Sensory neuron (Chemosensory?);AB.alapappap
+IL2DR;Sensory neuron (Chemosensory?);AB.alappppap
+IL2L;Sensory neuron (Chemosensory?);AB.alapaappp
+IL2R;Sensory neuron (Chemosensory?);AB.alaappppp
+IL2VL;Sensory neuron (Chemosensory?);AB.alppapppp
+IL2VR;Sensory neuron (Chemosensory?);AB.arapppppp
+LUAL;Interneuron;AB.plpppaapap
+LUAR;Interneuron;AB.prpppaapap
+M1;Pharyngeal neuron (Motor);MS.paapaaa
+M2L;Pharyngeal neuron (Motor);AB.araapappa
+M2R;Pharyngeal neuron (Motor);AB.araappppa
+M3L;Pharyngeal neuron - motor (also possibly proprioceptive sensory);AB.araapappp
+M3R;Pharyngeal neuron - motor (also possibly proprioceptive sensory);AB.araappppp
+M4;Pharyngeal neuron (Motor neuron);MS.paaaaaa
+M5;Pharyngeal neuron (Motor);MS.paaapap
+MCL;Pharyngeal neuron (Motor neuron, putative sensory);AB.alpaaappp
+MCR;Pharyngeal neuron (Motor neuron, putative sensory);AB.arapaappp
+MI;Pharyngeal neuron (motor), Interneuron;AB.araappaaa
+NSML;Motor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapapaav
+NSMR;Motor neuron. Possibly also proprioceptive/mechanosensory.;AB.araapppaav
+OLLL;Sensory neuron;AB.alppppapaa
+OLLR;Sensory neuron;AB.praaapapaa
+OLQDL;All polymodal: [Sensory neuron (Mechanosensory) Interneuron];AB.alapapapaa
+OLQDR;All polymodal: [Sensory neuron (Mechanosensory) Interneuron];AB.alapppapaa
+OLQVL;All polymodal: [Sensory neuron (Mechanosensory) Interneuron];AB.plpaaappaa
+OLQVR;All polymodal: [Sensory neuron (Mechanosensory) Interneuron];AB.prpaaappaa
+PDA;Sensory - motor neuron;AB.prpppaaaa
+PDB;Motor neuron;P12.apa
+PDEL;Sensory neuron;V5L.paaa
+PDER;Sensory neuron;V5R.paaa
+PHAL;Sensory neuron (Chemosensory);AB.plpppaapp
+PHAR;Sensory neuron (Chemosensory);AB.prpppaapp
+PHBL;Sensory neuron (Chemosensory);AB.plapppappp
+PHBR;Sensory neuron (Chemosensory);AB.prapppappp
+PHCL;Sensory neuron (Mechanosensory?);TL.pppaa
+PHCR;Sensory neuron (Mechanosensory?);TR.pppaa
+PLML;Sensory neuron (Mechanosensory);AB.plapappppaa
+PLMR;Sensory neuron (Mechanosensory);AB.prapappppaa
+PLNL;Neuron (Interneuron?);TL.pppap
+PLNR;Neuron (Interneuron?);TR.pppap
+PQR;Putative mechanosensory neuron;QL.ap
+PVCL;Ventral cord interneuron;AB.plpppaapaa
+PVCR;Ventral cord interneuron;AB.prpppaapaa
+PVDL;Sensory neuron (Mechanosensory);V5L.paapa
+PVDR;Sensory neuron (Mechanosensory);V5R.paapa
+PVM;Sensory neuron (Mechanosensory);QL.paa
+PVNL;Interneuron/motorneuron;TL.appp
+PVNR;Interneuron/motorneuron;TR.appp
+PVPL;Interneuron;AB.plppppaaa
+PVPR;Interneuron;AB.prppppaaa
+PVQL;Interneuron;AB.plapppaaa
+PVQR;Interneuron;AB.prapppaaa
+PVR;Interneuron;C.aappv
+PVT;Interneuron;AB.plpappppa
+PVWL;Interneuron;TL.ppa
+PVWR;Interneuron;TR.ppa
+RIAL;Interneuron;AB.alapaapaa
+RIAR;Interneuron;AB.alaapppaa
+RIBL;Interneuron;AB.plpaappap
+RIBR;Interneuron;AB.prpaappap
+RICL;Interneuron;AB.plppaaaapp
+RICR;Interneuron;AB.prppaaaapp
+RID;Interneuron;AB.alappaapa
+RIFL;Interneuron;AB.plppapaaap
+RIFR;Interneuron;AB.prppapaaap
+RIGL;Interneuron;AB.plppappaa
+RIGR;Interneuron;AB.prppappaa
+RIH;Interneuron;AB.prpappaaa
+RIML;Ring motor neuron;AB.plppaapap
+RIMR;Ring motor neuron;AB.prppaapap
+RIPL;Ring/Pharynx interneuron;AB.alpapaaaa
+RIPR;Ring/Pharynx interneuron;AB.prappaaaa
+RIR;Ring interneuron;AB.prpapppaa
+RIS;Interneuron;AB.prpappapa
+RIVL;Polymodal (interneuron/motor neuron);AB.plpaapaaa
+RIVR;Polymodal (interneuron/motor neuron);AB.prpaapaaa
+RMDDL;Ring motor neuron;AB.alpapapaa
+RMDDR;Ring motor neuron;AB.arappapaa
+RMDL;Ring motor neuron;AB.alpppapad
+RMDR;Ring motor neuron;AB.praaaapad
+RMDVL;Ring motor neuron;AB.alppapaaa
+RMDVR;Ring motor neuron;AB.arapppaaa
+RMED;Motor neuron;AB.alapppaap
+RMEL;Motor neuron;AB.alaaaarlp
+RMER;Motor neuron;AB.alaaaarrp
+RMEV;Motor neuron;AB.plpappaaa
+RMFL;Motor neuron;G2.al
+RMFR;Motor neuron;G2.ar
+RMGL;Interneuron;AB.plapaaapp
+RMGR;Interneuron;AB.prapaaapp
+RMHL;Motor neuron;G1.l
+RMHR;Motor neuron;G1.r
+SAADL;Interneuron;AB.alppapapa
+SAADR;Interneuron;AB.arapppapa
+SAAVL;Interneuron;AB.plpaaaaaa
+SAAVR;Interneuron;AB.prpaaaaaa
+SABD;Interneuron;AB.plppapaap
+SABVL;Interneuron;AB.plppapaaaa
+SABVR;Interneuron;AB.prppapaaaa
+SDQL;Interneuron;QL.pap
+SDQR;Interneuron;QR.pap
+SIADL;Interneuron;AB.plpapaapa
+SIADR;Interneuron;AB.prpapaapa
+SIAVL;Interneuron;AB.plpapappa
+SIAVR;Interneuron;AB.prpapappa
+SIBDL;Interneuron;AB.plppaaaaa
+SIBDR;Interneuron;AB.prppaaaaa
+SIBVL;Interneuron;AB.plpapaapp
+SIBVR;Interneuron;AB.prpapaapp
+SMBDL;Motor neuron/interneuron;AB.alpapapapp
+SMBDR;Motor neuron/interneuron;AB.arappapapp
+SMBVL;Motor neuron/interneuron;AB.alpapappp
+SMBVR;Motor neuron/interneuron;AB.arappappp
+SMDDL;Motor neuron/interneuron;AB.plpapaaaa
+SMDDR;Motor neuron/interneuron;AB.prpapaaaa
+SMDVL;Motor neuron/interneuron;AB.alppappaa
+SMDVR;Motor neuron/interneuron;AB.arappppaa
+URADL;Motor neuron;AB.plaaaaaaa
+URADR;Motor neuron;AB.arpapaaaa
+URAVL;Motor neuron;AB.plpaaapaa
+URAVR;Motor neuron;AB.prpaaapaa
+URBL;Interneuron;AB.plaapaapa
+URBR;Interneuron;AB.praapaapa
+URXL;Sensory neuron (oxygen sensor), also ring interneuron;AB.plaaaaappp
+URXR;Sensory neuron (oxygen sensor), also ring interneuron;AB.arpapaappp
+URYDL;Sensory neuron;AB.alapapapp
+URYDR;Sensory neuron;AB.alapppapp
+URYVL;Sensory neuron;AB.plpaaappp
+URYVR;Sensory neuron;AB.prpaaappp
+VA1;Motor neuron;W.pa
+VA10;Motor neuron;P10.aaaa
+VA11;Motor neuron;P11.aaaa
+VA12;Motor neuron;P12.aaaa
+VA2;Motor neuron;P2.aaaa
+VA3;Motor neuron;P3.aaaa
+VA4;Motor neuron;P4.aaaa
+VA5;Motor neuron;P5.aaaa
+VA6;Motor neuron;P6.aaaa
+VA7;Motor neuron;P7.aaaa
+VA8;Motor neuron;P8.aaaa
+VA9;Motor neuron;P9.aaaa
+VB1;Motor neuron;P1.aaap
+VB10;Motor neuron;P9.aaap
+VB11;Motor neuron;P10.aaap
+VB2;Motor neuron;W.aap
+VB3;Motor neuron;P2.aaap
+VB4;Motor neuron;P3.aaap
+VB5;Motor neuron;P4.aaap
+VB6;Motor neuron;P5.aaap
+VB7;Motor neuron;P6.aaap
+VB8;Motor neuron;P7.aaap
+VB9;Motor neuron;P8.aaap
+VC1;Motor neuron (Hermaphrodite specific);P3.aap
+VC2;Motor neuron (Hermaphrodite specific);P4.aap
+VC3;Motor neuron (Hermaphrodite specific);P5.aap
+VC4;Motor neuron (Hermaphrodite specific);P6.aap
+VC5;Motor neuron (Hermaphrodite specific);P7.aap
+VC6;Motor neuron (Hermaphrodite specific);P8.aap
+VD1;Motor neuron;W.pp
+VD10;Motor neuron;P9.app
+VD11;Motor neuron;P10.app
+VD12;Motor neuron;P11.app
+VD13;Motor neuron;P12.app
+VD2;Motor neuron;P1.app
+VD3;Motor neuron;P2.app
+VD4;Motor neuron;P3.app
+VD5;Motor neuron;P4.app
+VD6;Motor neuron;P5.app
+VD7;Motor neuron;P6.app
+VD8;Motor neuron;P7.app
+VD9;Motor neuron;P8.app
