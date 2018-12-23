@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 DataSourceLoaders take a data source identifier and retrieve the primary data (e.g., CSV files, electrode recordings)
 from some location (e.g., a file store, via a bittorrent tracker).

@@ -839,7 +839,8 @@ class TestDSD(unittest.TestCase):
         '''
         Test directory for the dsdl exists
         '''
-        os.makedirs(p(self.testdir, 'dirkey')) self.cut['dirkey']
+        os.makedirs(p(self.testdir, 'dirkey'))
+        self.cut['dirkey']
         self.assertIn('dirkey', listdir(self.testdir))
 
     def test_no_loaders_key_error(self):
