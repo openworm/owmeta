@@ -15,8 +15,7 @@ from .contextualize import (Contextualizable,
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
-                               GraphObjectQuerier,
-                               ZeroOrMoreTQLayer)
+                               GraphObjectQuerier)
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass

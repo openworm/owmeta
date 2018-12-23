@@ -36,10 +36,6 @@ class DataWithEvidenceDataSource(DataSource):
                                                                               self.evidence_context),
                                                                     conf=self.conf)
 
-        self.combined_context = Context.contextualize(self.context)(ident=self.identifier,
-                                                                    imported=(self.data_context,
-                                                                              self.evidence_context))
-
         self.data_context_property(self.data_context.rdf_object)
         self.evidence_context_property(self.evidence_context.rdf_object)
         self.combined_context_property(self.combined_context.rdf_object)

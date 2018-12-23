@@ -10,3 +10,6 @@ class HTTPFileDataSource(FileDataSource):
     @contextmanager
     def file_contents(self):
         return urlopen(self.url.one())
+
+
+__yarom_mapped_classes__ = (HTTPFileDataSource,)

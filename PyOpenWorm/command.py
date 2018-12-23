@@ -3,6 +3,11 @@ import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
 from os import makedirs, mkdir, listdir, rename
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
+
 from contextlib import contextmanager
 import hashlib
 import shutil
@@ -319,163 +324,6 @@ class POWConfig(object):
             try:
                 json_value = json.loads(value)
             except ValueError:
-                json_value = value
-            ob[key] = json_value
-            write_config(ob, f)
-
-    def delete(self, key):
-        '''
-        Deletes a config value
-
-        Parameters
-        ----------
-        key : str
-            The configuration key
-        '''
-        fname = self._get_config_file()
-        with open(fname, 'r+') as f:
-            ob = json.load(f)
-            f.seek(0)
-            del ob[key]
-            write_config(ob, f)
-
-
-_PROGRESS_MOCK = _ProgressMock()
-
-
-@contextmanager
-def default_progress_reporter(*args, **kwargs):
-    yield _PROGRESS_MOCK
-
-
-class POWTranslator(object):
-    def __init__(self, parent):
-        self._parent = parent
-
-    def list(self, context=None):
-        '''
-        List translator types
-        '''
-        from PyOpenWorm.datasource import DataTranslator
-        conf = self._parent._conf()
-        dt = self._parent._data_ctx.stored(DataTranslator)(conf=conf)
-        nm = conf['rdf.graph'].namespace_manager
-        for x in dt.load():
-            yield nm.normalizeUri(x.identifier)
-
-    def show(self, translator):
-        '''
-        Show a translator
-
-        Parameters
-        ----------
-        translator : str
-            The translator to show
-        '''
-        from PyOpenWorm.datasource import DataTranslator
-        conf = self._parent._conf()
-        uri = self._parent._den3(translator)
-        dt = self._parent._data_ctx.stored(DataTranslator)(ident=uri, conf=conf)
-        for x in dt.load():
-            self._parent.message(x)
-            return
-
-
-class POWNamespace(object):
-    def __init__(self, parent):
-        self._parent = parent
-
-    def list(self):
-        conf = self._parent._conf()
-        nm = conf['rdf.graph'].namespace_manager
-        for prefix, uri in nm.namespaces():
-            self._parent.message(prefix, uri.n3())
-
-
-class _ProgressMock(object):
-
-    def __getattr__(self, name):
-        return type(self)()
-
-    def __call__(self, *args, **kwargs):
-        return type(self)()
-
-
-class POWConfig(object):
-    user = IVar(value_type=bool,
-                default_value=False,
-                doc='If set, configs are only for the user; otherwise, they \
-                       would be committed to the repository')
-
-    def __init__(self, parent):
-        self._parent = parent
-
-    def __setattr__(self, t, v):
-        super(POWConfig, self).__setattr__(t, v)
-
-    @IVar.property('user.conf', value_type=str)
-    def user_config_file(self):
-        ''' The user config file name '''
-        if isabs(self._user_config_file):
-            return self._user_config_file
-        return pth_join(self._parent.powdir, self._user_config_file)
-
-    @user_config_file.setter
-    def user_config_file(self, val):
-        self._user_config_file = val
-
-    def _get_config_file(self):
-        if not exists(self._parent.powdir):
-            raise POWDirMissingException(self._parent.powdir)
-
-        if self.user:
-            res = self.user_config_file
-        else:
-            res = self._parent.config_file
-
-        if not exists(res):
-            if self.user:
-                self._init_user_config_file()
-            else:
-                self._parent._init_config_file()
-        return res
-
-    def _init_user_config_file(self):
-        with open(self.user_config_file, 'w') as f:
-            write_config({}, f)
-
-    def get(self, key):
-        '''
-        Read a config value
-
-        Parameters
-        ----------
-        key : str
-            The configuration key
-        '''
-        fname = self._get_config_file()
-        with open(fname, 'r') as f:
-            ob = json.load(f)
-            return ob.get(key)
-
-    def set(self, key, value):
-        '''
-        Set a config value
-
-        Parameters
-        ----------
-        key : str
-            The configuration key
-        value : str
-            The value to set
-        '''
-        fname = self._get_config_file()
-        with open(fname, 'r+') as f:
-            ob = json.load(f)
-            f.seek(0)
-            try:
-                json_value = json.loads(value)
-            except json.decoder.JSONDecodeError:
                 json_value = value
             ob[key] = json_value
             write_config(ob, f)
@@ -1296,7 +1144,7 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
         self._index = dict()
 
     def _load_index(self):
-        with os.scandir(self._basedir) as dirents:
+        with scandir(self._basedir) as dirents:
             dentdict = {de.name: de for de in dirents}
             with open(self._idx_fname) as f:
                 for l in f:
