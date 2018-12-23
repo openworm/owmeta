@@ -22,7 +22,7 @@ class DataSourceDirLoaderMeta(type):
 class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
 
     def __init__(self, base_directory):
-        self._basedir = base_directory
+        self._basedir = realpath(base_directory)
 
     def __call__(self, ident):
         '''

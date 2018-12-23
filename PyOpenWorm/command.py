@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import
 import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
-from os import makedirs, mkdir, listdir
+from os import makedirs, mkdir, listdir, rename
 from contextlib import contextmanager
 import hashlib
 import shutil
@@ -29,8 +29,65 @@ L = logging.getLogger(__name__)
 DEFAULT_SAVE_CALLABLE_NAME = 'pow_data'
 
 
+class POWSourceData(object):
+    ''' Commands for saving and loading data for DataSources '''
+    def __init__(self, parent):
+        self._source_command = parent
+        self._pow_command = parent._parent
+
+    def retrieve(self, source, archive='data.tar', archive_type=None):
+        '''
+        Retrieves the data for the source
+
+        Parameters
+        ----------
+        source : str
+            The source for data
+        archive : str
+            The file name of the archive. If this ends with an extension like
+            '.zip', and no `archive_type` argument is given, then an archive
+            will be created of that type. The archive name will *not* have any
+            extension appended in any case.
+        archive_type : str
+            The type of the archive to create.
+        '''
+        sid = self._pow_command._den3(source)
+        if not archive_type:
+            for ext in EXT_TO_ARCHIVE_FMT:
+                if archive.endswith(ext):
+                    archive_type = EXT_TO_ARCHIVE_FMT.get(ext)
+                    break
+
+        if not archive_type:
+            if ext:
+                msg = "The extension '{}', does not match any known archive format." \
+                        " Defaulting to TAR format"
+                L.warning(msg.format(ext))
+            archive_type = 'tar'
+
+        try:
+            dd = self._pow_command._dsd[sid]
+        except KeyError:
+            raise GenericUserError('Could not find data for {} ({})'.format(sid, source))
+
+        with self._pow_command._tempdir(prefix='pow-source-data-retrieve.') as d:
+            temp_archive = shutil.make_archive(pth_join(d, 'archive'), archive_type, dd)
+            rename(temp_archive, archive)
+
+
+EXT_TO_ARCHIVE_FMT = {
+    '.tar.bz2': 'bztar',
+    '.tar.gz': 'gztar',
+    '.tar.xz': 'xztar',
+    '.tar': 'tar',
+    '.zip': 'zip',
+}
+
+
 class POWSource(object):
     ''' Commands for working with DataSource objects '''
+
+    data = SubCommand(POWSourceData)
 
     def __init__(self, parent):
         self._parent = parent
@@ -663,7 +720,7 @@ class POW(object):
         if None in positional_sources:
             raise GenericUserError('No source for ' + data_sources[positional_sources.index(None)])
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
-        with TemporaryDirectory(prefix='pow-translate.') as d:
+        with self._tempdir(prefix='pow-translate.') as d:
             orig_wd = os.getcwd()
             os.chdir(d)
             try:
@@ -671,6 +728,15 @@ class POW(object):
                 res.commit()
             finally:
                 os.chdir(orig_wd)
+
+    @contextmanager
+    def _tempdir(self, *args, **kwargs):
+        td = pth_join(self.powdir, 'temp')
+        if not exists(td):
+            makedirs(td, exist_ok=True)
+        kwargs['dir'] = td
+        with TemporaryDirectory(*args, **kwargs) as d:
+            yield d
 
     @property
     def _dsd(self):
@@ -1021,6 +1087,7 @@ class _DSD(object):
         self._lclasses = loader_classes
 
     def __getitem__(self, dsid):
+        dsid = str(dsid)
         try:
             return self._dsdict[dsid]
         except KeyError:
@@ -1050,7 +1117,7 @@ class DataSourceDirectoryProvider(FilePathProvider):
     def __call__(self, ob):
         ident = ob.identifier
         try:
-            path = self._dsd[str(ident)]
+            path = self._dsd[ident]
         except KeyError:
             return None
 
@@ -1067,7 +1134,7 @@ class _DSDP(FilePathProvider):
 
 class POWDirDataSourceDirLoader(DataSourceDirLoader):
     def __init__(self, basedir):
-        self._basedir = basedir
+        super(POWDirDataSourceDirLoader, self).__init__(basedir)
         self._idx_fname = pth_join(self._basedir, 'index')
         self._index = dict()
 

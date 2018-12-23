@@ -50,6 +50,16 @@ CLI_HINTS = {
             },
         },
     },
+    'PyOpenWorm.command.POWSourceData': {
+        'retrieve': {
+            (METHOD_NAMED_ARG, 'source'): {
+                'names': ['source'],
+            },
+            (METHOD_NAMED_ARG, 'archive'): {
+                'names': ['archive'],
+            },
+        },
+    },
     'PyOpenWorm.command.POWTranslator': {
         'show': {
             (METHOD_NAMED_ARG, 'translator'): {
