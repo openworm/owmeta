@@ -12,6 +12,7 @@ from .contextualize import (Contextualizable,
                             ContextualizableClass,
                             contextualize_helper,
                             decontextualize_helper)
+from .context import ClassContext
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -21,7 +22,6 @@ from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
 from yarom.utils import FCN
 from .data import DataUser
-from .context import Contexts
 from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
 from .rdf_query_util import goq_hop_scorer, get_most_specific_rdf_type, oid, load
@@ -83,13 +83,10 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
 
-        ctx_uri = ContextMappedClass._find_class_context(dct, bases)
+        ctx = ContextMappedClass._find_class_context(dct, bases)
 
-        if ctx_uri is not None:
-            if not isinstance(ctx_uri, URIRef) \
-               and isinstance(ctx_uri, (str, six.text_type)):
-                ctx_uri = URIRef(ctx_uri)
-            self.__context = Contexts[ctx_uri]
+        if ctx is not None:
+            self.__context = ctx
         else:
             self.__context = None
 
@@ -115,15 +112,22 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     @classmethod
     def _find_class_context(cls, dct, bases):
-        ctx_uri = dct.get('class_context', None)
-        if ctx_uri is None:
+        ctx_or_ctx_uri = dct.get('class_context', None)
+        if ctx_or_ctx_uri is None:
             for b in bases:
                 pctx = getattr(b, 'definition_context', None)
                 if pctx is not None:
-                    ctx_uri = pctx.identifier
+                    ctx = pctx
                     break
-
-        return ctx_uri
+        else:
+            if not isinstance(ctx_or_ctx_uri, URIRef) \
+               and isinstance(ctx_or_ctx_uri, (str, six.text_type)):
+                ctx_or_ctx_uri = URIRef(ctx_or_ctx_uri)
+            if isinstance(ctx_or_ctx_uri, (str, six.text_type)):
+                ctx = ClassContext(ctx_or_ctx_uri)
+            else:
+                ctx = ctx_or_ctx_uri
+        return ctx
 
     @classmethod
     def _find_base_namespace(cls, dct, bases):
