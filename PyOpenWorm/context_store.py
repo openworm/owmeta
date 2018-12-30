@@ -166,6 +166,15 @@ class RDFContextStore(Store):
             for c in self.__context_transitive_imports:
                 yield c
 
+    def namespace(self, prefix):
+        return self.__store.namespace(prefix)
+
+    def prefix(self, uri):
+        return self.__store.prefix(uri)
+
+    def bind(self, prefix, namespace):
+        return self.__store.bind(prefix, namespace)
+
     def namespaces(self):
         for x in self.__store.namespaces():
             yield x
