@@ -554,6 +554,7 @@ class POW(object):
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
+        o = object()
         if not context:
             ctx = _POWSaveContext(self._data_ctx, m)
         else:
@@ -562,7 +563,7 @@ class POW(object):
         p = m
         for x in attr_chain:
             p = getattr(p, x)
-        p(ctx)
+        p(POWSaveNamespace(context=ctx))
         # validation of imports
         ctx.save_context(graph=conf['rdf.graph'])
         return ctx.created_contexts()
@@ -1047,7 +1048,6 @@ class _POWSaveContext(Context):
         self._user_mod = user_module
         self._backer = backer  #: Backing context
         self._imported_ctx_ids = set([self._backer.identifier])
-        self._created_ctxs = set()
         self._unvalidated_statements = []
 
     def add_import(self, ctx):
@@ -1068,31 +1068,6 @@ class _POWSaveContext(Context):
 
     def __getattr__(self, name):
         return getattr(self._backer, name)
-
-    def validate(self):
-        unvalidated = []
-        for c in self._created_ctxs:
-            unvalidated += c._unvalidated_statements
-        unvalidated += self._unvalidated_statements
-        if unvalidated:
-            raise StatementValidationError(unvalidated)
-
-    def save_context(self, *args, **kwargs):
-        self.validate()
-        for c in self._created_ctxs:
-            c.save_context(*args, **kwargs)
-        return self._backer.save_context(*args, **kwargs)
-
-    def created_contexts(self):
-        for ctx in self._created_ctxs:
-            for cctx in ctx.created_contexts():
-                yield cctx
-        yield self
-
-    def new_context(self, ctx_id):
-        res = self(type(self))(self(Context)(ident=ctx_id, conf=self.conf))
-        self._created_ctxs.add(res)
-        return res
 
 
 class _BatchAddGraph(object):
@@ -1295,6 +1270,38 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
             return self._index[ident]
         except KeyError:
             raise LoadFailed(ident, self, 'The given identifier is not in the index')
+
+
+class POWSaveNamespace(object):
+    def __init__(self, **kwargs):
+        self.context = kwargs.get('context')
+        self._created_ctxs = set()
+
+    def new_context(self, ctx_id):
+        res = self.context(type(self.context))(self.context(Context)(ident=ctx_id, conf=self.context.conf),
+                user_module=self.context._user_mod)
+        self._created_ctxs.add(res)
+        return res
+
+    def created_contexts(self):
+        for ctx in self._created_ctxs:
+            for cctx in ctx.created_contexts():
+                yield cctx
+        yield self
+
+    def validate(self):
+        unvalidated = []
+        for c in self._created_ctxs:
+            unvalidated += c._unvalidated_statements
+        unvalidated += self.context._unvalidated_statements
+        if unvalidated:
+            raise StatementValidationError(unvalidated)
+
+    def save_context(self, *args, **kwargs):
+        self.validate()
+        for c in self._created_ctxs:
+            c.save_context(*args, **kwargs)
+        return self.context.save_context(*args, **kwargs)
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):
