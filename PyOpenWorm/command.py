@@ -563,10 +563,11 @@ class POW(object):
         p = m
         for x in attr_chain:
             p = getattr(p, x)
-        p(POWSaveNamespace(context=ctx))
+        ns = POWSaveNamespace(context=ctx)
+        p(ns)
         # validation of imports
-        ctx.save_context(graph=conf['rdf.graph'])
-        return ctx.created_contexts()
+        ns.save(graph=conf['rdf.graph'])
+        return ns.created_contexts()
 
     def context(self, context=None, user=False):
         '''
@@ -1069,6 +1070,9 @@ class _POWSaveContext(Context):
     def __getattr__(self, name):
         return getattr(self._backer, name)
 
+    def save_context(self, *args, **kwargs):
+        return self._backer.save_context(*args, **kwargs)
+
 
 class _BatchAddGraph(object):
     ''' Wrapper around graph that turns calls to 'add' into calls to 'addN' '''
@@ -1285,9 +1289,8 @@ class POWSaveNamespace(object):
 
     def created_contexts(self):
         for ctx in self._created_ctxs:
-            for cctx in ctx.created_contexts():
-                yield cctx
-        yield self
+            yield ctx
+        yield self.context
 
     def validate(self):
         unvalidated = []
@@ -1297,7 +1300,7 @@ class POWSaveNamespace(object):
         if unvalidated:
             raise StatementValidationError(unvalidated)
 
-    def save_context(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         self.validate()
         for c in self._created_ctxs:
             c.save_context(*args, **kwargs)
