@@ -43,6 +43,18 @@ CLI_HINTS = {
         },
         'IGNORE': ['message', 'progress_reporter']
     },
+    'PyOpenWorm.command.POWContexts': {
+        'edit': {
+            (METHOD_NAMED_ARG, 'context'): {
+                'names': ['context'],
+                'nargs': '?'
+            },
+            (METHOD_NAMED_ARG, 'list_formats'): {
+                'names': ['--list-formats'],
+                'nargs': '?'
+            }
+        }
+    },
     'PyOpenWorm.command.POWSource': {
         'show': {
             (METHOD_NAMED_ARG, 'data_source'): {
