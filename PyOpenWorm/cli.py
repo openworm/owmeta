@@ -30,8 +30,12 @@ class NSHandler(object):
 class JSONSerializer(object):
     def __call__(self, o):
         from rdflib.graph import Graph
+        from PyOpenWorm.context import Context
         if isinstance(o, Graph):
             return 'eventually, we will use something like JSON-LD'
+        elif isinstance(o, Context):
+            return {'identifier': o.identifier,
+                    'base_namespace': o.base_namespace}
         else:
             return list(o)
 

@@ -548,13 +548,13 @@ class POW(object):
         context : str
             The target context
         '''
+        import transaction
         import importlib as IM
         conf = self._conf()
 
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
-        o = object()
         if not context:
             ctx = _POWSaveContext(self._data_ctx, m)
         else:
@@ -564,9 +564,10 @@ class POW(object):
         for x in attr_chain:
             p = getattr(p, x)
         ns = POWSaveNamespace(context=ctx)
-        p(ns)
-        # validation of imports
-        ns.save(graph=conf['rdf.graph'])
+        with transaction.manager:
+            p(ns)
+            # validation of imports
+            ns.save(graph=conf['rdf.graph'])
         return ns.created_contexts()
 
     def context(self, context=None, user=False):
@@ -1280,12 +1281,21 @@ class POWSaveNamespace(object):
     def __init__(self, **kwargs):
         self.context = kwargs.get('context')
         self._created_ctxs = set()
+        self._external_contexts = set()
 
     def new_context(self, ctx_id):
         res = self.context(type(self.context))(self.context(Context)(ident=ctx_id, conf=self.context.conf),
                 user_module=self.context._user_mod)
         self._created_ctxs.add(res)
         return res
+
+    def include_context(self, ctx):
+        '''
+        Include the given exernally-created context for saving.
+
+        If you the context is being made within the save function, then you can use new_context instead.
+        '''
+        self._external_contexts.add(ctx)
 
     def created_contexts(self):
         for ctx in self._created_ctxs:
@@ -1303,6 +1313,9 @@ class POWSaveNamespace(object):
     def save(self, *args, **kwargs):
         self.validate()
         for c in self._created_ctxs:
+            c.save_context(*args, **kwargs)
+
+        for c in self._external_contexts:
             c.save_context(*args, **kwargs)
         return self.context.save_context(*args, **kwargs)
 
