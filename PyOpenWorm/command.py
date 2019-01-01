@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import
 import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
-from os import makedirs, mkdir, listdir, rename
+from os import makedirs, mkdir, listdir, rename, unlink
 
 from contextlib import contextmanager
 try:
@@ -837,6 +837,31 @@ class POW(object):
                     self._context_changed_set().clear()
         progress.write('Loaded {:,} triples'.format(triples_read))
 
+    @property
+    def _context_fnames(self):
+        if not hasattr(self, '_cfn'):
+            self._read_graphs_index()
+        return self._cfn
+
+    @property
+    def _fname_contexts(self):
+        if not hasattr(self, '_fnc'):
+            self._read_graphs_index()
+        return self._fnc
+
+    def _read_graphs_index(self):
+        idx_fname = pth_join(self.powdir, 'graphs', 'index')
+        ctx_index = dict()
+        fname_index = dict()
+        if exists(idx_fname):
+            with open(idx_fname) as index_file:
+                for l in index_file:
+                    fname, ctx = l.strip().split(' ')
+                    ctx_index[ctx] = pth_join(self.powdir, 'graphs', fname)
+                    fname_index[fname] = ctx
+        self._cfn = ctx_index
+        self._fnc = fname_index
+
     def translate(self, translator, output_key=None,
                   data_sources=(), named_data_sources=None):
         """
@@ -1021,7 +1046,7 @@ class POW(object):
         self._serialize_graphs()
         repo.commit(message)
 
-    def _serialize_graphs(self):
+    def _serialize_graphs(self, ignore_change_cache=False):
         from rdflib import plugin
         from rdflib.serializer import Serializer
         g = self._conf()['rdf.graph']
@@ -1033,26 +1058,44 @@ class POW(object):
         if repo.is_dirty:
             repo.reset()
 
-        if exists(graphs_base):
-            repo.remove(['graphs'], recursive=True)
-            shutil.rmtree(graphs_base)
+        if not exists(graphs_base):
+            mkdir(graphs_base)
 
-        mkdir(graphs_base)
         files = []
         ctx_data = []
+        if not ignore_change_cache:
+            changed = set(self._context_changed_set())
+
         for x in g.contexts():
             ident = x.identifier
-            hs = hashlib.sha256(ident.encode()).hexdigest()
-            fname = pth_join(graphs_base, hs + '.nt')
-            i = 1
-            while exists(fname):
-                fname = pth_join(graphs_base, hs + '-' + i + '.nt')
-                i += 1
-            files.append(fname)
-            serializer = plugin.get('nt', Serializer)(sorted(x))
-            with open(fname, 'wb') as gfile:
-                serializer.serialize(gfile)
+
+            if not ignore_change_cache:
+                ctx_changed = ident in changed
+            else:
+                ctx_changed = True
+
+            sfname = self._context_fnames.get(str(ident))
+            if not sfname:
+                fname = self._gen_ctx_fname(ident, graphs_base)
+            else:
+                fname = sfname
+
+            if ctx_changed:
+                if not ignore_change_cache:
+                    changed.remove(ident)
+
+                serializer = plugin.get('nt', Serializer)(sorted(x))
+                with open(fname, 'wb') as gfile:
+                    serializer.serialize(gfile)
             ctx_data.append((relpath(fname, graphs_base), ident))
+            files.append(fname)
+
+        if not ignore_change_cache:
+            for ident in changed:
+                hs = hashlib.sha256(ident.encode()).hexdigest()
+                fname = pth_join(graphs_base, hs + '.nt')
+                repo.remove([relpath(fname, self.powdir)])
+                os.unlink(fname)
 
         index_fname = pth_join(graphs_base, 'index')
         with open(index_fname, 'w') as index_file:
@@ -1063,8 +1106,18 @@ class POW(object):
         repo.add([relpath(f, self.powdir) for f in files] + [relpath(self.config_file, self.powdir),
                                                              'graphs'])
 
+    def _gen_ctx_fname(self, ident, graphs_base):
+        hs = hashlib.sha256(ident.encode()).hexdigest()
+        fname = pth_join(graphs_base, hs + '.nt')
+        i = 1
+        while exists(fname):
+            fname = pth_join(graphs_base, hs + '-' + str(i) + '.nt')
+            i += 1
+        return fname
+
     def diff(self):
         """
+        Show differences between what's in the working context set and what's in the serializations
         """
         import sys
         from difflib import unified_diff
@@ -1072,23 +1125,18 @@ class POW(object):
         import traceback
         from git import Repo
 
-        self._serialize_graphs()
+        r = self.repository_provider
+        try:
+            self._serialize_graphs()
+        except Exception:
+            r.reset()
+            L.exception("Could not serialize graphs")
+            raise GenericUserError("Could not serialize graphs")
 
-        powdir = '.pow'
-        r = Repo(powdir)
-        head_commit = r.head.commit
+        head_commit = r.repo().head.commit
         di = head_commit.diff(None)
 
-        idx_fname = join(powdir, 'graphs', 'index')
-        ctx_index = dict()
-        with open(idx_fname) as index_file:
-            for l in index_file:
-                fname, ctx = l.strip().split(' ')
-                ctx_index[fname] = ctx
-        print(ctx_index, file=sys.stderr)
-
         for d in di:
-            print(d, file=sys.stderr)
             try:
                 adata = d.a_blob.data_stream.read().split(b'\n')
             except Exception as e:
@@ -1100,7 +1148,7 @@ class POW(object):
                 if b_blob:
                     bdata = b_blob.data_stream.read().split(b'\n')
                 else:
-                    with open(join(r.working_dir, d.b_path), 'rb') as f:
+                    with open(join(r.repo().working_dir, d.b_path), 'rb') as f:
                         bdata = f.read().split(b'\n')
             except Exception as e:
                 print(e, file=sys.stderr)
@@ -1108,9 +1156,9 @@ class POW(object):
             afname = basename(d.a_path)
             bfname = basename(d.b_path)
 
-            graphdir = join(powdir, 'graphs')
-            fromfile = ctx_index.get(afname, afname)
-            tofile = ctx_index.get(bfname, bfname)
+            graphdir = join(self.powdir, 'graphs')
+            fromfile = self._fname_contexts.get(afname, afname)
+            tofile = self._fname_contexts.get(bfname, bfname)
 
             sys.stdout.writelines(
                     unified_diff([x.decode('utf-8') + '\n' for x in adata],
