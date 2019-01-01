@@ -450,6 +450,13 @@ class POWContexts(object):
                     g.remove((None, None, None))
                     parser.parse(create_input_source(source), g)
 
+    def list_changed(self):
+        '''
+        Return the set of contexts which differ from the serialization on disk
+        '''
+        par = self._parent
+        return par._context_changed_set()
+
 
 class POW(object):
     """
@@ -481,6 +488,7 @@ class POW(object):
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
         self._data_source_directories = None
+        self._changed_contexts = None
 
     @IVar.property('.pow')
     def powdir(self):
@@ -566,7 +574,6 @@ class POW(object):
         ns = POWSaveNamespace(context=ctx)
         with transaction.manager:
             p(ns)
-            # validation of imports
             ns.save(graph=conf['rdf.graph'])
         return ns.created_contexts()
 
@@ -729,11 +736,40 @@ class POW(object):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
             dat = Data.process_config(rc)
             dat.init_database()
+
+            dat.on_context_changed(self._context_changed_handler())
+
             self._dat = dat
             self._dat_file = self.config_file
         return dat
 
     _init_store = _conf
+
+    def _context_changed_handler(self):
+        def handler(event):
+            self._context_changed_set().add(event.context)
+        return handler
+
+    def _context_changed_set(self):
+        if not self._changed_contexts:
+            import ZODB
+            from ZODB.FileStorage import FileStorage
+            import BTrees
+            ccfile = pth_join(self.powdir, 'changed_contexts')
+
+            try:
+                fs = FileStorage(ccfile)
+            except IOError:
+                L.exception("Failed to create a FileStorage")
+                raise Exception("Failed to open", ccfile)
+
+            _cc_zdb = ZODB.DB(fs, cache_size=1600)
+            _cc_conn = _cc_zdb.open()
+            root = _cc_conn.root()
+            if 'ccmap' not in root:
+                root['ccmap'] = BTrees.family32.OO.TreeSet()
+            self._changed_contexts = root['ccmap']
+        return self._changed_contexts
 
     def clone(self, url=None, update_existing_config=False):
         """Clone a data store
@@ -798,6 +834,7 @@ class POW(object):
                         triples_read += g.count
                         trip_prog.update(g.count)
                     progress.write('Finalizing writes to database...')
+                    self._context_changed_set().clear()
         progress.write('Loaded {:,} triples'.format(triples_read))
 
     def translate(self, translator, output_key=None,
@@ -1029,7 +1066,58 @@ class POW(object):
     def diff(self):
         """
         """
+        import sys
+        from difflib import unified_diff
+        from os.path import join, basename
+        import traceback
+        from git import Repo
+
         self._serialize_graphs()
+
+        powdir = '.pow'
+        r = Repo(powdir)
+        head_commit = r.head.commit
+        di = head_commit.diff(None)
+
+        idx_fname = join(powdir, 'graphs', 'index')
+        ctx_index = dict()
+        with open(idx_fname) as index_file:
+            for l in index_file:
+                fname, ctx = l.strip().split(' ')
+                ctx_index[fname] = ctx
+        print(ctx_index, file=sys.stderr)
+
+        for d in di:
+            print(d, file=sys.stderr)
+            try:
+                adata = d.a_blob.data_stream.read().split(b'\n')
+            except Exception as e:
+                print(e, file=sys.stderr)
+                adata = []
+
+            try:
+                b_blob = d.b_blob
+                if b_blob:
+                    bdata = b_blob.data_stream.read().split(b'\n')
+                else:
+                    with open(join(r.working_dir, d.b_path), 'rb') as f:
+                        bdata = f.read().split(b'\n')
+            except Exception as e:
+                print(e, file=sys.stderr)
+                bdata = []
+            afname = basename(d.a_path)
+            bfname = basename(d.b_path)
+
+            graphdir = join(powdir, 'graphs')
+            fromfile = ctx_index.get(afname, afname)
+            tofile = ctx_index.get(bfname, bfname)
+
+            sys.stdout.writelines(
+                    unified_diff([x.decode('utf-8') + '\n' for x in adata],
+                                 [x.decode('utf-8') + '\n' for x in bdata],
+                                 fromfile='a ' + fromfile,
+                                 tofile='b ' + tofile,
+                                 lineterm='\n'))
 
     def merge(self):
         """
@@ -1073,6 +1161,9 @@ class _POWSaveContext(Context):
 
     def save_context(self, *args, **kwargs):
         return self._backer.save_context(*args, **kwargs)
+
+    def save_imports(self, *args, **kwargs):
+        return self._backer.save_imports(*args, **kwargs)
 
 
 class _BatchAddGraph(object):
@@ -1278,8 +1369,8 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
 
 
 class POWSaveNamespace(object):
-    def __init__(self, **kwargs):
-        self.context = kwargs.get('context')
+    def __init__(self, context):
+        self.context = context
         self._created_ctxs = set()
         self._external_contexts = set()
 

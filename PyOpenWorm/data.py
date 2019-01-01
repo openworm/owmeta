@@ -2,6 +2,8 @@ from __future__ import print_function
 import sqlite3
 import hashlib
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
+from rdflib.store import TripleAddedEvent, TripleRemovedEvent
+from rdflib.events import Event
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
 import datetime
@@ -245,6 +247,9 @@ class Data(Configure):
         self['molecule_name'] = self._molecule_hash
         self['new_graph_uri'] = self._molecule_hash
 
+        self._cch = None
+        self._listeners = dict()
+
     @classmethod
     def load(cls, file_name):
         """ Load a file into a new Data instance storing configuration in a JSON format """
@@ -281,11 +286,40 @@ class Data(Configure):
         # to the graph
         self['rdf.graph.change_counter'] = 0
 
+        self['rdf.graph'].store.dispatcher.subscribe(TripleAddedEvent, self._context_changed_handler())
+        self['rdf.graph'].store.dispatcher.subscribe(TripleRemovedEvent, self._context_changed_handler())
+
         self['rdf.graph']._add = self['rdf.graph'].add
         self['rdf.graph']._remove = self['rdf.graph'].remove
         self['rdf.graph'].add = self._my_graph_add
         self['rdf.graph'].remove = self._my_graph_remove
         nm.bind("", self['rdf.namespace'])
+
+    def _context_changed_handler(self):
+        if not self._cch:
+            def handler(event):
+                ctx = event.context
+                self._dispatch(ContextChangedEvent(context=getattr(ctx, 'identifier', ctx)))
+            self._cch = handler
+        return self._cch
+
+    def _dispatch(self, event):
+        for et in type(event).mro():
+            listeners = self._listeners.get(et, ())
+            for listener in listeners:
+                listener(event)
+
+    def on_context_changed(self, listener):
+        ccl = self._listeners.get(ContextChangedEvent)
+        if not ccl:
+            ccl = []
+            self._listeners[ContextChangedEvent] = ccl
+
+        try:
+            ccl.remove(listener)
+        except ValueError:
+            pass
+        ccl.append(listener)
 
     def _my_graph_add(self, triple):
         self['rdf.graph']._add(triple)
@@ -337,6 +371,10 @@ class Data(Configure):
 
     def __getitem__(self, k):
         return Configure.__getitem__(self, k)
+
+
+class ContextChangedEvent(Event):
+    pass
 
 
 def modification_date(filename):
@@ -661,6 +699,3 @@ class ZODBSource(RDFSource):
         self.conn.close()
         self.zdb.close()
         self.graph = False
-
-def test(f):
-    f()
