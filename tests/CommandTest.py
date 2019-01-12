@@ -193,10 +193,10 @@ class POWTest(BaseTest):
             a = 'http://example.org/mdc'
             self._init_conf({DATA_CONTEXT_KEY: a})
             with patch('importlib.import_module') as im:
-                def f(ctx):
+                def f(ns):
                     stmt = MagicMock()
                     stmt.context.identifier = URIRef(a)
-                    ctx.add_statement(stmt)
+                    ns.context.add_statement(stmt)
                 im().test = f
                 self.cut.save('tests', 'test')
 
@@ -207,14 +207,14 @@ class POWTest(BaseTest):
         s = URIRef('http://example.org/node')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            def f(ctx):
+            def f(ns):
                 stmt = Mock()
                 stmt.object.context = None
                 stmt.to_triple.return_value = (s, s, s)
                 stmt.property.context.identifier = URIRef(a)
                 stmt.subject.context.identifier = URIRef(a)
                 stmt.context.identifier = URIRef(a)
-                ctx.add_statement(stmt)
+                ns.context.add_statement(stmt)
             im().test = f
             self.cut.save('tests', 'test')
 
@@ -223,7 +223,8 @@ class POWTest(BaseTest):
         s = URIRef('http://example.org/node')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            def f(ctx):
+            def f(ns):
+                ctx = ns.context
                 stmt = MagicMock(name='stmt')
                 new_ctx = Mock(name='new_ctx')
                 stmt.to_triple.return_value = (s, s, s)
@@ -243,7 +244,8 @@ class POWTest(BaseTest):
         k = URIRef('http://example.org/new_ctx')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            def f(ctx):
+            def f(ns):
+                ctx = ns.context
                 stmt = MagicMock(name='stmt')
                 new_ctx = Mock(name='new_ctx')
                 new_ctx.identifier = k
@@ -269,8 +271,9 @@ class POWTest(BaseTest):
         s = URIRef('http://example.org/node')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            def f(ctx):
-                new_ctx = ctx.new_context('http://example.org/nctx')
+            def f(ns):
+                ctx = ns.context
+                new_ctx = ns.new_context('http://example.org/nctx')
                 stmt = MagicMock(name='stmt')
                 stmt.to_triple.return_value = (s, s, s)
                 stmt.object.context.identifier = new_ctx.identifier
@@ -299,8 +302,9 @@ class POWTest(BaseTest):
 
                 ctxc.side_effect = [data_context, ctxk]
 
-                def f(ctx):
-                    ctx.new_context('this value doesnt matter')
+                def f(ns):
+                    ctx = ns.context
+                    ns.new_context('this value doesnt matter')
                     stmt = MagicMock(name='stmt')
                     stmt.to_triple.return_value = (s, s, s)
 
@@ -338,8 +342,9 @@ class POWTest(BaseTest):
 
                 ctxc.side_effect = [data_context, ctxk]
 
-                def f(ctx):
-                    new_ctx = ctx.new_context('this value doesnt matter')
+                def f(ns):
+                    ctx = ns.context
+                    new_ctx = ns.new_context('this value doesnt matter')
                     stmt = MagicMock(name='stmt')
                     stmt.to_triple.return_value = (s, s, s)
 

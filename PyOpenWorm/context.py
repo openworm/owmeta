@@ -44,9 +44,6 @@ class ModuleProxy(wrapt.ObjectProxy):
             return o
 
 
-Contexts = dict()
-
-
 class ContextMeta(ContextualizableClass):
     @property
     def context(self):
@@ -61,11 +58,6 @@ class ContextMeta(ContextualizableClass):
             return self
         ctxd_meta = contextualize_metaclass(context, self)
         return ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
-
-    def __call__(self, *args, **kwargs):
-        o = super(ContextMeta, self).__call__(*args, **kwargs)
-        Contexts[o.identifier] = o
-        return o
 
 
 class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, DataUser)):
@@ -364,6 +356,22 @@ class QueryContext(Context):
 
     def rdf_graph(self):
         return self.__graph
+
+
+ClassContexts = dict()
+
+
+class ClassContextMeta(ContextMeta):
+
+    def __call__(self, ident):
+        res = ClassContexts.get(ident)
+        if not res:
+            res = super(ClassContextMeta, self).__call__(ident=ident)
+        return res
+
+
+class ClassContext(six.with_metaclass(ClassContextMeta, Context)):
+    pass
 
 
 class ContextContextManager(object):

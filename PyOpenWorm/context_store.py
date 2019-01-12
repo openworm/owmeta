@@ -29,10 +29,7 @@ class ContextStore(Store):
             self._init_store(context)
 
     def open(self, configuration, create=False):
-        from .context import Contexts
-        ctx = Contexts.get(configuration)
-        if ctx is not None:
-            self._init_store(ctx)
+        if self.ctx is not None:
             return VALID_STORE
         else:
             return NO_STORE
@@ -44,6 +41,7 @@ class ContextStore(Store):
             self._store_store = RDFContextStore(ctx)
         else:
             self._store_store = None
+
         if self._memory_store is None:
             self._memory_store = IOMemory()
             self._init_store0(ctx)
@@ -167,6 +165,15 @@ class RDFContextStore(Store):
             self.__init_contexts()
             for c in self.__context_transitive_imports:
                 yield c
+
+    def namespace(self, prefix):
+        return self.__store.namespace(prefix)
+
+    def prefix(self, uri):
+        return self.__store.prefix(uri)
+
+    def bind(self, prefix, namespace):
+        return self.__store.bind(prefix, namespace)
 
     def namespaces(self):
         for x in self.__store.namespaces():

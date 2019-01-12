@@ -362,6 +362,95 @@ def default_progress_reporter(*args, **kwargs):
     yield _PROGRESS_MOCK
 
 
+possible_editors = [
+    '/usr/bin/vi',
+    '/usr/bin/vim',
+    '/usr/bin/nano',
+    'vim',
+    'vi',
+    'nano'
+]
+
+
+class POWContexts(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+    def edit(self, context=None, format=None, editor=None, list_formats=False):
+        '''
+        Edit a provided context or the current data context.
+
+        The file name of the serialization will be passed as the sole argument to the editor. If the editor argument is
+        not provided, will use the EDITOR environment variable. If EDITOR is also not defined, will try a few known
+        editors until one is found. The editor must write back to the file.
+
+        Parameters
+        ----------
+        context : str
+            The context to edit
+        format : str
+            Serialization format (ex, 'n3', 'nquads'). Default 'n3'
+        editor : str
+            The program which will be used to edit the context serialization.
+        list_formats : bool
+            List the formats available for editing
+        '''
+
+        from rdflib.plugin import plugins
+        from rdflib.serializer import Serializer
+        from rdflib.parser import Parser
+
+        stores = set(x.name for x in plugins(kind=Serializer))
+        parsers = set(x.name for x in plugins(kind=Parser))
+        formats = stores & parsers
+
+        if list_formats:
+            return formats
+
+        if not format:
+            format = 'n3'
+
+        if format not in formats:
+            raise GenericUserError("Unsupported format: " + format)
+
+        from subprocess import call
+        if context is None:
+            ctx = self._parent._data_ctx
+            ctxid = self._parent._conf()[DATA_CONTEXT_KEY]
+        else:
+            ctx = Context(ident=context, conf=self._parent._conf())
+            ctxid = context
+
+        if not editor:
+            editor = os.environ['EDITOR'].strip()
+
+        for editor in possible_editors:
+            if hasattr(shutil, 'which'):
+                editor = shutil.which(editor)
+                if editor:
+                    break
+            elif os.access(editor, os.R_OK | os.X_OK):
+                break
+
+        if not editor:
+            raise GenericUserError("No known editor could be found")
+
+        with self._parent._tempdir(prefix='pow-context-edit.') as d:
+            from rdflib import plugin
+            from rdflib.parser import Parser, create_input_source
+            import transaction
+            parser = plugin.get(format, Parser)()
+            fname = pth_join(d, 'data')
+            with transaction.manager:
+                with open(fname, mode='wb') as destination:
+                    ctx.stored.rdf_graph().serialize(destination, format=format)
+                call([editor, fname])
+                with open(fname, mode='rb') as source:
+                    g = self._parent._rdf.get_context(ctxid)
+                    g.remove((None, None, None))
+                    parser.parse(create_input_source(source), g)
+
+
 class POW(object):
     """
     High-level commands for working with PyOpenWorm data
@@ -385,6 +474,8 @@ class POW(object):
     translator = SubCommand(POWTranslator)
 
     namespace = SubCommand(POWNamespace)
+
+    contexts = SubCommand(POWContexts)
 
     def __init__(self):
         self.progress_reporter = default_progress_reporter
@@ -463,6 +554,7 @@ class POW(object):
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
+        o = object()
         if not context:
             ctx = _POWSaveContext(self._data_ctx, m)
         else:
@@ -471,10 +563,11 @@ class POW(object):
         p = m
         for x in attr_chain:
             p = getattr(p, x)
-        p(ctx)
+        ns = POWSaveNamespace(context=ctx)
+        p(ns)
         # validation of imports
-        ctx.save_context(graph=conf['rdf.graph'])
-        return ctx.created_contexts()
+        ns.save(graph=conf['rdf.graph'])
+        return ns.created_contexts()
 
     def context(self, context=None, user=False):
         '''
@@ -671,7 +764,7 @@ class POW(object):
         from glob import glob
         for g in glob(self.store_name + '*'):
             self.message('unlink', g)
-            self.unlink(g)
+            os.unlink(g)
         self._regenerate_database()
 
     def _regenerate_database(self):
@@ -956,7 +1049,6 @@ class _POWSaveContext(Context):
         self._user_mod = user_module
         self._backer = backer  #: Backing context
         self._imported_ctx_ids = set([self._backer.identifier])
-        self._created_ctxs = set()
         self._unvalidated_statements = []
 
     def add_import(self, ctx):
@@ -978,30 +1070,8 @@ class _POWSaveContext(Context):
     def __getattr__(self, name):
         return getattr(self._backer, name)
 
-    def validate(self):
-        unvalidated = []
-        for c in self._created_ctxs:
-            unvalidated += c._unvalidated_statements
-        unvalidated += self._unvalidated_statements
-        if unvalidated:
-            raise StatementValidationError(unvalidated)
-
     def save_context(self, *args, **kwargs):
-        self.validate()
-        for c in self._created_ctxs:
-            c.save_context(*args, **kwargs)
         return self._backer.save_context(*args, **kwargs)
-
-    def created_contexts(self):
-        for ctx in self._created_ctxs:
-            for cctx in ctx.created_contexts():
-                yield cctx
-        yield self
-
-    def new_context(self, ctx_id):
-        res = self(type(self))(self(Context)(ident=ctx_id, conf=self.conf))
-        self._created_ctxs.add(res)
-        return res
 
 
 class _BatchAddGraph(object):
@@ -1204,6 +1274,37 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
             return self._index[ident]
         except KeyError:
             raise LoadFailed(ident, self, 'The given identifier is not in the index')
+
+
+class POWSaveNamespace(object):
+    def __init__(self, **kwargs):
+        self.context = kwargs.get('context')
+        self._created_ctxs = set()
+
+    def new_context(self, ctx_id):
+        res = self.context(type(self.context))(self.context(Context)(ident=ctx_id, conf=self.context.conf),
+                user_module=self.context._user_mod)
+        self._created_ctxs.add(res)
+        return res
+
+    def created_contexts(self):
+        for ctx in self._created_ctxs:
+            yield ctx
+        yield self.context
+
+    def validate(self):
+        unvalidated = []
+        for c in self._created_ctxs:
+            unvalidated += c._unvalidated_statements
+        unvalidated += self.context._unvalidated_statements
+        if unvalidated:
+            raise StatementValidationError(unvalidated)
+
+    def save(self, *args, **kwargs):
+        self.validate()
+        for c in self._created_ctxs:
+            c.save_context(*args, **kwargs)
+        return self.context.save_context(*args, **kwargs)
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):

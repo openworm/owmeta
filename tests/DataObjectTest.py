@@ -158,7 +158,7 @@ class DataObjectTest(_DataTest):
     def test_save_load_subtype(self):
 
         class A(DataObject):
-            class_context = self.context.identifier
+            class_context = self.context
         self.context.mapper.process_class(A)
 
         self.context.add_import(BASE_CONTEXT)
