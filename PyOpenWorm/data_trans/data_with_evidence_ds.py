@@ -1,5 +1,6 @@
 from rdflib.namespace import Namespace
 from ..context import Context
+from ..contextDataObject import ContextDataObject
 from ..datasource import Informational, DataSource
 from .. import CONTEXT
 from .common_data import DS_NS
@@ -24,23 +25,29 @@ class DataWithEvidenceDataSource(DataSource):
     def __init__(self, *args, **kwargs):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)
 
-        self.data_context = Context.contextualize(self.context)(ident=self.identifier + '-data',
-                                                                imported=(CONTEXT,),
-                                                                conf=self.conf)
-        self.evidence_context = Context.contextualize(self.context)(ident=self.identifier + '-evidence',
-                                                                    imported=(CONTEXT,),
-                                                                    conf=self.conf)
-
-        self.combined_context = Context.contextualize(self.context)(ident=self.identifier,
-                                                                    imported=(self.data_context,
-                                                                              self.evidence_context),
-                                                                    conf=self.conf)
-
-        self.data_context_property(self.data_context.rdf_object)
-        self.evidence_context_property(self.evidence_context.rdf_object)
-        self.combined_context_property(self.combined_context.rdf_object)
+        if self.defined:
+            if not self.data_context_property.has_defined_value():
+                self.data_context_property(ContextDataObject.contextualize(self.context)(self.identifier + '-data'))
+            if not self.evidence_context_property.has_defined_value():
+                self.evidence_context_property(ContextDataObject.contextualize(self.context)(self.identifier +
+                                                                                             '-evidence'))
+            if not self.combined_context.has_defined_value():
+                self.combined_context_property(ContextDataObject.contextualize(self.context)(self.identifier))
 
         self.__ad_hoc_contexts = dict()
+
+    @property
+    def data_context(self):
+        return Context.contextualize(self.context)(ident=self.identifier + '-data', imported=(CONTEXT,))
+
+    @property
+    def evidence_context(self):
+        return Context.contextualize(self.context)(ident=self.identifier + '-evidence', imported=(CONTEXT,))
+
+    @property
+    def combined_context(self):
+        return Context.contextualize(self.context)(ident=self.identifier, imported=(self.data_context,
+                                                   self.evidence_context))
 
     def data_context_for(self, **kwargs):
         ctx = self.context_for(**kwargs)
