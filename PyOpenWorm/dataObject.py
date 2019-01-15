@@ -675,9 +675,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             owner = kwargs.get('owner', None)
             if owner is not None:
                 del kwargs['owner']
+        attr_name = kwargs.get('attrName')
         if owner is None:
             raise TypeError('No owner')
-        return owner.attach_property(cls._create_property_class(*args, **kwargs))
+        return owner.attach_property(cls._create_property_class(*args, **kwargs), name=attr_name)
 
     def attach_property(self, c, name=None):
         ctxd_pclass = c.contextualize_class(self.context)

@@ -189,11 +189,10 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             # the inf.property_name is used for the linkName so that the property's URI is generated based on that name.
             # This allows to set an attribute named inf.property_name on self while still having access to the property
             # through inf.name.
-            setattr(self,
-                    inf.name,
-                    getattr(inf.cls, inf.property_type)(owner=self,
-                                                        linkName=inf.property_name,
-                                                        multiple=inf.multiple))
+            getattr(inf.cls, inf.property_type)(owner=self,
+                                                linkName=inf.property_name,
+                                                multiple=inf.multiple,
+                                                attrName=inf.name)
             ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)
