@@ -27,27 +27,28 @@ class DataWithEvidenceDataSource(DataSource):
 
         if self.defined:
             if not self.data_context_property.has_defined_value():
-                self.data_context_property(ContextDataObject.contextualize(self.context)(self.identifier + '-data'))
+                self.data_context_property(ContextDataObject.contextualize(self.context)(ident=self.identifier +
+                                                                                         '-data'))
             if not self.evidence_context_property.has_defined_value():
-                self.evidence_context_property(ContextDataObject.contextualize(self.context)(self.identifier +
+                self.evidence_context_property(ContextDataObject.contextualize(self.context)(ident=self.identifier +
                                                                                              '-evidence'))
-            if not self.combined_context.has_defined_value():
-                self.combined_context_property(ContextDataObject.contextualize(self.context)(self.identifier))
+            if not self.combined_context_property.has_defined_value():
+                self.combined_context_property(ContextDataObject.contextualize(self.context)(ident=self.identifier))
 
         self.__ad_hoc_contexts = dict()
 
-    @property
-    def data_context(self):
-        return Context.contextualize(self.context)(ident=self.identifier + '-data', imported=(CONTEXT,))
+        self.data_context = _DataContext.contextualize(self.context)(maker=self,
+                                                                     imported=(CONTEXT,),
+                                                                     conf=self.conf)
 
-    @property
-    def evidence_context(self):
-        return Context.contextualize(self.context)(ident=self.identifier + '-evidence', imported=(CONTEXT,))
+        self.evidence_context = _EvidenceContext.contextualize(self.context)(maker=self,
+                                                                             imported=(CONTEXT,),
+                                                                             conf=self.conf)
 
-    @property
-    def combined_context(self):
-        return Context.contextualize(self.context)(ident=self.identifier, imported=(self.data_context,
-                                                   self.evidence_context))
+        self.combined_context = _CombinedContext.contextualize(self.context)(maker=self,
+                                                                             imported=(self.data_context,
+                                                                                       self.evidence_context),
+                                                                             conf=self.conf)
 
     def data_context_for(self, **kwargs):
         ctx = self.context_for(**kwargs)
@@ -66,9 +67,40 @@ class DataWithEvidenceDataSource(DataSource):
     def commit_augment(self):
         saved_contexts = set([])
         self.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
-        self.data_context.save_imports()
+        # self.data_context.save_imports()
         self.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
-        self.evidence_context.save_imports()
+        # self.evidence_context.save_imports()
+        print(self.combined_context)
+        self.combined_context.save_imports()
+
+
+class _SContext(Context):
+    def __init__(self, maker, **kwargs):
+        super(_SContext, self).__init__(**kwargs)
+        self.maker = maker
+
+    @property
+    def identifier(self):
+        return self.identifier_helper()
+
+    @identifier.setter
+    def identifier(self, a):
+        pass
+
+
+class _CombinedContext(_SContext):
+    def identifier_helper(self):
+        return self.maker.identifier
+
+
+class _EvidenceContext(_SContext):
+    def identifier_helper(self):
+        return self.maker.identifier + '-evidence'
+
+
+class _DataContext(_SContext):
+    def identifier_helper(self):
+        return self.maker.identifier + '-data'
 
 
 __yarom_mapped_classes__ = (DataWithEvidenceDataSource,)
