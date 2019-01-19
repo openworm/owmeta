@@ -67,7 +67,7 @@ setup(
         'pyparsing==2.2.0',
         'rdflib>=4.1.2',
         'requests==2.18.4',
-        'six~=1.11',
+        'six~=1.10',
         'SPARQLWrapper==1.6.2',
         'tqdm==4.23.4',
         'termcolor==1.1.0',
