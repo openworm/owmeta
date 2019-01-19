@@ -63,7 +63,7 @@ setup(
         'numpydoc>=0.7.0',
         'persistent==4.0.8',
         'Pint==0.8.1',
-        'pow-store-zodb==0.0.5',
+        'pow-store-zodb==0.0.7',
         'pyparsing==2.2.0',
         'rdflib>=4.1.2',
         'requests==2.18.4',
