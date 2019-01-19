@@ -855,9 +855,10 @@ class POW(object):
 
     def _graphs_index(self):
         idx_fname = pth_join(self.powdir, 'graphs', 'index')
-        with open(idx_fname) as index_file:
-            for l in index_file:
-                yield l.strip().split(' ')
+        if exists(idx_fname):
+            with open(idx_fname) as index_file:
+                for l in index_file:
+                    yield l.strip().split(' ')
 
     @property
     def _context_fnames(self):
@@ -872,15 +873,11 @@ class POW(object):
         return self._fnc
 
     def _read_graphs_index(self):
-        idx_fname = pth_join(self.powdir, 'graphs', 'index')
         ctx_index = dict()
         fname_index = dict()
-        if exists(idx_fname):
-            with open(idx_fname) as index_file:
-                for l in index_file:
-                    fname, ctx = l.strip().split(' ')
-                    ctx_index[ctx] = pth_join(self.powdir, 'graphs', fname)
-                    fname_index[fname] = ctx
+        for fname, ctx in self._graphs_index():
+            ctx_index[ctx] = pth_join(self.powdir, 'graphs', fname)
+            fname_index[fname] = ctx
         self._cfn = ctx_index
         self._fnc = fname_index
 
