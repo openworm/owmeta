@@ -38,17 +38,14 @@ class DataWithEvidenceDataSource(DataSource):
         self.__ad_hoc_contexts = dict()
 
         self.data_context = _DataContext.contextualize(self.context)(maker=self,
-                                                                     imported=(CONTEXT,),
-                                                                     conf=self.conf)
+                                                                     imported=(CONTEXT,))
 
         self.evidence_context = _EvidenceContext.contextualize(self.context)(maker=self,
-                                                                             imported=(CONTEXT,),
-                                                                             conf=self.conf)
+                                                                             imported=(CONTEXT,))
 
         self.combined_context = _CombinedContext.contextualize(self.context)(maker=self,
                                                                              imported=(self.data_context,
-                                                                                       self.evidence_context),
-                                                                             conf=self.conf)
+                                                                                       self.evidence_context))
 
     def data_context_for(self, **kwargs):
         ctx = self.context_for(**kwargs)
@@ -67,16 +64,14 @@ class DataWithEvidenceDataSource(DataSource):
     def commit_augment(self):
         saved_contexts = set([])
         self.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
-        # self.data_context.save_imports()
         self.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
-        # self.evidence_context.save_imports()
-        print(self.combined_context)
         self.combined_context.save_imports()
 
 
 class _SContext(Context):
     def __init__(self, maker, **kwargs):
-        super(_SContext, self).__init__(**kwargs)
+        conf = kwargs.pop('conf', maker.conf)
+        super(_SContext, self).__init__(conf=conf, **kwargs)
         self.maker = maker
 
     @property

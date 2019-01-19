@@ -1,5 +1,3 @@
-#!/home/ubuntu/env/bin/python
-
 from rpy2.robjects.packages import importr
 from rpy2.robjects import r as R
 from PyOpenWorm.datasource import DataTranslator, DataSource, Informational
