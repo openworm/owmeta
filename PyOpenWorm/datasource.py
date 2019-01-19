@@ -332,10 +332,12 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
 
     def __call__(self, *args, **kwargs):
         self.output_key = kwargs.pop('output_key', None)
+        self.output_identifier = kwargs.pop('output_identifier', None)
         try:
             return self.translate(*args, **kwargs)
         finally:
             self.output_key = None
+            self.output_identifier = None
 
     def __str__(self):
         s = '''Input type(s): {}
@@ -365,6 +367,7 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
     def make_new_output(self, sources, *args, **kwargs):
         trans = self.make_translation(sources)
         res = self.output_type.contextualize(self.context)(*args, translation=trans,
+                                                           ident=self.output_identifier,
                                                            key=self.output_key, **kwargs)
         for s in sources:
             res.contextualize(self.context).source(s)

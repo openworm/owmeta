@@ -36,7 +36,7 @@ class DataIntegrityTest(unittest.TestCase):
     def setUp(self):
         PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
         self.g = PyOpenWorm.config("rdf.graph")
-        self.context = Context()
+        self.context = Context(ident="http://openworm.org/data")
         self.qctx = self.context.stored
 
     def tearDown(self):

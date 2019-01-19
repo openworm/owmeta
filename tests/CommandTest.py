@@ -445,6 +445,8 @@ class POWTranslateTest(BaseTest):
         with self.assertRaisesRegexp(GenericUserError, re.escape(source)):
             self.cut.translate(translator, imports_context_ident, data_sources=(source,))
 
+    # Test saving a translator ensures the input and output types are saved source is saved
+
 
 class IVarTest(unittest.TestCase):
 

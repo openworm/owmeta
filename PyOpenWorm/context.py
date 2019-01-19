@@ -153,6 +153,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
             context = Context(ident=ctx_key, conf=self.conf)
         self._declare_imports(context)
+        return context
 
     def _declare_imports(self, context):
         for ctx in self._imported_contexts:

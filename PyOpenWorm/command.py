@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import
 import sys
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
-from os import makedirs, mkdir, listdir, rename, unlink
+from os import makedirs, mkdir, listdir, rename, unlink, stat
 
 from contextlib import contextmanager
 try:
@@ -166,9 +166,14 @@ class POWSource(object):
         for x in self._parent._data_ctx.stored(DataSource)(ident=uri).load():
             self._parent.message(x.format_str(stored=True))
 
-    def list_kinds(self):
+    def list_kinds(self, full=False):
         """
         List kinds of sources
+
+        Parameters
+        ----------
+        full : bool
+            Whether to (attempt to) shorten the source URIs by using the namespace manager
         """
         from .datasource import DataSource
         from .dataObject import TypeDataObject, RDFSSubClassOfProperty
@@ -183,7 +188,10 @@ class POWSource(object):
         nm = conf['rdf.graph'].namespace_manager
         g = ZeroOrMoreTQLayer(zomifier(DataSource.rdf_type), ctx.stored.rdf_graph())
         for x in sc.load(graph=g):
-            yield nm.normalizeUri(x.identifier)
+            if full:
+                yield x.identifier
+            else:
+                yield nm.normalizeUri(x.identifier)
 
 
 class POWTranslator(object):
@@ -454,8 +462,7 @@ class POWContexts(object):
         '''
         Return the set of contexts which differ from the serialization on disk
         '''
-        par = self._parent
-        return par._context_changed_set()
+        return self._parent._changed_contexts_set()
 
 
 class POW(object):
@@ -485,8 +492,10 @@ class POW(object):
     contexts = SubCommand(POWContexts)
 
     def __init__(self):
+        from time import time
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
+        self._clock = time
         self._data_source_directories = None
         self._changed_contexts = None
 
@@ -747,16 +756,20 @@ class POW(object):
 
     def _context_changed_handler(self):
         def handler(event):
-            self._context_changed_set().add(event.context)
+            from rdflib.term import URIRef
+            self._context_changed_times[URIRef(event.context)] = self._clock()
         return handler
 
-    def _context_changed_set(self):
-        if not self._changed_contexts:
+    @property
+    def _context_changed_times(self):
+        if self._changed_contexts is None:
             import ZODB
             from ZODB.FileStorage import FileStorage
             import BTrees
             ccfile = pth_join(self.powdir, 'changed_contexts')
-
+            all_changed = False
+            if not exists(ccfile):
+                all_changed = True
             try:
                 fs = FileStorage(ccfile)
             except IOError:
@@ -767,7 +780,7 @@ class POW(object):
             _cc_conn = _cc_zdb.open()
             root = _cc_conn.root()
             if 'ccmap' not in root:
-                root['ccmap'] = BTrees.family32.OO.TreeSet()
+                root['ccmap'] = BTrees.family32.OO.BTree()
             self._changed_contexts = root['ccmap']
         return self._changed_contexts
 
@@ -812,6 +825,7 @@ class POW(object):
     def _load_all_graphs(self, progress, trip_prog):
         import transaction
         from rdflib import plugin
+        from rdflib.term import URIRef
         from rdflib.parser import Parser, create_input_source
         idx_fname = pth_join(self.powdir, 'graphs', 'index')
         triples_read = 0
@@ -827,15 +841,23 @@ class POW(object):
                     for l in index_file:
                         fname, ctx = l.strip().split(' ')
                         parser = plugin.get('nt', Parser)()
-                        with open(pth_join(self.powdir, 'graphs', fname), 'rb') as f, \
+                        graph_fname = pth_join(self.powdir, 'graphs', fname)
+                        with open(graph_fname, 'rb') as f, \
                                 _BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
                             parser.parse(create_input_source(f), g)
+
                         progress.update(1)
                         triples_read += g.count
                         trip_prog.update(g.count)
+                        self._context_changed_times[URIRef(ctx)] = stat(graph_fname).st_mtime
                     progress.write('Finalizing writes to database...')
-                    self._context_changed_set().clear()
         progress.write('Loaded {:,} triples'.format(triples_read))
+
+    def _graphs_index(self):
+        idx_fname = pth_join(self.powdir, 'graphs', 'index')
+        with open(idx_fname) as index_file:
+            for l in index_file:
+                yield l.strip().split(' ')
 
     @property
     def _context_fnames(self):
@@ -862,7 +884,7 @@ class POW(object):
         self._cfn = ctx_index
         self._fnc = fname_index
 
-    def translate(self, translator, output_key=None,
+    def translate(self, translator, output_key=None, output_identifier=None,
                   data_sources=(), named_data_sources=None):
         """
         Do a translation with the named translator and inputs
@@ -874,12 +896,15 @@ class POW(object):
         imports_context_ident : str
             Identifier for the imports context. All imports go in here
         output_key : str
-            Output identifier
+            Output key. Used for generating the output's identifier. Exclusive with output_identifier
+        output_identifier : str
+            Output identifier. Exclusive with output_key
         data_sources : list of str
             Input data sources
         named_data_sources : dict
             Named input data sources
         """
+        import transaction
         if named_data_sources is None:
             named_data_sources = dict()
         translator_obj = self._lookup_translator(translator)
@@ -888,16 +913,21 @@ class POW(object):
 
         positional_sources = [self._lookup_source(src) for src in data_sources]
         if None in positional_sources:
-            raise GenericUserError('No source for ' + data_sources[positional_sources.index(None)])
+            raise GenericUserError('No source for "' + data_sources[positional_sources.index(None)] + '"')
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
         with self._tempdir(prefix='pow-translate.') as d:
             orig_wd = os.getcwd()
             os.chdir(d)
-            try:
-                res = translator_obj(*positional_sources, output_key=output_key, **named_sources)
+            with transaction.manager:
+                try:
+                    res = translator_obj(*positional_sources,
+                                         output_identifier=output_identifier,
+                                         output_key=output_key,
+                                         **named_sources)
+                finally:
+                    os.chdir(orig_wd)
                 res.commit()
-            finally:
-                os.chdir(orig_wd)
+                res.context.save_context()
 
     @contextmanager
     def _tempdir(self, *args, **kwargs):
@@ -922,8 +952,8 @@ class POW(object):
             lclasses = [POWDirDataSourceDirLoader]
             dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
             dindex = open(pth_join(self.powdir, 'data_source_directories'))
-            for ds_id, dname in (x.split(' ', 1) for x in dindex):
-                dsd[ds_id] = dname.strip()
+            for ds_id, dname in (x.strip().split(' ', 1) for x in dindex):
+                dsd[ds_id] = dname
             self._data_source_directories = dsd
 
     def _stage_translation_directory(self, source_directory, target_directory):
@@ -1046,7 +1076,20 @@ class POW(object):
         self._serialize_graphs()
         repo.commit(message)
 
+    def _changed_contexts_set(self):
+        from rdflib.term import URIRef
+        changed = set()
+        gf_index = {URIRef(y): x for x, y in self._graphs_index()}
+        for ctx, mtime in self._context_changed_times.items():
+            g_fname = gf_index.get(ctx)
+            g_fname = None if g_fname is None else pth_join(self.powdir, 'graphs', g_fname)
+            if not g_fname or stat(g_fname).st_mtime != mtime:
+                changed.add(ctx)
+        changed |= set(gf_index.keys()) - set(self._context_changed_times.keys())
+        return changed
+
     def _serialize_graphs(self, ignore_change_cache=False):
+        import transaction
         from rdflib import plugin
         from rdflib.serializer import Serializer
         g = self._conf()['rdf.graph']
@@ -1063,39 +1106,40 @@ class POW(object):
 
         files = []
         ctx_data = []
-        if not ignore_change_cache:
-            changed = set(self._context_changed_set())
+        changed = self._changed_contexts_set()
 
-        for x in g.contexts():
-            ident = x.identifier
+        with transaction.manager:
+            for x in g.contexts():
+                ident = x.identifier
 
-            if not ignore_change_cache:
-                ctx_changed = ident in changed
-            else:
-                ctx_changed = True
-
-            sfname = self._context_fnames.get(str(ident))
-            if not sfname:
-                fname = self._gen_ctx_fname(ident, graphs_base)
-            else:
-                fname = sfname
-
-            if ctx_changed:
                 if not ignore_change_cache:
-                    changed.remove(ident)
+                    ctx_changed = ident in changed
+                else:
+                    ctx_changed = True
 
-                serializer = plugin.get('nt', Serializer)(sorted(x))
-                with open(fname, 'wb') as gfile:
-                    serializer.serialize(gfile)
-            ctx_data.append((relpath(fname, graphs_base), ident))
-            files.append(fname)
+                sfname = self._context_fnames.get(str(ident))
+                if not sfname:
+                    fname = self._gen_ctx_fname(ident, graphs_base)
+                else:
+                    fname = sfname
 
-        if not ignore_change_cache:
-            for ident in changed:
-                hs = hashlib.sha256(ident.encode()).hexdigest()
-                fname = pth_join(graphs_base, hs + '.nt')
-                repo.remove([relpath(fname, self.powdir)])
-                os.unlink(fname)
+                if ctx_changed:
+                    if not ignore_change_cache:
+                        changed.remove(ident)
+
+                    serializer = plugin.get('nt', Serializer)(sorted(x))
+                    with open(fname, 'wb') as gfile:
+                        serializer.serialize(gfile)
+                self._context_changed_times[ident] = stat(fname).st_mtime
+                ctx_data.append((relpath(fname, graphs_base), ident))
+                files.append(fname)
+
+        # if not ignore_change_cache:
+            # for ident in changed:
+                # hs = hashlib.sha256(ident.encode()).hexdigest()
+                # fname = pth_join(graphs_base, hs + '.nt')
+                # repo.remove([relpath(fname, self.powdir)])
+                # os.unlink(fname)
 
         index_fname = pth_join(graphs_base, 'index')
         with open(index_fname, 'w') as index_file:
@@ -1127,7 +1171,7 @@ class POW(object):
 
         r = self.repository_provider
         try:
-            self._serialize_graphs()
+            self._serialize_graphs(ignore_change_cache=False)
         except Exception:
             r.reset()
             L.exception("Could not serialize graphs")
@@ -1161,11 +1205,21 @@ class POW(object):
             tofile = self._fname_contexts.get(bfname, bfname)
 
             sys.stdout.writelines(
-                    unified_diff([x.decode('utf-8') + '\n' for x in adata],
+                    self._colorize_diff(unified_diff([x.decode('utf-8') + '\n' for x in adata],
                                  [x.decode('utf-8') + '\n' for x in bdata],
                                  fromfile='a ' + fromfile,
                                  tofile='b ' + tofile,
-                                 lineterm='\n'))
+                                 lineterm='\n')))
+
+    def _colorize_diff(self, lines):
+        from termcolor import colored
+        for l in lines:
+            if l.startswith('+'):
+                yield colored(l, 'green')
+            elif l.startswith('-'):
+                yield colored(l, 'red')
+            else:
+                yield l
 
     def merge(self):
         """

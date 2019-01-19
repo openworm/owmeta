@@ -25,6 +25,12 @@ CLI_HINTS = {
             },
         },
         'translate': {
+            (METHOD_NAMED_ARG, 'output_key'): {
+                'names': ['--output-key']
+            },
+            (METHOD_NAMED_ARG, 'output_identifier'): {
+                'names': ['--output-identifier']
+            },
             (METHOD_NAMED_ARG, 'translator'): {
                 'names': ['translator']
             },

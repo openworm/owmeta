@@ -70,6 +70,7 @@ setup(
         'six==1.11.0',
         'SPARQLWrapper==1.6.2',
         'tqdm==4.23.4',
+        'termcolor==1.1.0',
         'transaction==1.4.4',
         'wrapt==1.10.11',
         'xlrd==1.1.0',
