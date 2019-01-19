@@ -1098,7 +1098,9 @@ class POW(object):
         repo.base = self.powdir
         graphs_base = pth_join(self.powdir, 'graphs')
 
-        if repo.is_dirty:
+        changed = self._changed_contexts_set()
+
+        if changed and repo.is_dirty:
             repo.reset()
 
         if not exists(graphs_base):
@@ -1106,11 +1108,10 @@ class POW(object):
 
         files = []
         ctx_data = []
-        changed = self._changed_contexts_set()
 
         with transaction.manager:
-            for x in g.contexts():
-                ident = x.identifier
+            for context in g.contexts():
+                ident = context.identifier
 
                 if not ignore_change_cache:
                     ctx_changed = ident in changed
@@ -1124,22 +1125,12 @@ class POW(object):
                     fname = sfname
 
                 if ctx_changed:
-                    if not ignore_change_cache:
-                        changed.remove(ident)
-
-                    serializer = plugin.get('nt', Serializer)(sorted(x))
+                    serializer = plugin.get('nt', Serializer)(sorted(context))
                     with open(fname, 'wb') as gfile:
                         serializer.serialize(gfile)
                 self._context_changed_times[ident] = stat(fname).st_mtime
                 ctx_data.append((relpath(fname, graphs_base), ident))
                 files.append(fname)
-
-        # if not ignore_change_cache:
-            # for ident in changed:
-                # hs = hashlib.sha256(ident.encode()).hexdigest()
-                # fname = pth_join(graphs_base, hs + '.nt')
-                # repo.remove([relpath(fname, self.powdir)])
-                # os.unlink(fname)
 
         index_fname = pth_join(graphs_base, 'index')
         with open(index_fname, 'w') as index_file:
