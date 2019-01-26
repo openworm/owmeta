@@ -4,6 +4,8 @@ import os
 import subprocess as SP
 import tempfile
 
+from .TestUtilities import xfail_without_db
+
 
 class ExampleRunnerTest(unittest.TestCase):
 
@@ -15,6 +17,9 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         os.chdir('examples')
+
+    def setUp(self):
+        xfail_without_db()
 
     @classmethod
     def tearDownClass(self):
