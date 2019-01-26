@@ -1,6 +1,7 @@
 from __future__ import print_function
 from rdflib.term import URIRef
 from six.moves.urllib.parse import quote
+from six import string_types
 import hashlib
 import logging
 from yarom.graphObject import IdentifierMissingException
@@ -86,7 +87,7 @@ def IdMixin(typ=object, hashfunc=None):
 
                 Equivalent to self.key = key
                 '''
-                if isinstance(key, str):
+                if isinstance(key, string_types):
                     self._id = self.make_identifier_direct(key)
                 else:
                     self._id = self.make_identifier(key)

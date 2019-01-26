@@ -89,6 +89,9 @@ class Mapper(with_metaclass(MapperMeta, object)):
         self.class_ordering = dict()
 
     def decorate_class(self, cls):
+        '''
+        Extension point for subclasses of Mapper to apply an operation to all mapped classes
+        '''
         return cls
 
     def add_class(self, cls):
