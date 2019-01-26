@@ -133,6 +133,8 @@ class Configure(object):
                     valid_var_name = re.match(r'^[A-Za-z_]', match)
                     if valid_var_name:
                         res = environ.get(match, None)
+                        if res is None and match == 'BASE':
+                            res = resource_filename(Requirement.parse('PyOpenWorm'), value)
                         res = None if res == '' else res
                     else:
                         raise ValueError("'%s' is an invalid env-var name\n"
@@ -142,10 +144,6 @@ class Configure(object):
                 res = re.sub(r'\$([A-Za-z0-9_]+)', matchf, value)
                 res = None if res == '' else res
                 config_dict[k] = res
-                if value.startswith("BASE/"):
-                    value = value[4:]
-                    value = resource_filename(Requirement.parse('PyOpenWorm'), value)
-                    config_dict[k] = value
             c[k] = _C(config_dict[k])
         return c
 

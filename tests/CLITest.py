@@ -1,7 +1,14 @@
 import unittest
 
+try:
+    from unittest.mock import patch, Mock
+except ImportError:
+    from mock import patch, Mock
+
+from pytest import mark
 from PyOpenWorm.command_util import SubCommand, IVar
 from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
+import PyOpenWorm.cli as PCLI
 from six import StringIO
 from contextlib import contextmanager
 
@@ -131,6 +138,14 @@ class CLICommandWrapperTest(unittest.TestCase):
         self.assertIn('TEST_STRING', out.getvalue())
 
 
+@mark.inttest
+class CLITest(unittest.TestCase):
+    def test_cli(self):
+        with patch('sys.argv', ['command']), noexit(), stderr() as se:
+            PCLI.main()
+        self.assertIn('usage: command', se.getvalue())
+
+
 @contextmanager
 def noexit():
     try:
@@ -149,3 +164,15 @@ def stdout():
         yield sys.stdout
     finally:
         sys.stdout = oldstdout
+
+
+@contextmanager
+def stderr():
+    import sys
+    oldstderr = sys.stderr
+    sio = StringIO()
+    sys.stderr = sio
+    try:
+        yield sys.stderr
+    finally:
+        sys.stderr = oldstderr

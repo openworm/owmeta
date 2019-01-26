@@ -25,6 +25,7 @@ class ContextStore(Store):
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
+        print("context =", context)
         if context is not None:
             self._init_store(context)
 
@@ -77,9 +78,9 @@ class ContextStore(Store):
         raise NotImplementedError("This is a query-only store")
 
     def triples(self, triple_pattern, context=None):
-        context = getattr(context, 'identifier', context)
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
+        context = getattr(context, 'identifier', context)
         context_triples = []
         if self._store_store is not None:
             context_triples.append(self._store_store.triples(triple_pattern,
@@ -98,7 +99,7 @@ class ContextStore(Store):
 
         """
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
         if self._store_store is None:
             return len(self._memory_store)
         else:
@@ -115,8 +116,9 @@ class ContextStore(Store):
 
         :returns: a generator over Nodes
         """
+        print('shoi')
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
         seen = set()
         rest = ()
 
@@ -149,7 +151,6 @@ class RDFContextStore(Store):
 
     def triples(self, pattern, context=None):
         self.__init_contexts()
-
         for t in self.__store.triples(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
             inter = self.__context_transitive_imports & contexts
@@ -159,6 +160,7 @@ class RDFContextStore(Store):
     def contexts(self, triple=None):
         if triple is not None:
             for x in self.triples(triple):
+                print(x)
                 for c in x[1]:
                     yield getattr(c, 'identifier', c)
         else:

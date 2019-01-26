@@ -2,12 +2,12 @@ import rdflib
 from rdflib.term import URIRef, Variable
 from PyOpenWorm.dataObject import DataObject, InverseProperty
 from PyOpenWorm.context import Context
-from PyOpenWorm.context_store import ContextStore
+from PyOpenWorm.context_store import ContextStore, ContextStoreException, RDFContextStore
 from .DataTestTemplate import _DataTest
 try:
-    from unittest.mock import MagicMock, Mock
+    from unittest.mock import MagicMock, Mock, patch
 except ImportError:
-    from mock import MagicMock, Mock
+    from mock import MagicMock, Mock, patch
 
 
 class ContextTest(_DataTest):
@@ -302,6 +302,94 @@ class ContextStoreTest(_DataTest):
         store = ContextStore(ctx, include_stored=True)
         with self.assertRaises(NotImplementedError):
             len(store)
+
+    def test_length_of_unopened_database(self):
+        cut = ContextStore(None, include_stored=True)
+
+        with self.assertRaises(ContextStoreException):
+            len(cut)
+
+    def test_triples_of_unopened_database(self):
+        cut = ContextStore(None, include_stored=True)
+
+        with self.assertRaises(ContextStoreException):
+            cut.triples(None)
+
+    def test_no_stored_length(self):
+        ctx = Mock()
+        graph = Mock()
+        ctx.conf = {'rdf.graph': graph}
+        ctx.contents_triples.return_value = ()
+        ctx.imports = []
+        cut = ContextStore(ctx, include_stored=False)
+        self.assertEqual(0, len(cut))
+
+    def test_contexts_of_unopened_database(self):
+        cut = ContextStore(None, include_stored=True)
+
+        with self.assertRaises(ContextStoreException):
+            list(cut.contexts(None))
+
+    def test_init_imports(self):
+        ctx = Mock()
+        m = Mock()
+        m.identifier = 'blah'
+        ctx.imports = [m, m]
+        m.imports = []
+        ctx.contents_triples.return_value = ()
+        m.contents_triples.return_value = [('a', 'b', 'c')]
+        with patch('PyOpenWorm.context_store.RDFContextStore'):
+            cut = ContextStore(ctx, include_stored=True)
+            m.contents_triples.assert_called()
+
+
+class RDFContextStoreTest(_DataTest):
+    def test_contexts_with_triple(self):
+        ctx = Mock()
+        g = MagicMock(name='graph')
+        ctx.conf = {'rdf.graph': g}
+        g.store.triples.return_value = []
+        cut = RDFContextStore(context=ctx)
+
+        # Magic mocks return empty iterables when you attempt to iterate over them, so no triples and hence no contexts
+        # when we ask 'g'
+        self.assertEqual([], list(cut.contexts((None, None, None))))
+
+    def test_namespaces(self):
+        ctx = Mock()
+        g = MagicMock(name='graph')
+        ctx.conf = {'rdf.graph': g}
+        ns1 = Mock()
+        g.store.namespaces.return_value = [ns1]
+        cut = RDFContextStore(context=ctx)
+        self.assertEqual([ns1], list(cut.namespaces()))
+
+    def test_bind(self):
+        ctx = Mock()
+        g = MagicMock(name='graph')
+        ctx.conf = {'rdf.graph': g}
+        ns1 = Mock()
+        g.store.namespaces.return_value = [ns1]
+        cut = RDFContextStore(context=ctx)
+        self.assertEqual([ns1], list(cut.namespaces()))
+
+    def test_namespace(self):
+        ctx = Mock()
+        g = MagicMock(name='graph')
+        ctx.conf = {'rdf.graph': g}
+        ns1 = Mock()
+        g.store.namespace.return_value = ns1
+        cut = RDFContextStore(context=ctx)
+        self.assertEqual(ns1, cut.namespace('prefix'))
+
+    def test_prefix(self):
+        ctx = Mock()
+        g = MagicMock(name='graph')
+        ctx.conf = {'rdf.graph': g}
+        pre = Mock()
+        g.store.prefix.return_value = pre
+        cut = RDFContextStore(context=ctx)
+        self.assertEqual(pre, cut.prefix('namespace'))
 
 
 def create_mock_statement(ident_uri, stmt_id):

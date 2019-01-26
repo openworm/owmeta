@@ -9,15 +9,18 @@ from .common_data import DS_NS
 class DataWithEvidenceDataSource(DataSource):
     evidence_context_property = Informational(display_name='Evidence context',
                                               property_name='evidence_context',
+                                              property_type='ObjectProperty',
                                               description='The context in which evidence'
                                                           ' for the "Data context" is defined')
     data_context_property = Informational(display_name='Data context',
                                           property_name='data_context',
+                                          property_type='ObjectProperty',
                                           description='The context in which primary data'
                                                       ' for this data source is defined')
 
     combined_context_property = Informational(display_name='Combined context',
                                               property_name='combined_context',
+                                              property_type='ObjectProperty',
                                               description='Context importing both the data and evidence contexts')
 
     rdf_namespace = Namespace(DS_NS['DataWithEvidenceDataSource#'])
