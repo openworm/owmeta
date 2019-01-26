@@ -20,13 +20,7 @@ class UnmappedClassException(Exception):
     pass
 
 
-class MapperMeta(type):
-    def __call__(self, *args, **kwargs):
-        x = super(MapperMeta, self).__call__(*args, **kwargs)
-        return x
-
-
-class Mapper(with_metaclass(MapperMeta, object)):
+class Mapper(object):
     _instances = dict()
 
     @classmethod
