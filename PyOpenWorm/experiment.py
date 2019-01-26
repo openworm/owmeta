@@ -24,10 +24,8 @@ class Experiment(DataObject):
 
     def __init__(self, reference=None, **kwargs):
         super(Experiment, self).__init__(**kwargs)
-        Experiment.ObjectProperty('reference',
-                                  owner=self,
-                                  value_type=Evidence,
-                                  multiple=True)
+        self.reference = Experiment.ObjectProperty(value_type=Evidence,
+                                                   multiple=True)
 
         if isinstance(reference, Evidence):
             #TODO: make this so the reference asserts this Experiment when it is added

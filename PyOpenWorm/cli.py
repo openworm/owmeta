@@ -10,11 +10,13 @@ from .git_repo import GitRepoProvider
 
 def additional_args(parser):
     'Add some additional options specific to CLI'
-    parser.add_argument('--output-mode', default='text')
+    parser.add_argument('--output-mode', default='text',
+            help='How to print the results of a command'
+            ' (if any). Either "json" or "text" (the default)')
     parser.add_argument('--text-field-separator', default='\t',
-            description='Separator to use between fields in text-mode output')
+            help='Separator to use between fields in text-mode output')
     parser.add_argument('--text-record-separator', default='\n',
-            description='Separator to use between records in text-mode output')
+            help='Separator to use between records in text-mode output')
 
 
 class NSHandler(object):
