@@ -24,13 +24,13 @@ class CLIUserError(Exception):
 
 def _method_runner(runner, key):
     def _f(*args, **kwargs):
-        getattr(runner, key)(*args, **kwargs)
+        return getattr(runner, key)(*args, **kwargs)
     return _f
 
 
 def _sc_runner(sub_mapper, sub_runner):
     def _f():
-        sub_mapper.apply(sub_runner)
+        return sub_mapper.apply(sub_runner)
     return _f
 
 
@@ -45,6 +45,8 @@ class CLIArgMapper(object):
         self.runners = dict()
         ''' Mapping from subcommand names to functions which run for them '''
 
+        self.arg_count = dict()
+
         self.argparser = None
 
     def apply(self, runner):
@@ -52,8 +54,12 @@ class CLIArgMapper(object):
         kvpairs = self.get(METHOD_KWARGS)
         kvs = list(kv.split('=') for kv in kvpairs.values())
         kvs += self.get(METHOD_NAMED_ARG).items()
+
         kwargs = {k: v for k, v in kvs}
-        args = self.get(METHOD_NARGS).values()
+        try:
+            args = next(iter(self.get(METHOD_NARGS).values()))
+        except StopIteration:
+            args = ()
 
         runmethod = None
 
@@ -71,10 +77,13 @@ class CLIArgMapper(object):
         for k, v in iattrs.items():
             setattr(runner, k, v)
 
-        runmethod(*args, **kwargs)
+        return runmethod(*args, **kwargs)
 
     def get(self, key):
         return {k[1]: self.mappings[k] for k in self.mappings if k[0] == key}
+
+    def get0(self, key):
+        return {k: self.mappings[k] for k in self.mappings if k[0] == key}
 
     def __str__(self):
         return type(self).__name__ + '(' + str(self.mappings) + ')'
@@ -83,7 +92,7 @@ class CLIArgMapper(object):
 class CLIStoreAction(argparse.Action):
     ''' Interacts with the CLIArgMapper '''
 
-    def __init__(self, mapper, key, *args, **kwargs):
+    def __init__(self, mapper, key, index=-1, *args, **kwargs):
         super(CLIStoreAction, self).__init__(*args, **kwargs)
         if self.nargs == 0:
             raise ValueError('nargs for store actions must be > 0; if you '
@@ -95,9 +104,10 @@ class CLIStoreAction(argparse.Action):
         self.mapper = mapper
         self.key = key
         self.name = self.dest
+        self.index = index
 
     def __call__(self, parser, namespace, values, option_string=None):
-        self.mapper.mappings[(self.key, self.name)] = values
+        self.mapper.mappings[(self.key, self.name, self.index)] = values
         setattr(namespace, self.dest, values)
 
 
@@ -146,7 +156,7 @@ class CLICommandWrapper(object):
     def __init__(self, runner, mapper=None):
         self.runner = runner
         self.mapper = CLIArgMapper() if mapper is None else mapper
-        self.hints = CLI_HINTS.get(FCN(type(runner)))
+        self.hints = CLI_HINTS.get(FCN(type(runner)), {})
 
     def extract_args(self, val):
         docstring = getattr(val, '__doc__', '')
@@ -184,10 +194,15 @@ class CLICommandWrapper(object):
 
     def parser(self, parser=None):
         if parser is None:
-            parser = argparse.ArgumentParser()
+            doc = getattr(self.runner, '__doc__', None)
+            if doc:
+                cmd_summary, _, _ = self.extract_args(self.runner)
+            else:
+                cmd_summary = None
+            parser = argparse.ArgumentParser(description=cmd_summary)
         self.mapper.argparser = parser
         for key, val in vars(self.runner).items():
-            if not key.startswith('_'):
+            if not key.startswith('_') and key not in self.hints.get('IGNORE', ()):
                 parser.add_argument('--' + key, help=key.__doc__)
 
         _sp = [None]
@@ -199,7 +214,7 @@ class CLICommandWrapper(object):
             return _sp[0]
 
         for key, val in sorted(vars(type(self.runner)).items()):
-            if not key.startswith('_'):
+            if not key.startswith('_') and key not in self.hints.get('IGNORE', ()):
                 if isinstance(val, (types.FunctionType, types.MethodType)):
                     sc_hints = self.hints.get(key) if self.hints else None
                     summary, detail, params = self.extract_args(val)
@@ -207,7 +222,8 @@ class CLICommandWrapper(object):
                     subparser = sp().add_parser(key, help=summary, description=detail)
 
                     self.mapper.runners[key] = _method_runner(self.runner, key)
-                    for param in params:
+                    argcount = 0
+                    for pindex, param in enumerate(params):
                         action = CLIStoreAction
                         if param[1] == 'bool':
                             action = CLIStoreTrueAction
@@ -228,16 +244,24 @@ class CLICommandWrapper(object):
                                                    mapper=self.mapper,
                                                    help=desc)
                         else:
-                            args_hints = None if sc_hints is None else sc_hints.get((METHOD_NAMED_ARG, arg))
-                            names = None if args_hints is None else args_hints.get('names')
+                            arg_hints = self._arg_hints(sc_hints, METHOD_NAMED_ARG, arg)
+                            names = None if arg_hints is None else arg_hints.get('names')
                             if names is None:
                                 names = ['--' + arg]
+                            argument_args = dict(action=action,
+                                                 key=METHOD_NAMED_ARG,
+                                                 mapper=self.mapper,
+                                                 index=pindex,
+                                                 help=desc)
+                            if arg_hints:
+                                nargs = arg_hints.get('nargs')
+                                if nargs is not None:
+                                    argument_args['nargs'] = nargs
 
                             subparser.add_argument(*names,
-                                                   action=action,
-                                                   key=METHOD_NAMED_ARG,
-                                                   mapper=self.mapper,
-                                                   help=desc)
+                                                   **argument_args)
+                        argcount += 1
+                    self.mapper.arg_count[key] = argcount
                 elif isinstance(val, property):
                     doc = getattr(val, '__doc__', None)
                     parser.add_argument('--' + key, help=doc,
@@ -262,22 +286,38 @@ class CLICommandWrapper(object):
                             doc = 'Default is ' + repr(val.default_value)
                     # NOTE: we have a default value from the val, but we don't
                     # set it here -- IVars return the defaults ... by default
-                    parser.add_argument('--' + key, help=doc,
-                                        action=CLIStoreAction,
-                                        key=INSTANCE_ATTRIBUTE,
-                                        mapper=self.mapper)
+                    arg_kwargs = dict(help=doc,
+                                      action=CLIStoreAction,
+                                      key=INSTANCE_ATTRIBUTE,
+                                      mapper=self.mapper)
+                    if val.value_type == bool:
+                        arg_kwargs['action'] = CLIStoreTrueAction
+                    parser.add_argument('--' + key, **arg_kwargs)
 
         return parser
 
-    def main(self, args=None):
+    def _arg_hints(self, sc_hints, atype, key):
+        return None if sc_hints is None else sc_hints.get((atype, key))
+
+    def main(self, args=None, argument_callback=None, argument_namespace_callback=None):
         '''
         Runs in a manner suitable for being the 'main' method for a command
         line interface: parses arguments (as would be done with the result of
         `parser`) from sys.argv or the provided args list and executes the
         commands specified therein
+
+        Parameters
+        ----------
+        args : list
+            the argument list to parse. optional
+        argument_callback : callable
+            a callback to add additional arguments to the command line. optional
         '''
-        self.parser().parse_args(args=args)
-        try:
-            self.mapper.apply(self.runner)
-        except CLIUserError as e:
-            print(e, file=sys.stderr)
+
+        parser = self.parser()
+        if argument_callback:
+            argument_callback(parser)
+        ns = parser.parse_args(args=args)
+        if argument_namespace_callback:
+            argument_namespace_callback(ns)
+        return self.mapper.apply(self.runner)

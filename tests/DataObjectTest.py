@@ -5,18 +5,22 @@ import rdflib as R
 import six
 import warnings
 
+from yarom.utils import FCN
+
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
+from PyOpenWorm.context import Context
+from PyOpenWorm import BASE_CONTEXT
 
 from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
 try:
-    from unittest.mock import MagicMock, Mock
+    from unittest.mock import Mock
 except ImportError:
-    from mock import MagicMock, Mock
+    from mock import Mock
 
 
 DATAOBJECT_PROPERTIES = ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
@@ -116,6 +120,57 @@ class DataObjectTest(_DataTest):
     def test_rdfs_comment_property(self):
         a = DataObject(rdfs_comment='Hello')
         self.assertIn('Hello', a.rdfs_comment())
+
+    def test_load_unloaded_subtype(self):
+        '''
+        This test actually combines a few different features:
+            - loading a module from a ClassDescription
+            - resolving subclasses from superclasses
+        '''
+        from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
+        from PyOpenWorm.class_registry import RegistryEntry
+
+        ident = R.URIRef('http://openworm.org/entities/TDO01')
+        rdftype = R.RDF['type']
+        sc = R.RDFS['subClassOf']
+        tdo = R.URIRef('http://openworm.org/entities/TDO')
+        pm = R.URIRef('http://example.com/pymod')
+        pcd = R.URIRef('http://example.com/pycd')
+        re = R.URIRef('http://example.com/re')
+        g = R.ConjunctiveGraph()
+        ctx = g.get_context(self.context.identifier)
+        self.TestConfig['rdf.graph'] = g
+        trips = [(ident, rdftype, tdo),
+                 (tdo, sc, DataObject.rdf_type),
+                 (pm, rdftype, PythonModule.rdf_type),
+                 (pm, PythonModule.name.link, R.Literal('tests.tmod.tdo')),
+                 (pcd, PythonClassDescription.name.link, R.Literal('TDO')),
+                 (pcd, rdftype, PythonClassDescription.rdf_type),
+                 (pcd, PythonClassDescription.module.link, pm),
+                 (re, rdftype, RegistryEntry.rdf_type),
+                 (re, RegistryEntry.rdf_class.link, tdo),
+                 (re, RegistryEntry.class_description.link, pcd)]
+        for tr in trips:
+            ctx.add(tr)
+        o = list(self.context.stored(DataObject)(ident=ident).load())
+        self.assertEqual('tests.tmod.tdo.TDO', FCN(type(o[0])))
+
+    def test_save_load_subtype(self):
+
+        class A(DataObject):
+            class_context = self.context
+        self.context.mapper.process_class(A)
+
+        self.context.add_import(BASE_CONTEXT)
+        m = Context(ident='http://example.org/ctx', imported=(self.context,))
+        im = Context(ident='http://example.org/ctxim', imported=(self.context,))
+        co = Context(ident='http://example.org/ctxb', imported=(m, im))
+        m(A)(ident='http://example.org/anA')
+        co.save_imports(im)
+        co.save_context(inline_imports=True)
+
+        o = list(m.stored(DataObject)(ident='http://example.org/anA').load())
+        self.assertIsInstance(o[0], A)
 
     def test_context_getter(self):
         a = DataObject()

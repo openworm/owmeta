@@ -32,7 +32,7 @@ The get() method also allows for parameterizing the query in ways specific to th
 """
 
 from __future__ import print_function
-__version__ = '0.8.2-post'
+__version__ = '0.8.2.post0'
 __author__ = 'Stephen Larson'
 
 import sys
@@ -46,7 +46,7 @@ os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 from .configure import Configureable
 from .context import Context
 import yarom
-from yarom.mapper import Mapper
+from .mapper import Mapper
 from PyOpenWorm.import_override import Overrider
 
 __import__('__main__').connected = False

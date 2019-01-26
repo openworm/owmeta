@@ -3,16 +3,16 @@ from functools import partial
 import rdflib as R
 from rdflib.term import URIRef
 import logging
-from itertools import groupby
 import six
 import hashlib
 
-import PyOpenWorm
+import PyOpenWorm  # noqa
 from . import BASE_SCHEMA_URL
 from .contextualize import (Contextualizable,
                             ContextualizableClass,
                             contextualize_helper,
                             decontextualize_helper)
+from .context import ClassContext
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -20,11 +20,11 @@ from yarom.graphObject import (GraphObject,
 from yarom.rdfUtils import triples_to_bgp, deserialize_rdflib_term
 from yarom.rdfTypeResolver import RDFTypeResolver
 from yarom.mappedClass import MappedClass
-from yarom.mapper import FCN
+from yarom.utils import FCN
 from .data import DataUser
-from .context import Contexts
 from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
+from .rdf_query_util import goq_hop_scorer, get_most_specific_rdf_type, oid, load
 
 import PyOpenWorm.simpleProperty as SP
 
@@ -55,6 +55,15 @@ This = object()
 """
 
 
+class PropertyProperty(property):
+    def __init__(self, cls, *args):
+        super(PropertyProperty, self).__init__(*args)
+        self._cls = cls
+
+    def __getattr__(self, attr):
+        return getattr(self._cls, attr)
+
+
 def mp(c, k):
     ak = '_pow_' + k
     if c.lazy:
@@ -67,20 +76,17 @@ def mp(c, k):
         def getter(target):
             return getattr(target, ak)
 
-    return property(getter)
+    return PropertyProperty(c, getter)
 
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
 
-        ctx_uri = ContextMappedClass._find_class_context(dct, bases)
+        ctx = ContextMappedClass._find_class_context(dct, bases)
 
-        if ctx_uri is not None:
-            if not isinstance(ctx_uri, URIRef) \
-               and isinstance(ctx_uri, (str, six.text_type)):
-                ctx_uri = URIRef(ctx_uri)
-            self.__context = Contexts[ctx_uri]
+        if ctx is not None:
+            self.__context = ctx
         else:
             self.__context = None
 
@@ -106,15 +112,22 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     @classmethod
     def _find_class_context(cls, dct, bases):
-        ctx_uri = dct.get('class_context', None)
-        if ctx_uri is None:
+        ctx_or_ctx_uri = dct.get('class_context', None)
+        if ctx_or_ctx_uri is None:
             for b in bases:
                 pctx = getattr(b, 'definition_context', None)
                 if pctx is not None:
-                    ctx_uri = pctx.identifier
+                    ctx = pctx
                     break
-
-        return ctx_uri
+        else:
+            if not isinstance(ctx_or_ctx_uri, URIRef) \
+               and isinstance(ctx_or_ctx_uri, (str, six.text_type)):
+                ctx_or_ctx_uri = URIRef(ctx_or_ctx_uri)
+            if isinstance(ctx_or_ctx_uri, (str, six.text_type)):
+                ctx = ClassContext(ctx_or_ctx_uri)
+            else:
+                ctx = ctx_or_ctx_uri
+        return ctx
 
     @classmethod
     def _find_base_namespace(cls, dct, bases):
@@ -124,8 +137,12 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 if hasattr(b, 'base_namespace') and b.base_namespace is not None:
                     base_ns = b.base_namespace
                     break
-
         return base_ns
+
+    def contextualize_class_augment(self, context):
+        res = super(ContextMappedClass, self).contextualize_class_augment(context)
+        res.__module__ = self.__module__
+        return res
 
     def after_mapper_module_load(self, mapper):
         self.init_rdf_type_object()
@@ -136,7 +153,62 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                 raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
                     self, self.rdf_type))
             L.debug('Creating rdf_type_object for {} in {}'.format(self, self.definition_context))
-            self.rdf_type_object = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
+            rdto = TypeDataObject.contextualize(self.definition_context)(ident=self.rdf_type)
+            rdto.attach_property(RDFSSubClassOfProperty)
+            for par in self.__bases__:
+                prdto = getattr(par, 'rdf_type_object', None)
+                if prdto is not None:
+                    rdto.rdfs_subclassof_property.set(prdto)
+            self.rdf_type_object = rdto
+
+            # These imports have to come after the rdf_type_object is set on these types. Basically, the evaluation goes
+            # like this:
+            #
+            # >after_mapper_module_load BaseDataObject
+            # init_rdf_type_object BaseDataObject
+            #   >after_mapper_module_load RegistryEntry
+            #   init_rdf_type_object RegistryEntry
+            #     >after_mapper_module_load PythonModule
+            #     init_rdf_type_object PythonModule
+            #     <after_mapper_module_load done PythonModule
+            #
+            #     >after_mapper_module_load PythonClassDescription
+            #     init_rdf_type_object PythonClassDescription
+            #     <after_mapper_module_load done PythonClassDescription
+            #
+            #     >after_mapper_module_load PyPIPackage
+            #     init_rdf_type_object PyPIPackage
+            #     <after_mapper_module_load done PyPIPackage
+            #
+            #   <after_mapper_module_load done RegistryEntry
+            #
+            #   >after_mapper_module_load ModuleAccess
+            #   init_rdf_type_object ModuleAccess
+            #   <after_mapper_module_load done ModuleAccess
+            #
+            #   >after_mapper_module_load Module
+            #   init_rdf_type_object Module
+            #   <after_mapper_module_load done Module
+            #
+            #   >after_mapper_module_load ClassDescription
+            #   init_rdf_type_object ClassDescription
+            #   <after_mapper_module_load done ClassDescription
+            # <after_mapper_module_load done BaseDataObject
+
+            from PyOpenWorm.class_registry import RegistryEntry
+            from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
+
+            re = RegistryEntry.contextualize(self.definition_context)()
+            cd = PythonClassDescription.contextualize(self.definition_context)()
+
+            mo = PythonModule.contextualize(self.definition_context)()
+            mo.name(self.__module__)
+
+            cd.module(mo)
+            cd.name(self.__name__)
+
+            re.rdf_class(self.rdf_type)
+            re.class_description(cd)
         else:
             self.rdf_type_object = None
 
@@ -183,6 +255,14 @@ def contextualized_data_object(context, obj):
         res.add_attr_override('properties', cprop)
         for p in cprop:
             res.add_attr_override(p.linkName, p)
+
+        ops = res.owner_properties
+        new_ops = []
+        for p in ops:
+            if p.context == context:
+                new_ops.append(p)
+        ctxd_owner_props = res.owner_properties.contextualize(context)
+        res.add_attr_override('owner_properties', ctxd_owner_props)
     return res
 
 
@@ -201,6 +281,24 @@ class ContextualizableList(Contextualizable, list):
         res = type(self)(None)
         res += list(x.decontextualize() for x in self)
         return res
+
+
+class ContextFilteringList(Contextualizable, list):
+    def __init__(self, context):
+        self._context = context
+
+    def __iter__(self):
+        for x in super(ContextFilteringList, self).__iter__():
+            if self._context is None or x.context == self._context:
+                yield x
+
+    def contextualize(self, context):
+        res = type(self)(context)
+        res += self
+        return res
+
+    def decontextualize(self):
+        return list(super(ContextFilteringList, self).__iter__())
 
 
 class PThunk(object):
@@ -324,13 +422,14 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                              if val is not None]
         super(BaseDataObject, self).__init__(**kwargs)
         self.properties = ContextualizableList(self.context)
-        self.owner_properties = []
+        self.owner_properties = ContextFilteringList(self.context)
 
         self.po_cache = None
         """ A cache of property URIs and values. Used by RealSimpleProperty """
 
         self._variable = None
 
+        self.filling = False
         for k, v in pc.items():
             if not v.lazy:
                 self.attach_property(v, name='_pow_' + k)
@@ -357,7 +456,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf.get('rdf.graph', None)
+            try:
+                return self.conf['rdf.graph']
+            except KeyError:
+                raise Exception('No rdf graph in the conf %s' % self.conf)
 
     @classmethod
     def next_variable(cls):
@@ -412,23 +514,19 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             super(BaseDataObject, self).__setattr__(name, val)
 
     def count(self):
-        return len(GraphObjectQuerier(self, self.rdf, parallel=False)())
+        return len(GraphObjectQuerier(self, self.rdf, parallel=False,
+                                      hop_scorer=goq_hop_scorer)())
 
-    def load(self):
-        idents = GraphObjectQuerier(self, self.rdf, parallel=False)()
-        if idents:
-            choices = self.rdf.triples_choices((list(idents),
-                                                R.RDF['type'],
-                                                None))
-            grouped_type_triples = groupby(choices, lambda x: x[0])
-            for ident, type_triples in grouped_type_triples:
-                types = set()
-                for __, __, rdf_type in type_triples:
-                    types.add(rdf_type)
-                the_type = get_most_specific_rdf_type(types)
-                yield oid(ident, the_type, self.context)
-        else:
-            return
+    def load(self, graph=None):
+        # XXX: May need to rethink this refactor at some point...
+        for x in load(self.rdf if graph is None else graph,
+                      start=self,
+                      target_type=type(self).rdf_type,
+                      context=self.context):
+            yield x
+
+    def fill(self):
+        pass
 
     def variable(self):
         if self._variable is None:
@@ -577,9 +675,10 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             owner = kwargs.get('owner', None)
             if owner is not None:
                 del kwargs['owner']
+        attr_name = kwargs.get('attrName')
         if owner is None:
             raise TypeError('No owner')
-        return owner.attach_property(cls._create_property_class(*args, **kwargs))
+        return owner.attach_property(cls._create_property_class(*args, **kwargs), name=attr_name)
 
     def attach_property(self, c, name=None):
         ctxd_pclass = c.contextualize_class(self.context)
@@ -714,10 +813,21 @@ class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
         super(RDFSClass, self).__init__(ident=R.RDFS["Class"], *args, **kwargs)
 
 
+class RDFSSubClassOfProperty(SP.ObjectProperty):
+    link = R.RDFS.subClassOf
+    linkName = 'rdfs_subclassof_property'
+    value_type = RDFSClass
+    owner_type = RDFSClass
+    multiple = True
+    lazy = False
+
+
 class RDFTypeProperty(SP.ObjectProperty):
+    # XXX: This class is special. It doesn't have its after_mapper_module_load called because that would mess up
+    # evaluation order for this module...
     link = R.RDF['type']
     linkName = "rdf_type_property"
-    value_type = RDFSClass
+    value_rdf_type = RDFSClass.rdf_type
     owner_type = BaseDataObject
     multiple = True
     lazy = False
@@ -735,49 +845,6 @@ class RDFProperty(DataObjectSingleton):
                                           **kwargs)
 
 
-def oid(identifier_or_rdf_type, rdf_type=None, context=None):
-    """ Create an object from its rdf type
-
-    Parameters
-    ----------
-    identifier_or_rdf_type : :class:`str` or :class:`rdflib.term.URIRef`
-        If `rdf_type` is provided, then this value is used as the identifier
-        for the newly created object. Otherwise, this value will be the
-        :attr:`rdf_type` of the object used to determine the Python type and
-        the object's identifier will be randomly generated.
-    rdf_type : :class:`str`, :class:`rdflib.term.URIRef`, :const:`False`
-        If provided, this will be the :attr:`rdf_type` of the newly created
-        object.
-
-    Returns
-    -------
-       The newly created object
-
-    """
-    identifier = identifier_or_rdf_type
-    if rdf_type is None:
-        rdf_type = identifier_or_rdf_type
-        identifier = None
-
-    c = None
-    try:
-        c = PyOpenWorm.CONTEXT.mapper.RDFTypeTable[rdf_type]
-    except KeyError:
-        c = BaseDataObject
-    L.debug("oid: making a {} with ident {}".format(c, identifier))
-
-    # if its our class name, then make our own object
-    # if there's a part after that, that's the property name
-    o = None
-    if context is not None:
-        c = context(c)
-    if identifier is not None:
-        o = c(ident=identifier)
-    else:
-        o = c()
-    return o
-
-
 def disconnect():
     global PropertyTypes
     global DataObjectTypes
@@ -787,28 +854,6 @@ def disconnect():
     RDFTypeTable.clear()
     DataObjectsParents.clear()
     PropertyTypes.clear()
-
-
-def get_most_specific_rdf_type(types):
-    """ Gets the most specific rdf_type.
-
-    Returns the URI corresponding to the lowest in the DataObject class
-    hierarchy from among the given URIs.
-    """
-    mapper = PyOpenWorm.CONTEXT.mapper
-    most_specific_types = tuple(mapper.base_classes.values())
-    for x in types:
-        try:
-            class_object = mapper.RDFTypeTable[x]
-            if issubclass(class_object, most_specific_types):
-                most_specific_types = (class_object,)
-        except KeyError:
-            L.warning(
-                """A Python class corresponding to the type URI "{}" couldn't be found.
-            You may want to import the module containing the class as well as
-            add additional type annotations in order to resolve your objects to
-            a more precise type.""".format(x))
-    return most_specific_types[0].rdf_type
 
 
 class PropertyDataObject(DataObject):
@@ -827,7 +872,7 @@ class _Resolver(RDFTypeResolver):
     @classmethod
     def get_instance(cls):
         if cls.instance is None:
-            cls.instance = RDFTypeResolver(
+            cls.instance = cls(
                 BaseDataObject.rdf_type,
                 get_most_specific_rdf_type,
                 oid,
@@ -836,4 +881,4 @@ class _Resolver(RDFTypeResolver):
 
 
 __yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
-                            RDFProperty, PropertyDataObject)
+                            RDFProperty, RDFSSubClassOfProperty, PropertyDataObject)

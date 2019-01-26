@@ -50,7 +50,7 @@ class ConnectionTest(_DataTest):
 
     def test_load1(self):
         """ Put the appropriate triples in. Try to load them """
-        g = R.Graph()
+        g = R.ConjunctiveGraph()
         self.config['rdf.graph'] = g
         for t in self.trips:
             g.add(t)
@@ -60,7 +60,7 @@ class ConnectionTest(_DataTest):
 
     def test_load_with_filter(self):
         # Put the appropriate triples in. Try to load them
-        g = R.Graph()
+        g = R.ConjunctiveGraph()
         self.config['rdf.graph'] = g
         for t in self.trips:
             g.add(t)

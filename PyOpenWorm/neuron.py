@@ -181,8 +181,8 @@ class Neighbor(Property):
                         yield post
         else:
             conn = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
-            for r in conn.load():
-                yield r.post_cell()
+            for r in conn.post_cell.get():
+                yield r
 
     def count(self, **kwargs):
         conntype = self._conntype.contextualize(self.context)
@@ -251,6 +251,7 @@ class ConnectionProperty(Property):
         for x in c:
             for r in x.load():
                 yield r
+
         for x in self._conns:
             if x.defined and x.context == self.context:
                 yield x
@@ -266,17 +267,17 @@ class ConnectionProperty(Property):
         return []
 
     def count(self, pre_post_or_either='pre', *args, **kwargs):
-        c = []
+        res = 0
         conntype = self._conntype.contextualize(self.context)
         if pre_post_or_either == 'pre':
-            c.append(conntype(pre_cell=self.owner, **kwargs))
+            res += conntype(pre_cell=self.owner, **kwargs).count()
         elif pre_post_or_either == 'post':
-            c.append(conntype(post_cell=self.owner, **kwargs))
+            res += conntype(post_cell=self.owner, **kwargs).count()
         elif pre_post_or_either == 'either':
-            c.append(conntype(pre_cell=self.owner, **kwargs))
-            c.append(conntype(post_cell=self.owner, **kwargs))
+            res += conntype(pre_cell=self.owner, **kwargs).count() + \
+                    conntype(post_cell=self.owner, **kwargs).count()
 
-        return sum(x.count() for x in c)
+        return res
 
     def set(self, conn, **kwargs):
         """Add a connection associated with the owner Neuron

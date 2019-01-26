@@ -6,7 +6,7 @@ from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
-from .dataObject import BaseDataObject, ObjectProperty
+from .dataObject import DataObject, ObjectProperty
 
 
 class Informational(object):
@@ -16,7 +16,7 @@ class Informational(object):
                  property_name=None, also=()):
         self.name = name
         self._property_name = property_name
-        self.display_name = name if display_name is None else display_name
+        self._display_name = display_name
         self.default_value = default_value
         self.description = description
         self._value = value
@@ -34,6 +34,14 @@ class Informational(object):
         """
 
         self.cls = None
+
+    @property
+    def display_name(self):
+        return self._display_name if self._display_name is not None else self.name
+
+    @display_name.setter
+    def display_name(self, val):
+        self._display_name = val
 
     @property
     def property_name(self):
@@ -65,7 +73,7 @@ class DuplicateAlsoException(Exception):
     pass
 
 
-class DataSourceType(type(BaseDataObject)):
+class DataSourceType(type(DataObject)):
 
     """A type for DataSources
 
@@ -115,7 +123,7 @@ class DataSourceType(type(BaseDataObject)):
         return self.__info_fields
 
 
-class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
+class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     '''
     A source for data that can get translated into PyOpenWorm objects.
 
@@ -181,14 +189,27 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
             # the inf.property_name is used for the linkName so that the property's URI is generated based on that name.
             # This allows to set an attribute named inf.property_name on self while still having access to the property
             # through inf.name.
-            setattr(self,
-                    inf.name,
-                    getattr(inf.cls, inf.property_type)(owner=self,
-                                                        linkName=inf.property_name,
-                                                        multiple=True))
+            getattr(inf.cls, inf.property_type)(owner=self,
+                                                linkName=inf.property_name,
+                                                multiple=inf.multiple,
+                                                attrName=inf.name)
             ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)
+
+    def commit(self):
+        '''
+        Commit the data source *locally*
+
+        This includes staging files such as they would be available for a translation. In general, a sub-class should
+        implement :meth:`commit_augment` rather than this method, or at least call this method via super
+
+        For example, if the data source produces a file, that file should be in
+        '''
+        self.commit_augment()
+
+    def commit_augment():
+        pass
 
     def defined_augment(self):
         return self.translation.has_defined_value()
@@ -197,21 +218,41 @@ class DataSource(six.with_metaclass(DataSourceType, BaseDataObject)):
         return self.make_identifier(self.translation.defined_values[0].identifier.n3())
 
     def __str__(self):
+        return self.format_str(False)
+
+    def format_str(self, stored):
         try:
             sio = six.StringIO()
             print(self.__class__.__name__, file=sio)
             for info in self.info_fields.values():
-                print('    ' + info.display_name, end=': ', file=sio)
-                for val in getattr(self, info.name).defined_values:
-                    val_line_sep = '\n      ' + ' ' * len(info.display_name)
-                    print(val_line_sep.join(str(val).split('\n')), end=' ', file=sio)
-                print(file=sio)
+                attr = getattr(self, info.name)
+                if stored:
+                    attr_vals = list()
+                    for x in attr.get():
+                        if x not in attr_vals:
+                            attr_vals.append(x)
+                else:
+                    attr_vals = attr.defined_values
+                if attr_vals:
+                    print('    ' + info.display_name, end=': ', file=sio)
+                    for val in sorted(attr_vals):
+                        val_line_sep = '\n      ' + ' ' * len(info.display_name)
+                        if isinstance(val, DataSource):
+                            valstr = val.format_str(stored)
+                        elif isinstance(val, URIRef):
+                            valstr = val.n3()
+                        elif isinstance(val, six.string_types):
+                            valstr = repr(val)
+                        else:
+                            valstr = str(val)
+                        print(val_line_sep.join(valstr.split('\n')), end=' ', file=sio)
+                    print(file=sio)
             return sio.getvalue()
         except AttributeError:
             return super(DataSource, self).__str__()
 
 
-class Translation(BaseDataObject):
+class Translation(DataObject):
     """
     Representation of the method by which a DataSource was translated and
     the sources of that translation.  Unlike the 'source' field attached to
@@ -255,13 +296,15 @@ class DataObjectContextDataSource(DataSource):
 
 
 def format_types(typ):
-    if isinstance(typ, type):
+    if isinstance(typ, OneOrMore):
+        return ':class:`{}` (:class:`{}`)'.format(FCN(OneOrMore), FCN(typ.source_type))
+    elif isinstance(typ, type):
         return ':class:`{}`'.format(FCN(typ))
     else:
         return ', '.join(':class:`{}`'.format(FCN(x)) for x in typ)
 
 
-class DataTransatorType(type(BaseDataObject)):
+class DataTransatorType(type(DataObject)):
     def __init__(self, name, bases, dct):
         super(DataTransatorType, self).__init__(name, bases, dct)
 
@@ -273,7 +316,7 @@ class DataTransatorType(type(BaseDataObject)):
                                                 self.translator_identifier)
 
 
-class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
+class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
     """ Translates from a data source to PyOpenWorm objects """
 
     input_type = DataSource
@@ -281,25 +324,26 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
     translator_identifier = None
     translation_type = Translation
 
-    def __init__(self):
-        if self.translator_identifier is not None:
-            super(BaseDataTranslator, self).__init__(ident=self.translator_identifier)
+    def __init__(self, **kwargs):
+        if self.translator_identifier is not None and 'ident' not in kwargs:
+            super(BaseDataTranslator, self).__init__(ident=self.translator_identifier, **kwargs)
         else:
-            super(BaseDataTranslator, self).__init__()
-
-    def get_data_objects(self, data_source):
-        """ Override this to change how data objects are generated """
-        if not isinstance(data_source, self.input_type):
-            return set([])
-        else:
-            return self.translate(data_source)
+            super(BaseDataTranslator, self).__init__(**kwargs)
 
     def __call__(self, *args, **kwargs):
         self.output_key = kwargs.pop('output_key', None)
+        self.output_identifier = kwargs.pop('output_identifier', None)
         try:
             return self.translate(*args, **kwargs)
         finally:
             self.output_key = None
+            self.output_identifier = None
+
+    def __str__(self):
+        s = '''Input type(s): {}
+               Output type(s): {}'''.format(self.input_type,
+                                            self.output_type)
+        return '\n'.join(x.strip() for x in s.split('\n'))
 
     def translate(self, *args, **kwargs):
         '''
@@ -323,11 +367,24 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, BaseDataObject)):
     def make_new_output(self, sources, *args, **kwargs):
         trans = self.make_translation(sources)
         res = self.output_type.contextualize(self.context)(*args, translation=trans,
+                                                           ident=self.output_identifier,
                                                            key=self.output_key, **kwargs)
         for s in sources:
             res.contextualize(self.context).source(s)
 
         return res
+
+
+class OneOrMore(object):
+    """
+    Wrapper for :class:`DataTranslator` input :class:`DataSource` types indicating that one or more of the wrapped type
+    must be provided to the translator
+    """
+    def __init__(self, source_type):
+        self.source_type = source_type
+
+    def __repr__(self):
+        return FCN(type(self)) + '(' + repr(self.source_type) + ')'
 
 
 class DataTranslator(BaseDataTranslator):

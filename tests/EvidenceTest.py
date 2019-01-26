@@ -75,7 +75,7 @@ class Issue211EvidenceTest(_DataTest):
         self.e1 = self.ctx.Evidence()
         self.e2 = self.ctx.Evidence()
 
-        c = DataObject(key=23)
+        c = DataObject(key='23')
         self.e1.supports(c)
         self.e2.supports(c)
         self.evs = self.context.stored(Evidence)()
@@ -83,12 +83,9 @@ class Issue211EvidenceTest(_DataTest):
 
         self.expected_ids = set(['777', '888'])
 
-    def assertEvidences(self, prop):
+    def test_references(self):
         self.e1.reference(DataObject(ident='777'))
         self.e2.reference(DataObject(ident='888'))
         self.save()
         loaded_ids = set(str(x.identifier) for x in self.evs.reference.get())
         self.assertTrue(self.expected_ids.issubset(loaded_ids))
-
-    def test_references(self):
-        self.assertEvidences('reference')

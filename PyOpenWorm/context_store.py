@@ -2,6 +2,7 @@ from itertools import chain
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
+from yarom.rdfUtils import transitive_lookup
 
 from .context_common import CONTEXT_IMPORTS
 
@@ -24,14 +25,12 @@ class ContextStore(Store):
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
+        print("context =", context)
         if context is not None:
             self._init_store(context)
 
     def open(self, configuration, create=False):
-        from .context import Contexts
-        ctx = Contexts.get(configuration)
-        if ctx is not None:
-            self._init_store(ctx)
+        if self.ctx is not None:
             return VALID_STORE
         else:
             return NO_STORE
@@ -43,6 +42,7 @@ class ContextStore(Store):
             self._store_store = RDFContextStore(ctx)
         else:
             self._store_store = None
+
         if self._memory_store is None:
             self._memory_store = IOMemory()
             self._init_store0(ctx)
@@ -78,9 +78,9 @@ class ContextStore(Store):
         raise NotImplementedError("This is a query-only store")
 
     def triples(self, triple_pattern, context=None):
-        context = getattr(context, 'identifier', context)
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
+        context = getattr(context, 'identifier', context)
         context_triples = []
         if self._store_store is not None:
             context_triples.append(self._store_store.triples(triple_pattern,
@@ -99,7 +99,7 @@ class ContextStore(Store):
 
         """
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
         if self._store_store is None:
             return len(self._memory_store)
         else:
@@ -116,8 +116,9 @@ class ContextStore(Store):
 
         :returns: a generator over Nodes
         """
+        print('shoi')
         if self._memory_store is None:
-            raise Exception("Database has not been opened")
+            raise ContextStoreException("Database has not been opened")
         seen = set()
         rest = ()
 
@@ -145,22 +146,11 @@ class RDFContextStore(Store):
 
     def __init_contexts(self):
         if self.__store is not None and self.__context_transitive_imports is None:
-            imports = set()
-            border = set([self.__context.identifier])
-            while border:
-                new_border = set()
-                for b in border:
-                    itr = self.__store.triples((b, CONTEXT_IMPORTS, None),
-                                               context=self.__imports_graph)
-                    for t in itr:
-                        new_border.add(t[0][2])
-                imports |= border
-                border = new_border
+            imports = transitive_lookup(self.__store, self.__context.identifier, CONTEXT_IMPORTS, self.__imports_graph)
             self.__context_transitive_imports = imports
 
     def triples(self, pattern, context=None):
         self.__init_contexts()
-
         for t in self.__store.triples(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
             inter = self.__context_transitive_imports & contexts
@@ -170,9 +160,23 @@ class RDFContextStore(Store):
     def contexts(self, triple=None):
         if triple is not None:
             for x in self.triples(triple):
+                print(x)
                 for c in x[1]:
                     yield getattr(c, 'identifier', c)
         else:
             self.__init_contexts()
             for c in self.__context_transitive_imports:
                 yield c
+
+    def namespace(self, prefix):
+        return self.__store.namespace(prefix)
+
+    def prefix(self, uri):
+        return self.__store.prefix(uri)
+
+    def bind(self, prefix, namespace):
+        return self.__store.bind(prefix, namespace)
+
+    def namespaces(self):
+        for x in self.__store.namespaces():
+            yield x

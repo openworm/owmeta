@@ -168,6 +168,42 @@ class ConfigureTest(unittest.TestCase):
             finally:
                 os.unlink(tf.name)
 
+    def test_base_varname(self):
+        with patch('PyOpenWorm.configure.resource_filename') as rf:
+            with patch.dict('os.environ', (), clear=True):
+                rf.return_value = 'moosh'
+                tf = self.tempfile()
+                print('{"z": "$BASE/car"}', file=tf)
+                tf.close()
+                try:
+                    c = Configure.open(tf.name)
+                    self.assertEqual(c['z'], 'moosh/car')
+                finally:
+                    os.unlink(tf.name)
+
+    def test_base_varname_override(self):
+        with patch('PyOpenWorm.configure.resource_filename') as rf:
+            with patch.dict('os.environ', {'BASE': 'cars'}, clear=True):
+                rf.return_value = 'moosh'
+                tf = self.tempfile()
+                print('{"z": "$BASE/car"}', file=tf)
+                tf.close()
+                try:
+                    c = Configure.open(tf.name)
+                    self.assertEqual(c['z'], 'cars/car')
+                finally:
+                    os.unlink(tf.name)
+
+    def test_copy_dict(self):
+        c = Configure()
+        c.copy({'a': 1})
+        self.assertEqual(c['a'], 1)
+
+    def test_copy_non_string_key(self):
+        c = Configure()
+        c.copy({5: 1})
+        self.assertEqual(c[5], 1)
+
     def test_configurable_init_empty(self):
         """Ensure Configureable gets init'd with the defalut if nothing is given"""
         i = Configureable()
@@ -181,6 +217,14 @@ class ConfigureTest(unittest.TestCase):
     def test_dict_init(self):
         c = Configure(x=4, y=3)
         self.assertEqual(4, c['x'])
+
+    def test_iter(self):
+        c = Configure(x=2, y=1)
+        self.assertEqual({'x', 'y'}, {s for s in c})
+
+    def test_contains(self):
+        c = Configure(x=2, y=1)
+        self.assertIn('x', c)
 
     @staticmethod
     def tempfile():
