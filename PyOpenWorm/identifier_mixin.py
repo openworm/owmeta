@@ -69,7 +69,7 @@ def IdMixin(typ=object, hashfunc=None):
 
             @classmethod
             def make_identifier_direct(cls, string):
-                if not isinstance(string, str):
+                if not isinstance(string, string_types):
                     raise ValueError('make_identifier_direct only accepts strings')
                 return URIRef(cls.rdf_namespace[quote(string)])
 

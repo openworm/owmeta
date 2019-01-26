@@ -45,7 +45,7 @@ class DataSourceDirLoaderTest(unittest.TestCase):
 
             cut = A(dname)
 
-            with self.assertRaisesRegex(LoadFailed, r'outside of the base'):
+            with self.assertRaisesRegexp(LoadFailed, r'outside of the base'):
                 cut('ident')
 
     def test_load_success(self):
