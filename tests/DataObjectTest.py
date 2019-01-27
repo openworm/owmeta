@@ -18,15 +18,26 @@ from .GraphDBInit import make_graph
 
 from .DataTestTemplate import _DataTest
 try:
-    from unittest.mock import Mock
+    from unittest.mock import Mock, patch
 except ImportError:
-    from mock import Mock
+    from mock import Mock, patch
 
 
 DATAOBJECT_PROPERTIES = ['DatatypeProperty', 'ObjectProperty', 'UnionProperty']
 
 
 class DataObjectTest(_DataTest):
+    ctx_classes = (DataObject,)
+
+    def setUp(self):
+        super(DataObjectTest, self).setUp()
+        self.patcher = patch('PyOpenWorm.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        super(DataObjectTest, self).tearDown()
+
     def test_DataUser(self):
         do = DataObject()
         self.assertTrue(isinstance(do, DataUser))
@@ -46,11 +57,11 @@ class DataObjectTest(_DataTest):
         self.assertEqual(self.config['user.email'], u)
 
     def test_object_from_id_type_0(self):
-        g = DataObject.object_from_id('http://openworm.org/entities/Neuron')
+        g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
 
     def test_object_from_id_type_1(self):
-        g = DataObject.object_from_id('http://openworm.org/entities/Connection')
+        g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
 
     @unittest.skip("Should be tracked by version control")
@@ -127,8 +138,7 @@ class DataObjectTest(_DataTest):
             - loading a module from a ClassDescription
             - resolving subclasses from superclasses
         '''
-        from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
-        from PyOpenWorm.class_registry import RegistryEntry
+        from PyOpenWorm.dataObject import PythonModule, PythonClassDescription, RegistryEntry
 
         ident = R.URIRef('http://openworm.org/entities/TDO01')
         rdftype = R.RDF['type']
@@ -162,9 +172,9 @@ class DataObjectTest(_DataTest):
         self.context.mapper.process_class(A)
 
         self.context.add_import(BASE_CONTEXT)
-        m = Context(ident='http://example.org/ctx', imported=(self.context,))
-        im = Context(ident='http://example.org/ctxim', imported=(self.context,))
-        co = Context(ident='http://example.org/ctxb', imported=(m, im))
+        m = self.context(Context)(ident='http://example.org/ctx', imported=(self.context,))
+        im = self.context(Context)(ident='http://example.org/ctxim', imported=(self.context,))
+        co = self.context(Context)(ident='http://example.org/ctxb', imported=(m, im))
         m(A)(ident='http://example.org/anA')
         co.save_imports(im)
         co.save_context(inline_imports=True)

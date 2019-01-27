@@ -7,6 +7,8 @@ from .DataTestTemplate import _DataTest
 
 
 class ConnectionTest(_DataTest):
+    ctx_classes = (Connection,)
+
     def setUp(self):
         _DataTest.setUp(self)
         ns = self.config['rdf.namespace']
@@ -54,7 +56,7 @@ class ConnectionTest(_DataTest):
         self.config['rdf.graph'] = g
         for t in self.trips:
             g.add(t)
-        c = Connection(conf=self.config)
+        c = self.ctx.Connection(conf=self.config)
         for x in c.load():
             self.assertIsInstance(x, Connection)
 

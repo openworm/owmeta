@@ -25,7 +25,6 @@ class ContextStore(Store):
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
-        print("context =", context)
         if context is not None:
             self._init_store(context)
 
@@ -116,7 +115,6 @@ class ContextStore(Store):
 
         :returns: a generator over Nodes
         """
-        print('shoi')
         if self._memory_store is None:
             raise ContextStoreException("Database has not been opened")
         seen = set()
@@ -138,7 +136,7 @@ class RDFContextStore(Store):
 
     def __init__(self, context=None, imports_graph=None, **kwargs):
         super(RDFContextStore, self).__init__(**kwargs)
-        self.__graph = context.conf['rdf.graph']
+        self.__graph = context.rdf
         self.__imports_graph = imports_graph
         self.__store = self.__graph.store
         self.__context = context
@@ -160,7 +158,6 @@ class RDFContextStore(Store):
     def contexts(self, triple=None):
         if triple is not None:
             for x in self.triples(triple):
-                print(x)
                 for c in x[1]:
                     yield getattr(c, 'identifier', c)
         else:

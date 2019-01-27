@@ -70,7 +70,7 @@ class ChannelTest(_DataTest):
         self.assertIn((cell.identifier,
                        cell.channel.link,
                        chan.identifier),
-                      config('rdf.graph'))
+                      self.config['rdf.graph'])
 
     def test_property_in_graph(self):
         chan = self.ctx.Channel(name='K+')
@@ -81,4 +81,4 @@ class ChannelTest(_DataTest):
         self.assertIn((chan.identifier,
                        chan.appearsIn.link,
                        cell.identifier),
-                      config('rdf.graph'))
+                      self.config['rdf.graph'])

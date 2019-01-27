@@ -60,7 +60,22 @@ class ContextMeta(ContextualizableClass):
         return ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
 
 
-class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, DataUser)):
+class ContextualizableDataUserMixin(Contextualizable, DataUser):
+
+    @property
+    def conf(self):
+        if self.context is None:
+            return super(ContextualizableDataUserMixin, self).conf
+        else:
+            return self.context.conf
+
+    @conf.setter
+    def conf(self, conf):
+        super(ContextualizableDataUserMixin, self).conf = conf
+
+
+class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
+                                 ContextualizableDataUserMixin)):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
@@ -95,14 +110,13 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             raise Exception(self)
 
         self._statements = []
-        self._set_buffer_size = 10000
         self._imported_contexts = list(imported)
         self._rdf_object = None
         self._graph = None
-        # XXX: Is this a hack? Sure feels like one...
+
         if mapper is None:
-            from PyOpenWorm import CONTEXT
-            mapper = CONTEXT.mapper
+            mapper = self.conf.get('mapper', None)
+
         self.mapper = mapper
         self.base_namespace = base_namespace
 
@@ -129,12 +143,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self._graph = None
         self._statements.remove(stmt)
         self._change_counter += 1
-
-    def add_object(self, o):
-        pass
-
-    def add_objects(self, objects):
-        pass
 
     @property
     def imports(self):
@@ -174,7 +182,6 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
         if graph is None:
             graph = self._retrieve_configured_graph()
-
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
@@ -307,35 +314,40 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
     @property
     def query(self):
-        return QueryContext(graph=self.load_combined_graph(),
-                            ident=self.identifier,
-                            conf=self.conf)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_combined_graph(),
+                ident=self.identifier,
+                conf=self.conf)
 
     @property
     def staged(self):
-        return QueryContext(graph=self.load_staged_graph(),
-                            ident=self.identifier)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_staged_graph(),
+                ident=self.identifier,
+                conf=self.conf)
 
     @property
     def stored(self):
-        return QueryContext(graph=self.load_graph_from_configured_store(),
-                            ident=self.identifier,
-                            conf=self.conf)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_graph_from_configured_store(),
+                ident=self.identifier,
+                conf=self.conf)
 
     def _retrieve_configured_graph(self):
-        try:
-            return self.conf['rdf.graph']
-        except KeyError:
-            raise Exception('No graph was given and configuration has no graph')
+        return self.rdf
 
     def resolve_class(self, uri):
         # look up the class in the registryCache
+        if self.mapper is None:
+            return None
         c = self.mapper.RDFTypeTable.get(uri)
         if c is None:
             # otherwise, attempt to load into the cache by
             # reading the RDF graph.
-            from PyOpenWorm.python_class_registry import PythonClassDescription
-            from PyOpenWorm.class_registry import RegistryEntry
+            from PyOpenWorm.dataObject import PythonClassDescription, RegistryEntry
 
             re = self(RegistryEntry)()
             re.rdf_class(uri)

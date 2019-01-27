@@ -85,7 +85,7 @@ pow clone git@github.com:openworm/OpenWormData.git
 Then, in Python, from the same directory:
 ```python
 >>> import PyOpenWorm as P
->>> P.connect('readme.conf')
+>>> conn = P.connect('readme.conf')
 
 ```
 
@@ -103,7 +103,7 @@ Then you can try out a few things:
 ```python
 # Make the context
 >>> from PyOpenWorm.context import Context
->>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data')
+>>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data', conf=conn)
 
 # Grabs the representation of the neuronal network
 >>> from PyOpenWorm.worm import Worm
@@ -170,10 +170,10 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> from PyOpenWorm.evidence import Evidence
 
 # Make a context for evidence (i.e., statements about other groups of statements)
->>> evctx = Context(ident='http://example.org/evidence/context')
+>>> evctx = Context(ident='http://example.org/evidence/context', conf=conn)
 
 # Make a context for defining domain knowledge
->>> dctx = Context(ident='http://example.org/data/context')
+>>> dctx = Context(ident='http://example.org/data/context', conf=conn)
 >>> doc = evctx(Document)(key="Sulston83", author='Sulston et al.', date='1983')
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
@@ -231,7 +231,7 @@ PyOpenWorm.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_.
 
 Get direct access to the RDFLib graph::
 ```python
->>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }")
+>>> conn['rdf.graph'].query("SELECT ?y WHERE { ?x rdf:type ?y }")
 <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
 
 ```
@@ -267,7 +267,7 @@ model was derived from.
 
 Finally, when you're done accessing the database, be sure to disconnect from it::
 ```python
->>> P.disconnect()
+>>> P.disconnect(conn)
 
 ```
 

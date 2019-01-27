@@ -37,19 +37,41 @@ __author__ = 'Stephen Larson'
 
 import sys
 import os
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 BASE_SCHEMA_URL = 'http://openworm.org/schema'
 
 # The c extensions are incompatible with our code...
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
+from .import_override import Overrider
+from .module_recorder import ModuleRecorder
 
+ImportOverrider = None
+_ModuleRecorder = None
+
+
+def install_module_import_wrapper():
+    global ImportOverrider
+    global _ModuleRecorder
+
+    if ImportOverrider is None:
+        _ModuleRecorder = ModuleRecorder()
+        ImportOverrider = Overrider(mapper=_ModuleRecorder)
+        ImportOverrider.wrap_import()
+        ImportOverrider.install_excepthook()
+    else:
+        LOGGER.info("Import overrider already installed")
+    return ImportOverrider
+
+
+install_module_import_wrapper()
 from .configure import Configureable
 from .context import Context
 import yarom
 from .mapper import Mapper
-from PyOpenWorm.import_override import Overrider
 
-__import__('__main__').connected = False
 __all__ = [
     "get_data",
     "loadConfig",
@@ -59,47 +81,32 @@ __all__ = [
     "config",
     ]
 
-# Base class names is empty because we won't be adding any objects to the
-# context automatically
-mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                  'PyOpenWorm.simpleProperty.RealSimpleProperty'))
-# An "empty" context, that serves as the default when no context is defined
-DEF_CTX = Context(mapper=mapper)
+_connected = False
+
+DEF_CTX = Context()
 
 RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
-                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                      mapper=mapper)
+                      base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 
 RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
                        imported=(RDF_CONTEXT,),
-                       base_namespace='http://www.w3.org/2000/01/rdf-schema#',
-                       mapper=mapper)
-
+                       base_namespace='http://www.w3.org/2000/01/rdf-schema#')
 
 BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
                        ident=BASE_SCHEMA_URL,
-                       base_namespace=BASE_SCHEMA_URL + '#',
-                       mapper=mapper)
+                       base_namespace=BASE_SCHEMA_URL + '#')
 
 SCI_CTX = Context(imported=(BASE_CONTEXT,),
                   ident=BASE_SCHEMA_URL + '/sci',
-                  base_namespace=BASE_SCHEMA_URL + '/sci#',
-                  mapper=mapper)
+                  base_namespace=BASE_SCHEMA_URL + '/sci#')
 
 SCI_BIO_CTX = Context(imported=(SCI_CTX,),
                       ident=BASE_SCHEMA_URL + '/sci/bio',
-                      base_namespace=BASE_SCHEMA_URL + '/sci/bio#',
-                      mapper=mapper)
+                      base_namespace=BASE_SCHEMA_URL + '/sci/bio#')
 
 CONTEXT = Context(imported=(SCI_BIO_CTX,),
                   ident=BASE_SCHEMA_URL + '/bio',
-                  base_namespace=BASE_SCHEMA_URL + '/bio#',
-                  mapper=mapper)
-
-yarom.MAPPER = CONTEXT.mapper
-overrider = Overrider(yarom.MAPPER)
-overrider.wrap_import()
-overrider.install_excepthook()
+                  base_namespace=BASE_SCHEMA_URL + '/bio#')
 
 
 def get_data(path):
@@ -131,29 +138,19 @@ def config(key=None):
 def loadConfig(f):
     """ Load configuration for the module. """
     from .data import Data
-    Configureable.default = Data.open(f)
-    return Configureable.default
+    return Data.open(f)
 
 
 def disconnect(c=False):
     """ Close the database. """
+    global _connected
+    _connected = False
 
-    m = __import__('__main__')
-    if not m.connected:
-        return
-
-    if not c:
-        c = Configureable.default
-
+    from .dataObject import disconnect as do_disconnect
+    do_disconnect()
     if c:
         c.closeDatabase()
-
-    from .dataObject import disconnect as DODisconnect
-    from .dataObject import PropertyTypes
-    DODisconnect()
-    assert(len(PropertyTypes) == 0)
-
-    m.connected = False
+        _ModuleRecorder.remove_listener(c['mapper'])
 
 
 def loadData(
@@ -186,8 +183,7 @@ def loadData(
         except Exception as e:
             logging.exception("Failed to determine if the serialized data file is older than the binary database."
                               " The data file will be reloaded. Reason: {}".format(e.message))
-    sys.stderr.write(
-        "[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
+    sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
     config('rdf.graph').parse(data, format=dataFormat)
 
 
@@ -200,7 +196,7 @@ class ConnectionFailError(Exception):
 
 
 def connect(configFile=False,
-            conf=False,
+            conf=None,
             do_logging=False,
             data=False,
             dataFormat='n3'):
@@ -208,17 +204,16 @@ def connect(configFile=False,
      Load desired configuration and open the database
 
     :param configFile: (Optional) The configuration file for PyOpenWorm
-    :param conf: (Optional) If true, initializes a data object with the PyOpenWorm configuration
+    :param conf: (Optional) a configuration object for the connection. Takes precedence over `configFile`
     :param do_logging: (Optional) If true, turn on debug level logging
-    :param data: (Optional) If provided, specify the file to load into the library
-    :param dataFormat: (Optional) If provided, specify the file format to load into the library. Currently n3 is supported
+    :param data: (Optional) specify the file to load into the library
+    :param dataFormat: (Optional) file format of `data`. Currently n3 is supported
     """
     import logging
-    import atexit
     from .data import Data, ZODBSourceOpenFailError
-    m = __import__('__main__')
-    if m.connected:
-        print ("PyOpenWorm already connected")
+    global _connected
+    if _connected is True:
+        print("PyOpenWorm already connected")
         return
 
     if do_logging:
@@ -226,8 +221,6 @@ def connect(configFile=False,
 
     if conf:
         if not isinstance(conf, Data):
-            # Initializes a Data object with
-            # the Configureable.conf
             conf = Data(conf)
     elif configFile:
         conf = loadConfig(configFile)
@@ -239,7 +232,6 @@ def connect(configFile=False,
             "rdf.upload_block_statement_count": 50
         })
 
-    Configureable.default = conf
     try:
         conf.init_database()
     except ZODBSourceOpenFailError as e:
@@ -253,8 +245,19 @@ def connect(configFile=False,
 
     logging.getLogger('PyOpenWorm').info("Connected to database")
 
-    atexit.register(disconnect)
-
-    m.connected = True
+    _connected = True
     if data:
         loadData(data, dataFormat)
+
+    # Base class names is empty because we won't be adding any objects to the
+    # context automatically
+    mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
+                                      'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+    conf['mapper'] = mapper
+    # An "empty" context, that serves as the default when no context is defined
+
+    yarom.MAPPER = mapper
+
+    _ModuleRecorder.add_listener(mapper)
+
+    return conf

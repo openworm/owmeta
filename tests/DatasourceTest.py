@@ -11,6 +11,7 @@ from rdflib.term import URIRef
 from PyOpenWorm.datasource import Informational, DataSource, DuplicateAlsoException
 from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
 from PyOpenWorm.contextDataObject import ContextDataObject
+from .DataTestTemplate import _DataTest
 
 
 class InformationalTest(unittest.TestCase):
@@ -28,8 +29,10 @@ class InformationalTest(unittest.TestCase):
         self.assertEqual(inf.display_name, 'test')
 
 
-class DataSourceTest(unittest.TestCase):
+class DataSourceTest(_DataTest):
     def setUp(self):
+        super(DataSourceTest, self).setUp()
+
         class DS1(DataSource):
             a = Informational(default_value='A')
 

@@ -34,13 +34,13 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
-        self.g = PyOpenWorm.config("rdf.graph")
-        self.context = Context(ident="http://openworm.org/data")
+        self.conf = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.g = self.conf["rdf.graph"]
+        self.context = Context(ident="http://openworm.org/data", conf=self.conf)
         self.qctx = self.context.stored
 
     def tearDown(self):
-        PyOpenWorm.disconnect()
+        PyOpenWorm.disconnect(self.conf)
 
     def test_correct_neuron_number(self):
         """

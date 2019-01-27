@@ -3,11 +3,12 @@ import importlib as IM
 import logging
 import rdflib as R
 import yarom
+from .configure import Configureable
+from .module_recorder import ModuleRecordListener
 from itertools import count
 from six import with_metaclass
 from yarom.mapperUtils import parents_str
 from yarom.utils import FCN
-from pprint import pformat
 
 
 __all__ = ["Mapper",
@@ -20,7 +21,7 @@ class UnmappedClassException(Exception):
     pass
 
 
-class Mapper(object):
+class Mapper(ModuleRecordListener, Configureable):
     _instances = dict()
 
     @classmethod
@@ -30,7 +31,8 @@ class Mapper(object):
 
         return cls._instances[args]
 
-    def __init__(self, base_class_names, base_namespace=None, imported=()):
+    def __init__(self, base_class_names, base_namespace=None, imported=(), name=None, **kwargs):
+        super(Mapper, self).__init__(**kwargs)
 
         """ Maps class names to classes """
         self.MappedClasses = dict()
@@ -68,19 +70,16 @@ class Mapper(object):
         """ Base namespace used if a mapped class doesn't define its own """
         self.base_namespace = base_namespace
 
-        self.mapdepth = 0
-
         """ Modules that have already been loaded """
         self.modules = dict()
 
-        """ Module relationships """
-        self.ModuleDependencies = dict()
-        self.ModuleDependents = dict()
-
         self.imported_mappers = imported
 
-        self.loading_module = None
         self.class_ordering = dict()
+
+        if name is None:
+            name = hex(id(self))
+        self.name = name
 
     def decorate_class(self, cls):
         '''
@@ -207,43 +206,15 @@ class Mapper(object):
         module = self.lookup_module(module_name)
         if not module:
             module = IM.import_module(module_name)
-            return self.process_module(module)
+            return self.process_module(module_name, module)
         else:
             return module
 
-    def process_module(self, module=None, cb=None, module_name=None):
-        if module is None:
-            if cb is None:
-                raise ValueError("At least one of cb or module argument must"
-                                 " be provided")
-            if module_name is None:
-                raise ValueError("At least one of module argument or"
-                                 " module_name must be provided")
-        if module_name is None:
-            module_name = module.__name__
-
-        L.debug("%sLOADING %s", ' ' * self.mapdepth, module_name)
-        self.mapdepth += 1
-        old_mapper = yarom.MAPPER
-        yarom.MAPPER = self
-        try:
-            self.add_module_dependency(module_name)
-            previously_loading = self.loading_module
-            self.loading_module = module_name
-
-            if cb is not None:
-                x = cb()
-                if module is None:
-                    module = x
-
-            self.modules[module_name] = module
-            for c in self._module_load_helper(module):
-                if hasattr(c, 'after_mapper_module_load'):
-                    c.after_mapper_module_load(self)
-        finally:
-            self.loading_module = previously_loading
-            self.mapdepth -= 1
-            yarom.MAPPER = old_mapper
+    def process_module(self, module_name, module):
+        self.modules[module_name] = module
+        for c in self._module_load_helper(module):
+            if hasattr(c, 'after_mapper_module_load'):
+                c.after_mapper_module_load(self)
         return module
 
     def process_class(self, c):
@@ -278,16 +249,6 @@ class Mapper(object):
         except AttributeError:
             raise UnmappedClassException(cnames)
 
-    def add_module_dependency(self, module_name):
-        if self.loading_module:
-            depends = self.ModuleDependencies.get(self.loading_module, set())
-            depends.add(module_name)
-            self.ModuleDependencies[self.loading_module] = depends
-
-            callers = self.ModuleDependents.get(module_name, set())
-            callers.add(self.loading_module)
-            self.ModuleDependents[module_name] = callers
-
     def _module_load_helper(self, module):
         # TODO: Make this class selector pluggable and decouple the Resolver
         # init from this -- maybe put it in a callback of some kind
@@ -305,12 +266,6 @@ class Mapper(object):
                 res.append(cls)
 
         return sorted(res, key=_ClassOrderable, reverse=True)
-
-    def _merged_base_classes(self):
-        ret = tuple(self.base_classes.values())
-        for p in self.imported_mappers:
-            ret += p._merged_base_classes()
-        return ret
 
     def oid(self, identifier_or_rdf_type, rdf_type=False):
         """ Create an object from its rdf type
@@ -401,13 +356,10 @@ class Mapper(object):
             yield c
 
     def __str__(self):
-        return "Mapper[" + \
-            pformat({x: getattr(self, x) for x in ('MappedClasses',
-                                                   'DataObjectsParents',
-                                                   'DataObjectsChildren',
-                                                   'RDFTypeTable',
-                                                   'ModuleDependencies')}) + \
-            "]"
+        if self.name is not None:
+            return 'Mapper(name="'+str(self.name)+'")'
+        else:
+            return super(Mapper, self).__str__()
 
 
 class _ClassOrderable(object):

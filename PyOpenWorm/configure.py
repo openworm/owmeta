@@ -93,7 +93,10 @@ class Configure(object):
             self._properties[pname] = value
 
     def __getitem__(self, pname):
-        return self._properties[pname].get()
+        try:
+            return self._properties[pname].get()
+        except KeyError:
+            raise
 
     def __delitem__(self, pname):
         del self._properties[pname]
@@ -218,7 +221,7 @@ class Configureable(object):
                 raise ValueError('The \'conf\' of a Configureable cannot be itself')
             self.__conf = conf
         else:
-            self.__conf = Configureable.default
+            self.__conf = type(self).default
 
     @property
     def conf(self):

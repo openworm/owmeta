@@ -10,6 +10,8 @@ import datetime
 import transaction
 import os
 import logging
+import atexit
+
 from .utils import grouper
 from .configure import Configureable, Configure, ConfigValue
 
@@ -17,8 +19,6 @@ __all__ = [
     "Data",
     "DataUser",
     "RDFSource",
-    "SerializationSource",
-    "TrixSource",
     "SPARQLSource",
     "SleepyCatSource",
     "DefaultSource",
@@ -26,12 +26,31 @@ __all__ = [
 
 L = logging.getLogger(__name__)
 
+ALLOW_UNCONNECTED_DATA_USERS = True
+
 
 _B_UNSET = object()
 
 
+ACTIVE_CONNECTIONS = []
+
+
+def close_databases():
+    for conn in ACTIVE_CONNECTIONS:
+        conn.closeDatabase()
+
+
+atexit.register(close_databases)
+
+
 class OpenFailError(Exception):
     pass
+
+
+class DataUserUnconnected(Exception):
+    def __init__(self, msg):
+        super(DataUserUnconnected, self).__init__(str(msg) + ': No connection has been made for this data'
+        ' user (i.e., it is unconfigured)')
 
 
 class _B(ConfigValue):
@@ -98,7 +117,12 @@ class DataUser(Configureable):
 
     @property
     def rdf(self):
-        return self.conf['rdf.graph']
+        try:
+            return self.conf['rdf.graph']
+        except KeyError:
+            if ALLOW_UNCONNECTED_DATA_USERS:
+                return ConjunctiveGraph()
+            raise DataUserUnconnected('No rdf.graph')
 
     @property
     def namespace_manager(self):
@@ -267,6 +291,7 @@ class Data(Configure):
 
     def openDatabase(self):
         self.init_database()
+        ACTIVE_CONNECTIONS.append(self)
 
     def init_database(self):
         """ Open the configured database """
@@ -338,6 +363,10 @@ class Data(Configure):
     def closeDatabase(self):
         """ Close a the configured database """
         self.source.close()
+        try:
+            ACTIVE_CONNECTIONS.remove(self)
+        except ValueError:
+            L.debug("Attempted to close a database which was already closed")
 
     def _init_rdf_graph(self):
         # Set these in case they were left out
@@ -346,12 +375,9 @@ class Data(Configure):
         self['rdf.store_conf'] = self.get('rdf.store_conf', 'default')
 
         # XXX:The conf=self can probably be removed
-        self.sources = {'sqlite': SQLiteSource,
-                        'sparql_endpoint': SPARQLSource,
+        self.sources = {'sparql_endpoint': SPARQLSource,
                         'sleepycat': SleepyCatSource,
                         'default': DefaultSource,
-                        'trix': TrixSource,
-                        'serialization': SerializationSource,
                         'zodb': ZODBSource}
         source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
@@ -412,81 +438,6 @@ class RDFSource(Configureable, ConfigValue):
         raise NotImplementedError()
 
 
-class SerializationSource(RDFSource):
-
-    """ Reads from an RDF serialization or, if the configured database is more
-        recent, then from that.
-
-        The database store is configured with::
-
-            "rdf.source" = "serialization"
-            "rdf.store" = <your rdflib store name here>
-            "rdf.serialization" = <your RDF serialization>
-            "rdf.serialization_format" = <rdflib serialization format>
-            "rdf.store_conf" = <your rdflib store configuration here>
-
-    """
-
-    def open(self):
-        if not self.graph:
-            self.graph = True
-            import glob
-            # Check the ages of the files. Read the more recent one.
-            g0 = ConjunctiveGraph(store=self.conf['rdf.store'])
-            database_store = self.conf['rdf.store_conf']
-            source_file = self.conf['rdf.serialization']
-            file_format = self.conf['rdf.serialization_format']
-            # store_time only works for stores that are on the local
-            # machine.
-            try:
-                store_time = modification_date(database_store)
-                # If the store is newer than the serialization
-                # get the newest file in the store
-                for x in glob.glob(database_store + "/*"):
-                    mod = modification_date(x)
-                    if store_time < mod:
-                        store_time = mod
-            except Exception:
-                store_time = DT.min
-
-            trix_time = modification_date(source_file)
-
-            g0.open(database_store, create=True)
-
-            if store_time > trix_time:
-                # just use the store
-                pass
-            else:
-                # delete the database and read in the new one
-                # read in the serialized format
-                g0.parse(source_file, format=file_format)
-
-            self.graph = g0
-
-        return self.graph
-
-
-class TrixSource(SerializationSource):
-
-    """ A SerializationSource specialized for TriX
-
-        The database store is configured with::
-
-            "rdf.source" = "trix"
-            "rdf.trix_location" = <location of the TriX file>
-            "rdf.store" = <your rdflib store name here>
-            "rdf.store_conf" = <your rdflib store configuration here>
-
-    """
-
-    def __init__(self, **kwargs):
-        SerializationSource.__init__(self, **kwargs)
-        h = self.conf.get('trix_location', 'UNSET')
-        self.conf.link('rdf.serialization', 'trix_location')
-        self.conf['rdf.serialization'] = h
-        self.conf['rdf.serialization_format'] = 'trix'
-
-
 def _rdf_literal_to_gp(x):
     return x.n3()
 
@@ -535,77 +486,6 @@ class SleepyCatSource(RDFSource):
         g0.open(self.conf['rdf.store_conf'], create=True)
         self.graph = g0
         logging.debug("Opened SleepyCatSource")
-
-
-class SQLiteSource(RDFSource):
-
-    """ Reads from and queries against a SQLite database
-
-    See see the SQLite database :file:`db/celegans.db` for the format
-
-    The database store is configured with::
-
-        "rdf.source" = "Sleepycat"
-        "sqldb" = "/home/USER/openworm/PyOpenWorm/db/celegans.db",
-        "rdf.store" = <your rdflib store name here>
-        "rdf.store_conf" = <your rdflib store configuration here>
-
-    Leaving ``rdf.store`` unconfigured simply gives an in-memory data store.
-    """
-
-    def open(self):
-        conn = sqlite3.connect(self.conf['sqldb'])
-        cur = conn.cursor()
-
-        # first step, grab all entities and add them to the graph
-        n = self.conf['rdf.namespace']
-
-        cur.execute("SELECT DISTINCT ID, Entity FROM tblentity")
-        g0 = ConjunctiveGraph(self.conf['rdf.store'])
-        g0.open(self.conf['rdf.store_conf'], create=True)
-
-        for r in cur.fetchall():
-            # first item is a number -- needs to be converted to a string
-            first = str(r[0])
-            # second item is text
-            second = str(r[1])
-
-            # This is the backbone of any RDF graph.  The unique
-            # ID for each entity is encoded as a URI and every other piece of
-            # knowledge about that entity is connected via triples to that URI
-            # In this case, we connect the common name of that entity to the
-            # root URI via the RDFS label property.
-            g0.add((n[first], RDFS.label, Literal(second)))
-
-        # second step, get the relationships between them and add them to the
-        # graph
-        cur.execute(
-            "SELECT DISTINCT EnID1, Relation, EnID2, Citations FROM tblrelationship")
-
-        gi = ''
-
-        i = 0
-        for r in cur.fetchall():
-            # all items are numbers -- need to be converted to a string
-            first = str(r[0])
-            second = str(r[1])
-            third = str(r[2])
-            prov = str(r[3])
-
-            ui = self.conf['molecule_name'](prov)
-            gi = Graph(g0.store, ui)
-
-            gi.add((n[first], n[second], n[third]))
-
-            g0.add([ui, RDFS.label, Literal(str(i))])
-            if (prov != ''):
-                g0.add([ui, n[u'text_reference'], Literal(prov)])
-
-            i = i + 1
-
-        cur.close()
-        conn.close()
-        self.graph = g0
 
 
 class DefaultSource(RDFSource):

@@ -26,10 +26,6 @@ class _DataTest(unittest.TestCase):
             else:
                 raise e
 
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         # Set do_logging to True if you like walls of text
         self.TestConfig = Data.open(TEST_CONFIG)
@@ -40,7 +36,7 @@ class _DataTest(unittest.TestCase):
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
+        self.connection = PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
         self.context = Context(ident='http://example.org/test-context',
                                conf=self.TestConfig)
         typ = type(self)
@@ -54,9 +50,9 @@ class _DataTest(unittest.TestCase):
         self.context.save_context()
 
     def tearDown(self):
-        PyOpenWorm.disconnect()
+        PyOpenWorm.disconnect(self.connection)
         self.delete_dir()
 
     @property
     def config(self):
-        return PyOpenWorm.config()
+        return self.TestConfig

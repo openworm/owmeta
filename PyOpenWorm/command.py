@@ -815,6 +815,11 @@ class POW(object):
         for g in glob(self.store_name + '*'):
             self.message('unlink', g)
             os.unlink(g)
+
+        ccfile = pth_join(self.powdir, 'changed_contexts')
+        for g in glob(ccfile + '*'):
+            self.message('unlink', g)
+            os.unlink(g)
         self._regenerate_database()
 
     def _regenerate_database(self):

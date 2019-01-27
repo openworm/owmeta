@@ -14,17 +14,18 @@ from yarom.propertyValue import PropertyValue
 from yarom.propertyMixins import (DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from yarom.mapper import FCN
-from PyOpenWorm.data import DataUser
-from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
-                                      contextualize_helper,
-                                      decontextualize_helper)
-from PyOpenWorm.context import Context
-from PyOpenWorm.statement import Statement
-import itertools
-from lazy_object_proxy import Proxy
+from .data import DataUser
+from .contextualize import (Contextualizable, ContextualizableClass,
+                            contextualize_helper,
+                            decontextualize_helper)
+from .context import Context
+from .statement import Statement
 from .inverse_property import InversePropertyMixin
 from .rdf_query_util import goq_hop_scorer, load
 from .rdf_go_modifiers import SubClassModifier
+
+import itertools
+from lazy_object_proxy import Proxy
 
 L = logging.getLogger(__name__)
 
@@ -174,7 +175,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf['rdf.graph']
+            return super(RealSimpleProperty, self).rdf
 
     @property
     def identifier(self):
@@ -300,7 +301,7 @@ class OPResolver(object):
         self._ctx = context
 
     def id2ob(self, ident, typ):
-        from .dataObject import oid
+        from .rdf_query_util import oid
         return oid(ident, typ, self._ctx)
 
     @property
@@ -324,10 +325,10 @@ class PropertyCountMixin(object):
         return sum(1 for _ in super(PropertyCountMixin, self).get())
 
 
-class ObjectProperty (InversePropertyMixin,
-                      _ContextualizingPropertySetMixin,
-                      PropertyCountMixin,
-                      RealSimpleProperty):
+class ObjectProperty(InversePropertyMixin,
+                     _ContextualizingPropertySetMixin,
+                     PropertyCountMixin,
+                     RealSimpleProperty):
 
     def __init__(self, resolver=None, *args, **kwargs):
         super(ObjectProperty, self).__init__(*args, **kwargs)
@@ -361,7 +362,7 @@ class ObjectProperty (InversePropertyMixin,
                                 for x in super(ObjectProperty, self).statements))
 
 
-class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
+class DatatypeProperty(DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
 
     def get(self):
         r = super(DatatypeProperty, self).get()

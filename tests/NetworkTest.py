@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-
+import PyOpenWorm
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.neuron import Neuron
@@ -14,7 +14,7 @@ class NetworkTest(_DataTest):
 
     def setUp(self):
         super(NetworkTest, self).setUp()
-        self.net = self.ctx.Network(conf=self.config)
+        self.net = self.ctx.Network(conf=self.TestConfig)
         self.worm = self.ctx.Worm()
         self.worm.neuron_network(self.net)
 

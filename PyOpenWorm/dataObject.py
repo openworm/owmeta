@@ -7,12 +7,12 @@ import six
 import hashlib
 
 import PyOpenWorm  # noqa
-from . import BASE_SCHEMA_URL
+from . import BASE_SCHEMA_URL, DEF_CTX
 from .contextualize import (Contextualizable,
                             ContextualizableClass,
                             contextualize_helper,
                             decontextualize_helper)
-from .context import ClassContext
+from .context import ClassContext, ContextualizableDataUserMixin
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -31,18 +31,12 @@ import PyOpenWorm.simpleProperty as SP
 __all__ = [
     "BaseDataObject",
     "ContextMappedClass",
-    "DataObject",
-    "DataObjectTypes",
-    "RDFTypeTable",
-    "DataObjectsParents"]
+    "DataObject"]
 
 L = logging.getLogger(__name__)
 
 
-DataObjectTypes = dict()
 PropertyTypes = dict()
-RDFTypeTable = dict()
-DataObjectsParents = dict()
 
 This = object()
 """ A reference to be used in class-level property declarations to denote the
@@ -77,6 +71,64 @@ def mp(c, k):
             return getattr(target, ak)
 
     return PropertyProperty(c, getter)
+
+
+class PThunk(object):
+    def __init__(self):
+        self.result = None
+
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError()
+
+
+class CPThunk(PThunk):
+    def __init__(self, c):
+        super(CPThunk, self).__init__()
+        self.c = c
+
+    def __call__(self, *args, **kwargs):
+        self.result = self.c
+        return self.c
+
+
+class APThunk(PThunk):
+    def __init__(self, t, args, kwargs):
+        super(APThunk, self).__init__()
+        self.t = t
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, cls, linkName):
+        if self.result is None:
+            self.result = cls._create_property_class(linkName,
+                                                     *self.args,
+                                                     property_type=self.t,
+                                                     **self.kwargs)
+        return self.result
+
+    def __repr__(self):
+        return '{}({}, {})'.format(self.t, ',\n'.join(self.args),
+                                   ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
+
+
+class Alias(object):
+    def __init__(self, target):
+        self.target = target
+
+    def __repr__(self):
+        return 'Alias(' + repr(self.target) + ')'
+
+
+def DatatypeProperty(*args, **kwargs):
+    return APThunk('DatatypeProperty', args, kwargs)
+
+
+def ObjectProperty(*args, **kwargs):
+    return APThunk('ObjectProperty', args, kwargs)
+
+
+def UnionProperty(*args, **kwargs):
+    return APThunk('UnionProperty', args, kwargs)
 
 
 class ContextMappedClass(MappedClass, ContextualizableClass):
@@ -149,6 +201,15 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     def init_rdf_type_object(self):
         if self is not TypeDataObject:
+            self._init_rdf_type_object()
+            for crtype in (CR_TYPES - frozenset((self,))):
+                crtype._init_rdf_type_object()
+            self.init_python_class_registry_entries()
+        else:
+            self.rdf_type_object = None
+
+    def _init_rdf_type_object(self):
+        if not hasattr(self, 'rdf_type_object') or self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
                 raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
                     self, self.rdf_type))
@@ -161,56 +222,18 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                     rdto.rdfs_subclassof_property.set(prdto)
             self.rdf_type_object = rdto
 
-            # These imports have to come after the rdf_type_object is set on these types. Basically, the evaluation goes
-            # like this:
-            #
-            # >after_mapper_module_load BaseDataObject
-            # init_rdf_type_object BaseDataObject
-            #   >after_mapper_module_load RegistryEntry
-            #   init_rdf_type_object RegistryEntry
-            #     >after_mapper_module_load PythonModule
-            #     init_rdf_type_object PythonModule
-            #     <after_mapper_module_load done PythonModule
-            #
-            #     >after_mapper_module_load PythonClassDescription
-            #     init_rdf_type_object PythonClassDescription
-            #     <after_mapper_module_load done PythonClassDescription
-            #
-            #     >after_mapper_module_load PyPIPackage
-            #     init_rdf_type_object PyPIPackage
-            #     <after_mapper_module_load done PyPIPackage
-            #
-            #   <after_mapper_module_load done RegistryEntry
-            #
-            #   >after_mapper_module_load ModuleAccess
-            #   init_rdf_type_object ModuleAccess
-            #   <after_mapper_module_load done ModuleAccess
-            #
-            #   >after_mapper_module_load Module
-            #   init_rdf_type_object Module
-            #   <after_mapper_module_load done Module
-            #
-            #   >after_mapper_module_load ClassDescription
-            #   init_rdf_type_object ClassDescription
-            #   <after_mapper_module_load done ClassDescription
-            # <after_mapper_module_load done BaseDataObject
+    def init_python_class_registry_entries(self):
+        re = RegistryEntry.contextualize(self.definition_context)()
+        cd = PythonClassDescription.contextualize(self.definition_context)()
 
-            from PyOpenWorm.class_registry import RegistryEntry
-            from PyOpenWorm.python_class_registry import PythonModule, PythonClassDescription
+        mo = PythonModule.contextualize(self.definition_context)()
+        mo.name(self.__module__)
 
-            re = RegistryEntry.contextualize(self.definition_context)()
-            cd = PythonClassDescription.contextualize(self.definition_context)()
+        cd.module(mo)
+        cd.name(self.__name__)
 
-            mo = PythonModule.contextualize(self.definition_context)()
-            mo.name(self.__module__)
-
-            cd.module(mo)
-            cd.name(self.__name__)
-
-            re.rdf_class(self.rdf_type)
-            re.class_description(cd)
-        else:
-            self.rdf_type_object = None
+        re.rdf_class(self.rdf_type)
+        re.class_description(cd)
 
     def __call__(self, *args, **kwargs):
         o = super(ContextMappedClass, self).__call__(*args, **kwargs)
@@ -362,8 +385,7 @@ def UnionProperty(*args, **kwargs):
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                         IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
-                                        DataUser,
-                                        Contextualizable)):
+                                        ContextualizableDataUserMixin)):
 
     """ An object backed by the database
 
@@ -441,25 +463,11 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self.attach_property(RDFTypeProperty)
 
     @property
-    def conf(self):
-        if self.context is None:
-            return super(BaseDataObject, self).conf
-        else:
-            return self.context.conf
-
-    @conf.setter
-    def conf(self, conf):
-        super(BaseDataObject, self).conf = conf
-
-    @property
     def rdf(self):
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            try:
-                return self.conf['rdf.graph']
-            except KeyError:
-                raise Exception('No rdf graph in the conf %s' % self.conf)
+            return super(BaseDataObject, self).rdf
 
     @classmethod
     def next_variable(cls):
@@ -624,6 +632,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             value_type = BaseDataObject
 
         c = None
+
         if _PropertyTypes_key in PropertyTypes:
             c = PropertyTypes[_PropertyTypes_key]
         else:
@@ -661,7 +670,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
             c = type(property_class_name, (klass,), props)
             c.__module__ = owner_class.__module__
-            owner_class.mapper.add_class(c)
+            if hasattr(owner_class, 'mapper') and owner_class.mapper is not None:
+                owner_class.mapper.add_class(c)
             PropertyTypes[_PropertyTypes_key] = c
         return c
 
@@ -725,11 +735,15 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         if not isinstance(identifier_or_rdf_type, URIRef):
             identifier_or_rdf_type = URIRef(identifier_or_rdf_type)
 
+        context = DEF_CTX
+        if cls.context is not None:
+            context = cls.context
+
         if rdf_type is None:
-            return oid(identifier_or_rdf_type)
+            return oid(identifier_or_rdf_type, context=context)
         else:
             rdf_type = URIRef(rdf_type)
-            return oid(identifier_or_rdf_type, rdf_type)
+            return oid(identifier_or_rdf_type, rdf_type, context=context)
 
     def decontextualize(self):
         if self.context is None:
@@ -847,12 +861,6 @@ class RDFProperty(DataObjectSingleton):
 
 def disconnect():
     global PropertyTypes
-    global DataObjectTypes
-    global RDFTypeTable
-    global DataObjectsParents
-    DataObjectTypes.clear()
-    RDFTypeTable.clear()
-    DataObjectsParents.clear()
     PropertyTypes.clear()
 
 
@@ -880,5 +888,95 @@ class _Resolver(RDFTypeResolver):
         return cls.instance
 
 
+class Module(DataObject):
+    '''
+    Represents a module of code
+
+    Most modern programming languages organize code into importable modules of one kind or another. This is basically
+    the nearest level above a *class* in the language.
+    '''
+
+
+class ModuleAccess(DataObject):
+    '''
+    Describes how to access a module.
+
+    Module access is how a person or automated system brings the module to where it can be imported/included, possibly
+    in a subsequent
+    '''
+
+
+class ClassDescription(DataObject):
+    '''
+    Describes a class in the programming language
+    '''
+
+    module = ObjectProperty(value_type=Module)
+    ''' The module the class belongs to '''
+
+
+class RegistryEntry(DataObject):
+
+    '''
+    A mapping from a class in the programming language to an RDF class.
+
+    Objects of this type are utilized in the resolution of classes from the RDF graph
+    '''
+
+    class_description = ObjectProperty(value_type=ClassDescription)
+    ''' The description of the class '''
+
+    rdf_class = DatatypeProperty()
+    ''' The RDF type for the class '''
+
+    def defined_augment(self):
+        return self.class_description.has_defined_value() and self.rdf_class.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(self.class_description.defined_values[0].identifier.n3() +
+                                    self.rdf_class.defined_values[0].identifier.n3())
+
+
+class PythonModule(Module):
+    '''
+    A Python module
+    '''
+
+    name = DatatypeProperty(multiple=False)
+    ''' The full name of the module '''
+
+    def defined_augment(self):
+        return self.name.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
+
+
+class PyPIPackage(ModuleAccess):
+
+    '''
+    Describes a package hosted on the Python Package Index (PyPI)
+    '''
+
+    name = DatatypeProperty()
+    version = DatatypeProperty()
+
+
+class PythonClassDescription(ClassDescription):
+    name = DatatypeProperty()
+    ''' Local name of the class (i.e., relative to the module name) '''
+
+    def defined_augment(self):
+        return self.name.has_defined_value() and self.module.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(self.name.defined_values[0].identifier.n3() +
+                                    self.module.defined_values[0].identifier.n3())
+
+
+CR_TYPES = frozenset((RegistryEntry, PythonClassDescription, PythonModule))
+
 __yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
-                            RDFProperty, RDFSSubClassOfProperty, PropertyDataObject)
+                            RDFProperty, RDFSSubClassOfProperty, PropertyDataObject,
+                            RegistryEntry, ModuleAccess, ClassDescription, Module,
+                            PythonModule, PyPIPackage, PythonClassDescription)

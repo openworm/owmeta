@@ -34,5 +34,8 @@ class Muscle(Cell):
     receptors = DatatypeProperty(multiple=True)
     ''' Receptor types expressed by this type of muscle '''
 
+    receptor = Alias(receptors)
+    ''' Alias to receptors '''
+
 
 __yarom_mapped_classes__ = (Muscle,)

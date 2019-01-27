@@ -9,13 +9,17 @@ from PyOpenWorm import connect, disconnect
 from .TestUtilities import xfail_without_db
 
 
+connection = None
+
+
 def setup():
+    global connection
     xfail_without_db()
-    connect(configFile='tests/data_integrity_test.conf')
+    connection = connect(configFile='tests/data_integrity_test.conf')
 
 
 def teardown():
-    disconnect()
+    disconnect(connection)
 
 
 def test_adal_connections():

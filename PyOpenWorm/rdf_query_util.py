@@ -4,7 +4,6 @@ from itertools import groupby
 from yarom.graphObject import (GraphObjectQuerier,
                                ZeroOrMoreTQLayer)
 from .rdf_go_modifiers import SubClassModifier
-from . import DEF_CTX
 
 L = logging.getLogger(__name__)
 
@@ -59,14 +58,18 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
     hierarchy from among the given URIs.
     """
     if context is None:
-        context = DEF_CTX
+        return
+
     mapper = context.mapper
+
     if bases:
         most_specific_types = tuple(y for y in (context.resolve_class(x) for x in bases) if y is not None)
-        if not most_specific_types:
+        if not most_specific_types and mapper:
             most_specific_types = tuple(mapper.base_classes.values())
-    else:
+    elif mapper:
         most_specific_types = tuple(mapper.base_classes.values())
+    else:
+        most_specific_types = ()
 
     for x in types:
         try:
@@ -110,18 +113,24 @@ def oid(identifier_or_rdf_type=None, rdf_type=None, context=None, base_type=None
         identifier = None
 
     c = None
-    try:
-        qctx = DEF_CTX if context is None else context
-        c = qctx.resolve_class(rdf_type)
-    except KeyError:
-        c = base_type
+    if context is not None:
+        c = context.resolve_class(rdf_type)
+
+    if c is None:
+        if base_type is None:
+            from .dataObject import DataObject
+            c = DataObject
+        else:
+            c = base_type
     L.debug("oid: making a {} with ident {}".format(c, identifier))
 
     # if its our class name, then make our own object
     # if there's a part after that, that's the property name
     o = None
+
     if context is not None:
         c = context(c)
+
     if identifier is not None:
         o = c(ident=identifier)
     else:

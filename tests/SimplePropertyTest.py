@@ -1,11 +1,10 @@
 from __future__ import print_function
 from __future__ import absolute_import
-from yarom import yarom_import
 import rdflib as R
 
 from .DataTestTemplate import _DataTest
 
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.dataObject import DataObject
 
 
 class SimplePropertyTest(_DataTest):

@@ -608,8 +608,6 @@ class GitCommandTest(BaseTest):
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        for x in os.walk('.'):
-            print(x)
         self.assertTrue(exists(self.cut.store_name), msg=self.cut.store_name)
 
     def test_reset_resets_add(self):

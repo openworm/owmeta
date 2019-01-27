@@ -4,16 +4,31 @@ from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 from PyOpenWorm.evidence import Evidence
 from PyOpenWorm.dataObject import DataObject
+from PyOpenWorm.configure import Configureable
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 
 class EvidenceTest(_DataTest):
     ctx_classes = (Evidence,)
 
+    def setUp(self):
+        self.patcher = patch('PyOpenWorm.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher.start()
+        super(EvidenceTest, self).setUp()
+
+    def tearDown(self):
+        super(EvidenceTest, self).tearDown()
+        self.patcher.stop()
+
     def test_asserts(self):
         """
         Asserting something should allow us to get it back.
         """
-        e = Evidence(key='WBPaper00044600')
+        e = self.ctx.Evidence(key='WBPaper00044600')
         r = DataObject(key="context_data_object")
         e.supports(r)
         s = list(e.supports.get())
@@ -45,7 +60,7 @@ class EvidenceTest(_DataTest):
         e1.supports(r)
         self.save()
 
-        e0 = Evidence()
+        e0 = self.ctx.Evidence()
         e0.supports(r)
         for x in e0.load():
             lar = x.reference.one()

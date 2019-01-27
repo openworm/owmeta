@@ -1,4 +1,5 @@
 import wrapt
+import importlib
 from PyOpenWorm.import_contextualizer import ImportContextualizer
 import six
 
@@ -22,21 +23,8 @@ class Overrider(object):
         @wrapt.function_wrapper
         def import_wrapper(orig__import__, __, args, kwargs):
             m = [None, None]
-            if len(args) > 4 and args[4]:
-                depth = args[4]
 
-                if args[1] is None:
-                    raise ImportError("No globals given to import to detect calling module for relative import")
-
-                caller = args[1].get('__name__', None)
-
-                if caller is None:
-                    raise ImportError("No calling module in import globals to resolve relative import")
-
-                parent = caller.rsplit('.', depth)[0]
-                module_name = parent + '.' + args[0]
-            else:
-                module_name = args[0]
+            module_name, caller = module_name_from_import_args(args)
 
             def cb():
                 if len(args) >= 3:
@@ -55,16 +43,13 @@ class Overrider(object):
                                 return orig__import__(*new_args, **kwargs)
                 return orig__import__(*args, **kwargs)
 
-            def cb1():
-                return orig__import__(*args, **kwargs)
-
             def mb(mod):
                 if m[0] is not None:
                     return m[0](mod)
                 else:
                     return mod
 
-            return mb(self.mapper.process_module(module_name=module_name, cb=cb))
+            return mb(self.mapper.process_module(module_name=module_name, cb=cb, caller=caller))
         self.import_wrapper = import_wrapper
         self.wrapped = None
 
@@ -92,3 +77,26 @@ class Overrider(object):
             self.wrapped = builtins.__import__
 
         builtins.__import__ = self.import_wrapper(self.wrapped)
+
+
+def module_name_from_import_args(args):
+    caller = None # This happens, for instance, when __import__ is called directly
+    if len(args) > 4 and args[4]:
+        depth = args[4]
+
+        if args[1] is None:
+            raise ImportError("No globals given to import to detect calling module for relative import")
+
+        caller = args[1].get('__name__', None)
+
+        if caller is None:
+            raise ImportError("No calling module in import globals to resolve relative import")
+
+        parent = caller.rsplit('.', depth)[0]
+        module_name = parent + '.' + args[0]
+    else:
+        if len(args) > 1 and args[1]:
+            caller = args[1].get('__name__', None)
+        module_name = args[0]
+
+    return module_name, caller

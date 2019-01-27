@@ -1,6 +1,8 @@
 import rdflib
 from rdflib.term import URIRef, Variable
+from yarom.mapper import FCN
 from PyOpenWorm.dataObject import DataObject, InverseProperty
+from PyOpenWorm.mapper import Mapper
 from PyOpenWorm.context import Context
 from PyOpenWorm.context_store import ContextStore, ContextStoreException, RDFContextStore
 from .DataTestTemplate import _DataTest
@@ -56,15 +58,17 @@ class ContextTest(_DataTest):
 
     def test_save_context_no_graph(self):
         ctx = Context()
-        del ctx.conf['rdf.graph']
-        with self.assertRaisesRegexp(Exception, r'graph'):
-            ctx.save_context()
+        with patch('PyOpenWorm.data.ALLOW_UNCONNECTED_DATA_USERS', False):
+            with self.assertRaisesRegexp(Exception, r'graph'):
+                ctx.save_context()
 
     def test_context_store(self):
         class A(DataObject):
             pass
 
-        ctx = Context(ident='http://example.com/context_1')
+        mapper = Mapper(base_class_names=(FCN(A),))
+        mapper.add_class(A)
+        ctx = Context(ident='http://example.com/context_1', mapper=mapper)
         ctx(A)(ident='anA')
         self.assertIn(URIRef('anA'),
                       tuple(x.identifier for x in ctx.query(A)().load()))
@@ -257,7 +261,7 @@ class ContextStoreTest(_DataTest):
         ctx = Mock()
         graph = Mock()
         graph.store.triples.side_effect = ([], [((URIRef('anA0'), rdflib.RDF.type, rdf_type), (ctxid,))],)
-        ctx.conf = {'rdf.graph': graph}
+        ctx.rdf = graph
 
         ctx.contents_triples.return_value = [(URIRef('anA'), rdflib.RDF.type, rdf_type)]
         ctx.identifier = ctxid
@@ -285,7 +289,7 @@ class ContextStoreTest(_DataTest):
         ctx = Mock()
         graph = Mock()
         graph.store.triples.side_effect = [[((None, None, ctxid0), ())], []]
-        ctx.conf = {'rdf.graph': graph}
+        ctx.rdf = graph
         ctx.contents_triples.return_value = ()
         ctx.identifier = ctxid1
         ctx.imports = []
@@ -296,7 +300,7 @@ class ContextStoreTest(_DataTest):
     def test_len_fail(self):
         ctx = Mock()
         graph = Mock()
-        ctx.conf = {'rdf.graph': graph}
+        ctx.rdf = graph
         ctx.contents_triples.return_value = ()
         ctx.imports = []
         store = ContextStore(ctx, include_stored=True)
@@ -318,7 +322,7 @@ class ContextStoreTest(_DataTest):
     def test_no_stored_length(self):
         ctx = Mock()
         graph = Mock()
-        ctx.conf = {'rdf.graph': graph}
+        ctx.rdf = graph
         ctx.contents_triples.return_value = ()
         ctx.imports = []
         cut = ContextStore(ctx, include_stored=False)
@@ -347,7 +351,7 @@ class RDFContextStoreTest(_DataTest):
     def test_contexts_with_triple(self):
         ctx = Mock()
         g = MagicMock(name='graph')
-        ctx.conf = {'rdf.graph': g}
+        ctx.rdf = g
         g.store.triples.return_value = []
         cut = RDFContextStore(context=ctx)
 
@@ -358,7 +362,7 @@ class RDFContextStoreTest(_DataTest):
     def test_namespaces(self):
         ctx = Mock()
         g = MagicMock(name='graph')
-        ctx.conf = {'rdf.graph': g}
+        ctx.rdf = g
         ns1 = Mock()
         g.store.namespaces.return_value = [ns1]
         cut = RDFContextStore(context=ctx)
@@ -367,7 +371,7 @@ class RDFContextStoreTest(_DataTest):
     def test_bind(self):
         ctx = Mock()
         g = MagicMock(name='graph')
-        ctx.conf = {'rdf.graph': g}
+        ctx.rdf = g
         ns1 = Mock()
         g.store.namespaces.return_value = [ns1]
         cut = RDFContextStore(context=ctx)
@@ -376,7 +380,7 @@ class RDFContextStoreTest(_DataTest):
     def test_namespace(self):
         ctx = Mock()
         g = MagicMock(name='graph')
-        ctx.conf = {'rdf.graph': g}
+        ctx.rdf = g
         ns1 = Mock()
         g.store.namespace.return_value = ns1
         cut = RDFContextStore(context=ctx)
@@ -385,7 +389,7 @@ class RDFContextStoreTest(_DataTest):
     def test_prefix(self):
         ctx = Mock()
         g = MagicMock(name='graph')
-        ctx.conf = {'rdf.graph': g}
+        ctx.rdf = g
         pre = Mock()
         g.store.prefix.return_value = pre
         cut = RDFContextStore(context=ctx)
