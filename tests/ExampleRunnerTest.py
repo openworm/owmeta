@@ -62,3 +62,6 @@ class ExampleRunnerTest(unittest.TestCase):
     @unittest.skip("See #102")
     def test_rmgr(self):
         self.execfile("rmgr.py")
+
+    def test_extrasyn(self):
+        self.execfile("extrasynaptic_edges.py")
