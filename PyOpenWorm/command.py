@@ -498,6 +498,7 @@ class POW(object):
         self._clock = time
         self._data_source_directories = None
         self._changed_contexts = None
+        self._pow_connection = None
 
     @IVar.property('.pow')
     def powdir(self):
@@ -726,6 +727,7 @@ class POW(object):
 
     def _conf(self):
         from PyOpenWorm.data import Data
+        from PyOpenWorm import connect
         dat = getattr(self, '_dat', None)
         if not dat or self._dat_file != self.config_file:
             if not exists(self.config_file):
@@ -744,7 +746,7 @@ class POW(object):
             if store_conf and isinstance(store_conf, string_types) and not isabs(store_conf):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
             dat = Data.process_config(rc)
-            dat.init_database()
+            self._pow_connection = connect(conf=dat)
 
             dat.on_context_changed(self._context_changed_handler())
 

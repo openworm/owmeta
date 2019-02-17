@@ -17,7 +17,7 @@ import re
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
-                                POWConfig, POWSource, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
+                                POWConfig, POWSource, POWTranslator, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
                                 POWDirDataSourceDirLoader, _DSD)
 from PyOpenWorm.datasource_loader import LoadFailed
 from PyOpenWorm.command_util import IVar, PropertyIVar
@@ -33,6 +33,13 @@ class BaseTest(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
+
+    def _init_conf(self, conf=None):
+        if not conf:
+            conf = {}
+        os.mkdir('.pow')
+        with open(p('.pow', 'pow.conf'), 'w') as f:
+            json.dump(conf, f)
 
 
 class POWTest(BaseTest):
@@ -113,12 +120,11 @@ class POWTest(BaseTest):
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
 
-    def _init_conf(self, conf=None):
-        if not conf:
-            conf = {}
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
-            json.dump(conf, f)
+    def test_conf_connection(self):
+        self._init_conf()
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
 
     def test_user_config_in_main_config(self):
         self._init_conf()
@@ -411,6 +417,20 @@ class POWTest(BaseTest):
             im().test.side_effect = f
             self.cut.save('tests', 'test')
             c[0]._backer.save_context.assert_called()
+
+
+class POWTranslatorTest(BaseTest):
+
+    def test_translator_list(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        ps = POWTranslator(parent)
+
+        self.assertIsNotNone(next(ps.list(), None))
 
 
 class POWTranslateTest(BaseTest):
