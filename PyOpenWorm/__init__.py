@@ -135,6 +135,22 @@ def config(key=None):
         return Configureable.default[key]
 
 
+class Connection(object):
+
+    def __init__(self, conf):
+        self.conf = conf
+
+    def disconnect(self):
+        self.conf.closeDatabase()
+        _ModuleRecorder.remove_listener(self.conf['mapper'])
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.disconnect()
+
+
 def loadConfig(f):
     """ Load configuration for the module. """
     from .data import Data
@@ -146,14 +162,12 @@ def disconnect(c=False):
     global _connected
     _connected = False
 
-    from .dataObject import disconnect as do_disconnect
-    do_disconnect()
     if c:
-        c.closeDatabase()
-        _ModuleRecorder.remove_listener(c['mapper'])
+        c.disconnect()
 
 
 def loadData(
+        conf,
         data='OpenWormData/WormData.n3',
         dataFormat='n3',
         skipIfNewer=False):
@@ -174,17 +188,17 @@ def loadData(
 
     if skipIfNewer:
         try:
-            db_file_name = config('rdf.store.conf')
+            db_file_name = conf['rdf.store.conf']
             if os.path.isfile(db_file_name):
                 data_file_time = os.path.getmtime(data)
-                db_file_time = os.path.getmtime(config('rdf.store_conf'))
+                db_file_time = os.path.getmtime(conf['rdf.store_conf'])
                 if data_file_time < db_file_time:
                     return
         except Exception as e:
             logging.exception("Failed to determine if the serialized data file is older than the binary database."
                               " The data file will be reloaded. Reason: {}".format(e.message))
     sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
-    config('rdf.graph').parse(data, format=dataFormat)
+    conf['rdf.graph'].parse(data, format=dataFormat)
 
 
 class ConnectionFailError(Exception):
@@ -223,7 +237,7 @@ def connect(configFile=False,
         if not isinstance(conf, Data):
             conf = Data(conf)
     elif configFile:
-        conf = loadConfig(configFile)
+        conf = Data.open(configFile)
     else:
         conf = Data({
             "rdf.source": "ZODB",
@@ -247,7 +261,7 @@ def connect(configFile=False,
 
     _connected = True
     if data:
-        loadData(data, dataFormat)
+        loadData(conf, data, dataFormat)
 
     # Base class names is empty because we won't be adding any objects to the
     # context automatically
@@ -260,4 +274,4 @@ def connect(configFile=False,
 
     _ModuleRecorder.add_listener(mapper)
 
-    return conf
+    return Connection(conf)

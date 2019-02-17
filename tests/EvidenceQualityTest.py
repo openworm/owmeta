@@ -27,7 +27,7 @@ class EvidenceQualityTests(_DataTest):
 
     def setUp(self):
         self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
-        self.g = self.conn["rdf.graph"]
+        self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 

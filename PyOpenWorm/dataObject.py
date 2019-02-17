@@ -632,7 +632,6 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             value_type = BaseDataObject
 
         c = None
-
         if _PropertyTypes_key in PropertyTypes:
             c = PropertyTypes[_PropertyTypes_key]
         else:

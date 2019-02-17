@@ -18,10 +18,10 @@ from PyOpenWorm.context import Context
 d = Data()
 
 # Connect to database with dummy configuration
-P.connect(conf=d)
+conn = P.connect(conf=d)
 
-ctx = Context(ident='http://example.org/data')
-evctx = Context(ident='http://example.org/meta')
+ctx = Context(ident='http://example.org/data', conf=conn.conf)
+evctx = Context(ident='http://example.org/meta', conf=conn.conf)
 
 # Create a new Neuron object to work with
 n = ctx(Neuron)(name='AVAL')
@@ -48,4 +48,4 @@ for e_i in evctx.stored(Evidence)().load():
     print(e_i.reference(), e_i.supports())
 
 # Disconnect from the database.
-P.disconnect()
+P.disconnect(conn)

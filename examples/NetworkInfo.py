@@ -22,9 +22,9 @@ from OpenWormData import BIO_ENT_NS
 
 
 print("Connecting to the database...")
-P.connect('default.conf')
+conn = P.connect('default.conf')
 
-ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
 
 #Get the worm object.
 worm = ctx(Worm)()
@@ -86,3 +86,4 @@ for neuron in some_neurons:
     print("Gap junction neighbors")
     print(conns["gap"])
     print()
+conn.disconnect()

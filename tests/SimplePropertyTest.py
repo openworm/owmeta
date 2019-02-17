@@ -10,6 +10,16 @@ from PyOpenWorm.dataObject import DataObject
 class SimplePropertyTest(_DataTest):
     ctx_classes = (DataObject,)
 
+    def setUp(self):
+        super(SimplePropertyTest, self).setUp()
+        from PyOpenWorm.dataObject import PropertyTypes
+        PropertyTypes.clear()
+
+    def tearDown(self):
+        super(SimplePropertyTest, self).tearDown()
+        from PyOpenWorm.dataObject import PropertyTypes
+        PropertyTypes.clear()
+
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):
         do = self.ctx.DataObject(ident=R.URIRef("http://example.org"))

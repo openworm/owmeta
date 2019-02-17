@@ -14,7 +14,7 @@ from six import StringIO
 #Connect to database.
 conn = P.connect('default.conf')
 
-ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn).stored
+ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
 
 #Create a new Cell object to work with.
 aval = ctx(Worm)().get_neuron_network().aneuron('AVAL')

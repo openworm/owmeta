@@ -19,7 +19,7 @@ class EvidenceCoverageTest(unittest.TestCase):
     def setUp(self):
         xfail_without_db()
         self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
-        self.g = self.conn["rdf.graph"]
+        self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
