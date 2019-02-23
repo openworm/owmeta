@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 import os
 import hashlib
+from contextlib import contextmanager
+from six import StringIO
 
 import pytest
 
@@ -32,6 +34,7 @@ def findSkippedTests():
                     print('\n')
                     count = False
 
+
 # Function to list function names in test suite so we can quickly see \
 # which ones do not adhere to the proper naming convention.
 def listFunctionNames():
@@ -60,7 +63,7 @@ def xfail_without_db():
         ".pow",
         "worm.db"
     )
-    # todo: also hash db file?
+
     if not os.path.isfile(db_path):
         pytest.xfail("Database is not installed. Try \n\tpow clone https://github.com/openworm/OpenWormData.git")
 
@@ -80,3 +83,35 @@ def findDummyTests():
                     if count:
                         print('\n')
                         count = False
+
+
+@contextmanager
+def noexit():
+    try:
+        yield
+    except SystemExit:
+        pass
+
+
+@contextmanager
+def stdout():
+    import sys
+    oldstdout = sys.stdout
+    sio = StringIO()
+    sys.stdout = sio
+    try:
+        yield sys.stdout
+    finally:
+        sys.stdout = oldstdout
+
+
+@contextmanager
+def stderr():
+    import sys
+    oldstderr = sys.stderr
+    sio = StringIO()
+    sys.stderr = sio
+    try:
+        yield sys.stderr
+    finally:
+        sys.stderr = oldstderr

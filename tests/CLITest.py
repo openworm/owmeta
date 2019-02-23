@@ -9,8 +9,7 @@ from pytest import mark
 from PyOpenWorm.command_util import SubCommand, IVar
 from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
 import PyOpenWorm.cli as PCLI
-from six import StringIO
-from contextlib import contextmanager
+from .TestUtilities import noexit, stderr, stdout
 import json
 
 
@@ -340,35 +339,3 @@ def collect_argument_defaults(ns, callback):
     parser.add_argument.side_effect = cb
     callback(parser)
     return res
-
-
-@contextmanager
-def noexit():
-    try:
-        yield
-    except SystemExit:
-        pass
-
-
-@contextmanager
-def stdout():
-    import sys
-    oldstdout = sys.stdout
-    sio = StringIO()
-    sys.stdout = sio
-    try:
-        yield sys.stdout
-    finally:
-        sys.stdout = oldstdout
-
-
-@contextmanager
-def stderr():
-    import sys
-    oldstderr = sys.stderr
-    sio = StringIO()
-    sys.stderr = sio
-    try:
-        yield sys.stderr
-    finally:
-        sys.stderr = oldstderr

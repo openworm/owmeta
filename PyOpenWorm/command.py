@@ -570,6 +570,7 @@ class POW(object):
         import importlib as IM
         conf = self._conf()
 
+        print(module)
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME

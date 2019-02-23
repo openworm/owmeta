@@ -6,7 +6,7 @@ except ImportError:
     from mock import MagicMock, Mock, ANY, patch
 import tempfile
 import os
-from os import listdir
+from os import listdir, system as sh
 from os.path import exists, join as p
 import shutil
 import json
@@ -21,6 +21,7 @@ from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
                                 POWDirDataSourceDirLoader, _DSD)
 from PyOpenWorm.datasource_loader import LoadFailed
 from PyOpenWorm.command_util import IVar, PropertyIVar
+from .TestUtilities import noexit, stderr, stdout
 
 
 class BaseTest(unittest.TestCase):
@@ -881,6 +882,43 @@ class TestDSD(unittest.TestCase):
     # Test a loader that returns a directory outside of its assigned directory
     # Test a loader that returns a non-existant file
     # Test a loader that returns a non-directory
+
+
+@mark.inttest
+class POWAccTest(unittest.TestCase):
+    ''' smoke-test for pow command line and the standard data base '''
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        self.startdir = os.getcwd()
+        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        os.chdir(self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
+
+    def test_translator_list(self):
+        ''' Test we have some translator '''
+        with os.popen('pow translator list', 'r') as out:
+            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+
+    def test_source_list(self):
+        ''' Test we have some data source '''
+        with os.popen('pow source list', 'r') as out:
+            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+
+    def test_save_diff(self):
+        ''' Change something and make a diff '''
+        with os.popen('pow save --module tests.command_test_save', 'r') as out:
+            print(out.read())
+        with os.popen('pow diff', 'r') as out:
+            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+
+    def test_list_contexts(self):
+        ''' Test we have some contexts '''
+        with os.popen('pow list_contexts', 'r') as out:
+            self.assertRegexpMatches(out.read(), r'^http://')
 
 
 class _TestException(Exception):
