@@ -2,7 +2,9 @@ from __future__ import absolute_import
 import unittest
 import os
 import subprocess as SP
+import shutil
 import tempfile
+from os.path import join as p
 
 from .TestUtilities import xfail_without_db
 
@@ -16,6 +18,11 @@ class ExampleRunnerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('examples', p(self.testdir, 'examples'), symlinks=True)
+        self.startdir = os.getcwd()
+        os.chdir(self.testdir)
         os.chdir('examples')
 
     def setUp(self):
@@ -23,7 +30,7 @@ class ExampleRunnerTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        os.chdir('..')
+        os.chdir(self.startdir)
 
     def execfile(self, example_file_name):
         fname = tempfile.mkstemp()[1]
