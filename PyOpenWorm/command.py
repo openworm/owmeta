@@ -817,6 +817,25 @@ class POW(object):
             self._ensure_no_powdir()
             raise e
 
+    def git(self, *args):
+        '''
+        Runs git commmands in the .pow directory
+
+        Parameters
+        ----------
+        *args : *str
+            arguments to git
+        '''
+        import shlex
+        from subprocess import Popen, PIPE
+        startdir = os.getcwd()
+        os.chdir(self.powdir)
+        try:
+            with Popen(['git'] + list(args), stdout=PIPE) as p:
+                self.message(p.stdout.read().decode('utf-8', 'ignore'))
+        finally:
+            os.chdir(startdir)
+
     def regendb(self):
         from glob import glob
         for g in glob(self.store_name + '*'):

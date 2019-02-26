@@ -22,8 +22,7 @@ class ExampleRunnerTest(unittest.TestCase):
         shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
         shutil.copytree('examples', p(self.testdir, 'examples'), symlinks=True)
         self.startdir = os.getcwd()
-        os.chdir(self.testdir)
-        os.chdir('examples')
+        os.chdir(p(self.testdir, 'examples'))
 
     def setUp(self):
         xfail_without_db()
@@ -31,6 +30,7 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
 
     def execfile(self, example_file_name):
         fname = tempfile.mkstemp()[1]
