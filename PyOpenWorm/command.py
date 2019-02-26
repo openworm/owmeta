@@ -570,7 +570,6 @@ class POW(object):
         import importlib as IM
         conf = self._conf()
 
-        print(module)
         m = IM.import_module(module)
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
@@ -1129,7 +1128,14 @@ class POW(object):
                 else:
                     fname = sfname
 
+                # If there's a context in the graph, but we don't even have a file, then it is changed.
+                # This can happen if we get out of sync with what's on disk.
+                if not ctx_changed and not exists(fname):
+                    ctx_changed = True
+
                 if ctx_changed:
+                    # N.B. We *overwrite* changes to the serialized graphs -- the source of truth is what's in the
+                    # RDFLib graph unless we regenerate the database
                     serializer = plugin.get('nt', Serializer)(sorted(context))
                     with open(fname, 'wb') as gfile:
                         serializer.serialize(gfile)
@@ -1140,7 +1146,7 @@ class POW(object):
         index_fname = pth_join(graphs_base, 'index')
         with open(index_fname, 'w') as index_file:
             for l in sorted(ctx_data):
-                print(*l, file=index_file)
+                print(*l, file=index_file, end='\n')
 
         files.append(index_fname)
         repo.add([relpath(f, self.powdir) for f in files] + [relpath(self.config_file, self.powdir),
@@ -1178,9 +1184,13 @@ class POW(object):
 
         for d in di:
             try:
-                adata = d.a_blob.data_stream.read().split(b'\n')
+                a_blob = d.a_blob
+                if a_blob:
+                    adata = a_blob.data_stream.read().split(b'\n')
+                else:
+                    adata = []
             except Exception as e:
-                print(e, file=sys.stderr)
+                print('No "a" data: {}'.format(e), file=sys.stderr)
                 adata = []
 
             try:
@@ -1191,7 +1201,7 @@ class POW(object):
                     with open(join(r.repo().working_dir, d.b_path), 'rb') as f:
                         bdata = f.read().split(b'\n')
             except Exception as e:
-                print(e, file=sys.stderr)
+                print('No "b" data: {}'.format(e), file=sys.stderr)
                 bdata = []
             afname = basename(d.a_path)
             bfname = basename(d.b_path)
@@ -1200,12 +1210,31 @@ class POW(object):
             fromfile = self._fname_contexts.get(afname, afname)
             tofile = self._fname_contexts.get(bfname, bfname)
 
-            sys.stdout.writelines(
-                    self._colorize_diff(unified_diff([x.decode('utf-8') + '\n' for x in adata],
-                                 [x.decode('utf-8') + '\n' for x in bdata],
-                                 fromfile='a ' + fromfile,
-                                 tofile='b ' + tofile,
-                                 lineterm='\n')))
+            try:
+                sys.stdout.writelines(
+                        self._colorize_diff(unified_diff([x.decode('utf-8') + '\n' for x in adata],
+                                     [x.decode('utf-8') + '\n' for x in bdata],
+                                     fromfile='a ' + fromfile,
+                                     tofile='b ' + tofile,
+                                     lineterm='\n')))
+            except Exception:
+                if adata and not bdata:
+                    sys.stdout.writelines('Deleted ' + fromfile + '\n')
+                elif bdata and not adata:
+                    sys.stdout.writelines('Created ' + fromfile + '\n')
+                else:
+                    asize = a_blob.size
+                    asha = a_blob.hexsha
+                    bsize = b_blob.size
+                    bsha = b_blob.hexsha
+                    sys.stdout.writelines(self._colorize_diff('''
+                    --- a {fromfile}
+                    --- Size: {asize}
+                    --- Shasum: {asha}
+                    +++ b {tofile}
+                    +++ Size: {bsize}
+                    +++ Shasum: {bsha}
+                    '''.strip().format(locals())))
 
     def _colorize_diff(self, lines):
         from termcolor import colored

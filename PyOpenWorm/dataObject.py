@@ -415,8 +415,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
             >>> A(p=5)
 
-        If the arguments are written explicitly into the __init__, then no
-        special processing is done.
+        If the arguments are written explicitly into the __init__ method
+        definition, then no special processing is done.
     '''
 
     def __new__(cls, *args, **kwargs):

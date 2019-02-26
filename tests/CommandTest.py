@@ -4,15 +4,17 @@ try:
     from unittest.mock import MagicMock, Mock, ANY, patch
 except ImportError:
     from mock import MagicMock, Mock, ANY, patch
+import re
 import tempfile
 import os
 from os import listdir, system as sh
-from os.path import exists, join as p
+from os.path import exists, join as p, realpath
+from subprocess import Popen, PIPE
+import shlex
 import shutil
 import json
 from rdflib.term import URIRef
 from pytest import mark
-import re
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
@@ -56,14 +58,14 @@ class POWTest(BaseTest):
     def test_init_default_store_config_file_exists_no_change(self):
         self._init_conf()
         self.cut.init()
-        with open('.pow/pow.conf', 'r') as f:
+        with open(p('.pow', 'pow.conf'), 'r') as f:
             self.assertEqual('{}', f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
         self._init_conf()
 
         self.cut.init(update_existing_config=True)
-        with open('.pow/pow.conf', 'r') as f:
+        with open(p('.pow', 'pow.conf'), 'r') as f:
             conf = json.load(f)
             self.assertEqual(conf['rdf.store_conf'], p('.pow', 'worm.db'), msg='path is updated')
 
@@ -439,7 +441,7 @@ class POWTranslateTest(BaseTest):
     def setUp(self):
         super(POWTranslateTest, self).setUp()
         os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
+        with open(p('.pow', 'pow.conf'), 'w') as f:
             f.write('{"data_context_id": "http://example.org/data"}')
 
     def test_translate_unknown_translator_message(self):
@@ -587,7 +589,7 @@ class GitCommandTest(BaseTest):
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        self.assertTrue(exists('r2/.pow/.git'))
+        self.assertTrue(exists(p('r2', '.pow', '.git')))
 
     def test_clones_graphs(self):
         self.cut.basedir = 'r1'
@@ -877,11 +879,13 @@ class TestDSD(unittest.TestCase):
         with self.assertRaises(KeyError):
             self.cut['not_there']
 
-    # Test multiple loaders are ordered by preference -> should pick the highest ordered
-    # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
     # Test a loader that returns a directory outside of its assigned directory
     # Test a loader that returns a non-existant file
     # Test a loader that returns a non-directory
+
+    # Don't have preferences yet
+    # Test multiple loaders are ordered by preference -> should pick the highest ordered
+    # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
 
 
 @mark.inttest
@@ -893,32 +897,76 @@ class POWAccTest(unittest.TestCase):
         self.startdir = os.getcwd()
         shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
         os.chdir(self.testdir)
+        print("Test directory at " + self.testdir)
+
+    def exec(self, command, **kwargs):
+        env = dict(os.environ)
+        env['PYTHONPATH'] = self.testdir
+        with Popen(shlex.split(command), env=env, stdout=PIPE) as p:
+            return p.stdout.read().decode('utf-8')
 
     def tearDown(self):
         os.chdir(self.startdir)
-        shutil.rmtree(self.testdir)
+        # shutil.rmtree(self.testdir)
 
     def test_translator_list(self):
         ''' Test we have some translator '''
-        with os.popen('pow translator list', 'r') as out:
-            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+        self.assertRegexpMatches(self.exec('pow translator list'), r'<[^>]+>')
 
     def test_source_list(self):
         ''' Test we have some data source '''
-        with os.popen('pow source list', 'r') as out:
-            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+        self.assertRegexpMatches(self.exec('pow source list'), r'<[^>]+>')
 
     def test_save_diff(self):
         ''' Change something and make a diff '''
-        with os.popen('pow save --module tests.command_test_save', 'r') as out:
-            print(out.read())
-        with os.popen('pow diff', 'r') as out:
-            self.assertRegexpMatches(out.read(), r'<[^>]+>')
+        os.mkdir('test_module')
+        open(p('test_module', '__init__.py'), 'w').close()
+        with open(p('test_module', 'command_test_save.py'), 'w') as out:
+            print(r'''
+from test_module.monkey import Monkey
+
+
+def pow_data(ns):
+    ns.context.add_import(Monkey.definition_context)
+    ns.context(Monkey)(bananas=55)
+''', file=out)
+
+        with open(p('test_module', 'monkey.py'), 'w') as out:
+            print(r'''
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+
+
+class Monkey(DataObject):
+    class_context = 'http://example.org/primate/monkey'
+
+    bananas = DatatypeProperty()
+    def identifier_augment(self):
+        return type(self).rdf_namespace['paul']
+
+    def defined_augment(self):
+        return True
+
+
+__yarom_mapped_classes__ = (Monkey,)
+''', file=out)
+        print(listdir('.'))
+        print(self.exec('pow save --module test_module.command_test_save'))
+        self.assertRegexpMatches(self.exec('pow diff'), r'<[^>]+>')
+
+    def test_manual_graph_edit_no_diff(self):
+        '''
+        Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
+        '''
+        index = self.exec('cat ' + p('.pow', 'graphs', 'index'))
+        fname = index.split('\n')[0].split(' ')[0]
+
+        open(p('.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
+
+        self.assertRegexpMatches(self.exec('pow diff'), r'^$')
 
     def test_list_contexts(self):
         ''' Test we have some contexts '''
-        with os.popen('pow list_contexts', 'r') as out:
-            self.assertRegexpMatches(out.read(), r'^http://')
+        self.assertRegexpMatches(self.exec('pow list_contexts'), r'^http://')
 
 
 class _TestException(Exception):
