@@ -80,6 +80,7 @@ setup(
         'zodb==4.1.0',
         'zope.interface==4.1.1',
     ] + (['zodbpickle==1.0', 'backports.tempfile==1.0'] if PY2 else [])
+      + (['Jinja2<2.9'] if sys.version_info.major == 3 and sys.version_info.minor < 5 else [])
       + (['scandir'] if sys.version_info.major < 3 or
           sys.version_info.major == 3 and sys.version_info.minor < 5 else []),
     version=version,

@@ -900,7 +900,7 @@ class POWAccTest(unittest.TestCase):
         os.chdir(self.testdir)
         print("Test directory at " + self.testdir)
 
-    def exec(self, command, **kwargs):
+    def sh(self, command, **kwargs):
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir
         with Popen(shlex.split(command), env=env, stdout=PIPE) as p:
@@ -912,11 +912,11 @@ class POWAccTest(unittest.TestCase):
 
     def test_translator_list(self):
         ''' Test we have some translator '''
-        self.assertRegexpMatches(self.exec('pow translator list'), r'<[^>]+>')
+        self.assertRegexpMatches(self.sh('pow translator list'), r'<[^>]+>')
 
     def test_source_list(self):
         ''' Test we have some data source '''
-        self.assertRegexpMatches(self.exec('pow source list'), r'<[^>]+>')
+        self.assertRegexpMatches(self.sh('pow source list'), r'<[^>]+>')
 
     def test_save_diff(self):
         ''' Change something and make a diff '''
@@ -951,23 +951,23 @@ class Monkey(DataObject):
 __yarom_mapped_classes__ = (Monkey,)
 ''', file=out)
         print(listdir('.'))
-        print(self.exec('pow save --module test_module.command_test_save'))
-        self.assertRegexpMatches(self.exec('pow diff'), r'<[^>]+>')
+        print(self.sh('pow save --module test_module.command_test_save'))
+        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
     def test_manual_graph_edit_no_diff(self):
         '''
         Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
         '''
-        index = self.exec('cat ' + p('.pow', 'graphs', 'index'))
+        index = self.sh('cat ' + p('.pow', 'graphs', 'index'))
         fname = index.split('\n')[0].split(' ')[0]
 
         open(p('.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
 
-        self.assertRegexpMatches(self.exec('pow diff'), r'^$')
+        self.assertRegexpMatches(self.sh('pow diff'), r'^$')
 
     def test_list_contexts(self):
         ''' Test we have some contexts '''
-        self.assertRegexpMatches(self.exec('pow list_contexts'), r'^http://')
+        self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
 
 
 class _TestException(Exception):
