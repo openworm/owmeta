@@ -87,7 +87,7 @@ class DocumentElaborationTest(_DataTest):
         """ Initialize with wormbase source """
         doc = self.ctx.Document(wormbase="WBPaper00044287")
         doc.update_from_wormbase()
-        self.assertIn(u'Frederic, M. Y.', list(doc.author()))
+        self.assertIn(u'Frederic MY', list(doc.author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
