@@ -36,6 +36,7 @@ class BaseTest(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
+        self.cut._disconnect()
 
     def _init_conf(self, conf=None):
         if not conf:

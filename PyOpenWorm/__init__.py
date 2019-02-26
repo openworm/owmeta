@@ -81,8 +81,6 @@ __all__ = [
     "config",
     ]
 
-_connected = False
-
 DEF_CTX = Context()
 
 RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
@@ -159,9 +157,6 @@ def loadConfig(f):
 
 def disconnect(c=False):
     """ Close the database. """
-    global _connected
-    _connected = False
-
     if c:
         c.disconnect()
 
@@ -225,10 +220,6 @@ def connect(configFile=False,
     """
     import logging
     from .data import Data, ZODBSourceOpenFailError
-    global _connected
-    if _connected is True:
-        print("PyOpenWorm already connected")
-        return
 
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
@@ -259,7 +250,6 @@ def connect(configFile=False,
 
     logging.getLogger('PyOpenWorm').info("Connected to database")
 
-    _connected = True
     if data:
         loadData(conf, data, dataFormat)
 

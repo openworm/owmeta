@@ -754,6 +754,11 @@ class POW(object):
             self._dat_file = self.config_file
         return dat
 
+    def _disconnect(self):
+        from PyOpenWorm import disconnect
+        if self._pow_connection is not None:
+            disconnect(self._pow_connection)
+
     _init_store = _conf
 
     def _context_changed_handler(self):
