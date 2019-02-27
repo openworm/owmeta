@@ -17,6 +17,7 @@ import PyOpenWorm as P
 from PyOpenWorm.context import Context
 from PyOpenWorm.worm import Worm
 from OpenWormData import BIO_ENT_NS
+import six
 
 #Connect to database.
 BASE_URL = (
@@ -64,7 +65,10 @@ def get_possible_extrasynaptic_edges(cell_transmitter_mapping, transmitter_recep
 
 def decode_lines(response, encoding='utf-8'):
     for line in response:
-        yield line.decode(encoding)
+        if six.PY2:
+            yield line
+        else:
+            yield line.decode(encoding)
 
 
 def fetch_np_mapping():
@@ -110,5 +114,12 @@ with P.connect('default.conf') as conn:
     np_t_r_mapping = fetch_np_mapping()
     np_edges = list(get_possible_extrasynaptic_edges(cell_transmitter_mapping, np_t_r_mapping, receptor_cell_mapping))
 
-    print(ma_edges)
-    print(np_edges)
+    print('Monamine edges: count={}'.format(len(ma_edges)))
+    for x in ma_edges[:4]:
+        print(x)
+    print('...')
+    print()
+    print('Neuropeptide edges: count={}'.format(len(np_edges)))
+    for x in np_edges[:4]:
+        print(x)
+    print('...')

@@ -9,7 +9,7 @@ import tempfile
 import os
 from os import listdir, system as sh
 from os.path import exists, join as p, realpath
-from subprocess import Popen, PIPE
+from subprocess import check_output
 import shlex
 import shutil
 import json
@@ -903,8 +903,7 @@ class POWAccTest(unittest.TestCase):
     def sh(self, command, **kwargs):
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir
-        with Popen(shlex.split(command), env=env, stdout=PIPE) as p:
-            return p.stdout.read().decode('utf-8')
+        return check_output(shlex.split(command), env=env).decode('utf-8')
 
     def tearDown(self):
         os.chdir(self.startdir)
