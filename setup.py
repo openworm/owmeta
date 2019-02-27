@@ -33,6 +33,8 @@ for line in open('PyOpenWorm/__init__.py'):
 package_data_excludes = ['.*', '*.bkp', '~*']
 
 PY2 = sys.version_info.major == 2
+PY3 = sys.version_info.major == 3
+PY34 = PY3 and sys.version_info.minor == 4
 
 
 def excludes(base):
@@ -79,10 +81,11 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-    ] + (['zodbpickle==1.0', 'backports.tempfile==1.0'] if PY2 else [])
-      + (['Jinja2<2.9'] if sys.version_info.major == 3 and sys.version_info.minor < 5 else [])
-      + (['scandir'] if sys.version_info.major < 3 or
-          sys.version_info.major == 3 and sys.version_info.minor < 5 else []),
+    ] + (['zodbpickle==1.0'] if PY2 or PY34 else [])
+      + (['Sphinx<1.8.4'] if PY34 else [])
+      + (['backports.tempfile==1.0'] if PY2 else [])
+      + (['Jinja2<2.9'] if PY34 else [])
+      + (['scandir'] if PY2 or PY34 else []),
     version=version,
     packages=['PyOpenWorm',
               'PyOpenWorm.data_trans'],
@@ -107,6 +110,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering'
     ]
 )
