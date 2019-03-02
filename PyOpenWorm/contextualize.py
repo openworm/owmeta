@@ -169,9 +169,7 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                         # We have to check the __wrapped__. Don't check our
                         # self since all we have is a context.
                         try:
-                            wrapped = get_wrapped(self) if wrapped is None else wrapped
-                            res = k.__get__(self, type(self))
-                            return res
+                            return k.__get__(self, type(self))
                         except AttributeError:
                             # The __wrapped__ doesn't have the named attribute
                             # Pass in this proxy to the descriptor so that
@@ -185,14 +183,13 @@ class ContextualizingProxy(wrapt.ObjectProxy):
                                 wrapped = get_wrapped(self) if wrapped is None else wrapped
                                 return k.__get__(wrapped, type(wrapped))
                             else:
-                                return k.__get__(self, type(self))
+                                raise
+                    # it's a data descriptor
+                    elif isinstance(k, classmethod):
+                        wrapped = get_wrapped(self) if wrapped is None else wrapped
+                        return k.__get__(wrapped, type(wrapped))
                     else:
-                        # It's a data descriptor
-                        if isinstance(k, classmethod):
-                            wrapped = get_wrapped(self) if wrapped is None else wrapped
-                            return k.__get__(wrapped, type(wrapped))
-                        else:
-                            return k.__get__(self, type(self))
+                        return k.__get__(self, type(self))
                 else:
                     try:
                         wrapped = get_wrapped(self) if wrapped is None else wrapped

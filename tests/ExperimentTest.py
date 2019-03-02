@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 from PyOpenWorm.experiment import Experiment
+from PyOpenWorm.document import Document
 from PyOpenWorm.data import DataUser
 
 
@@ -10,8 +11,12 @@ class ExperimentTest(_DataTest):
         """
         Test that the Experiment object is a DataUser object as well.
         """
-        do = Experiment('', conf=self.config)
+        do = Experiment(conf=self.config)
         self.assertTrue(isinstance(do, DataUser))
+
+    def test_data_user_reference(self):
+        do = Experiment(reference=Document(conf=self.config), conf=self.config)
+        self.assertIsNotNone(do.reference())
 
     def test_unimplemented_conditions(self):
         """

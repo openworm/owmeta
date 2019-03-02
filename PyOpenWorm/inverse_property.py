@@ -18,9 +18,9 @@ class InversePropertyMixin(object):
         ip = InverseProperties.get(ip_key)
         if ip:
             rhs_cls, rhs_linkName = ip.other(*ip_key)
-            assert isinstance(other, rhs_cls)
-            rhs_prop = getattr(other.contextualize(self.context), rhs_linkName)
-            super(InversePropertyMixin, rhs_prop).set(self.owner)
+            if isinstance(other, rhs_cls):
+                rhs_prop = getattr(other.contextualize(self.context), rhs_linkName)
+                super(InversePropertyMixin, rhs_prop).set(self.owner)
         return super(InversePropertyMixin, self).set(other)
 
     def unset(self, other):
@@ -28,10 +28,10 @@ class InversePropertyMixin(object):
         ip = InverseProperties.get(ip_key)
         if ip:
             rhs_cls, rhs_linkName = ip.other(*ip_key)
-            assert isinstance(other, rhs_cls)
-            rhs_prop = getattr(other, rhs_linkName)
-            ctxd_rhs_prop = rhs_prop.contextualize(self.context)
-            super(InversePropertyMixin, ctxd_rhs_prop).unset(self.owner)
+            if isinstance(other, rhs_cls):
+                rhs_prop = getattr(other, rhs_linkName)
+                ctxd_rhs_prop = rhs_prop.contextualize(self.context)
+                super(InversePropertyMixin, ctxd_rhs_prop).unset(self.owner)
         return super(InversePropertyMixin, self).unset(other)
 
 

@@ -15,12 +15,6 @@ class Muscle(Cell):
         >>> innervates_mdr21 = mdr21.innervatedBy()
         >>> len(innervates_mdr21)
         4
-
-    Attributes
-    ----------
-    neurons : ObjectProperty
-        Neurons synapsing with this muscle
-    receptors : DatatypeProperty
     """
 
     class_context = Cell.class_context
@@ -29,13 +23,13 @@ class Muscle(Cell):
     ''' Neurons synapsing with this muscle '''
 
     neurons = Alias(innervatedBy)
-    ''' Alias to innervatedBy '''
+    ''' Alias to `innervatedBy` '''
 
     receptors = DatatypeProperty(multiple=True)
     ''' Receptor types expressed by this type of muscle '''
 
     receptor = Alias(receptors)
-    ''' Alias to receptors '''
+    ''' Alias to `receptors` '''
 
 
 __yarom_mapped_classes__ = (Muscle,)

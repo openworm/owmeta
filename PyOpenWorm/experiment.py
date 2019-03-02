@@ -1,5 +1,5 @@
-from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.dataObject import DataObject, ObjectProperty
+from PyOpenWorm.document import Document
 
 
 class Experiment(DataObject):
@@ -14,23 +14,15 @@ class Experiment(DataObject):
     type of experiment.
     Each of the items in "conditions" should also be either a
     DatatypeProperty or ObjectProperty for the experiment as well.
-
-    Parameters
-    ----------
-    reference : Evidence
-        Supporting article for this experiment.
     """
+
     class_context = 'http://openworm.org/schema/sci'
 
-    def __init__(self, reference=None, **kwargs):
+    reference = ObjectProperty(value_type=Document, multiple=True)
+    ''' Supporting article for this experiment. '''
+
+    def __init__(self, **kwargs):
         super(Experiment, self).__init__(**kwargs)
-        self.reference = Experiment.ObjectProperty(value_type=Evidence,
-                                                   multiple=True)
-
-        if isinstance(reference, Evidence):
-            #TODO: make this so the reference asserts this Experiment when it is added
-            self.reference(reference)
-
         self._condits = {}
 
     def get_conditions(self):

@@ -1,6 +1,6 @@
 from rdflib.namespace import Namespace
 from ..bibtex import parse_bibtex_into_evidence
-from .datasource import Informational, DataTranslator, DataSource
+from ..datasource import Informational, DataTranslator, DataSource
 from .local_file_ds import LocalFileDataSource
 from ..context import Context
 from ..contextDataObject import ContextDataObject
