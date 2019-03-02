@@ -1,15 +1,24 @@
 from __future__ import print_function
 from __future__ import absolute_import
-from yarom import yarom_import
 import rdflib as R
 
 from .DataTestTemplate import _DataTest
 
-DataObject = yarom_import('PyOpenWorm.dataObject.DataObject')
+from PyOpenWorm.dataObject import DataObject
 
 
 class SimplePropertyTest(_DataTest):
     ctx_classes = (DataObject,)
+
+    def setUp(self):
+        super(SimplePropertyTest, self).setUp()
+        from PyOpenWorm.dataObject import PropertyTypes
+        PropertyTypes.clear()
+
+    def tearDown(self):
+        super(SimplePropertyTest, self).tearDown()
+        from PyOpenWorm.dataObject import PropertyTypes
+        PropertyTypes.clear()
 
     # XXX: auto generate some of these tests...
     def test_same_value_same_id_empty(self):

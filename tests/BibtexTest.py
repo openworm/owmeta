@@ -7,7 +7,6 @@ from os.path import dirname, abspath, join
 
 # logging.basicConfig(level=logging.DEBUG)
 
-
 class BibtexTest(_DataTest):
     def loads(self, s):
         for x in loads(s).entries:
@@ -32,7 +31,7 @@ class BibtexTest(_DataTest):
     def test_parse(self):
         basepath = dirname(__file__)
         filepath = abspath(join(basepath, "test_data", "test.bib"))
-        bt = parse_bibtex_into_evidence(filepath)
+        bt = parse_bibtex_into_evidence(filepath, context=self.context)
         for x in bt.values():
             self.assertEqual(
                 set(x.reference().author()),

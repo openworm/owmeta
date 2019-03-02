@@ -1,12 +1,9 @@
 from __future__ import absolute_import
-
-import unittest
-
+import PyOpenWorm
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.network import Network
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
-import networkx
 
 from .DataTestTemplate import _DataTest
 
@@ -17,7 +14,7 @@ class NetworkTest(_DataTest):
 
     def setUp(self):
         super(NetworkTest, self).setUp()
-        self.net = self.ctx.Network(conf=self.config)
+        self.net = self.ctx.Network(conf=self.TestConfig)
         self.worm = self.ctx.Worm()
         self.worm.neuron_network(self.net)
 
@@ -46,11 +43,6 @@ class NetworkTest(_DataTest):
         for x in self.net.synapse():
             self.assertIsInstance(x, Connection)
             break
-
-    @unittest.skip('not implemented')
-    def test_as_networkx(self):
-        """Test that as_networkx returns the correct type."""
-        self.assertTrue(isinstance(self.net.as_networkx(), networkx.DiGraph))
 
     def test_interneurons(self):
         n0 = self.ctx.Neuron(name='TestNeuron0')

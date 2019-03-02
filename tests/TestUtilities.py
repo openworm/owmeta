@@ -1,6 +1,13 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+import hashlib
+from contextlib import contextmanager
+from six import StringIO
+
+import pytest
+
+
 excludedFiles = ['TestUtilities.py', 'pytest_profile.py']
 
 
@@ -27,6 +34,7 @@ def findSkippedTests():
                     print('\n')
                     count = False
 
+
 # Function to list function names in test suite so we can quickly see \
 # which ones do not adhere to the proper naming convention.
 def listFunctionNames():
@@ -44,6 +52,22 @@ def listFunctionNames():
                     print('\n')
                     count = False
 
+
+def xfail_without_db():
+    db_path = os.path.join(
+        os.path.dirname(  # project root
+            os.path.dirname(  # test dir
+                os.path.realpath(__file__)  # this file
+            )
+        ),
+        ".pow",
+        "worm.db"
+    )
+
+    if not os.path.isfile(db_path):
+        pytest.xfail("Database is not installed. Try \n\tpow clone https://github.com/openworm/OpenWormData.git")
+
+
 # Add function to find dummy tests, i.e. ones that are simply marked pass.
 # TODO: improve this to list function names
 def findDummyTests():
@@ -59,3 +83,35 @@ def findDummyTests():
                     if count:
                         print('\n')
                         count = False
+
+
+@contextmanager
+def noexit():
+    try:
+        yield
+    except SystemExit:
+        pass
+
+
+@contextmanager
+def stdout():
+    import sys
+    oldstdout = sys.stdout
+    sio = StringIO()
+    sys.stdout = sio
+    try:
+        yield sys.stdout
+    finally:
+        sys.stdout = oldstdout
+
+
+@contextmanager
+def stderr():
+    import sys
+    oldstderr = sys.stderr
+    sio = StringIO()
+    sys.stderr = sio
+    try:
+        yield sys.stderr
+    finally:
+        sys.stderr = oldstderr

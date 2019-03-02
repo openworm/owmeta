@@ -12,9 +12,9 @@ from OpenWormData import BIO_ENT_NS
 from six import StringIO
 
 #Connect to database.
-P.connect('default.conf')
+conn = P.connect('default.conf')
 
-ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
 
 #Create a new Cell object to work with.
 aval = ctx(Worm)().get_neuron_network().aneuron('AVAL')
@@ -26,4 +26,4 @@ morph.export(out, 0) # we're printing it here, but we would normally do somethin
 print(str(out.read()))
 
 #Disconnect from the database.
-P.disconnect()
+P.disconnect(conn)

@@ -4,23 +4,28 @@ import rdflib as R
 import logging
 from six import with_metaclass
 
-from yarom.graphObject import GraphObject, GraphObjectQuerier
+from yarom.graphObject import (GraphObject,
+                               GraphObjectQuerier,
+                               ZeroOrMoreTQLayer)
 
 from yarom.mappedProperty import MappedPropertyClass
 from yarom.variable import Variable
 from yarom.propertyValue import PropertyValue
-from yarom.propertyMixins import (ObjectPropertyMixin,
-                                  DatatypePropertyMixin,
+from yarom.propertyMixins import (DatatypePropertyMixin,
                                   UnionPropertyMixin)
 from yarom.mapper import FCN
-from PyOpenWorm.data import DataUser
-from PyOpenWorm.contextualize import (Contextualizable, ContextualizableClass,
-                                      contextualize_helper)
-from PyOpenWorm.context import Context
-from PyOpenWorm.statement import Statement
+from .data import DataUser
+from .contextualize import (Contextualizable, ContextualizableClass,
+                            contextualize_helper,
+                            decontextualize_helper)
+from .context import Context
+from .statement import Statement
+from .inverse_property import InversePropertyMixin
+from .rdf_query_util import goq_hop_scorer, load
+from .rdf_go_modifiers import SubClassModifier
+
 import itertools
 from lazy_object_proxy import Proxy
-from .inverse_property import InversePropertyMixin
 
 L = logging.getLogger(__name__)
 
@@ -39,6 +44,13 @@ class ContextMappedPropertyClass(MappedPropertyClass, ContextualizableClass):
         if self._cmpc_context is not None and self._cmpc_context != newc:
             raise Exception('Contexts cannot be reassigned for a class')
         self._cmpc_context = newc
+
+
+class ContextualizedPropertyValue(PropertyValue):
+
+    @property
+    def context(self):
+        return None
 
 
 class _ContextualizableLazyProxy(Proxy, Contextualizable):
@@ -84,11 +96,20 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         super(RealSimpleProperty, self).__init__(**kwargs)
         self._v = []
         self.owner = owner
-        self._hdf = None
+        self._hdf = dict()
+        self.filling = False
 
     def contextualize_augment(self, context):
-        self._hdf = None
-        return contextualize_helper(context, self)
+        self._hdf[context] = None
+        res = contextualize_helper(context, self)
+        if res is not self:
+            cowner = context(res.owner)
+            res.add_attr_override('owner', cowner)
+        return res
+
+    def decontextualize(self):
+        self._hdf[self.context] = None
+        return decontextualize_helper(self)
 
     def has_value(self):
         for x in self._v:
@@ -97,19 +118,21 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         return False
 
     def has_defined_value(self):
-        if self._hdf is not None:
-            return self._hdf
+        hdf = self._hdf.get(self.context)
+        if hdf is not None:
+            return hdf
         for x in self._v:
             if x.context == self.context and x.object.defined:
-                self._hdf = True
+                self._hdf[self.context] = True
                 return True
         return False
 
     def set(self, v):
         if v is None:
             raise ValueError('It is not permitted to declare a property to have value the None')
+
         if not hasattr(v, 'idl'):
-            v = PropertyValue(v)
+            v = ContextualizedPropertyValue(v)
 
         if not self.multiple:
             self.clear()
@@ -121,7 +144,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def clear(self):
         """ Clears values set *in all contexts* """
-        self._hdf = None
+        self._hdf = dict()
         for x in self._v:
             assert self in x.object.owner_properties
             x.object.owner_properties.remove(self)
@@ -134,18 +157,42 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     @property
     def values(self):
-        return tuple(x.object for x in self._v if x.context == self.context)
+        return tuple(self._values_helper())
+
+    def _values_helper(self):
+        for x in self._v:
+            if x.context == self.context:
+                # XXX: decontextualzing default context here??
+                if self.context is not None:
+                    yield self.context(x.object)
+                elif isinstance(x.object, Contextualizable):
+                    yield x.object.decontextualize()
+                else:
+                    yield x.object
 
     @property
     def rdf(self):
         if self.context is not None:
             return self.context.rdf_graph()
         else:
-            return self.conf['rdf.graph']
+            return super(RealSimpleProperty, self).rdf
 
     @property
     def identifier(self):
         return self.link
+
+    def fill(self):
+        self.filling = True
+        try:
+            self.clear()
+            for val in self.get():
+                self.set(val)
+                fill = getattr(val, 'fill', True)
+                filling = getattr(val, 'filling', True)
+                if fill and not filling:
+                    fill()
+        finally:
+            self.filling = False
 
     def get(self):
         if self.rdf is None:
@@ -161,13 +208,19 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         else:
             v = Variable("var" + str(id(self)))
             self._insert_value(v)
-            results = GraphObjectQuerier(v, self.rdf, parallel=False)()
+
+            def _zomifier(rdf_type):
+                if rdf_type and getattr(self, 'value_rdf_type', None) == rdf_type:
+                    return SubClassModifier(rdf_type)
+            g = ZeroOrMoreTQLayer(_zomifier, self.rdf)
+            results = GraphObjectQuerier(v, g, parallel=False,
+                                         hop_scorer=goq_hop_scorer)()
             self._remove_value(v)
         return results
 
     def _insert_value(self, v):
         stmt = Statement(self.owner, self, v, self.context)
-        self._hdf = None
+        self._hdf[self.context] = None
         self._v.append(stmt)
         if self not in v.owner_properties:
             v.owner_properties.append(self)
@@ -175,7 +228,7 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
 
     def _remove_value(self, v):
         assert self in v.owner_properties
-        self._hdf = None
+        self._hdf[self.context] = None
         v.owner_properties.remove(self)
         self._v.remove(Statement(self.owner, self, v, self.context))
 
@@ -248,7 +301,7 @@ class OPResolver(object):
         self._ctx = context
 
     def id2ob(self, ident, typ):
-        from .dataObject import oid
+        from .rdf_query_util import oid
         return oid(ident, typ, self._ctx)
 
     @property
@@ -272,15 +325,13 @@ class PropertyCountMixin(object):
         return sum(1 for _ in super(PropertyCountMixin, self).get())
 
 
-class ObjectProperty (InversePropertyMixin,
-                      _ContextualizingPropertySetMixin,
-                      ObjectPropertyMixin,
-                      PropertyCountMixin,
-                      RealSimpleProperty):
+class ObjectProperty(InversePropertyMixin,
+                     _ContextualizingPropertySetMixin,
+                     PropertyCountMixin,
+                     RealSimpleProperty):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, resolver=None, *args, **kwargs):
         super(ObjectProperty, self).__init__(*args, **kwargs)
-        self.resolver = OPResolver(self.context)
 
     def contextualize_augment(self, context):
         res = super(ObjectProperty, self).contextualize_augment(context)
@@ -297,7 +348,8 @@ class ObjectProperty (InversePropertyMixin,
         return super(ObjectProperty, self).set(v)
 
     def get(self):
-        r = super(ObjectProperty, self).get()
+        idents = super(ObjectProperty, self).get()
+        r = load(self.rdf, idents=idents, context=self.context)
         return itertools.chain(self.defined_values, r)
 
     @property
@@ -310,14 +362,20 @@ class ObjectProperty (InversePropertyMixin,
                                 for x in super(ObjectProperty, self).statements))
 
 
-class DatatypeProperty (DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
+class DatatypeProperty(DatatypePropertyMixin, PropertyCountMixin, RealSimpleProperty):
 
     def get(self):
         r = super(DatatypeProperty, self).get()
         s = set()
+        unhashables = []
         for x in self.defined_values:
-            s.add(self.resolver.deserializer(x.idl))
-        return itertools.chain(r, s)
+            val = self.resolver.deserializer(x.idl)
+            try:
+                s.add(val)
+            except TypeError as e:
+                unhashables.append(val)
+                L.info('Unhashable type: %s', e)
+        return itertools.chain(r, s, unhashables)
 
     def onedef(self):
         x = super(DatatypeProperty, self).onedef()

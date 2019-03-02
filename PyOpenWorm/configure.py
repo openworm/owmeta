@@ -93,7 +93,10 @@ class Configure(object):
             self._properties[pname] = value
 
     def __getitem__(self, pname):
-        return self._properties[pname].get()
+        try:
+            return self._properties[pname].get()
+        except KeyError:
+            raise
 
     def __delitem__(self, pname):
         del self._properties[pname]
@@ -121,6 +124,33 @@ class Configure(object):
         return len(self._properties)
 
     @classmethod
+    def process_config(cls, config_dict):
+        c = cls()
+        for k in config_dict:
+            value = config_dict[k]
+            if isinstance(value, six.string_types):
+                def matchf(md):
+                    match = md.group(1)
+                    # Note: We already matched the rest of the string, so
+                    # we just need to check for the initial char here
+                    valid_var_name = re.match(r'^[A-Za-z_]', match)
+                    if valid_var_name:
+                        res = environ.get(match, None)
+                        if res is None and match == 'BASE':
+                            res = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                        res = None if res == '' else res
+                    else:
+                        raise ValueError("'%s' is an invalid env-var name\n"
+                                         "Env-var names must be alphnumeric "
+                                         "and start with either a letter or '_'" % match)
+                    return res
+                res = re.sub(r'\$([A-Za-z0-9_]+)', matchf, value)
+                res = None if res == '' else res
+                config_dict[k] = res
+            c[k] = _C(config_dict[k])
+        return c
+
+    @classmethod
     def open(cls, file_name):
         """
         Open a configuration file and read it to build the internal state.
@@ -130,32 +160,8 @@ class Configure(object):
         """
 
         with open(file_name) as f:
-            c = Configure()
             d = json.load(f)
-            for k in d:
-                value = d[k]
-                if isinstance(value, six.string_types):
-                    def matchf(md):
-                        match = md.group(1)
-                        # Note: We already matched the rest of the string, so
-                        # we just need to check for the initial char here
-                        valid_var_name = re.match(r'^[A-Za-z_]', match)
-                        if valid_var_name:
-                            res = environ.get(match, None)
-                            res = None if res == '' else res
-                        else:
-                            raise ValueError("'%s' is an invalid env-var name\n"
-                                             "Env-var names must be alphnumeric "
-                                             "and start with either a letter or '_'" % match)
-                        return res
-                    res = re.sub(r'\$([A-Za-z0-9_]+)', matchf, value)
-                    res = None if res == '' else res
-                    d[k] = res
-                    if value.startswith("BASE/"):
-                        value = value[4:]
-                        value = resource_filename(Requirement.parse('PyOpenWorm'), value)
-                        d[k] = value
-                c[k] = _C(d[k])
+            c = cls.process_config(d)
         c['configure.file_location'] = file_name
         return c
 
@@ -215,7 +221,7 @@ class Configureable(object):
                 raise ValueError('The \'conf\' of a Configureable cannot be itself')
             self.__conf = conf
         else:
-            self.__conf = Configureable.default
+            self.__conf = type(self).default
 
     @property
     def conf(self):

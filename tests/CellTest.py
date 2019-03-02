@@ -52,7 +52,7 @@ class CellTest(_DataTest):
         """
         Test that setting the lineage name gives the blast cell.
         """
-        c = Cell(name="carrots")
+        c = self.ctx.Cell(name="carrots")
         c.lineageName("a tahsuetoahusenoatu")
         self.assertEqual(c.blast(), "a")
 
@@ -60,7 +60,7 @@ class CellTest(_DataTest):
         """
         Test that setting the lineage name gives the blast cell.
         """
-        c = Cell(name="peas")
+        c = self.ctx.Cell(name="peas")
         c.lineageName("ab.tahsuetoahusenoatu")
         self.assertEqual(c.blast(), "ab")
 

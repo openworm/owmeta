@@ -20,7 +20,7 @@ from PyOpenWorm.context import Context
 from OpenWormData import BIO_ENT_NS
 import os
 print(os.getcwd())
-P.connect('default.conf')
+conn = P.connect('default.conf')
 
 
 def get_names(it):
@@ -30,7 +30,7 @@ def get_names(it):
     return res
 
 
-ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
 
 w = ctx(Worm)()
 net = w.neuron_network()

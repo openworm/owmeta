@@ -1,82 +1,55 @@
 import wrapt
+import importlib
 from PyOpenWorm.import_contextualizer import ImportContextualizer
 import six
 
 
 class Overrider(object):
-    instances = dict()
+    instance = None
 
     def __new__(cls, mapper):
-        if len(Overrider.instances.keys()) > 1:
-            raise Exception('Only one Overrider should exist. There are overriders for these: ' +
-                            ' '.join(str(x) for x in Overrider.instances.keys()))
+        if Overrider.instance is not None:
+            raise Exception('Only one Overrider should exist. Here it is: {}'.format(Overrider.instance))
 
-        inst = Overrider.instances.get(mapper, None)
-        if inst is not None:
-            return inst
-        sup = super(Overrider, cls).__new__(cls)
-        Overrider.instances[mapper] = sup
-        return sup
+        Overrider.instance = super(Overrider, cls).__new__(cls)
+        return Overrider.instance
 
     def __init__(self, mapper):
         if hasattr(self, 'mapper') and self.mapper is not None:
             return
 
-        self.i = 0
-        self.k = 0
         self.mapper = mapper
 
         @wrapt.function_wrapper
         def import_wrapper(orig__import__, __, args, kwargs):
-            self.k += 1
-            self.i += 1
-            try:
-                m = [None, None]
-                if len(args) > 4 and args[4]:
-                    depth = args[4]
+            m = [None, None]
 
-                    if args[1] is None:
-                        raise ImportError("No globals given to import to detect calling module for relative import")
+            module_name, caller = module_name_from_import_args(args)
 
-                    caller = args[1].get('__name__', None)
+            def cb():
+                if len(args) >= 3:
+                    importer_locals = args[2]
+                    if importer_locals is not None:
+                        splits = module_name.split('.', 1)
+                        if len(splits) == 2:
+                            first, rest = splits
+                            local = importer_locals.get(first, None)
+                            if isinstance(local, ImportContextualizer):
+                                new_args = list(args)
+                                new_args[0] = rest
+                                m[0] = local
+                                if len(new_args) >= 4:
+                                    m[1] = new_args[3]
+                                return orig__import__(*new_args, **kwargs)
+                return orig__import__(*args, **kwargs)
 
-                    if caller is None:
-                        raise ImportError("No calling module in import globals to resolve relative import")
-
-                    parent = caller.rsplit('.', depth)[0]
-                    module_name = parent + '.' + args[0]
+            def mb(mod):
+                if m[0] is not None:
+                    return m[0](mod)
                 else:
-                    module_name = args[0]
+                    return mod
 
-                def cb():
-                    if len(args) >= 3:
-                        importer_locals = args[2]
-                        if importer_locals is not None:
-                            splits = module_name.split('.', 1)
-                            if len(splits) == 2:
-                                first, rest = splits
-                                local = importer_locals.get(first, None)
-                                if isinstance(local, ImportContextualizer):
-                                    new_args = list(args)
-                                    new_args[0] = rest
-                                    m[0] = local
-                                    if len(new_args) >= 4:
-                                        m[1] = new_args[3]
-                                    return orig__import__(*new_args, **kwargs)
-                    return orig__import__(*args, **kwargs)
-
-                def cb1():
-                    return orig__import__(*args, **kwargs)
-
-                def mb(mod):
-                    if m[0] is not None:
-                        return m[0](mod)
-                    else:
-                        return mod
-
-                return mb(self.mapper.process_module(module_name=module_name, cb=cb))
-            finally:
-                self.i -= 1
+            return mb(self.mapper.process_module(module_name=module_name, cb=cb, caller=caller))
         self.import_wrapper = import_wrapper
         self.wrapped = None
 
@@ -104,3 +77,26 @@ class Overrider(object):
             self.wrapped = builtins.__import__
 
         builtins.__import__ = self.import_wrapper(self.wrapped)
+
+
+def module_name_from_import_args(args):
+    caller = None # This happens, for instance, when __import__ is called directly
+    if len(args) > 4 and args[4]:
+        depth = args[4]
+
+        if args[1] is None:
+            raise ImportError("No globals given to import to detect calling module for relative import")
+
+        caller = args[1].get('__name__', None)
+
+        if caller is None:
+            raise ImportError("No calling module in import globals to resolve relative import")
+
+        parent = caller.rsplit('.', depth)[0]
+        module_name = parent + '.' + args[0]
+    else:
+        if len(args) > 1 and args[1]:
+            caller = args[1].get('__name__', None)
+        module_name = args[0]
+
+    return module_name, caller

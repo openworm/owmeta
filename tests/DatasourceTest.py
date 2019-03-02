@@ -1,7 +1,17 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
+try:
+    from unittest.mock import Mock, MagicMock, ANY, patch
+except ImportError:
+    from mock import Mock, MagicMock, ANY, patch
+
+from rdflib.term import URIRef
+
 from PyOpenWorm.datasource import Informational, DataSource, DuplicateAlsoException
+from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+from PyOpenWorm.contextDataObject import ContextDataObject
+from .DataTestTemplate import _DataTest
 
 
 class InformationalTest(unittest.TestCase):
@@ -19,8 +29,10 @@ class InformationalTest(unittest.TestCase):
         self.assertEqual(inf.display_name, 'test')
 
 
-class DataSourceTest(unittest.TestCase):
+class DataSourceTest(_DataTest):
     def setUp(self):
+        super(DataSourceTest, self).setUp()
+
         class DS1(DataSource):
             a = Informational(default_value='A')
 
@@ -151,3 +163,16 @@ class DataSourceTest(unittest.TestCase):
             q = Informational(also=self.DS1.a, default_value='Q')
         c = C()
         self.assertEqual(c.a.onedef(), 'Q')
+
+
+class DataWithEvidenceDataSourceTest(unittest.TestCase):
+    def test_init_with_args(self):
+        m = Mock(name='evidence_context', spec=ContextDataObject())
+        m.owner_properties = []
+        cut = DataWithEvidenceDataSource(ident=URIRef('http://example.org/dweds6'),
+                                         evidence_context_property=m)
+        self.assertEqual(m, cut.evidence_context_property.onedef())
+
+    def test_init_context_properties(self):
+        cut = DataWithEvidenceDataSource(ident=URIRef('http://example.org/dweds6'))
+        self.assertIsNotNone(cut.evidence_context_property.onedef())

@@ -26,13 +26,13 @@ class EvidenceQualityTests(_DataTest):
     '''
 
     def setUp(self):
-        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
-        self.g = PyOpenWorm.config("rdf.graph")
+        self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
     def tearDown(self):
-        PyOpenWorm.disconnect()
+        PyOpenWorm.disconnect(self.conn)
 
     def test_has_valid_resource(self):
         """Checks if the object has either a valid DOI or URL"""

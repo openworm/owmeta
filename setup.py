@@ -33,6 +33,8 @@ for line in open('PyOpenWorm/__init__.py'):
 package_data_excludes = ['.*', '*.bkp', '~*']
 
 PY2 = sys.version_info.major == 2
+PY3 = sys.version_info.major == 3
+PY34 = PY3 and sys.version_info.minor == 4
 
 
 def excludes(base):
@@ -48,7 +50,7 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=[
         'pytest>=3.4.0',
-        'pytest-cov==2.5.1',
+        'pytest-cov>=2.5.1',
         'discover==0.4.0',
     ] + (['mock==2.0.0'] if PY2 else []),
     install_requires=[
@@ -59,33 +61,34 @@ setup(
         'html5lib==0.999',
         'isodate==0.5.0',
         'lazy-object-proxy==1.2.1',
-        'libneuroml==0.2.18',
-        'networkx==1.9',
+        'libneuroml',
         'numpydoc>=0.7.0',
         'persistent==4.0.8',
         'Pint==0.8.1',
-        'pow-store-zodb==0.0.3',
+        'pow-store-zodb==0.0.7',
         'pyparsing==2.2.0',
         'rdflib>=4.1.2',
-        'requests==2.18.4',
-        'six==1.10.0',
+        'six~=1.10',
         'SPARQLWrapper==1.6.2',
         'tqdm==4.23.4',
+        'termcolor==1.1.0',
         'transaction==1.4.4',
         'wrapt==1.10.11',
         'xlrd==1.1.0',
-        'yarom==0.11.0',
+        'yarom>=0.11.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'zope.interface==4.1.1',
-    ] + (['zodbpickle==1.0'] if PY2 else []),
+    ] + (['zodbpickle==1.0'] if PY2 or PY34 else [])
+      + (['Sphinx<1.8.4'] if PY34 else [])
+      + (['backports.tempfile==1.0'] if PY2 else [])
+      + (['Jinja2<2.9'] if PY34 else [])
+      + (['scandir'] if PY2 or PY34 else []),
     version=version,
     packages=['PyOpenWorm',
-              'PyOpenWorm.data_trans',
-              'OpenWormData',
-              'OpenWormData.scripts'],
+              'PyOpenWorm.data_trans'],
     include_package_data=True,
     exclude_package_data={'OpenWormData': sum((excludes(x) for x in ('aux_data',
                                                                      'aux_data/bibtex_files',
@@ -107,6 +110,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering'
     ]
 )

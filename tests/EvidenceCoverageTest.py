@@ -3,7 +3,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 import unittest
 import itertools
-from .DataTestTemplate import _DataTest
+
+from .TestUtilities import xfail_without_db
 import PyOpenWorm
 from PyOpenWorm.context import Context
 from PyOpenWorm.neuron import Neuron
@@ -13,16 +14,17 @@ from PyOpenWorm.evidence import Evidence
 
 # XXX: This could probably just be one test at this point -- iterate over all contexts and check for an
 # Evidence:supports triple
-class EvidenceCoverageTest(_DataTest):
+class EvidenceCoverageTest(unittest.TestCase):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
-        PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
-        self.g = PyOpenWorm.config("rdf.graph")
+        xfail_without_db()
+        self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
     def tearDown(self):
-        PyOpenWorm.disconnect()
+        PyOpenWorm.disconnect(self.conn)
 
     def test_verify_neurons_have_evidence(self):
         """
@@ -49,7 +51,7 @@ class EvidenceCoverageTest(_DataTest):
     def test_verify_muslces_have_evidence(self):
         """ For each muscle in PyOpenWorm, verify
         that there is supporting evidence"""
-        muscles = list(Worm().muscles())
+        muscles = list(self.qctx(Worm)().muscles())
         evcheck = []
         knowns = dict()
         for n in muscles:

@@ -1,11 +1,16 @@
+from __future__ import print_function
 import unittest
 try:
-    from unittest.mock import Mock
+    from unittest.mock import MagicMock, Mock, ANY, patch
 except ImportError:
-    from mock import Mock
+    from mock import MagicMock, Mock, ANY, patch
+import re
 import tempfile
 import os
-from os.path import exists, join as p
+from os import listdir, system as sh
+from os.path import exists, join as p, realpath
+from subprocess import check_output
+import shlex
 import shutil
 import json
 from rdflib.term import URIRef
@@ -13,8 +18,12 @@ from pytest import mark
 
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import POW, UnreadableGraphException
+from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
+                                POWConfig, POWSource, POWTranslator, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
+                                POWDirDataSourceDirLoader, _DSD)
+from PyOpenWorm.datasource_loader import LoadFailed
 from PyOpenWorm.command_util import IVar, PropertyIVar
+from .TestUtilities import noexit, stderr, stdout
 
 
 class BaseTest(unittest.TestCase):
@@ -27,6 +36,14 @@ class BaseTest(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
+        self.cut._disconnect()
+
+    def _init_conf(self, conf=None):
+        if not conf:
+            conf = {}
+        os.mkdir('.pow')
+        with open(p('.pow', 'pow.conf'), 'w') as f:
+            json.dump(conf, f)
 
 
 class POWTest(BaseTest):
@@ -40,21 +57,16 @@ class POWTest(BaseTest):
         self.assertTrue(exists(p('.pow', 'pow.conf')), msg='pow.conf is created')
 
     def test_init_default_store_config_file_exists_no_change(self):
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
-            f.write('{}')
-
+        self._init_conf()
         self.cut.init()
-        with open('.pow/pow.conf', 'r') as f:
+        with open(p('.pow', 'pow.conf'), 'r') as f:
             self.assertEqual('{}', f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            f.write('{}')
+        self._init_conf()
 
         self.cut.init(update_existing_config=True)
-        with open('.pow/pow.conf', 'r') as f:
+        with open(p('.pow', 'pow.conf'), 'r') as f:
             conf = json.load(f)
             self.assertEqual(conf['rdf.store_conf'], p('.pow', 'worm.db'), msg='path is updated')
 
@@ -106,14 +118,358 @@ class POWTest(BaseTest):
              URIRef('http://example.org/o'),
              URIRef('http://example.org/c'))
         m().quads.return_value = [q]
-        os.mkdir('.pow')
-        with open('.pow/pow.conf', 'w') as f:
-            json.dump({'rdf.store': 'default'}, f)
-            f.flush()
+        self._init_conf()
 
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.add_graph("http://example.org/ImAGraphYesSiree")
         self.assertIn(q, self.cut._conf()['rdf.graph'])
+
+    def test_conf_connection(self):
+        self._init_conf()
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_user_config_in_main_config(self):
+        self._init_conf()
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_conifg_set_get(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.assertEqual(self.cut._conf()['key'], 11)
+
+    def test_user_conifg_set_get_override(self):
+        self._init_conf()
+        self.cut.config.set('key', '11')
+        self.cut.config.user = True
+        self.cut.config.set('key', '10')
+        self.assertEqual(self.cut._conf()['key'], 10)
+
+    def test_context_set_config_get(self):
+        c = 'http://example.org/context'
+        self._init_conf()
+        self.cut.context(c)
+        self.assertEqual(self.cut.config.get(DATA_CONTEXT_KEY), c)
+
+    def test_context_set_user_override(self):
+        c = 'http://example.org/context'
+        d = 'http://example.org/context_override'
+        self._init_conf()
+        self.cut.context(d, user=True)
+        self.cut.context(c)
+        self.assertEqual(self.cut.context(), d)
+
+    def test_save_empty_attr_defaults(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', '', 'http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test', 'http://example.org/context')
+            im(ANY).test.assert_called()
+
+    def test_save_dotted_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', 'test.test', 'http://example.org/context')
+            im(ANY).test.test.assert_called()
+
+    def test_save_no_attr(self):
+        self._init_conf()
+        with patch('importlib.import_module') as im:
+            self.cut.save('tests.command_test_module', context='http://example.org/context')
+            getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
+
+    def test_save_data_context(self):
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            with patch('PyOpenWorm.command.Context') as ctxc:
+                self.cut.save('tests.command_test_module')
+                ctxc.assert_called_with(ident=a, conf=ANY)
+                ctxc().save_context.assert_called()
+
+    def test_save_validates_imports_fail(self):
+        # add a statement with an object in another context
+        # don't import context
+        # expect exception
+        with self.assertRaises(StatementValidationError):
+            a = 'http://example.org/mdc'
+            self._init_conf({DATA_CONTEXT_KEY: a})
+            with patch('importlib.import_module') as im:
+                def f(ns):
+                    stmt = MagicMock()
+                    stmt.context.identifier = URIRef(a)
+                    ns.context.add_statement(stmt)
+                im().test = f
+                self.cut.save('tests', 'test')
+
+    def test_save_validates_with_no_context_on_object(self):
+        # add a statement with an uncontextualized object (e.g., a literal)
+        # doesn't fail
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ns):
+                stmt = Mock()
+                stmt.object.context = None
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+                ns.context.add_statement(stmt)
+            im().test = f
+            self.cut.save('tests', 'test')
+
+    def test_save_validates_object_context_import_before_success(self):
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ns):
+                ctx = ns.context
+                stmt = MagicMock(name='stmt')
+                new_ctx = Mock(name='new_ctx')
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_import(new_ctx)
+                ctx.add_statement(stmt)
+            im().test = f
+            self.cut.save('tests', 'test')
+
+    def test_save_validates_import_after_success(self):
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/new_ctx')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ns):
+                ctx = ns.context
+                stmt = MagicMock(name='stmt')
+                new_ctx = Mock(name='new_ctx')
+                new_ctx.identifier = k
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = k
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_statement(stmt)
+                ctx.add_import(new_ctx)
+            im().test = f
+            self.cut.save('tests', 'test')
+
+    def test_save_validates_additional_context_saved_fails(self):
+        # add a statement with an object in another context
+        # define a context using the 'context factory' provided by the context with that context ID
+        # validation should not succeed
+        #
+        # Usually don't test non-specified interactions, but this one seems relevant to clearly show the separation of
+        # these features
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ns):
+                ctx = ns.context
+                new_ctx = ns.new_context('http://example.org/nctx')
+                stmt = MagicMock(name='stmt')
+                stmt.to_triple.return_value = (s, s, s)
+                stmt.object.context.identifier = new_ctx.identifier
+                stmt.property.context.identifier = URIRef(a)
+                stmt.subject.context.identifier = URIRef(a)
+                stmt.context.identifier = URIRef(a)
+
+                ctx.add_statement(stmt)
+            im().test = f
+            with self.assertRaises(StatementValidationError):
+                self.cut.save('tests', 'test')
+
+    def test_save_validation_fail_in_parent_precludes_save(self):
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/unknown_ctx')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            with patch('PyOpenWorm.command.Context') as ctxc:
+
+                data_context = Mock()
+                data_context.identifier = URIRef(a)
+
+                ctxk = Mock()
+                ctxk.identifier = k
+
+                ctxc.side_effect = [data_context, ctxk]
+
+                def f(ns):
+                    ctx = ns.context
+                    ns.new_context('this value doesnt matter')
+                    stmt = MagicMock(name='stmt')
+                    stmt.to_triple.return_value = (s, s, s)
+
+                    stmt.object.context.identifier = URIRef(a)
+                    stmt.property.context.identifier = k
+                    stmt.subject.context.identifier = URIRef(a)
+                    stmt.context.identifier = URIRef(a)
+
+                    ctx.add_statement(stmt)
+
+                im().test = f
+
+                try:
+                    self.cut.save('tests', 'test')
+                    self.fail('Should have errored')
+                except StatementValidationError:
+                    data_context.save_context.assert_not_called()
+                    ctxk.save_context.assert_not_called()
+
+    def test_save_validation_fail_in_created_context_precludes_save(self):
+        # Test that if validation fails in the parent, no other valid contexts are saved
+        a = 'http://example.org/mdc'
+        s = URIRef('http://example.org/node')
+        k = URIRef('http://example.org/created_context')
+        v = URIRef('http://example.org/unknown_context')
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            with patch('PyOpenWorm.command.Context') as ctxc:
+
+                data_context = Mock()
+                data_context.identifier = URIRef(a)
+
+                ctxk = Mock()
+                ctxk.identifier = k
+
+                ctxc.side_effect = [data_context, ctxk]
+
+                def f(ns):
+                    ctx = ns.context
+                    new_ctx = ns.new_context('this value doesnt matter')
+                    stmt = MagicMock(name='stmt')
+                    stmt.to_triple.return_value = (s, s, s)
+
+                    stmt.object.context.identifier = URIRef(a)
+                    stmt.property.context.identifier = URIRef(a)
+                    stmt.subject.context.identifier = URIRef(a)
+                    stmt.context.identifier = URIRef(a)
+                    ctx.add_statement(stmt)
+
+                    stmt1 = MagicMock(name='stmt')
+                    stmt1.to_triple.return_value = (s, s, s)
+
+                    stmt1.object.context.identifier = k
+                    stmt1.property.context.identifier = v
+                    stmt1.subject.context.identifier = k
+                    stmt1.context.identifier = k
+
+                    new_ctx.add_statement(stmt1)
+
+                im().test = f
+
+                try:
+                    self.cut.save('tests', 'test')
+                    self.fail('Should have errored')
+                except StatementValidationError:
+                    data_context.save_context.assert_not_called()
+                    ctxk.save_context.assert_not_called()
+
+    def test_save_returns_something(self):
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
+
+    def test_save_returns_context(self):
+        from PyOpenWorm.context import Context
+        a = 'http://example.org/mdc'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module'):
+            self.assertIsInstance(next(self.cut.save('tests', 'test')), Context)
+
+    def test_save_returns_created_contexts(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im:
+            def f(ctx):
+                ctx.new_context(b)
+
+            im().test.side_effect = f
+            self.assertEqual(set(x.identifier for x in self.cut.save('tests', 'test')), {URIRef(a), URIRef(b)})
+
+    def test_save_saves_new_context(self):
+        a = 'http://example.org/mdc'
+        b = 'http://example.org/smoo'
+        c = []
+        self._init_conf({DATA_CONTEXT_KEY: a})
+        with patch('importlib.import_module') as im, \
+                patch('PyOpenWorm.command.Context'), \
+                patch('PyOpenWorm.context.Context'):
+            def f(ctx):
+                c.append(ctx.new_context(b))
+
+            im().test.side_effect = f
+            self.cut.save('tests', 'test')
+            c[0]._backer.save_context.assert_called()
+
+
+class POWTranslatorTest(BaseTest):
+
+    def test_translator_list(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        ps = POWTranslator(parent)
+
+        self.assertIsNotNone(next(ps.list(), None))
+
+
+class POWTranslateTest(BaseTest):
+
+    def setUp(self):
+        super(POWTranslateTest, self).setUp()
+        os.mkdir('.pow')
+        with open(p('.pow', 'pow.conf'), 'w') as f:
+            f.write('{"data_context_id": "http://example.org/data"}')
+
+    def test_translate_unknown_translator_message(self):
+        '''
+        Should exit with a message indicating the translator type
+        cannot be found in the graph
+        '''
+
+        translator = 'http://example.org/translator'
+        imports_context_ident = 'http://example.org/imports'
+        with self.assertRaisesRegexp(GenericUserError, re.escape(translator)):
+            self.cut.translate(translator, imports_context_ident)
+
+    def test_translate_unknown_source_message(self):
+        '''
+        Should exit with a message indicating the source type cannot
+        be found in the graph
+        '''
+
+        translator = 'http://example.org/translator'
+        source = 'http://example.org/source'
+        imports_context_ident = 'http://example.org/imports'
+        self.cut._lookup_translator = lambda *args, **kwargs: Mock()
+        with self.assertRaisesRegexp(GenericUserError, re.escape(source)):
+            self.cut.translate(translator, imports_context_ident, data_sources=(source,))
+
+    # Test saving a translator ensures the input and output types are saved source is saved
 
 
 class IVarTest(unittest.TestCase):
@@ -234,7 +590,7 @@ class GitCommandTest(BaseTest):
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        self.assertTrue(exists('r2/.pow/.git'))
+        self.assertTrue(exists(p('r2', '.pow', '.git')))
 
     def test_clones_graphs(self):
         self.cut.basedir = 'r1'
@@ -276,8 +632,6 @@ class GitCommandTest(BaseTest):
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        for x in os.walk('.'):
-            print(x)
         self.assertTrue(exists(self.cut.store_name), msg=self.cut.store_name)
 
     def test_reset_resets_add(self):
@@ -358,6 +712,260 @@ class CloneProgressTest(unittest.TestCase):
         pr = Mock()
         pr.unit.side_effect = f
         _CloneProgress(pr)
+
+
+class ConfigTest(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        self.startdir = os.getcwd()
+        os.chdir(self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
+
+    def test_set_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.set('key', 'null')
+        parent._init_config_file.assert_called()
+
+    def test_set_get_new(self):
+        parent = Mock()
+        fname = p(self.testdir, 'test.conf')
+
+        def f():
+            with open(fname, 'w') as f:
+                f.write('{}\n')
+        parent._init_config_file.side_effect = f
+        parent.config_file = fname
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_new_user(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '1')
+        self.assertEqual(cut.get('key'), 1)
+
+    def test_set_user_object(self):
+        parent = Mock()
+        parent.powdir = self.testdir
+        cut = POWConfig(parent)
+        cut.user = True
+        cut.set('key', '{"smoop": "boop"}')
+        self.assertEqual(cut.get('key'), {'smoop': 'boop'})
+
+
+class POWSourceTest(unittest.TestCase):
+    def test_list(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = []
+        ps = POWSource(parent)
+        self.assertIsNone(next(ps.list(), None))
+
+    def test_list_with_entry(self):
+        parent = Mock()
+        dct = dict()
+        dct['rdf.graph'] = Mock()
+        parent._conf.return_value = dct
+        # Mock the loading of DataObjects from the DataContext
+        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        ps = POWSource(parent)
+
+        self.assertIsNotNone(next(ps.list(), None))
+
+
+class POWDSDLoaderNoIndex(unittest.TestCase):
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+
+    def tearDown(self):
+        shutil.rmtree(self.testdir)
+
+    def test_no_index_can_load_false(self):
+        "Test index of dsds doesn't exist yet -> should indicate with an exception"
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        self.assertFalse(cut.can_load(Mock()))
+
+    def test_no_index_load_failed(self):
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        with self.assertRaisesRegexp(LoadFailed, re.escape(self.testdir)):
+            cut.load(Mock())
+
+
+class POWDSDLoaderMissingDSD(unittest.TestCase):
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        with open(p(self.testdir, 'index'), 'w') as f:
+            print('dsdid1 dir1', file=f)
+            print('dsdid2 dir2', file=f)
+
+    def tearDown(self):
+        shutil.rmtree(self.testdir)
+
+    def test_dir_missing_can_load_false(self):
+        '''
+        If the directory pointed at by the index isn't there, then can_load should return false
+
+        It may take some non-trivial amount of time to do the directory listing and check each entry exists, but we
+        don't anticipate all that many in one repo
+        '''
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        self.assertFalse(cut.can_load('dsdid1'))
+
+    def test_dir_missing_load(self):
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        with self.assertRaises(LoadFailed):
+            cut.load('dsdid1')
+
+    def test_dir_removed_load_no_raise(self):
+        '''
+        The load method doesn't take responsibility for the directory existing, in general
+        '''
+        os.mkdir(p(self.testdir, 'dir1'))
+        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut.load('dsdid1')
+        os.rmdir(p(self.testdir, 'dir1'))
+        cut.load('dsdid1')
+
+
+class TestDSD(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        mc = [MagicMock()]
+        mc[0].dirkey = 'dirkey'
+        self.cut = _DSD(dict(), self.testdir, mc)
+        self.mc = mc
+
+    def test_dsd_create(self):
+        '''
+        Test directory for the dsdl doesn't exist yet AND loaders available
+            -> should create the dir
+        '''
+        self.cut['dirkey']
+        self.assertIn('dirkey', listdir(self.testdir))
+
+    def test_index_dir_exists(self):
+        '''
+        Test directory for the dsdl exists
+        '''
+        os.makedirs(p(self.testdir, 'dirkey'))
+        self.cut['dirkey']
+        self.assertIn('dirkey', listdir(self.testdir))
+
+    def test_no_loaders_key_error(self):
+        '''
+        Test no loaders can load the data source -> should present a key error
+        '''
+        self.mc[0]().can_load.return_value = False
+        with self.assertRaises(KeyError):
+            self.cut['not_there']
+
+    # Test a loader that returns a directory outside of its assigned directory
+    # Test a loader that returns a non-existant file
+    # Test a loader that returns a non-directory
+
+    # Don't have preferences yet
+    # Test multiple loaders are ordered by preference -> should pick the highest ordered
+    # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
+
+
+@mark.inttest
+class POWAccTest(unittest.TestCase):
+    ''' smoke-test for pow command line and the standard data base '''
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        self.startdir = os.getcwd()
+        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        os.chdir(self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
+
+    def sh(self, command, **kwargs):
+        env = dict(os.environ)
+        env['PYTHONPATH'] = self.testdir
+        return check_output(shlex.split(command), env=env).decode('utf-8')
+
+    def test_translator_list(self):
+        ''' Test we have some translator '''
+        self.assertRegexpMatches(self.sh('pow translator list'), r'<[^>]+>')
+
+    def test_source_list(self):
+        ''' Test we have some data source '''
+        self.assertRegexpMatches(self.sh('pow source list'), r'<[^>]+>')
+
+    def test_save_diff(self):
+        ''' Change something and make a diff '''
+        os.mkdir('test_module')
+        open(p('test_module', '__init__.py'), 'w').close()
+        with open(p('test_module', 'command_test_save.py'), 'w') as out:
+            print(r'''
+from test_module.monkey import Monkey
+
+
+def pow_data(ns):
+    ns.context.add_import(Monkey.definition_context)
+    ns.context(Monkey)(bananas=55)
+''', file=out)
+
+        with open(p('test_module', 'monkey.py'), 'w') as out:
+            print(r'''
+from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+
+
+class Monkey(DataObject):
+    class_context = 'http://example.org/primate/monkey'
+
+    bananas = DatatypeProperty()
+    def identifier_augment(self):
+        return type(self).rdf_namespace['paul']
+
+    def defined_augment(self):
+        return True
+
+
+__yarom_mapped_classes__ = (Monkey,)
+''', file=out)
+        print(listdir('.'))
+        print(self.sh('pow save --module test_module.command_test_save'))
+        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
+
+    def test_manual_graph_edit_no_diff(self):
+        '''
+        Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
+        '''
+        index = self.sh('cat ' + p('.pow', 'graphs', 'index'))
+        fname = index.split('\n')[0].split(' ')[0]
+
+        open(p('.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
+
+        self.assertRegexpMatches(self.sh('pow diff'), r'^$')
+
+    def test_list_contexts(self):
+        ''' Test we have some contexts '''
+        self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
 
 
 class _TestException(Exception):

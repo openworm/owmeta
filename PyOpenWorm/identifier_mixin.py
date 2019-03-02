@@ -1,6 +1,7 @@
 from __future__ import print_function
 from rdflib.term import URIRef
 from six.moves.urllib.parse import quote
+from six import string_types
 import hashlib
 import logging
 from yarom.graphObject import IdentifierMissingException
@@ -68,7 +69,7 @@ def IdMixin(typ=object, hashfunc=None):
 
             @classmethod
             def make_identifier_direct(cls, string):
-                if not isinstance(string, str):
+                if not isinstance(string, string_types):
                     raise ValueError('make_identifier_direct only accepts strings')
                 return URIRef(cls.rdf_namespace[quote(string)])
 
@@ -86,7 +87,7 @@ def IdMixin(typ=object, hashfunc=None):
 
                 Equivalent to self.key = key
                 '''
-                if isinstance(key, str):
+                if isinstance(key, string_types):
                     self._id = self.make_identifier_direct(key)
                 else:
                     self._id = self.make_identifier(key)

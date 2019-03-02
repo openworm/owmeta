@@ -21,9 +21,13 @@ class Network(BiologyType):
     ''' Returns a set of all Neuron objects in the network '''
 
     worm = ObjectProperty(value_rdf_type=WORM_RDF_TYPE)
+    ''' The worm connected to the network '''
 
     synapses = Alias(synapse)
+    ''' Alias to `synapse` '''
+
     neurons = Alias(neuron)
+    ''' Alias to `neuron` '''
 
     def __init__(self, worm=None, **kwargs):
         super(Network, self).__init__(**kwargs)

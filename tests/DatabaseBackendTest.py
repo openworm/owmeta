@@ -5,7 +5,6 @@ import unittest
 from PyOpenWorm.configure import Configure, Configureable
 from PyOpenWorm.data import Data
 from PyOpenWorm import connect, config, disconnect
-from . import test_data as TD
 import rdflib as R
 import os
 import subprocess
@@ -84,56 +83,3 @@ class DatabaseBackendTest(unittest.TestCase):
             self.fail("Bad state")
 
         subprocess.call("rm -rf "+fname, shell=True)
-
-    def test_trix_source(self):
-        """ Test that we can load the datbase up from an XML file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'trix'
-        c['rdf.store'] = 'default'
-        c['trix_location'] = f[1]
-
-        with open(f[1], 'w') as fo:
-            fo.write(TD.TriX_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()
-        os.unlink(f[1])
-
-    def test_trig_source(self):
-        """ Test that we can load the datbase up from a trig file.
-        """
-        f = tempfile.mkstemp()
-
-        c = Configure()
-        c['rdf.source'] = 'serialization'
-        c['rdf.serialization'] = f[1]
-        c['rdf.serialization_format'] = 'trig'
-        c['rdf.store'] = 'default'
-        with open(f[1], 'w') as fo:
-            fo.write(TD.Trig_data)
-
-        connect(conf=c)
-        c = config()
-
-        try:
-            g = c['rdf.graph']
-            b = g.query("ASK { ?S ?P ?O }")
-            for x in b:
-                self.assertTrue(x)
-        except ImportError:
-            pass
-        finally:
-            disconnect()

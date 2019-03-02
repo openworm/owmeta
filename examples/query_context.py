@@ -1,3 +1,4 @@
+from __future__ import print_function
 from PyOpenWorm import connect, config
 from PyOpenWorm.context import Context
 from PyOpenWorm.neuron import Neuron
@@ -6,8 +7,8 @@ from PyOpenWorm.document import Document
 from PyOpenWorm.website import Website
 
 
-connect(configFile="default.conf")
-print('the graph', config('rdf.graph'))
+conn = connect(configFile="default.conf")
+print('the graph', conn.conf['rdf.graph'])
 
 
 def query_context(graph, qctx):
@@ -29,12 +30,12 @@ def query_context(graph, qctx):
 
 qctx = Context()
 qctx(Neuron)('AVAL').innexin('UNC-7')
-ctxs = query_context(config('rdf.graph'), qctx)
+ctxs = query_context(conn.conf['rdf.graph'], qctx)
 for c in ctxs:
-    mqctx = Context()
+    mqctx = Context(conf=conn.conf)
     print('CONTEXT', c.identifier)
     ev = mqctx.stored(Evidence)()
-    ev.supports(Context(ident=c.identifier).rdf_object)
+    ev.supports(Context(ident=c.identifier, conf=conn.conf).rdf_object)
     for x in ev.load():
         ref = x.reference()
         if isinstance(ref, Document):

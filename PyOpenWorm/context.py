@@ -13,10 +13,14 @@ from .contextualize import (BaseContextualizable,
                             ContextualizableClass,
                             ContextualizingProxy,
                             contextualize_metaclass)
-from yarom.mapper import FCN
+from yarom.utils import FCN
 from six.moves.urllib.parse import quote
 from six import text_type
 import six
+
+
+DATA_CONTEXT_KEY = 'data_context_id'
+IMPORTS_CONTEXT_KEY = 'imports_context_id'
 
 
 class ModuleProxy(wrapt.ObjectProxy):
@@ -40,9 +44,6 @@ class ModuleProxy(wrapt.ObjectProxy):
             return o
 
 
-Contexts = dict()
-
-
 class ContextMeta(ContextualizableClass):
     @property
     def context(self):
@@ -58,13 +59,23 @@ class ContextMeta(ContextualizableClass):
         ctxd_meta = contextualize_metaclass(context, self)
         return ctxd_meta(self.__name__, (self,), dict(class_context=context.identifier))
 
-    def __call__(self, *args, **kwargs):
-        o = super(ContextMeta, self).__call__(*args, **kwargs)
-        Contexts[o.identifier] = o
-        return o
+
+class ContextualizableDataUserMixin(Contextualizable, DataUser):
+
+    @property
+    def conf(self):
+        if self.context is None:
+            return super(ContextualizableDataUserMixin, self).conf
+        else:
+            return self.context.conf
+
+    @conf.setter
+    def conf(self, conf):
+        super(ContextualizableDataUserMixin, self).conf = conf
 
 
-class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualizable, DataUser)):
+class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
+                                 ContextualizableDataUserMixin)):
     """
     A context. Analogous to an RDF context, with some special sauce
     """
@@ -99,10 +110,13 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
             raise Exception(self)
 
         self._statements = []
-        self._set_buffer_size = 10000
         self._imported_contexts = list(imported)
         self._rdf_object = None
         self._graph = None
+
+        if mapper is None:
+            mapper = self.conf.get('mapper', None)
+
         self.mapper = mapper
         self.base_namespace = base_namespace
 
@@ -130,28 +144,32 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         self._statements.remove(stmt)
         self._change_counter += 1
 
-    def add_object(self, o):
-        pass
-
-    def add_objects(self, objects):
-        pass
-
     @property
     def imports(self):
         for x in self._imported_contexts:
             yield x
 
-    def save_imports(self, context, *args, **kwargs):
+    def save_imports(self, context=None, *args, **kwargs):
+        if not context:
+            ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
+            context = Context(ident=ctx_key, conf=self.conf)
         self.declare_imports(context)
         context.save_context(*args, **kwargs)
 
-    def declare_imports(self, context):
+    def declare_imports(self, context=None):
+        if not context:
+            ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
+            context = Context(ident=ctx_key, conf=self.conf)
+        self._declare_imports(context)
+        return context
+
+    def _declare_imports(self, context):
         for ctx in self._imported_contexts:
             if self.identifier is not None \
                     and ctx.identifier is not None \
                     and not isinstance(ctx.identifier, rdflib.term.BNode):
                 context(self.rdf_object).imports(ctx.rdf_object)
-                ctx.declare_imports(context)
+                ctx._declare_imports(context)
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, saved_contexts=None):
         if saved_contexts is None:
@@ -163,8 +181,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         saved_contexts.add((self._change_counter, id(self)))
 
         if graph is None:
-            graph = self._retreive_configured_graph()
-
+            graph = self._retrieve_configured_graph()
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
 
@@ -273,7 +290,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
         return repr(self)
 
     def __repr__(self):
-        return '{}(ident="{}")'.format(FCN(type(self)), getattr(self, 'identifier', '???'))
+        ident = getattr(self, 'identifier', '???')
+        if ident is None:
+            identpart = ''
+        else:
+            identpart = 'ident="{}"'.format(ident)
+        return '{}({})'.format(FCN(type(self)), identpart)
 
     def load_graph_from_configured_store(self):
         return ConjunctiveGraph(store=RDFContextStore(self))
@@ -292,24 +314,52 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer, Contextualiz
 
     @property
     def query(self):
-        return QueryContext(graph=self.load_combined_graph(),
-                            ident=self.identifier)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_combined_graph(),
+                ident=self.identifier,
+                conf=self.conf)
 
     @property
     def staged(self):
-        return QueryContext(graph=self.load_staged_graph(),
-                            ident=self.identifier)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_staged_graph(),
+                ident=self.identifier,
+                conf=self.conf)
 
     @property
     def stored(self):
-        return QueryContext(graph=self.load_graph_from_configured_store(),
-                            ident=self.identifier)
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_graph_from_configured_store(),
+                ident=self.identifier,
+                conf=self.conf)
 
-    def _retreive_configured_graph(self):
-        try:
-            return self.conf['rdf.graph']
-        except KeyError:
-            raise Exception('No graph was given and configuration has no graph')
+    def _retrieve_configured_graph(self):
+        return self.rdf
+
+    def resolve_class(self, uri):
+        # look up the class in the registryCache
+        if self.mapper is None:
+            return None
+        c = self.mapper.RDFTypeTable.get(uri)
+        if c is None:
+            # otherwise, attempt to load into the cache by
+            # reading the RDF graph.
+            from PyOpenWorm.dataObject import PythonClassDescription, RegistryEntry
+
+            re = self(RegistryEntry)()
+            re.rdf_class(uri)
+            cd = self(PythonClassDescription)()
+            re.class_description(cd)
+            for cd_l in cd.load():
+                class_name = cd_l.name()
+                moddo = cd_l.module()
+                mod = self.mapper.load_module(moddo.name())
+                c = getattr(mod, class_name)
+                break
+        return c
 
 
 class QueryContext(Context):
@@ -319,6 +369,22 @@ class QueryContext(Context):
 
     def rdf_graph(self):
         return self.__graph
+
+
+ClassContexts = dict()
+
+
+class ClassContextMeta(ContextMeta):
+
+    def __call__(self, ident):
+        res = ClassContexts.get(ident)
+        if not res:
+            res = super(ClassContextMeta, self).__call__(ident=ident)
+        return res
+
+
+class ClassContext(six.with_metaclass(ClassContextMeta, Context)):
+    pass
 
 
 class ContextContextManager(object):

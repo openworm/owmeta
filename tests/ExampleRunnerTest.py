@@ -2,7 +2,11 @@ from __future__ import absolute_import
 import unittest
 import os
 import subprocess as SP
+import shutil
 import tempfile
+from os.path import join as p
+
+from .TestUtilities import xfail_without_db
 
 
 class ExampleRunnerTest(unittest.TestCase):
@@ -14,11 +18,19 @@ class ExampleRunnerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        os.chdir('examples')
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('examples', p(self.testdir, 'examples'), symlinks=True)
+        self.startdir = os.getcwd()
+        os.chdir(p(self.testdir, 'examples'))
+
+    def setUp(self):
+        xfail_without_db()
 
     @classmethod
     def tearDownClass(self):
-        os.chdir('..')
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
 
     def execfile(self, example_file_name):
         fname = tempfile.mkstemp()[1]
@@ -57,3 +69,6 @@ class ExampleRunnerTest(unittest.TestCase):
     @unittest.skip("See #102")
     def test_rmgr(self):
         self.execfile("rmgr.py")
+
+    def test_extrasyn(self):
+        self.execfile("extrasynaptic_edges.py")

@@ -5,6 +5,7 @@ import pytest
 
 
 class DocumentTest(_DataTest):
+    ctx_classes = (Document,)
 
     def test_bibtex_init(self):
         bibtex = u"""@ARTICLE{Cesar2013,
@@ -21,7 +22,7 @@ class DocumentTest(_DataTest):
           keywords = {keyword1, keyword2},
         }
         """
-        self.assertIn(u'Jean César', Document(bibtex=bibtex).author())
+        self.assertIn(u'Jean César', self.ctx.Document(bibtex=bibtex).author())
 
 
 @pytest.mark.inttest
@@ -30,12 +31,14 @@ class DocumentElaborationTest(_DataTest):
     Tests for Document 'elaboration', the process of looking up documents from external resources by using their
     identifiers and setting those values on the object
     '''
+    ctx_classes = (Document,)
+
     def test_pubmed_init1(self):
         """
         A pubmed uri
         """
         uri = 'http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract'
-        doc = Document(pubmed=uri)
+        doc = self.ctx.Document(pubmed=uri)
         doc.update_from_pubmed()
         self.assertIn(u'Frédéric MY', list(doc.author()))
 
@@ -44,7 +47,7 @@ class DocumentElaborationTest(_DataTest):
         A pubmed uri doesn't work
         """
         uri = 'http://www.ncbi.nlm.nih.gov/pubmed/24098140?dopt=abstract'
-        doc = Document(pmid=uri)
+        doc = self.ctx.Document(pmid=uri)
         doc.update_from_pubmed()
         self.assertEqual([], list(doc.author()))
 
@@ -53,7 +56,7 @@ class DocumentElaborationTest(_DataTest):
         A pubmed id
         """
         pmid = "24098140"
-        doc = Document(pmid=pmid)
+        doc = self.ctx.Document(pmid=pmid)
         doc.update_from_pubmed()
         self.assertIn(u'Frédéric MY', list(doc.author()))
 
@@ -76,20 +79,20 @@ class DocumentElaborationTest(_DataTest):
             "Goodman MB",
             "Brinkman FS",
             "Leroux MR"]
-        doc = Document(pmid=pmid)
+        doc = self.ctx.Document(pmid=pmid)
         doc.update_from_pubmed()
         self.assertEqual(set(alist), set(doc.author()))
 
     def test_wormbase_init(self):
         """ Initialize with wormbase source """
-        doc = Document(wormbase="WBPaper00044287")
+        doc = self.ctx.Document(wormbase="WBPaper00044287")
         doc.update_from_wormbase()
-        self.assertIn(u'Frederic, M. Y.', list(doc.author()))
+        self.assertIn(u'Frederic MY', list(doc.author()))
 
     def test_wormbase_year(self):
         """ Just make sure we can extract something without crashing """
         for i in range(600, 610):
             wbid = 'WBPaper00044' + str(i)
-            doc = Document(wormbase=wbid)
+            doc = self.ctx.Document(wormbase=wbid)
             doc.update_from_wormbase()
             doc.year()

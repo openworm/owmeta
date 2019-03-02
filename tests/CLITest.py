@@ -1,9 +1,16 @@
 import unittest
 
+try:
+    from unittest.mock import patch, Mock
+except ImportError:
+    from mock import patch, Mock
+
+from pytest import mark
 from PyOpenWorm.command_util import SubCommand, IVar
 from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
-from six import StringIO
-from contextlib import contextmanager
+import PyOpenWorm.cli as PCLI
+from .TestUtilities import noexit, stderr, stdout
+import json
 
 
 class CLICommandWrapperTest(unittest.TestCase):
@@ -131,21 +138,204 @@ class CLICommandWrapperTest(unittest.TestCase):
         self.assertIn('TEST_STRING', out.getvalue())
 
 
-@contextmanager
-def noexit():
-    try:
-        yield
-    except SystemExit:
-        pass
+class CLITestOutputMode(unittest.TestCase):
+    def test_json_list(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'json'
+                return ['a']
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(json.loads(so.getvalue()), ['a'])
+
+    def test_json_set(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'json'
+                return set('ab')
+            ccw().main.side_effect = main
+            PCLI.main()
+        val = json.loads(so.getvalue())
+        self.assertTrue(val == list('ba') or val == list('ab'))
+
+    def test_json_context(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                from PyOpenWorm.context import Context
+                argument_namespace_callback.output_mode = 'json'
+                m = Mock(name='context_result', spec=Context())
+                m.identifier = 'ident'
+                m.base_namespace = 'base_namespace'
+                return m
+            ccw().main.side_effect = main
+            PCLI.main()
+        val = json.loads(so.getvalue())
+        self.assertEqual(val, dict(identifier='ident', base_namespace='base_namespace'))
+
+    def test_json_graph(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                from rdflib.graph import Graph
+                argument_namespace_callback.output_mode = 'json'
+                return Mock(name='graph', spec=Graph())
+            ccw().main.side_effect = main
+            PCLI.main()
+        val = json.loads(so.getvalue())
+        self.assertEqual(val, [])
+
+    def test_text_list(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                return ['a']
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\n')
+
+    def test_text_multiple_element_list(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                return ['a', 'b']
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\nb\n')
+
+    def test_text_set(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                return set('ab')
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertTrue(so.getvalue() == 'b\na\n' or so.getvalue() == 'a\nb\n')
+
+    def test_text_dict(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                return dict(a='b')
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\tb\n')
+
+    def test_text_dict_field_separator(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                argument_namespace_callback.text_field_separator = '\0'
+                return dict(a='b')
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\0b\n')
+
+    def test_text_dict_record_separator(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                argument_namespace_callback.text_record_separator = '\0'
+                return dict(a='b')
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\tb\0')
+
+    def test_text_list_record_separator(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                argument_namespace_callback.text_record_separator = '\0'
+                return ['a', 'b']
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), 'a\0b\0')
+
+    def test_text_uniterable(self):
+        target = object()
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+                return target
+            ccw().main.side_effect = main
+            PCLI.main()
+        self.assertEqual(so.getvalue(), str(target) + '\n')
+
+    def test_text_iterable_type_error(self):
+        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
+                noexit(), stdout() as so:
+
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'text'
+
+                def iterable():
+                    yield 'blah'
+                    yield 'blah'
+                    raise TypeError("blah blah")
+                return iterable()
+            ccw().main.side_effect = main
+            with self.assertRaises(TypeError):
+                PCLI.main()
+            self.assertEqual(so.getvalue(), 'blah\nblah\n')
 
 
-@contextmanager
-def stdout():
-    import sys
-    oldstdout = sys.stdout
-    sio = StringIO()
-    sys.stdout = sio
-    try:
-        yield sys.stdout
-    finally:
-        sys.stdout = oldstdout
+def with_defaults(func):
+    '''
+    Sets the default values for options
+    '''
+    from functools import wraps
+
+    @wraps(func)
+    def wrapper(argument_namespace_callback, argument_callback, *args, **kwargs):
+        collect_argument_defaults(argument_namespace_callback, argument_callback)
+        kwargs['argument_namespace_callback'] = argument_namespace_callback
+        kwargs['argument_callback'] = argument_callback
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def collect_argument_defaults(ns, callback):
+    res = dict()
+    parser = Mock(name='parser')
+
+    def cb(*args, **kwargs):
+        da = kwargs.get('default')
+        setattr(ns, args[0].strip('-').replace('-', '_'), da)
+    parser.add_argument.side_effect = cb
+    callback(parser)
+    return res

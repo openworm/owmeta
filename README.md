@@ -4,6 +4,7 @@
 
 PyOpenWorm
 ===========
+<img width="1207" alt="pyow_in_overview" src="https://user-images.githubusercontent.com/1573896/44875328-d92ec800-ac6b-11e8-9430-b29c834f518e.png">
 
 A data access layer in Python which integrates disparate structures and
 representations for *C. elegans* anatomy and physiology. Enables a simple
@@ -35,10 +36,10 @@ objects related to the *biological reality of the worm*, and forget about which
 representation is being used under the hood.  The worm itself has a unified
 sense of neurons, networks, muscles, ion channels, etc. and so should our code.
 
-Relationship to ChannelWorm
+Relationship to ChannelWorm2
 -----------------------------
-[ChannelWorm](https://github.com/openworm/ChannelWorm) is the sub-project of
-OpenWorm which houses ion channel models.  In the future, we expect ChannelWorm
+[ChannelWorm2](https://github.com/openworm/ChannelWorm2) is the sub-project of
+OpenWorm which houses ion channel models.  In the future, we expect ChannelWorm2
 to be a "consumer" of PyOpenWorm.  A PyOpenWorm database will house physical
 models, the digitized plots they are derived from (there is a Plot type in
 PyOpenWorm), and provide code to put those models into enumerated formats along
@@ -73,17 +74,22 @@ See INSTALL.md
 Quickstart
 -----------
 
-To get started, you'll need to connect to the database. If you cloned the
-repository from Github, then the database will be in the OpenWormData
-subdirectory. You can read it in by doing:
+To get started, you'll need to connect to a database. The OpenWorm database is
+currently hosted at `git@github.com:openworm/OpenWormData.git`. You can read it
+in by executing the following command line after installation:
 
+```bash
+pow clone git@github.com:openworm/OpenWormData.git
+```
+
+Then, in Python, from the same directory:
 ```python
 >>> import PyOpenWorm as P
->>> P.connect('readme.conf')
+>>> conn = P.connect('readme.conf')
 
 ```
 
-readme.conf:
+where `readme.conf` contains:
 
 ```json
 {
@@ -97,7 +103,7 @@ Then you can try out a few things:
 ```python
 # Make the context
 >>> from PyOpenWorm.context import Context
->>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data')
+>>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data', conf=conn.conf)
 
 # Grabs the representation of the neuronal network
 >>> from PyOpenWorm.worm import Worm
@@ -164,10 +170,10 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> from PyOpenWorm.evidence import Evidence
 
 # Make a context for evidence (i.e., statements about other groups of statements)
->>> evctx = Context(ident='http://example.org/evidence/context')
+>>> evctx = Context(ident='http://example.org/evidence/context', conf=conn.conf)
 
 # Make a context for defining domain knowledge
->>> dctx = Context(ident='http://example.org/data/context')
+>>> dctx = Context(ident='http://example.org/data/context', conf=conn.conf)
 >>> doc = evctx(Document)(key="Sulston83", author='Sulston et al.', date='1983')
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
@@ -225,7 +231,7 @@ PyOpenWorm.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_.
 
 Get direct access to the RDFLib graph::
 ```python
->>> P.config('rdf.graph').query("SELECT ?y WHERE { ?x rdf:type ?y }")
+>>> conn.conf['rdf.graph'].query("SELECT ?y WHERE { ?x rdf:type ?y }")
 <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
 
 ```
@@ -234,7 +240,7 @@ Modeling data
 --------------
 
 As described above, ultimately, ion channel models will be part of the
-ChannelWorm repository.  And as the project evolves, other models, such as for
+ChannelWorm2 repository.  And as the project evolves, other models, such as for
 reproduction and development, may be housed in their own repositories.  But for
 the time being, the PyOpenWorm repository contains specific models as well.
 These models will eventually be transferred to an appropriate and independent
@@ -261,7 +267,7 @@ model was derived from.
 
 Finally, when you're done accessing the database, be sure to disconnect from it::
 ```python
->>> P.disconnect()
+>>> P.disconnect(conn)
 
 ```
 

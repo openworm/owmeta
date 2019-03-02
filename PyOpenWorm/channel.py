@@ -12,9 +12,16 @@ class ExpressionPattern(BiologyType):
     class_context = BiologyType.class_context
 
     wormbaseid = DatatypeProperty()
+    ''' The ID for the expression pattern in Wormbase '''
+
     wormbaseID = Alias(wormbaseid)
+    ''' Alias to `wormbaseid` '''
+
     wormbaseURL = DatatypeProperty()
+    ''' The URL for the expression pattern in Wormbase '''
+
     description = DatatypeProperty()
+    ''' Natural language description of the expression pattern '''
 
     def __init__(self, wormbaseid=None, **kwargs):
         super(ExpressionPattern, self).__init__(**kwargs)
