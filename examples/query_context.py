@@ -1,3 +1,4 @@
+from __future__ import print_function
 from PyOpenWorm import connect, config
 from PyOpenWorm.context import Context
 from PyOpenWorm.neuron import Neuron

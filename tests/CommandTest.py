@@ -898,16 +898,15 @@ class POWAccTest(unittest.TestCase):
         self.startdir = os.getcwd()
         shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
         os.chdir(self.testdir)
-        print("Test directory at " + self.testdir)
+
+    def tearDown(self):
+        os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
 
     def sh(self, command, **kwargs):
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir
         return check_output(shlex.split(command), env=env).decode('utf-8')
-
-    def tearDown(self):
-        os.chdir(self.startdir)
-        # shutil.rmtree(self.testdir)
 
     def test_translator_list(self):
         ''' Test we have some translator '''

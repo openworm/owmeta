@@ -1006,8 +1006,7 @@ class POW(object):
     def _lookup_source(self, sname):
         from PyOpenWorm.datasource import DataSource
         for x in self._data_ctx.stored(DataSource)(ident=sname).load():
-            if is_capable(x):
-                provide(x, self._cap_provs)
+            provide(x, self._cap_provs)
             return x
 
     @property

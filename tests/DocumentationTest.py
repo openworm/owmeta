@@ -28,6 +28,7 @@ class DocumentationTest(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.startdir)
+        shutil.rmtree(self.testdir)
 
     def test_readme(self):
         [failure_count, return_count] = doctest.testfile("README.md", module_relative=False,

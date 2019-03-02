@@ -324,64 +324,6 @@ class ContextFilteringList(Contextualizable, list):
         return list(super(ContextFilteringList, self).__iter__())
 
 
-class PThunk(object):
-    def __init__(self):
-        self.result = None
-
-    def __call__(self, *args, **kwargs):
-        raise NotImplementedError()
-
-
-class CPThunk(PThunk):
-    def __init__(self, c):
-        super(CPThunk, self).__init__()
-        self.c = c
-
-    def __call__(self, *args, **kwargs):
-        self.result = self.c
-        return self.c
-
-
-class APThunk(PThunk):
-    def __init__(self, t, args, kwargs):
-        super(APThunk, self).__init__()
-        self.t = t
-        self.args = args
-        self.kwargs = kwargs
-
-    def __call__(self, cls, linkName):
-        if self.result is None:
-            self.result = cls._create_property_class(linkName,
-                                                     *self.args,
-                                                     property_type=self.t,
-                                                     **self.kwargs)
-        return self.result
-
-    def __repr__(self):
-        return '{}({}, {})'.format(self.t, ',\n'.join(self.args),
-                                   ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
-
-
-class Alias(object):
-    def __init__(self, target):
-        self.target = target
-
-    def __repr__(self):
-        return 'Alias(' + repr(self.target) + ')'
-
-
-def DatatypeProperty(*args, **kwargs):
-    return APThunk('DatatypeProperty', args, kwargs)
-
-
-def ObjectProperty(*args, **kwargs):
-    return APThunk('ObjectProperty', args, kwargs)
-
-
-def UnionProperty(*args, **kwargs):
-    return APThunk('UnionProperty', args, kwargs)
-
-
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                         IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
