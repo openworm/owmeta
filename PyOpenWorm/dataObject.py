@@ -467,6 +467,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         return len(GraphObjectQuerier(self, self.rdf, parallel=False,
                                       hop_scorer=goq_hop_scorer)())
 
+    def get_evidence(self):
+        return "ok"
+
     def load(self, graph=None):
         # XXX: May need to rethink this refactor at some point...
         for x in load(self.rdf if graph is None else graph,

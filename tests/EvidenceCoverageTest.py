@@ -84,6 +84,11 @@ class EvidenceCoverageTest(unittest.TestCase):
         supporting evidence. """
         pass
 
+    def test_get_evidence(self):
+        ctx = Context()
+        worm = ctx(Worm)()
+        self.assertEqual(worm.get_evidence(), "ok")
+
     def get_supporting_evidence(self, stmt):
         """ Helper function for checking amount of Evidence.
         Returns list of Evidence supporting fact. """
