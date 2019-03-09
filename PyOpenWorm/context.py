@@ -4,6 +4,7 @@ import rdflib
 from rdflib.term import Variable, URIRef
 from rdflib.graph import ConjunctiveGraph
 import wrapt
+from . import BASE_MAPPER
 from .data import DataUser
 
 from .import_contextualizer import ImportContextualizer
@@ -115,7 +116,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         self._graph = None
 
         if mapper is None:
-            mapper = self.conf.get('mapper', None)
+            mapper = self.conf.get('mapper', BASE_MAPPER)
 
         self.mapper = mapper
         self.base_namespace = base_namespace

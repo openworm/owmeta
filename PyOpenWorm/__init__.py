@@ -47,9 +47,14 @@ BASE_SCHEMA_URL = 'http://openworm.org/schema'
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 from .import_override import Overrider
 from .module_recorder import ModuleRecorder as MR
+from .mapper import Mapper
 
 ImportOverrider = None
 ModuleRecorder = None
+
+
+BASE_MAPPER = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
+    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
 
 
 def install_module_import_wrapper():
@@ -67,10 +72,10 @@ def install_module_import_wrapper():
 
 
 install_module_import_wrapper()
+ModuleRecorder.add_listener(BASE_MAPPER)
 from .configure import Configureable
 from .context import Context
 import yarom
-from .mapper import Mapper
 
 __all__ = [
     "get_data",
