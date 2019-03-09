@@ -18,8 +18,9 @@ alternatives were considered, such as using Python's context managers, but I
 (Mark) also wanted a way to put statements in a context that could also be
 carried with the subject of the statement. Using the `wrapt <wrapt_>`_
 package's proxies allows to achieve this while keeping the interface of the
-wrapped object the same which is useful since it doesn't require a user of the
-object know anything about contexts.
+wrapped object the same, which is useful since it doesn't require a user of the
+object to know anything about contexts unless they need to change the context
+of a statement.
 
 .. _wrapt: https://wrapt.readthedocs.io/en/latest/
 
@@ -44,4 +45,7 @@ imported (transitively) by that graph. The statements you need are these
 where ``:a_class_desc`` and ``:a_module`` are placeholders for objects which
 will typically be created by POW on the user's behalf, and ``AClassName`` is the
 name of the class available at the top-level of the module
-``APackage.and.module.name``. These statements will be created in memory by POW when a module defining a :class:`PyOpenWorm.dataObject.DataObject`-derived class is 
+``APackage.and.module.name``. These statements will be created in memory by POW
+when a module defining a :class:`PyOpenWorm.dataObject.DataObject`-derived
+class is first processed by a :py:class:`~PyOpenWorm.mapper.Mapper` which will
+happen after the module is imported.

@@ -172,6 +172,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                 ctx._declare_imports(context)
 
     def save_context(self, graph=None, inline_imports=False, autocommit=True, saved_contexts=None):
+        ''' Save the context to a graph '''
         if saved_contexts is None:
             saved_contexts = set([])
 
@@ -204,6 +205,9 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
+
+    save = save_context
+    ''' Alias to save_context '''
 
     @property
     def triples_saved(self):
@@ -305,7 +309,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
             self._graph = self.load_staged_graph()
         return self._graph
 
-    def load_combined_graph(self):
+    def load_mixed_graph(self):
         return ConjunctiveGraph(store=ContextStore(context=self,
                                                    include_stored=True))
 
@@ -313,10 +317,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         return ConjunctiveGraph(store=ContextStore(context=self))
 
     @property
-    def query(self):
+    def mixed(self):
         return QueryContext(
                 mapper=self.mapper,
-                graph=self.load_combined_graph(),
+                graph=self.load_mixed_graph(),
                 ident=self.identifier,
                 conf=self.conf)
 

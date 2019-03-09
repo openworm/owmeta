@@ -557,6 +557,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             link=None,
             lazy=True,
             inverse_of=None,
+            mixins=(),
             **kwargs):
 
         owner_class = cls
@@ -609,7 +610,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                     invc = owner_class
                 InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
-            c = type(property_class_name, (klass,), props)
+            c = type(property_class_name, mixins + (klass,), props)
             c.__module__ = owner_class.__module__
             if hasattr(owner_class, 'mapper') and owner_class.mapper is not None:
                 owner_class.mapper.add_class(c)

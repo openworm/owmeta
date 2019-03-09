@@ -22,6 +22,9 @@ class UnmappedClassException(Exception):
 
 
 class Mapper(ModuleRecordListener, Configureable):
+    '''
+    Keeps track of relationships between classes, between modules, and between classes and modules
+    '''
     _instances = dict()
 
     @classmethod
@@ -217,10 +220,13 @@ class Mapper(ModuleRecordListener, Configureable):
                 c.after_mapper_module_load(self)
         return module
 
-    def process_class(self, c):
-        self.add_class(c)
-        if hasattr(c, 'after_mapper_module_load'):
-            c.after_mapper_module_load(self)
+    def process_class(self, *classes):
+        for c in classes:
+            self.add_class(c)
+            if hasattr(c, 'after_mapper_module_load'):
+                c.after_mapper_module_load(self)
+
+    process_classes = process_class
 
     def lookup_module(self, module_name):
         m = self.modules.get(module_name, None)
@@ -250,8 +256,7 @@ class Mapper(ModuleRecordListener, Configureable):
             raise UnmappedClassException(cnames)
 
     def _module_load_helper(self, module):
-        # TODO: Make this class selector pluggable and decouple the Resolver
-        # init from this -- maybe put it in a callback of some kind
+        # TODO: Make this class selector pluggable
         return self.handle_mapped_classes(getattr(module, '__yarom_mapped_classes__', ()))
 
     def handle_mapped_classes(self, classes):

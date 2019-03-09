@@ -47,6 +47,10 @@ class OpenFailError(Exception):
     pass
 
 
+class DatabaseConflict(Exception):
+    pass
+
+
 class DataUserUnconnected(Exception):
     def __init__(self, msg):
         super(DataUserUnconnected, self).__init__(str(msg) + ': No connection has been made for this data'
@@ -536,6 +540,7 @@ class ZODBSource(RDFSource):
     def open(self):
         import ZODB
         from ZODB.FileStorage import FileStorage
+        from zc.lockfile import LockError
         self.path = self.conf['rdf.store_conf']
         openstr = os.path.abspath(self.path)
 
@@ -544,6 +549,10 @@ class ZODBSource(RDFSource):
         except IOError:
             L.exception("Failed to create a FileStorage")
             raise ZODBSourceOpenFailError(openstr)
+        except LockError:
+            L.exception('Found database "{}" is locked when trying to open it. '
+                    'The PID of this process: {}'.format(openstr, os.getpid()), exc_info=True)
+            raise DatabaseConflict('Database ' + openstr + ' locked')
 
         self.zdb = ZODB.DB(fs, cache_size=1600)
         self.conn = self.zdb.open()
