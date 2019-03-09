@@ -2,11 +2,13 @@
 
 Making data objects
 ====================
-To make new objects like ``Neuron`` or ``Worm``, for the most part, you just
-need to make a Python class.
-Say, for example, that I want to record some information about drug reactions in
-C. elegans. I make ``Drug`` and ``Experiment`` classes to describe C. elegans
-reactions::
+To make a new object type like :py:class:`~PyOpenWorm.neuron.Neuron` or
+:py:class:`PyOpenWorm.worm.Worm`, for the most part, you just need to make a
+Python class.
+
+Say, for example, that I want to record some information about drug reactions
+in C. elegans. I make ``Drug`` and ``Experiment`` classes to describe C.
+elegans reactions::
 
     >>> from PyOpenWorm.dataObject import (DataObject,
     ...                                    DatatypeProperty,
@@ -32,11 +34,14 @@ reactions::
     ...     subject = ObjectProperty(value_type=Worm)
     ...     route_of_entry = DatatypeProperty()
     ...     reaction = DatatypeProperty()
+
+    # Do some accounting stuff to register the classes. Usually happens behind
+    # the scenes. 
     >>> m = Mapper(('PyOpenWorm.dataObject.DataObject',))
     >>> ModuleRecorder.add_listener(m)
     >>> m.process_classes(Drug, Experiment)
 
-I can then make a Drug object for moon rocks and describe an experiment by
+So, we have created I can then make a Drug object for moon rocks and describe an experiment by
 Aperture Labs::
 
     >>> ctx = Context(ident='http://example.org/experiments', mapper=m)
@@ -59,7 +64,7 @@ Aperture Labs::
     >>> ev.supports(ctx)
     PyOpenWorm.statement.Statement(...)
 
-and save it::
+and save those statements::
 
     >>> ctx.save()
 

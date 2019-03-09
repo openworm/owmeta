@@ -9,6 +9,10 @@ from os.path import join as p
 import tempfile
 import shutil
 import pytest
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
 from .doctest_plugin import ALLOW_UNICODE, UnicodeOutputChecker
 from .TestUtilities import xfail_without_db
 
@@ -50,12 +54,19 @@ class SphinxTest(unittest.TestCase):
         os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
 
-    def test_readme(self):
-        total_failures = 0
-        for root, dirs, files in os.walk('docs'):
-            for f in files:
-                if not f.startswith('.') and f.endswith('.rst'):
-                    failure_count, _ = doctest.testfile(p(root, f), module_relative=False,
-                            optionflags=(ALLOW_UNICODE | doctest.ELLIPSIS))
-                    total_failures += failure_count
-        self.assertEqual(total_failures, 0)
+    def execute(self, fname, **kwargs):
+        failure_count, _ = doctest.testfile(p('docs', fname + '.rst'), module_relative=False,
+                optionflags=(ALLOW_UNICODE | doctest.ELLIPSIS), setup=self._doctestSetUp, **kwargs)
+        self.assertEqual(failure_count, 0)
+
+    def test_adding_data(self):
+        import types
+        bdw = types.ModuleType('bdw')
+        bdw.Load = lambda *args: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
+        mymod = types.ModuleType('mymod')
+        mymod.Widget = MagicMock('Widget')
+
+        self.execute('adding_data', extraglobs={'bdw': bdw, 'mymod': mymod})
+
+    def test_making_dataObjects(self):
+        self.execute('making_dataObjects')
