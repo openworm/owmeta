@@ -115,8 +115,8 @@ interpreted. In |pow|, that kind of context-sensitivity is modeled by using
 :class:`PyOpenWorm.context.Context` objects. To see what this looks like, let's
 start with an example.
 
-Example 1
-^^^^^^^^^
+Basics
+^^^^^^
 I have data about widgets from BigDataWarehouse (BDW) that I want to translate
 into RDF using |pow|, but I don't want put them with my other widget data since
 BDW data may conflict with mine. Also, if get more BDW data, I want to be able
@@ -126,8 +126,8 @@ using contexts. The code below shows how to do that::
 
    >>> from rdflib import ConjunctiveGraph
    >>> from PyOpenWorm.context import Context
-   >>> from mymod import Widget # my model for Widgets
-   >>> from bdw import Load # BigDataWarehouse API
+   >>> # from mymod import Widget  # my own POW widget model
+   >>> # from bdw import Load # BigDataWarehouse API
 
    >>> # Create a Context with an identifier appropriate to this BDW data import
    >>> ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2017-2018')
@@ -140,22 +140,41 @@ using contexts. The code below shows how to do that::
    ...         c.W(part_number=record.pnum,
    ...             fullness=record.flns,
    ...             hardiness=record.hrds)
+   Widget(ident=rdflib.term.URIRef(...))
+
    
    >>> # Create an RDFLib graph as the target for the data
    >>> g = ConjunctiveGraph()
 
    >>> # Save the data
-   >>> c.save_context(g)
+   >>> ctx.save_context(g)
 
    >>> # Serialize the data in the nquads format so we can see that all of our
    >>> # statements are in the proper context
-   >>> g.serialize(format='nquads')
+   >>> print(g.serialize(format='nquads'))
+   <http://openworm.org/entities/Widget/12> <http...> <http://example.org/data/imports/BDW_Widgets_2017-2018> .
+   <http://openworm.org/entities/Widget/12> <...
 
 If you've worked with lots of data before, this kind of pattern should be
 familiar. You can see how, with later imports, you would follow the naming
-scheme to create new contexts (e.g., ``http://example.org/data/imports/BDW_Widgets_2018-2019``).
+scheme to create new contexts (e.g.,
+``http://example.org/data/imports/BDW_Widgets_2018-2019``). These additional
+contexts could then have separate metadata attached to them or they could be
+compared::
 
-.. Context metadata
+   >>> len(list(ctx(Widget)().load()))
+   1
+   >>> len(list(ctx18(Widget)().load()))  # 2018-2019 context
+   3
+
+Context Metadata
+^^^^^^^^^^^^^^^^
+Contexts, because they have identifiers just like any other objects, so we can
+make statements about them as well. An essential statement is imports: Contexts
+import other contexts, which means, if you follow PyOpenWorm semantics, that
+when you query objects from the importing context, that the imported contexts
+will also be available to query.
+
 .. Importing contexts
 .. Evidence, DataSources, DataTranslators, Provenance and contexts
 

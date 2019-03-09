@@ -9,6 +9,7 @@ from os.path import join as p
 import tempfile
 import shutil
 import pytest
+from collections import namedtuple
 try:
     from unittest.mock import MagicMock
 except ImportError:
@@ -56,17 +57,34 @@ class SphinxTest(unittest.TestCase):
 
     def execute(self, fname, **kwargs):
         failure_count, _ = doctest.testfile(p('docs', fname + '.rst'), module_relative=False,
-                optionflags=(ALLOW_UNICODE | doctest.ELLIPSIS), setup=self._doctestSetUp, **kwargs)
+                optionflags=(ALLOW_UNICODE | doctest.ELLIPSIS), **kwargs)
         self.assertEqual(failure_count, 0)
 
     def test_adding_data(self):
-        import types
-        bdw = types.ModuleType('bdw')
-        bdw.Load = lambda *args: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
-        mymod = types.ModuleType('mymod')
-        mymod.Widget = MagicMock('Widget')
+        # Setup a class imported by docs for demonstration purposes
+        from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+        from PyOpenWorm.context import Context
+        Load = lambda *args, **kwargs: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
 
-        self.execute('adding_data', extraglobs={'bdw': bdw, 'mymod': mymod})
+        class Widget(DataObject):
+            hardiness = DatatypeProperty()
+            fullness = DatatypeProperty()
+            part_number = DatatypeProperty()
+
+            def identifier_augment(self):
+                return self.make_identifier_direct(str(self.part_number.onedef()))
+
+            def defined_augment(self):
+                return self.part_number.has_defined_value()
+
+        ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2018-2019')
+        ctx.mapper.process_class(Widget)
+
+        ctx(Widget)(part_number=15)
+        ctx(Widget)(part_number=17)
+        ctx(Widget)(part_number=20)
+
+        self.execute('adding_data', extraglobs={'Load': Load, 'Widget': Widget, 'ctx18': ctx})
 
     def test_making_dataObjects(self):
         self.execute('making_dataObjects')
