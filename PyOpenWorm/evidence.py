@@ -85,4 +85,37 @@ class Evidence(DataObject):
         return self.make_identifier(s)
 
 
+def evidence_for(qctx, conn, Evidence, Context):
+    """
+    Returns an iterable of Evidence  
+    """
+    ctxs = query_context(conn.conf['rdf.graph'], qctx)
+    for c in ctxs:
+        mqctx = Context(conf=conn.conf)
+        print('CONTEXT', c.identifier)
+        ev = mqctx.stored(Evidence)()
+        ev.supports(Context(ident=c.identifier, conf=conn.conf).rdf_object)
+        ev_objs = []
+        for x in ev.load():
+            ev_objs.append(x)
+
+
+    return ev_objs       
+
+def query_context(graph, qctx):
+    trips = qctx.contents_triples()
+    lctx = None
+    for t in trips:
+        ctxs = graph.contexts(t)
+        if lctx is None:
+            lctx = frozenset(ctxs)
+            continue
+        if len(lctx) == 0:
+            return frozenset()
+        else:
+            lctx = frozenset(ctxs) & lctx
+            if len(lctx) == 0:
+                return lctx
+    return frozenset() if lctx is None else lctx
+
 __yarom_mapped_classes__ = (Evidence,)
