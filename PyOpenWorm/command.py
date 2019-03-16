@@ -153,18 +153,19 @@ class POWSource(object):
             else:
                 yield nm.normalizeUri(x.identifier)
 
-    def show(self, data_source):
+    def show(self, *data_source):
         '''
         Parameters
         ----------
-        data_source : str
+        *data_source : str
             The ID of the data source to show
         '''
         from PyOpenWorm.datasource import DataSource
 
-        uri = self._parent._den3(data_source)
-        for x in self._parent._data_ctx.stored(DataSource)(ident=uri).load():
-            self._parent.message(x.format_str(stored=True))
+        for ds in data_source:
+            uri = self._parent._den3(ds)
+            for x in self._parent._data_ctx.stored(DataSource)(ident=uri).load():
+                self._parent.message(x.format_str(stored=True))
 
     def list_kinds(self, full=False):
         """
@@ -380,6 +381,40 @@ possible_editors = [
 ]
 
 
+class POWEvidence(object):
+    def __init__(self, parent):
+        self._parent = parent
+
+    def get(self, identifier, rdf_type=None):
+        '''
+        Retrieves evidence for the given object. If there are multiple types for the object, the evidence for only one
+        type will be shown, but you can specify which type should be used.
+
+        Parameters
+        ----------
+        identifier : str
+            The object to show evidence for
+        rdf_type : str
+            Type of the object to show evidence
+        '''
+        from PyOpenWorm.evidence import Evidence
+        from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+        ctx = self._parent._data_ctx.stored
+        identifier = self._parent._den3(identifier)
+        rdf_type = self._parent._den3(rdf_type)
+        if rdf_type:
+            base_type = ctx(ctx.resolve_class(rdf_type))
+        else:
+            from PyOpenWorm.dataObject import DataObject
+            base_type = ctx(DataObject)
+        print('!!!!!!!!!!!!!!!', base_type, base_type.context)
+        for l in base_type.query(ident=identifier).load():
+            print('heeeee', l)
+            if isinstance(l, DataWithEvidenceDataSource):
+                for m in l.evidence_context.stored(Evidence).query().load():
+                    print(m)
+
+
 class POWContexts(object):
     def __init__(self, parent):
         self._parent = parent
@@ -490,6 +525,8 @@ class POW(object):
     namespace = SubCommand(POWNamespace)
 
     contexts = SubCommand(POWContexts)
+
+    evidence = SubCommand(POWEvidence)
 
     def __init__(self):
         from time import time
@@ -672,6 +709,8 @@ class POW(object):
             self.repository_provider.init(base=self.powdir)
 
     def _den3(self, s):
+        if not s:
+            return s
         from rdflib.namespace import is_ncname
         from rdflib.term import URIRef
         conf = self._conf()

@@ -71,17 +71,26 @@ class DataWithEvidenceDataSource(DataSource):
 
 class _CombinedContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier
+        if self.maker.defined:
+            return self.maker.identifier
+        else:
+            return None
 
 
 class _EvidenceContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier + '-evidence'
+        if self.maker.defined:
+            return self.maker.identifier + '-evidence'
+        else:
+            return None
 
 
 class _DataContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier + '-data'
+        if self.maker.defined:
+            return self.maker.identifier + '-data'
+        else:
+            return None
 
 
 __yarom_mapped_classes__ = (DataWithEvidenceDataSource,)

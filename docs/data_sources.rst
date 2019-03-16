@@ -3,17 +3,24 @@
 |pow| Data Sources
 ==================
 
-The sources of data for PyOpenWorm are stored under the `OpenWormData/aux_data
-directory <https://github.com/openworm/PyOpenWorm/tree/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/aux_data>`_.
+The sources of data for PyOpenWorm are stored in the `OpenWormData
+repository<https://github.com/openworm/PyOpenWorm>`_. A few
+:py:class:`DataTranslators<~PyOpenWorm.datasource.DataTranslator>`_ translate
+these data into common PyOpenWorm data sources. You can list these by running::
 
-These data sources are brought into PyOpenWorm by means of the `insert_worm.py script`_, which shows exactly how a given
-kind of data is brought into the system.  For example `this method <m1_>`_ shows where data about muscles comes from,
-while `this method <m2_>`_ shows where the connectivity data comes from. A more detailed human readable key is provided
-below.
+   pow source list
 
-.. _insert_worm.py script: https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py
-.. _m1: https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py#L37
-.. _m2: https://github.com/openworm/PyOpenWorm/blob/5cc3042b004f167dbf18acc119474ea48b47810d/OpenWormData/scripts/insert_worm.py#L218
+and you can show some of the properties of a data source by running::
+
+   pow source show $SOURCE_IDENTIFIER
+
+For instance, you can run the following to see the top-level data source, try::
+
+   pow source show http://openworm.org/data
+
+This will print out summary descriptions of the sources that contribute to the
+main data source.
+
 
 A Note on |pow| Data
 --------------------

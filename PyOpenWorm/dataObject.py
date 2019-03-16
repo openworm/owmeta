@@ -142,6 +142,7 @@ class RDFSClass(GraphObject):
     class_context = 'http://www.w3.org/2000/01/rdf-schema'
 
     instance = None
+    defined = True
     identifier = R.RDFS["Class"]
 
     def __new__(cls, *args, **kwargs):
@@ -243,6 +244,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self
 
     def _init_rdf_type_object(self):
+        # print('initializing', self.__name__, self.__module__, 'in', self.definition_context)
         if not hasattr(self, 'rdf_type_object') or \
                 self.rdf_type_object is not None and self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
