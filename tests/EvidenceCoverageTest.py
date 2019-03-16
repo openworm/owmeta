@@ -10,7 +10,7 @@ from PyOpenWorm.context import Context
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.evidence import Evidence
-
+from PyOpenWorm.evidence import evidence_for
 
 # XXX: This could probably just be one test at this point -- iterate over all contexts and check for an
 # Evidence:supports triple
@@ -90,3 +90,9 @@ class EvidenceCoverageTest(unittest.TestCase):
         ev = self.qctx(Evidence)()
         ev.supports(stmt.context.rdf_object)
         return ev.count()
+
+    def test_evidence_for(self):
+        qctx = Context()
+        qctx(Neuron)('AVAL').innexin('UNC-7')
+        ev_iterable = evidence_for(qctx, self.conn, Evidence, Context)
+        self.assertTrue((len(ev_iterable) != 0))
