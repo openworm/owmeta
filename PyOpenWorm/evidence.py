@@ -2,8 +2,10 @@ import logging
 
 from PyOpenWorm.dataObject import DataObject, ObjectProperty
 from PyOpenWorm.contextDataObject import ContextDataObject
+from PyOpenWorm.context import Context
 
 logger = logging.getLogger(__name__)
+
 
 
 class EvidenceError(Exception):
@@ -85,22 +87,21 @@ class Evidence(DataObject):
         return self.make_identifier(s)
 
 
-def evidence_for(qctx, conn, Evidence, Context):
+def evidence_for(qctx, conn):
     """
-    Returns an iterable of Evidence  
+    Returns an iterable of Evidence
     """
     ctxs = query_context(conn.conf['rdf.graph'], qctx)
+    ev_objs = []
     for c in ctxs:
         mqctx = Context(conf=conn.conf)
         print('CONTEXT', c.identifier)
         ev = mqctx.stored(Evidence)()
         ev.supports(Context(ident=c.identifier, conf=conn.conf).rdf_object)
-        ev_objs = []
         for x in ev.load():
             ev_objs.append(x)
+    return ev_objs
 
-
-    return ev_objs       
 
 def query_context(graph, qctx):
     trips = qctx.contents_triples()
@@ -117,5 +118,6 @@ def query_context(graph, qctx):
             if len(lctx) == 0:
                 return lctx
     return frozenset() if lctx is None else lctx
+
 
 __yarom_mapped_classes__ = (Evidence,)
