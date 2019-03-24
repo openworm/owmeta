@@ -59,7 +59,15 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
     hierarchy from among the given URIs.
     """
     if context is None:
-        return
+        if len(types) == 1 and (not bases or tuple(bases) == tuple(types)):
+            return tuple(types)[0]
+        if not types and len(bases) == 1:
+            return tuple(bases)[0]
+        msg = "Without a Context, `get_most_specific_rdf_type` cannot order RDF types {}{}".format(
+                types,
+                " constrained to be subclasses of {}".format(bases) if bases else '')
+        logging.warning(msg)
+        return None
 
     mapper = context.mapper
 
