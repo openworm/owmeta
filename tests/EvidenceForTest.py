@@ -12,9 +12,9 @@ from PyOpenWorm.worm import Worm
 from PyOpenWorm.evidence import Evidence
 from PyOpenWorm.evidence import evidence_for
 from PyOpenWorm import connect, disconnect
+from .DataTestTemplate import _DataTest
 
-
-class EvidenceForTest(unittest.TestCase):
+class EvidenceForTest(_DataTest):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
         xfail_without_db()
@@ -29,12 +29,5 @@ class EvidenceForTest(unittest.TestCase):
     def test_evidence_for(self):
         c1 = Context()
         c1(Neuron)('AVAL').innexin('UNC-7')
-        evc = Context()
-        ev1 = evc(Evidence)(key='js2019')
-        ev1.supports(c1.rdf_object)
-        ctx = Context()
-        ctx.add_import(c1)
-        ctx.add_import(evc)
-        ctx.save_context()
         ev_iterable = evidence_for(c1, self.conn)
         self.assertTrue((len(ev_iterable) != 0))
