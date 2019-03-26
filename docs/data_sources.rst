@@ -8,15 +8,15 @@ repository<https://github.com/openworm/PyOpenWorm>`_. A few
 :py:class:`DataTranslators<~PyOpenWorm.datasource.DataTranslator>`_ translate
 these data into common PyOpenWorm data sources. You can list these by running::
 
-   pow source list
+    pow source list
 
 and you can show some of the properties of a data source by running::
 
-   pow source show $SOURCE_IDENTIFIER
+    pow source show $SOURCE_IDENTIFIER
 
 For instance, you can run the following to see the top-level data source, try::
 
-   pow source show http://openworm.org/data
+    pow source show http://openworm.org/data
 
 This will print out summary descriptions of the sources that contribute to the
 main data source.

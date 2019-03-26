@@ -47,15 +47,6 @@ class DataObjectTest(_DataTest):
         do = DataObject(ident="http://example.org")
         self.assertEqual(do.identifier, R.URIRef("http://example.org"))
 
-    @unittest.skip("Should be tracked by version control")
-    def test_uploader(self):
-        """ Make sure that we're marking a statement with it's uploader """
-        g = make_graph(20)
-        r = DataObject(triples=g, conf=self.config)
-        r.save()
-        u = r.uploader()
-        self.assertEqual(self.config['user.email'], u)
-
     def test_object_from_id_type_0(self):
         g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
@@ -63,15 +54,6 @@ class DataObjectTest(_DataTest):
     def test_object_from_id_type_1(self):
         g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
-
-    @unittest.skip("Should be tracked by version control")
-    def test_upload_date(self):
-        """ Make sure that we're marking a statement with it's upload date """
-        g = make_graph(20)
-        r = DataObject(triples=g)
-        r.save()
-        u = r.upload_date()
-        self.assertIsNotNone(u)
 
     def test_repr(self):
         self.assertRegexpMatches(repr(DataObject(ident="http://example.com")),
@@ -201,3 +183,52 @@ class DataObjectTest(_DataTest):
             owner = Mock()
             getattr(DataObject, property_classmethod)(owner=owner, linkName="")
             owner.attach_property.assert_called_once()
+
+    def test_query_identifier(self):
+        class A(DataObject):
+            @property
+            def identifier(self):
+                return R.URIRef('http://example.org/idid')
+
+        self.assertIsNone(A.query().identifier)
+
+    def test_query_defined(self):
+        class A(DataObject):
+            @property
+            def defined(self):
+                return True
+
+        self.assertFalse(A.query().defined)
+
+    def test_query_cname(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.__name__, A.query.__name__)
+
+    def test_query_module(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.__module__, A.query.__module__)
+
+    def test_query_rdf_type(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.rdf_type, A.query.rdf_type)
+
+    def test_query_py_type(self):
+        class A(DataObject):
+            pass
+
+        self.assertIs(type(A), type(A.query))
+
+    def test_query_context(self):
+        class A(DataObject):
+            pass
+
+        ctx = Context(ident='http://example.org/texas')
+        ctxd = ctx(A)
+        qctxd = ctxd.query
+        self.assertIs(ctxd.context, qctxd.context)

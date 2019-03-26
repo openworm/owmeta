@@ -46,6 +46,6 @@ where ``:a_class_desc`` and ``:a_module`` are placeholders for objects which
 will typically be created by POW on the user's behalf, and ``AClassName`` is the
 name of the class available at the top-level of the module
 ``APackage.and.module.name``. These statements will be created in memory by POW
-when a module defining a :class:`PyOpenWorm.dataObject.DataObject`-derived
+when a module defining a :py:class:`~PyOpenWorm.dataObject.DataObject`-derived
 class is first processed by a :py:class:`~PyOpenWorm.mapper.Mapper` which will
 happen after the module is imported.

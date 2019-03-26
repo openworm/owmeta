@@ -187,6 +187,8 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
         self.init_rdf_type_object()
 
+        self.__query_form = None
+
     @classmethod
     def _find_class_context(cls, dct, bases):
         ctx_or_ctx_uri = dct.get('class_context', None)
@@ -241,7 +243,11 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         Stub. Eventually, creates a proxy that changes how some things behave
         for purposes of querying
         '''
-        return self
+        if self.__query_form is None:
+            meta = type(self)
+            self.__query_form = meta(self.__name__, (_QueryMixin, self), {})
+            self.__query_form.__module__ = self.__module__
+        return self.__query_form
 
     def _init_rdf_type_object(self):
         # print('initializing', self.__name__, self.__module__, 'in', self.definition_context)
@@ -295,6 +301,23 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def definition_context(self):
         """ Unlike self.context, definition_context isn't meant to be overriden """
         return self.__context
+
+
+class _QueryMixin(object):
+    '''
+    Mixin for DataObject types to be used for executing queries. This is optional since queries can be executed with
+    plain-old DataObjects. Use of the mixin is, however, recommended.
+
+    Overrides the identifier generation logic. May do other things in the future.
+    '''
+
+    @property
+    def identifier(self):
+        return None
+
+    @property
+    def defined(self):
+        return False
 
 
 def _make_property(cls, property_type, *args, **kwargs):

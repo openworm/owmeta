@@ -6,7 +6,7 @@ from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
-from .dataObject import DataObject, ObjectProperty
+from .dataObject import DataObject, ObjectProperty, This
 import logging
 
 L = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
                  value=None, default_value=None, identifier=None,
                  property_type='DatatypeProperty', multiple=True,
-                 property_name=None, also=()):
+                 property_name=None, also=(), **property_args):
         self.name = name
         self._property_name = property_name
         self._display_name = display_name
@@ -29,6 +29,7 @@ class Informational(object):
         if also and not isinstance(also, (list, tuple)):
             also = (also,)
         self.also = also
+        self.property_args = property_args
 
         self.default_override = None
         """
@@ -143,7 +144,8 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     source = Informational(display_name='Input source',
                            description='The data source that was translated into this one',
                            identifier=URIRef('http://openworm.org/schema/DataSource/source'),
-                           property_type='ObjectProperty')
+                           property_type='ObjectProperty',
+                           value_type=This)
 
     translation = Informational(display_name='Translation',
                                 description='Information about the translation process that created this object',
@@ -195,7 +197,8 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             getattr(inf.cls, inf.property_type)(owner=self,
                                                 linkName=inf.property_name,
                                                 multiple=inf.multiple,
-                                                attrName=inf.name)
+                                                attrName=inf.name,
+                                                **inf.property_args)
             ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)

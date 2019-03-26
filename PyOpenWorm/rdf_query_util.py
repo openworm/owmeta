@@ -28,6 +28,7 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
         g = ZeroOrMoreTQLayer(zomifier(target_type), graph)
         idents = GraphObjectQuerier(start, g, parallel=False,
                                     hop_scorer=goq_hop_scorer)()
+
     if idents:
         choices = graph.triples_choices((list(idents),
                                          rdflib.RDF['type'],

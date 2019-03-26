@@ -53,11 +53,14 @@ class DataWithEvidenceDataSource(DataSource):
         self.data_context.add_import(ctx)
         return ctx
 
-    def context_for(self, **kwargs):
+    def context_for(self, ident=None, **kwargs):
         key = "&".join(k + "=" + kwargs[k].identifier for k in sorted(kwargs.keys()))
         res = self.__ad_hoc_contexts.get(key)
         if res is None:
-            ctxid = self.identifier + '/context_for?' + key
+            if ident:
+                ctxid = ident
+            else:
+                ctxid = self.identifier + '/context_for?' + key
             self.__ad_hoc_contexts[key] = Context.contextualize(self.context)(ident=ctxid)
             res = self.__ad_hoc_contexts[key]
         return res
