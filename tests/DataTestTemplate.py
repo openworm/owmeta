@@ -56,3 +56,4 @@ class _DataTest(unittest.TestCase):
     @property
     def config(self):
         return self.TestConfig
+    conf = config
