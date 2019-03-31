@@ -2,8 +2,10 @@ import logging
 
 from PyOpenWorm.dataObject import DataObject, ObjectProperty
 from PyOpenWorm.contextDataObject import ContextDataObject
+from PyOpenWorm.context import Context
 
 logger = logging.getLogger(__name__)
+
 
 
 class EvidenceError(Exception):
@@ -83,6 +85,58 @@ class Evidence(DataObject):
 
         s += self.reference.defined_values[0].identifier.n3()
         return self.make_identifier(s)
+
+
+def evidence_for(qctx, ctx, evctx=None):
+    """
+     Returns an iterable of Evidence
+
+    Parameters
+    ----------
+    qctx : object
+        an object supported by evidence. If the object is a
+        :class:`~PyOpenWorm.context.Context` with no identifier, then the query
+        considers statements 'staged' (rather than stored) in the context
+    ctx : Context
+        Context that bounds where we look for statements about `qctx`. The
+        contexts for statements found in this context are the actual targets of
+        Evidence.supports statements.
+    evctx : Context
+        if the Evidence.supports statements should be looked for somewhere other
+        than `ctx`, that can be specified in evctx. optional
+"""
+    if not evctx:
+        evctx = ctx
+    ctxs = query_context(ctx.rdf_graph(), qctx)
+    ev_objs = []
+    for c in ctxs:
+        ev = evctx(Evidence)()
+        ev.supports(Context(ident=c.identifier).rdf_object)
+        for x in ev.load():
+            ev_objs.append(x)
+    return ev_objs
+
+def query_context(graph, qctx):
+    '''
+    graph : rdflib.graph.Graph
+        Graph where we can find the contexts for statements in `qctx`
+    qctx : PyOpenWorm.context.Context
+        Container for statements
+    '''
+    trips = qctx.contents_triples()
+    lctx = None
+    for t in trips:
+        ctxs = graph.contexts(t)
+        if lctx is None:
+            lctx = frozenset(ctxs)
+            continue
+        if len(lctx) == 0:
+            return frozenset()
+        else:
+            lctx = frozenset(ctxs) & lctx
+            if len(lctx) == 0:
+                return lctx
+    return frozenset() if lctx is None else lctx
 
 
 __yarom_mapped_classes__ = (Evidence,)
