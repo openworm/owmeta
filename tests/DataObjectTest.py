@@ -6,6 +6,7 @@ import six
 import warnings
 
 from yarom.utils import FCN
+from yarom.graphObject import IdentifierMissingException
 
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
@@ -190,12 +191,27 @@ class DataObjectTest(_DataTest):
             def identifier(self):
                 return R.URIRef('http://example.org/idid')
 
-        self.assertIsNone(A.query().identifier)
+        self.assertEquals(A.query().identifier, R.URIRef('http://example.org/idid'))
+
+    def test_query_identifier_augment(self):
+        class A(DataObject):
+            def identifier_augment(self):
+                return R.URIRef('http://example.org/idid')
+
+        with self.assertRaises(IdentifierMissingException):
+            A.query().identifier
 
     def test_query_defined(self):
         class A(DataObject):
             @property
             def defined(self):
+                return True
+
+        self.assertTrue(A.query().defined)
+
+    def test_query_defined_augment(self):
+        class A(DataObject):
+            def defined_augment(self):
                 return True
 
         self.assertFalse(A.query().defined)

@@ -315,7 +315,8 @@ class GenericTranslation(Translation):
 
         if attr_vals:
             val_line_sep = '\n' + len(sources_field_name) * ' '
-            print(val_line_sep.join(val_line_sep.join(val.format_str(stored).split('\n')) for val in sorted(attr_vals)), file=sio)
+            print(val_line_sep.join(val_line_sep.join(val.format_str(stored).split('\n'))
+                                    for val in sorted(attr_vals)), file=sio)
 
         if stored:
             translator = self.translator.one()

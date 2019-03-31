@@ -224,14 +224,20 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return res
 
     def after_mapper_module_load(self, mapper):
+        '''
+        Called after the module has been loaded. See :class:`PyOpenWorm.mapper.Mapper`
+        '''
         self.init_python_class_registry_entries()
 
     def init_rdf_type_object(self):
         global TypeDataObject
         if self.__name__ == 'BaseDataObject':
+            # Skip BaseDataObject during initialization since TypeDataObject won't be available yet
             pass
-        elif TypeDataObject is None and self.__name__ == 'TypeDataObject': # May not be resolvable yet
+        elif TypeDataObject is None and self.__name__ == 'TypeDataObject':
+            # TypeDataObject may not be resolvable yet, so we have to check by name
             TypeDataObject = self
+            # We don't use the rdf_type_object, but see `__call__` below for how we
             self.rdf_type_object = None
             BaseDataObject._init_rdf_type_object()
         else:
@@ -250,7 +256,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self.__query_form
 
     def _init_rdf_type_object(self):
-        # print('initializing', self.__name__, self.__module__, 'in', self.definition_context)
         if not hasattr(self, 'rdf_type_object') or \
                 self.rdf_type_object is not None and self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
@@ -968,7 +973,7 @@ class PythonClassDescription(ClassDescription):
 
 CR_TYPES = frozenset((RegistryEntry, PythonClassDescription, PythonModule))
 
-__yarom_mapped_classes__ = (BaseDataObject, DataObject, TypeDataObject,
+__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
                             RDFProperty, RDFSSubClassOfProperty, PropertyDataObject,
                             RegistryEntry, ModuleAccess, ClassDescription, Module,
                             PythonModule, PyPIPackage, PythonClassDescription)
