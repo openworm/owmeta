@@ -35,18 +35,16 @@ class DataWithEvidenceDataSource(DataSource):
         self.data_context = _DataContext.contextualize(self.context)(maker=self,
                                                                      imported=(CONTEXT,))
 
-        self.data_context_property(self.data_context.rdf_object)
-
         self.evidence_context = _EvidenceContext.contextualize(self.context)(maker=self,
                                                                              imported=(CONTEXT,))
-
-        self.evidence_context_property(self.evidence_context.rdf_object)
 
         self.combined_context = _CombinedContext.contextualize(self.context)(maker=self,
                                                                              imported=(self.data_context,
                                                                                        self.evidence_context))
-
-        self.combined_context_property(self.combined_context.rdf_object)
+        if not type(self).query_mode:
+            self.data_context_property(self.data_context.rdf_object)
+            self.evidence_context_property(self.evidence_context.rdf_object)
+            self.combined_context_property(self.combined_context.rdf_object)
 
     def data_context_for(self, **kwargs):
         ctx = self.context_for(**kwargs)

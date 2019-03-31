@@ -398,6 +398,8 @@ class POWEvidence(object):
             Type of the object to show evidence
         '''
         from PyOpenWorm.evidence import Evidence
+        from PyOpenWorm.document import Document
+        from PyOpenWorm.website import Website
         from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
         ctx = self._parent._data_ctx.stored
         identifier = self._parent._den3(identifier)
@@ -407,12 +409,42 @@ class POWEvidence(object):
         else:
             from PyOpenWorm.dataObject import DataObject
             base_type = ctx(DataObject)
-        print('!!!!!!!!!!!!!!!', base_type, base_type.context)
-        for l in base_type.query(ident=identifier).load():
-            print('heeeee', l)
+
+        msg = self._parent.message
+        q = base_type.query(ident=identifier)
+        for l in q.load():
             if isinstance(l, DataWithEvidenceDataSource):
-                for m in l.evidence_context.stored(Evidence).query().load():
-                    print(m)
+                evq = l.evidence_context.stored(Evidence).query()
+                for m in evq.load():
+                    ref = m.reference()
+                    if isinstance(ref, Document):
+                        msg(ref)
+                        titles = ['Author:',
+                                  'Title: ',
+                                  'URI:   ',
+                                  'DOI:   ',
+                                  'PMID:  ',
+                                  'WBID:  ']
+                        vals = [ref.author(),
+                                ref.title(),
+                                ref.uri(),
+                                ref.doi(),
+                                ref.pmid(),
+                                ref.wbid()]
+                        for title, v in zip(titles, vals):
+                            if v:
+                                msg(title, v)
+                        msg()
+                    elif isinstance(ref, Website):
+                        msg(ref)
+                        titles = ['Title: ',
+                                  'URL:   ']
+                        vals = [ref.title(),
+                                ref.url()]
+                        for title, v in zip(titles, vals):
+                            if v:
+                                msg(title, v)
+                        msg()
 
 
 class POWContexts(object):

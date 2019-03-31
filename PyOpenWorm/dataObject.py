@@ -311,12 +311,13 @@ class _QueryMixin(object):
     Overrides the identifier generation logic. May do other things in the future.
     '''
 
-    @property
-    def identifier(self):
-        return None
+    query_mode = True
+    ''' An indicator that the object is in "query" mode allows for simple adaptations in subclasses.'''
 
-    @property
-    def defined(self):
+    def identifier_helper(self):
+        raise IdentifierMissingException('Generated identifiers are disabled in query mode')
+
+    def defined_augment(self):
         return False
 
 
@@ -420,6 +421,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         If the arguments are written explicitly into the __init__ method
         definition, then no special processing is done.
     '''
+
+    query_mode = False
 
     def __new__(cls, *args, **kwargs):
         """ This is defined so that the __init__ method gets a contextualized
