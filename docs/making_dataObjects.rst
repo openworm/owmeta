@@ -16,6 +16,7 @@ elegans reactions::
     ...                                    Alias)
     >>> from PyOpenWorm.worm import Worm
     >>> from PyOpenWorm.evidence import Evidence
+    >>> from PyOpenWorm.document import Document
     >>> from PyOpenWorm.context import Context
     >>> from PyOpenWorm.mapper import Mapper
     >>> from PyOpenWorm import connect, ModuleRecorder
@@ -60,7 +61,7 @@ Aperture Labs::
     >>> e.reaction('no reaction')
     PyOpenWorm.statement.Statement(...)
 
-    >>> ev = Evidence(author="Aperture Labs")
+    >>> ev = Evidence(key='labresults', reference=Document(author="Aperture Labs"))
     >>> ev.supports(ctx)
     PyOpenWorm.statement.Statement(...)
 

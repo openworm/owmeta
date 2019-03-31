@@ -300,7 +300,7 @@ class GenericTranslation(Translation):
 
     def format_str(self, stored):
         sio = six.StringIO()
-        print('{}({})'.format(self.__class__.__name__, self.identifier), file=sio)
+        print('{}({})'.format(self.__class__.__name__, self.idl), file=sio)
         sources_field_name = 'Sources: '
         print(sources_field_name, end='', file=sio)
 
@@ -320,7 +320,7 @@ class GenericTranslation(Translation):
         if stored:
             translator = self.translator.one()
         else:
-            translator = self.translator.ondef()
+            translator = self.translator.onedef()
         if translator is not None:
             field = "Translator: "
             s = ('\n' + len(field) * ' ').join(str(translator).split('\n'))
