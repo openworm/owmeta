@@ -53,7 +53,7 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
         return
 
 
-def get_most_specific_rdf_type(types, context=None, bases=None):
+def get_most_specific_rdf_type(types, context=None, bases=()):
     """ Gets the most specific rdf_type.
 
     Returns the URI corresponding to the lowest in the DataObject class
@@ -67,7 +67,7 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
         msg = "Without a Context, `get_most_specific_rdf_type` cannot order RDF types {}{}".format(
                 types,
                 " constrained to be subclasses of {}".format(bases) if bases else '')
-        logging.warning(msg)
+        L.warning(msg)
         return None
 
     mapper = context.mapper
@@ -94,7 +94,14 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
             You may want to import the module containing the class as well as
             add additional type annotations in order to resolve your objects to
             a more precise type.""".format(x))
-    return most_specific_types[0].rdf_type
+
+    # XXX: Should we require that there's only one type at this point?
+    if len(most_specific_types) == 1:
+        return most_specific_types[0].rdf_type
+    else:
+        L.warning(('No most-specific type could be determined among {}'
+                   ' constrained to subclasses of {}').format(types, bases))
+        return None
 
 
 def oid(identifier_or_rdf_type=None, rdf_type=None, context=None, base_type=None):

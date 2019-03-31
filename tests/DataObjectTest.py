@@ -13,6 +13,7 @@ from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_propert
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.context import Context
+from PyOpenWorm.rdf_query_util import get_most_specific_rdf_type
 from PyOpenWorm import BASE_CONTEXT
 
 from .GraphDBInit import make_graph
@@ -248,3 +249,65 @@ class DataObjectTest(_DataTest):
         ctxd = ctx(A)
         qctxd = ctxd.query
         self.assertIs(ctxd.context, qctxd.context)
+
+
+class GMSRTTest(unittest.TestCase):
+    '''
+    Just covering some edge cases here...other unit tests cover query utils pretty well
+    '''
+
+    def test_no_context_no_bases_return_types0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types={t1}))
+
+    def test_no_context_return_types0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types={t1}, bases={t1}))
+
+    def test_no_context_no_types_return_bases0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types=set(), bases={t1}))
+
+    def test_no_context_no_types_no_bases_no_mst(self):
+        self.assertIsNone(get_most_specific_rdf_type(types=set()))
+
+    def test_no_context_many_types_no_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1, t2}))
+
+    def test_no_context_no_types_many_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), bases={t1, t2}))
+
+    def test_no_context_one_type_many_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1}, bases={t1, t2}))
+
+    def test_no_context_one_type_different_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1}, bases={t2}))
+
+    def test_context_with_no_mapper_or_bases(self):
+        ctx = Mock()
+        ctx.mapper = None
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))
+
+    def test_context_with_no_mapper_and_bases_context_doesnt_know(self):
+        ctx = Mock()
+        ctx.resolve_class.return_value = None
+        ctx.mapper = None
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))
+
+    def test_context_with_mapper_and_bases_context_doesnt_know(self):
+        ctx = Mock()
+        ctx.resolve_class.return_value = None
+        t1 = Mock()
+        t2 = Mock()
+        t1.rdf_type = R.URIRef('http://example.org/t1')
+        t2.rdf_type = R.URIRef('http://example.org/t2')
+        ctx.mapper.base_classes.values.return_value = {t1, t2}
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))
