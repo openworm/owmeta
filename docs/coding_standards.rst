@@ -1,7 +1,7 @@
 .. _coding_standards:
 
 |pow| coding standards
-========================================
+======================
 
 Pull requests are *required* to follow the PEP-8 Guidelines for contributions of
 Python code to PyOpenWorm, with some exceptions noted below. Compliance can be

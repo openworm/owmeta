@@ -6,12 +6,14 @@ import six
 import warnings
 
 from yarom.utils import FCN
+from yarom.graphObject import IdentifierMissingException
 
 from PyOpenWorm.data import DataUser
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.context import Context
+from PyOpenWorm.rdf_query_util import get_most_specific_rdf_type
 from PyOpenWorm import BASE_CONTEXT
 
 from .GraphDBInit import make_graph
@@ -47,15 +49,6 @@ class DataObjectTest(_DataTest):
         do = DataObject(ident="http://example.org")
         self.assertEqual(do.identifier, R.URIRef("http://example.org"))
 
-    @unittest.skip("Should be tracked by version control")
-    def test_uploader(self):
-        """ Make sure that we're marking a statement with it's uploader """
-        g = make_graph(20)
-        r = DataObject(triples=g, conf=self.config)
-        r.save()
-        u = r.uploader()
-        self.assertEqual(self.config['user.email'], u)
-
     def test_object_from_id_type_0(self):
         g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Neuron')
         self.assertIsInstance(g, Neuron)
@@ -63,15 +56,6 @@ class DataObjectTest(_DataTest):
     def test_object_from_id_type_1(self):
         g = self.ctx.DataObject.object_from_id('http://openworm.org/entities/Connection')
         self.assertIsInstance(g, Connection)
-
-    @unittest.skip("Should be tracked by version control")
-    def test_upload_date(self):
-        """ Make sure that we're marking a statement with it's upload date """
-        g = make_graph(20)
-        r = DataObject(triples=g)
-        r.save()
-        u = r.upload_date()
-        self.assertIsNotNone(u)
 
     def test_repr(self):
         self.assertRegexpMatches(repr(DataObject(ident="http://example.com")),
@@ -201,3 +185,129 @@ class DataObjectTest(_DataTest):
             owner = Mock()
             getattr(DataObject, property_classmethod)(owner=owner, linkName="")
             owner.attach_property.assert_called_once()
+
+    def test_query_identifier(self):
+        class A(DataObject):
+            @property
+            def identifier(self):
+                return R.URIRef('http://example.org/idid')
+
+        self.assertEquals(A.query().identifier, R.URIRef('http://example.org/idid'))
+
+    def test_query_identifier_augment(self):
+        class A(DataObject):
+            def identifier_augment(self):
+                return R.URIRef('http://example.org/idid')
+
+        with self.assertRaises(IdentifierMissingException):
+            A.query().identifier
+
+    def test_query_defined(self):
+        class A(DataObject):
+            @property
+            def defined(self):
+                return True
+
+        self.assertTrue(A.query().defined)
+
+    def test_query_defined_augment(self):
+        class A(DataObject):
+            def defined_augment(self):
+                return True
+
+        self.assertFalse(A.query().defined)
+
+    def test_query_cname(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.__name__, A.query.__name__)
+
+    def test_query_module(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.__module__, A.query.__module__)
+
+    def test_query_rdf_type(self):
+        class A(DataObject):
+            pass
+
+        self.assertEquals(A.rdf_type, A.query.rdf_type)
+
+    def test_query_py_type(self):
+        class A(DataObject):
+            pass
+
+        self.assertIs(type(A), type(A.query))
+
+    def test_query_context(self):
+        class A(DataObject):
+            pass
+
+        ctx = Context(ident='http://example.org/texas')
+        ctxd = ctx(A)
+        qctxd = ctxd.query
+        self.assertIs(ctxd.context, qctxd.context)
+
+
+class GMSRTTest(unittest.TestCase):
+    '''
+    Just covering some edge cases here...other unit tests cover query utils pretty well
+    '''
+
+    def test_no_context_no_bases_return_types0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types={t1}))
+
+    def test_no_context_return_types0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types={t1}, bases={t1}))
+
+    def test_no_context_no_types_return_bases0(self):
+        t1 = R.URIRef('http://example.org/t1')
+        self.assertEqual(t1, get_most_specific_rdf_type(types=set(), bases={t1}))
+
+    def test_no_context_no_types_no_bases_no_mst(self):
+        self.assertIsNone(get_most_specific_rdf_type(types=set()))
+
+    def test_no_context_many_types_no_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1, t2}))
+
+    def test_no_context_no_types_many_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), bases={t1, t2}))
+
+    def test_no_context_one_type_many_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1}, bases={t1, t2}))
+
+    def test_no_context_one_type_different_bases_no_mst(self):
+        t1 = R.URIRef('http://example.org/t1')
+        t2 = R.URIRef('http://example.org/t2')
+        self.assertIsNone(get_most_specific_rdf_type(types={t1}, bases={t2}))
+
+    def test_context_with_no_mapper_or_bases(self):
+        ctx = Mock()
+        ctx.mapper = None
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))
+
+    def test_context_with_no_mapper_and_bases_context_doesnt_know(self):
+        ctx = Mock()
+        ctx.resolve_class.return_value = None
+        ctx.mapper = None
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))
+
+    def test_context_with_mapper_and_bases_context_doesnt_know(self):
+        ctx = Mock()
+        ctx.resolve_class.return_value = None
+        t1 = Mock()
+        t2 = Mock()
+        t1.rdf_type = R.URIRef('http://example.org/t1')
+        t2.rdf_type = R.URIRef('http://example.org/t2')
+        ctx.mapper.base_classes.values.return_value = {t1, t2}
+        self.assertIsNone(get_most_specific_rdf_type(types=set(), context=ctx))

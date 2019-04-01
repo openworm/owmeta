@@ -6,14 +6,17 @@ from rdflib.namespace import Namespace
 from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
-from .dataObject import DataObject, ObjectProperty
+from .dataObject import DataObject, ObjectProperty, This
+import logging
+
+L = logging.getLogger(__name__)
 
 
 class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
                  value=None, default_value=None, identifier=None,
                  property_type='DatatypeProperty', multiple=True,
-                 property_name=None, also=()):
+                 property_name=None, also=(), **property_args):
         self.name = name
         self._property_name = property_name
         self._display_name = display_name
@@ -26,6 +29,7 @@ class Informational(object):
         if also and not isinstance(also, (list, tuple)):
             also = (also,)
         self.also = also
+        self.property_args = property_args
 
         self.default_override = None
         """
@@ -140,7 +144,8 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     source = Informational(display_name='Input source',
                            description='The data source that was translated into this one',
                            identifier=URIRef('http://openworm.org/schema/DataSource/source'),
-                           property_type='ObjectProperty')
+                           property_type='ObjectProperty',
+                           value_type=This)
 
     translation = Informational(display_name='Translation',
                                 description='Information about the translation process that created this object',
@@ -192,7 +197,8 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             getattr(inf.cls, inf.property_type)(owner=self,
                                                 linkName=inf.property_name,
                                                 multiple=inf.multiple,
-                                                attrName=inf.name)
+                                                attrName=inf.name,
+                                                **inf.property_args)
             ctxd_prop = getattr(self, inf.name).contextualize(self.context)
             if v is not None:
                 ctxd_prop(v)
@@ -239,6 +245,8 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
                         val_line_sep = '\n      ' + ' ' * len(info.display_name)
                         if isinstance(val, DataSource):
                             valstr = val.format_str(stored)
+                        elif isinstance(val, GenericTranslation):
+                            valstr = val.format_str(stored)
                         elif isinstance(val, URIRef):
                             valstr = val.n3()
                         elif isinstance(val, six.string_types):
@@ -249,7 +257,9 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
                     print(file=sio)
             return sio.getvalue()
         except AttributeError:
-            return super(DataSource, self).__str__()
+            res = super(DataSource, self).__str__()
+            L.error('Failed while creating formatting string representation for %s', res)
+            return res
 
 
 class Translation(DataObject):
@@ -274,7 +284,7 @@ class GenericTranslation(Translation):
     A generic translation that just has sources in order
     """
 
-    source = ObjectProperty(multiple=True)
+    source = ObjectProperty(multiple=True, value_rdf_type=DataSource.rdf_type)
 
     def defined_augment(self):
         return super(GenericTranslation, self).defined_augment() and \
@@ -284,6 +294,39 @@ class GenericTranslation(Translation):
         data = super(GenericTranslation, self).identifier_augment().n3() + \
                 "".join(x.identifier.n3() for x in self.source.defined_values)
         return self.make_identifier(data)
+
+    def __str__(self):
+        return self.format_str(False)
+
+    def format_str(self, stored):
+        sio = six.StringIO()
+        print('{}({})'.format(self.__class__.__name__, self.idl), file=sio)
+        sources_field_name = 'Sources: '
+        print(sources_field_name, end='', file=sio)
+
+        attr = self.source
+        if stored:
+            attr_vals = list()
+            for x in attr.get():
+                if x not in attr_vals:
+                    attr_vals.append(x)
+        else:
+            attr_vals = attr.defined_values
+
+        if attr_vals:
+            val_line_sep = '\n' + len(sources_field_name) * ' '
+            print(val_line_sep.join(val_line_sep.join(val.format_str(stored).split('\n'))
+                                    for val in sorted(attr_vals)), file=sio)
+
+        if stored:
+            translator = self.translator.one()
+        else:
+            translator = self.translator.onedef()
+        if translator is not None:
+            field = "Translator: "
+            s = ('\n' + len(field) * ' ').join(str(translator).split('\n'))
+            print(field + s, file=sio)
+        return sio.getvalue()
 
 
 class DataObjectContextDataSource(DataSource):
@@ -343,7 +386,7 @@ class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
         s = '''Input type(s): {}
                Output type(s): {}'''.format(self.input_type,
                                             self.output_type)
-        return '\n'.join(x.strip() for x in s.split('\n'))
+        return FCN(type(self)) + ': \n    ' + ('\n    '.join(x.strip() for x in s.split('\n')))
 
     def translate(self, *args, **kwargs):
         '''

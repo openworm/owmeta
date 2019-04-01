@@ -1,3 +1,4 @@
+from __future__ import print_function
 import rdflib
 import logging
 from itertools import groupby
@@ -27,6 +28,7 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
         g = ZeroOrMoreTQLayer(zomifier(target_type), graph)
         idents = GraphObjectQuerier(start, g, parallel=False,
                                     hop_scorer=goq_hop_scorer)()
+
     if idents:
         choices = graph.triples_choices((list(idents),
                                          rdflib.RDF['type'],
@@ -51,14 +53,22 @@ def load(graph, start=None, target_type=None, context=None, idents=None):
         return
 
 
-def get_most_specific_rdf_type(types, context=None, bases=None):
+def get_most_specific_rdf_type(types, context=None, bases=()):
     """ Gets the most specific rdf_type.
 
     Returns the URI corresponding to the lowest in the DataObject class
     hierarchy from among the given URIs.
     """
     if context is None:
-        return
+        if len(types) == 1 and (not bases or tuple(bases) == tuple(types)):
+            return tuple(types)[0]
+        if not types and len(bases) == 1:
+            return tuple(bases)[0]
+        msg = "Without a Context, `get_most_specific_rdf_type` cannot order RDF types {}{}".format(
+                types,
+                " constrained to be subclasses of {}".format(bases) if bases else '')
+        L.warning(msg)
+        return None
 
     mapper = context.mapper
 
@@ -84,7 +94,14 @@ def get_most_specific_rdf_type(types, context=None, bases=None):
             You may want to import the module containing the class as well as
             add additional type annotations in order to resolve your objects to
             a more precise type.""".format(x))
-    return most_specific_types[0].rdf_type
+
+    # XXX: Should we require that there's only one type at this point?
+    if len(most_specific_types) == 1:
+        return most_specific_types[0].rdf_type
+    else:
+        L.warning(('No most-specific type could be determined among {}'
+                   ' constrained to subclasses of {}').format(types, bases))
+        return None
 
 
 def oid(identifier_or_rdf_type=None, rdf_type=None, context=None, base_type=None):

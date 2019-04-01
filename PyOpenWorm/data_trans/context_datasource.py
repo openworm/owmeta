@@ -1,11 +1,16 @@
 from ..context import Context
 from ..contextDataObject import ContextDataObject
+from rdflib.term import URIRef
+from rdflib.namespace import Namespace
 
 
 class VariableIdentifierMixin(object):
-    def __init__(self, maker, **kwargs):
-        conf = kwargs.pop('conf', maker.conf)
-        super(VariableIdentifierMixin, self).__init__(conf=conf, **kwargs)
+    def __init__(self, maker=None, **kwargs):
+        if maker is not None:
+            conf = kwargs.pop('conf', maker.conf)
+            super(VariableIdentifierMixin, self).__init__(conf=conf, **kwargs)
+        else:
+            super(VariableIdentifierMixin, self).__init__(**kwargs)
         self.maker = maker
 
     @property
@@ -17,7 +22,10 @@ class VariableIdentifierMixin(object):
         pass
 
     def identifier_helper(self):
-        return self.maker.identifier
+        if self.maker is not None:
+            return self.maker.identifier
+        else:
+            return super(VariableIdentifierMixin, self).identifier
 
 
 class VariableIdentifierContext(VariableIdentifierMixin, Context):
@@ -39,5 +47,11 @@ class VariableIdentifierContextDataObject(VariableIdentifierMixin, ContextDataOb
     A ContextDataObject that gets its identifier and its configuration from its 'maker' passed in at initialization
     '''
 
+    rdf_type = URIRef('http://openworm.org/schema/Context')
+    rdf_namespace = Namespace(rdf_type + '#')
+
     def defined_augment(self):
-        return self.maker.identifier is not None
+        return self.maker is not None and self.maker.identifier is not None
+
+
+__yarom_mapped_classes__ = (VariableIdentifierContextDataObject,)

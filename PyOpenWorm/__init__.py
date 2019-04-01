@@ -46,19 +46,24 @@ BASE_SCHEMA_URL = 'http://openworm.org/schema'
 # The c extensions are incompatible with our code...
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
 from .import_override import Overrider
-from .module_recorder import ModuleRecorder
+from .module_recorder import ModuleRecorder as MR
+from .mapper import Mapper
 
 ImportOverrider = None
-_ModuleRecorder = None
+ModuleRecorder = None
+
+
+BASE_MAPPER = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
+    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
 
 
 def install_module_import_wrapper():
     global ImportOverrider
-    global _ModuleRecorder
+    global ModuleRecorder
 
     if ImportOverrider is None:
-        _ModuleRecorder = ModuleRecorder()
-        ImportOverrider = Overrider(mapper=_ModuleRecorder)
+        ModuleRecorder = MR()
+        ImportOverrider = Overrider(mapper=ModuleRecorder)
         ImportOverrider.wrap_import()
         ImportOverrider.install_excepthook()
     else:
@@ -67,10 +72,10 @@ def install_module_import_wrapper():
 
 
 install_module_import_wrapper()
+ModuleRecorder.add_listener(BASE_MAPPER)
 from .configure import Configureable
 from .context import Context
 import yarom
-from .mapper import Mapper
 
 __all__ = [
     "get_data",
@@ -140,7 +145,7 @@ class Connection(object):
 
     def disconnect(self):
         self.conf.closeDatabase()
-        _ModuleRecorder.remove_listener(self.conf['mapper'])
+        ModuleRecorder.remove_listener(self.conf['mapper'])
 
     def __enter__(self):
         return self
@@ -219,7 +224,7 @@ def connect(configFile=False,
     :param dataFormat: (Optional) file format of `data`. Currently n3 is supported
     """
     import logging
-    from .data import Data, ZODBSourceOpenFailError
+    from .data import Data, ZODBSourceOpenFailError, DatabaseConflict
 
     if do_logging:
         logging.basicConfig(level=logging.DEBUG)
@@ -245,6 +250,8 @@ def connect(configFile=False,
         if e.openstr.endswith('.pow/worm.db'):
             raise ConnectionFailError(e, 'Perhaps you need to do a `pow clone`?')
         raise ConnectionFailError(e)
+    except DatabaseConflict as e:
+        raise ConnectionFailError(e, "It looks like a connection is already opened by a living process")
     except Exception as e:
         raise ConnectionFailError(e)
 
@@ -262,6 +269,6 @@ def connect(configFile=False,
 
     yarom.MAPPER = mapper
 
-    _ModuleRecorder.add_listener(mapper)
+    ModuleRecorder.add_listener(mapper)
 
     return Connection(conf)

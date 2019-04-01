@@ -12,6 +12,14 @@ class EvidenceError(Exception):
     pass
 
 
+class ContextToDataObjectMixin(object):
+    def set(self, value):
+        v = value
+        if isinstance(value, Context):
+            v = value.rdf_object
+        return super(ContextToDataObjectMixin, self).set(v)
+
+
 class Evidence(DataObject):
 
     """
@@ -60,11 +68,13 @@ class Evidence(DataObject):
 
     class_context = 'http://openworm.org/schema/sci'
 
-    supports = ObjectProperty(value_type=ContextDataObject)
+    supports = ObjectProperty(value_type=ContextDataObject,
+                              mixins=(ContextToDataObjectMixin,))
     '''A context naming a set of statements which are supported by the attached
        reference'''
 
-    refutes = ObjectProperty(value_type=ContextDataObject)
+    refutes = ObjectProperty(value_type=ContextDataObject,
+                             mixins=(ContextToDataObjectMixin,))
     '''A context naming a set of statements which are refuted by the attached
        reference'''
 
@@ -79,11 +89,11 @@ class Evidence(DataObject):
     def identifier_augment(self):
         s = ""
         if self.supports.has_defined_value:
-            s += self.supports.defined_values[0].identifier.n3()
+            s += self.supports.onedef().identifier.n3()
         else:
-            s += self.refutes.defined_values[0].identifier.n3()
+            s += self.refutes.onedef().identifier.n3()
 
-        s += self.reference.defined_values[0].identifier.n3()
+        s += self.reference.onedef().identifier.n3()
         return self.make_identifier(s)
 
 
