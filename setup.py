@@ -75,7 +75,7 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
     ] + (['zodbpickle==1.0'] if PY2 or PY34 else [])
-      + (['Sphinx<1.8.4'] if PY34 else [])
+      + (['Sphinx<1.8.4'] if PY34 or PY2 else [])
       + (['backports.tempfile==1.0'] if PY2 else [])
       + (['Jinja2<2.9'] if PY34 else [])
       + (['scandir'] if PY2 or PY34 else []),
