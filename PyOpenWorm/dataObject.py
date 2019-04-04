@@ -25,7 +25,6 @@ from .data import DataUser
 from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
 from .rdf_query_util import goq_hop_scorer, get_most_specific_rdf_type, oid, load
-import traceback
 
 import PyOpenWorm.simpleProperty as SP
 
@@ -318,9 +317,6 @@ class _QueryMixin(object):
 
     query_mode = True
     ''' An indicator that the object is in "query" mode allows for simple adaptations in subclasses.'''
-
-    def identifier_helper(self):
-        raise IdentifierMissingException('Generated identifiers are disabled in query mode')
 
     def defined_augment(self):
         return False
