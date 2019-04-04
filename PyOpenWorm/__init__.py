@@ -55,6 +55,10 @@ ModuleRecorder = None
 
 BASE_MAPPER = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
     'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+'''
+Handles some of the PyOpenWorm DataObjects regardless of whether there's been any connection. Used by Contexts outside
+of a connection.
+'''
 
 
 def install_module_import_wrapper():
