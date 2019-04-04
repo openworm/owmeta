@@ -35,29 +35,30 @@ class DataWithEvidenceDataSource(DataSource):
         self.data_context = _DataContext.contextualize(self.context)(maker=self,
                                                                      imported=(CONTEXT,))
 
-        self.data_context_property(self.data_context.rdf_object)
-
         self.evidence_context = _EvidenceContext.contextualize(self.context)(maker=self,
                                                                              imported=(CONTEXT,))
-
-        self.evidence_context_property(self.evidence_context.rdf_object)
 
         self.combined_context = _CombinedContext.contextualize(self.context)(maker=self,
                                                                              imported=(self.data_context,
                                                                                        self.evidence_context))
-
-        self.combined_context_property(self.combined_context.rdf_object)
+        if not type(self).query_mode:
+            self.data_context_property(self.data_context.rdf_object)
+            self.evidence_context_property(self.evidence_context.rdf_object)
+            self.combined_context_property(self.combined_context.rdf_object)
 
     def data_context_for(self, **kwargs):
         ctx = self.context_for(**kwargs)
         self.data_context.add_import(ctx)
         return ctx
 
-    def context_for(self, **kwargs):
+    def context_for(self, ident=None, **kwargs):
         key = "&".join(k + "=" + kwargs[k].identifier for k in sorted(kwargs.keys()))
         res = self.__ad_hoc_contexts.get(key)
         if res is None:
-            ctxid = self.identifier + '/context_for?' + key
+            if ident:
+                ctxid = ident
+            else:
+                ctxid = self.identifier + '/context_for?' + key
             self.__ad_hoc_contexts[key] = Context.contextualize(self.context)(ident=ctxid)
             res = self.__ad_hoc_contexts[key]
         return res
@@ -71,17 +72,26 @@ class DataWithEvidenceDataSource(DataSource):
 
 class _CombinedContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier
+        if self.maker.defined:
+            return self.maker.identifier
+        else:
+            return None
 
 
 class _EvidenceContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier + '-evidence'
+        if self.maker.defined:
+            return self.maker.identifier + '-evidence'
+        else:
+            return None
 
 
 class _DataContext(VariableIdentifierContext):
     def identifier_helper(self):
-        return self.maker.identifier + '-data'
+        if self.maker.defined:
+            return self.maker.identifier + '-data'
+        else:
+            return None
 
 
 __yarom_mapped_classes__ = (DataWithEvidenceDataSource,)

@@ -71,7 +71,7 @@ class ContextTest(_DataTest):
         ctx = Context(ident='http://example.com/context_1', mapper=mapper)
         ctx(A)(ident='anA')
         self.assertIn(URIRef('anA'),
-                      tuple(x.identifier for x in ctx.query(A)().load()))
+                      tuple(x.identifier for x in ctx.mixed(A)().load()))
 
     def test_decontextualize(self):
         class A(DataObject):

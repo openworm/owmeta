@@ -131,6 +131,28 @@ def UnionProperty(*args, **kwargs):
     return APThunk('UnionProperty', args, kwargs)
 
 
+class RDFSClass(GraphObject):
+
+    """ The GraphObject corresponding to rdfs:Class """
+    # XXX: This class may be changed from a singleton later to facilitate
+    #      dumping and reloading the object graph
+    rdf_type = R.RDFS['Class']
+    auto_mapped = True
+    class_context = 'http://www.w3.org/2000/01/rdf-schema'
+
+    instance = None
+    defined = True
+    identifier = R.RDFS["Class"]
+
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super(RDFSClass, cls).__new__(cls)
+        return cls.instance
+
+
+TypeDataObject = None
+
+
 class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
@@ -161,6 +183,10 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
             if isinstance(v, Alias):
                 setattr(self, k, getattr(self, v.target.result.linkName))
                 self._property_classes[k] = v.target.result
+
+        self.init_rdf_type_object()
+
+        self.__query_form = None
 
     @classmethod
     def _find_class_context(cls, dct, bases):
@@ -197,19 +223,40 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return res
 
     def after_mapper_module_load(self, mapper):
-        self.init_rdf_type_object()
+        '''
+        Called after the module has been loaded. See :class:`PyOpenWorm.mapper.Mapper`
+        '''
+        self.init_python_class_registry_entries()
 
     def init_rdf_type_object(self):
-        if self is not TypeDataObject:
-            self._init_rdf_type_object()
-            for crtype in (CR_TYPES - frozenset((self,))):
-                crtype._init_rdf_type_object()
-            self.init_python_class_registry_entries()
-        else:
+        global TypeDataObject
+        if self.__name__ == 'BaseDataObject':
+            # Skip BaseDataObject during initialization since TypeDataObject won't be available yet
+            pass
+        elif TypeDataObject is None and self.__name__ == 'TypeDataObject':
+            # TypeDataObject may not be resolvable yet, so we have to check by name
+            TypeDataObject = self
+            # We don't use the rdf_type_object, but see `__call__` below for how we
             self.rdf_type_object = None
+            BaseDataObject._init_rdf_type_object()
+        else:
+            self._init_rdf_type_object()
+
+    @property
+    def query(self):
+        '''
+        Stub. Eventually, creates a proxy that changes how some things behave
+        for purposes of querying
+        '''
+        if self.__query_form is None:
+            meta = type(self)
+            self.__query_form = meta(self.__name__, (_QueryMixin, self), {})
+            self.__query_form.__module__ = self.__module__
+        return self.__query_form
 
     def _init_rdf_type_object(self):
-        if not hasattr(self, 'rdf_type_object') or self.rdf_type_object.identifier != self.rdf_type:
+        if not hasattr(self, 'rdf_type_object') or \
+                self.rdf_type_object is not None and self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
                 raise Exception("The class {0} has no context for TypeDataObject(ident={1})".format(
                     self, self.rdf_type))
@@ -238,14 +285,14 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def __call__(self, *args, **kwargs):
         o = super(ContextMappedClass, self).__call__(*args, **kwargs)
 
-        if isinstance(o, PropertyDataObject):
+        if isinstance(o, TypeDataObject):
+            o.rdf_type_property(RDFSClass())
+        elif isinstance(o, PropertyDataObject):
             o.rdf_type_property(RDFProperty.get_instance())
         elif isinstance(o, RDFProperty):
-            o.rdf_type_property(RDFSClass.get_instance())
+            o.rdf_type_property(RDFSClass())
         elif isinstance(o, RDFSClass):
             o.rdf_type_property.set(o)
-        elif isinstance(o, TypeDataObject):
-            o.rdf_type_property(RDFSClass.get_instance())
         else:
             o.rdf_type_property.set(self.rdf_type_object)
         return o
@@ -258,6 +305,21 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
     def definition_context(self):
         """ Unlike self.context, definition_context isn't meant to be overriden """
         return self.__context
+
+
+class _QueryMixin(object):
+    '''
+    Mixin for DataObject types to be used for executing queries. This is optional since queries can be executed with
+    plain-old DataObjects. Use of the mixin is, however, recommended.
+
+    Overrides the identifier generation logic. May do other things in the future.
+    '''
+
+    query_mode = True
+    ''' An indicator that the object is in "query" mode allows for simple adaptations in subclasses.'''
+
+    def defined_augment(self):
+        return False
 
 
 def _make_property(cls, property_type, *args, **kwargs):
@@ -360,6 +422,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         If the arguments are written explicitly into the __init__ method
         definition, then no special processing is done.
     '''
+
+    query_mode = False
 
     def __new__(cls, *args, **kwargs):
         """ This is defined so that the __init__ method gets a contextualized
@@ -557,6 +621,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             link=None,
             lazy=True,
             inverse_of=None,
+            mixins=(),
             **kwargs):
 
         owner_class = cls
@@ -609,7 +674,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                     invc = owner_class
                 InverseProperty(owner_class, linkName, invc, inverse_of[1])
 
-            c = type(property_class_name, (klass,), props)
+            c = type(property_class_name, mixins + (klass,), props)
             c.__module__ = owner_class.__module__
             if hasattr(owner_class, 'mapper') and owner_class.mapper is not None:
                 owner_class.mapper.add_class(c)
@@ -704,25 +769,42 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
             return self
 
 
-class RDFSCommentProperty(SP.DatatypeProperty):
-    link = R.RDFS['comment']
-    linkName = 'rdfs_comment'
+class _Resolver(RDFTypeResolver):
+    instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls.instance is None:
+            cls.instance = cls(
+                BaseDataObject.rdf_type,
+                get_most_specific_rdf_type,
+                oid,
+                deserialize_rdflib_term)
+        return cls.instance
+
+
+class RDFTypeProperty(SP.ObjectProperty):
+    # XXX: This class is special. It doesn't have its after_mapper_module_load called because that would mess up
+    # evaluation order for this module...
+    link = R.RDF['type']
+    linkName = "rdf_type_property"
+    value_rdf_type = R.RDFS['Class']
     owner_type = BaseDataObject
     multiple = True
-    lazy = True
+    lazy = False
 
 
-class RDFSLabelProperty(SP.DatatypeProperty):
-    link = R.RDFS['label']
-    linkName = 'rdfs_label'
-    owner_type = BaseDataObject
+class RDFSSubClassOfProperty(SP.ObjectProperty):
+    link = R.RDFS.subClassOf
+    linkName = 'rdfs_subclassof_property'
+    value_type = RDFSClass
+    owner_type = RDFSClass
     multiple = True
-    lazy = True
+    lazy = False
 
 
-class DataObject(BaseDataObject):
-    rdfs_comment = CPThunk(RDFSCommentProperty)
-    rdfs_label = CPThunk(RDFSLabelProperty)
+class TypeDataObject(BaseDataObject):
+    class_context = URIRef(BASE_SCHEMA_URL)
 
 
 class DataObjectSingletonMeta(type(BaseDataObject)):
@@ -751,41 +833,35 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
         return cls.instance
 
 
-class TypeDataObject(BaseDataObject):
+class PropertyDataObject(BaseDataObject):
+
+    """ A PropertyDataObject represents the property-as-object.
+
+    Try not to confuse this with the Property class
+    """
+    rdf_type = R.RDF['Property']
     class_context = URIRef(BASE_SCHEMA_URL)
 
 
-class RDFSClass(DataObjectSingleton):  # This maybe becomes a DataObject later
-
-    """ The DataObject corresponding to rdfs:Class """
-    # XXX: This class may be changed from a singleton later to facilitate
-    #      dumping and reloading the object graph
-    rdf_type = R.RDFS['Class']
-    auto_mapped = True
-    class_context = 'http://www.w3.org/2000/01/rdf-schema'
-
-    def __init__(self, *args, **kwargs):
-        super(RDFSClass, self).__init__(ident=R.RDFS["Class"], *args, **kwargs)
-
-
-class RDFSSubClassOfProperty(SP.ObjectProperty):
-    link = R.RDFS.subClassOf
-    linkName = 'rdfs_subclassof_property'
-    value_type = RDFSClass
-    owner_type = RDFSClass
-    multiple = True
-    lazy = False
-
-
-class RDFTypeProperty(SP.ObjectProperty):
-    # XXX: This class is special. It doesn't have its after_mapper_module_load called because that would mess up
-    # evaluation order for this module...
-    link = R.RDF['type']
-    linkName = "rdf_type_property"
-    value_rdf_type = RDFSClass.rdf_type
+class RDFSCommentProperty(SP.DatatypeProperty):
+    link = R.RDFS['comment']
+    linkName = 'rdfs_comment'
     owner_type = BaseDataObject
     multiple = True
-    lazy = False
+    lazy = True
+
+
+class RDFSLabelProperty(SP.DatatypeProperty):
+    link = R.RDFS['label']
+    linkName = 'rdfs_label'
+    owner_type = BaseDataObject
+    multiple = True
+    lazy = True
+
+
+class DataObject(BaseDataObject):
+    rdfs_comment = CPThunk(RDFSCommentProperty)
+    rdfs_label = CPThunk(RDFSLabelProperty)
 
 
 class RDFProperty(DataObjectSingleton):
@@ -803,30 +879,6 @@ class RDFProperty(DataObjectSingleton):
 def disconnect():
     global PropertyTypes
     PropertyTypes.clear()
-
-
-class PropertyDataObject(DataObject):
-
-    """ A PropertyDataObject represents the property-as-object.
-
-    Try not to confuse this with the Property class
-    """
-    rdf_type = R.RDF['Property']
-    class_context = URIRef(BASE_SCHEMA_URL)
-
-
-class _Resolver(RDFTypeResolver):
-    instance = None
-
-    @classmethod
-    def get_instance(cls):
-        if cls.instance is None:
-            cls.instance = cls(
-                BaseDataObject.rdf_type,
-                get_most_specific_rdf_type,
-                oid,
-                deserialize_rdflib_term)
-        return cls.instance
 
 
 class Module(DataObject):

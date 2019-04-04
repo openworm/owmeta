@@ -349,7 +349,8 @@ class ObjectProperty(InversePropertyMixin,
 
     def get(self):
         idents = super(ObjectProperty, self).get()
-        r = load(self.rdf, idents=idents, context=self.context)
+        r = load(self.rdf, idents=idents, context=self.context,
+                 target_type=self.value_rdf_type)
         return itertools.chain(self.defined_values, r)
 
     @property

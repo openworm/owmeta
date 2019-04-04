@@ -151,7 +151,15 @@ class RDFContextStore(Store):
         self.__init_contexts()
         for t in self.__store.triples(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
-            inter = self.__context_transitive_imports & contexts
+            if self.__context_transitive_imports:
+                inter = self.__context_transitive_imports & contexts
+            else:
+                # Note that our own identifier is also included in the
+                # transitive imports, so if we don't have *any* imports then we
+                # fall back to querying across all contexts => we don't filter
+                # based on contexts. This is in line with rdflib ConjuctiveGraph
+                # semantics
+                inter = contexts
             if inter:
                 yield t[0], inter
 

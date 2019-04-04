@@ -16,6 +16,8 @@ L = logging.getLogger(__name__)
 
 def IdMixin(typ=object, hashfunc=None):
     """
+    Mixin that provides common identifier logic
+
     Parameters
     ----------
     typ : type
