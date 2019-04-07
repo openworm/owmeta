@@ -79,7 +79,7 @@ currently hosted at `git@github.com:openworm/OpenWormData.git`. You can read it
 in by executing the following command line after installation:
 
 ```bash
-pow clone git@github.com:openworm/OpenWormData.git
+pow clone https://github.com/openworm/OpenWormData.git
 ```
 
 Then, in Python, from the same directory:
