@@ -1,4 +1,4 @@
-..cmd:
+.. _command:
 
 ``pow`` Command Line
 ====================
