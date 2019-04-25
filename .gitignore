@@ -16,12 +16,6 @@ worm.fs*
 six-1.7.3*
 .eggs/*
 .idea/*
-.idea/encodings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/PyOpenWorm-OW.iml
-.idea/scopes/scope_settings.xml
-.idea/vcs.xml
 zodb_test_db.fs.tmp
 zodb_test_db.fs
 zodb_test_db.fs.index

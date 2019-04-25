@@ -1,2 +1,1 @@
-recursive-include OpenWormData/aux_data *
 include PyOpenWorm/default.conf
