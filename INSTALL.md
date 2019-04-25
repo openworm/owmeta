@@ -10,6 +10,21 @@ Alternatively, you can grab the latest on the development branch from GitHub:
     cd PyOpenWorm
     python setup.py install
 
+
+POW Database
+------------
+`pow` is a command line installed with PyOpenWorm which provides a high-level
+interface for interacting with data created with PyOpenWorm. Although you can
+use PyOpenWorm without it, there is an OpenWorm database which is managed with
+`pow`. You can clone this database by running the following command: 
+
+    pow clone https://github.com/openworm/OpenWormData.git
+
+This will create a directory `.pow` in your current working directory
+underneath which, the database and related files are stored. See
+docs/command.rst in the documentation for more detail on `pow`. 
+
+
 Running tests
 -------------
 

@@ -11,3 +11,4 @@ For Users
    making_dataObjects
    sharing
    contexts
+   command
