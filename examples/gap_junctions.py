@@ -7,11 +7,10 @@ from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.context import Context
-from OpenWormData import BIO_ENT_NS
 
 # Connect to existing database.
 with P.connect('default.conf') as conn:
-    ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
+    ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
     # Put the Worm's Network object in a variable.
     net = ctx(Worm)().get_neuron_network()

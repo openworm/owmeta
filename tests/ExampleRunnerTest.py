@@ -39,9 +39,7 @@ class ExampleRunnerTest(unittest.TestCase):
                            stdout=out,
                            stderr=out)
             out.seek(0)
-            self.assertEqual(
-                0,
-                stat,
+            self.assertEqual(0, stat,
                 "Example failed with status {}. Its output:\n{}".format(
                     stat,
                     out.read()))

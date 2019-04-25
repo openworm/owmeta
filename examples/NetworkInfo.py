@@ -18,13 +18,12 @@ import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.context import Context
-from OpenWormData import BIO_ENT_NS
 
 
 print("Connecting to the database...")
 conn = P.connect('default.conf')
 
-ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
+ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
 #Get the worm object.
 worm = ctx(Worm)()

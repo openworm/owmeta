@@ -9,17 +9,14 @@ import PyOpenWorm as P
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.context import Context
-from OpenWormData import BIO_ENT_NS
-
-P.connect('default.conf')
 
 
 def pp_connection(conn):
     print(conn.pre_cell(), conn.post_cell(), conn.syntype(), conn.synclass(), conn.number())
 
 
-try:
-    ctx = Context(ident=BIO_ENT_NS['worm0']).stored
+with P.connect('default.conf') as powconn:
+    ctx = Context(ident="http://openworm.org/data", conf=powconn.conf).stored
     query_object = ctx(Connection)(pre_cell=ctx(Neuron)(name='AVAL'))
     print('STARTING WITH AVAL')
     for x in query_object.load():
@@ -61,5 +58,3 @@ try:
         except StopIteration:
             pass
         print()
-finally:
-    P.disconnect()

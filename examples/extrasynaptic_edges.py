@@ -16,7 +16,6 @@ import csv
 import PyOpenWorm as P
 from PyOpenWorm.context import Context
 from PyOpenWorm.worm import Worm
-from OpenWormData import BIO_ENT_NS
 import six
 
 #Connect to database.
@@ -100,7 +99,7 @@ def fetch_ma_mapping():
 
 
 with P.connect('default.conf') as conn:
-    ctx = Context(ident=BIO_ENT_NS['worm0'], conf=conn.conf).stored
+    ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
     #Get the worm object.
     worm = ctx(Worm)()
     #Extract the network object from the worm object.
