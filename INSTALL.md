@@ -1,6 +1,6 @@
 Installation
 ============
-The recommended way to get PyOpenWorm is from [pip](http://pip.readthedocs.org/en/latest/installing.html):
+The recommended way to get PyOpenWorm is with [pip](http://pip.readthedocs.org/en/latest/installing.html):
 
     pip install pyopenworm
 
@@ -20,9 +20,11 @@ use PyOpenWorm without it, there is an OpenWorm database which is managed with
 
     pow clone https://github.com/openworm/OpenWormData.git
 
-This will create a directory `.pow` in your current working directory
-underneath which, the database and related files are stored. See
-docs/command.rst in the documentation for more detail on `pow`. 
+This will create a directory `.pow` in your current working directory,
+underneath which, the database and related files are stored. See documentation
+for the command on ReadTheDocs.io
+[here](http://pow-doc.readthedocs.org/en/dev/command.html) or look at
+docs/command.rst. 
 
 
 Running tests
