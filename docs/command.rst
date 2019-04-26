@@ -34,3 +34,5 @@ To make a new repository::
    pow init
 
 This will create a repository in ``.pow`` in your current working directory.
+
+
