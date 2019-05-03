@@ -8,21 +8,18 @@ another cell.
 This type of script could be useful for visualizing data, generating reports,
 or any number programmatic applications in OpenWorm that involve connectivity.
 
-Try running this script and see what it prints out. It takes a while to run
-because there are so many connections, so feel free to comment out some of the
-neuron names in the arbitrary list declared further below.
+Try running this script and see what it prints out.
 """
 from __future__ import absolute_import
 from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.context import Context
 
-
-print("Connecting to the database...")
+print("Connecting to the database using PyOpenWorm v%s..."%P.__version__)
 conn = P.connect('default.conf')
 
+from PyOpenWorm.context import Context
 ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
 #Get the worm object.
@@ -38,15 +35,17 @@ some_neuron_names = ["ADAL", "AIBL", "I1R", "PVCR", "DD5"]
 #Store these in another list.
 some_neurons = [ctx(Neuron)(name) for name in some_neuron_names]
 
-print("Going through our list of neurons:")
+print("Going through our list of neurons: %s"%some_neuron_names)
+
 for neuron in some_neurons:
-    print("Checking connectivity of %s" % neuron.name())
+    print("Checking connectivity of %s (%s)..." % (neuron.name(), ', '.join(neuron.type())))
 
     #Go through all synapses in the network.
     #Note that we can go through all connection objects (even gap junctions) by
     #using `net.synapses()` and a for loop, as below.
     conns = {'pre': {"E": [], "I": []}, 'post': {"E": [], "I": []}, 'gap': set()}
     for s in neuron.connection.get('either'):
+        print('   - Connection from %s -> %s (%s; %s)'%(s.pre_cell().name(), s.post_cell().name(), s.syntype(), s.synclass()))
         #Below we print different things depending on the connections we find.
         #If the neuron we are currently looking at from our list is the pre or
         #post cell in a connection, we print a different diagram. We also print
@@ -74,15 +73,12 @@ for neuron in some_neurons:
                 l = conns['post'].get(type, [])
                 l.append(s.pre_cell().name())
                 conns['post'][type] = l
-    print("Excites")
-    print(conns["pre"]["E"])
-    print("Excited by")
-    print(conns["post"]["E"])
-    print("Inhibits")
-    print(conns["pre"]["I"])
-    print("Inhibited by")
-    print(conns["post"]["I"])
-    print("Gap junction neighbors")
-    print(conns["gap"])
+
+    print("  Excites: "+', '.join(conns["pre"]["E"]))
+    print("  Excited by: "+', '.join(conns["post"]["E"]))
+    print("  Inhibits: "+', '.join(conns["pre"]["I"]))
+    print("  Inhibited by: "+', '.join(conns["post"]["I"]))
+    print("  Gap junction neighbors: "+', '.join(conns["gap"]))
     print()
+
 conn.disconnect()
