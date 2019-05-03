@@ -40,7 +40,7 @@ some_neurons = [ctx(Neuron)(name) for name in some_neuron_names]
 
 print("Going through our list of neurons:")
 for neuron in some_neurons:
-    print("Checking connectivity of %s" % neuron.name())
+    print("Checking connectivity of %s (%s)..." % (neuron.name(), ', '.join(neuron.type())))
 
     #Go through all synapses in the network.
     #Note that we can go through all connection objects (even gap junctions) by
@@ -74,15 +74,10 @@ for neuron in some_neurons:
                 l = conns['post'].get(type, [])
                 l.append(s.pre_cell().name())
                 conns['post'][type] = l
-    print("Excites")
-    print(conns["pre"]["E"])
-    print("Excited by")
-    print(conns["post"]["E"])
-    print("Inhibits")
-    print(conns["pre"]["I"])
-    print("Inhibited by")
-    print(conns["post"]["I"])
-    print("Gap junction neighbors")
-    print(conns["gap"])
+    print("  Excites: "+', '.join(conns["pre"]["E"]))
+    print("  Excited by: "+', '.join(conns["post"]["E"]))
+    print("  Inhibits: "+', '.join(conns["pre"]["I"]))
+    print("  Inhibited by: "+', '.join(conns["post"]["I"]))
+    print("  Gap junction neighbors: "+', '.join(conns["gap"]))
     print()
 conn.disconnect()
