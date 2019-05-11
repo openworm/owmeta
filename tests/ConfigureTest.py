@@ -194,6 +194,34 @@ class ConfigureTest(unittest.TestCase):
                 finally:
                     os.unlink(tf.name)
 
+    def test_here_varname(self):
+        '''
+        By default, $HERE refers to the directory the config file sits in, or to the
+        current working directory
+        '''
+        with patch.dict('os.environ', (), clear=True):
+            tf = self.tempfile()
+            dname = os.path.dirname(tf.name)
+            print('{"z": "$HERE/car"}', file=tf)
+            tf.close()
+            try:
+                c = Configure.open(tf.name)
+                self.assertEqual(c['z'], dname + '/car')
+            finally:
+                os.unlink(tf.name)
+
+    def test_here_varname_root(self):
+        with patch.dict('os.environ', (), clear=True):
+            c = Configure.process_config({'configure.file_location': '/blah.file',
+                                          'z': '$HERE/car'})
+            self.assertEqual(c['z'], '/car')
+
+    def test_here_varname_override(self):
+        with patch.dict('os.environ', {'HERE': 'there'}, clear=True):
+            c = Configure.process_config({'configure.file_location': '/blah.file',
+                                          'z': '$HERE/car'})
+            self.assertEqual(c['z'], 'there/car')
+
     def test_copy_dict(self):
         c = Configure()
         c.copy({'a': 1})
@@ -225,6 +253,8 @@ class ConfigureTest(unittest.TestCase):
     def test_contains(self):
         c = Configure(x=2, y=1)
         self.assertIn('x', c)
+
+
 
     @staticmethod
     def tempfile():
