@@ -222,6 +222,11 @@ class ConfigureTest(unittest.TestCase):
                                           'z': '$HERE/car'})
             self.assertEqual(c['z'], 'there/car')
 
+    def test_here_varname_no_value(self):
+        with patch.dict('os.environ', (), clear=True):
+            c = Configure.process_config({'z': '$HERE/car'})
+            self.assertEqual(c['z'], '/car')
+
     def test_copy_dict(self):
         c = Configure()
         c.copy({'a': 1})
