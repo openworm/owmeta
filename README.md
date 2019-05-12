@@ -4,7 +4,7 @@
 
 PyOpenWorm
 ===========
-![Logo](pyopenworm-logo.min.svg)
+<img width="128" alt="pyopenworm_logo" src="pyopenworm-logo.min.svg">
 <img width="1207" alt="pyow_in_overview" src="https://user-images.githubusercontent.com/1573896/44875328-d92ec800-ac6b-11e8-9430-b29c834f518e.png">
 
 A data access layer in Python which integrates disparate structures and
