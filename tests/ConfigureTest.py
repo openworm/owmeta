@@ -259,8 +259,6 @@ class ConfigureTest(unittest.TestCase):
         c = Configure(x=2, y=1)
         self.assertIn('x', c)
 
-
-
     @staticmethod
     def tempfile():
         return tempfile.NamedTemporaryFile(mode='w+', delete=False)
