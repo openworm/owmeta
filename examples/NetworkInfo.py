@@ -15,11 +15,11 @@ from __future__ import print_function
 import PyOpenWorm as P
 from PyOpenWorm.worm import Worm
 from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.context import Context
 
-print("Connecting to the database...")
+print("Connecting to the database using PyOpenWorm v%s..."%P.__version__)
 conn = P.connect('default.conf')
 
+from PyOpenWorm.context import Context
 ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
 #Get the worm object.
