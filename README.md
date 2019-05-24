@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/openworm/PyOpenWorm.png?branch=dev)](https://travis-ci.org/openworm/PyOpenWorm/builds)
-[![Docs](https://readthedocs.org/projects/pow-doc/badge/?version=latest)](https://pow-doc.readthedocs.io/en/latest)
-[![Stories in Ready](https://badge.waffle.io/openworm/pyopenworm.png?label=ready&title=Ready)](https://waffle.io/openworm/pyopenworm)  [![Coverage Status](https://coveralls.io/repos/github/openworm/PyOpenWorm/badge.svg?branch=dev)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
+[![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.io/en/latest)
+[![Coverage Status](https://coveralls.io/repos/github/openworm/PyOpenWorm/badge.svg?branch=dev)](https://coveralls.io/github/openworm/PyOpenWorm?branch=dev)
 
 PyOpenWorm
 ===========
@@ -15,6 +15,8 @@ pipeline](http://docs.openworm.org/en/latest/projects) for the
 
 Overview
 --------
+<img align="left" width="128" alt="pyopenworm_logo" src="pyopenworm-logo.min.svg"/>
+
 The data and models required to simulate *C. elegans* are highly heterogeneous.
 Consequently, from a software perspective, a variety of underlying
 representations are needed to store different aspects of the relevant anatomy
@@ -278,9 +280,20 @@ More examples can be found
 Documentation
 -------------
 
-Further documentation [is available online](http://pow-doc.readthedocs.org).
+Further documentation [is available online](http://pyopenworm.readthedocs.org).
 
-Questions?
-----------
-[Join the Slack chat](https://openworm.slack.com/messages/C02EPNMP1/) for
-clarification, to ask questions, or just to say, 'Hi'.
+Contributing
+------------
+We happily welcome pull requests and [bug
+reports](https://github.com/openworm/PyOpenWorm/issues/new). If, you are not
+sure how you can contribute, fill out this (short)
+[form](https://docs.google.com/forms/d/e/1FAIpQLSdzVilyRX3z9e0PeAoQdXhBDiNXp2ugqpnT536xA2iQbLNymQ/viewform?formkey=dC1CUDQtTV82MEJJcjY0NjdCcHpYdmc6MQ#gid=0),
+and you'll receive an invite to our Slack chat where you can initiate more
+in-depth conversations.
+
+
+Questions/Concerns?
+-------------------
+You can ask questions, leave bug reports, or propose features on [our issue
+tracker](https://github.com/openworm/PyOpenWorm/issues/new).
+
