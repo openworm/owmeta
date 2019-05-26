@@ -145,7 +145,7 @@ class POWSource(object):
         kind_uri = self._parent._den3(kind)
 
         dst = ctx.stored(ctx.stored.resolve_class(kind_uri))
-        dt = dst(conf=conf)
+        dt = dst.query(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
             if full:
