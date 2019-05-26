@@ -9,13 +9,12 @@ import tempfile
 import os
 from os import listdir, system as sh
 from os.path import exists, join as p, realpath
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import shlex
 import shutil
 import json
 from rdflib.term import URIRef
 from pytest import mark
-
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
@@ -777,7 +776,7 @@ class POWSourceTest(unittest.TestCase):
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = []
+        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = []
         ps = POWSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
@@ -787,7 +786,7 @@ class POWSourceTest(unittest.TestCase):
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = [Mock()]
         ps = POWSource(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
@@ -894,33 +893,84 @@ class POWAccTest(unittest.TestCase):
     ''' smoke-test for pow command line and the standard data base '''
 
     def setUp(self):
-        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        self.startdir = os.getcwd()
-        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
-        os.chdir(self.testdir)
+        import threading
+        self.ns = threading.local()
 
-    def tearDown(self):
-        os.chdir(self.startdir)
-        shutil.rmtree(self.testdir)
+    def set_up(self):
+        self.ns.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        shutil.copytree('.pow', p(self.ns.testdir, '.pow'), symlinks=True)
+
+    def tear_down(self):
+        shutil.rmtree(self.ns.testdir)
 
     def sh(self, command, **kwargs):
         env = dict(os.environ)
-        env['PYTHONPATH'] = self.testdir
-        return check_output(shlex.split(command), env=env).decode('utf-8')
+        env['PYTHONPATH'] = self.ns.testdir
+        return check_output(shlex.split(command), env=env, cwd=self.ns.testdir).decode('utf-8')
 
-    def test_translator_list(self):
+    @property
+    def testdir(self):
+        return self.ns.testdir
+
+    def test_runner(self):
+        import threading
+        mytests = [getattr(self, x) for x in dir(self) if x.startswith('t_')]
+        threads = []
+        exceptions = [None] * len(mytests)
+        barrier = threading.Semaphore()
+
+        def test_exec(idx, test):
+            def f():
+                try:
+                    self.set_up()
+                except BaseException as e:
+                    barrier.release()
+                    exceptions[idx] = e
+                    return
+
+                try:
+                    return test()
+                except BaseException as e:
+                    exceptions[idx] = e
+                finally:
+                    try:
+                        self.tear_down()
+                    finally:
+                        barrier.release()
+            return f
+
+        for idx, k in enumerate(mytests):
+            t = threading.Thread(target=test_exec(idx, k), name=k.__name__)
+            threads.append(t)
+            t.start()
+
+        for m in mytests:
+            barrier.acquire()
+
+        for thr, test, exc in zip(threads, mytests, exceptions):
+            thr.join()
+            if exc is not None:
+                raise exc
+
+    def t_translator_list(self):
         ''' Test we have some translator '''
         self.assertRegexpMatches(self.sh('pow translator list'), r'<[^>]+>')
 
-    def test_source_list(self):
+    def t_source_list(self):
         ''' Test we have some data source '''
         self.assertRegexpMatches(self.sh('pow source list'), r'<[^>]+>')
 
-    def test_save_diff(self):
+    def t_source_list_dweds(self):
+        ''' Test listing of DWEDS '''
+        out = self.sh('pow source list --kind :DataWithEvidenceDataSource')
+        self.assertRegexpMatches(out, r'<[^>]+>')
+
+    def t_save_diff(self):
         ''' Change something and make a diff '''
-        os.mkdir('test_module')
-        open(p('test_module', '__init__.py'), 'w').close()
-        with open(p('test_module', 'command_test_save.py'), 'w') as out:
+        modpath = p(self.testdir, 'test_module')
+        os.mkdir(modpath)
+        open(p(modpath, '__init__.py'), 'w').close()
+        with open(p(modpath, 'command_test_save.py'), 'w') as out:
             print(r'''
 from test_module.monkey import Monkey
 
@@ -930,7 +980,7 @@ def pow_data(ns):
     ns.context(Monkey)(bananas=55)
 ''', file=out)
 
-        with open(p('test_module', 'monkey.py'), 'w') as out:
+        with open(p(modpath, 'monkey.py'), 'w') as out:
             print(r'''
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty
 
@@ -948,22 +998,21 @@ class Monkey(DataObject):
 
 __yarom_mapped_classes__ = (Monkey,)
 ''', file=out)
-        print(listdir('.'))
         print(self.sh('pow save --module test_module.command_test_save'))
         self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
-    def test_manual_graph_edit_no_diff(self):
+    def t_manual_graph_edit_no_diff(self):
         '''
         Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
         '''
         index = self.sh('cat ' + p('.pow', 'graphs', 'index'))
         fname = index.split('\n')[0].split(' ')[0]
 
-        open(p('.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
+        open(p(self.testdir, '.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
 
         self.assertRegexpMatches(self.sh('pow diff'), r'^$')
 
-    def test_list_contexts(self):
+    def t_list_contexts(self):
         ''' Test we have some contexts '''
         self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
 
