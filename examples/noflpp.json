@@ -1,0 +1,48 @@
+{
+   "units" : {
+      "t" : "seconds",
+      "px" : "micrometers",
+      "y" : "micrometers",
+      "x" : "micrometers",
+      "size" : "mm",
+      "py" : "micrometers"
+   },
+   "metadata" : {
+      "software" : {
+         "version" : "cbfc23eb4f1ac2f29be75ade7a937eed58a5b219",
+         "featureID" : "@OMG",
+         "name" : "tierpsy (https://github.com/ver228/tierpsy-tracker)"
+      },
+      "strain" : "N2",
+      "protocol" : [
+         "method in E. Yemini et al. doi:10.1038/nmeth.2560",
+         "worm transferred to arena 30 minutes before recording starts."
+      ],
+      "food" : "OP50",
+      "who" : "Laura Grundy",
+      "media" : "NGM agar low peptone",
+      "@OMG" : {
+         "habituation" : "30m wait",
+         "original_video_name" : "/Volumes/behavgenom_archive$/single_worm/original_videos/single_worm_raw_bkp10/thecus/nas207-3/Data/from pc207-16/Laura/18-05-10/N2 on food L_2010_05_18__12_16_13___7___2.avi",
+         "tracker" : "tracker_7",
+         "gene" : "-N/A-",
+         "base_name" : "N2 on food L_2010_05_18__12_16_13___7___2",
+         "ventral_side" : "clockwise",
+         "allele" : "-N/A-",
+         "strain_description" : "Schafer Lab N2 (Bristol, UK)",
+         "chromosome" : "-N/A-"
+      },
+      "sex" : "hermaphrodite",
+      "timestamp" : "2010-05-18T12:16:13+01:00",
+      "stage" : "adult",
+      "arena" : {
+         "orientation" : "away",
+         "style" : "petri",
+         "size" : 35
+      },
+      "lab" : {
+         "name" : "William R Schafer",
+         "location" : "MRC Laboratory of Molecular Biology, Hills Road, Cambridge, CB2 0QH, UK"
+      }
+   }
+}
