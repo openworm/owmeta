@@ -30,6 +30,7 @@ def normalize_muscle(name):
         name = REPLACE_STRING_MUSCLE.sub('', name)
     return name
 
+
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
@@ -44,3 +45,12 @@ def grouper(iterable, n, fillvalue=None):
         yield l
         if len(l) < n:
             break
+
+
+def ellipsize(s, max_length):
+    t = s[:max_length]
+    if t != s:
+        if len(t) <= 1:
+            return t
+        return t[:-1] + '⋯'
+    return t

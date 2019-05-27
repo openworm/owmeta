@@ -3,6 +3,7 @@ from pprint import pprint
 import json
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, ObjectProperty
 from PyOpenWorm.datasource import DataSource, Informational
+from PyOpenWorm.utils import ellipsize
 import PyOpenWorm.simpleProperty as SP
 from jsonschema.validators import validator_for
 from contextlib import contextmanager
@@ -12,12 +13,14 @@ from urllib.parse import unquote
 from os.path import join as p
 import logging
 
+L = logging.getLogger(__name__)
+
 
 class AssignmentValidationException(Exception):
     pass
 
 
-class Assigner(object):
+class Creator(object):
     def __init__(self, schema):
         '''
         Takes a schema annotated with '_pow_type' entries indicating which types are
@@ -37,6 +40,12 @@ class Assigner(object):
     def gen_ident(self):
         if self._root_identifier:
             return self._root_identifier + '#' + '/'.join(self._path_stack)
+
+    def assign(self, obj, key, val):
+        '''
+        Assigns values to properties on the created objects
+        '''
+        getattr(obj, key)(val)
 
     def create(self, instance, schema=None, ident=None):
         if schema is None:
@@ -134,13 +143,18 @@ class Assigner(object):
 
                     res = pow_type(ident=self.gen_ident())
                     for k, v in pt_args.items():
-                        if hasattr(res, k):
-                            getattr(res, k)(v)
-                        else:
-                            # TODO: Do this properly...construct a property and set the
-                            # value
-                            pow_type.DatatypeProperty(k, owner=res)
-                            getattr(res, k)(v)
+                        if not hasattr(res, k):
+                            if isinstance(v, (str, float, bool, int)) or \
+                                    isinstance(v, list) and v and \
+                                    isinstance(v[0], (str, float, bool, int)):
+                                pow_type.DatatypeProperty(k, owner=res)
+                            elif isinstance(v, dict):
+                                L.warning("Received an object of unknown type: %s", ellipsize(str(v), 40))
+                                pow_type.DatatypeProperty(k, owner=res)
+                            else:
+                                pow_type.ObjectProperty(k, value_type=type(v), owner=res)
+
+                        self.assign(res, k, v)
                     return res
                 else:
                     return None
@@ -148,7 +162,7 @@ class Assigner(object):
             raise AssignmentValidationException(sType, instance)
 
 
-class JSONSchemaTypeCreator(object):
+class TypeCreator(object):
 
     def __init__(self, name, schema, definition_base_name=''):
         '''
@@ -195,7 +209,7 @@ class JSONSchemaTypeCreator(object):
         annotated_property_schemas = None
         properties = schema.get('properties', None)
         if properties is not None:
-            with self.processing_properties(path):
+            with self._processing_properties(path):
                 annotated_property_schemas = {}
                 for k, v in properties.items():
                     prop_type = None
@@ -211,7 +225,7 @@ class JSONSchemaTypeCreator(object):
 
                     self.proc_prop(path, k, v)
 
-        typ = self.create_type(path)
+        typ = self.create_type(path, schema)
 
         annotated = copy.deepcopy(schema)
 
@@ -260,14 +274,14 @@ class JSONSchemaTypeCreator(object):
             self._annotate_obj(subpart, path[1:], repl)
 
 
-class DataSourceJSONSchemaTypeCreator(JSONSchemaTypeCreator):
+class DataSourceTypeCreator(TypeCreator):
     def __init__(self, *args, **kwargs):
-        super(DataSourceJSONSchemaTypeCreator, self).__init__(*args, **kwargs)
+        super(DataSourceTypeCreator, self).__init__(*args, **kwargs)
         self.infos = dict()
         self.props = dict()
 
     @contextmanager
-    def processing_properties(self, path):
+    def _processing_properties(self, path):
         if not path:
             self.infos[path] = {}
         else:
@@ -288,7 +302,7 @@ class DataSourceJSONSchemaTypeCreator(JSONSchemaTypeCreator):
                 info_type = ObjectProperty
             self.props[path][k] = info_type()
 
-    def create_type(self, path):
+    def create_type(self, path, schema):
         doc = (schema.get('title', '') + '\n\n' +
                schema.get('description', '')).strip()
         if not path:
