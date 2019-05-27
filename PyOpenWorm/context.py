@@ -393,9 +393,10 @@ ClassContexts = dict()
 class ClassContextMeta(ContextMeta):
 
     def __call__(self, ident):
-        res = ClassContexts.get(ident)
+        res = ClassContexts.get(URIRef(ident))
         if not res:
             res = super(ClassContextMeta, self).__call__(ident=ident)
+            ClassContexts[URIRef(ident)] = res
         return res
 
 

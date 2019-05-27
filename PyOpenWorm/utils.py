@@ -52,5 +52,5 @@ def ellipsize(s, max_length):
     if t != s:
         if len(t) <= 1:
             return t
-        return t[:-1] + '⋯'
+        return t[:-1] + '\u2026'
     return t

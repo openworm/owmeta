@@ -25,6 +25,8 @@ class ContextStore(Store):
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
+        self._namespaces = dict()
+        self._namespaces_r = dict()
         if context is not None:
             self._init_store(context)
 
@@ -128,6 +130,20 @@ class ContextStore(Store):
                 continue
             seen.add(ctx)
             yield ctx
+
+    def namespace(self, prefix):
+        return self._namespaces.get(prefix)
+
+    def prefix(self, uri):
+        return self._namespaces_r.get(uri)
+
+    def bind(self, prefix, namespace):
+        self._namespaces[prefix] = namespace
+        self._namespaces_r[namespace] = prefix
+
+    def namespaces(self):
+        for x in self._namespaces.items():
+            yield x
 
 
 class RDFContextStore(Store):

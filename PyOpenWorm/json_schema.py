@@ -4,6 +4,7 @@ import json
 from PyOpenWorm.dataObject import DataObject, DatatypeProperty, ObjectProperty
 from PyOpenWorm.datasource import DataSource, Informational
 from PyOpenWorm.utils import ellipsize
+from PyOpenWorm.context import ClassContext
 import PyOpenWorm.simpleProperty as SP
 from jsonschema.validators import validator_for
 from contextlib import contextmanager
@@ -45,9 +46,34 @@ class Creator(object):
         '''
         Assigns values to properties on the created objects
         '''
+        if not hasattr(obj, key):
+            typ = type(obj)
+            if isinstance(val, (str, float, bool, int)) or \
+                    isinstance(val, list) and val and \
+                    isinstance(val[0], (str, float, bool, int)):
+                typ.DatatypeProperty(key, owner=obj)
+            elif isinstance(val, dict):
+                L.warning("Received an object of unknown type: %s", ellipsize(str(val), 40))
+                typ.DatatypeProperty(key, owner=obj)
+            else:
+                typ.ObjectProperty(key, value_type=type(val), owner=obj)
         getattr(obj, key)(val)
 
-    def create(self, instance, schema=None, ident=None):
+    def create(self, instance, context=None, ident=None):
+        self._context = context
+        try:
+            return self._create(instance, ident=ident)
+        finally:
+            del self._path_stack[:]
+            self._root_identifier = None
+            self._context = None
+
+    def make_instance(self, pow_type):
+        if self._context:
+            pow_type = self._context(pow_type)
+        return pow_type(ident=self.gen_ident())
+
+    def _create(self, instance, schema=None, ident=None):
         if schema is None:
             schema = self.schema
 
@@ -63,13 +89,13 @@ class Creator(object):
         sRef = schema.get('$ref')
 
         if sRef:
-            return self.create(instance, resolve_fragment(self.schema, sRef))
+            return self._create(instance, resolve_fragment(self.schema, sRef))
 
         sOneOf = schema.get('oneOf')
         if sOneOf:
             for opt in sOneOf:
                 try:
-                    return self.create(instance, opt)
+                    return self._create(instance, opt)
                 except AssignmentValidationException:
                     pass
 
@@ -97,7 +123,7 @@ class Creator(object):
                     converted_list = list()
                     for idx, elt in enumerate(instance):
                         with self._pushing(idx):
-                            converted_list.append(self.create(elt, item_schema))
+                            converted_list.append(self._create(elt, item_schema))
                     return converted_list
                 else:
                     # The default for items is to accept all, so we short-cut here...
@@ -119,7 +145,7 @@ class Creator(object):
                             sub_schema = props.get(k)
                             if sub_schema:
                                 with self._pushing(k):
-                                    pt_args[k] = self.create(v, sub_schema)
+                                    pt_args[k] = self._create(v, sub_schema)
                                 continue
 
                         if patprops:
@@ -127,7 +153,7 @@ class Creator(object):
                             for p in patprops:
                                 if re.match(p, k):
                                     with self._pushing(k):
-                                        pt_args[k] = self.create(v, patprops[p])
+                                        pt_args[k] = self._create(v, patprops[p])
                                     found = True
                                     break
                             if found:
@@ -135,25 +161,14 @@ class Creator(object):
 
                         if addprops:
                             with self._pushing(k):
-                                pt_args[k] = self.create(v, addprops)
+                                pt_args[k] = self._create(v, addprops)
                             continue
 
                         if not default:
                             raise AssignmentValidationException(sType, instance, k, v)
 
-                    res = pow_type(ident=self.gen_ident())
+                    res = self.make_instance(pow_type)
                     for k, v in pt_args.items():
-                        if not hasattr(res, k):
-                            if isinstance(v, (str, float, bool, int)) or \
-                                    isinstance(v, list) and v and \
-                                    isinstance(v[0], (str, float, bool, int)):
-                                pow_type.DatatypeProperty(k, owner=res)
-                            elif isinstance(v, dict):
-                                L.warning("Received an object of unknown type: %s", ellipsize(str(v), 40))
-                                pow_type.DatatypeProperty(k, owner=res)
-                            else:
-                                pow_type.ObjectProperty(k, value_type=type(v), owner=res)
-
                         self.assign(res, k, v)
                     return res
                 else:
@@ -275,10 +290,17 @@ class TypeCreator(object):
 
 
 class DataSourceTypeCreator(TypeCreator):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, context=None, **kwargs):
         super(DataSourceTypeCreator, self).__init__(*args, **kwargs)
         self.infos = dict()
         self.props = dict()
+        if context and not isinstance(context, str):
+            context = context.identifier
+
+        if context is not None:
+            self._context = ClassContext(ident=context)
+        else:
+            self._context = None
 
     @contextmanager
     def _processing_properties(self, path):
@@ -307,18 +329,23 @@ class DataSourceTypeCreator(TypeCreator):
                schema.get('description', '')).strip()
         if not path:
             infos = self.infos.get(path, dict())
-            return type(DataSource)(self._extract_name(path),
-                                    (DataSource,),
-                                    dict(__doc__=doc,
-                                         __module__=__name__,
-                                         **infos))
+            dt = type(DataSource)(self._extract_name(path),
+                                  (DataSource,),
+                                  dict(__doc__=doc,
+                                       __module__=__name__,
+                                       class_context=self._context,
+                                       **infos))
         else:
             props = self.props.get(path, dict())
-            return type(DataObject)(self._extract_name(path),
-                                    (DataObject,),
-                                    dict(__doc__=doc,
-                                         __module__=__name__,
-                                         **props))
+            dt = type(DataObject)(self._extract_name(path),
+                                  (DataObject,),
+                                  dict(__doc__=doc,
+                                       __module__=__name__,
+                                       class_context=self._context,
+                                       **props))
+        if self._context is not None:
+            self._context.mapper.process_class(dt)
+        return dt
 
 
 # Copied from jsonschema...don't want to handle all that shit yet.
