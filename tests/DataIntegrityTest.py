@@ -252,3 +252,16 @@ class DataIntegrityTest(unittest.TestCase):
         for name in neuron.name.get():
             connected_neurons.add(name)
         self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))
+
+    def test_neuron_neurotransmitter(self):
+        '''
+        #257
+        '''
+
+        neuron = self.qctx(Neuron).query()
+        missing = []
+        for n in neuron.load():
+            if len(n.neurotransmitter()) == 0:
+                missing.append(n.name())
+        if missing:
+            self.fail("Neurons w/o neurotransmitters: " + ", ".join(missing))
