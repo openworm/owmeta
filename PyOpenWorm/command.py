@@ -398,9 +398,8 @@ class POWEvidence(object):
             Type of the object to show evidence
         '''
         from PyOpenWorm.evidence import Evidence
-        from PyOpenWorm.document import Document
-        from PyOpenWorm.website import Website
         from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+        from PyOpenWorm.contextDataObject import ContextDataObject
         ctx = self._parent._data_ctx.stored
         identifier = self._parent._den3(identifier)
         rdf_type = self._parent._den3(rdf_type)
@@ -410,41 +409,50 @@ class POWEvidence(object):
             from PyOpenWorm.dataObject import DataObject
             base_type = ctx(DataObject)
 
-        msg = self._parent.message
         q = base_type.query(ident=identifier)
         for l in q.load():
+            if isinstance(l, ContextDataObject):
+                evq = ctx(Evidence).query()
+                evq.supports(l)
+                self._message_evidence(evq)
             if isinstance(l, DataWithEvidenceDataSource):
                 evq = l.evidence_context.stored(Evidence).query()
-                for m in evq.load():
-                    ref = m.reference()
-                    if isinstance(ref, Document):
-                        msg(ref)
-                        titles = ['Author:',
-                                  'Title: ',
-                                  'URI:   ',
-                                  'DOI:   ',
-                                  'PMID:  ',
-                                  'WBID:  ']
-                        vals = [ref.author(),
-                                ref.title(),
-                                ref.uri(),
-                                ref.doi(),
-                                ref.pmid(),
-                                ref.wbid()]
-                        for title, v in zip(titles, vals):
-                            if v:
-                                msg(title, v)
-                        msg()
-                    elif isinstance(ref, Website):
-                        msg(ref)
-                        titles = ['Title: ',
-                                  'URL:   ']
-                        vals = [ref.title(),
-                                ref.url()]
-                        for title, v in zip(titles, vals):
-                            if v:
-                                msg(title, v)
-                        msg()
+                self._message_evidence(evq)
+
+    def _message_evidence(self, evq):
+        from PyOpenWorm.website import Website
+        from PyOpenWorm.document import Document
+        msg = self._parent.message
+        for m in evq.load():
+            ref = m.reference()
+            if isinstance(ref, Document):
+                msg(ref)
+                titles = ['Author:',
+                          'Title: ',
+                          'URI:   ',
+                          'DOI:   ',
+                          'PMID:  ',
+                          'WBID:  ']
+                vals = [ref.author(),
+                        ref.title(),
+                        ref.uri(),
+                        ref.doi(),
+                        ref.pmid(),
+                        ref.wbid()]
+                for title, v in zip(titles, vals):
+                    if v:
+                        msg(title, v)
+                msg()
+            elif isinstance(ref, Website):
+                msg(ref)
+                titles = ['Title: ',
+                          'URL:   ']
+                vals = [ref.title(),
+                        ref.url()]
+                for title, v in zip(titles, vals):
+                    if v:
+                        msg(title, v)
+                msg()
 
 
 class POWContexts(object):

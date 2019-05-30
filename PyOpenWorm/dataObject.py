@@ -156,7 +156,6 @@ TypeDataObject = None
 class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
-
         ctx = ContextMappedClass._find_class_context(dct, bases)
 
         if ctx is not None:
@@ -218,7 +217,14 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return base_ns
 
     def contextualize_class_augment(self, context):
-        res = super(ContextMappedClass, self).contextualize_class_augment(context)
+        '''
+        For MappedClass, rdf_type and rdf_namespace have special behavior where they can
+        be auto-generated based on the class name and base_namespace. We have to pass
+        through these values to our "proxy" to avoid this behavior
+        '''
+        res = super(ContextMappedClass, self).contextualize_class_augment(context,
+                rdf_type=self.rdf_type,
+                rdf_namespace=self.rdf_namespace)
         res.__module__ = self.__module__
         return res
 
@@ -250,11 +256,14 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         '''
         if self.__query_form is None:
             meta = type(self)
-            self.__query_form = meta(self.__name__, (_QueryMixin, self), {})
+            self.__query_form = meta(self.__name__, (_QueryMixin, self),
+                    dict(rdf_type=self.rdf_type,
+                         rdf_namespace=self.rdf_namespace))
             self.__query_form.__module__ = self.__module__
         return self.__query_form
 
     def _init_rdf_type_object(self):
+
         if not hasattr(self, 'rdf_type_object') or \
                 self.rdf_type_object is not None and self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
