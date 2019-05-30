@@ -1,5 +1,6 @@
 from rdflib.term import URIRef
-from PyOpenWorm.dataObject import DataObject, ObjectProperty, This
+from .dataObject import DataObject, ObjectProperty, This
+from .context import Context
 from .context_common import CONTEXT_IMPORTS
 
 
