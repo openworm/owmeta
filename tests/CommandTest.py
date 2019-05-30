@@ -18,10 +18,16 @@ from pytest import mark
 import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
-                                POWConfig, POWSource, POWTranslator, DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
+                                POWConfig, POWSource, POWTranslator, POWEvidence,
+                                DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
                                 POWDirDataSourceDirLoader, _DSD)
 from PyOpenWorm.datasource_loader import LoadFailed
+from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from PyOpenWorm.command_util import IVar, PropertyIVar
+from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.document import Document
+from PyOpenWorm.website import Website
+from PyOpenWorm.contextDataObject import ContextDataObject
 from .TestUtilities import noexit, stderr, stdout
 
 
@@ -458,7 +464,98 @@ class POWTest(BaseTest):
             c[0]._backer.save_context.assert_called()
 
 
-class POWTranslatorTest(BaseTest):
+class POWEvidenceGetDWEDSTest(unittest.TestCase):
+    def setUp(self):
+        self.parent = Mock(name='parent')
+        self.cut = POWEvidence(self.parent)
+
+        dweds = Mock(name='dweds', spec=DWEDS())
+        # load from the given identifier is a dweds
+        self.parent._data_ctx.stored(ANY).query().load.return_value = [dweds]
+        # load evidence from the evidence_context is just one evidence object
+        self.ev_load = dweds.evidence_context.stored(ANY).query().load
+
+    def test_doc(self):
+        # given
+        evid = Mock(name='evidence')
+        doc = Mock(name="doc", spec=Document())
+        self.ev_load.return_value = [evid]
+        evid.reference.return_value = doc
+
+        # when
+        self.cut.get(URIRef('http://example.org/context'))
+
+        # then
+        self.parent.message.assert_called()
+
+    def test_no_evidence(self):
+        '''
+        There's no evidence, so we shouldn't see any output
+        '''
+        # given
+        self.ev_load.return_value = []
+
+        # when
+        self.cut.get(URIRef('http://example.org/context'))
+
+        # then
+        self.parent.message.assert_not_called()
+
+
+class POWEvidenceGetContextTest(unittest.TestCase):
+    def setUp(self):
+        self.parent = Mock(name='parent')
+        self.cut = POWEvidence(self.parent)
+
+    def test_doc(self):
+        # given
+        evid = Mock(name='evidence')
+        doc = Mock(name="doc", spec=Document())
+        cdo = Mock(name='cdo', spec=ContextDataObject())
+        # load from the given identifier is a ContextDataObject
+        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+                                                                      [evid]]
+        evid.reference.return_value = doc
+
+        # when
+        self.cut.get(URIRef('http://example.org/context'))
+
+        # then
+        self.parent.message.assert_called()
+
+    def test_web(self):
+        # given
+        evid = Mock(name='evidence')
+        web = Mock(name="web", spec=Website())
+        cdo = Mock(name='cdo', spec=ContextDataObject())
+        # load from the given identifier is a ContextDataObject
+        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+                                                                      [evid]]
+        evid.reference.return_value = web
+
+        # when
+        self.cut.get(URIRef('http://example.org/context'))
+
+        # then
+        self.parent.message.assert_called()
+
+    def test_no_evidence(self):
+        '''
+        There's no evidence, so we shouldn't see any output
+        '''
+        # given
+        cdo = Mock(name='cdo', spec=ContextDataObject())
+        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+                                                                      []]
+
+        # when
+        self.cut.get(URIRef('http://example.org/context'))
+
+        # then
+        self.parent.message.assert_not_called()
+
+
+class POWTranslatorTest(unittest.TestCase):
 
     def test_translator_list(self):
         parent = Mock()

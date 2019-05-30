@@ -85,6 +85,13 @@ CLI_HINTS = {
             },
         },
     },
+    'PyOpenWorm.command.POWEvidence': {
+        'get': {
+            (METHOD_NAMED_ARG, 'identifier'): {
+                'names': ['identifier'],
+            },
+        },
+    },
     'PyOpenWorm.command.POWConfig': {
         'set': {
             (METHOD_NAMED_ARG, 'key'): {
