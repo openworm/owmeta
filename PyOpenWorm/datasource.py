@@ -446,7 +446,10 @@ class DataTranslator(BaseDataTranslator):
 
 
 class PersonDataTranslator(BaseDataTranslator):
-    """ A person who was responsible for carrying out the translation of a data source """
+    """
+    A person who was responsible for carrying out the translation of a data source
+    manually
+    """
 
     person = ObjectProperty(multiple=True)
     ''' A person responsible for carrying out the translation. '''

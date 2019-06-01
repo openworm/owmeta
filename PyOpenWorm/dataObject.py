@@ -423,6 +423,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         definition, then no special processing is done.
     '''
 
+    key_properties = None
+
     query_mode = False
 
     def __new__(cls, *args, **kwargs):
@@ -487,6 +489,38 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     @context.setter
     def context(self, value):
         self.__context = value
+
+    def make_identifier_from_properties(self, names):
+        '''
+        Creates an identifier from properties
+        '''
+        sdata = ''
+        for n in names:
+            prop = getattr(self, n)
+            val = prop.onedef()
+            if hasattr(val, 'identifier'):
+                sdata += val.identifier.n3()
+            else:
+                sdata += val
+        return self.make_identifier(sdata)
+
+    def defined_augment(self):
+        if self.key_properties is not None:
+            for k in self.key_properties:
+                attr = getattr(self, k, None)
+                if attr is None:
+                    raise Exception('Key property "{}" is not available on object'.format(k))
+                if not attr.has_defined_value():
+                    return False
+            return True
+        else:
+            return super(BaseDataObject, self).defined_augment()
+
+    def identifier_augment(self):
+        if self.key_properties is not None:
+            return self.make_identifier_from_properties(self.key_properties)
+        else:
+            return super(BaseDataObject, self).identifier_augment()
 
     def clear_po_cache(self):
         """ Clear the property-object cache for this object.

@@ -163,8 +163,9 @@ class POWTest(BaseTest):
 
     def test_user_config_HERE_relative(self):
         '''
-        $HERE should resolve relative to the config file
+        $HERE should resolve relative to the user config file
         '''
+        # setup
         self._init_conf()
         userconfdir = p(self.testdir, 'userconf')
         os.mkdir(userconfdir)

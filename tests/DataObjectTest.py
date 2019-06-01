@@ -9,7 +9,7 @@ from yarom.utils import FCN
 from yarom.graphObject import IdentifierMissingException
 
 from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, DatatypeProperty, _partial_property
+from PyOpenWorm.dataObject import DataObject, ObjectProperty, DatatypeProperty, _partial_property
 from PyOpenWorm.neuron import Neuron
 from PyOpenWorm.connection import Connection
 from PyOpenWorm.context import Context
@@ -249,6 +249,64 @@ class DataObjectTest(_DataTest):
         ctxd = ctx(A)
         qctxd = ctxd.query
         self.assertIs(ctxd.context, qctxd.context)
+
+
+class KeyPropertiesTest(_DataTest):
+
+    def test_defined(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            b = DatatypeProperty()
+            key_properties = ('a', 'b')
+
+        a = A()
+        a.a('hello')
+        a.b('dolly')
+        self.assertTrue(a.defined)
+
+    def test_undef(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            b = DatatypeProperty()
+            key_properties = ('a', 'b')
+
+        a = A()
+        a.a('hello')
+        self.assertFalse(a.defined)
+
+    def test_ident(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            b = DatatypeProperty()
+            key_properties = ('a', 'b')
+
+        a = A()
+        a.a('hello')
+        a.b('dolly')
+        self.assertIsInstance(a.identifier, R.URIRef)
+
+    def test_object_property_ident(self):
+        class A(DataObject):
+            a = ObjectProperty()
+            b = DatatypeProperty()
+            key_properties = ('a', 'b')
+
+        o1 = A()
+        o2 = A(ident='http://example.org/o2')
+        o1.a(o2)
+        o1.b('dolly')
+        self.assertIsInstance(o1.identifier, R.URIRef)
+
+    def test_missing_properties(self):
+        class A(DataObject):
+            a = ObjectProperty()
+            key_properties = ('a', 'not_an_attr')
+
+        o1 = A()
+        o2 = A(ident='http://example.org/o2')
+        o1.a(o2)
+        with self.assertRaisesRegexp(Exception, r'\bnot_an_attr\b'):
+            o1.defined
 
 
 class GMSRTTest(unittest.TestCase):
