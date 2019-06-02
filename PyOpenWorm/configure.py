@@ -105,6 +105,10 @@ class Configure(object):
     def __iter__(self):
         return iter(self._properties)
 
+    def items(self):
+        for k, v in self._properties.items():
+            yield (k, v.get())
+
     def link(self, *names):
         """ Call link() with the names of configuration values that should
         always be the same to link them together

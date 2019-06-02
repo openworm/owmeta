@@ -812,10 +812,16 @@ class POW(object):
                 with open(self.config.user_config_file) as user_config:
                     uc = json.load(user_config)
 
-            rc.update(uc)
+            # Pre-process the user-config to resolve variables based on the user
+            # config-file location
+            uc['configure.file_location'] = self.config.user_config_file
+            udat = Data.process_config(uc)
+
+            rc.update(udat.items())
             store_conf = rc.get('rdf.store_conf', None)
             if store_conf and isinstance(store_conf, string_types) and not isabs(store_conf):
                 rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
+            rc['configure.file_location'] = self.config_file
             dat = Data.process_config(rc)
             self._pow_connection = connect(conf=dat)
 

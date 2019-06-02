@@ -153,6 +153,42 @@ class POWTest(BaseTest):
         self.cut.context(c)
         self.assertEqual(self.cut.config.get(DATA_CONTEXT_KEY), c)
 
+    def test_config_HERE_relative(self):
+        '''
+        $HERE should resolve relative to the user config file
+        '''
+        self._init_conf({'key': '$HERE/irrelevant'})
+        conf = self.cut._conf()
+        self.assertEqual(conf['key'], p(self.cut.powdir, 'irrelevant'))
+
+    def test_user_config_HERE_relative(self):
+        '''
+        $HERE should resolve relative to the config file
+        '''
+        self._init_conf()
+        userconfdir = p(self.testdir, 'userconf')
+        os.mkdir(userconfdir)
+        userconf = p(userconfdir, 'user.conf')
+        self.cut.config = Mock()
+        with open(userconf, 'w') as f:
+            f.write('{"key": "$HERE/irrelevant"}')
+        self.cut.config.user_config_file = userconf
+        conf = self.cut._conf()
+        self.assertEqual(conf['key'], p(userconfdir, 'irrelevant'))
+
+    def test_config_HERE_relative_configured(self):
+        '''
+        $HERE should resolve relative to the config file
+        '''
+        userconfdir = p(self.testdir, 'movedconf')
+        os.mkdir(userconfdir)
+        userconf = p(userconfdir, 'pow.conf')
+        with open(userconf, 'w') as f:
+            f.write('{"key": "$HERE/irrelevant"}')
+        self.cut.config_file = userconf
+        conf = self.cut._conf()
+        self.assertEqual(conf['key'], p(userconfdir, 'irrelevant'))
+
     def test_context_set_user_override(self):
         c = 'http://example.org/context'
         d = 'http://example.org/context_override'
@@ -640,8 +676,7 @@ class GitCommandTest(BaseTest):
         # dirty up the index
         repo = git.Repo(self.cut.powdir)
         f = p(self.cut.powdir, 'something')
-        with open(f, 'w'):
-            pass
+        open(f, 'w').close()
 
         self.cut.commit('Commit Message 1')
 
@@ -658,8 +693,7 @@ class GitCommandTest(BaseTest):
         # dirty up the index
         repo = git.Repo(self.cut.powdir)
         f = p(self.cut.powdir, 'something')
-        with open(f, 'w'):
-            pass
+        open(f, 'w').close()
 
         self.cut.commit('Commit Message 1')
 
@@ -713,6 +747,7 @@ class CloneProgressTest(unittest.TestCase):
         _CloneProgress(pr)
 
 
+@mark.inttest
 class ConfigTest(unittest.TestCase):
 
     def setUp(self):
