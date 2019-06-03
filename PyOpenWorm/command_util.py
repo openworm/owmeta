@@ -3,16 +3,18 @@ class IVar(object):
     A descriptor for instance variables amended to provide some attributes like
     default values, value types, etc.
     '''
+
+    _instance_counter = 0
+
     def __init__(self, default_value=None, doc=None, value_type=str, name=None):
+        self.name = ('_ivar_' + str(IVar._instance_counter)) if name is None else name
+        IVar._instance_counter += 1
         self.default_value = default_value
-        self.name = '_ivar_' + str(id(self)) if name is None else name
         self.__doc__ = doc.strip() if doc is not None else doc
         self.value_type = value_type
 
     def __get__(self, target, typ=None):
-        res = getattr(target, self.name, self.default_value)
-        ha = hasattr(target, self.name)
-        return res
+        return getattr(target, self.name, self.default_value)
 
     def __set__(self, target, value):
         setattr(target, self.name, value)
@@ -60,9 +62,9 @@ class SubCommand(object):
 class PropertyIVar(IVar):
     def __init__(self, *args, **kwargs):
         super(PropertyIVar, self).__init__(*args, **kwargs)
-        self._have_set = True
         self.value_getter = None
         self.value_setter = None
+        self._setter_called_flag = '_' + self.name + '_is_set'
 
     def setter(self, fset):
         res = type(self)(default_value=self.default_value,
@@ -71,14 +73,13 @@ class PropertyIVar(IVar):
                          name=self.name)
         res.value_getter = self.value_getter
         res.value_setter = fset
-        res._have_set = False
         return res
 
     def __set__(self, target, value):
         if self.value_setter is None:
             raise AttributeError("can't set attribute")
+        setattr(target, self._setter_called_flag, True)
         self.value_setter(target, value)
-        self._have_set = True
 
     def __get__(self, target, objecttype=None):
         ''' Executes the provided getter
@@ -90,6 +91,8 @@ class PropertyIVar(IVar):
         if target is None:
             return self
 
-        if not self._have_set:
+        if self.value_setter is not None and \
+                not hasattr(target, self._setter_called_flag):
+            setattr(target, self._setter_called_flag, True)
             self.value_setter(target, self.default_value)
         return self.value_getter(target)
