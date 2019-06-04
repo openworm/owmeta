@@ -20,7 +20,12 @@ from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
 class ConnectomeCSVDataSource(CSVDataSource):
-    pass
+    '''
+    A CSV data source whose CSV file describes a neural connectome
+
+    Basically, this is just a marker type to indicate what's described in the CSV --
+    there's no consistent schema
+    '''
 
 
 class NeuronConnectomeCSVTranslation(GenericTranslation):
@@ -159,6 +164,91 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
 
         except Exception:
             traceback.print_exc()
+        return res
+
+
+class NeuronConnectomeCSVTranslation(GenericTranslation):
+    def __init__(self, **kwargs):
+        super(NeuronConnectomeCSVTranslation, self).__init__(**kwargs)
+        self.neurons_source = NeuronConnectomeCSVTranslation.ObjectProperty()
+        self.muscles_source = NeuronConnectomeCSVTranslation.ObjectProperty()
+
+    def defined_augment(self):
+        return super(NeuronConnectomeCSVTranslation, self).defined_augment() and \
+                self.neurons_source.has_defined_value() and \
+                self.muscles_source.has_defined_value()
+
+    def identifier_augment(self):
+        return self.make_identifier(super(NeuronConnectomeCSVTranslation, self).identifier_augment().n3() +
+                                    self.neurons_source.onedef().identifier.n3() +
+                                    self.muscles_source.onedef().identifier.n3())
+
+
+class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
+    '''
+    Adds synapse classes to existing connections
+    '''
+
+    translator_identifier = TRANS_NS.NeuronConnectomeSynapseClassTranslator
+
+    input_type = (ConnectomeCSVDataSource, DataWithEvidenceDataSource)
+    output_type = DataWithEvidenceDataSource
+
+    def make_translation(self, sources):
+        tr = super(NeuronConnectomeSynapseClassTranslator, self).make_translation()
+        tr.source(sources[0])
+        tr.neurons_source(sources[1])
+        tr.muscles_source(sources[2])
+        return tr
+
+    def translate(self, data_source, neurotransmitter_source):
+        res = self.make_new_output(sources=(data_source, neurotransmitter_source))
+        doc = res.evidence_context(Document)(author=['Dimitar Sht. Shterionov', 'Gerda Janssens'],
+                       title='Data acquisition and modeling for learning and'
+                             ' reasoning in probabilistic logic environment',
+                       year=2011,
+                       uri='https://groups.google.com/forum/m/#!topic/openworm-discuss/G9wKoR8N-l0/discussion')
+        e = res.evidence_context(Evidence)(key="shterionov2011", reference=doc)
+
+        # We don't use doc.as_context for the statements' context because the document
+        # itself doesn't actually make the statements below, although it does *support*
+        # them by describing the process by which they are derived
+        docctx = res.evidence_context(Context)(ident=self.translator_identifier + '#shterionov2011-context')
+
+        # There are many entries in the Shterionov data where the number of synapses
+        # doesn't match that in, say, the Emmons (2015) data. We distinguish these so it's
+        # easy to look back at the differences later, but the different number of synapses
+        # isn't recorded here.
+        docctx_anynum = res.evidence_context(Context)(ident=self.translator_identifier
+                                                      + '#shterionov2011-context-any-number')
+        e.supports(docctx.rdf_object)
+        res.data_context.add_import(docctx)
+        with self.make_reader(neurotransmitter_source,
+                              skipheader=False,
+                              delimiter=';') as reader:
+            for row in reader:
+                pre, post, typ, number, nt = row
+                with data_source.data_context.stored(Connection, Neuron) as srcctx:
+                    conn = srcctx.Connection.query(pre_cell=srcctx.Neuron(pre),
+                                                   post_cell=srcctx.Neuron(post),
+                                                   number=int(number),
+                                                   syntype=typ)
+                    hit = False
+                    for c in conn.load():
+                        docctx(c).synclass(nt)
+                        hit = True
+
+                    if not hit:
+                        conn = srcctx.Connection.query(pre_cell=srcctx.Neuron(pre),
+                                                       post_cell=srcctx.Neuron(post),
+                                                       syntype=typ)
+                        hit = False
+                        for c in conn.load():
+                            docctx(c).synclass(nt)
+                            hit = True
+                        if not hit:
+                            print("Didn't find any connections matching: {}".format(conn))
+
         return res
 
 
