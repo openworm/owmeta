@@ -13,7 +13,7 @@ like "Who made these statements?" or "When were these statements made?". That's
 the main usage. Beyond that, we need a way to share statements. Contexts have
 identifiers by which we can naturally refer to contexts from other contexts.
 
-POW need a way to represent contexts with the existing statement form. Other
+POW needs a way to represent contexts with the existing statement form. Other
 alternatives were considered, such as using Python's context managers, but I
 (Mark) also wanted a way to put statements in a context that could also be
 carried with the subject of the statement. Using the `wrapt <wrapt_>`_
