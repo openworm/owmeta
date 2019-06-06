@@ -285,6 +285,80 @@ class KeyPropertiesTest(_DataTest):
         a.b('dolly')
         self.assertIsInstance(a.identifier, R.URIRef)
 
+    def test_ident_pass_ident(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            b = DatatypeProperty()
+            key_properties = (a, b)
+
+        a = A()
+        a.a('hello')
+        a.b('dolly')
+        self.assertIsInstance(a.identifier, R.URIRef)
+
+    def test_ident_pass_ident_and_string(self):
+        class A(DataObject):
+            a = DatatypeProperty()
+            b = DatatypeProperty()
+            key_properties = (a, 'b')
+
+        a = A()
+        a.a('hello')
+        a.b('dolly')
+        self.assertIsInstance(a.identifier, R.URIRef)
+
+    def test_ident_pass_ident_and_string_from_parent(self):
+        class B(DataObject):
+            b = DatatypeProperty()
+
+        class A(B):
+            a = DatatypeProperty()
+            key_properties = (a, 'b')
+
+        a = A()
+        a.a('hello')
+        a.b('dolly')
+        self.assertIsInstance(a.identifier, R.URIRef)
+
+    def test_ident_undef_ident_and_string_from_parent(self):
+        class B(DataObject):
+            prop = DatatypeProperty()
+
+        class A(B):
+            a = DatatypeProperty()
+            key_properties = (a, 'prop')
+
+        a = A()
+        a.a('hello')
+        self.assertFalse(a.defined)
+
+    def test_ident_undef_ident_and_ident_from_parent(self):
+        class B(DataObject):
+            prop = DatatypeProperty()
+
+        class A(B):
+            a = DatatypeProperty()
+            key_properties = (a, B.prop)
+
+        a = A()
+        a.a('hello')
+        self.assertFalse(a.defined)
+
+    def test_error_non_property_pthunk(self):
+        with self.assertRaisesRegexp(Exception, r'\bcookie\b'):
+            class B(DataObject):
+                a = DatatypeProperty()
+                key_properties = (a, DatatypeProperty(name="cookie"))
+
+    def test_error_non_property_PropertyProperty(self):
+        class A(DataObject):
+            cookie = DatatypeProperty()
+
+        with self.assertRaisesRegexp(Exception, r'cookie'):
+            class B(DataObject):
+                prop = DatatypeProperty()
+                key_properties = (prop, A.cookie)
+
     def test_object_property_ident(self):
         class A(DataObject):
             a = ObjectProperty()

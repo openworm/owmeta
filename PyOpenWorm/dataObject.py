@@ -57,6 +57,9 @@ class PropertyProperty(property):
     def __getattr__(self, attr):
         return getattr(self._cls, attr)
 
+    def __repr__(self):
+        return '{}(cls={})'.format(FCN(type(self)), repr(self._cls))
+
 
 def mp(c, k):
     ak = '_pow_' + k
@@ -107,8 +110,8 @@ class APThunk(PThunk):
         return self.result
 
     def __repr__(self):
-        return '{}({}, {})'.format(self.t, ',\n'.join(self.args),
-                                   ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
+        return '{}({}{})'.format(self.t, self.args and ',\n'.join(self.args) + ', ' or '',
+                                 ',\n'.join(k + '=' + str(v) for k, v in self.kwargs.items()))
 
 
 class Alias(object):
@@ -182,6 +185,34 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
             if isinstance(v, Alias):
                 setattr(self, k, getattr(self, v.target.result.linkName))
                 self._property_classes[k] = v.target.result
+
+        key_properties = dct.get('key_properties')
+        if key_properties is not None:
+            new_key_properties = []
+            for kp in key_properties:
+                if isinstance(kp, PThunk):
+                    for k, p in self._property_classes.items():
+                        if p is kp.result:
+                            new_key_properties.append(k)
+                            break
+                    else:
+                        raise Exception(("The provided 'key_properties' entry, {},"
+                                " does not appear to be a property").format(kp))
+                elif isinstance(kp, PropertyProperty):
+                    for k, p in self._property_classes.items():
+                        print(k, p, kp._cls)
+                        if p is kp._cls:
+                            new_key_properties.append(k)
+                            break
+                    else:
+                        raise Exception(("The provided 'key_properties' entry, {},"
+                                " does not appear to be a property for this class").format(kp))
+                elif isinstance(kp, six.string_types):
+                    new_key_properties.append(kp)
+                else:
+                    raise Exception("The provided 'key_properties' entry does not appear"
+                            " to be a property")
+            self.key_properties = tuple(new_key_properties)
 
         self.init_rdf_type_object()
 
