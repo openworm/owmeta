@@ -13,6 +13,7 @@ from ..muscle import Muscle
 from ..worm import Worm
 from ..network import Network
 from ..datasource import GenericTranslation
+from ..dataObject import DatatypeProperty, ObjectProperty
 
 from .csv_ds import CSVDataTranslator, CSVDataSource
 from .common_data import TRANS_NS
@@ -29,20 +30,11 @@ class ConnectomeCSVDataSource(CSVDataSource):
 
 
 class NeuronConnectomeCSVTranslation(GenericTranslation):
-    def __init__(self, **kwargs):
-        super(NeuronConnectomeCSVTranslation, self).__init__(**kwargs)
-        self.neurons_source = NeuronConnectomeCSVTranslation.ObjectProperty()
-        self.muscles_source = NeuronConnectomeCSVTranslation.ObjectProperty()
 
-    def defined_augment(self):
-        return super(NeuronConnectomeCSVTranslation, self).defined_augment() and \
-                self.neurons_source.has_defined_value() and \
-                self.muscles_source.has_defined_value()
+    neurons_source = ObjectProperty(value_type=DataWithEvidenceDataSource)
+    muscles_source = ObjectProperty(value_type=DataWithEvidenceDataSource)
 
-    def identifier_augment(self):
-        return self.make_identifier(super(NeuronConnectomeCSVTranslation, self).identifier_augment().n3() +
-                                    self.neurons_source.onedef().identifier.n3() +
-                                    self.muscles_source.onedef().identifier.n3())
+    key_properties = (GenericTranslation.source, muscles_source, neurons_source)
 
 
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
@@ -167,21 +159,10 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         return res
 
 
-class NeuronConnectomeCSVTranslation(GenericTranslation):
-    def __init__(self, **kwargs):
-        super(NeuronConnectomeCSVTranslation, self).__init__(**kwargs)
-        self.neurons_source = NeuronConnectomeCSVTranslation.ObjectProperty()
-        self.muscles_source = NeuronConnectomeCSVTranslation.ObjectProperty()
+class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
+    neurotransmitter_source = ObjectProperty()
 
-    def defined_augment(self):
-        return super(NeuronConnectomeCSVTranslation, self).defined_augment() and \
-                self.neurons_source.has_defined_value() and \
-                self.muscles_source.has_defined_value()
-
-    def identifier_augment(self):
-        return self.make_identifier(super(NeuronConnectomeCSVTranslation, self).identifier_augment().n3() +
-                                    self.neurons_source.onedef().identifier.n3() +
-                                    self.muscles_source.onedef().identifier.n3())
+    key_properties = (GenericTranslation.source, neurotransmitter_source)
 
 
 class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
@@ -190,15 +171,15 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
     '''
 
     translator_identifier = TRANS_NS.NeuronConnectomeSynapseClassTranslator
+    translation_type = NeuronConnectomeSynapseClassTranslation
 
-    input_type = (ConnectomeCSVDataSource, DataWithEvidenceDataSource)
+    input_type = (DataWithEvidenceDataSource, ConnectomeCSVDataSource)
     output_type = DataWithEvidenceDataSource
 
     def make_translation(self, sources):
         tr = super(NeuronConnectomeSynapseClassTranslator, self).make_translation()
         tr.source(sources[0])
-        tr.neurons_source(sources[1])
-        tr.muscles_source(sources[2])
+        tr.neurotransmitter_source(sources[1])
         return tr
 
     def translate(self, data_source, neurotransmitter_source):
@@ -330,4 +311,6 @@ def expand_muscle(ctx, name):
 
 __yarom_mapped_classes__ = (ConnectomeCSVDataSource,
                             NeuronConnectomeCSVTranslation,
-                            NeuronConnectomeCSVTranslator)
+                            NeuronConnectomeCSVTranslator,
+                            NeuronConnectomeSynapseClassTranslator,
+                            NeuronConnectomeSynapseClassTranslation)

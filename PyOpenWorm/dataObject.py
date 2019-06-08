@@ -537,11 +537,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         sdata = ''
         for n in names:
             prop = getattr(self, n)
-            val = prop.onedef()
-            if hasattr(val, 'identifier'):
-                sdata += val.identifier.n3()
-            else:
-                sdata += val
+            val = prop.defined_values[0]
+            sdata += val.identifier.n3()
         return self.make_identifier(sdata)
 
     def defined_augment(self):

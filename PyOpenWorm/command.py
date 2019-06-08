@@ -645,11 +645,15 @@ class POW(object):
         '''
         import transaction
         import importlib as IM
+        import functools
         conf = self._conf()
+        mapper = conf['mapper']
 
-        m = IM.import_module(module)
+        m = mapper.load_module(module)
+        provider_not_set = provider is None
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
+
         if not context:
             ctx = _POWSaveContext(self._data_ctx, m)
         else:
@@ -657,8 +661,29 @@ class POW(object):
         attr_chain = provider.split('.')
         p = m
         for x in attr_chain:
-            p = getattr(p, x)
+            try:
+                p = getattr(p, x)
+            except AttributeError:
+                if provider_not_set and getattr(m, '__yarom_mapped_classes__', None):
+                    def p(*args, **kwargs):
+                        pass
+                    break
+                raise
         ns = POWSaveNamespace(context=ctx)
+
+        mapped_classes = getattr(m, '__yarom_mapped_classes__', None)
+        if mapped_classes:
+            # It's a module with class definitions -- take each of the mapped
+            # classes
+            np = p
+
+            @functools.wraps(p)
+            def save_classes(ns):
+                for mapped_class in mapped_classes:
+                    ns.include_context(mapped_class.definition_context)
+                np(ns)
+            p = save_classes
+
         with transaction.manager:
             p(ns)
             ns.save(graph=conf['rdf.graph'])
@@ -1610,8 +1635,16 @@ class POWSaveNamespace(object):
         self._external_contexts = set()
 
     def new_context(self, ctx_id):
-        res = self.context(type(self.context))(self.context(Context)(ident=ctx_id, conf=self.context.conf),
-                user_module=self.context._user_mod)
+        # Get the type of our context contextualized *with* our context
+        ctx_type = self.context(type(self.context))
+
+        # Make the "backing" context for the result we return
+        new_ctx = self.context(Context)(ident=ctx_id, conf=self.context.conf)
+
+        # Make the "wrapper" context and pass through the user's module for validation
+        res = ctx_type(new_ctx, user_module=self.context._user_mod)
+
+        # Finally, add the context
         self._created_ctxs.add(res)
         return res
 

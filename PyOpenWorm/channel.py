@@ -15,7 +15,7 @@ class ExpressionPattern(BiologyType):
     ''' The ID for the expression pattern in Wormbase '''
 
     wormbaseID = Alias(wormbaseid)
-    ''' Alias to `wormbaseid` '''
+    ''' Alias to :py:attr:`wormbaseid` '''
 
     wormbaseURL = DatatypeProperty()
     ''' The URL for the expression pattern in Wormbase '''

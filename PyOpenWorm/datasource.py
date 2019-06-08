@@ -292,7 +292,7 @@ class GenericTranslation(Translation):
 
     def identifier_augment(self):
         data = super(GenericTranslation, self).identifier_augment().n3() + \
-                "".join(x.identifier.n3() for x in self.source.defined_values)
+                "".join(sorted(x.identifier.n3() for x in self.source.defined_values))
         return self.make_identifier(data)
 
     def __str__(self):

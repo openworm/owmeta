@@ -28,6 +28,7 @@ from PyOpenWorm.evidence import Evidence
 from PyOpenWorm.document import Document
 from PyOpenWorm.website import Website
 from PyOpenWorm.contextDataObject import ContextDataObject
+from textwrap import dedent
 from .TestUtilities import noexit, stderr, stdout
 
 
@@ -463,6 +464,51 @@ class POWTest(BaseTest):
             im().test.side_effect = f
             self.cut.save('tests', 'test')
             c[0]._backer.save_context.assert_called()
+
+    def test_save_no_such_attr(self):
+        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        with patch('importlib.import_module') as im:
+            with self.assertRaisesRegexp(AttributeError, r'\btest\b'):
+                im.return_value = Mock(spec=[])
+                self.cut.save('tests', 'test')
+
+    def test_save_no_such_attr_yarom_mapped_classes_1(self):
+        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        with patch('importlib.import_module') as im:
+            with self.assertRaisesRegexp(AttributeError, r'\btest\b'):
+                module = Mock(spec=['__yarom_mapped_classes__'])
+                module.__yarom_mapped_classes__ = [Mock()]
+                im.return_value = module
+                self.cut.save('tests', 'test')
+
+    def test_save_no_such_attr_yarom_mapped_classes_2(self):
+        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        with patch('importlib.import_module') as im:
+            with self.assertRaisesRegexp(AttributeError, r'\b' + DEFAULT_SAVE_CALLABLE_NAME + r'\b'):
+                module = Mock(spec=['__yarom_mapped_classes__'])
+                module.__yarom_mapped_classes__ = [Mock()]
+                im.return_value = module
+                self.cut.save('tests', DEFAULT_SAVE_CALLABLE_NAME)
+
+    def test_save_no_provider_yarom_mapped_classes(self):
+        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        with patch('importlib.import_module') as im:
+            module = Mock(spec=['__yarom_mapped_classes__'])
+            # must have at least one entry in mapped classes
+            module.__yarom_mapped_classes__ = [Mock()]
+            im.return_value = module
+            self.cut.save('tests')
+            # then, no exception was raised
+
+    def test_save_no_provider_yarom_mapped_classes(self):
+        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        with patch('importlib.import_module') as im:
+            module = Mock(spec=['__yarom_mapped_classes__'])
+            # must have at least one entry in mapped classes
+            module.__yarom_mapped_classes__ = [Mock()]
+            im.return_value = module
+            self.cut.save('tests')
+            # then, no exception was raised
 
 
 class POWEvidenceGetDWEDSTest(unittest.TestCase):
@@ -1098,42 +1144,6 @@ class POWAccTest(unittest.TestCase):
         out = self.sh('pow source list --kind :DataWithEvidenceDataSource')
         self.assertRegexpMatches(out, r'<[^>]+>')
 
-    def t_save_diff(self):
-        ''' Change something and make a diff '''
-        modpath = p(self.testdir, 'test_module')
-        os.mkdir(modpath)
-        open(p(modpath, '__init__.py'), 'w').close()
-        with open(p(modpath, 'command_test_save.py'), 'w') as out:
-            print(r'''
-from test_module.monkey import Monkey
-
-
-def pow_data(ns):
-    ns.context.add_import(Monkey.definition_context)
-    ns.context(Monkey)(bananas=55)
-''', file=out)
-
-        with open(p(modpath, 'monkey.py'), 'w') as out:
-            print(r'''
-from PyOpenWorm.dataObject import DataObject, DatatypeProperty
-
-
-class Monkey(DataObject):
-    class_context = 'http://example.org/primate/monkey'
-
-    bananas = DatatypeProperty()
-    def identifier_augment(self):
-        return type(self).rdf_namespace['paul']
-
-    def defined_augment(self):
-        return True
-
-
-__yarom_mapped_classes__ = (Monkey,)
-''', file=out)
-        print(self.sh('pow save --module test_module.command_test_save'))
-        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
-
     def t_manual_graph_edit_no_diff(self):
         '''
         Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
@@ -1148,6 +1158,67 @@ __yarom_mapped_classes__ = (Monkey,)
     def t_list_contexts(self):
         ''' Test we have some contexts '''
         self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
+
+    def t_save_diff(self):
+        ''' Change something and make a diff '''
+        modpath = p(self.testdir, 'test_module')
+        os.mkdir(modpath)
+        open(p(modpath, '__init__.py'), 'w').close()
+        with open(p(modpath, 'command_test_save.py'), 'w') as out:
+            print(dedent('''\
+                    from test_module.monkey import Monkey
+
+
+                    def pow_data(ns):
+                        ns.context.add_import(Monkey.definition_context)
+                        ns.context(Monkey)(bananas=55)
+                    '''), file=out)
+
+        with open(p(modpath, 'monkey.py'), 'w') as out:
+            print(dedent('''\
+                    from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+
+
+                    class Monkey(DataObject):
+                        class_context = 'http://example.org/primate/monkey'
+
+                        bananas = DatatypeProperty()
+                        def identifier_augment(self):
+                            return type(self).rdf_namespace['paul']
+
+                        def defined_augment(self):
+                            return True
+
+
+                    __yarom_mapped_classes__ = (Monkey,)
+                    '''), file=out)
+        print(self.sh('pow save --module test_module.command_test_save'))
+        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
+
+    def t_save_classes(self):
+        modpath = p(self.testdir, 'test_module')
+        os.mkdir(modpath)
+        open(p(modpath, '__init__.py'), 'w').close()
+        with open(p(modpath, 'monkey.py'), 'w') as out:
+            print(dedent('''\
+                    from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+
+
+                    class Monkey(DataObject):
+                        class_context = 'http://example.org/primate/monkey'
+
+                        bananas = DatatypeProperty()
+                        def identifier_augment(self):
+                            return type(self).rdf_namespace['paul']
+
+                        def defined_augment(self):
+                            return True
+
+
+                    __yarom_mapped_classes__ = (Monkey,)
+                    '''), file=out)
+        print(self.sh('pow save --module test_module.monkey'))
+        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
 
 class _TestException(Exception):

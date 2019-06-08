@@ -44,6 +44,9 @@ class Connection(BiologyType):
     termination = DatatypeProperty()
     ''' Where the connection terminates. Inferred from type of post_cell at initialization '''
 
+    key_properties = (pre_cell, post_cell, syntype)
+
+    # Arguments are given explicitly here to support positional arguments
     def __init__(self,
                  pre_cell=None,
                  post_cell=None,
@@ -73,33 +76,12 @@ class Connection(BiologyType):
             elif syntype in ('gapjunction', SynapseType.GapJunction):
                 self.syntype(SynapseType.GapJunction)
 
-    def defined_augment(self):
-        return (self.pre_cell.has_defined_value() and
-                self.post_cell.has_defined_value() and
-                self.syntype.has_defined_value())
-
-    def identifier_augment(self):
-        data = (self.pre_cell,
-                self.post_cell,
-                self.syntype)
-        data = tuple(x.defined_values[0].identifier.n3() for x in data)
-        data = "".join(data)
-        return self.make_identifier(data)
-
     def __str__(self):
         nom = []
-        if self.pre_cell.has_defined_value():
-            nom.append(('pre_cell', self.pre_cell.values[0]))
-        if self.post_cell.has_defined_value():
-            nom.append(('post_cell', self.post_cell.values[0]))
-        if self.syntype.has_defined_value():
-            nom.append(('syntype', self.syntype.values[0]))
-        if self.termination.has_defined_value():
-            nom.append(('termination', self.termination.values[0]))
-        if self.number.has_defined_value():
-            nom.append(('number', self.number.values[0]))
-        if self.synclass.has_defined_value():
-            nom.append(('synclass', self.synclass.values[0]))
+        props = ('pre_cell', 'post_cell', 'syntype', 'termination', 'number', 'synclass',)
+        for p in props:
+            if getattr(self, p).has_defined_value():
+                nom.append((p, getattr(self, p).defined_values[0]))
         if len(nom) == 0:
             return super(Connection, self).__str__()
         else:

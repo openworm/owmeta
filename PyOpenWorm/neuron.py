@@ -90,7 +90,7 @@ class Neuron(Cell):
     ''' Name of the gene corresponding to the neuropeptide produced by this neuron '''
 
     receptors = Alias(receptor)
-    ''' Alias to receptor '''
+    ''' Alias to py:attr:`receptor` '''
 
     def __init__(self, name=False, **kwargs):
         super(Neuron, self).__init__(name=name, **kwargs)
