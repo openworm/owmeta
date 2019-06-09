@@ -1151,7 +1151,7 @@ class POW(object):
 
     def _lookup_source(self, sname):
         from PyOpenWorm.datasource import DataSource
-        for x in self._data_ctx.stored(DataSource)(ident=sname).load():
+        for x in self._data_ctx.stored(DataSource)(ident=self._den3(sname)).load():
             provide(x, self._cap_provs)
             return x
 
@@ -1180,7 +1180,7 @@ class POW(object):
             Identifier for the data source to reconstitute
         '''
 
-    def serialize(self, context=None, destination=None, format='nquads', whole_graph=False):
+    def serialize(self, context=None, destination=None, format='nquads', include_imports=False, whole_graph=False):
         '''
         Serialize the current data context or the one provided
 
@@ -1192,6 +1192,9 @@ class POW(object):
             A file-like object to write the file to or a file name. If not provided, messages the result.
         format : str
             Serialization format (ex, 'n3', 'nquads')
+        include_imports : bool
+            If true, then include contexts imported by the provided context in the result.
+            The default is not to include imported contexts.
         whole_graph: bool
             Serialize all contexts from all graphs (this probably isn't what you want)
         '''
@@ -1205,12 +1208,15 @@ class POW(object):
         if context is None:
             ctx = self._data_ctx
         else:
-            ctx = Context(ident=context, conf=self._conf())
+            ctx = Context(ident=self._den3(context), conf=self._conf())
 
         if whole_graph:
             self._conf()['rdf.graph'].serialize(destination, format=format)
         else:
-            ctx.stored.rdf_graph().serialize(destination, format=format)
+            if include_imports:
+                ctx.stored.rdf_graph().serialize(destination, format=format)
+            else:
+                ctx.own_stored.rdf_graph().serialize(destination, format=format)
 
         if retstr:
             self.message(destination.getvalue().decode(encoding='utf-8'))
