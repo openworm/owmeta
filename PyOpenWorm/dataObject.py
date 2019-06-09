@@ -200,7 +200,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                                 " does not appear to be a property").format(kp))
                 elif isinstance(kp, PropertyProperty):
                     for k, p in self._property_classes.items():
-                        print(k, p, kp._cls)
                         if p is kp._cls:
                             new_key_properties.append(k)
                             break
