@@ -21,4 +21,5 @@ http://openworm.org/entities/WormAtlasCellListDataSource/WormAtlasCellList 4cbb9
 http://openworm.org/entities/WormBaseCSVDataSource/WormBaseCSVDataSource 4cbb96ef-710a-4731-b1cb-f104164678d1
 http://openworm.org/entities/WormbaseIonChannelCSVDataSource/WormbaseIonChannelCSVDataSource 4cbb96ef-710a-4731-b1cb-f104164678d1
 http://openworm.org/entities/WormbaseTextMatchCSVDataSource/WormbaseTextMatchCSVChannelMuscleDataSource 4cbb96ef-710a-4731-b1cb-f104164678d1
+http://openworm.org/entities/WormbaseTextMatchCSVDataSource/WormbaseTextMatchCSVChannelNeuronDataSource 4cbb96ef-710a-4731-b1cb-f104164678d1
 http://openworm.org/entities/ConnectomeCSVDataSource/Shterionov2011_connections 4cbb96ef-710a-4731-b1cb-f104164678d1
