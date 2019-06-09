@@ -134,18 +134,23 @@ class RDFContextStore(Store):
     # Returns triples imported by the given context
     context_aware = True
 
-    def __init__(self, context=None, imports_graph=None, **kwargs):
+    def __init__(self, context=None, imports_graph=None, include_imports=True, **kwargs):
         super(RDFContextStore, self).__init__(**kwargs)
         self.__graph = context.rdf
         self.__imports_graph = imports_graph
         self.__store = self.__graph.store
         self.__context = context
         self.__context_transitive_imports = None
+        self.__include_imports = include_imports
 
     def __init_contexts(self):
         if self.__store is not None and self.__context_transitive_imports is None:
-            imports = transitive_lookup(self.__store, self.__context.identifier, CONTEXT_IMPORTS, self.__imports_graph)
-            self.__context_transitive_imports = imports
+            if self.__include_imports:
+                imports = transitive_lookup(self.__store,
+                                            self.__context.identifier, CONTEXT_IMPORTS, self.__imports_graph)
+                self.__context_transitive_imports = imports
+            else:
+                self.__context_transitive_imports = set([self.__context.identifier])
 
     def triples(self, pattern, context=None):
         self.__init_contexts()

@@ -302,6 +302,9 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
             identpart = 'ident="{}"'.format(ident)
         return '{}({})'.format(FCN(type(self)), identpart)
 
+    def load_own_graph_from_configured_store(self):
+        return ConjunctiveGraph(store=RDFContextStore(self, include_imports=False))
+
     def load_graph_from_configured_store(self):
         return ConjunctiveGraph(store=RDFContextStore(self))
 
@@ -338,6 +341,14 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         return QueryContext(
                 mapper=self.mapper,
                 graph=self.load_graph_from_configured_store(),
+                ident=self.identifier,
+                conf=self.conf)
+
+    @property
+    def own_stored(self):
+        return QueryContext(
+                mapper=self.mapper,
+                graph=self.load_own_graph_from_configured_store(),
                 ident=self.identifier,
                 conf=self.conf)
 

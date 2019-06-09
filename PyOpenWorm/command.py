@@ -384,7 +384,7 @@ def default_progress_reporter(*args, **kwargs):
     yield _PROGRESS_MOCK
 
 
-possible_editors = [
+POSSIBLE_EDITORS = [
     '/usr/bin/vi',
     '/usr/bin/vim',
     '/usr/bin/nano',
@@ -520,13 +520,14 @@ class POWContexts(object):
         if not editor:
             editor = os.environ['EDITOR'].strip()
 
-        for editor in possible_editors:
-            if hasattr(shutil, 'which'):
-                editor = shutil.which(editor)
-                if editor:
+        if not editor:
+            for editor in POSSIBLE_EDITORS:
+                if hasattr(shutil, 'which'):
+                    editor = shutil.which(editor)
+                    if editor:
+                        break
+                elif os.access(editor, os.R_OK | os.X_OK):
                     break
-            elif os.access(editor, os.R_OK | os.X_OK):
-                break
 
         if not editor:
             raise GenericUserError("No known editor could be found")
@@ -539,7 +540,7 @@ class POWContexts(object):
             fname = pth_join(d, 'data')
             with transaction.manager:
                 with open(fname, mode='wb') as destination:
-                    ctx.stored.rdf_graph().serialize(destination, format=format)
+                    ctx.own_stored.rdf_graph().serialize(destination, format=format)
                 call([editor, fname])
                 with open(fname, mode='rb') as source:
                     g = self._parent._rdf.get_context(ctxid)
