@@ -1,0 +1,10 @@
+<http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> <http://openworm.org/entities/Document/author> "[\"Dimitar Sht. Shterionov\", \"Gerda Janssens\"]"^^<http://markw.cc/yarom/schema/datatype/list> .
+<http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> <http://openworm.org/entities/Document/title> "Data acquisition and modeling for learning and reasoning in probabilistic logic environment" .
+<http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> <http://openworm.org/entities/Document/uri> "https://groups.google.com/forum/m/#!topic/openworm-discuss/G9wKoR8N-l0/discussion" .
+<http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> <http://openworm.org/entities/Document/year> "2011"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Document> .
+<http://openworm.org/entities/Evidence/shterionov2011> <http://openworm.org/entities/Evidence/reference> <http://openworm.org/entities/Document/aca617d62c5bb5cb3f6bf96092c179512> .
+<http://openworm.org/entities/Evidence/shterionov2011> <http://openworm.org/entities/Evidence/supports> <http://openworm.org/entities/translators/NeuronConnectomeSynapseClassTranslator#shterionov2011-context> .
+<http://openworm.org/entities/Evidence/shterionov2011> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Evidence> .
+<http://openworm.org/entities/translators/NeuronConnectomeSynapseClassTranslator#shterionov2011-context> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/schema/Context> .
+
