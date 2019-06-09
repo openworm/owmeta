@@ -147,11 +147,24 @@ class POWSource(object):
         dst = ctx.stored(ctx.stored.resolve_class(kind_uri))
         dt = dst.query(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
-        for x in dt.load():
+
+        def format_id(r):
             if full:
-                yield x.identifier
-            else:
-                yield nm.normalizeUri(x.identifier)
+                return r.identifier
+            return nm.normalizeUri(r.identifier)
+
+        def format_comment(r):
+            comment = r.rdfs_comment()
+            if comment:
+                return '\n'.join(comment)
+            return ''
+
+        return GeneratorWithData(dt.load(),
+                                 text_format=format_id,
+                                 default_columns=('ID',),
+                                 columns=(format_id,
+                                          format_comment),
+                                 header=('ID', 'Comment'))
 
     def show(self, *data_source):
         '''
@@ -201,7 +214,7 @@ class POWTranslator(object):
 
     def list(self, context=None, full=False):
         '''
-        List translator types
+        List translators
 
         Parameters
         ----------
@@ -1700,3 +1713,16 @@ class StatementValidationError(GenericUserError):
 class ConfigMissingException(GenericUserError):
     def __init__(self, key):
         self.key = key
+
+
+class GeneratorWithData(object):
+    def __init__(self, generator, header, text_format=None, default_columns=None, columns=None):
+        self._gen = generator
+        self.header = header
+        self.columns = columns
+        self.default_columns = default_columns
+        self.text_format = text_format if text_format else format
+
+    def __iter__(self):
+        for m in self._gen:
+            yield m

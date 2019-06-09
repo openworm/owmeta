@@ -219,7 +219,7 @@ def connect(configFile=False,
             data=False,
             dataFormat='n3'):
     """
-     Load desired configuration and open the database
+    Load desired configuration and open the database
 
     :param configFile: (Optional) The configuration file for PyOpenWorm
     :param conf: (Optional) a configuration object for the connection. Takes precedence over `configFile`
