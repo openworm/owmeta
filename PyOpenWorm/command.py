@@ -703,6 +703,28 @@ class POW(object):
             ns.save(graph=conf['rdf.graph'])
         return ns.created_contexts()
 
+    def say(self, subject, property, object):
+        '''
+        Make a statement
+
+        Parameters
+        ----------
+        subject : str
+            The object which you want to say something about
+        property : str
+            The type of statement to make
+        object : str
+            The other object you want to say something about
+        '''
+        from PyOpenWorm.dataObject import DataObject
+        import transaction
+        dctx = self._data_ctx
+        query = dctx.stored(DataObject)(ident=self._den3(subject))
+        with transaction.manager:
+            for ob in query.load():
+                getattr(dctx(ob), property)(object)
+            dctx.save()
+
     def context(self, context=None, user=False):
         '''
         Read or set current target context for the repository

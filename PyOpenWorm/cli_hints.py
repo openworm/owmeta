@@ -39,6 +39,22 @@ CLI_HINTS = {
                 'names': ['data_sources'],
             },
         },
+        'say': {
+            (METHOD_NAMED_ARG, 'subject'): {
+                'names': ['subject']
+            },
+            (METHOD_NAMED_ARG, 'property'): {
+                'names': ['property']
+            },
+            (METHOD_NAMED_ARG, 'object'): {
+                'names': ['object']
+            }
+        },
+        'save': {
+            (METHOD_NAMED_ARG, 'module'): {
+                'names': ['module']
+            }
+        },
         'serialize': {
             (METHOD_NAMED_ARG, 'destination'): {
                 'names': ['--destination', '-w']
