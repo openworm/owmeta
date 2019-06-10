@@ -477,7 +477,7 @@ class POWTest(BaseTest):
         with patch('importlib.import_module') as im:
             with self.assertRaisesRegexp(AttributeError, r'\btest\b'):
                 module = Mock(spec=['__yarom_mapped_classes__'])
-                module.__yarom_mapped_classes__ = [Mock()]
+                module.__yarom_mapped_classes__ = [MagicMock()]
                 im.return_value = module
                 self.cut.save('tests', 'test')
 
@@ -486,26 +486,17 @@ class POWTest(BaseTest):
         with patch('importlib.import_module') as im:
             with self.assertRaisesRegexp(AttributeError, r'\b' + DEFAULT_SAVE_CALLABLE_NAME + r'\b'):
                 module = Mock(spec=['__yarom_mapped_classes__'])
-                module.__yarom_mapped_classes__ = [Mock()]
+                module.__yarom_mapped_classes__ = [MagicMock()]
                 im.return_value = module
                 self.cut.save('tests', DEFAULT_SAVE_CALLABLE_NAME)
 
     def test_save_no_provider_yarom_mapped_classes(self):
         self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
-        with patch('importlib.import_module') as im:
+        with patch('importlib.import_module') as im, \
+                patch('PyOpenWorm.mapper.Mapper.process_module'):
             module = Mock(spec=['__yarom_mapped_classes__'])
             # must have at least one entry in mapped classes
-            module.__yarom_mapped_classes__ = [Mock()]
-            im.return_value = module
-            self.cut.save('tests')
-            # then, no exception was raised
-
-    def test_save_no_provider_yarom_mapped_classes(self):
-        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
-        with patch('importlib.import_module') as im:
-            module = Mock(spec=['__yarom_mapped_classes__'])
-            # must have at least one entry in mapped classes
-            module.__yarom_mapped_classes__ = [Mock()]
+            module.__yarom_mapped_classes__ = [MagicMock()]
             im.return_value = module
             self.cut.save('tests')
             # then, no exception was raised
@@ -954,8 +945,10 @@ class POWSourceTest(unittest.TestCase):
         dct = dict()
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
+
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = []
+        def emptygen(): yield
+        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = emptygen()
         ps = POWSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
@@ -964,8 +957,10 @@ class POWSourceTest(unittest.TestCase):
         dct = dict()
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
+
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = [Mock()]
+        def gen(): yield Mock()
+        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = gen()
         ps = POWSource(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
@@ -1192,7 +1187,7 @@ class POWAccTest(unittest.TestCase):
 
                     __yarom_mapped_classes__ = (Monkey,)
                     '''), file=out)
-        print(self.sh('pow save --module test_module.command_test_save'))
+        print(self.sh('pow save test_module.command_test_save'))
         self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
     def t_save_classes(self):
@@ -1217,7 +1212,7 @@ class POWAccTest(unittest.TestCase):
 
                     __yarom_mapped_classes__ = (Monkey,)
                     '''), file=out)
-        print(self.sh('pow save --module test_module.monkey'))
+        print(self.sh('pow save test_module.monkey'))
         self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
 

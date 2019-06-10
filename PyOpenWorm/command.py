@@ -661,9 +661,8 @@ class POW(object):
         import importlib as IM
         import functools
         conf = self._conf()
-        mapper = conf['mapper']
 
-        m = mapper.load_module(module)
+        m = IM.import_module(module)
         provider_not_set = provider is None
         if not provider:
             provider = DEFAULT_SAVE_CALLABLE_NAME
@@ -693,6 +692,8 @@ class POW(object):
 
             @functools.wraps(p)
             def save_classes(ns):
+                mapper = conf['mapper']
+                mapper.process_module(module, m)
                 for mapped_class in mapped_classes:
                     ns.include_context(mapped_class.definition_context)
                 np(ns)
@@ -1755,3 +1756,6 @@ class GeneratorWithData(object):
     def __iter__(self):
         for m in self._gen:
             yield m
+
+    def __next__(self):
+        return next(self._gen)

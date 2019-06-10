@@ -204,6 +204,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                                                       + '#shterionov2011-context-any-number')
         e.supports(docctx.rdf_object)
         res.data_context.add_import(docctx)
+        res.data_context.add_import(docctx_anynum)
         with self.make_reader(neurotransmitter_source,
                               skipheader=False,
                               delimiter=';') as reader:
@@ -225,7 +226,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                                                        syntype=typ)
                         hit = False
                         for c in conn.load():
-                            docctx(c).synclass(nt)
+                            docctx_anynum(c).synclass(nt)
                             hit = True
                         if not hit:
                             print("Didn't find any connections matching: {}".format(conn))
