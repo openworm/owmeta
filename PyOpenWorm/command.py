@@ -1759,3 +1759,5 @@ class GeneratorWithData(object):
 
     def __next__(self):
         return next(self._gen)
+
+    next = __next__
