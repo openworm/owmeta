@@ -31,7 +31,7 @@ try:
 except ImportError:
     from backports.tempfile import TemporaryDirectory
 
-from .command_util import IVar, SubCommand
+from .command_util import IVar, SubCommand, GeneratorWithData
 from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide, is_capable
 from .capabilities import FilePathProvider
@@ -547,6 +547,13 @@ class POWContexts(object):
                     g.remove((None, None, None))
                     parser.parse(create_input_source(source), g)
 
+    def list(self):
+        '''
+        List the set of contexts in the graph
+        '''
+        for c in self._parent._conf()['rdf.graph'].contexts():
+            yield c.identifier
+
     def list_changed(self):
         '''
         Return the set of contexts which differ from the serialization on disk
@@ -659,7 +666,7 @@ class POW(object):
         '''
         import transaction
         import importlib as IM
-        import functools
+        from functools import wraps
         conf = self._conf()
 
         m = IM.import_module(module)
@@ -687,10 +694,10 @@ class POW(object):
         mapped_classes = getattr(m, '__yarom_mapped_classes__', None)
         if mapped_classes:
             # It's a module with class definitions -- take each of the mapped
-            # classes
+            # classes and add their contexts so they're saved properly...
             np = p
 
-            @functools.wraps(p)
+            @wraps(p)
             def save_classes(ns):
                 mapper = conf['mapper']
                 mapper.process_module(module, m)
@@ -1236,8 +1243,7 @@ class POW(object):
         '''
         List contexts
         '''
-        for c in self._conf()['rdf.graph'].contexts():
-            yield c.identifier
+        yield from self.contexts.list()
 
     @property
     def _rdf(self):
@@ -1743,21 +1749,3 @@ class StatementValidationError(GenericUserError):
 class ConfigMissingException(GenericUserError):
     def __init__(self, key):
         self.key = key
-
-
-class GeneratorWithData(object):
-    def __init__(self, generator, header, text_format=None, default_columns=None, columns=None):
-        self._gen = generator
-        self.header = header
-        self.columns = columns
-        self.default_columns = default_columns
-        self.text_format = text_format if text_format else format
-
-    def __iter__(self):
-        for m in self._gen:
-            yield m
-
-    def __next__(self):
-        return next(self._gen)
-
-    next = __next__

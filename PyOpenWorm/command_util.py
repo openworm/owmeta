@@ -96,3 +96,21 @@ class PropertyIVar(IVar):
             setattr(target, self._setter_called_flag, True)
             self.value_setter(target, self.default_value)
         return self.value_getter(target)
+
+
+class GeneratorWithData(object):
+    def __init__(self, generator, header=None, text_format=None, default_columns=None, columns=None):
+        self._gen = generator
+        self.header = header
+        self.columns = columns
+        self.default_columns = default_columns
+        self.text_format = text_format if text_format else format
+
+    def __iter__(self):
+        for m in self._gen:
+            yield m
+
+    def __next__(self):
+        return next(self._gen)
+
+    next = __next__

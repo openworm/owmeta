@@ -1150,6 +1150,10 @@ class POWAccTest(unittest.TestCase):
 
         self.assertRegexpMatches(self.sh('pow diff'), r'^$')
 
+    def t_contexts_list(self):
+        ''' Test we have some contexts '''
+        self.assertRegexpMatches(self.sh('pow contexts list'), r'^http://')
+
     def t_list_contexts(self):
         ''' Test we have some contexts '''
         self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')

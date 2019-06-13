@@ -11,6 +11,7 @@ from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
 import PyOpenWorm.cli as PCLI
 from .TestUtilities import noexit, stderr, stdout
 import json
+import re
 
 
 class CLICommandWrapperTest(unittest.TestCase):
@@ -138,36 +139,40 @@ class CLICommandWrapperTest(unittest.TestCase):
         self.assertIn('TEST_STRING', out.getvalue())
 
 
-class CLITestOutputMode(unittest.TestCase):
-    def test_json_list(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
+class CLIOutputModeTest(unittest.TestCase):
+    def setUp(self):
+        self.ccw = patch('PyOpenWorm.cli.CLICommandWrapper').start()
+        patch('PyOpenWorm.cli.POW').start()
+        patch('PyOpenWorm.cli.GitRepoProvider').start()
 
+    def tearDown(self):
+        patch.stopall()
+
+
+class CLIJSONOutputModeTest(CLIOutputModeTest):
+    def test_json_list(self):
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'json'
                 return ['a']
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(json.loads(so.getvalue()), ['a'])
 
     def test_json_set(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'json'
                 return set('ab')
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         val = json.loads(so.getvalue())
         self.assertTrue(val == list('ba') or val == list('ab'))
 
     def test_json_context(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 from PyOpenWorm.context import Context
@@ -176,129 +181,112 @@ class CLITestOutputMode(unittest.TestCase):
                 m.identifier = 'ident'
                 m.base_namespace = 'base_namespace'
                 return m
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         val = json.loads(so.getvalue())
         self.assertEqual(val, dict(identifier='ident', base_namespace='base_namespace'))
 
     def test_json_graph(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 from rdflib.graph import Graph
                 argument_namespace_callback.output_mode = 'json'
                 return Mock(name='graph', spec=Graph())
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         val = json.loads(so.getvalue())
         self.assertEqual(val, [])
 
-    def test_text_list(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
 
+class CLITextOutputModeTest(CLIOutputModeTest):
+    def test_text_list(self):
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 return ['a']
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\n')
 
     def test_text_multiple_element_list(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 return ['a', 'b']
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\nb\n')
 
     def test_text_set(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 return set('ab')
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertTrue(so.getvalue() == 'b\na\n' or so.getvalue() == 'a\nb\n')
 
     def test_text_dict(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
+        with noexit(), stdout() as so:
 
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 return dict(a='b')
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\tb\n')
 
     def test_text_dict_field_separator(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 argument_namespace_callback.text_field_separator = '\0'
                 return dict(a='b')
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\0b\n')
 
     def test_text_dict_record_separator(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 argument_namespace_callback.text_record_separator = '\0'
                 return dict(a='b')
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\tb\0')
 
     def test_text_list_record_separator(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 argument_namespace_callback.text_record_separator = '\0'
                 return ['a', 'b']
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), 'a\0b\0')
 
     def test_text_uniterable(self):
         target = object()
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
                 return target
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             PCLI.main()
         self.assertEqual(so.getvalue(), str(target) + '\n')
 
     def test_text_iterable_type_error(self):
-        with patch('PyOpenWorm.cli.CLICommandWrapper') as ccw, \
-                noexit(), stdout() as so:
-
+        with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
                 argument_namespace_callback.output_mode = 'text'
@@ -308,10 +296,122 @@ class CLITestOutputMode(unittest.TestCase):
                     yield 'blah'
                     raise TypeError("blah blah")
                 return iterable()
-            ccw().main.side_effect = main
+            self.ccw().main.side_effect = main
             with self.assertRaises(TypeError):
                 PCLI.main()
             self.assertEqual(so.getvalue(), 'blah\nblah\n')
+
+
+class CLITableOutputModeTest(CLIOutputModeTest):
+    def test_no_headers_or_columns_header_name(self):
+        with noexit(), stdout() as so:
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'table'
+
+                def iterable():
+                    yield 'blah'
+                    yield 'blah'
+                return iterable()
+            self.ccw().main.side_effect = main
+            PCLI.main()
+            self.assertRegexpMatches(so.getvalue(), 'Value')
+
+    def test_no_headers_or_columns_row_value(self):
+        with noexit(), stdout() as so:
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'table'
+
+                def iterable():
+                    yield 'blah'
+                    yield 'blah'
+                return iterable()
+            self.ccw().main.side_effect = main
+            PCLI.main()
+            self.assertRegexpMatches(so.getvalue(), 'blah')
+
+    def test_with_header_row(self):
+        with noexit(), stdout() as so:
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'table'
+
+                def gen():
+                    yield 'blah'
+                    yield 'blah'
+                it = gen()
+
+                class Iterable(object):
+                    header = ['FIELD']
+
+                    def __next__(self):
+                        return next(it)
+
+                    next = __next__
+
+                    def __iter__(self):
+                        return iter(it)
+
+                return Iterable()
+            self.ccw().main.side_effect = main
+            PCLI.main()
+            self.assertRegexpMatches(so.getvalue(), 'blah')
+
+    def test_with_header_name(self):
+        with noexit(), stdout() as so:
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'table'
+
+                def gen():
+                    yield 'blah'
+                    yield 'blah'
+                it = gen()
+
+                class Iterable(object):
+                    header = ['FIELD']
+
+                    def __next__(self):
+                        return next(it)
+
+                    next = __next__
+
+                    def __iter__(self):
+                        return iter(it)
+
+                return Iterable()
+            self.ccw().main.side_effect = main
+            PCLI.main()
+            self.assertRegexpMatches(so.getvalue(), 'FIELD')
+
+    def test_with_header_and_columns_accessor(self):
+        with noexit(), stdout() as so:
+            @with_defaults
+            def main(argument_namespace_callback, **kwargs):
+                argument_namespace_callback.output_mode = 'table'
+
+                def gen():
+                    yield 'blah'
+                    yield 'blah'
+                it = gen()
+
+                class Iterable(object):
+                    header = ['FIELD']
+                    columns = [lambda x: x[:1]]
+
+                    def __next__(self):
+                        return next(it)
+
+                    next = __next__
+
+                    def __iter__(self):
+                        return iter(it)
+
+                return Iterable()
+            self.ccw().main.side_effect = main
+            PCLI.main()
+            self.assertRegexpMatches(so.getvalue(), re.compile('^b *$', flags=re.MULTILINE))
 
 
 def with_defaults(func):

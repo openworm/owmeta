@@ -7,6 +7,7 @@ from .cli_command_wrapper import CLICommandWrapper, CLIUserError
 from .command import POW, GenericUserError
 from .git_repo import GitRepoProvider
 from .text_util import format_table
+from .command_util import GeneratorWithData
 
 
 def additional_args(parser):
@@ -20,6 +21,11 @@ def additional_args(parser):
             help='Separator to use between fields in "text" output mode')
     parser.add_argument('--text-record-separator', default='\n',
             help='Separator to use between records in "text" output mode')
+
+
+def die(message, status=1):
+    print(message, file=sys.stderr)
+    raise SystemExit(1)
 
 
 NOT_SET = object()
@@ -69,6 +75,10 @@ def _select(a, indexes):
     return [h for h, i in zip(a, range(len(a))) if i in indexes]
 
 
+def columns_arg_to_list(arg):
+    return [s.strip() for s in arg.split(',')]
+
+
 def main():
     import logging
     logging.basicConfig()
@@ -88,8 +98,7 @@ def main():
             from yarom.utils import FCN
             # In case someone forgets to add a helpful message for their user error
             s = 'Received error: ' + FCN(type(e))
-        print(s, file=sys.stderr)
-        return 1
+        die(s)
     output_mode = ns_handler.output_mode
     text_field_separator = ns_handler.text_field_separator
     text_record_separator = ns_handler.text_record_separator
@@ -98,20 +107,60 @@ def main():
         if output_mode == 'json':
             json.dump(out, sys.stdout, default=JSONSerializer(), indent=2)
         elif output_mode == 'table':
-            if getattr(out, 'columns', None):
+            # `out.header` holds the *names* for each column whereas `out.columns` holds
+            # accessors for each column. `out` must have either:
+            # 1) Just `header`
+            # 2) `header` and `columns`
+            # 3) neither `header` nor `columns`
+            # at least one to be valid.
+            #
+            # If `out` has only `header`, then `header must have one element which is the
+            # header for a single result from `out`.
+            #
+            # If it has `header` and `columns` then the two must be of equal length and
+            # each element of `header` names the result of the corresponding entry in
+            # `columns`.
+            #
+            # If neither `header` nor `columns` is given, then a default header of
+            # `['Value']` is used and the column accessor is the identify function.
+            #
+            # `out.default_columns` determines which columns to show by default. If there
+            # is no `default_columns`, then all defined columns are shown. The columns can
+            # be overriden by the `--columns` command line argument. If there is no
+            # `header`, but `--columns` is provided, the user will get an error.
+            if getattr(out, 'columns', None) and getattr(out, 'header', None):
                 if ns_handler.columns:
                     selected_columns = [i for i, e in zip(range(len(out.header)), out.header)
-                                        if e in ns_handler.columns.split(',')]
-                elif out.default_columns:
+                                        if e in columns_arg_to_list(ns_handler.columns)]
+                    if not selected_columns:
+                        die('The given list of columns is not valid for this command')
+                elif getattr(out, 'default_columns', None):
                     selected_columns = [i for i, e in zip(range(len(out.header)), out.header)
                                         if e in out.default_columns]
                 else:
                     selected_columns = list(range(len(out.header)))
+            elif getattr(out, 'columns', None):
+                raise Exception('Programmer error: A header must be provided if an output'
+                                ' has multiple columns')
+            elif getattr(out, 'header', None):
+                if len(out.header) != 1:
+                    raise Exception('Programmer error: Only one column in the header can be defined if'
+                                    ' no columns are defined')
+                if ns_handler.columns \
+                        and columns_arg_to_list(ns_handler.columns) != out.header:
+                    die('The given list of columns is not valid for this command')
+                out = GeneratorWithData(out,
+                                        columns=[lambda x: x],
+                                        header=out.header)
+                selected_columns = [0]
             else:
-                print('Tabular output is not supported for this command or there are no'
-                      ' columns in the output')
+                if ns_handler.columns:
+                    die('The given list of columns is not valid for this command')
+                out = GeneratorWithData(out,
+                                        columns=[lambda x: x],
+                                        header=['Value'])
+                selected_columns = [0]
 
-                return 1
             header = _select(out.header, selected_columns)
             columns = _select(out.columns, selected_columns)
 
