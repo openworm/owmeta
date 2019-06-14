@@ -211,13 +211,14 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
             for row in reader:
                 pre, post, typ, number, nt = row
                 with data_source.data_context.stored(Connection, Neuron) as srcctx:
+                    print("CCC", list(srcctx.Connection.query().load()))
                     conn = srcctx.Connection.query(pre_cell=srcctx.Neuron(pre),
                                                    post_cell=srcctx.Neuron(post),
                                                    number=int(number),
                                                    syntype=typ)
                     hit = False
                     for c in conn.load():
-                        docctx(c).synclass(nt)
+                        docctx_anynum(Connection)(ident=c.identifier).synclass(nt)
                         hit = True
 
                     if not hit:
@@ -226,7 +227,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                                                        syntype=typ)
                         hit = False
                         for c in conn.load():
-                            docctx_anynum(c).synclass(nt)
+                            docctx_anynum(Connection)(ident=c.identifier).synclass(nt)
                             hit = True
                         if not hit:
                             print("Didn't find any connections matching: {}".format(conn))
