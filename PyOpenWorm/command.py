@@ -1243,7 +1243,8 @@ class POW(object):
         '''
         List contexts
         '''
-        yield from self.contexts.list()
+        for m in self.contexts.list():
+            yield m
 
     @property
     def _rdf(self):
