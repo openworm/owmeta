@@ -7,6 +7,7 @@ except ImportError:
 import re
 import tempfile
 import os
+import sys
 from os import listdir, system as sh
 from os.path import exists, join as p, realpath
 from subprocess import check_output, CalledProcessError
@@ -1069,9 +1070,14 @@ class POWAccTest(unittest.TestCase):
     def setUp(self):
         import threading
         self.ns = threading.local()
+        with open('tests/pytest-cov-embed.py', 'r') as f:
+            self.ptcov = f.read()
 
     def set_up(self):
         self.ns.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        # Added so pytest_cov gets to run for our subprocesses
+        with open(p(self.ns.testdir, 'sitecustomize.py'), 'w') as f:
+            f.write(self.ptcov)
         shutil.copytree('.pow', p(self.ns.testdir, '.pow'), symlinks=True)
 
     def tear_down(self):
@@ -1079,7 +1085,7 @@ class POWAccTest(unittest.TestCase):
 
     def sh(self, command, **kwargs):
         env = dict(os.environ)
-        env['PYTHONPATH'] = self.ns.testdir
+        env['PYTHONPATH'] = self.ns.testdir + os.pathsep + env['PYTHONPATH']
         return check_output(shlex.split(command), env=env, cwd=self.ns.testdir).decode('utf-8')
 
     @property

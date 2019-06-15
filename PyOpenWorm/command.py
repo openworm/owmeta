@@ -654,6 +654,9 @@ class POW(object):
         '''
         Save the data in the given context
 
+        Saves the "mapped" classes declared in a module and saves the objects declared by
+        the "provider" (see the argument's description)
+
         Parameters
         ----------
         module : str
