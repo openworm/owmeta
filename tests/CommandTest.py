@@ -32,6 +32,7 @@ class BaseTest(unittest.TestCase):
         self.startdir = os.getcwd()
         os.chdir(self.testdir)
         self.cut = POW()
+        self._default_conf = {'rdf.store_conf': '$HERE/worm.db'}
 
     def tearDown(self):
         os.chdir(self.startdir)
@@ -39,11 +40,12 @@ class BaseTest(unittest.TestCase):
         self.cut._disconnect()
 
     def _init_conf(self, conf=None):
-        if not conf:
-            conf = {}
+        my_conf = dict(self._default_conf)
+        if conf:
+            my_conf.update(conf)
         os.mkdir('.pow')
         with open(p('.pow', 'pow.conf'), 'w') as f:
-            json.dump(conf, f)
+            json.dump(my_conf, f)
 
 
 class POWTest(BaseTest):
@@ -58,9 +60,11 @@ class POWTest(BaseTest):
 
     def test_init_default_store_config_file_exists_no_change(self):
         self._init_conf()
+        with open(p('.pow', 'pow.conf'), 'r') as f:
+            init = f.read()
         self.cut.init()
         with open(p('.pow', 'pow.conf'), 'r') as f:
-            self.assertEqual('{}', f.read())
+            self.assertEqual(init, f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
         self._init_conf()
@@ -68,7 +72,7 @@ class POWTest(BaseTest):
         self.cut.init(update_existing_config=True)
         with open(p('.pow', 'pow.conf'), 'r') as f:
             conf = json.load(f)
-            self.assertEqual(conf['rdf.store_conf'], p('.pow', 'worm.db'), msg='path is updated')
+            self.assertEqual(conf['rdf.store_conf'], p('$HERE', 'worm.db'))
 
     def test_fetch_graph_no_accessor_finder(self):
         with self.assertRaises(Exception):
@@ -441,9 +445,7 @@ class POWTranslateTest(BaseTest):
 
     def setUp(self):
         super(POWTranslateTest, self).setUp()
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
-            f.write('{"data_context_id": "http://example.org/data"}')
+        self._init_conf({"data_context_id": "http://example.org/data"})
 
     def test_translate_unknown_translator_message(self):
         '''

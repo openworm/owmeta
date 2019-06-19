@@ -6,6 +6,7 @@ from pkg_resources import Requirement, resource_filename
 import json
 import re
 from os import environ
+from os.path import dirname
 
 
 class ConfigValue(object):
@@ -104,6 +105,10 @@ class Configure(object):
     def __iter__(self):
         return iter(self._properties)
 
+    def items(self):
+        for k, v in self._properties.items():
+            yield (k, v.get())
+
     def link(self, *names):
         """ Call link() with the names of configuration values that should
         always be the same to link them together
@@ -138,6 +143,11 @@ class Configure(object):
                         res = environ.get(match, None)
                         if res is None and match == 'BASE':
                             res = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                        elif res is None and match == 'HERE':
+                            cfg_name = config_dict.get('configure.file_location')
+                            cfg_dname = cfg_name and dirname(cfg_name)
+                            if cfg_dname != '/':
+                                res = cfg_dname
                         res = None if res == '' else res
                     else:
                         raise ValueError("'%s' is an invalid env-var name\n"
@@ -161,8 +171,8 @@ class Configure(object):
 
         with open(file_name) as f:
             d = json.load(f)
+            d['configure.file_location'] = file_name
             c = cls.process_config(d)
-        c['configure.file_location'] = file_name
         return c
 
     def copy(self, other):

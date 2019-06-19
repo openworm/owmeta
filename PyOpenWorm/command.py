@@ -713,8 +713,8 @@ class POW(object):
             elif update_existing_config:
                 with open(self.config_file, 'r+') as f:
                     conf = json.load(f)
-                    conf['rdf.store_conf'] = relpath(abspath(self.store_name),
-                                                     abspath(self.basedir))
+                    conf['rdf.store_conf'] = pth_join('$HERE', relpath(abspath(self.store_name),
+                                                                       abspath(self.powdir)))
                     f.seek(0)
                     write_config(conf, f)
 
@@ -732,8 +732,8 @@ class POW(object):
         with open(self._default_config(), 'r') as f:
             default = json.load(f)
             with open(self.config_file, 'w') as of:
-                default['rdf.store_conf'] = relpath(abspath(self.store_name),
-                                                    abspath(self.basedir))
+                default['rdf.store_conf'] = pth_join('$HERE', relpath(abspath(self.store_name),
+                                                                      abspath(self.powdir)))
                 write_config(default, of)
 
     def _init_repository(self):
@@ -812,11 +812,24 @@ class POW(object):
                 with open(self.config.user_config_file) as user_config:
                     uc = json.load(user_config)
 
-            rc.update(uc)
-            store_conf = rc.get('rdf.store_conf', None)
-            if store_conf and isinstance(store_conf, string_types) and not isabs(store_conf):
-                rc['rdf.store_conf'] = abspath(pth_join(self.basedir, store_conf))
+            # Pre-process the user-config to resolve variables based on the user
+            # config-file location
+            uc['configure.file_location'] = self.config.user_config_file
+            udat = Data.process_config(uc)
+
+            rc.update(udat.items())
+            rc['configure.file_location'] = self.config_file
             dat = Data.process_config(rc)
+            store_conf = dat.get('rdf.store_conf', None)
+            if not store_conf:
+                raise GenericUserError('rdf.store_conf is not defined in either of the POW'
+                ' configuration files at ' + self.config_file + ' or ' +
+                self.config.user_config_file + ' POW repository may have been initialized'
+                ' incorrectly')
+            if isabs(store_conf) and \
+                    not store_conf.startswith(abspath(self.powdir)):
+                raise GenericUserError('rdf.store_conf must specify a path inside of ' +
+                        self.powdir + ' but instead it is ' + store_conf)
             self._pow_connection = connect(conf=dat)
 
             dat.on_context_changed(self._context_changed_handler())
@@ -1032,7 +1045,7 @@ class POW(object):
     def _tempdir(self, *args, **kwargs):
         td = pth_join(self.powdir, 'temp')
         if not exists(td):
-            makedirs(td, exist_ok=True)
+            makedirs(td)
         kwargs['dir'] = td
         with TemporaryDirectory(*args, **kwargs) as d:
             yield d
