@@ -169,7 +169,7 @@ class OWMTest(BaseTest):
         '''
         self._init_conf({'key': '$HERE/irrelevant'})
         conf = self.cut._conf()
-        self.assertEqual(conf['key'], p(self.cut.owmdir, 'irrelevant'))
+        self.assertEqual(realpath(conf['key']), realpath(p(self.cut.owmdir, 'irrelevant')))
 
     def test_user_config_HERE_relative(self):
         '''

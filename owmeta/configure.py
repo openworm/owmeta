@@ -6,7 +6,7 @@ from pkg_resources import Requirement, resource_filename
 import json
 import re
 from os import environ
-from os.path import dirname
+from os.path import dirname, realpath
 
 
 class ConfigValue(object):
@@ -146,7 +146,7 @@ class Configure(object):
                                 res = resource_filename(Requirement.parse('owmeta'), value)
                             elif match == 'HERE':
                                 cfg_name = config_dict.get('configure.file_location')
-                                cfg_dname = cfg_name and dirname(cfg_name)
+                                cfg_dname = cfg_name and dirname(realpath(cfg_name))
                                 if cfg_dname != '/':
                                     res = cfg_dname
                             elif variables and match in variables:

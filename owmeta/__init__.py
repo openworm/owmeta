@@ -156,6 +156,12 @@ class Connection(object):
     def __exit__(self, *args):
         self.disconnect()
 
+    def __str__(self):
+        conf = self.conf
+        return 'Connection:{source}:{store_conf}'.format(
+                source=conf.get('rdf.source'),
+                store_conf=conf.get('rdf.store_conf', 'default'))
+
 
 def loadConfig(f):
     """ Load configuration for the module. """
