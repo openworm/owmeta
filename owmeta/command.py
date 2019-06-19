@@ -169,6 +169,31 @@ class OWMSource(object):
                                           format_comment),
                                  header=('ID', 'Comment'))
 
+    def derivs(self, data_source):
+        '''
+        List data sources derived from the one given
+
+        Parameters
+        -----------
+        data_source : str
+            The ID of the data source to find derivatives of
+        '''
+        from PyOpenWorm.datasource import DataSource
+        uri = self._parent._den3(data_source)
+        ctx = self._parent._data_ctx.stored
+        source = ctx(DataSource)(ident=uri)
+        return self._derivs(ctx, source)
+
+    def _derivs(self, ctx, source):
+        from PyOpenWorm.datasource import DataSource
+        derived = ctx(DataSource).query()
+        derived.source(source)
+        res = dict()
+        for x in derived.load():
+            print(x)
+            res[x.identifier] = self._derivs(ctx, x)
+        return res
+
     def show(self, *data_source):
         '''
         Parameters
@@ -421,6 +446,9 @@ class OWMEvidence(object):
         rdf_type = self._parent._den3(rdf_type)
         if rdf_type:
             base_type = ctx(ctx.resolve_class(rdf_type))
+            if base_type is None:
+                raise GenericUserError("Could not find Python class corresponding to " +
+                        str(rdf_type))
         else:
             from owmeta.dataObject import DataObject
             base_type = ctx(DataObject)

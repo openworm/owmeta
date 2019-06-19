@@ -280,7 +280,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
             The object to contexualize. Defaults to locals()
         """
         if o is None:
-            o = kwargs
+            if kwargs:
+                o = kwargs
         elif args:
             o = {x.__name__: x for x in [o] + list(args)}
 

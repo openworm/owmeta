@@ -12,6 +12,19 @@ import logging
 L = logging.getLogger(__name__)
 
 
+class FormatUtil(object):
+    @staticmethod
+    def collect_values(attr, stored):
+        if stored:
+            attr_vals = list()
+            for x in attr.get():
+                if x not in attr_vals:
+                    attr_vals.append(x)
+        else:
+            attr_vals = attr.defined_values
+        return attr_vals
+
+
 class Informational(object):
     def __init__(self, name=None, display_name=None, description=None,
                  value=None, default_value=None, identifier=None,
@@ -232,13 +245,7 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             print(self.__class__.__name__, file=sio)
             for info in self.info_fields.values():
                 attr = getattr(self, info.name)
-                if stored:
-                    attr_vals = list()
-                    for x in attr.get():
-                        if x not in attr_vals:
-                            attr_vals.append(x)
-                else:
-                    attr_vals = attr.defined_values
+                attr_vals = FormatUtil.collect_values(attr, stored)
                 if attr_vals:
                     print('    ' + info.display_name, end=': ', file=sio)
                     for val in sorted(attr_vals):
@@ -305,13 +312,7 @@ class GenericTranslation(Translation):
         print(sources_field_name, end='', file=sio)
 
         attr = self.source
-        if stored:
-            attr_vals = list()
-            for x in attr.get():
-                if x not in attr_vals:
-                    attr_vals.append(x)
-        else:
-            attr_vals = attr.defined_values
+        attr_vals = FormatUtil.collect_values(attr, stored)
 
         if attr_vals:
             val_line_sep = '\n' + len(sources_field_name) * ' '

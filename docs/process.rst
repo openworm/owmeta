@@ -2,7 +2,7 @@
 
 Requirements for data storage in OpenWorm
 =========================================
-Our OpenWorm database captures facts about C. `elegans`. The database stores
+Our OpenWorm database captures facts about `C. elegans`. The database stores
 data for generating model files and together with annotations describing the
 origins of the data. Below are a set of recommendations for implementation of
 the database organized around an RDF model.

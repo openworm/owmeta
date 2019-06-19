@@ -559,6 +559,19 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
         # then
         self.parent.message.assert_not_called()
 
+    def test_no_type_resolved(self):
+        '''
+        There's no evidence, so we shouldn't see any output
+        '''
+        # given
+        self.parent._data_ctx.stored.resolve_class.return_value = None
+        self.parent._data_ctx.stored.side_effect = lambda x: x
+        self.parent._den3.side_effect = lambda x: x
+        # then
+        with self.assertRaisesRegexp(GenericUserError, r'unresolved'):
+            # when
+            self.cut.get(URIRef('http://example.org/context'), rdf_type='unresolved')
+
 
 class OWMEvidenceGetContextTest(unittest.TestCase):
     def setUp(self):
