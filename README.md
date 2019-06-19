@@ -77,8 +77,8 @@ Quickstart
 -----------
 
 To get started, you'll need to connect to a database. The OpenWorm database is
-currently hosted at `git@github.com:openworm/OpenWormData.git`. You can read it
-in by executing the following command line after installation:
+currently hosted at `https://github.com/openworm/OpenWormData.git`. You can
+read it in by executing the following command line after installation:
 
 ```bash
 pow clone https://github.com/openworm/OpenWormData.git
@@ -96,16 +96,18 @@ where `readme.conf` contains:
 ```json
 {
     "rdf.source" : "ZODB",
-    "rdf.store_conf" : ".pow/worm.db"
+    "rdf.store_conf" : "$HERE/.pow/worm.db"
 }
 ```
+
+`$HERE` is resolved by PyOpenWorm to the location of the config file.
 
 Then you can try out a few things:
 
 ```python
 # Make the context
 >>> from PyOpenWorm.context import Context
->>> ctx = Context(ident='http://openworm.org/entities/bio#worm0-data', conf=conn.conf)
+>>> ctx = Context(ident='http://openworm.org/data', conf=conn.conf)
 
 # Grabs the representation of the neuronal network
 >>> from PyOpenWorm.worm import Worm
