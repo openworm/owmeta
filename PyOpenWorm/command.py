@@ -987,7 +987,7 @@ class POW(object):
 
         Parameters
         ----------
-        *args : *str
+        *args
             arguments to git
         '''
         import shlex

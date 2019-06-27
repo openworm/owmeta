@@ -4,8 +4,8 @@
 ==================
 
 The sources of data for PyOpenWorm are stored in the `OpenWormData
-repository<https://github.com/openworm/PyOpenWorm>`_. A few
-:py:class:`DataTranslators<~PyOpenWorm.datasource.DataTranslator>`_ translate
+repository <https://github.com/openworm/PyOpenWorm>`_. A few
+:py:class:`DataTranslators <~PyOpenWorm.datasource.DataTranslator>` translate
 these data into common PyOpenWorm data sources. You can list these by running::
 
     pow source list
