@@ -79,7 +79,7 @@ class POWTest(BaseTest):
         self.cut.init(update_existing_config=True)
         with open(p('.pow', 'pow.conf'), 'r') as f:
             conf = json.load(f)
-            self.assertEqual(conf['rdf.store_conf'], p('$HERE', 'worm.db'))
+            self.assertEqual(conf['rdf.store_conf'], p('$POW', 'worm.db'))
 
     def test_fetch_graph_no_accessor_finder(self):
         with self.assertRaises(Exception):
@@ -197,7 +197,7 @@ class POWTest(BaseTest):
         os.mkdir(userconfdir)
         userconf = p(userconfdir, 'pow.conf')
         with open(userconf, 'w') as f:
-            f.write('{"key": "$HERE/irrelevant"}')
+            f.write('{"key": "$HERE/irrelevant", "rdf.store_conf": "$POW/worm.db"}')
         self.cut.config_file = userconf
         conf = self.cut._conf()
         self.assertEqual(conf['key'], p(userconfdir, 'irrelevant'))
