@@ -129,7 +129,7 @@ class Configure(object):
         return len(self._properties)
 
     @classmethod
-    def process_config(cls, config_dict):
+    def process_config(cls, config_dict, variables=None):
         c = cls()
         for k in config_dict:
             value = config_dict[k]
@@ -141,13 +141,16 @@ class Configure(object):
                     valid_var_name = re.match(r'^[A-Za-z_]', match)
                     if valid_var_name:
                         res = environ.get(match, None)
-                        if res is None and match == 'BASE':
-                            res = resource_filename(Requirement.parse('PyOpenWorm'), value)
-                        elif res is None and match == 'HERE':
-                            cfg_name = config_dict.get('configure.file_location')
-                            cfg_dname = cfg_name and dirname(cfg_name)
-                            if cfg_dname != '/':
-                                res = cfg_dname
+                        if res is None:
+                            if match == 'BASE':
+                                res = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                            elif match == 'HERE':
+                                cfg_name = config_dict.get('configure.file_location')
+                                cfg_dname = cfg_name and dirname(cfg_name)
+                                if cfg_dname != '/':
+                                    res = cfg_dname
+                            elif variables and match in variables:
+                                res = variables[match]
                         res = None if res == '' else res
                     else:
                         raise ValueError("'%s' is an invalid env-var name\n"
