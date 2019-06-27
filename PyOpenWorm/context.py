@@ -373,7 +373,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                 class_name = cd_l.name()
                 moddo = cd_l.module()
                 mod = self.mapper.load_module(moddo.name())
-                c = getattr(mod, class_name)
+                c = getattr(mod, class_name, None)
                 break
         return c
 

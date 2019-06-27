@@ -9,7 +9,7 @@ from .common_data import DS_NS
 from .context_datasource import VariableIdentifierContext, VariableIdentifierContextDataObject
 
 
-class ContextDataSource(DataSource):
+class EvidenceDataSource(DataSource):
     context_property = Informational(display_name='Context',
                                      property_name='evidence_context',
                                      property_type='ObjectProperty',

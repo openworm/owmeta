@@ -10,3 +10,4 @@ For Developers
    rdf_details
    futureapi
    coding_standards
+   query
