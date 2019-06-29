@@ -26,10 +26,16 @@ sys.path.insert(0, os.path.abspath('../'))
 #needs_sphinx = '1.0'
 numpydoc_show_class_members = False
 autodoc_default_flags = []
+autoclass_content = 'both'
 autodoc_member_order = 'groupwise'
+autodoc_typehints = 'none'
+numpydoc_xref_param_type = True
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode', 'numpydoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode',
+              'sphinx.ext.intersphinx', 'numpydoc']
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'rdflib': ('https://rdflib.readthedocs.io/en/stable/', None)}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

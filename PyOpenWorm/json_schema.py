@@ -6,7 +6,6 @@ from PyOpenWorm.datasource import DataSource, Informational
 from PyOpenWorm.utils import ellipsize
 from PyOpenWorm.context import ClassContext
 import PyOpenWorm.simpleProperty as SP
-from jsonschema.validators import validator_for
 from contextlib import contextmanager
 from collections.abc import Sequence  # noqa
 import re
@@ -17,16 +16,30 @@ import logging
 L = logging.getLogger(__name__)
 
 
-class AssignmentValidationException(Exception):
+class ValidationException(Exception):
+    pass
+
+
+class AssignmentValidationException(ValidationException):
     pass
 
 
 class Creator(object):
+    '''
+    Creates objects based on a JSON schema augmented with type annotations as would be
+    produced by :py:class:`TypeCreator`
+    '''
+
     def __init__(self, schema):
         '''
         Takes a schema annotated with '_pow_type' entries indicating which types are
         expected at each position in the object and produces an instance of the root type
         described in the schema
+
+        Parameters
+        ----------
+        schema : dict
+            The annotated schema
         '''
         self._path_stack = []
         self._root_identifier = None
@@ -44,7 +57,9 @@ class Creator(object):
 
     def assign(self, obj, key, val):
         '''
-        Assigns values to properties on the created objects
+        Assigns values to properties on the created objects. If the `obj` does not already
+        have a property for the given `key`, then it will be created. This is how
+        ``additionalProperties`` and ``patternProperties`` are supported.
         '''
         if not hasattr(obj, key):
             typ = type(obj)
@@ -60,6 +75,20 @@ class Creator(object):
         getattr(obj, key)(val)
 
     def create(self, instance, context=None, ident=None):
+        '''
+        Creates an instance of the root POW type given a deserialized instance of the type
+        described in our JSON schema.
+
+        A context can be passed in and it will be used to contextualize the POW types
+
+
+        Parameters
+        ----------
+        instance : dict
+            The JSON object to create from
+        context : PyOpenWorm.context.Context
+            The context in which the object should be created
+        '''
         self._context = context
         try:
             return self._create(instance, ident=ident)
@@ -99,6 +128,12 @@ class Creator(object):
                 except AssignmentValidationException:
                     pass
 
+        if instance is None:
+            default = schema.get('default', None)
+            # If the default is None, then it'll just fail below
+            if default is not None:
+                return self._create(default, schema)
+
         sType = schema.get('type')
         if isinstance(instance, str):
             if sType == 'string':
@@ -137,9 +172,14 @@ class Creator(object):
                     pt_args = dict()
                     for k, v in instance.items():
                         props = schema.get('properties', {})
+
+                        # If patprops doesn't have anything, then we pick it up with
+                        # additionalProperties
                         patprops = schema.get('patternProperties', {})
-                        addprops = schema.get('additionalProperties', {})
-                        default = schema.get('default', True)
+
+                        # additionalProperties doesn't have any keys to check, so we
+                        # can just pass true down to the next level
+                        addprops = schema.get('additionalProperties', True)
 
                         if props:
                             sub_schema = props.get(k)
@@ -164,8 +204,7 @@ class Creator(object):
                                 pt_args[k] = self._create(v, addprops)
                             continue
 
-                        if not default:
-                            raise AssignmentValidationException(sType, instance, k, v)
+                        raise AssignmentValidationException(sType, instance, k, v)
 
                     res = self.make_instance(pow_type)
                     for k, v in pt_args.items():
@@ -178,6 +217,12 @@ class Creator(object):
 
 
 class TypeCreator(object):
+    '''
+    Creates POW types from a JSON schema and produces an copy of the schema annotated with
+    the created types.
+
+    The annontate method i
+    '''
 
     def __init__(self, name, schema, definition_base_name=''):
         '''
@@ -187,7 +232,7 @@ class TypeCreator(object):
             The name of the root class and the base-name for all classes derived from a
             schema's properties
         schema : dict
-            A JSON schema as would be translated by the :mod:`json` module
+            A JSON schema as would be returned by :py:func:`json.load`
         definition_base_name : str
             The base-name for types defined in the schema's definitions. optional.
             By default, definitions just take the capitalized form of their key in the
@@ -198,6 +243,9 @@ class TypeCreator(object):
         self.schema = schema
 
     def annotate(self):
+        '''
+        Returns the annotated JSON schema
+        '''
         self._references = []
         return self._make_object(self.schema)
 
@@ -259,7 +307,53 @@ class TypeCreator(object):
 
         return annotated
 
+    def proc_prop(self, path, key, value):
+        '''
+        Process property named `key` with the given `value`.
+
+        The `path` will not include the key but will be the path of the definition that
+        contains the property. For example, in::
+
+            {"$schema": "http://json-schema.org/schema",
+             "title": "Example Schema",
+             "type": "object",
+             "properties": {"data": {"type": "object",
+                                     "properties": {
+                                        "data_data": {"type": "string"}
+                                     }}}}
+
+        `proc_prop` would be called as ``.proc_path((), 'data', {'type': 'object', ...})``
+        for ``data``, but for ``data_data``, it would be called like
+        ``.proc_path(('properties', 'data'), 'data_data', {'type': 'string'})``
+
+        Parameters
+        ----------
+        path : tuple
+            The path to the given property.
+        key : str
+            The name of the property
+        value : dict
+            the definition of the property
+        '''
+        raise NotImplementedError()
+
+    def create_type(self, path, schema):
+        '''
+        Create the POW type.
+
+        At this point, the properties for the schema will already be created.
+
+        Parameters
+        ----------
+        path : tuple
+            The path to the type
+        schema : dict
+            The JSON schema that applies to this type
+        '''
+        raise NotImplementedError()
+
     def _process_definitions(self, schema, path, references=None):
+        # TODO: Actually use definition_base_name
         annotated_definition_schemas = None
         definitions = schema.get('definitions', None)
         if definitions:
