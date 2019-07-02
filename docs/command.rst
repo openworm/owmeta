@@ -5,9 +5,9 @@
 
 The ``owm`` command line provides a high-level interface for working with
 owmeta-managed data. The central object which ``owm`` works on is the
-repository, which contains the database -- a set of files in binary format. The
-sub-commands act on important files inside the repository or with entities in
-the database.
+repository, which contains the triple store -- a set of files in a binary
+format.  The sub-commands act on important files inside the repository or with
+entities in the database.
 
 To get usage information::
    
