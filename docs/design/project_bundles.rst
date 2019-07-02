@@ -5,20 +5,19 @@ Project Bundles
 Project bundles are:
 
 * collections of contexts,
-* and a set of mappings between project-scoped human-readable names and context
+* and a set of mappings between project-scoped human-friendly names and context
   identifiers.
-
 
 They solve the problem of contexts containing different statements having the
 same identifier.
 
-There several ways we can get different contexts with the same identifier: 
+There are several ways we can get different contexts with the same identifier: 
 
 * through revisions of a context over time, 
 * by distinct groups using the same context identifier, 
 * or by contexts being distributed with different variants (e.g., a full and an abridged version).
 
-In solving the problem of context ID aliasing, bundles also help solve the
+In solving this problem of context ID aliasing, bundles also helps solve the
 problem of having contexts with inconsistent statements in the same project by
 providing a division within a project, between groups of contexts that aren't
 necessarily related.
