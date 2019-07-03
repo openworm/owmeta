@@ -14,7 +14,7 @@ class CSVDataSource(LocalFileDataSource):
 
     csv_file_name = Informational(display_name='CSV file name',
                                   also=LocalFileDataSource.file_name)
-
+    
     csv_header = Informational(display_name='Header column names', multiple=False)
 
     csv_field_delimiter = Informational(display_name='CSV field delimiter')
