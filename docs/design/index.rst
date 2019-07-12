@@ -9,3 +9,4 @@ These comprise the core design artifacts for PyOpenWorm.
    project_bundles
    project_distribution
    package_lifecycle
+   publishing_datasources

@@ -453,9 +453,9 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         The RDF type URI for objects of this type
     rdf_namespace : rdflib.namespace.Namespace
         The rdflib namespace (prefix for URIs) for objects from this class
-    properties : list of Property
+    properties : list of PyOpenWorm.simpleProperty.RealSimpleProperty or PyOpenWorm.pProperty.Property
         Properties belonging to this object
-    owner_properties : list of Property
+    owner_properties : list of PyOpenWorm.simpleProperty.RealSimpleProperty or PyOpenWorm.pProperty.Property
         Properties belonging to parents of this object
     """
     rdf_type = R.RDFS['Resource']
@@ -482,9 +482,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
     query_mode = False
 
     def __new__(cls, *args, **kwargs):
-        """ This is defined so that the __init__ method gets a contextualized
-        instance, allowing for statements made in __init__ to be contextualized.
-        """
+        # This is defined so that the __init__ method gets a contextualized
+        # instance, allowing for statements made in __init__ to be contextualized.
         ores = super(BaseDataObject, cls).__new__(cls)
         if cls.context is not None:
             ores.context = cls.context
@@ -661,7 +660,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         linkName : string
             The name of this property.
         owner : PyOpenWorm.dataObject.BaseDataObject
-            The name of this property.
+            The owner of this property.
         """
         return _make_property(cls, 'DatatypeProperty', *args, **kwargs)
 
@@ -675,7 +674,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         linkName : string
             The name of this property.
         owner : PyOpenWorm.dataObject.BaseDataObject
-            The name of this property.
+            The owner of this property.
         value_type : type
             The type of BaseDataObject for values of this property
         """
@@ -691,7 +690,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         linkName : string
             The name of this property.
         owner : PyOpenWorm.dataObject.BaseDataObject
-            The name of this property.
+            The owner of this property.
         """
         return _make_property(cls, 'UnionProperty', *args, **kwargs)
 

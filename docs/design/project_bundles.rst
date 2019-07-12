@@ -39,6 +39,9 @@ one and only one Human"
 
 Types
 -----
-A Tag is an arbitrary string
-A Message Digest is a Base-64 encoding of a string of bytes
+Below is a description in terms of lower-level types of some higher-level types
+referenced above.
+
+* A Tag is an arbitrary string
+* A Message Digest is a Base-64 encoding of a string of bytes
 
