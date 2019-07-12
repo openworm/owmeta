@@ -1774,7 +1774,7 @@ class OWMSaveNamespace(object):
         '''
         Include the given exernally-created context for saving.
 
-        If you the context is being made within the save function, then you can use new_context instead.
+        If the context is being made within the save function, then you can use new_context instead.
         '''
         self._external_contexts.add(ctx)
 
