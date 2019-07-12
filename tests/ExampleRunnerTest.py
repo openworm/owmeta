@@ -4,6 +4,7 @@ import os
 import subprocess as SP
 import shutil
 import tempfile
+from six import string_types
 from os.path import join as p
 
 from .TestUtilities import xfail_without_db
@@ -33,11 +34,17 @@ class ExampleRunnerTest(unittest.TestCase):
         shutil.rmtree(self.testdir)
 
     def execfile(self, example_file_name):
+        self.exec(["python", example_file_name])
+
+    def exec(self, command, **kwargs):
+        if isinstance(command, string_types):
+            command = command.split(' ')
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
-            stat = SP.call(["python", example_file_name],
+            stat = SP.call(command,
                            stdout=out,
-                           stderr=out)
+                           stderr=out,
+                           **kwargs)
             out.seek(0)
             self.assertEqual(0, stat,
                 "Example failed with status {}. Its output:\n{}".format(
@@ -70,3 +77,7 @@ class ExampleRunnerTest(unittest.TestCase):
 
     def test_extrasyn(self):
         self.execfile("extrasynaptic_edges.py")
+
+    def test_pow_save(self):
+        self.exec("pow save examples.pow_save_example",
+                  cwd=self.testdir)
