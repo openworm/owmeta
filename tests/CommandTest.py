@@ -23,6 +23,7 @@ from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
                                 DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
                                 POWDirDataSourceDirLoader, _DSD)
 from PyOpenWorm.datasource_loader import LoadFailed
+from PyOpenWorm.bittorrent import BitTorrentDataSourceDirLoader
 from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from PyOpenWorm.command_util import IVar, PropertyIVar
 from PyOpenWorm.evidence import Evidence
@@ -1023,38 +1024,68 @@ class POWDSDLoaderMissingDSD(unittest.TestCase):
         cut.load('dsdid1')
 
 
+class TorrentFileDSD(unittest.TestCase):
+    def test_load(self):
+        loader = BitTorrentDataSourceDirLoader()
+        lfds = Mock(name='MockLocalFileDataSource')
+        loader.load(lfds)
+
+
 class TestDSD(unittest.TestCase):
 
     def setUp(self):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+        # The MagicMock returns a result as an actual loader would
         mc = [MagicMock()]
         mc[0].dirkey = 'dirkey'
         self.cut = _DSD(dict(), self.testdir, mc)
         self.mc = mc
+
+    def test_no_loaders_key_error(self):
+        '''
+        Test no loaders can load the data source -> should present a key error
+        '''
+        self.mc[0].can_load.return_value = False
+        ds = Mock()
+        ds.identifier = 'not_there'
+        with self.assertRaises(KeyError):
+            self.cut[ds]
+
+
+class TestDSDDirExists(unittest.TestCase):
+
+    def setUp(self):
+        self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
 
     def test_dsd_create(self):
         '''
         Test directory for the dsdl doesn't exist yet AND loaders available
             -> should create the dir
         '''
-        self.cut['dirkey']
+        # Given
+        mc = [MagicMock()]
+        mc[0].dirkey = 'dirkey'
+
+        # When
+        _DSD(dict(), self.testdir, mc)
+
+        # Then
         self.assertIn('dirkey', listdir(self.testdir))
 
     def test_index_dir_exists(self):
         '''
-        Test directory for the dsdl exists
+        Test directory for the DSDL already exists
         '''
+        # Given
+        mc = [MagicMock()]
+        mc[0].dirkey = 'dirkey'
         os.makedirs(p(self.testdir, 'dirkey'))
-        self.cut['dirkey']
-        self.assertIn('dirkey', listdir(self.testdir))
 
-    def test_no_loaders_key_error(self):
-        '''
-        Test no loaders can load the data source -> should present a key error
-        '''
-        self.mc[0]().can_load.return_value = False
-        with self.assertRaises(KeyError):
-            self.cut['not_there']
+        # When
+        _DSD(dict(), self.testdir, mc)
+
+        # Then
+        self.assertIn('dirkey', listdir(self.testdir))
 
     # Test a loader that returns a directory outside of its assigned directory
     # Test a loader that returns a non-existant file

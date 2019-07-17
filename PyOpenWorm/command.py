@@ -65,6 +65,7 @@ class POWSourceData(object):
         archive_type : str
             The type of the archive to create.
         '''
+        from PyOpenWorm.datasource import DataSource
         sid = self._pow_command._den3(source)
         if not archive_type:
             for ext in EXT_TO_ARCHIVE_FMT:
@@ -80,7 +81,9 @@ class POWSourceData(object):
             archive_type = 'tar'
 
         try:
-            dd = self._pow_command._dsd[sid]
+            sources = self._pow_command._data_ctx.stored(DataSource)(ident=sid).load()
+            for data_source in sources:
+                dd = self._pow_command._dsd[data_source]
         except KeyError:
             raise GenericUserError('Could not find data for {} ({})'.format(sid, source))
 
@@ -1141,11 +1144,11 @@ class POW(object):
             # to not worry about checking if they have loaded something before.
 
             # XXX persist the dict
-            lclasses = [POWDirDataSourceDirLoader]
+            lclasses = [POWDirDataSourceDirLoader()]
             dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
             dindex = open(pth_join(self.powdir, 'data_source_directories'))
             for ds_id, dname in (x.strip().split(' ', 1) for x in dindex):
-                dsd[ds_id] = dname
+                dsd.put(ds_id, dname)
             self._data_source_directories = dsd
 
     def _stage_translation_directory(self, source_directory, target_directory):
@@ -1577,33 +1580,39 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
 
 
 class _DSD(object):
-    def __init__(self, ds_dict, base_directory, loader_classes):
+    def __init__(self, ds_dict, base_directory, loaders):
         self._dsdict = ds_dict
         self._base_directory = base_directory
-        self._lclasses = loader_classes
+        self._loaders = self._init_loaders(loaders)
 
-    def __getitem__(self, dsid):
-        dsid = str(dsid)
+    def __getitem__(self, data_source):
+        dsid = str(data_source.identifier)
         try:
             return self._dsdict[dsid]
         except KeyError:
-            res = self._load_data_source(dsid)
+            res = self._load_data_source(data_source)
             if res:
                 self._dsdict[dsid] = res
                 return res
             raise
 
-    def _loaders(self):
-        for cls in self._lclasses:
-            nd = pth_join(self._base_directory, cls.dirkey)
+    def put(self, data_source_ident, directory):
+        self._dsdict[str(data_source_ident)] = directory
+
+    def _init_loaders(self, loaders):
+        res = []
+        for loader in loaders:
+            nd = pth_join(self._base_directory, loader.dirkey)
             if not exists(nd):
                 makedirs(nd)
-            yield cls(nd)
+            loader.base_directory = nd
+            res.append(loader)
+        return res
 
-    def _load_data_source(self, dsid):
-        for loader in self._loaders():
-            if loader.can_load(dsid):
-                return loader(dsid)
+    def _load_data_source(self, data_source):
+        for loader in self._loaders:
+            if loader.can_load(data_source):
+                return loader(data_source)
 
 
 class DataSourceDirectoryProvider(FilePathProvider):
@@ -1611,9 +1620,8 @@ class DataSourceDirectoryProvider(FilePathProvider):
         self._dsd = dsd
 
     def __call__(self, ob):
-        ident = ob.identifier
         try:
-            path = self._dsd[ident]
+            path = self._dsd[ob]
         except KeyError:
             return None
 
@@ -1629,13 +1637,23 @@ class _DSDP(FilePathProvider):
 
 
 class POWDirDataSourceDirLoader(DataSourceDirLoader):
-    def __init__(self, basedir):
-        super(POWDirDataSourceDirLoader, self).__init__(basedir)
-        self._idx_fname = pth_join(self._basedir, 'index')
+    def __init__(self, basedir=None):
+        super(POWDirDataSourceDirLoader, self).__init__()
         self._index = dict()
+        self.base_directory = basedir
+
+    @property
+    def base_directory(self):
+        return self._base_directory
+
+    @base_directory.setter
+    def base_directory(self, val):
+        if val:
+            self._base_directory = val
+            self._idx_fname = pth_join(val, 'index')
 
     def _load_index(self):
-        with scandir(self._basedir) as dirents:
+        with scandir(self._base_directory) as dirents:
             dentdict = {de.name: de for de in dirents}
             with open(self._idx_fname) as f:
                 for l in f:
@@ -1649,12 +1667,12 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
     def _index_dir_entry_is_bad(self, dname, de):
         if not de:
             msg = "There is no directory entry for {} in {}"
-            L.warn(msg.format(dname, self._basedir), exc_info=True)
+            L.warn(msg.format(dname, self._base_directory), exc_info=True)
             return True
 
         if not de.is_dir():
             msg = "The directory entry for {} in {} is not a directory"
-            L.warn(msg.format(dname, self._basedir))
+            L.warn(msg.format(dname, self._base_directory))
             return True
 
         return False
