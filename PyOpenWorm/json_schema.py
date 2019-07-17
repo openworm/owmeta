@@ -139,16 +139,17 @@ class Creator(object):
             if sType == 'string':
                 return instance
             raise AssignmentValidationException(sType, instance)
+        elif isinstance(instance, bool):
+            # remember bool is a subtype of int, so boolean has to precede int
+            if sType == 'boolean':
+                return instance
+            raise AssignmentValidationException(sType, instance)
         elif isinstance(instance, int):
             if sType in ('integer', 'number'):
                 return instance
             raise AssignmentValidationException(sType, instance)
         elif isinstance(instance, float):
             if sType == 'number':
-                return instance
-            raise AssignmentValidationException(sType, instance)
-        elif isinstance(instance, bool):
-            if sType == 'boolean':
                 return instance
             raise AssignmentValidationException(sType, instance)
         elif isinstance(instance, list):
