@@ -128,3 +128,64 @@ class DictTypeCheckTest(unittest.TestCase):
 
         with self.assertRaises(AssignmentValidationException):
             cut.create(['blah', True])
+
+    def test_items_empty(self):
+        cut = Creator({
+            'type': 'array',
+            'items': {'type': 'string'}
+        })
+
+        self.assertEqual([], cut.create([]))
+
+
+class ObjectTypeCheck(unittest.TestCase):
+    def test_no_pow_type(self):
+        cut = Creator({
+            'type': 'object',
+        })
+
+        with self.assertRaises(AssignmentValidationException):
+            cut.create({})
+
+    def test_make_instance(self):
+        class A(object):
+            pass
+
+        class C(Creator):
+            def make_instance(self, pow_type):
+                return A()
+
+        cut = C({
+            'type': 'object',
+            '_pow_type': 'whatever'
+        })
+        self.assertIsInstance(cut.create({}), A)
+
+    def test_assign(self):
+        class A(object):
+            pass
+
+        called = [False]
+
+        class C(Creator):
+            def make_instance(self, pt):
+                return A()
+
+            def assign(self, obj, name, val):
+                called[0] = True
+
+        cut = C({
+            'type': 'object',
+            '_pow_type': 'whatever'
+        })
+        cut.create({'duck': 'sauce'})
+        self.assertTrue(called[0])
+
+    def test_additionalProperties(self):
+        pass
+
+    def test_patternProperties(self):
+        pass
+
+    def test_properties(self):
+        pass

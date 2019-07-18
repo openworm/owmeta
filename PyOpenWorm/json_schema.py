@@ -28,6 +28,9 @@ class Creator(object):
     '''
     Creates objects based on a JSON schema augmented with type annotations as would be
     produced by :py:class:`TypeCreator`
+
+    Currently, only annotations for JSON objects are supported. In the future, conversions
+    for all types (arrays, numbers, ints, strings) may be supported.
     '''
 
     def __init__(self, schema):
@@ -169,52 +172,64 @@ class Creator(object):
         elif isinstance(instance, dict):
             if sType == 'object':
                 pow_type = schema.get('_pow_type')
-                if pow_type:
-                    pt_args = dict()
-                    for k, v in instance.items():
-                        props = schema.get('properties', {})
+                if not pow_type:
+                    # If an object isn't annotated, we treat as an error -- alternatives
+                    # like returning None or just 'instance' could both be surprising and
+                    # not annotating an object is most likely a mistake in a TypeCreator
+                    # sub-class.
+                    raise AssignmentValidationException(sType, instance)
 
-                        # If patprops doesn't have anything, then we pick it up with
-                        # additionalProperties
-                        patprops = schema.get('patternProperties', {})
+                pt_args = dict()
+                for k, v in instance.items():
+                    props = schema.get('properties', {})
 
-                        # additionalProperties doesn't have any keys to check, so we
-                        # can just pass true down to the next level
-                        addprops = schema.get('additionalProperties', True)
+                    # If patprops doesn't have anything, then we pick it up with
+                    # additionalProperties
+                    patprops = schema.get('patternProperties', {})
 
-                        if props:
-                            sub_schema = props.get(k)
-                            if sub_schema:
-                                with self._pushing(k):
-                                    pt_args[k] = self._create(v, sub_schema)
-                                continue
+                    # additionalProperties doesn't have any keys to check, so we
+                    # can just pass true down to the next level
+                    addprops = schema.get('additionalProperties', True)
 
-                        if patprops:
-                            found = False
-                            for p in patprops:
-                                if re.match(p, k):
-                                    with self._pushing(k):
-                                        pt_args[k] = self._create(v, patprops[p])
-                                    found = True
-                                    break
-                            if found:
-                                continue
-
-                        if addprops:
+                    if props:
+                        sub_schema = props.get(k)
+                        if sub_schema:
                             with self._pushing(k):
-                                pt_args[k] = self._create(v, addprops)
+                                pt_args[k] = self._create(v, sub_schema)
                             continue
 
-                        raise AssignmentValidationException(sType, instance, k, v)
+                    if patprops:
+                        found = False
+                        for p in patprops:
+                            if re.match(p, k):
+                                with self._pushing(k):
+                                    pt_args[k] = self._create(v, patprops[p])
+                                found = True
+                                break
+                        if found:
+                            continue
 
-                    res = self.make_instance(pow_type)
-                    for k, v in pt_args.items():
-                        self.assign(res, k, v)
-                    return res
-                else:
-                    return None
+                    if addprops:
+                        with self._pushing(k):
+                            pt_args[k] = self._create(v, addprops)
+                        continue
+
+                    raise AssignmentValidationException(sType, instance, k, v)
+
+                # res must be treated as a black-box since sub-classes have total freedom
+                # as far as what substitution they want to make
+                res = self.make_instance(pow_type)
+                for k, v in pt_args.items():
+                    self.assign(res, k, v)
+                return res
         else:
             raise AssignmentValidationException(sType, instance)
+
+        def assign(self, obj, name, value):
+            raise NotImplementedError()
+
+        def make_instance(self, pow_type):
+            raise NotImplementedError()
 
 
 class TypeCreator(object):
