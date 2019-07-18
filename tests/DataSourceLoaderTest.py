@@ -13,7 +13,7 @@ class DataSourceDirLoaderTest(unittest.TestCase):
         with TemporaryDirectory() as d:
             reldir = relpath(d, getcwd())
             cut = DataSourceDirLoader(reldir)
-            self.assertEqual(d, cut._basedir)
+            self.assertEqual(d, cut.base_directory)
 
     def test_load_no_ident(self):
         class A(DataSourceDirLoader):

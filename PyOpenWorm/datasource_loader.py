@@ -21,18 +21,24 @@ class DataSourceDirLoaderMeta(type):
 
 
 class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
+    '''
+    Loads a data files for a DataSource
 
-    def __init__(self, base_directory):
-        self._basedir = realpath(base_directory)
+    The loader is expected to organize files for each data source within the given
+    base directory.
+    '''
+    def __init__(self, base_directory=None):
+        if base_directory:
+            self.base_directory = realpath(base_directory)
 
-    def __call__(self, ident):
+    def __call__(self, data_source):
         '''
         Load the data source
 
         Parameters
         ----------
-        ident : str
-            The identifier of the data source to load data for
+        data_source : PyOpenWorm.datasource.DataSource
+            The data source to load data for
 
         Returns
         -------
@@ -44,37 +50,37 @@ class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
         '''
         # Call str(·) to give a more uniform interface to the sub-class ``load``
         # Conventionally, types that tag or "enhance" a string have the base string representation as their __str__
-        s = self.load(str(ident))
+        s = self.load(data_source)
         if not s:
-            raise LoadFailed(ident, self, 'Loader returned an empty string')
+            raise LoadFailed(data_source, self, 'Loader returned an empty string')
 
         # N.B.: This logic is NOT intended as a security measure against directory traversal: it is only to make the
         # interface both flexible and unambiguous for implementers
 
         # Relative paths are allowed
         if not isabs(s):
-            s = pth_join(self._basedir, s)
+            s = pth_join(self.base_directory, s)
 
         # Make sure the loader isn't doing some nonsense with symlinks or non-portable paths
         rpath = realpath(s)
-        if not rpath.startswith(self._basedir):
-            msg = 'Loader returned a file path outside of the base directory, {}'.format(self._basedir)
-            raise LoadFailed(ident, self, msg)
+        if not rpath.startswith(self.base_directory):
+            msg = 'Loader returned a file path outside of the base directory, {}'.format(self.base_directory)
+            raise LoadFailed(data_source, self, msg)
 
         if not exists(rpath):
             msg = 'Loader returned a non-existant file {}'.format(rpath)
-            raise LoadFailed(ident, self, msg)
+            raise LoadFailed(data_source, self, msg)
 
         if not isdir(rpath):
             msg = 'Loader did not return a directory, but returned {}'.format(rpath)
-            raise LoadFailed(ident, self, msg)
+            raise LoadFailed(data_source, self, msg)
 
         return rpath
 
-    def load(self, ident):
+    def load(self, data_source):
         raise NotImplementedError()
 
-    def can_load(self, ident):
+    def can_load(self, data_source):
         return False
 
     def __str__(self):
@@ -82,7 +88,7 @@ class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
 
 
 class LoadFailed(Exception):
-    def __init__(self, ident, loader, *args):
+    def __init__(self, data_source, loader, *args):
         msg = args[0]
-        mmsg = 'Failed to load {} data with loader {}{}'.format(ident, loader, ': ' + msg if msg else '')
+        mmsg = 'Failed to load {} data with loader {}{}'.format(data_source, loader, ': ' + msg if msg else '')
         super(LoadFailed, self).__init__(mmsg, *args[1:])
