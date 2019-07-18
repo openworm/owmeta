@@ -675,6 +675,7 @@ class POW(object):
         from functools import wraps
         conf = self._conf()
 
+        sys.path.append(os.getcwd())
         m = IM.import_module(module)
         provider_not_set = provider is None
         if not provider:
