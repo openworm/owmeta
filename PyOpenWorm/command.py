@@ -675,48 +675,56 @@ class POW(object):
         from functools import wraps
         conf = self._conf()
 
-        sys.path.append(os.getcwd())
-        m = IM.import_module(module)
-        provider_not_set = provider is None
-        if not provider:
-            provider = DEFAULT_SAVE_CALLABLE_NAME
+        added_cwd = False
+        cwd = os.getcwd()
+        if cwd not in sys.path:
+            sys.path.append(cwd)
+            added_cwd = True
+        try:
+            m = IM.import_module(module)
+            provider_not_set = provider is None
+            if not provider:
+                provider = DEFAULT_SAVE_CALLABLE_NAME
 
-        if not context:
-            ctx = _POWSaveContext(self._data_ctx, m)
-        else:
-            ctx = _POWSaveContext(Context(ident=context, conf=conf), m)
-        attr_chain = provider.split('.')
-        p = m
-        for x in attr_chain:
-            try:
-                p = getattr(p, x)
-            except AttributeError:
-                if provider_not_set and getattr(m, '__yarom_mapped_classes__', None):
-                    def p(*args, **kwargs):
-                        pass
-                    break
-                raise
-        ns = POWSaveNamespace(context=ctx)
+            if not context:
+                ctx = _POWSaveContext(self._data_ctx, m)
+            else:
+                ctx = _POWSaveContext(Context(ident=context, conf=conf), m)
+            attr_chain = provider.split('.')
+            p = m
+            for x in attr_chain:
+                try:
+                    p = getattr(p, x)
+                except AttributeError:
+                    if provider_not_set and getattr(m, '__yarom_mapped_classes__', None):
+                        def p(*args, **kwargs):
+                            pass
+                        break
+                    raise
+            ns = POWSaveNamespace(context=ctx)
 
-        mapped_classes = getattr(m, '__yarom_mapped_classes__', None)
-        if mapped_classes:
-            # It's a module with class definitions -- take each of the mapped
-            # classes and add their contexts so they're saved properly...
-            np = p
+            mapped_classes = getattr(m, '__yarom_mapped_classes__', None)
+            if mapped_classes:
+                # It's a module with class definitions -- take each of the mapped
+                # classes and add their contexts so they're saved properly...
+                np = p
 
-            @wraps(p)
-            def save_classes(ns):
-                mapper = conf['mapper']
-                mapper.process_module(module, m)
-                for mapped_class in mapped_classes:
-                    ns.include_context(mapped_class.definition_context)
-                np(ns)
-            p = save_classes
+                @wraps(p)
+                def save_classes(ns):
+                    mapper = conf['mapper']
+                    mapper.process_module(module, m)
+                    for mapped_class in mapped_classes:
+                        ns.include_context(mapped_class.definition_context)
+                    np(ns)
+                p = save_classes
 
-        with transaction.manager:
-            p(ns)
-            ns.save(graph=conf['rdf.graph'])
-        return ns.created_contexts()
+            with transaction.manager:
+                p(ns)
+                ns.save(graph=conf['rdf.graph'])
+            return ns.created_contexts()
+        finally:
+            if added_cwd:
+                sys.path.remove(cwd)
 
     def say(self, subject, property, object):
         '''
