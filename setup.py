@@ -52,7 +52,8 @@ setup(
         'pytest>=3.4.0',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
-    ] + (['mock==2.0.0'] if PY2 else []),
+    ] + (['mock==2.0.0'] if PY2 else [])
+      + (['pytest-parallel'] if PY3 else []),
     install_requires=[
         'bibtexparser~=1.1.0',
         'BTrees==4.0.8',

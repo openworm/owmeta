@@ -7,11 +7,8 @@ except ImportError:
 import re
 import tempfile
 import os
-import sys
-from os import listdir, system as sh
+from os import listdir
 from os.path import exists, join as p, realpath
-from subprocess import check_output, CalledProcessError
-import shlex
 import shutil
 import json
 from rdflib.term import URIRef
@@ -22,15 +19,13 @@ from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError,
                                 POWConfig, POWSource, POWTranslator, POWEvidence,
                                 DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
                                 POWDirDataSourceDirLoader, _DSD)
-from PyOpenWorm.datasource_loader import LoadFailed
 from PyOpenWorm.bittorrent import BitTorrentDataSourceDirLoader
-from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from PyOpenWorm.command_util import IVar, PropertyIVar
-from PyOpenWorm.evidence import Evidence
+from PyOpenWorm.contextDataObject import ContextDataObject
+from PyOpenWorm.datasource_loader import LoadFailed
+from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from PyOpenWorm.document import Document
 from PyOpenWorm.website import Website
-from PyOpenWorm.contextDataObject import ContextDataObject
-from textwrap import dedent
 from .TestUtilities import noexit, stderr, stdout
 
 
@@ -1006,7 +1001,9 @@ class POWDSDLoaderMissingDSD(unittest.TestCase):
         don't anticipate all that many in one repo
         '''
         cut = POWDirDataSourceDirLoader(self.testdir)
-        self.assertFalse(cut.can_load('dsdid1'))
+        m = Mock()
+        m.identifier = 'dsid1'
+        self.assertFalse(cut.can_load(m))
 
     def test_dir_missing_load(self):
         cut = POWDirDataSourceDirLoader(self.testdir)
@@ -1037,7 +1034,7 @@ class TestDSD(unittest.TestCase):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
         # The MagicMock returns a result as an actual loader would
         mc = [MagicMock()]
-        mc[0].dirkey = 'dirkey'
+        mc[0].directory_key = 'dirkey'
         self.cut = _DSD(dict(), self.testdir, mc)
         self.mc = mc
 
@@ -1064,7 +1061,7 @@ class TestDSDDirExists(unittest.TestCase):
         '''
         # Given
         mc = [MagicMock()]
-        mc[0].dirkey = 'dirkey'
+        mc[0].directory_key = 'dirkey'
 
         # When
         _DSD(dict(), self.testdir, mc)
@@ -1078,7 +1075,7 @@ class TestDSDDirExists(unittest.TestCase):
         '''
         # Given
         mc = [MagicMock()]
-        mc[0].dirkey = 'dirkey'
+        mc[0].directory_key = 'dirkey'
         os.makedirs(p(self.testdir, 'dirkey'))
 
         # When
@@ -1094,169 +1091,6 @@ class TestDSDDirExists(unittest.TestCase):
     # Don't have preferences yet
     # Test multiple loaders are ordered by preference -> should pick the highest ordered
     # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
-
-
-@mark.inttest
-class POWAccTest(unittest.TestCase):
-    ''' smoke-test for pow command line and the standard data base '''
-
-    def setUp(self):
-        import threading
-        self.ns = threading.local()
-        with open('tests/pytest-cov-embed.py', 'r') as f:
-            self.ptcov = f.read()
-
-    def set_up(self):
-        self.ns.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        # Added so pytest_cov gets to run for our subprocesses
-        with open(p(self.ns.testdir, 'sitecustomize.py'), 'w') as f:
-            f.write(self.ptcov)
-        shutil.copytree('.pow', p(self.ns.testdir, '.pow'), symlinks=True)
-
-    def tear_down(self):
-        shutil.rmtree(self.ns.testdir)
-
-    def sh(self, command, **kwargs):
-        env = dict(os.environ)
-        env['PYTHONPATH'] = self.ns.testdir + os.pathsep + env['PYTHONPATH']
-        return check_output(shlex.split(command), env=env, cwd=self.ns.testdir).decode('utf-8')
-
-    @property
-    def testdir(self):
-        return self.ns.testdir
-
-    def test_runner(self):
-        import threading
-        mytests = [getattr(self, x) for x in dir(self) if x.startswith('t_')]
-        threads = []
-        exceptions = [None] * len(mytests)
-        barrier = threading.Semaphore()
-
-        def test_exec(idx, test):
-            def f():
-                try:
-                    self.set_up()
-                except BaseException as e:
-                    barrier.release()
-                    exceptions[idx] = e
-                    return
-
-                try:
-                    return test()
-                except BaseException as e:
-                    exceptions[idx] = e
-                finally:
-                    try:
-                        self.tear_down()
-                    finally:
-                        barrier.release()
-            return f
-
-        for idx, k in enumerate(mytests):
-            t = threading.Thread(target=test_exec(idx, k), name=k.__name__)
-            threads.append(t)
-            t.start()
-
-        for m in mytests:
-            barrier.acquire()
-
-        for thr, test, exc in zip(threads, mytests, exceptions):
-            thr.join()
-            if exc is not None:
-                raise exc
-
-    def t_translator_list(self):
-        ''' Test we have some translator '''
-        self.assertRegexpMatches(self.sh('pow translator list'), r'<[^>]+>')
-
-    def t_source_list(self):
-        ''' Test we have some data source '''
-        self.assertRegexpMatches(self.sh('pow source list'), r'<[^>]+>')
-
-    def t_source_list_dweds(self):
-        ''' Test listing of DWEDS '''
-        out = self.sh('pow source list --kind :DataWithEvidenceDataSource')
-        self.assertRegexpMatches(out, r'<[^>]+>')
-
-    def t_manual_graph_edit_no_diff(self):
-        '''
-        Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
-        '''
-        index = self.sh('cat ' + p('.pow', 'graphs', 'index'))
-        fname = index.split('\n')[0].split(' ')[0]
-
-        open(p(self.testdir, '.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
-
-        self.assertRegexpMatches(self.sh('pow diff'), r'^$')
-
-    def t_contexts_list(self):
-        ''' Test we have some contexts '''
-        self.assertRegexpMatches(self.sh('pow contexts list'), r'^http://')
-
-    def t_list_contexts(self):
-        ''' Test we have some contexts '''
-        self.assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
-
-    def t_save_diff(self):
-        ''' Change something and make a diff '''
-        modpath = p(self.testdir, 'test_module')
-        os.mkdir(modpath)
-        open(p(modpath, '__init__.py'), 'w').close()
-        with open(p(modpath, 'command_test_save.py'), 'w') as out:
-            print(dedent('''\
-                    from test_module.monkey import Monkey
-
-
-                    def pow_data(ns):
-                        ns.context.add_import(Monkey.definition_context)
-                        ns.context(Monkey)(bananas=55)
-                    '''), file=out)
-
-        with open(p(modpath, 'monkey.py'), 'w') as out:
-            print(dedent('''\
-                    from PyOpenWorm.dataObject import DataObject, DatatypeProperty
-
-
-                    class Monkey(DataObject):
-                        class_context = 'http://example.org/primate/monkey'
-
-                        bananas = DatatypeProperty()
-                        def identifier_augment(self):
-                            return type(self).rdf_namespace['paul']
-
-                        def defined_augment(self):
-                            return True
-
-
-                    __yarom_mapped_classes__ = (Monkey,)
-                    '''), file=out)
-        print(self.sh('pow save test_module.command_test_save'))
-        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
-
-    def t_save_classes(self):
-        modpath = p(self.testdir, 'test_module')
-        os.mkdir(modpath)
-        open(p(modpath, '__init__.py'), 'w').close()
-        with open(p(modpath, 'monkey.py'), 'w') as out:
-            print(dedent('''\
-                    from PyOpenWorm.dataObject import DataObject, DatatypeProperty
-
-
-                    class Monkey(DataObject):
-                        class_context = 'http://example.org/primate/monkey'
-
-                        bananas = DatatypeProperty()
-                        def identifier_augment(self):
-                            return type(self).rdf_namespace['paul']
-
-                        def defined_augment(self):
-                            return True
-
-
-                    __yarom_mapped_classes__ = (Monkey,)
-                    '''), file=out)
-        print(self.sh('pow save test_module.monkey'))
-        self.assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
 
 class _TestException(Exception):

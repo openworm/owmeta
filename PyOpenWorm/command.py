@@ -1155,9 +1155,12 @@ class POW(object):
             # XXX persist the dict
             lclasses = [POWDirDataSourceDirLoader()]
             dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
-            dindex = open(pth_join(self.powdir, 'data_source_directories'))
-            for ds_id, dname in (x.strip().split(' ', 1) for x in dindex):
-                dsd.put(ds_id, dname)
+            try:
+                dindex = open(pth_join(self.powdir, 'data_source_directories'))
+                for ds_id, dname in (x.strip().split(' ', 1) for x in dindex):
+                    dsd.put(ds_id, dname)
+            except OSError:
+                pass
             self._data_source_directories = dsd
 
     def _stage_translation_directory(self, source_directory, target_directory):
@@ -1611,7 +1614,7 @@ class _DSD(object):
     def _init_loaders(self, loaders):
         res = []
         for loader in loaders:
-            nd = pth_join(self._base_directory, loader.dirkey)
+            nd = pth_join(self._base_directory, loader.directory_key)
             if not exists(nd):
                 makedirs(nd)
             loader.base_directory = nd
@@ -1690,7 +1693,7 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
         if not self._index:
             self._load_index()
 
-    def can_load(self, ident):
+    def can_load(self, data_source):
         try:
             self._ensure_index_loaded()
         except (OSError, IOError) as e:
@@ -1701,7 +1704,7 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
             if e.errno == 2: # FileNotFound
                 return False
             raise
-        return ident in self._index
+        return str(data_source.identifier) in self._index
 
     def load(self, ident):
         try:

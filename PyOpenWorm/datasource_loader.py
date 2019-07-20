@@ -10,17 +10,7 @@ from os.path import exists, isdir, join as pth_join, isabs, realpath
 import six
 
 
-class DataSourceDirLoaderMeta(type):
-
-    # Logic behind this: I want to provide a good default of the FCN, but also allow implementers to say "I just want to
-    # use a class variable". You can also subclass this meta, set dirkey in the meta's class definition and then
-    # override in instances of that meta by explicitly setting dirkey in the instance...so best of both.
-    @property
-    def dirkey(self):
-        return getattr(self, 'directory_key', None) or FCN(self)
-
-
-class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
+class DataSourceDirLoader(object):
     '''
     Loads a data files for a DataSource
 
@@ -30,6 +20,7 @@ class DataSourceDirLoader(six.with_metaclass(DataSourceDirLoaderMeta, object)):
     def __init__(self, base_directory=None):
         if base_directory:
             self.base_directory = realpath(base_directory)
+        self.directory_key = FCN(type(self))
 
     def __call__(self, data_source):
         '''

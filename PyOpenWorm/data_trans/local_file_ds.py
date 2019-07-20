@@ -1,9 +1,10 @@
+from os.path import join
 from contextlib import contextmanager
 from rdflib.namespace import Namespace
 from ..datasource import Informational
 from .file_ds import FileDataSource
 from .common_data import DS_NS
-from ..capability import Capable
+from ..capability import Capable, NoProviderGiven
 from ..capabilities import FilePathCapability
 
 
@@ -16,9 +17,18 @@ class LocalFileDataSource(Capable, FileDataSource):
     torrent_file_name = Informational(display_name='Torrent file name')
     needed_capabilities = [FilePathCapability()]
 
-    @contextmanager
+    def __init__(self, *args, **kwargs):
+        super(LocalFileDataSource, self).__init__(*args, **kwargs)
+        self._base_path_provider = None
+
     def file_contents(self):
-        yield open(self.file_name.one(), 'b')
+        if not self._base_path_provider:
+            raise NoProviderGiven()
+
+        return open(self.full_path(), 'b')
+
+    def full_path(self):
+        return join(self.basedir(), self.file_name.one())
 
     def accept_capability_provider(self, cap, provider):
         self._base_path_provider = provider

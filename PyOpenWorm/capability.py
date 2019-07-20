@@ -36,8 +36,8 @@ class _Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+            _Singleton._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
+        return _Singleton._instances[cls]
 
 
 class Capability(six.with_metaclass(_Singleton)):
@@ -96,6 +96,13 @@ class NoProviderAvailable(Exception):
     def __init__(self, cap, receiver=None):
         super(NoProviderAvailable, self).__init__('No providers currently provide {}{}'
                 .format(cap, ' for ' + repr(receiver) if receiver else ''))
+        self._cap = cap
+
+
+class NoProviderGiven(Exception):
+    def __init__(self, cap, receiver=None):
+        super(NoProviderGiven, self).__init__('No {} providers were given{}'
+                .format(cap, ' to ' + repr(receiver) if receiver else ''))
         self._cap = cap
 
 

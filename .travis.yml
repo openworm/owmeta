@@ -4,6 +4,7 @@ matrix:
     - python: '3.7'
       dist: xenial
       sudo: true
+      env: WORKERS=8
     - python: '3.6'
     - python: '3.4'
     - python: '2.7'
@@ -16,10 +17,7 @@ install:
 - python setup.py install
 - pow clone https://github.com/openworm/OpenWormData.git
 script:
-- python setup.py test --addopts "--verbose -m 'not inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
-- mv .coverage .coverage-functional
-- python setup.py test --addopts "--verbose -m 'inttest' --cov=PyOpenWorm --ignore=tests/InferenceTest.py"
-- coverage combine .coverage-functional .coverage 
+- "./ci-test.sh"
 after_script:
 - coveralls
 after_success:
