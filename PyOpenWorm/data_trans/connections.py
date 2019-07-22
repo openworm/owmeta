@@ -211,7 +211,6 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
             for row in reader:
                 pre, post, typ, number, nt = row
                 with data_source.data_context.stored(Connection, Neuron) as srcctx:
-                    print("CCC", list(srcctx.Connection.query().load()))
                     conn = srcctx.Connection.query(pre_cell=srcctx.Neuron(pre),
                                                    post_cell=srcctx.Neuron(post),
                                                    number=int(number),

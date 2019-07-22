@@ -43,10 +43,9 @@ class InexactNumberMatchTest(_Base):
     def setUp(self):
         super(InexactNumberMatchTest, self).setUp()
         fname = p(self.testdir, 'mycsv.csv')
-        text = dedent('''\
-               PreCell;PostCell;send;3;neurotransmitter''')
+        text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
-            f.write(text.strip())
+            f.write(text)
         self.nt_ds.csv_file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
@@ -71,10 +70,9 @@ class ExactNumberMatchTest(_Base):
     def setUp(self):
         super(ExactNumberMatchTest, self).setUp()
         fname = p(self.testdir, 'mycsv.csv')
-        text = dedent('''\
-               PreCell;PostCell;send;3;neurotransmitter''')
+        text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
-            f.write(text.strip())
+            f.write(text)
         self.nt_ds.csv_file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),

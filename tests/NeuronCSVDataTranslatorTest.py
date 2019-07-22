@@ -136,5 +136,3 @@ ADAR,Neuropeptide,PDF-1,WormAtlas,'''
         ev = res.evidence_context(Evidence)()
         for e in ev.load():
             self.assertEqual(e.reference().title(), 'something')
-
-
