@@ -69,7 +69,6 @@ def install_module_import_wrapper():
         ModuleRecorder = MR()
         ImportOverrider = Overrider(mapper=ModuleRecorder)
         ImportOverrider.wrap_import()
-        ImportOverrider.install_excepthook()
     else:
         LOGGER.info("Import overrider already installed")
     return ImportOverrider
