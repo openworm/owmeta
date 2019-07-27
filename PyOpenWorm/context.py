@@ -1,5 +1,6 @@
 from __future__ import print_function
 from types import ModuleType
+import logging
 import rdflib
 from rdflib.term import Variable, URIRef
 from rdflib.graph import ConjunctiveGraph
@@ -19,6 +20,8 @@ from six.moves.urllib.parse import quote
 from six import text_type
 import six
 
+
+L = logging.getLogger(__name__)
 
 DATA_CONTEXT_KEY = 'data_context_id'
 IMPORTS_CONTEXT_KEY = 'imports_context_id'
@@ -374,6 +377,17 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                 moddo = cd_l.module()
                 mod = self.mapper.load_module(moddo.name())
                 c = getattr(mod, class_name, None)
+                if c is None:
+                    ymc = getattr(mod, '__yarom_mapped_classes__', None)
+                    if ymc:
+                        matching_classes = tuple(mc for mc in ymc
+                                                 if mc.__name__ == class_name)
+                        if matching_classes:
+                            c = matching_classes[0]
+                        if len(matching_classes) > 1:
+                            L.warn('More than one class has the same name in'
+                            ' __yarom_mapped_classes__ for {}, so we are picking the'
+                            ' first one as the resolved class among {}'.format(mod, ymc))
                 break
         return c
 

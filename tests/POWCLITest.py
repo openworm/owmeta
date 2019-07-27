@@ -9,7 +9,7 @@ import os
 import re
 import shlex
 import shutil
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import six
 import sys
 import tempfile
@@ -57,7 +57,24 @@ class Data(object):
     def sh(self, command, **kwargs):
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir + os.pathsep + env['PYTHONPATH']
-        return check_output(shlex.split(command), env=env, cwd=self.testdir, **kwargs).decode('utf-8')
+        try:
+            return check_output(shlex.split(command), env=env, cwd=self.testdir, **kwargs).decode('utf-8')
+        except CalledProcessError as e:
+            if e.stdout:
+                print(dedent('''\
+                ----------stdout from "{}"----------
+                {}
+                ----------{}----------
+                '''.format(command, e.stdout.decode('UTF-8'),
+                           'end stdout'.center(14 + len(command)))))
+            if e.stderr:
+                print(dedent('''\
+                ----------stderr from "{}"----------
+                {}
+                ----------{}----------
+                '''.format(command, e.stderr.decode('UTF-8'),
+                           'end stderr'.center(14 + len(command)))))
+            raise
 
     __repr__ = __str__
 
@@ -163,25 +180,25 @@ def test_save_classes(self):
     assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
 
 
+class DT1(DataTranslator):
+    class_context = 'http://example.org/context'
+    translator_identifier = URIRef('http://example.org/trans1')
+
+    def translate(source):
+        pass
+
+
 def test_translator_list(self):
     expected = URIRef('http://example.org/trans1')
     with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
         with transaction.manager:
             # Create data sources
             ctx = Context(ident='http://example.org/context', conf=conn.conf)
+            ctx.mapper.process_class(DT1)
 
-            class DT(DataTranslator):
-                class_context = ctx.identifier
-                translator_identifier = expected
-
-                def translate(source):
-                    pass
-
-            ctx.mapper.process_class(DT)
-
-            DT.definition_context.save(conn.conf['rdf.graph'])
+            DT1.definition_context.save(conn.conf['rdf.graph'])
             # Create a translator
-            dt = ctx(DT)()
+            dt = ctx(DT1)()
 
             ctx_id = conn.conf['data_context_id']
             main_ctx = Context(ident=ctx_id, conf=conn.conf)
@@ -196,6 +213,17 @@ def test_translator_list(self):
     )
 
 
+class DT2(DataTranslator):
+    class_context = 'http://example.org/context'
+    input_type = LFDS
+    output_type = LFDS
+    translator_identifier = 'http://example.org/trans1'
+
+    def translate(source):
+        print(source.full_path())
+        return source
+
+
 @mark.xfail
 def test_translate_data_source_loader(self):
     with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
@@ -207,21 +235,11 @@ def test_translate_data_source_loader(self):
                 file_name='Merged_Nuclei_Stained_Worm.zip',
                 torrent_file_name='d9da5ce947c6f1c127dfcdc2ede63320.torrent'
             )
-
-            class DT(DataTranslator):
-                class_context = ctx.identifier
-                input_type = LFDS
-                output_type = LFDS
-                translator_identifier = 'http://example.org/trans1'
-
-                def translate(source):
-                    print(source.full_path())
-                    return source
-            ctx.mapper.process_class(DT)
-            dt = ctx(DT)()
+            ctx.mapper.process_class(DT2)
+            dt = ctx(DT2)()
             # Create a translator
             ctx_id = conn.conf['data_context_id']
-            DT.definition_context.save(conn.conf['rdf.graph'])
+            DT2.definition_context.save(conn.conf['rdf.graph'])
             main_ctx = Context(ident=ctx_id, conf=conn.conf)
             main_ctx.add_import(ctx)
             main_ctx.save_imports()

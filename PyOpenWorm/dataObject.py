@@ -6,6 +6,7 @@ import logging
 import six
 import hashlib
 
+from importlib import import_module
 import PyOpenWorm  # noqa
 from . import BASE_SCHEMA_URL, DEF_CTX
 from .contextualize import (Contextualizable,
@@ -308,7 +309,21 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                     rdto.rdfs_subclassof_property.set(prdto)
             self.rdf_type_object = rdto
 
+    def _check_is_good_class_registry(self):
+        module = import_module(self.__module__)
+        if hasattr(module, self.__name__):
+            return
+
+        ymc = getattr(module, '__yarom_mapped_classes__', None)
+        if ymc and self in ymc:
+            return
+
+        L.warning('While saving the registry entry of {}, we found that its'
+                  ' module, {}, does not have "{}" in its'
+                  ' namespace'.format(self, self.__module__, self.__name__))
+
     def init_python_class_registry_entries(self):
+        self._check_is_good_class_registry()
         re = RegistryEntry.contextualize(self.definition_context)()
         cd = PythonClassDescription.contextualize(self.definition_context)()
 

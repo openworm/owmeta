@@ -1149,8 +1149,9 @@ class POW(object):
 
     def _load_data_source_directories(self):
         if not self._data_source_directories:
-            # The DSD holds mappings to data sources we've loaded before. In general, this allows the individual loaders
-            # to not worry about checking if they have loaded something before.
+            # The DSD holds mappings to data sources we've loaded before. In general, this
+            # allows the individual loaders to not worry about checking if they have
+            # loaded something before.
 
             # XXX persist the dict
             lclasses = [POWDirDataSourceDirLoader()]

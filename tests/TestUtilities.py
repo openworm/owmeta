@@ -4,6 +4,7 @@ import os
 import hashlib
 from contextlib import contextmanager
 from six import StringIO
+import logging
 
 import pytest
 
@@ -25,10 +26,10 @@ def findSkippedTests():
                 count = False
                 for line in f:
                     if skippedTest in line:
-                        print('found skipped test in file %s' %fname)
+                        print('found skipped test in file %s' % fname)
                         count = True
                     elif expectedFailure in line:
-                        print('found expected failure in file %s' %fname)
+                        print('found expected failure in file %s' % fname)
                         count = True
                 if count:
                     print('\n')
@@ -115,3 +116,16 @@ def stderr():
         yield sys.stderr
     finally:
         sys.stderr = oldstderr
+
+
+@contextmanager
+def captured_logging():
+    out = StringIO()
+    logger = logging.getLogger()
+    stream_handler = logging.StreamHandler(out)
+    logger.addHandler(stream_handler)
+    try:
+        yield out
+    finally:
+        logger.removeHandler(stream_handler)
+        out.close()
