@@ -51,6 +51,7 @@ setup(
         'pytest>=3.4.0',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
+        'rdflib-sqlalchemy'
     ] + (['mock==2.0.0'] if PY2 else [])
       + (['pytest-parallel'] if PY3 else []),
     install_requires=[
@@ -79,6 +80,11 @@ setup(
       + (['backports.tempfile==1.0'] if PY2 else [])
       + (['scandir'] if PY2 else [])
       + (['docutils<0.15'] if PY2 else []),
+    extras_require={
+        'sqlite_source': [
+            'rdflib-sqlalchemy'
+        ]
+    },
     version=version,
     packages=['PyOpenWorm',
               'PyOpenWorm.data_trans'],

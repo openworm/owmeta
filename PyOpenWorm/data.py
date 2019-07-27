@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sqlite3
 import hashlib
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, plugin
 from rdflib.store import TripleAddedEvent, TripleRemovedEvent, Store
@@ -604,10 +603,16 @@ class SQLiteSource(RDFSource):
         self.conf['rdf.store'] = "sqlite"
 
     def open(self):
-        from rdflib_sqlalchemy import registerplugins
+        try:
+            from rdflib_sqlalchemy import registerplugins
+        except ImportError:
+            raise OpenFailError('The rdflib-sqlalchemy package is not installed.'
+                    ' You may need to install the "sqlite_source" extra for PyOpenWorm.'
+                    ' For example, change "PyOpenWorm" in your setup.py or'
+                    ' requirements.txt to "PyOpenWorm[sqlite_source]" and reinstall')
         registerplugins()
-        self.path = self.conf['rdf.store_conf']
-        openstr = self.path
+        self.path = os.path.abspath(self.conf['rdf.store_conf'])
+        openstr = 'sqlite:///' + self.path
         store = plugin.get("SQLAlchemy", Store)()
         self.graph = ConjunctiveGraph(store)
         self.graph.open(openstr, create=True)
