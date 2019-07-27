@@ -1,8 +1,8 @@
 from __future__ import print_function
 import sqlite3
 import hashlib
-from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph
-from rdflib.store import TripleAddedEvent, TripleRemovedEvent
+from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, plugin
+from rdflib.store import TripleAddedEvent, TripleRemovedEvent, Store
 from rdflib.events import Event
 from rdflib.namespace import RDFS, RDF, NamespaceManager
 from datetime import datetime as DT
@@ -22,7 +22,8 @@ __all__ = [
     "SPARQLSource",
     "SleepyCatSource",
     "DefaultSource",
-    "ZODBSource"]
+    "ZODBSource",
+    "SQLiteSource"]
 
 L = logging.getLogger(__name__)
 
@@ -315,14 +316,18 @@ class Data(Configure):
         # to the graph
         self['rdf.graph.change_counter'] = 0
 
-        self['rdf.graph'].store.dispatcher.subscribe(TripleAddedEvent, self._context_changed_handler())
-        self['rdf.graph'].store.dispatcher.subscribe(TripleRemovedEvent, self._context_changed_handler())
+        if hasattr(self['rdf.graph'].store, 'dispatcher'):
+            self['rdf.graph'].store.dispatcher.subscribe(TripleAddedEvent, self._context_changed_handler())
+            self['rdf.graph'].store.dispatcher.subscribe(TripleRemovedEvent, self._context_changed_handler())
 
         self['rdf.graph']._add = self['rdf.graph'].add
         self['rdf.graph']._remove = self['rdf.graph'].remove
         self['rdf.graph'].add = self._my_graph_add
         self['rdf.graph'].remove = self._my_graph_remove
-        nm.bind("", self['rdf.namespace'])
+        try:
+            nm.bind("", self['rdf.namespace'])
+        except Exception:
+            L.warn("Failed to bind rdf namespace", exc_info=True)
 
     def _context_changed_handler(self):
         if not self._cch:
@@ -382,7 +387,8 @@ class Data(Configure):
         self.sources = {'sparql_endpoint': SPARQLSource,
                         'sleepycat': SleepyCatSource,
                         'default': DefaultSource,
-                        'zodb': ZODBSource}
+                        'zodb': ZODBSource,
+                        'sqlite': SQLiteSource}
         source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
 
@@ -558,8 +564,8 @@ class ZODBSource(RDFSource):
         self.conn = self.zdb.open()
         root = self.conn.root()
         if 'rdflib' not in root:
-            root['rdflib'] = ConjunctiveGraph('ZODB')
-        self.graph = root['rdflib']
+            store = plugin.get('ZODB', Store)()
+            root['rdflib'] = store
         try:
             transaction.commit()
         except Exception:
@@ -569,7 +575,8 @@ class ZODBSource(RDFSource):
             L.exception('Forced to abort transaction on ZODB store opening', exc_info=True)
             transaction.abort()
         transaction.begin()
-        self.graph.open(self.path)
+        self.graph = ConjunctiveGraph(root['rdflib'])
+        self.graph.open(openstr)
 
     def close(self):
         if self.graph is False:
@@ -588,3 +595,19 @@ class ZODBSource(RDFSource):
         self.conn.close()
         self.zdb.close()
         self.graph = False
+
+
+class SQLiteSource(RDFSource):
+
+    def __init__(self, *args, **kwargs):
+        super(SQLiteSource, self).__init__(*args, **kwargs)
+        self.conf['rdf.store'] = "sqlite"
+
+    def open(self):
+        from rdflib_sqlalchemy import registerplugins
+        registerplugins()
+        self.path = self.conf['rdf.store_conf']
+        openstr = self.path
+        store = plugin.get("SQLAlchemy", Store)()
+        self.graph = ConjunctiveGraph(store)
+        self.graph.open(openstr, create=True)

@@ -720,7 +720,13 @@ class POW(object):
 
             with transaction.manager:
                 p(ns)
+                from time import time
+                t0 = time()
                 ns.save(graph=conf['rdf.graph'])
+                t1 = time()
+            t2 = time()
+            print('save time', t1 - t0)
+            print('commit time', t2 - t1)
             return ns.created_contexts()
         finally:
             if added_cwd:
