@@ -6,7 +6,6 @@ matrix:
       sudo: true
       env: WORKERS=8
     - python: '3.6'
-    - python: '3.4'
     - python: '2.7'
 before_install:
 - pip install --upgrade pip
