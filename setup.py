@@ -34,7 +34,6 @@ package_data_excludes = ['.*', '*.bkp', '~*']
 
 PY2 = sys.version_info.major == 2
 PY3 = sys.version_info.major == 3
-PY34 = PY3 and sys.version_info.minor == 4
 
 
 def excludes(base):
@@ -75,11 +74,10 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
-    ] + (['zodbpickle==1.0'] if PY2 or PY34 else [])
-      + (['Sphinx<1.8.4'] if PY34 or PY2 else [])
+    ] + (['zodbpickle==1.0'] if PY2 else [])
+      + (['Sphinx<1.8.4'] if PY2 else [])
       + (['backports.tempfile==1.0'] if PY2 else [])
-      + (['Jinja2<2.9'] if PY34 else [])
-      + (['scandir'] if PY2 or PY34 else [])
+      + (['scandir'] if PY2 else [])
       + (['docutils<0.15'] if PY2 else []),
     version=version,
     packages=['PyOpenWorm',
