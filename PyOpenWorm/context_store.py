@@ -2,6 +2,7 @@ from itertools import chain
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
+import rdflib
 from yarom.rdfUtils import transitive_lookup
 
 from .context_common import CONTEXT_IMPORTS
@@ -155,6 +156,22 @@ class RDFContextStore(Store):
     def triples(self, pattern, context=None):
         self.__init_contexts()
         for t in self.__store.triples(pattern, context):
+            contexts = set(getattr(c, 'identifier', c) for c in t[1])
+            if self.__context_transitive_imports:
+                inter = self.__context_transitive_imports & contexts
+            else:
+                # Note that our own identifier is also included in the
+                # transitive imports, so if we don't have *any* imports then we
+                # fall back to querying across all contexts => we don't filter
+                # based on contexts. This is in line with rdflib ConjuctiveGraph
+                # semantics
+                inter = contexts
+            if inter:
+                yield t[0], inter
+
+    def triples_choices(self, pattern, context=None):
+        self.__init_contexts()
+        for t in self.__store.triples_choices(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
             if self.__context_transitive_imports:
                 inter = self.__context_transitive_imports & contexts

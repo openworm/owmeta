@@ -605,6 +605,7 @@ class SQLiteSource(RDFSource):
     def open(self):
         try:
             from rdflib_sqlalchemy import registerplugins
+            from sqlalchemy import event
         except ImportError:
             raise OpenFailError('The rdflib-sqlalchemy package is not installed.'
                     ' You may need to install the "sqlite_source" extra for PyOpenWorm.'
