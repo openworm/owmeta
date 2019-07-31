@@ -80,6 +80,7 @@ setup(
       + (['backports.tempfile==1.0'] if PY2 else [])
       + (['Jinja2<2.9'] if PY34 else [])
       + (['scandir'] if PY2 or PY34 else [])
+      + (['lxml<4.4.0'] if PY34 else [])
       + (['docutils<0.15'] if PY2 else []),
     version=version,
     packages=['PyOpenWorm',
