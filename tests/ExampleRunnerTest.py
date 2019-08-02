@@ -3,6 +3,7 @@ import unittest
 import os
 import subprocess as SP
 import shutil
+import shlex
 import tempfile
 from six import string_types
 from os.path import join as p
@@ -38,7 +39,7 @@ class ExampleRunnerTest(unittest.TestCase):
 
     def exec(self, command, **kwargs):
         if isinstance(command, string_types):
-            command = command.split(' ')
+            command = shlex.split(command)
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
             stat = SP.call(command,

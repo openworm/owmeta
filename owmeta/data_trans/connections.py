@@ -236,7 +236,6 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                             L.warn("Didn't find any connections matching: {}".format(conn))
                         else:
                             break
-        print('result', res)
         return res
 
 
