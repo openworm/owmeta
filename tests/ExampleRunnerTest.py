@@ -38,7 +38,7 @@ class ExampleRunnerTest(unittest.TestCase):
 
     def exec(self, command, **kwargs):
         if isinstance(command, string_types):
-            command = command.split(' ')
+            command = shlex.split(command)
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
             stat = SP.call(command,
