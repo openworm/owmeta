@@ -75,6 +75,9 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
+        'torrent-client',
+        'google-api-python-client',
+        'oauth2client==3.0.0',
     ] + (['zodbpickle==1.0'] if PY2 else [])
       + (['Sphinx<1.8.4'] if PY2 else [])
       + (['backports.tempfile==1.0'] if PY2 else [])
