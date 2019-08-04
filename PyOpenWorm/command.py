@@ -1182,7 +1182,8 @@ class POW(object):
             # loaded something before.
 
             # XXX persist the dict
-            lclasses = [POWDirDataSourceDirLoader()]
+            lclasses = [POWDirDataSourceDirLoader(),
+                        BitTorrentDataSourceDirLoader()]
             dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
             try:
                 dindex = open(pth_join(self.powdir, 'data_source_directories'))
