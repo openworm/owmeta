@@ -78,16 +78,12 @@ def download_torrent(torrent_name):
 
 class BitTorrentDataSourceDirLoader(DataSourceDirLoader):
     def load(self, *data_source):
-        with connect('.pow/pow.conf') as conn:
-            ctx = Context(ident='http://openworm.org/data', conf=conn.conf).stored
-            for d in data_source:
-                datasource = ctx(DataSource)(ident=URIRef(d)).load()
-                for g in datasource:
-                    x = list(g.torrent_file_name())
-                    downloaded_torrent_name = download_torrent(x[0])
-                    print('downloaded torrent', downloaded_torrent_name)
+        for d in data_source:
+            x = list(d.torrent_file_name())
+            downloaded_torrent_name = download_torrent(x[0])
+            print('downloaded torrent', downloaded_torrent_name)
 
-        
+
         os.system("torrent_cli.py start &")
         os.system("torrent_cli.py add "+ downloaded_torrent_name)
 

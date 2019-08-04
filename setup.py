@@ -77,6 +77,7 @@ setup(
         'zodb==4.1.0',
         'torrent-client',
         'google-api-python-client',
+        'google_auth_oauthlib',
         'oauth2client==3.0.0',
     ] + (['zodbpickle==1.0'] if PY2 else [])
       + (['Sphinx<1.8.4'] if PY2 else [])
