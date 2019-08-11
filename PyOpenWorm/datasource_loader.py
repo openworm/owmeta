@@ -24,12 +24,12 @@ class DataSourceDirLoader(object):
 
     def __call__(self, data_source):
         '''
-        Load the data source
+        Load the data source. Calls `load`
 
         Parameters
         ----------
         data_source : PyOpenWorm.datasource.DataSource
-            The data source to load data for
+            The data source to load files for
 
         Returns
         -------
@@ -38,10 +38,19 @@ class DataSourceDirLoader(object):
         Raises
         ------
         LoadFailed
+            If `load`:
+            * throws an exception
+            * doesn't return anything
+            * returns a path that isn't under `base_directory`
+            * returns a path that doesn't exist
         '''
         # Call str(·) to give a more uniform interface to the sub-class ``load``
         # Conventionally, types that tag or "enhance" a string have the base string representation as their __str__
-        s = self.load(data_source)
+        try:
+            s = self.load(data_source)
+        except LoadFailed as e:
+            raise LoadFailed(data_source, self, 'Loader erred')
+
         if not s:
             raise LoadFailed(data_source, self, 'Loader returned an empty string')
 
@@ -69,9 +78,30 @@ class DataSourceDirLoader(object):
         return rpath
 
     def load(self, data_source):
+        '''
+        Loads the files for the data source
+
+        Parameters
+        ----------
+        data_source : PyOpenWorm.datasource.DataSource
+            The data source to load files for
+
+        Returns
+        -------
+        A path to the loaded resource
+        '''
         raise NotImplementedError()
 
     def can_load(self, data_source):
+        '''
+        Returns true if the `~PyOpenWorm.datasource.DataSource` can be loaded by this
+        loader
+
+        Parameters
+        ----------
+        data_source : PyOpenWorm.datasource.DataSource
+            The data source to load files for
+        '''
         return False
 
     def __str__(self):
