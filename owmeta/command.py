@@ -303,9 +303,63 @@ class _ProgressMock(object):
         return type(self)()
 
 
-class OWMDist(object):
+class OWMBundle(object):
     def __init__(self, parent):
         self._parent = parent
+
+    def fetch(self, bundle_name):
+        self._load(bundle_name)
+
+    def load(self, input):
+        '''
+        Parameters
+        ----------
+        input : str
+            The source file
+        '''
+
+    def save(self, output):
+        '''
+        Parameters
+        ----------
+        output : str
+            The target file
+        '''
+
+    def install(self, bundle_name):
+        '''
+        Install the bundle locally for use across projects on the same machine
+
+        Parameters
+        ----------
+        bundle_name : str
+            Name of the bundle to install
+        '''
+
+    def deploy(self, bundle_name, remotes=None):
+        '''
+        Deploys a bundle to a remote. The target remotes come from project and user
+        settings or, if provided, the parameters
+
+        Parameters
+        ----------
+        bundle_name : str
+            Name of the bundle to deploy
+        remotes : str
+            Names of the remotes to deploy to
+        '''
+
+    def checkout(self, bundle_name):
+        '''
+        Switch to the named bundle
+        '''
+
+    def _load(self, bundle_name):
+        loader = self._get_bundle_loader(bundle_name)
+        bundle = loader(bundle_name)
+
+    def _get_bundle_loader(self, bundle_name):
+        pass
 
 
 class OWMConfig(object):

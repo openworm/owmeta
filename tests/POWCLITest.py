@@ -1,9 +1,5 @@
 from __future__ import print_function
-from collections import namedtuple
 from rdflib.term import URIRef
-import importlib as im
-import io
-from multiprocessing import Queue, Process
 from os.path import join as p
 import os
 import re
@@ -11,13 +7,10 @@ import shlex
 import shutil
 from subprocess import check_output, CalledProcessError
 import six
-import sys
 import tempfile
 from textwrap import dedent
-import traceback
 import transaction
 from pytest import mark, fixture
-import unittest
 
 from owmeta.data_trans.local_file_ds import LocalFileDataSource as LFDS
 from owmeta import connect
@@ -29,8 +22,7 @@ from owmeta.context_common import CONTEXT_IMPORTS
 pytestmark = mark.owm_cli_test
 
 
-@fixture
-def self():
+def module_fixture():
     res = Data()
     res.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
     with open(p('tests', 'pytest-cov-embed.py'), 'r') as f:
@@ -43,6 +35,9 @@ def self():
     yield res
 
     shutil.rmtree(res.testdir)
+
+
+self = fixture(module_fixture)
 
 
 class Data(object):
@@ -220,6 +215,37 @@ def test_save_imports(self):
         assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
                 CONTEXT_IMPORTS,
                 URIRef('http://example.org/ungulate/giraffe')) in trips
+
+
+def test_bundle_load(self):
+    pow_bundle = p('tests', 'bundle.tar.gz')
+    self.sh('pow bundle load ' + pow_bundle)
+    assertRegexpMatches(
+        self.sh('pow bundle list'),
+        r'http://example.org/test_bundle'
+    )
+
+
+def test_fetch_and_list_bundle(self):
+    '''
+    Retrieve the bundle from wherever and make sure we can list it
+    '''
+    self.sh('pow bundle fetch http://openworm.org/data#main')
+    assertRegexpMatches(
+        self.sh('pow bundle list'),
+        r'http://openworm.org/data#main'
+    )
+
+
+def test_checkout_bundle(self):
+    '''
+    Checking out a bundle changes the set of graphs to the chosen bundle
+    '''
+    self.sh('pow bundle checkout http://openworm.org/data#main')
+    assertRegexpMatches(
+        self.sh('pow bundle list'),
+        r'http://openworm.org/data#main'
+    )
 
 
 class DT1(DataTranslator):
