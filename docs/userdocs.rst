@@ -12,5 +12,4 @@ For Users
    sharing
    contexts
    command
-   versioning
-   python_release_compatibility
+   bittorrent
