@@ -86,9 +86,7 @@ BitTorrent client for P2P filesharing
 
 2. **Upload** your contents:
 
-- On an AWS EC2 instance is running a Nginx WSGI and a Flask Server to accept .zip content file uploads. Visit this `Elastic IP <13.235.204.78>`_ Elastic IP address to upload your files by browsing through your filesystem and then clicking the ``Submit Query button``.
-
-.. image:: https://drive.google.com/open?id=1Ts4QY8aRqczJDxI5-X1LZrN9esfQiVfM
+- On an AWS EC2 instance is running a Nginx WSGI and a Flask Server to accept .zip content file uploads. Visit this Elastic IP address [13.235.204.78] to upload your files by browsing through your filesystem and then clicking the ``Submit Query button``.
 
 
 
