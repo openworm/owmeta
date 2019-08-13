@@ -326,7 +326,7 @@ class Data(Configure):
         try:
             nm.bind("", self['rdf.namespace'])
         except Exception:
-            L.warn("Failed to bind rdf namespace", exc_info=True)
+            L.warn("Failed to bind default RDF namespace %s", self['rdf.namespace'], exc_info=True)
 
     def _context_changed_handler(self):
         if not self._cch:
