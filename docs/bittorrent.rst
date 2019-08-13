@@ -14,19 +14,19 @@ BitTorrent client for P2P filesharing
 
   Module ``t`` describes the ``DataSource`` attributes::
 
-    def pow_data(ns):
-       ns.context.add_import(ConnectomeCSVDataSource.definition_context)
-       ns.context(ConnectomeCSVDataSource)(
-       key = '2000_connections',
-       csv_file_name = 'connectome.csv',
-       torrent_file_name = 'd9da5ce947c6f1c127dfcdc2ede63320.torrent'
-    )
+        def pow_data(ns):
+            ns.context.add_import(ConnectomeCSVDataSource.definition_context)
+            ns.context(ConnectomeCSVDataSource)(
+            key = '2000_connections',
+            csv_file_name = 'connectome.csv',
+            torrent_file_name = 'd9da5ce947c6f1c127dfcdc2ede63320.torrent'
+         )
 
 |
 
   The ``DataSource`` can be created and stored on the local graph with::
-   
-  $ pow save t
+
+      $ pow save t
 
 
 
@@ -36,6 +36,7 @@ BitTorrent client for P2P filesharing
    
   $ pow source show ConnectomeCSVDataSource:2000_connections
 
+
   ConnectomeCSVDataSource
          CSV file name: 'connectome.csv'
 
@@ -43,11 +44,11 @@ BitTorrent client for P2P filesharing
 
          Torrent file name: 'd9da5ce947c6f1c127dfcdc2ede63320.torrent' 
  
-* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/PyOpenWorm/pull/449/files>`_ class inherits from the `DataSourceDirLoader <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L13-L79>`_ and overrides its `load <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L70-L73>`_  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``,performs `translation <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource.py#L433-L446>`_ from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
+* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/PyOpenWorm/pull/449/files>`_ class inherits from the `DataSourceDirLoader <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L13-L79>`_ and overrides its `load <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L70-L73>`_  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``, performs `translation <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource.py#L433-L446>`_ from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
 
 |
 
- This ``BitTorrent Client`` is `available on PyPI <https://pypi.org/project/torrent-client/>`_ and is included in the `PyOpenWorm setup <https://github.com/openworm/PyOpenWorm/pull/450>`_.
+ This ``BitTorrent Client`` is `available on PyPI <https://pypi.org/project/torrent-client/>`_ and is included in the `PyOpenWorm setup <https://github.com/openworm/PyOpenWorm/blob/dev/setup.py>`_.
 
 |
 
@@ -56,8 +57,7 @@ BitTorrent client for P2P filesharing
   $ pip install torrent-client
 
 
-  For `torrent-client repository <https://github.com/jaideep-seth/Torrent_client_gsoc19>`_
-  and usage information::
+  For reference, use the `torrent-client repository <https://github.com/jaideep-seth/Torrent_client_gsoc19>`_  and its usage information with::
 
   $ torrent_cli.py -h
 
@@ -73,7 +73,7 @@ BitTorrent client for P2P filesharing
 
 |
 	
-* The ``torrent`` file name is the `message digest <https://en.wikipedia.org/wiki/SHA-1>`_ of its contents. If the hash of the downloaded contents is the same as its ``torrent`` name the data is unaltered.
+* The ``torrent`` file name is the `MD5 message digest <https://en.wikipedia.org/wiki/MD5>`_ of its contents. If the hash of the downloaded contents is the same as its ``torrent`` name the data is unaltered.
 
 
 |
@@ -87,6 +87,8 @@ BitTorrent client for P2P filesharing
 2. **Upload** your contents:
 
 - On an AWS EC2 instance is running a Nginx WSGI and a Flask Server to accept .zip content file uploads. Visit this Elastic IP address [13.235.204.78] to upload your files by browsing through your filesystem and then clicking the ``Submit Query button``.
+
+
 
 
 
