@@ -197,8 +197,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
                 if hasattr(c, 'rdf_namespace'):
-                    graph.bind(c.__name__, c.rdf_namespace)
-
+                    try:
+                        graph.bind(c.__name__, c.rdf_namespace)
+                    except Exception as e:
+                        L.warn('Failed to bind RDF namespace for %s to %s', c.__name__,
+                               c.rdf_namespace, exc_info=True)
         if isinstance(graph, set):
             graph.update(self._save_context_triples())
         else:
