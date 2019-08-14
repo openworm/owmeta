@@ -7,7 +7,7 @@ BitTorrent client for P2P filesharing
 
 1. **Download** desired contents:
 
-* A `~PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/data_trans/local_file_ds.py#L11-L39>`_ created and stored within the local graph store contains a `torrent_file_name <https://github.com/openworm/PyOpenWorm/pull/424/files#diff-f837dedc6cde6b8c62975ac3b9ed4efe>`_ `Informational <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource.py#L15-L74>`_. This refers to the torrent containing the location of the desired contents on the BitTorrent. A ``torrent`` is used to locate files on the File System [ `BEP 3 <http://www.bittorrent.org/beps/bep_0003.html>`_ ]. A `DataSource <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource.py#L129-L264>`_ defines attributes about the contents that it represents.
+* A `~PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource` created and stored within the local graph store contains a `torrent_file_name <https://github.com/openworm/PyOpenWorm/pull/424/files#diff-f837dedc6cde6b8c62975ac3b9ed4efe>`_ `~PyOpenWorm.datasource.Informational`. This refers to the torrent containing the location of the desired contents on the BitTorrent. A ``torrent`` is used to locate files on the File System [ `BEP 3 <http://www.bittorrent.org/beps/bep_0003.html>`_ ]. A `~PyOpenWorm.datasource.DataSource` defines attributes about the contents that it represents.
 
 
 |
@@ -44,7 +44,7 @@ BitTorrent client for P2P filesharing
 
          Torrent file name: 'd9da5ce947c6f1c127dfcdc2ede63320.torrent' 
  
-* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/PyOpenWorm/pull/449/files>`_ class inherits from the `DataSourceDirLoader <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L13-L79>`_ and overrides its `load <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource_loader.py#L70-L73>`_  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``, performs `translation <https://github.com/openworm/PyOpenWorm/blob/dev/PyOpenWorm/datasource.py#L433-L446>`_ from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
+* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/PyOpenWorm/pull/449/files>`_ class inherits from the `~PyOpenWorm.datasource_loader.DataSourceDirLoader` and overrides its `load ()`  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``, performs `~PyOpenWorm.datasource.DataTranslator` from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
 
 |
 
