@@ -14,3 +14,5 @@ For Users
    command
    versioning
    python_release_compatibility
+   bittorrent
+
