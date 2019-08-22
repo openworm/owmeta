@@ -66,7 +66,7 @@ setup(
         'pow-store-zodb==0.0.7',
         'rdflib>=4.1.2',
         'six~=1.10',
-        'tqdm~=4.23.4',
+        'tqdm~=4.23',
         'termcolor==1.1.0',
         'transaction>=1.4.4',
         'wrapt==1.10.11',
