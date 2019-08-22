@@ -69,7 +69,7 @@ setup(
         'tqdm~=4.23.4',
         'termcolor==1.1.0',
         'transaction>=1.4.4',
-        'wrapt==1.10.11',
+        'wrapt >= 1.10.11, ~=1.11.1',
         'yarom>=0.11.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
