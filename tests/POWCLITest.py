@@ -22,7 +22,8 @@ import unittest
 from PyOpenWorm.data_trans.local_file_ds import LocalFileDataSource as LFDS
 from PyOpenWorm import connect
 from PyOpenWorm.datasource import DataTranslator
-from PyOpenWorm.context import Context
+from PyOpenWorm.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
+from PyOpenWorm.context_common import CONTEXT_IMPORTS
 
 
 pytestmark = mark.pow_cli_test
@@ -178,6 +179,47 @@ def test_save_classes(self):
                 '''), file=out)
     print(self.sh('pow save test_module.monkey'))
     assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
+
+
+def test_save_imports(self):
+    modpath = p(self.testdir, 'test_module')
+    os.mkdir(modpath)
+    open(p(modpath, '__init__.py'), 'w').close()
+    with open(p(modpath, 'monkey.py'), 'w') as out:
+        print(dedent('''\
+                from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+
+                class Monkey(DataObject):
+                    class_context = 'http://example.org/primate/monkey'
+
+                    bananas = DatatypeProperty()
+                    def identifier_augment(self):
+                        return type(self).rdf_namespace['paul']
+
+                    def defined_augment(self):
+                        return True
+
+
+                class Giraffe(DataObject):
+                    class_context = 'http://example.org/ungulate/giraffe'
+
+
+                def pow_data(ns):
+                    ns.context.add_import(Monkey.definition_context)
+                    ns.context.add_import(Giraffe.definition_context)
+
+                __yarom_mapped_classes__ = (Monkey,)
+                '''), file=out)
+    print(self.sh('pow save test_module.monkey'))
+    with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
+        ctx = Context(ident=conn.conf[IMPORTS_CONTEXT_KEY], conf=conn.conf)
+        trips = set(ctx.stored.rdf_graph().triples((None, None, None)))
+        assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
+                CONTEXT_IMPORTS,
+                URIRef('http://example.org/primate/monkey')) in trips
+        assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
+                CONTEXT_IMPORTS,
+                URIRef('http://example.org/ungulate/giraffe')) in trips
 
 
 class DT1(DataTranslator):

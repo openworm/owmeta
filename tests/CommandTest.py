@@ -17,8 +17,9 @@ import git
 from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
 from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
                                 POWConfig, POWSource, POWTranslator, POWEvidence,
-                                DATA_CONTEXT_KEY, DEFAULT_SAVE_CALLABLE_NAME,
-                                POWDirDataSourceDirLoader, _DSD)
+                                DEFAULT_SAVE_CALLABLE_NAME, POWDirDataSourceDirLoader, _DSD)
+from PyOpenWorm.context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY, Context
+from PyOpenWorm.context_common import CONTEXT_IMPORTS
 from PyOpenWorm.bittorrent import BitTorrentDataSourceDirLoader
 from PyOpenWorm.command_util import IVar, PropertyIVar
 from PyOpenWorm.contextDataObject import ContextDataObject
@@ -35,7 +36,8 @@ class BaseTest(unittest.TestCase):
         self.startdir = os.getcwd()
         os.chdir(self.testdir)
         self.cut = POW()
-        self._default_conf = {'rdf.store_conf': '$HERE/worm.db'}
+        self._default_conf = {'rdf.store_conf': '$HERE/worm.db',
+                              IMPORTS_CONTEXT_KEY: 'http://example.org/imports'}
 
     def tearDown(self):
         os.chdir(self.startdir)
@@ -280,7 +282,7 @@ class POWTest(BaseTest):
             def f(ns):
                 ctx = ns.context
                 stmt = MagicMock(name='stmt')
-                new_ctx = Mock(name='new_ctx')
+                new_ctx = Context(ident=URIRef(a))
                 stmt.to_triple.return_value = (s, s, s)
                 stmt.object.context.identifier = new_ctx.identifier
                 stmt.property.context.identifier = URIRef(a)
@@ -301,8 +303,7 @@ class POWTest(BaseTest):
             def f(ns):
                 ctx = ns.context
                 stmt = MagicMock(name='stmt')
-                new_ctx = Mock(name='new_ctx')
-                new_ctx.identifier = k
+                new_ctx = Context(ident=k)
                 stmt.to_triple.return_value = (s, s, s)
                 stmt.object.context.identifier = k
                 stmt.property.context.identifier = URIRef(a)
@@ -501,6 +502,24 @@ class POWTest(BaseTest):
             im.return_value = module
             self.cut.save('tests')
             # then, no exception was raised
+
+    def test_save_imports(self):
+        data_context = 'http://example.org/mdc'
+        imports_context = 'http://example.org/imports_ctx'
+        imported_context_id = URIRef('http://example.org/new_ctx')
+        self._init_conf({DATA_CONTEXT_KEY: data_context,
+                         IMPORTS_CONTEXT_KEY: imports_context})
+        with patch('importlib.import_module') as im:
+            def f(ns):
+                ctx = ns.context
+                new_ctx = Context(ident=imported_context_id)
+                ctx.add_import(new_ctx)
+
+            im().test = f
+            self.cut.save('tests', 'test')
+        trips = set(self.cut._conf()['rdf.graph'].triples((None, None, None),
+                                                          context=URIRef(imports_context)))
+        self.assertIn((URIRef(data_context), CONTEXT_IMPORTS, imported_context_id), trips)
 
 
 class POWEvidenceGetDWEDSTest(unittest.TestCase):

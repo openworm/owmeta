@@ -309,10 +309,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         return '{}({})'.format(FCN(type(self)), identpart)
 
     def load_own_graph_from_configured_store(self):
-        return ConjunctiveGraph(store=RDFContextStore(self, include_imports=False))
+        return ConjunctiveGraph(identifier=self.identifier,
+                                store=RDFContextStore(self, include_imports=False))
 
     def load_graph_from_configured_store(self):
-        return ConjunctiveGraph(store=RDFContextStore(self))
+        return ConjunctiveGraph(identifier=self.identifier, store=RDFContextStore(self))
 
     def rdf_graph(self):
         if self._graph is None:
@@ -320,11 +321,11 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         return self._graph
 
     def load_mixed_graph(self):
-        return ConjunctiveGraph(store=ContextStore(context=self,
-                                                   include_stored=True))
+        return ConjunctiveGraph(identifier=self.identifier,
+                                store=ContextStore(context=self, include_stored=True))
 
     def load_staged_graph(self):
-        return ConjunctiveGraph(store=ContextStore(context=self))
+        return ConjunctiveGraph(identifier=self.identifier, store=ContextStore(context=self))
 
     @property
     def mixed(self):

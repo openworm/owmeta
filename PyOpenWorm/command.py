@@ -1764,9 +1764,10 @@ class POWSaveNamespace(object):
         self.validate()
         for c in self._created_ctxs:
             c.save_context(*args, **kwargs)
-
         for c in self._external_contexts:
             c.save_context(*args, **kwargs)
+        self.context.save_imports(*args, **kwargs)
+
         return self.context.save_context(*args, **kwargs)
 
 
