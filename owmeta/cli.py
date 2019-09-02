@@ -4,10 +4,10 @@ import json
 from tqdm import tqdm
 import six
 from .cli_command_wrapper import CLICommandWrapper, CLIUserError
-from .command import OWM, GenericUserError
+from .command import OWM
 from .git_repo import GitRepoProvider
 from .text_util import format_table
-from .command_util import GeneratorWithData
+from .command_util import GeneratorWithData, GenericUserError
 
 
 def additional_args(parser):

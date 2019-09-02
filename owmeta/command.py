@@ -1,10 +1,9 @@
 from __future__ import print_function, absolute_import
 import sys
+from contextlib import contextmanager
 import os
 from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
-from os import makedirs, mkdir, listdir, rename, unlink, stat
 
-from contextlib import contextmanager
 try:
     from os import scandir
 except ImportError:
@@ -17,6 +16,7 @@ except ImportError:
             yield sd
         finally:
             del sd
+from os import makedirs, mkdir, listdir, rename, unlink, stat
 
 import hashlib
 import shutil
@@ -24,16 +24,16 @@ import json
 import logging
 import errno
 from collections import namedtuple
-from six import string_types
 
 try:
     from tempfile import TemporaryDirectory
 except ImportError:
     from backports.tempfile import TemporaryDirectory
 
-from .command_util import IVar, SubCommand, GeneratorWithData
+from .command_util import IVar, SubCommand, GeneratorWithData, GenericUserError
+from .commands.bundle import OWMBundle
 from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
-from .capability import provide, is_capable
+from .capability import provide
 from .capabilities import FilePathProvider
 from .datasource_loader import DataSourceDirLoader, LoadFailed
 
@@ -674,6 +674,8 @@ class OWM(object):
 
     evidence = SubCommand(OWMEvidence)
 
+    bundle = SubCommand(OWMBundle)
+
     def __init__(self):
         from time import time
         self.progress_reporter = default_progress_reporter
@@ -1101,7 +1103,7 @@ class OWM(object):
         from glob import glob
         for g in glob(self.store_name + '*'):
             self.message('unlink', g)
-            os.unlink(g)
+            unlink(g)
 
         ccfile = pth_join(self.owmdir, 'changed_contexts')
         for g in glob(ccfile + '*'):
@@ -1621,10 +1623,6 @@ def write_config(ob, f):
     f.truncate()
 
 
-class GenericUserError(Exception):
-    ''' An error which should be reported to the user. Not necessarily an error that is the user's fault '''
-
-
 class InvalidGraphException(GenericUserError):
     ''' Thrown when a graph cannot be translated due to formatting errors '''
 
@@ -1846,6 +1844,8 @@ class OWMSaveNamespace(object):
             raise StatementValidationError(unvalidated)
 
     def save(self, *args, **kwargs):
+        # TODO: (openworm/PyOpenWorm#374) look at automatically importing contexts based
+        # on UnimportedContextRecords among SaveValidationFailureRecords
         self.validate()
         for c in self._created_ctxs:
             c.save_context(*args, **kwargs)
@@ -1857,6 +1857,21 @@ class OWMSaveNamespace(object):
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):
+    '''
+    Stored when statements include a reference to an object but do not include the
+    context of that object in the callback passed to `OWM.save`. For example, if we had a
+    callback like this::
+
+        def owm_data(ns):
+            ctxA = ns.new_context(ident='http://example.org/just-pizza-stuff')
+            ctxB = ns.new_context(ident='http://example.org/stuff-sam-likes')
+            sam = ctxB(Person)('sam')
+            pizza = ctxA(Thing)('pizza')
+            sam.likes(pizza)
+
+    it would generate this error because ``ctxB`` does not declare an import for ``ctxA``
+    '''
+
     def __str__(self):
         from yarom.rdfUtils import triple_to_n3
         trip = self.statement.to_triple()

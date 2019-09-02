@@ -75,14 +75,13 @@ When we're generating data, our workspace is not necessarily in the right state
 for distribution. We may have created temporary files and notes to ourselves,
 or we may have generated data in trial runs (or by mistake) which do not
 reflect our formal experimental conditions. In the staging phase, we bring
-together just the data which we wish to distribute for a given bundle.  |RDF|
-data During the staging phase we also serialize 
+together just the data which we wish to distribute for a given bundle. During
+the staging phase we also serialize 
 
-Once
-these data are brought together in the staging area, they should be immutable
--- in other words, they should not change any more. Consequently, the packaging
-phase is the appropriate time for creating summary statistics, signatures, and
-content-based identifiers.
+Once these data are brought together in the staging area, they should be
+immutable -- in other words, they should not change any more. Consequently, the
+staging phase is the appropriate time for creating summary statistics,
+signatures, and content-based identifiers.
 
 
 For files associated with staged |RDF| data, Much of the data which is created

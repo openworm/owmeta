@@ -18,6 +18,7 @@ from owmeta.datasource import DataTranslator
 from owmeta.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
 from owmeta.context_common import CONTEXT_IMPORTS
 
+from .TestUtilities import assertRegexpMatches
 
 pytestmark = mark.owm_cli_test
 
@@ -32,9 +33,10 @@ def module_fixture():
         f.write(ptcov)
     shutil.copytree('.owm', p(res.testdir, '.owm'), symlinks=True)
 
-    yield res
-
-    shutil.rmtree(res.testdir)
+    try:
+        yield res
+    finally:
+        shutil.rmtree(res.testdir)
 
 
 self = fixture(module_fixture)
@@ -318,10 +320,3 @@ def test_translate_data_source_loader(self):
         self.sh('owm translate http://example.org/trans1 http://example.org/lfds'),
         r'Merged_Nuclei_Stained_Worm.zip'
     )
-
-
-def assertRegexpMatches(text, pattern):
-    if isinstance(pattern, six.string_types):
-        pattern = re.compile(pattern)
-    if not pattern.search(text):
-        raise AssertionError('Could not find {} in:\n{}'.format(pattern, text))

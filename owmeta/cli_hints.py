@@ -77,6 +77,43 @@ CLI_HINTS = {
             }
         }
     },
+    'owmeta.commands.bundle.OWMBundle': {
+        'fetch': {
+            (METHOD_NAMED_ARG, 'bundle_name'): {
+                'names': ['bundle_name'],
+            },
+        },
+        'load': {
+            (METHOD_NAMED_ARG, 'input_file_name'): {
+                'names': ['input'],
+            },
+        },
+        'save': {
+            (METHOD_NAMED_ARG, 'output'): {
+                'names': ['output'],
+            },
+        },
+        'install': {
+            (METHOD_NAMED_ARG, 'bundle_name'): {
+                'names': ['bundle_name'],
+            },
+        },
+        'register': {
+            (METHOD_NAMED_ARG, 'descriptor'): {
+                'names': ['descriptor'],
+            },
+        },
+        'deploy': {
+            (METHOD_NAMED_ARG, 'bundle_name'): {
+                'names': ['bundle_name'],
+            },
+        },
+        'checkout': {
+            (METHOD_NAMED_ARG, 'bundle_name'): {
+                'names': ['bundle_name'],
+            },
+        },
+    },
     'owmeta.command.OWMSource': {
         'show': {
             (METHOD_NAMED_ARG, 'data_source'): {

@@ -3,8 +3,9 @@ from __future__ import print_function
 import os
 import hashlib
 from contextlib import contextmanager
-from six import StringIO
+from six import StringIO, string_types
 import logging
+import re
 
 import pytest
 
@@ -72,18 +73,18 @@ def xfail_without_db():
 # Add function to find dummy tests, i.e. ones that are simply marked pass.
 # TODO: improve this to list function names
 def findDummyTests():
-        for fname in os.listdir('.'):
-            if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
-                with open(fname) as f:
-                    count = False
-                    for line in f:
-                        if 'pass' in line:
-                            print('dummy test in file ' + fname)
-                            count = True
+    for fname in os.listdir('.'):
+        if os.path.isfile(fname) and fname[-3:] == ".py" and fname not in excludedFiles:
+            with open(fname) as f:
+                count = False
+                for line in f:
+                    if 'pass' in line:
+                        print('dummy test in file ' + fname)
+                        count = True
 
-                    if count:
-                        print('\n')
-                        count = False
+                if count:
+                    print('\n')
+                    count = False
 
 
 @contextmanager
@@ -129,3 +130,10 @@ def captured_logging():
     finally:
         logger.removeHandler(stream_handler)
         out.close()
+
+
+def assertRegexpMatches(text, pattern):
+    if isinstance(pattern, string_types):
+        pattern = re.compile(pattern)
+    if not pattern.search(text):
+        raise AssertionError('Could not find {} in:\n{}'.format(pattern, text))
