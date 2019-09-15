@@ -77,6 +77,7 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
+        'rdflib-sqlalchemy',
 
     ] + py2_only('zodbpickle==1.0',
         'Sphinx<1.8.4',
@@ -84,13 +85,18 @@ setup(
         'scandir',
         'docutils<0.15'),
     extras_require={
-        'sqlite_source': [
-            'rdflib-sqlalchemy'
+        # SQL source support
+        'mysql_source_mysql_connector': [
+            'mysql-connector-python'
         ],
-        'mysql_source': [
-            # This is a judgement call
-            'mysqlclient ; python_version == "2.7"',
-            'mysql-connector ; python_version >= "3.4"',
+        'mysql_source_mysqlclient': [
+            'mysqlclient'
+        ],
+        'postgres_source_psycopg': [
+            'psycopg2'
+        ],
+        'postgres_source_pg8000': [
+            'pg8000'
         ]
     },
     version=version,

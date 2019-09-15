@@ -1,31 +1,40 @@
 language: python
-matrix:
-  include:
-    - python: '3.7'
-      dist: xenial
-      sudo: true
-      env: WORKERS=8
-    - python: '3.6'
-    - python: '2.7'
+
+python:
+- 3.7
+- 3.6
+- 2.7
+
+services:
+- postgresql
+- mysql
+
 before_install:
 - pip install --upgrade pip
 - pip install coveralls
 - pip uninstall pytest --yes
 - pip install pytest>=3.4.0
+
 install:
-- python setup.py install
-- pip install rdflib-sqlalchemy
+- ./ci-install.sh
 - owm clone https://github.com/openworm/OpenWormData.git --branch 461-pow-om-rename
+
 script:
 - "./ci-test.sh"
+
 after_script:
 - coveralls
+
 after_success:
 - "./codespeed-submit.sh"
+
 env:
   global:
   - secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
   - secure: YAH6uIq7iO/ufKMUyN3xpKjDqvrJ2yFXmUi7txYaKfqfN+5fW3H/GbnTFXiRVfmNU52c6PlXtcYzllzkJZY0UTkSqt8amMbHyS52JdLhJwMcch4ddDEd0NllMH7XCmGtfqN0E3EF4yHP4EnXqO/HV1VRmwCDRHHMn8c0rl/iqXc=
+  - SQLITE_SOURCE=1
+  - POSTGRES_SOURCE=1
+  - MYSQL_SOURCE=1
   - COVERALLS_PARALLEL=true
 notifications:
   webhooks: https://coveralls.io/webhook

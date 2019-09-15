@@ -295,11 +295,7 @@ class Data(Configure):
         """ Load a file into a new Data instance storing configuration in a JSON format """
         return cls(conf=Configure.process_config(config_dict, **kwargs))
 
-    def openDatabase(self):
-        self.init_database()
-        ACTIVE_CONNECTIONS.append(self)
-
-    def init_database(self):
+    def init(self):
         """ Open the configured database """
         self._init_rdf_graph()
         L.debug("opening " + str(self.source))
@@ -329,6 +325,12 @@ class Data(Configure):
             nm.bind("", self['rdf.namespace'])
         except Exception:
             L.warn("Failed to bind default RDF namespace %s", self['rdf.namespace'], exc_info=True)
+
+    def openDatabase(self):
+        self.init()
+        ACTIVE_CONNECTIONS.append(self)
+
+    init_database = init
 
     def _context_changed_handler(self):
         if not self._cch:
@@ -370,13 +372,15 @@ class Data(Configure):
         # checking could think they have the lastest version when they don't
         self['rdf.graph.change_counter'] += 1
 
-    def closeDatabase(self):
+    def destroy(self):
         """ Close a the configured database """
         self.source.close()
         try:
             ACTIVE_CONNECTIONS.remove(self)
         except ValueError:
             L.debug("Attempted to close a database which was already closed")
+
+    closeDatabase = destroy
 
     def _init_rdf_graph(self):
         # Set these in case they were left out
