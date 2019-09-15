@@ -148,7 +148,9 @@ class RDFContextStore(Store):
         if self.__store is not None and self.__context_transitive_imports is None:
             if self.__include_imports:
                 imports = transitive_lookup(self.__store,
-                                            self.__context.identifier, CONTEXT_IMPORTS, self.__imports_graph)
+                                            self.__context.identifier,
+                                            CONTEXT_IMPORTS,
+                                            self.__imports_graph)
                 self.__context_transitive_imports = imports
             else:
                 self.__context_transitive_imports = set([self.__context.identifier])

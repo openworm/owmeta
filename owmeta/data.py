@@ -22,7 +22,9 @@ __all__ = [
     "SleepyCatSource",
     "DefaultSource",
     "ZODBSource",
-    "SQLiteSource"]
+    "SQLiteSource",
+    "MySQLSource",
+    "PostgreSQLSource"]
 
 L = logging.getLogger(__name__)
 
@@ -387,7 +389,9 @@ class Data(Configure):
                         'sleepycat': SleepyCatSource,
                         'default': DefaultSource,
                         'zodb': ZODBSource,
-                        'sqlite': SQLiteSource}
+                        'sqlite': SQLiteSource,
+                        'mysql': MySQLSource,
+                        'postgresql': PostgreSQLSource}
         source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
 
@@ -596,11 +600,11 @@ class ZODBSource(RDFSource):
         self.graph = False
 
 
-class SQLiteSource(RDFSource):
+class SQLSource(RDFSource):
 
     def __init__(self, *args, **kwargs):
-        super(SQLiteSource, self).__init__(*args, **kwargs)
-        self.conf['rdf.store'] = "sqlite"
+        super(SQLSource, self).__init__(*args, **kwargs)
+        self.conf['rdf.store'] = self.store_name
 
     def open(self):
         try:
@@ -608,12 +612,59 @@ class SQLiteSource(RDFSource):
             from sqlalchemy import event
         except ImportError:
             raise OpenFailError('The rdflib-sqlalchemy package is not installed.'
-                    ' You may need to install the "sqlite_source" extra for owmeta.'
+                    ' You may need to install one of "sqlite_source", "mysql_source", or'
+                    ' "postgresql_source" extra for owmeta.'
                     ' For example, change "owmeta" in your setup.py or'
                     ' requirements.txt to "owmeta[sqlite_source]" and reinstall')
         registerplugins()
-        self.path = os.path.abspath(self.conf['rdf.store_conf'])
-        openstr = 'sqlite:///' + self.path
-        store = plugin.get("SQLAlchemy", Store)()
+
+        store = plugin.get("SQLAlchemy", Store)(**self._initargs())
         self.graph = ConjunctiveGraph(store)
-        self.graph.open(openstr, create=True)
+        cfg = self._openconfig()
+        self.graph.open(cfg, create=True)
+
+    def _initargs(self):
+        a = self._initargs_augment()
+        if not a or not isinstance(a, dict):
+            return dict()
+        return a
+
+    def _openconfig(self):
+        c = self.conf['rdf.store_conf']
+        if isinstance(c, dict):
+            c = dict(c)
+            url = c.pop('url', None)
+            if not url:
+                raise OpenFailError('A "url" argument must be provided in config dict')
+            c.pop('init_args', None)
+            self.url = self._openurl(url)
+            c['url'] = self.url
+            return c
+        else:
+            self.url = self._openurl(c)
+            return self.url
+
+    def _openurl(self, url):
+        return url
+
+    def _initargs_augment(self):
+        c = self.conf['rdf.store_conf']
+        if isinstance(c, dict):
+            initargs = self.conf['rdf.store_conf'].get('init_args', None)
+            if initargs:
+                return dict(initargs)
+
+
+class SQLiteSource(SQLSource):
+    store_name = 'sqlite'
+
+    def _openurl(self, url):
+        return 'sqlite:///' + url
+
+
+class MySQLSource(SQLSource):
+    store_name = 'mysql'
+
+
+class PostgreSQLSource(SQLSource):
+    store_name = 'postgresql'

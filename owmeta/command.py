@@ -975,6 +975,7 @@ class OWM(object):
     def _conf(self):
         from owmeta.data import Data
         from owmeta import connect
+        import six
         dat = getattr(self, '_dat', None)
         if not dat or self._dat_file != self.config_file:
             if not exists(self.config_file):
@@ -1002,8 +1003,9 @@ class OWM(object):
                 ' configuration files at ' + self.config_file + ' or ' +
                 self.config.user_config_file + ' OWM repository may have been initialized'
                 ' incorrectly')
-            if isabs(store_conf) and \
-                    not store_conf.startswith(abspath(self.owmdir)):
+            if (isinstance(store_conf, six.string_types) and
+                    isabs(store_conf) and
+                    not store_conf.startswith(abspath(self.owmdir))):
                 raise GenericUserError('rdf.store_conf must specify a path inside of ' +
                         self.owmdir + ' but instead it is ' + store_conf)
             self._owm_connection = connect(conf=dat)

@@ -86,11 +86,18 @@ setup(
     extras_require={
         'sqlite_source': [
             'rdflib-sqlalchemy'
+        ],
+        'mysql_source': [
+            # This is a judgement call
+            'mysqlclient ; python_version == "2.7"',
+            'mysql-connector ; python_version >= "3.4"',
         ]
     },
     version=version,
+<<<<<<< HEAD
     packages=['owmeta',
-              'owmeta.data_trans'],
+              'owmeta.data_trans',
+              'owmeta.commands'],
     author='OpenWorm.org authors and contributors',
     author_email='info@openworm.org',
     description='A Python library for working with OpenWorm data and models',
