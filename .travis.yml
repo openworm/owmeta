@@ -32,9 +32,7 @@ env:
   global:
   - secure: Qt0b8NlTnB2FxwdmlXL9/RLcDNA6gUx6+xriipLIZuv+n0rjUmovgqT1UfHGsIUl6pFUXKA8ywPoD2znd3GfigWs/VrB6fXgJiNVNPq1bx1xbX9sPl/6xw5wcVA8nDfFVMj5Q8I5qECaxUwXR83LiKrTCRGewNCRxgGj7aLiYso=
   - secure: YAH6uIq7iO/ufKMUyN3xpKjDqvrJ2yFXmUi7txYaKfqfN+5fW3H/GbnTFXiRVfmNU52c6PlXtcYzllzkJZY0UTkSqt8amMbHyS52JdLhJwMcch4ddDEd0NllMH7XCmGtfqN0E3EF4yHP4EnXqO/HV1VRmwCDRHHMn8c0rl/iqXc=
-  - SQLITE_SOURCE=1
-  - POSTGRES_SOURCE=1
-  - MYSQL_SOURCE=1
+  - SQLITE_SOURCE=1 POSTGRES_SOURCE=1 MYSQL_SOURCE=1
   - COVERALLS_PARALLEL=true
 notifications:
   webhooks: https://coveralls.io/webhook
