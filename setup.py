@@ -32,9 +32,6 @@ for line in open('PyOpenWorm/__init__.py'):
 
 package_data_excludes = ['.*', '*.bkp', '~*']
 
-PY2 = sys.version_info.major == 2
-PY3 = sys.version_info.major == 3
-
 
 def excludes(base):
     res = []
