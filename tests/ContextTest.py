@@ -260,7 +260,8 @@ class ContextStoreTest(_DataTest):
         ctxid = URIRef('http://example.com/context_1')
         ctx = Mock()
         graph = Mock()
-        graph.store.triples.side_effect = ([], [((URIRef('anA0'), rdflib.RDF.type, rdf_type), (ctxid,))],)
+        graph.store.triples.return_value = [((URIRef('anA0'), rdflib.RDF.type, rdf_type), (ctxid,))]
+        graph.store.triples_choices.return_value = []
         ctx.rdf = graph
 
         ctx.contents_triples.return_value = [(URIRef('anA'), rdflib.RDF.type, rdf_type)]
@@ -275,7 +276,7 @@ class ContextStoreTest(_DataTest):
         ctxid1 = URIRef('http://example.com/context_1')
         ctx = Mock()
         graph = Mock()
-        graph.store.triples.side_effect = [[((None, None, ctxid0), ())], []]
+        graph.store.triples_choices.side_effect = [[((None, None, ctxid0), ())], []]
         ctx.conf = {'rdf.graph': graph}
         ctx.contents_triples.return_value = ()
         ctx.identifier = ctxid1
@@ -288,7 +289,7 @@ class ContextStoreTest(_DataTest):
         ctxid1 = URIRef('http://example.com/context_1')
         ctx = Mock()
         graph = Mock()
-        graph.store.triples.side_effect = [[((None, None, ctxid0), ())], []]
+        graph.store.triples_choices.side_effect = [[((None, None, ctxid0), ())], []]
         ctx.rdf = graph
         ctx.contents_triples.return_value = ()
         ctx.identifier = ctxid1
