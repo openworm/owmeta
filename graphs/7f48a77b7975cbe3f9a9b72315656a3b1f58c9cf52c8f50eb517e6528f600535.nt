@@ -66,7 +66,7 @@
 <http://openworm.org/entities/NeuronConnectomeCSVTranslation/a668d7e08a931b769f9c4c2e04954a042> <http://openworm.org/entities/Translation/translator> <http://openworm.org/entities/translators/NeuronConnectomeCSVTranslator> .
 <http://openworm.org/entities/NeuronConnectomeCSVTranslation/a668d7e08a931b769f9c4c2e04954a042> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/NeuronConnectomeCSVTranslation> .
 <http://openworm.org/entities/PythonClassDescription/a86d147c2b9d137ac31d942063f3a74aa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/PythonClassDescription> .
-<http://openworm.org/entities/PythonModule/PyOpenWorm.data_trans.context_merge> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/PythonModule> .
+<http://openworm.org/entities/PythonModule/owmeta.data_trans.context_merge> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/PythonModule> .
 <http://openworm.org/entities/WormAtlasCellListDataSource/WormAtlasCellList> <http://openworm.org/entities/data_sources/CSVDataSource#csv_field_delimiter> "	" .
 <http://openworm.org/entities/WormAtlasCellListDataSource/WormAtlasCellList> <http://openworm.org/entities/data_sources/CSVDataSource#csv_file_name> "C. elegans Cell List - WormAtlas.tsv" .
 <http://openworm.org/entities/WormAtlasCellListDataSource/WormAtlasCellList> <http://openworm.org/entities/data_sources/CSVDataSource#csv_header> "[\"Cell\", \"Lineage Name\", \"Description\"]"^^<http://markw.cc/yarom/schema/datatype/list> .
