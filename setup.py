@@ -99,6 +99,7 @@ setup(
     url='http://owmeta.readthedocs.org/en/latest/',
     download_url='https://github.com/openworm/owmeta/archive/master.zip',
     entry_points={'console_scripts': ['owm = owmeta.cli:main']},
+    package_data={'owmeta': ['default.conf']},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
