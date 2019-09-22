@@ -35,9 +35,9 @@ class ExampleRunnerTest(unittest.TestCase):
         shutil.rmtree(self.testdir)
 
     def execfile(self, example_file_name):
-        self.exec(["python", example_file_name])
+        self.exec_(["python", example_file_name])
 
-    def exec(self, command, **kwargs):
+    def exec_(self, command, **kwargs):
         if isinstance(command, string_types):
             command = shlex.split(command)
         fname = tempfile.mkstemp()[1]
@@ -80,5 +80,5 @@ class ExampleRunnerTest(unittest.TestCase):
         self.execfile("extrasynaptic_edges.py")
 
     def test_pow_save(self):
-        self.exec("pow save examples.pow_save_example",
+        self.exec_("pow save examples.pow_save_example",
                   cwd=self.testdir)
