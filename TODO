@@ -1,23 +1,10 @@
 - Translate the below into Github issues
-- Add a specialized command for saving DataObject classes defined in a source
-file since: essentially this is equivalent to owm save 
-
-- Make `owm dist load` that unpacks a dist created by `owm dist save`
-
-- Have `owm dist load` specify any values in the 
 
 - Describe in the documentation the repository, which verifies imported contexts
 by downloading them or hashing them
 
 - Describe in the documentation potential "value-added" features that a repo
 may implement
-
-- Describe the motivation of breaking a reliance on a chain-of-trust for the
-total management of imports by the repository itself.
-
-- Mention in the documentation that a repository of data may indeed use
-multiple sources in an on-demand fashion and deploy a chain-of-trust as it
-chooses
 
 - Write an `owm source save` command as a special case of `owm data save` which 
 
@@ -40,8 +27,3 @@ or accepts on the command line, the fields for the data source
 
 - Write documentation describing the notion of the (current) data context and
 (current) imports context
-
-- Write (or reuse) a context accessor schema for acquiring RDF graphs from
-(possibly remote) resources
-
-- Allow to abbreviate names based on the context. Not necessarily prefixes
