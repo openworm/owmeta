@@ -43,6 +43,10 @@ def excludes(base):
     return res
 
 
+def py2_only(*args):
+    return [x + ' ; python_version < "3.0"' for x in args]
+
+
 setup(
     name='PyOpenWorm',
     zip_safe=False,
@@ -51,9 +55,10 @@ setup(
         'pytest>=3.4.0',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
-        'rdflib-sqlalchemy'
-    ] + (['mock==2.0.0'] if PY2 else [])
-      + (['pytest-parallel'] if PY3 else []),
+        'rdflib-sqlalchemy',
+        'mock==2.0.0 ; python_version < "3.0"',
+        'pytest-parallel ; python_version >= "3.0"'
+    ],
     install_requires=[
         'bibtexparser~=1.1.0',
         'BTrees==4.0.8',
@@ -69,17 +74,18 @@ setup(
         'tqdm~=4.23',
         'termcolor==1.1.0',
         'transaction>=1.4.4',
-        'wrapt ~=1.11.1',
+        'wrapt~=1.11.1',
         'yarom~=0.12.0',
         'zc.lockfile==1.1.0',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
-    ] + (['zodbpickle==1.0'] if PY2 else [])
-      + (['Sphinx<1.8.4'] if PY2 else [])
-      + (['backports.tempfile==1.0'] if PY2 else [])
-      + (['scandir'] if PY2 else [])
-      + (['docutils<0.15'] if PY2 else []),
+
+    ] + py2_only('zodbpickle==1.0',
+        'Sphinx<1.8.4',
+        'backports.tempfile==1.0',
+        'scandir',
+        'docutils<0.15'),
     extras_require={
         'sqlite_source': [
             'rdflib-sqlalchemy'
