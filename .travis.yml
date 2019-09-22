@@ -20,13 +20,13 @@ install:
 - owm clone https://github.com/openworm/OpenWormData.git --branch 461-pow-om-rename
 
 script:
-- "./ci-test.sh"
+- ./ci-test.sh
 
 after_script:
 - coveralls
 
 after_success:
-- "./codespeed-submit.sh"
+- ./codespeed-submit.sh
 
 env:
   global:
