@@ -967,7 +967,7 @@ class OWM(object):
             self._changed_contexts = root['ccmap']
         return self._changed_contexts
 
-    def clone(self, url=None, update_existing_config=False):
+    def clone(self, url=None, update_existing_config=False, branch=None):
         """Clone a data store
 
         Parameters
@@ -977,12 +977,15 @@ class OWM(object):
         update_existing_config : bool
             If True, updates the existing config file to point to the given
             file for the store configuration
+        branch : str
+            Branch to checkout after cloning
         """
         try:
             makedirs(self.owmdir)
             self.message('Cloning...', file=sys.stderr)
             with self.progress_reporter(file=sys.stderr, unit=' objects', miniters=0) as progress:
-                self.repository_provider.clone(url, base=self.owmdir, progress=progress)
+                self.repository_provider.clone(url, base=self.owmdir,
+                        progress=progress, branch=branch)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()

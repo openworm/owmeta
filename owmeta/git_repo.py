@@ -29,10 +29,10 @@ class GitRepoProvider(object):
             self._repo = Repo(self.base)
         return self._repo
 
-    def clone(self, url, base, progress=None):
+    def clone(self, url, base, progress=None, **kwargs):
         if progress is not None:
             progress = _CloneProgress(progress)
-        Repo.clone_from(url, base, progress=progress)
+        Repo.clone_from(url, base, progress=progress, **kwargs)
 
     @property
     def is_dirty(self):
