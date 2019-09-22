@@ -54,6 +54,7 @@ class _DatabaseBackendBT(object):
             self.dat.destroy()
 
 
+@unittest.skipIf(not os.environ.get('SQLITE_TEST'), 'SQLITE_TEST not defined')
 @mark.sqlite_source
 class SQLitePersistenceTest(_DatabaseBackendBT, unittest.TestCase):
     def _configure(self, conf):
@@ -69,6 +70,8 @@ class ZODBPersistenceTest(_DatabaseBackendBT, unittest.TestCase):
         conf['rdf.store_conf'] = fname
 
 
+@unittest.skipIf(not os.environ.get('MYSQL_TEST'), 'MYSQL_TEST not defined')
+@unittest.skipIf(not os.environ.get('MYSQL_URI'), 'MYSQL_URI not defined')
 @mark.mysql_source
 class MySQLPersistenceTest(_DatabaseBackendBT, unittest.TestCase):
     def _configure(self, conf):
@@ -79,6 +82,8 @@ class MySQLPersistenceTest(_DatabaseBackendBT, unittest.TestCase):
         conf['rdf.store_conf'] = sqlalchemy_url
 
 
+@unittest.skipIf(not os.environ.get('POSTGRES_TEST'), 'POSTGRES_TEST not defined')
+@unittest.skipIf(not os.environ.get('POSTGRES_URI'), 'POSTGRES_URI not defined')
 @mark.postgres_source
 class PostgresPersistenceTest(_DatabaseBackendBT, unittest.TestCase):
     def _configure(self, conf):
