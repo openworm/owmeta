@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from PyOpenWorm.collections import Bag
+from owmeta.collections import Bag
 from .DataTestTemplate import _DataTest
 import rdflib
 

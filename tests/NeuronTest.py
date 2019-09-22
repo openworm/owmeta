@@ -3,10 +3,10 @@ from __future__ import absolute_import
 
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.context import Context
+from owmeta.neuron import Neuron
+from owmeta.cell import Cell
+from owmeta.connection import Connection
+from owmeta.context import Context
 
 
 class NeuronTest(_DataTest):

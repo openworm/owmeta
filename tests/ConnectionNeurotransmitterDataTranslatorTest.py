@@ -11,12 +11,12 @@ import shutil
 from os.path import join as p
 from rdflib.term import URIRef
 
-from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-from PyOpenWorm.data_trans.connections import (NeuronConnectomeSynapseClassTranslator,
+from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+from owmeta.data_trans.connections import (NeuronConnectomeSynapseClassTranslator,
                                                ConnectomeCSVDataSource)
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.context import IMPORTS_CONTEXT_KEY
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta.context import IMPORTS_CONTEXT_KEY
 from .DataTestTemplate import _DataTest
 
 

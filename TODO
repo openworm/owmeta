@@ -1,10 +1,10 @@
 - Translate the below into Github issues
 - Add a specialized command for saving DataObject classes defined in a source
-file since: essentially this is equivalent to pow save 
+file since: essentially this is equivalent to owm save 
 
-- Make `pow dist load` that unpacks a dist created by `pow dist save`
+- Make `owm dist load` that unpacks a dist created by `owm dist save`
 
-- Have `pow dist load` specify any values in the 
+- Have `owm dist load` specify any values in the 
 
 - Describe in the documentation the repository, which verifies imported contexts
 by downloading them or hashing them
@@ -19,10 +19,10 @@ total management of imports by the repository itself.
 multiple sources in an on-demand fashion and deploy a chain-of-trust as it
 chooses
 
-- Write a `pow source save` command as a special case of `pow data save` which 
+- Write an `owm source save` command as a special case of `owm data save` which 
 
-- Make `pow source save` allow to save a directory tree with a user-selected
-"data source directory saver" (e.g., a POWDataSourceDirectorySaver that saves
+- Make `owm source save` allow to save a directory tree with a user-selected
+"data source directory saver" (e.g., an OWMDataSourceDirectorySaver that saves
 
 - Write a convenience function to both save a context and create a distribution
 for that context in one go

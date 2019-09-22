@@ -19,7 +19,7 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('.owm', p(self.testdir, '.owm'), symlinks=True)
         shutil.copytree('examples', p(self.testdir, 'examples'), symlinks=True)
         self.startdir = os.getcwd()
         os.chdir(p(self.testdir, 'examples'))

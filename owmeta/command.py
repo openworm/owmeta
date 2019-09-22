@@ -40,14 +40,14 @@ from .datasource_loader import DataSourceDirLoader, LoadFailed
 
 L = logging.getLogger(__name__)
 
-DEFAULT_SAVE_CALLABLE_NAME = 'pow_data'
+DEFAULT_SAVE_CALLABLE_NAME = 'owm_data'
 
 
-class POWSourceData(object):
+class OWMSourceData(object):
     ''' Commands for saving and loading data for DataSources '''
     def __init__(self, parent):
         self._source_command = parent
-        self._pow_command = parent._parent
+        self._owm_command = parent._parent
 
     def retrieve(self, source, archive='data.tar', archive_type=None):
         '''
@@ -65,8 +65,8 @@ class POWSourceData(object):
         archive_type : str
             The type of the archive to create.
         '''
-        from PyOpenWorm.datasource import DataSource
-        sid = self._pow_command._den3(source)
+        from owmeta.datasource import DataSource
+        sid = self._owm_command._den3(source)
         if not archive_type:
             for ext in EXT_TO_ARCHIVE_FMT:
                 if archive.endswith(ext):
@@ -81,13 +81,13 @@ class POWSourceData(object):
             archive_type = 'tar'
 
         try:
-            sources = self._pow_command._data_ctx.stored(DataSource)(ident=sid).load()
+            sources = self._owm_command._data_ctx.stored(DataSource)(ident=sid).load()
             for data_source in sources:
-                dd = self._pow_command._dsd[data_source]
+                dd = self._owm_command._dsd[data_source]
         except KeyError:
             raise GenericUserError('Could not find data for {} ({})'.format(sid, source))
 
-        with self._pow_command._tempdir(prefix='pow-source-data-retrieve.') as d:
+        with self._owm_command._tempdir(prefix='owm-source-data-retrieve.') as d:
             temp_archive = shutil.make_archive(pth_join(d, 'archive'), archive_type, dd)
             rename(temp_archive, archive)
 
@@ -101,10 +101,10 @@ EXT_TO_ARCHIVE_FMT = {
 }
 
 
-class POWSource(object):
+class OWMSource(object):
     ''' Commands for working with DataSource objects '''
 
-    data = SubCommand(POWSourceData)
+    data = SubCommand(OWMSourceData)
 
     def __init__(self, parent):
         self._parent = parent
@@ -176,7 +176,7 @@ class POWSource(object):
         *data_source : str
             The ID of the data source to show
         '''
-        from PyOpenWorm.datasource import DataSource
+        from owmeta.datasource import DataSource
 
         for ds in data_source:
             uri = self._parent._den3(ds)
@@ -211,7 +211,7 @@ class POWSource(object):
                 yield nm.normalizeUri(x.identifier)
 
 
-class POWTranslator(object):
+class OWMTranslator(object):
     def __init__(self, parent):
         self._parent = parent
 
@@ -226,7 +226,7 @@ class POWTranslator(object):
         full : bool
             Whether to (attempt to) shorten the source URIs by using the namespace manager
         '''
-        from PyOpenWorm.datasource import DataTranslator
+        from owmeta.datasource import DataTranslator
         conf = self._parent._conf()
         if context is not None:
             ctx = self._make_ctx(context)
@@ -249,7 +249,7 @@ class POWTranslator(object):
         translator : str
             The translator to show
         '''
-        from PyOpenWorm.datasource import DataTranslator
+        from owmeta.datasource import DataTranslator
         conf = self._parent._conf()
         uri = self._parent._den3(translator)
         dt = self._parent._data_ctx.stored(DataTranslator)(ident=uri, conf=conf)
@@ -258,7 +258,7 @@ class POWTranslator(object):
             return
 
 
-class POWNamespace(object):
+class OWMNamespace(object):
     def __init__(self, parent):
         self._parent = parent
 
@@ -278,12 +278,12 @@ class _ProgressMock(object):
         return type(self)()
 
 
-class POWDist(object):
+class OWMDist(object):
     def __init__(self, parent):
         self._parent = parent
 
 
-class POWConfig(object):
+class OWMConfig(object):
     user = IVar(value_type=bool,
                 default_value=False,
                 doc='If set, configs are only for the user; otherwise, they \
@@ -293,22 +293,22 @@ class POWConfig(object):
         self._parent = parent
 
     def __setattr__(self, t, v):
-        super(POWConfig, self).__setattr__(t, v)
+        super(OWMConfig, self).__setattr__(t, v)
 
     @IVar.property('user.conf', value_type=str)
     def user_config_file(self):
         ''' The user config file name '''
         if isabs(self._user_config_file):
             return self._user_config_file
-        return pth_join(self._parent.powdir, self._user_config_file)
+        return pth_join(self._parent.owmdir, self._user_config_file)
 
     @user_config_file.setter
     def user_config_file(self, val):
         self._user_config_file = val
 
     def _get_config_file(self):
-        if not exists(self._parent.powdir):
-            raise POWDirMissingException(self._parent.powdir)
+        if not exists(self._parent.owmdir):
+            raise OWMDirMissingException(self._parent.owmdir)
 
         if self.user:
             res = self.user_config_file
@@ -397,7 +397,7 @@ POSSIBLE_EDITORS = [
 ]
 
 
-class POWEvidence(object):
+class OWMEvidence(object):
     def __init__(self, parent):
         self._parent = parent
 
@@ -413,16 +413,16 @@ class POWEvidence(object):
         rdf_type : str
             Type of the object to show evidence
         '''
-        from PyOpenWorm.evidence import Evidence
-        from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-        from PyOpenWorm.contextDataObject import ContextDataObject
+        from owmeta.evidence import Evidence
+        from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+        from owmeta.contextDataObject import ContextDataObject
         ctx = self._parent._data_ctx.stored
         identifier = self._parent._den3(identifier)
         rdf_type = self._parent._den3(rdf_type)
         if rdf_type:
             base_type = ctx(ctx.resolve_class(rdf_type))
         else:
-            from PyOpenWorm.dataObject import DataObject
+            from owmeta.dataObject import DataObject
             base_type = ctx(DataObject)
 
         q = base_type.query(ident=identifier)
@@ -436,8 +436,8 @@ class POWEvidence(object):
                 self._message_evidence(evq)
 
     def _message_evidence(self, evq):
-        from PyOpenWorm.website import Website
-        from PyOpenWorm.document import Document
+        from owmeta.website import Website
+        from owmeta.document import Document
         msg = self._parent.message
         for m in evq.load():
             ref = m.reference()
@@ -471,7 +471,7 @@ class POWEvidence(object):
                 msg()
 
 
-class POWContexts(object):
+class OWMContexts(object):
     def __init__(self, parent):
         self._parent = parent
 
@@ -535,7 +535,7 @@ class POWContexts(object):
         if not editor:
             raise GenericUserError("No known editor could be found")
 
-        with self._parent._tempdir(prefix='pow-context-edit.') as d:
+        with self._parent._tempdir(prefix='owm-context-edit.') as d:
             from rdflib import plugin
             from rdflib.parser import Parser, create_input_source
             import transaction
@@ -564,14 +564,14 @@ class POWContexts(object):
         return self._parent._changed_contexts_set()
 
 
-class POW(object):
+class OWM(object):
     """
-    High-level commands for working with PyOpenWorm data
+    High-level commands for working with owmeta data
     """
 
     graph_accessor_finder = IVar(doc='Finds an RDFLib graph from the given URL')
 
-    basedir = IVar('.', doc='The base directory. powdir is resolved against this base')
+    basedir = IVar('.', doc='The base directory. owmdir is resolved against this base')
 
     repository_provider = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
@@ -580,17 +580,17 @@ class POW(object):
     # hence they do not, in any way, store attributes set on them. You must
     # save the instance of the subcommand to a variable in order to make
     # multiple statements including that sub-command
-    config = SubCommand(POWConfig)
+    config = SubCommand(OWMConfig)
 
-    source = SubCommand(POWSource)
+    source = SubCommand(OWMSource)
 
-    translator = SubCommand(POWTranslator)
+    translator = SubCommand(OWMTranslator)
 
-    namespace = SubCommand(POWNamespace)
+    namespace = SubCommand(OWMNamespace)
 
-    contexts = SubCommand(POWContexts)
+    contexts = SubCommand(OWMContexts)
 
-    evidence = SubCommand(POWEvidence)
+    evidence = SubCommand(OWMEvidence)
 
     def __init__(self):
         from time import time
@@ -599,27 +599,27 @@ class POW(object):
         self._clock = time
         self._data_source_directories = None
         self._changed_contexts = None
-        self._pow_connection = None
+        self._owm_connection = None
 
-    @IVar.property('.pow')
-    def powdir(self):
+    @IVar.property('.owm')
+    def owmdir(self):
         '''
-        The base directory for PyOpenWorm files. The repository provider's files also go under here
+        The base directory for owmeta files. The repository provider's files also go under here
         '''
-        if isabs(self._powdir):
-            return self._powdir
-        return pth_join(self.basedir, self._powdir)
+        if isabs(self._owmdir):
+            return self._owmdir
+        return pth_join(self.basedir, self._owmdir)
 
-    @powdir.setter
-    def powdir(self, val):
-        self._powdir = val
+    @owmdir.setter
+    def owmdir(self, val):
+        self._owmdir = val
 
-    @IVar.property('pow.conf', value_type=str)
+    @IVar.property('owm.conf', value_type=str)
     def config_file(self):
         ''' The config file name '''
         if isabs(self._config_file):
             return self._config_file
-        return pth_join(self.powdir, self._config_file)
+        return pth_join(self.owmdir, self._config_file)
 
     @config_file.setter
     def config_file(self, val):
@@ -630,15 +630,15 @@ class POW(object):
         ''' The file name of the database store '''
         if isabs(self._store_name):
             return self._store_name
-        return pth_join(self.powdir, self._store_name)
+        return pth_join(self.owmdir, self._store_name)
 
     @store_name.setter
     def store_name(self, val):
         self._store_name = val
 
-    def _ensure_powdir(self):
-        if not exists(self.powdir):
-            makedirs(self.powdir)
+    def _ensure_owmdir(self):
+        if not exists(self.owmdir):
+            makedirs(self.owmdir)
 
     @IVar.property
     def log_level(self):
@@ -651,7 +651,7 @@ class POW(object):
         # Tailoring for known loggers
 
         # Generally, too verbose for the user
-        logging.getLogger('PyOpenWorm.mapper').setLevel(logging.ERROR)
+        logging.getLogger('owmeta.mapper').setLevel(logging.ERROR)
 
     def save(self, module, provider=None, context=None):
         '''
@@ -687,9 +687,9 @@ class POW(object):
                 provider = DEFAULT_SAVE_CALLABLE_NAME
 
             if not context:
-                ctx = _POWSaveContext(self._data_ctx, m)
+                ctx = _OWMSaveContext(self._data_ctx, m)
             else:
-                ctx = _POWSaveContext(Context(ident=context, conf=conf), m)
+                ctx = _OWMSaveContext(Context(ident=context, conf=conf), m)
             attr_chain = provider.split('.')
             p = m
             for x in attr_chain:
@@ -701,7 +701,7 @@ class POW(object):
                             pass
                         break
                     raise
-            ns = POWSaveNamespace(context=ctx)
+            ns = OWMSaveNamespace(context=ctx)
 
             mapped_classes = getattr(m, '__yarom_mapped_classes__', None)
             if mapped_classes:
@@ -739,7 +739,7 @@ class POW(object):
         object : str
             The other object you want to say something about
         '''
-        from PyOpenWorm.dataObject import DataObject
+        from owmeta.dataObject import DataObject
         import transaction
         dctx = self._data_ctx
         query = dctx.stored(DataObject)(ident=self._den3(subject))
@@ -799,38 +799,38 @@ class POW(object):
             file for the store configuration
         """
         try:
-            self._ensure_powdir()
+            self._ensure_owmdir()
             if not exists(self.config_file):
                 self._init_config_file()
             elif update_existing_config:
                 with open(self.config_file, 'r+') as f:
                     conf = json.load(f)
-                    conf['rdf.store_conf'] = pth_join('$POW', relpath(abspath(self.store_name),
-                                                                      abspath(self.powdir)))
+                    conf['rdf.store_conf'] = pth_join('$OWM', relpath(abspath(self.store_name),
+                                                                      abspath(self.owmdir)))
                     f.seek(0)
                     write_config(conf, f)
 
             self._init_store()
             self._init_repository()
         except Exception:
-            self._ensure_no_powdir()
+            self._ensure_no_owmdir()
             raise
 
-    def _ensure_no_powdir(self):
-        if exists(self.powdir):
-            shutil.rmtree(self.powdir)
+    def _ensure_no_owmdir(self):
+        if exists(self.owmdir):
+            shutil.rmtree(self.owmdir)
 
     def _init_config_file(self):
         with open(self._default_config(), 'r') as f:
             default = json.load(f)
             with open(self.config_file, 'w') as of:
-                default['rdf.store_conf'] = pth_join('$POW', relpath(abspath(self.store_name),
-                                                                     abspath(self.powdir)))
+                default['rdf.store_conf'] = pth_join('$OWM', relpath(abspath(self.store_name),
+                                                                     abspath(self.owmdir)))
                 write_config(default, of)
 
     def _init_repository(self):
         if self.repository_provider is not None:
-            self.repository_provider.init(base=self.powdir)
+            self.repository_provider.init(base=self.owmdir)
 
     def _den3(self, s):
         if not s:
@@ -889,8 +889,8 @@ class POW(object):
         return self.graph_accessor_finder(url)
 
     def _conf(self):
-        from PyOpenWorm.data import Data
-        from PyOpenWorm import connect
+        from owmeta.data import Data
+        from owmeta import connect
         dat = getattr(self, '_dat', None)
         if not dat or self._dat_file != self.config_file:
             if not exists(self.config_file):
@@ -907,22 +907,22 @@ class POW(object):
             # Pre-process the user-config to resolve variables based on the user
             # config-file location
             uc['configure.file_location'] = self.config.user_config_file
-            udat = Data.process_config(uc, variables={'POW': self.powdir})
+            udat = Data.process_config(uc, variables={'OWM': self.owmdir})
 
             rc.update(udat.items())
             rc['configure.file_location'] = self.config_file
-            dat = Data.process_config(rc, variables={'POW': self.powdir})
+            dat = Data.process_config(rc, variables={'OWM': self.owmdir})
             store_conf = dat.get('rdf.store_conf', None)
             if not store_conf:
-                raise GenericUserError('rdf.store_conf is not defined in either of the POW'
+                raise GenericUserError('rdf.store_conf is not defined in either of the OWM'
                 ' configuration files at ' + self.config_file + ' or ' +
-                self.config.user_config_file + ' POW repository may have been initialized'
+                self.config.user_config_file + ' OWM repository may have been initialized'
                 ' incorrectly')
             if isabs(store_conf) and \
-                    not store_conf.startswith(abspath(self.powdir)):
+                    not store_conf.startswith(abspath(self.owmdir)):
                 raise GenericUserError('rdf.store_conf must specify a path inside of ' +
-                        self.powdir + ' but instead it is ' + store_conf)
-            self._pow_connection = connect(conf=dat)
+                        self.owmdir + ' but instead it is ' + store_conf)
+            self._owm_connection = connect(conf=dat)
 
             dat.on_context_changed(self._context_changed_handler())
 
@@ -931,9 +931,9 @@ class POW(object):
         return dat
 
     def _disconnect(self):
-        from PyOpenWorm import disconnect
-        if self._pow_connection is not None:
-            disconnect(self._pow_connection)
+        from owmeta import disconnect
+        if self._owm_connection is not None:
+            disconnect(self._owm_connection)
 
     _init_store = _conf
 
@@ -949,7 +949,7 @@ class POW(object):
             import ZODB
             from ZODB.FileStorage import FileStorage
             import BTrees
-            ccfile = pth_join(self.powdir, 'changed_contexts')
+            ccfile = pth_join(self.owmdir, 'changed_contexts')
             all_changed = False
             if not exists(ccfile):
                 all_changed = True
@@ -979,10 +979,10 @@ class POW(object):
             file for the store configuration
         """
         try:
-            makedirs(self.powdir)
+            makedirs(self.owmdir)
             self.message('Cloning...', file=sys.stderr)
             with self.progress_reporter(file=sys.stderr, unit=' objects', miniters=0) as progress:
-                self.repository_provider.clone(url, base=self.powdir, progress=progress)
+                self.repository_provider.clone(url, base=self.owmdir, progress=progress)
             if not exists(self.config_file):
                 self._init_config_file()
             self._init_store()
@@ -990,12 +990,12 @@ class POW(object):
             self._regenerate_database()
             self.message('Done!', file=sys.stderr)
         except BaseException as e:
-            self._ensure_no_powdir()
+            self._ensure_no_owmdir()
             raise e
 
     def git(self, *args):
         '''
-        Runs git commmands in the .pow directory
+        Runs git commmands in the .owm directory
 
         Parameters
         ----------
@@ -1005,7 +1005,7 @@ class POW(object):
         import shlex
         from subprocess import Popen, PIPE
         startdir = os.getcwd()
-        os.chdir(self.powdir)
+        os.chdir(self.owmdir)
         try:
             with Popen(['git'] + list(args), stdout=PIPE) as p:
                 self.message(p.stdout.read().decode('utf-8', 'ignore'))
@@ -1018,7 +1018,7 @@ class POW(object):
             self.message('unlink', g)
             os.unlink(g)
 
-        ccfile = pth_join(self.powdir, 'changed_contexts')
+        ccfile = pth_join(self.owmdir, 'changed_contexts')
         for g in glob(ccfile + '*'):
             self.message('unlink', g)
             os.unlink(g)
@@ -1034,7 +1034,7 @@ class POW(object):
         from rdflib import plugin
         from rdflib.term import URIRef
         from rdflib.parser import Parser, create_input_source
-        idx_fname = pth_join(self.powdir, 'graphs', 'index')
+        idx_fname = pth_join(self.owmdir, 'graphs', 'index')
         triples_read = 0
         if exists(idx_fname):
             dest = self._conf()['rdf.graph']
@@ -1048,7 +1048,7 @@ class POW(object):
                     for l in index_file:
                         fname, ctx = l.strip().split(' ')
                         parser = plugin.get('nt', Parser)()
-                        graph_fname = pth_join(self.powdir, 'graphs', fname)
+                        graph_fname = pth_join(self.owmdir, 'graphs', fname)
                         with open(graph_fname, 'rb') as f, \
                                 _BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
                             parser.parse(create_input_source(f), g)
@@ -1061,7 +1061,7 @@ class POW(object):
         progress.write('Loaded {:,} triples'.format(triples_read))
 
     def _graphs_index(self):
-        idx_fname = pth_join(self.powdir, 'graphs', 'index')
+        idx_fname = pth_join(self.owmdir, 'graphs', 'index')
         if exists(idx_fname):
             with open(idx_fname) as index_file:
                 for l in index_file:
@@ -1083,7 +1083,7 @@ class POW(object):
         ctx_index = dict()
         fname_index = dict()
         for fname, ctx in self._graphs_index():
-            ctx_index[ctx] = pth_join(self.powdir, 'graphs', fname)
+            ctx_index[ctx] = pth_join(self.owmdir, 'graphs', fname)
             fname_index[fname] = ctx
         self._cfn = ctx_index
         self._fnc = fname_index
@@ -1119,7 +1119,7 @@ class POW(object):
         if None in positional_sources:
             raise GenericUserError('No source for "' + data_sources[positional_sources.index(None)] + '"')
         named_sources = {k: self._lookup_source(src) for k, src in named_data_sources}
-        with self._tempdir(prefix='pow-translate.') as d:
+        with self._tempdir(prefix='owm-translate.') as d:
             orig_wd = os.getcwd()
             os.chdir(d)
             with transaction.manager:
@@ -1135,7 +1135,7 @@ class POW(object):
 
     @contextmanager
     def _tempdir(self, *args, **kwargs):
-        td = pth_join(self.powdir, 'temp')
+        td = pth_join(self.owmdir, 'temp')
         if not exists(td):
             makedirs(td)
         kwargs['dir'] = td
@@ -1154,10 +1154,10 @@ class POW(object):
             # loaded something before.
 
             # XXX persist the dict
-            lclasses = [POWDirDataSourceDirLoader()]
-            dsd = _DSD(dict(), pth_join(self.powdir, 'data_source_data'), lclasses)
+            lclasses = [OWMDirDataSourceDirLoader()]
+            dsd = _DSD(dict(), pth_join(self.owmdir, 'data_source_data'), lclasses)
             try:
-                dindex = open(pth_join(self.powdir, 'data_source_directories'))
+                dindex = open(pth_join(self.owmdir, 'data_source_directories'))
                 for ds_id, dname in (x.strip().split(' ', 1) for x in dindex):
                     dsd.put(ds_id, dname)
             except OSError:
@@ -1179,12 +1179,12 @@ class POW(object):
                     shutil.copy2(src, dst)
 
     def _lookup_translator(self, tname):
-        from PyOpenWorm.datasource import DataTranslator
+        from owmeta.datasource import DataTranslator
         for x in self._data_ctx.stored(DataTranslator)(ident=tname).load():
             return x
 
     def _lookup_source(self, sname):
-        from PyOpenWorm.datasource import DataSource
+        from owmeta.datasource import DataSource
         for x in self._data_ctx.stored(DataSource)(ident=self._den3(sname)).load():
             provide(x, self._cap_provs)
             return x
@@ -1260,7 +1260,7 @@ class POW(object):
         Get the package path
         """
         from pkgutil import get_loader
-        return dirname(get_loader('PyOpenWorm').get_filename())
+        return dirname(get_loader('owmeta').get_filename())
 
     def _default_config(self):
         return pth_join(self._package_path(), 'default.conf')
@@ -1295,7 +1295,7 @@ class POW(object):
         gf_index = {URIRef(y): x for x, y in self._graphs_index()}
         for ctx, mtime in self._context_changed_times.items():
             g_fname = gf_index.get(ctx)
-            g_fname = None if g_fname is None else pth_join(self.powdir, 'graphs', g_fname)
+            g_fname = None if g_fname is None else pth_join(self.owmdir, 'graphs', g_fname)
             if not g_fname or stat(g_fname).st_mtime != mtime:
                 changed.add(ctx)
         changed |= set(gf_index.keys()) - set(self._context_changed_times.keys())
@@ -1308,8 +1308,8 @@ class POW(object):
         g = self._conf()['rdf.graph']
         repo = self.repository_provider
 
-        repo.base = self.powdir
-        graphs_base = pth_join(self.powdir, 'graphs')
+        repo.base = self.owmdir
+        graphs_base = pth_join(self.owmdir, 'graphs')
 
         changed = self._changed_contexts_set()
 
@@ -1358,7 +1358,7 @@ class POW(object):
                 print(*l, file=index_file, end='\n')
 
         files.append(index_fname)
-        repo.add([relpath(f, self.powdir) for f in files] + [relpath(self.config_file, self.powdir),
+        repo.add([relpath(f, self.owmdir) for f in files] + [relpath(self.config_file, self.owmdir),
                                                              'graphs'])
 
     def _gen_ctx_fname(self, ident, graphs_base):
@@ -1415,7 +1415,7 @@ class POW(object):
             afname = basename(d.a_path)
             bfname = basename(d.b_path)
 
-            graphdir = join(self.powdir, 'graphs')
+            graphdir = join(self.owmdir, 'graphs')
             fromfile = self._fname_contexts.get(afname, afname)
             tofile = self._fname_contexts.get(bfname, bfname)
 
@@ -1468,7 +1468,7 @@ class POW(object):
         """
 
 
-class _POWSaveContext(Context):
+class _OWMSaveContext(Context):
 
     def __init__(self, backer, user_module=None):
         self._user_mod = user_module
@@ -1552,7 +1552,7 @@ class NoConfigFileError(GenericUserError):
     pass
 
 
-class POWDirMissingException(GenericUserError):
+class OWMDirMissingException(GenericUserError):
     pass
 
 
@@ -1587,7 +1587,7 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
     def __str__(self):
         from traceback import format_list
         stack = format_list([x[1:4] + (''.join(x[4]).strip(),) for x in self.filtered_stack()])
-        fmt = '{}\n Traceback (most recent call last, PyOpenWorm frames omitted):\n {}'
+        fmt = '{}\n Traceback (most recent call last, owmeta frames omitted):\n {}'
         res = fmt.format(self.validation_record, '\n '.join(''.join(s for s in stack if s).split('\n')))
         return res.strip()
 
@@ -1649,9 +1649,9 @@ class _DSDP(FilePathProvider):
         return self._path
 
 
-class POWDirDataSourceDirLoader(DataSourceDirLoader):
+class OWMDirDataSourceDirLoader(DataSourceDirLoader):
     def __init__(self, basedir=None):
-        super(POWDirDataSourceDirLoader, self).__init__()
+        super(OWMDirDataSourceDirLoader, self).__init__()
         self._index = dict()
         self.base_directory = basedir
 
@@ -1719,7 +1719,7 @@ class POWDirDataSourceDirLoader(DataSourceDirLoader):
             raise LoadFailed(ident, self, 'The given identifier is not in the index')
 
 
-class POWSaveNamespace(object):
+class OWMSaveNamespace(object):
     def __init__(self, context):
         self.context = context
         self._created_ctxs = set()

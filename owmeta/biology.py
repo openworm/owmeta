@@ -1,4 +1,4 @@
-from PyOpenWorm.dataObject import DataObject
+from owmeta.dataObject import DataObject
 
 
 class BiologyType(DataObject):

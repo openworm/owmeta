@@ -2,12 +2,12 @@ from __future__ import print_function
 from __future__ import absolute_import
 import unittest
 import csv
-import PyOpenWorm
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.cell import Cell
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.context import Context
+import owmeta
+from owmeta.worm import Worm
+from owmeta.cell import Cell
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta.context import Context
 
 import rdflib as R
 import pytest
@@ -34,14 +34,14 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.conn = owmeta.connect(configFile='tests/data_integrity_test.conf')
         self.conf = self.conn.conf
         self.g = self.conf["rdf.graph"]
         self.context = Context(ident="http://openworm.org/data", conf=self.conf)
         self.qctx = self.context.stored
 
     def tearDown(self):
-        PyOpenWorm.disconnect(self.conn)
+        owmeta.disconnect(self.conn)
 
     def test_correct_neuron_number(self):
         """

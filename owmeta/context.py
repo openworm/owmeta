@@ -260,7 +260,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
     @property
     def rdf_object(self):
         if self._rdf_object is None:
-            from PyOpenWorm.contextDataObject import ContextDataObject
+            from owmeta.contextDataObject import ContextDataObject
             self._rdf_object = ContextDataObject.contextualize(self.context)(ident=self.identifier)
 
         return self._rdf_object.contextualize(self.context)
@@ -370,7 +370,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         if c is None:
             # otherwise, attempt to load into the cache by
             # reading the RDF graph.
-            from PyOpenWorm.dataObject import PythonClassDescription, RegistryEntry
+            from owmeta.dataObject import PythonClassDescription, RegistryEntry
 
             re = self(RegistryEntry)()
             re.rdf_class(uri)

@@ -441,7 +441,7 @@ class RDFSource(Configureable, ConfigValue):
         self.graph = False
 
     def open(self):
-        """ Called on ``PyOpenWorm.connect()`` to set up and return the rdflib graph.
+        """ Called on ``owmeta.connect()`` to set up and return the rdflib graph.
         Must be overridden by sub-classes.
         """
         raise NotImplementedError()
@@ -608,9 +608,9 @@ class SQLiteSource(RDFSource):
             from sqlalchemy import event
         except ImportError:
             raise OpenFailError('The rdflib-sqlalchemy package is not installed.'
-                    ' You may need to install the "sqlite_source" extra for PyOpenWorm.'
-                    ' For example, change "PyOpenWorm" in your setup.py or'
-                    ' requirements.txt to "PyOpenWorm[sqlite_source]" and reinstall')
+                    ' You may need to install the "sqlite_source" extra for owmeta.'
+                    ' For example, change "owmeta" in your setup.py or'
+                    ' requirements.txt to "owmeta[sqlite_source]" and reinstall')
         registerplugins()
         self.path = os.path.abspath(self.conf['rdf.store_conf'])
         openstr = 'sqlite:///' + self.path

@@ -14,7 +14,7 @@ def get_library_location(package):
     sys.path = sys.path[len(library_package_paths):]
     return package_path
 
-package_location = get_library_location('PyOpenWorm')
+package_location = get_library_location('owmeta')
 pwd = os.path.dirname(os.path.realpath(__file__))
 user_id = os.stat(pwd).st_uid # this is the person that cloned the repo
 script_location = os.path.join(pwd, 'OpenWormData', 'scripts')

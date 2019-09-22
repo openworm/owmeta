@@ -4,7 +4,7 @@ import json
 from tqdm import tqdm
 import six
 from .cli_command_wrapper import CLICommandWrapper, CLIUserError
-from .command import POW, GenericUserError
+from .command import OWM, GenericUserError
 from .git_repo import GitRepoProvider
 from .text_util import format_table
 from .command_util import GeneratorWithData
@@ -60,7 +60,7 @@ class NSHandler(object):
 class JSONSerializer(object):
     def __call__(self, o):
         from rdflib.graph import Graph
-        from PyOpenWorm.context import Context
+        from owmeta.context import Context
         if isinstance(o, Graph):
             # eventually, we will use something like JSON-LD
             return []
@@ -82,7 +82,7 @@ def columns_arg_to_list(arg):
 def main():
     import logging
     logging.basicConfig()
-    p = POW()
+    p = OWM()
     p.log_level = 'WARN'
     p.message = print
     p.progress_reporter = tqdm

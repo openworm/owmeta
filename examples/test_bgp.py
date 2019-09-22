@@ -5,18 +5,18 @@ database.
 
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm as P
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.context import Context
+import owmeta as P
+from owmeta.connection import Connection
+from owmeta.neuron import Neuron
+from owmeta.context import Context
 
 
 def pp_connection(conn):
     print(conn.pre_cell(), conn.post_cell(), conn.syntype(), conn.synclass(), conn.number())
 
 
-with P.connect('default.conf') as powconn:
-    ctx = Context(ident="http://openworm.org/data", conf=powconn.conf).stored
+with P.connect('default.conf') as owmconn:
+    ctx = Context(ident="http://openworm.org/data", conf=owmconn.conf).stored
     query_object = ctx(Connection)(pre_cell=ctx(Neuron)(name='AVAL'))
     print('STARTING WITH AVAL')
     for x in query_object.load():

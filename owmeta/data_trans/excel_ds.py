@@ -1,5 +1,5 @@
 from rdflib.namespace import Namespace
-# from PyOpenWorm.datasource import Informational
+# from owmeta.datasource import Informational
 from .common_data import DS_NS
 from .http_ds import HTTPFileDataSource
 

@@ -61,12 +61,12 @@ def xfail_without_db():
                 os.path.realpath(__file__)  # this file
             )
         ),
-        ".pow",
+        ".owm",
         "worm.db"
     )
 
     if not os.path.isfile(db_path):
-        pytest.xfail("Database is not installed. Try \n\tpow clone https://github.com/openworm/OpenWormData.git")
+        pytest.xfail("Database is not installed. Try \n\towm clone https://github.com/openworm/OpenWormData.git")
 
 
 # Add function to find dummy tests, i.e. ones that are simply marked pass.

@@ -1,6 +1,6 @@
 import six
-from PyOpenWorm.contextualize import contextualize_metaclass, contextualized_new
-from PyOpenWorm.context import Context, ContextMeta
+from owmeta.contextualize import contextualize_metaclass, contextualized_new
+from owmeta.context import Context, ContextMeta
 
 
 class DocumentContextMeta(ContextMeta):

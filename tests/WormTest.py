@@ -2,9 +2,9 @@ from __future__ import absolute_import
 import rdflib as R
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
-from PyOpenWorm.muscle import Muscle
+from owmeta.worm import Worm
+from owmeta.network import Network
+from owmeta.muscle import Muscle
 
 
 class WormTest(_DataTest):

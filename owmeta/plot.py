@@ -3,7 +3,7 @@ from .dataObject import DataObject, DatatypeProperty
 
 class Plot(DataObject):
     """
-    Object for storing plot data in PyOpenWorm.
+    Object for storing plot data in owmeta.
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ class Plot(DataObject):
     def _to_string(self, input_list):
         """
         Converts input_list to a string
-        for serialized storage in PyOpenWorm.
+        for serialized storage in owmeta.
         """
         return '|'.join([str(item) for item in input_list])
 

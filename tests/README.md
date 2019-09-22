@@ -1,11 +1,11 @@
-PyOpenWorm Tests
-================
+owmeta Tests
+============
 
 Run tests by executing the following from your command line.
 
     $ py.test
 
-To run only tests which integrate with components outside of PyOpenWorm's control (e.g., web services) run this command:
+To run only tests which integrate with components outside of owmeta's control (e.g., web services) run this command:
 
     $ py.test -m 'inttest'
 
@@ -13,7 +13,7 @@ or, to exclude such tests:
 
     $ py.test -m 'not inttest'
 
-This directory contains the unit and integration tests for PyOpenWorm.
+This directory contains the unit and integration tests for owmeta.
 
 * ConfigureTest.py - Tests for the Configure class, which provides
   functionality to modules to allow outside objects to parameterize their

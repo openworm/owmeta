@@ -7,14 +7,14 @@ BitTorrent client for P2P filesharing
 
 1. **Download** desired contents:
 
-* A `~PyOpenWorm.data_trans.local_file_ds.LocalFileDataSource` created and stored within the local graph store contains a `torrent_file_name <https://github.com/openworm/PyOpenWorm/pull/424/files#diff-f837dedc6cde6b8c62975ac3b9ed4efe>`_ `~PyOpenWorm.datasource.Informational`. This refers to the torrent containing the location of the desired contents on the BitTorrent. A ``torrent`` is used to locate files on the File System [ `BEP 3 <http://www.bittorrent.org/beps/bep_0003.html>`_ ]. A `~PyOpenWorm.datasource.DataSource` defines attributes about the contents that it represents.
+* A `~owmeta.data_trans.local_file_ds.LocalFileDataSource` created and stored within the local graph store contains a `torrent_file_name <https://github.com/openworm/owmeta/pull/424/files#diff-f837dedc6cde6b8c62975ac3b9ed4efe>`_ `~owmeta.datasource.Informational`. This refers to the torrent containing the location of the desired contents on the BitTorrent. A ``torrent`` is used to locate files on the File System [ `BEP 3 <http://www.bittorrent.org/beps/bep_0003.html>`_ ]. A `~owmeta.datasource.DataSource` defines attributes about the contents that it represents.
 
 
 |
 
   Module ``t`` describes the ``DataSource`` attributes::
 
-        def pow_data(ns):
+        def owm_data(ns):
             ns.context.add_import(ConnectomeCSVDataSource.definition_context)
             ns.context(ConnectomeCSVDataSource)(
             key = '2000_connections',
@@ -26,7 +26,7 @@ BitTorrent client for P2P filesharing
 
   The ``DataSource`` can be created and stored on the local graph with::
 
-      $ pow save t
+      $ owm save t
 
 
 
@@ -34,7 +34,7 @@ BitTorrent client for P2P filesharing
 
   The ``DataSource`` identifier can be used to see contents stored in the local graph with::
    
-  $ pow source show ConnectomeCSVDataSource:2000_connections
+  $ owm source show ConnectomeCSVDataSource:2000_connections
 
 
   ConnectomeCSVDataSource
@@ -44,11 +44,11 @@ BitTorrent client for P2P filesharing
 
          Torrent file name: 'd9da5ce947c6f1c127dfcdc2ede63320.torrent' 
  
-* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/PyOpenWorm/pull/449/files>`_ class inherits from the `~PyOpenWorm.datasource_loader.DataSourceDirLoader` and overrides its `load ()`  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``, performs `~PyOpenWorm.datasource.DataTranslator` from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
+* The `BitTorrentDataSourceDirLoader <https://github.com/openworm/owmeta/pull/449/files>`_ class inherits from the `~owmeta.datasource_loader.DataSourceDirLoader` and overrides its `load ()`  method. `Google Drive <https://en.wikipedia.org/wiki/Google_Drive>`_ stores the ``torrents`` uploaded by other researchers. ``load()`` fetches the ``torrent`` refered to in ``torrent_file_name`` of the ``DataSource``, performs `~owmeta.datasource.DataTranslator` from one form to another and then adds the ``torrent`` to the `BitTorrent Client <https://github.com/openworm/bt-gsoc-2019>`_ for downloading its contents.
 
 |
 
- This ``BitTorrent Client`` is `available on PyPI <https://pypi.org/project/torrent-client/>`_ and is included in the `PyOpenWorm setup <https://github.com/openworm/PyOpenWorm/blob/dev/setup.py>`_.
+ This ``BitTorrent Client`` is `available on PyPI <https://pypi.org/project/torrent-client/>`_ and is included in the `owmeta setup <https://github.com/openworm/owmeta/blob/dev/setup.py>`_.
 
 |
 
@@ -69,7 +69,7 @@ BitTorrent client for P2P filesharing
 
 
 
-* Within the `.pow <https://github.com/openworm/PyOpenWorm/blob/dev/docs/command.rst>`_ directory we have the `credentials.json and token.pickle <https://github.com/openworm/OpenWormData/pull/4>`_ these are for authentication of the Google Drive. For the purpose of access control the ``client_secret`` required by ``credentials.json`` will only be shared by PyOpenWorm maintainers.
+* Within the `.owm <https://github.com/openworm/owmeta/blob/dev/docs/command.rst>`_ directory we have the `credentials.json and token.pickle <https://github.com/openworm/OpenWormData/pull/4>`_ these are for authentication of the Google Drive. For the purpose of access control the ``client_secret`` required by ``credentials.json`` will only be shared by owmeta maintainers.
 
 |
 	

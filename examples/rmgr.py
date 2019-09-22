@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm as P
+import owmeta as P
 
 P.connect('default.conf')
 
@@ -56,7 +56,7 @@ class NeuronClass(P.Neuron):
 NeuronClass.register()
 
 # A neuron class should be a way for saying what all neurons of a class have in common
-# (The notation below is a bit of a mish-mash. basically it's PyOpenWorm without
+# (The notation below is a bit of a mish-mash. basically it's owmeta without
 # iterators, type notations with ':', and some Python string operations)
 #
 # nc : NeuronClass

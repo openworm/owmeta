@@ -1,10 +1,10 @@
 from __future__ import absolute_import
-from PyOpenWorm import config
-from PyOpenWorm.data import DataUser
+from owmeta import config
+from owmeta.data import DataUser
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.channel import Channel
-from PyOpenWorm.cell import Cell
+from owmeta.channel import Channel
+from owmeta.cell import Cell
 
 
 class ChannelTest(_DataTest):

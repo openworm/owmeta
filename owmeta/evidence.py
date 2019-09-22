@@ -1,8 +1,8 @@
 import logging
 
-from PyOpenWorm.dataObject import DataObject, ObjectProperty
-from PyOpenWorm.contextDataObject import ContextDataObject
-from PyOpenWorm.context import Context
+from owmeta.dataObject import DataObject, ObjectProperty
+from owmeta.contextDataObject import ContextDataObject
+from owmeta.context import Context
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +27,9 @@ class Evidence(DataObject):
 
     Attaching evidence to an set of statements is done like this::
 
-       >>> from PyOpenWorm.connection import Connection
-       >>> from PyOpenWorm.evidence import Evidence
-       >>> from PyOpenWorm.context import Context
+       >>> from owmeta.connection import Connection
+       >>> from owmeta.evidence import Evidence
+       >>> from owmeta.context import Context
 
     Declare contexts::
 
@@ -105,7 +105,7 @@ def evidence_for(qctx, ctx, evctx=None):
     ----------
     qctx : object
         an object supported by evidence. If the object is a
-        :class:`~PyOpenWorm.context.Context` with no identifier, then the query
+        :class:`~owmeta.context.Context` with no identifier, then the query
         considers statements 'staged' (rather than stored) in the context
     ctx : Context
         Context that bounds where we look for statements about `qctx`. The
@@ -130,7 +130,7 @@ def query_context(graph, qctx):
     '''
     graph : rdflib.graph.Graph
         Graph where we can find the contexts for statements in `qctx`
-    qctx : PyOpenWorm.context.Context
+    qctx : owmeta.context.Context
         Container for statements
     '''
     trips = qctx.contents_triples()

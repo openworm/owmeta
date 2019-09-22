@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-.. _pow_module:
+.. _owm_module:
 
-PyOpenWorm
-==========
+owmeta
+======
 
 OpenWorm Unified Data Abstract Layer.
 
-An introduction to PyOpenWorm can be found in the README on our
-`Github page <https://github.com/openworm/PyOpenWorm>`_.
+An introduction to owmeta can be found in the README on our
+`Github page <https://github.com/openworm/owmeta>`_.
 
 Most statements correspond to some action on the database.
 Some of these actions may be complex, but intuitively ``a.B()``, the Query form,
@@ -53,10 +53,10 @@ ImportOverrider = None
 ModuleRecorder = None
 
 
-BASE_MAPPER = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
-    'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+BASE_MAPPER = Mapper(base_class_names=('owmeta.dataObject.DataObject',
+    'owmeta.simpleProperty.RealSimpleProperty'))
 '''
-Handles some of the PyOpenWorm DataObjects regardless of whether there's been any connection. Used by Contexts outside
+Handles some of the owmeta DataObjects regardless of whether there's been any connection. Used by Contexts outside
 of a connection.
 '''
 
@@ -123,7 +123,7 @@ def get_data(path):
     from glob import glob
     package_paths = glob(os.path.join(get_path('platlib'), '*'))
     sys.path = package_paths + sys.path
-    installed_package_root = os.path.dirname(get_loader('PyOpenWorm').get_filename())
+    installed_package_root = os.path.dirname(get_loader('owmeta').get_filename())
     sys.path = sys.path[len(package_paths):]
     filename = os.path.join(installed_package_root, path)
     return filename
@@ -131,7 +131,7 @@ def get_data(path):
 
 def config(key=None):
     """
-    Gets the main configuration for the whole PyOpenWorm library.
+    Gets the main configuration for the whole owmeta library.
 
     :return: the instance of the Configure class currently operating.
     """
@@ -200,16 +200,16 @@ def loadData(
         except Exception as e:
             logging.exception("Failed to determine if the serialized data file is older than the binary database."
                               " The data file will be reloaded. Reason: {}".format(e.message))
-    sys.stderr.write("[PyOpenWorm] Loading data into the graph; this may take several minutes!!\n")
+    sys.stderr.write("[owmeta] Loading data into the graph; this may take several minutes!!\n")
     conf['rdf.graph'].parse(data, format=dataFormat)
 
 
 class ConnectionFailError(Exception):
     def __init__(self, cause, *args):
         if args:
-            super(ConnectionFailError, self).__init__('PyOpenWorm connection failed: {}. {}'.format(cause, *args))
+            super(ConnectionFailError, self).__init__('owmeta connection failed: {}. {}'.format(cause, *args))
         else:
-            super(ConnectionFailError, self).__init__('PyOpenWorm connection failed: {}'.format(cause))
+            super(ConnectionFailError, self).__init__('owmeta connection failed: {}'.format(cause))
 
 
 def connect(configFile=False,
@@ -220,7 +220,7 @@ def connect(configFile=False,
     """
     Load desired configuration and open the database
 
-    :param configFile: (Optional) The configuration file for PyOpenWorm
+    :param configFile: (Optional) The configuration file for owmeta
     :param conf: (Optional) a configuration object for the connection. Takes precedence over `configFile`
     :param do_logging: (Optional) If true, turn on debug level logging
     :param data: (Optional) specify the file to load into the library
@@ -248,25 +248,25 @@ def connect(configFile=False,
     try:
         conf.init_database()
     except ZODBSourceOpenFailError as e:
-        # Special handling for a common user error with pow which, nonetheless,
-        # may be encontered when *not* using pow
-        if e.openstr.endswith('.pow/worm.db'):
-            raise ConnectionFailError(e, 'Perhaps you need to do a `pow clone`?')
+        # Special handling for a common user error with owm which, nonetheless,
+        # may be encontered when *not* using owm
+        if e.openstr.endswith('.owm/worm.db'):
+            raise ConnectionFailError(e, 'Perhaps you need to do a `owm clone`?')
         raise ConnectionFailError(e)
     except DatabaseConflict as e:
         raise ConnectionFailError(e, "It looks like a connection is already opened by a living process")
     except Exception as e:
         raise ConnectionFailError(e)
 
-    logging.getLogger('PyOpenWorm').info("Connected to database")
+    logging.getLogger('owmeta').info("Connected to database")
 
     if data:
         loadData(conf, data, dataFormat)
 
     # Base class names is empty because we won't be adding any objects to the
     # context automatically
-    mapper = Mapper(base_class_names=('PyOpenWorm.dataObject.DataObject',
-                                      'PyOpenWorm.simpleProperty.RealSimpleProperty'))
+    mapper = Mapper(base_class_names=('owmeta.dataObject.DataObject',
+                                      'owmeta.simpleProperty.RealSimpleProperty'))
     conf['mapper'] = mapper
     # An "empty" context, that serves as the default when no context is defined
 

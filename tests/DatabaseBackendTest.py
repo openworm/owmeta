@@ -2,9 +2,9 @@
 
 from __future__ import absolute_import
 import unittest
-from PyOpenWorm.configure import Configure, Configureable
-from PyOpenWorm.data import Data
-from PyOpenWorm import connect, config, disconnect
+from owmeta.configure import Configure, Configureable
+from owmeta.data import Data
+from owmeta import connect, config, disconnect
 import rdflib as R
 import os
 import subprocess

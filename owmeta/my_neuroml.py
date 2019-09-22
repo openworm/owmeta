@@ -1,6 +1,6 @@
-from PyOpenWorm.neuron import Neuron
+from owmeta.neuron import Neuron
 
-from PyOpenWorm.data import DataUser
+from owmeta.data import DataUser
 import neuroml as N
 
 

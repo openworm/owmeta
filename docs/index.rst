@@ -1,12 +1,12 @@
-.. PyOpenWorm documentation master file.
+.. owmeta documentation master file.
 
-Welcome to PyOpenWorm's documentation!
-======================================
+Welcome to owmeta's documentation!
+==================================
 
 Our main README is available online on Github. [1]_  This documentation contains
 additional materials beyond what is covered there.
 
-.. [1] http://github.com/openworm/PyOpenWorm
+.. [1] http://github.com/openworm/owmeta
 
 Contents:
 
@@ -21,7 +21,7 @@ Contents:
 Issues
 ------
 
-.. _github issue: https://github.com/openworm/PyOpenWorm/issues
+.. _github issue: https://github.com/openworm/owmeta/issues
 
 Indices and tables
 ==================

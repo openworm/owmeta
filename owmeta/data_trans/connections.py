@@ -52,10 +52,10 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
 
     def translate(self, data_source, neurons_source, muscles_source):
         # muscle cells that are generically defined in source and need to be broken
-        # into pair of L and R before being added to PyOpenWorm
+        # into pair of L and R before being added to owmeta
 
         # muscle cells that have different names in connectome source and cell list.
-        # Their wormbase cell list names will be used in PyOpenWorm
+        # Their wormbase cell list names will be used in owmeta
         changed_muscles = ['ANAL', 'INTR', 'INTL', 'SPH']
 
         # counters for terminal printing
@@ -296,7 +296,7 @@ TO_EXPAND_MUSCLES = ['PM1D', 'PM2D', 'PM3D', 'PM4D', 'PM5D']
 # connectome.
 #
 # TODO: In future work these should be uploaded seperately to
-# PyOpenWorm in a new upload function and should be referred from there
+# owmeta in a new upload function and should be referred from there
 # instead of this list.
 OTHER_CELLS = ['MC1DL', 'MC1DR', 'MC1V', 'MC2DL', 'MC2DR', 'MC2V', 'MC3DL',
                'MC3DR', 'MC3V']

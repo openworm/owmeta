@@ -7,7 +7,7 @@ import six
 import hashlib
 
 from importlib import import_module
-import PyOpenWorm  # noqa
+import owmeta  # noqa
 from . import BASE_SCHEMA_URL, DEF_CTX
 from .contextualize import (Contextualizable,
                             ContextualizableClass,
@@ -27,7 +27,7 @@ from .identifier_mixin import IdMixin
 from .inverse_property import InverseProperty
 from .rdf_query_util import goq_hop_scorer, get_most_specific_rdf_type, oid, load
 
-import PyOpenWorm.simpleProperty as SP
+import owmeta.simpleProperty as SP
 
 __all__ = [
     "BaseDataObject",
@@ -63,7 +63,7 @@ class PropertyProperty(property):
 
 
 def mp(c, k):
-    ak = '_pow_' + k
+    ak = '_owm_' + k
     if c.lazy:
         def getter(target):
             attr = getattr(target, ak, None)
@@ -261,7 +261,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
     def after_mapper_module_load(self, mapper):
         '''
-        Called after the module has been loaded. See :class:`PyOpenWorm.mapper.Mapper`
+        Called after the module has been loaded. See :class:`owmeta.mapper.Mapper`
         '''
         self.init_python_class_registry_entries()
 
@@ -516,7 +516,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         self.filling = False
         for k, v in pc.items():
             if not v.lazy:
-                self.attach_property(v, name='_pow_' + k)
+                self.attach_property(v, name='_owm_' + k)
 
         if paia:
             for k, v in property_args:
@@ -660,7 +660,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.BaseDataObject
+        owner : owmeta.dataObject.BaseDataObject
             The name of this property.
         """
         return _make_property(cls, 'DatatypeProperty', *args, **kwargs)
@@ -674,7 +674,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.BaseDataObject
+        owner : owmeta.dataObject.BaseDataObject
             The name of this property.
         value_type : type
             The type of BaseDataObject for values of this property
@@ -690,7 +690,7 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
         ----------
         linkName : string
             The name of this property.
-        owner : PyOpenWorm.dataObject.BaseDataObject
+        owner : owmeta.dataObject.BaseDataObject
             The name of this property.
         """
         return _make_property(cls, 'UnionProperty', *args, **kwargs)

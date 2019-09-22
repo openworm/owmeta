@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-from PyOpenWorm.collections import Bag
-from PyOpenWorm.package_utils import get_library_location
+from owmeta.collections import Bag
+from owmeta.package_utils import get_library_location
 import unittest
 from os.path import join, dirname
 

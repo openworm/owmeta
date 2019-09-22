@@ -2,9 +2,9 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.configure import Configureable
+from owmeta.evidence import Evidence
+from owmeta.dataObject import DataObject
+from owmeta.configure import Configureable
 
 try:
     from unittest.mock import patch
@@ -16,7 +16,7 @@ class EvidenceTest(_DataTest):
     ctx_classes = (Evidence,)
 
     def setUp(self):
-        self.patcher = patch('PyOpenWorm.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher = patch('owmeta.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
         self.patcher.start()
         super(EvidenceTest, self).setUp()
 
@@ -79,7 +79,7 @@ class Issue211EvidenceTest(_DataTest):
     """
     Can we assert the same fact with two distinct pieces of Evidence?
 
-    issue: openworm/PyOpenWorm#211
+    issue: openworm/owmeta#211
 
     """
 

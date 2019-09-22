@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from PyOpenWorm.data import DataUser
+from owmeta.data import DataUser
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.cell import Cell
+from owmeta.cell import Cell
 
 
 class CellTest(_DataTest):

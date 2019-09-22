@@ -1,18 +1,18 @@
 """
 How to reference supporting evidence for some object in the database.
 
-See: "Metadata in PyOpenWorm" for discussion on semantics of what giving
+See: "Metadata in owmeta" for discussion on semantics of what giving
 evidence for an object means.
 """
 
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm as P
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.document import Document
-from PyOpenWorm.data import Data
-from PyOpenWorm.context import Context
+import owmeta as P
+from owmeta.evidence import Evidence
+from owmeta.neuron import Neuron
+from owmeta.document import Document
+from owmeta.data import Data
+from owmeta.context import Context
 
 # Create dummy database configuration.
 d = Data()
@@ -27,7 +27,7 @@ evctx = Context(ident='http://example.org/meta', conf=conn.conf)
 n = ctx(Neuron)(name='AVAL')
 
 # Create a new Evidence object with `doi` and `pmid` fields populated.
-# See `PyOpenWorm/evidence.py` for other available fields.
+# See `owmeta/evidence.py` for other available fields.
 d = evctx(Document)(key='Anonymous2011', doi='125.41.3/ploscompbiol', pmid='12345678')
 e = evctx(Evidence)(key='Anonymous2011', reference=d)
 

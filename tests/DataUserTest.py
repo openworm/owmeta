@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 from six.moves import range
 import unittest
-from PyOpenWorm.data import DataUser
-from PyOpenWorm.configure import (Configureable, BadConf, Configure)
+from owmeta.data import DataUser
+from owmeta.configure import (Configureable, BadConf, Configure)
 import rdflib
 import rdflib as R
 
@@ -30,7 +30,7 @@ class DataUserTest(_DataTest):
     def test_init_config_no_Data(self):
         """ Should fail if given a non-Data configuration """
         # XXX: This test touches some machinery in
-        # PyOpenWorm/__init__.py. Feel like it's a bad test
+        # owmeta/__init__.py. Feel like it's a bad test
         tmp = Configureable.default
         Configureable.default = Configure()
         with self.assertRaises(BadConf):
@@ -88,7 +88,7 @@ class DataUserTest(_DataTest):
     def test_add_statements_completes(self):
         """ Test that we can upload lots of triples.
 
-        This is to address the problem from issue #31 on https://github.com/openworm/PyOpenWorm/issues
+        This is to address the problem from issue #31 on https://github.com/openworm/owmeta/issues
         """
         g = rdflib.Graph()
         for i in range(9000):

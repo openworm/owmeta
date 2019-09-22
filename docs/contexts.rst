@@ -7,13 +7,13 @@ more...context.
 
 Background
 ----------
-Contexts were introduced to PyOpenWorm (POW) as a generic tool for grouping
-statements. We need to group statements to make statements about statements
-like "Who made these statements?" or "When were these statements made?". That's
-the main usage. Beyond that, we need a way to share statements. Contexts have
+Contexts were introduced to owmeta as a generic tool for grouping statements.
+We need to group statements to make statements about statements like "Who made
+these statements?" or "When were these statements made?". That's the main
+usage. Beyond that, we need a way to share statements. Contexts have
 identifiers by which we can naturally refer to contexts from other contexts.
 
-POW need a way to represent contexts with the existing statement form. Other
+owmeta needs a way to represent contexts with the existing statement form. Other
 alternatives were considered, such as using Python's context managers, but I
 (Mark) also wanted a way to put statements in a context that could also be
 carried with the subject of the statement. Using the `wrapt <wrapt_>`_
@@ -28,7 +28,7 @@ The remainder of this page will go into doing some useful things with contexts.
 
 Classes and contexts
 --------------------
-POW can load classes as well as instances from an RDF graph. The packages which
+owmeta can load classes as well as instances from an RDF graph. The packages which
 define the classes must already be installed in the Python library path, and a
 few statements need to be in the graph you are loading from or in a graph
 imported (transitively) by that graph. The statements you need are these
@@ -43,9 +43,10 @@ imported (transitively) by that graph. The statements you need are these
    :a_module <http://openworm.org/entities/PythonModule/name> "APackage.and.module.name" .
 
 where ``:a_class_desc`` and ``:a_module`` are placeholders for objects which
-will typically be created by POW on the user's behalf, and ``AClassName`` is the
-name of the class available at the top-level of the module
-``APackage.and.module.name``. These statements will be created in memory by POW
-when a module defining a :py:class:`~PyOpenWorm.dataObject.DataObject`-derived
-class is first processed by a :py:class:`~PyOpenWorm.mapper.Mapper` which will
-happen after the module is imported.
+will typically be created by owmeta on the user's behalf, and ``AClassName`` is
+the name of the class available at the top-level of the module
+``APackage.and.module.name``. These statements will be created in memory by
+owmeta when a module defining a
+:py:class:`~owmeta.dataObject.DataObject`-derived class is first processed by a
+:py:class:`~owmeta.mapper.Mapper` which will happen after the module is
+imported.

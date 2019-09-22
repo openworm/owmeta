@@ -2,9 +2,9 @@
 Not actually tests, but benchmarks.
 """
 from __future__ import print_function
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
-from PyOpenWorm import connect, disconnect
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta import connect, disconnect
 
 from .TestUtilities import xfail_without_db
 
@@ -24,7 +24,7 @@ def teardown():
 
 def test_adal_connections():
     """
-    See github issue openworm/PyOpenWorm#90
+    See github issue openworm/owmeta#90
     """
     for x in range(10):
         adal = Neuron("ADAL")
@@ -35,7 +35,7 @@ def test_adal_connections():
 
 def test_adal_connections_property():
     """
-    See github issue openworm/PyOpenWorm#90
+    See github issue openworm/owmeta#90
     """
     for x in range(10):
         adal = Neuron("ADAL")

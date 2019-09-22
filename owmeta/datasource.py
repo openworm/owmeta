@@ -129,7 +129,7 @@ class DataSourceType(type(DataObject)):
 
 class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     '''
-    A source for data that can get translated into PyOpenWorm objects.
+    A source for data that can get translated into owmeta objects.
 
     The value for any field can be passed to __init__ by name. Additionally, if
     the sub-class definition of a DataSource assigns a value for that field like::
@@ -188,7 +188,7 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             inf = self.info_fields[n]
             v = vl.get('i', vl.get('e', vl.get('a', vl['d'])))
 
-            # Make the POW property
+            # Make the OWM property
             #
             # We set the name for the property to the inf.name since that's how we access the info on this object, but
             # the inf.property_name is used for the linkName so that the property's URI is generated based on that name.
@@ -360,7 +360,7 @@ class DataTransatorType(type(DataObject)):
 
 
 class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
-    """ Translates from a data source to PyOpenWorm objects """
+    """ Translates from a data source to owmeta objects """
 
     input_type = DataSource
     output_type = DataSource

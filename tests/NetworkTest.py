@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-import PyOpenWorm
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
+import owmeta
+from owmeta.worm import Worm
+from owmeta.network import Network
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
 
 from .DataTestTemplate import _DataTest
 

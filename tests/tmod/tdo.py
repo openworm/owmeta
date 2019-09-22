@@ -1,4 +1,4 @@
-from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+from owmeta.dataObject import DataObject, DatatypeProperty
 
 
 class TDO(DataObject):

@@ -14,9 +14,9 @@ declared the variable `adal`.
 
 from __future__ import print_function
 from __future__ import absolute_import
-import PyOpenWorm as P
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.context import Context
+import owmeta as P
+from owmeta.worm import Worm
+from owmeta.context import Context
 import os
 
 

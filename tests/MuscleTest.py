@@ -3,8 +3,8 @@ from __future__ import absolute_import
 
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.muscle import Muscle
-from PyOpenWorm.neuron import Neuron
+from owmeta.muscle import Muscle
+from owmeta.neuron import Neuron
 
 
 class MuscleTest(_DataTest):

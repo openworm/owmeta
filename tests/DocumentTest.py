@@ -2,9 +2,9 @@
 import unittest
 from yarom.graphObject import IdentifierMissingException
 from .DataTestTemplate import _DataTest
-from PyOpenWorm.document import (Document,
-                                 _doi_uri_to_doi,
-                                 WormbaseRetrievalException)
+from owmeta.document import (Document,
+                             _doi_uri_to_doi,
+                             WormbaseRetrievalException)
 import pytest
 
 

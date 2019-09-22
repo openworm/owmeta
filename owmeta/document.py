@@ -7,7 +7,7 @@ from yarom.graphObject import IdentifierMissingException
 from .context import Context
 from .dataObject import DataObject, DatatypeProperty, Alias
 
-from PyOpenWorm import bibtex as BIB
+from owmeta import bibtex as BIB
 
 logger = logging.getLogger(__name__)
 

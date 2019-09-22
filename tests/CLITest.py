@@ -6,9 +6,9 @@ except ImportError:
     from mock import patch, Mock
 
 from pytest import mark
-from PyOpenWorm.command_util import SubCommand, IVar
-from PyOpenWorm.cli_command_wrapper import CLICommandWrapper
-import PyOpenWorm.cli as PCLI
+from owmeta.command_util import SubCommand, IVar
+from owmeta.cli_command_wrapper import CLICommandWrapper
+import owmeta.cli as PCLI
 from .TestUtilities import noexit, stderr, stdout
 import json
 import re
@@ -141,9 +141,9 @@ class CLICommandWrapperTest(unittest.TestCase):
 
 class CLIOutputModeTest(unittest.TestCase):
     def setUp(self):
-        self.ccw = patch('PyOpenWorm.cli.CLICommandWrapper').start()
-        patch('PyOpenWorm.cli.POW').start()
-        patch('PyOpenWorm.cli.GitRepoProvider').start()
+        self.ccw = patch('owmeta.cli.CLICommandWrapper').start()
+        patch('owmeta.cli.OWM').start()
+        patch('owmeta.cli.GitRepoProvider').start()
 
     def tearDown(self):
         patch.stopall()
@@ -175,7 +175,7 @@ class CLIJSONOutputModeTest(CLIOutputModeTest):
         with noexit(), stdout() as so:
             @with_defaults
             def main(argument_namespace_callback, **kwargs):
-                from PyOpenWorm.context import Context
+                from owmeta.context import Context
                 argument_namespace_callback.output_mode = 'json'
                 m = Mock(name='context_result', spec=Context())
                 m.identifier = 'ident'

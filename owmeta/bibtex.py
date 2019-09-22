@@ -7,7 +7,7 @@ from .bibtex_customizations import customizations
 
 def bibtex_to_document(bibtex_entry, context=None):
     """ Takes a single BibTeX entry and translates it into a Document object """
-    from PyOpenWorm.document import Document
+    from owmeta.document import Document
 
     res = Document.contextualize(context)()
     update_document_with_bibtex(res, bibtex_entry)

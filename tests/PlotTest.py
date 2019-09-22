@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.plot import Plot
+from owmeta.plot import Plot
 
 
 class PlotTest(_DataTest):

@@ -28,7 +28,7 @@ class READMETest(unittest.TestCase):
         xfail_without_db()
         self.startdir = os.getcwd()
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('.owm', p(self.testdir, '.owm'), symlinks=True)
         shutil.copyfile('README.md', p(self.testdir, 'README.md'))
         shutil.copyfile('readme.conf', p(self.testdir, 'readme.conf'))
         os.chdir(self.testdir)
@@ -62,8 +62,8 @@ class SphinxTest(unittest.TestCase):
 
     def test_adding_data(self):
         # Setup a class imported by docs for demonstration purposes
-        from PyOpenWorm.dataObject import DataObject, DatatypeProperty
-        from PyOpenWorm.context import Context
+        from owmeta.dataObject import DataObject, DatatypeProperty
+        from owmeta.context import Context
         Load = lambda *args, **kwargs: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
 
         class Widget(DataObject):

@@ -12,14 +12,14 @@ Try running this script and see what it prints out.
 """
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm as P
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.neuron import Neuron
+import owmeta as P
+from owmeta.worm import Worm
+from owmeta.neuron import Neuron
 
-print("Connecting to the database using PyOpenWorm v%s..."%P.__version__)
+print("Connecting to the database using owmeta v%s..."%P.__version__)
 conn = P.connect('default.conf')
 
-from PyOpenWorm.context import Context
+from owmeta.context import Context
 ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
 #Get the worm object.

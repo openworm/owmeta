@@ -10,13 +10,13 @@ import warnings
 from yarom.utils import FCN
 from yarom.graphObject import IdentifierMissingException
 
-from PyOpenWorm.data import DataUser
-from PyOpenWorm.dataObject import DataObject, ObjectProperty, DatatypeProperty, _partial_property
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.context import Context
-from PyOpenWorm.rdf_query_util import get_most_specific_rdf_type
-from PyOpenWorm import BASE_CONTEXT
+from owmeta.data import DataUser
+from owmeta.dataObject import DataObject, ObjectProperty, DatatypeProperty, _partial_property
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta.context import Context
+from owmeta.rdf_query_util import get_most_specific_rdf_type
+from owmeta import BASE_CONTEXT
 
 from .GraphDBInit import make_graph
 
@@ -37,7 +37,7 @@ class DataObjectTest(_DataTest):
 
     def setUp(self):
         super(DataObjectTest, self).setUp()
-        self.patcher = patch('PyOpenWorm.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher = patch('owmeta.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
         self.patcher.start()
 
     def tearDown(self):
@@ -213,7 +213,7 @@ class ClassRegistryTest(_DataTest):
             - loading a module from a ClassDescription
             - resolving subclasses from superclasses
         '''
-        from PyOpenWorm.dataObject import (PythonModule,
+        from owmeta.dataObject import (PythonModule,
                                            PythonClassDescription,
                                            RegistryEntry)
 

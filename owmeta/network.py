@@ -71,7 +71,7 @@ class Network(BiologyType):
 
         :param name: Name of a c. elegans neuron
         :returns: Neuron corresponding to the name given
-        :rtype: PyOpenWorm.neuron.Neuron
+        :rtype: owmeta.neuron.Neuron
         """
         return Neuron.contextualize(self.context)(name=name, conf=self.conf)
 

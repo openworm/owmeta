@@ -1,10 +1,10 @@
 import rdflib
 from rdflib.term import URIRef, Variable
 from yarom.mapper import FCN
-from PyOpenWorm.dataObject import DataObject, InverseProperty
-from PyOpenWorm.mapper import Mapper
-from PyOpenWorm.context import Context
-from PyOpenWorm.context_store import ContextStore, ContextStoreException, RDFContextStore
+from owmeta.dataObject import DataObject, InverseProperty
+from owmeta.mapper import Mapper
+from owmeta.context import Context
+from owmeta.context_store import ContextStore, ContextStoreException, RDFContextStore
 from .DataTestTemplate import _DataTest
 try:
     from unittest.mock import MagicMock, Mock, patch
@@ -58,7 +58,7 @@ class ContextTest(_DataTest):
 
     def test_save_context_no_graph(self):
         ctx = Context()
-        with patch('PyOpenWorm.data.ALLOW_UNCONNECTED_DATA_USERS', False):
+        with patch('owmeta.data.ALLOW_UNCONNECTED_DATA_USERS', False):
             with self.assertRaisesRegexp(Exception, r'graph'):
                 ctx.save_context()
 
@@ -343,7 +343,7 @@ class ContextStoreTest(_DataTest):
         m.imports = []
         ctx.contents_triples.return_value = ()
         m.contents_triples.return_value = [('a', 'b', 'c')]
-        with patch('PyOpenWorm.context_store.RDFContextStore'):
+        with patch('owmeta.context_store.RDFContextStore'):
             cut = ContextStore(ctx, include_stored=True)
             m.contents_triples.assert_called()
 

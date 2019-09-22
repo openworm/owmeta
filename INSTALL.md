@@ -1,29 +1,29 @@
 Installation
 ============
-The recommended way to get PyOpenWorm is with [pip](http://pip.readthedocs.org/en/latest/installing.html):
+The recommended way to get owmeta is with [pip](http://pip.readthedocs.org/en/latest/installing.html):
 
     pip install pyopenworm
 
 Alternatively, you can grab the latest on the development branch from GitHub:
 
-    git clone https://github.com/openworm/PyOpenWorm.git
-    cd PyOpenWorm
+    git clone https://github.com/openworm/owmeta.git
+    cd owmeta
     python setup.py install
 
 
-POW Database
+OWM Database
 ------------
-`pow` is a command line installed with PyOpenWorm which provides a high-level
-interface for interacting with data created with PyOpenWorm. Although you can
-use PyOpenWorm without it, there is an OpenWorm database which is managed with
-`pow`. You can clone this database by running the following command: 
+`owm` is a command line installed with owmeta which provides a high-level
+interface for interacting with data created with owmeta. Although you can
+use owmeta without it, there is an OpenWorm database which is managed with
+`owm`. You can clone this database by running the following command:
 
-    pow clone https://github.com/openworm/OpenWormData.git
+    owm clone https://github.com/openworm/OpenWormData.git
 
-This will create a directory `.pow` in your current working directory,
+This will create a directory `.owm` in your current working directory,
 underneath which, the database and related files are stored. See documentation
 for the command on ReadTheDocs.io
-[here](http://pow-doc.readthedocs.org/en/dev/command.html) or look at
+[here](http://owmeta.readthedocs.org/en/dev/command.html) or look at
 docs/command.rst. 
 
 
@@ -44,16 +44,16 @@ For example, where *test_muscles1* is a test in the *WormTest* suite of tests (s
 
 Python 2 support
 ----------------
-Python 2.7 will be supported in PyOpenWorm through Python 2.7 end-of-life in
+Python 2.7 will be supported in owmeta through Python 2.7 end-of-life in
 2020. Subsequent to that, any regressions for 2.7-based applications will only
 be fixed for the sake of OpenWorm projects when requested by an issue on [our
-tracker](https://github.com/openworm/PyOpenWorm/issues).
+tracker](https://github.com/openworm/owmeta/issues).
 
 
 Uninstall
 ----------
 
-    pip uninstall PyOpenWorm
+    pip uninstall owmeta
 
 
 Optional

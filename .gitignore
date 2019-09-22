@@ -5,7 +5,7 @@
 *.db.lock
 *.db.tmp
 build/*
-PyOpenWorm.egg-info/*
+owmeta.egg-info/*
 env
 dist/*
 tests/*.log
@@ -42,5 +42,5 @@ snakefood
 # kind
 docs/api
 
-# pow clone'd databases
-.pow/
+# owm clone'd databases
+.owm/

@@ -14,19 +14,19 @@ import json
 from rdflib.term import URIRef
 from pytest import mark
 import git
-from PyOpenWorm.git_repo import GitRepoProvider, _CloneProgress
-from PyOpenWorm.command import (POW, UnreadableGraphException, GenericUserError, StatementValidationError,
-                                POWConfig, POWSource, POWTranslator, POWEvidence,
-                                DEFAULT_SAVE_CALLABLE_NAME, POWDirDataSourceDirLoader, _DSD)
-from PyOpenWorm.context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY, Context
-from PyOpenWorm.context_common import CONTEXT_IMPORTS
-from PyOpenWorm.bittorrent import BitTorrentDataSourceDirLoader
-from PyOpenWorm.command_util import IVar, PropertyIVar
-from PyOpenWorm.contextDataObject import ContextDataObject
-from PyOpenWorm.datasource_loader import LoadFailed
-from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
-from PyOpenWorm.document import Document
-from PyOpenWorm.website import Website
+from owmeta.git_repo import GitRepoProvider, _CloneProgress
+from owmeta.command import (OWM, UnreadableGraphException, GenericUserError, StatementValidationError,
+                            OWMConfig, OWMSource, OWMTranslator, OWMEvidence,
+                            DEFAULT_SAVE_CALLABLE_NAME, OWMDirDataSourceDirLoader, _DSD)
+from owmeta.context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY, Context
+from owmeta.context_common import CONTEXT_IMPORTS
+from owmeta.bittorrent import BitTorrentDataSourceDirLoader
+from owmeta.command_util import IVar, PropertyIVar
+from owmeta.contextDataObject import ContextDataObject
+from owmeta.datasource_loader import LoadFailed
+from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
+from owmeta.document import Document
+from owmeta.website import Website
 from .TestUtilities import noexit, stderr, stdout
 
 
@@ -35,7 +35,7 @@ class BaseTest(unittest.TestCase):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
         self.startdir = os.getcwd()
         os.chdir(self.testdir)
-        self.cut = POW()
+        self.cut = OWM()
         self._default_conf = {'rdf.store_conf': '$HERE/worm.db',
                               IMPORTS_CONTEXT_KEY: 'http://example.org/imports'}
 
@@ -48,36 +48,36 @@ class BaseTest(unittest.TestCase):
         my_conf = dict(self._default_conf)
         if conf:
             my_conf.update(conf)
-        os.mkdir('.pow')
-        with open(p('.pow', 'pow.conf'), 'w') as f:
+        os.mkdir('.owm')
+        with open(p('.owm', 'owm.conf'), 'w') as f:
             json.dump(my_conf, f)
 
 
-class POWTest(BaseTest):
+class OWMTest(BaseTest):
 
     def test_init_default_creates_store(self):
         self.cut.init()
-        self.assertTrue(exists(p('.pow', 'worm.db')), msg='worm.db is created')
+        self.assertTrue(exists(p('.owm', 'worm.db')), msg='worm.db is created')
 
     def test_init_default_creates_config(self):
         self.cut.init()
-        self.assertTrue(exists(p('.pow', 'pow.conf')), msg='pow.conf is created')
+        self.assertTrue(exists(p('.owm', 'owm.conf')), msg='owm.conf is created')
 
     def test_init_default_store_config_file_exists_no_change(self):
         self._init_conf()
-        with open(p('.pow', 'pow.conf'), 'r') as f:
+        with open(p('.owm', 'owm.conf'), 'r') as f:
             init = f.read()
         self.cut.init()
-        with open(p('.pow', 'pow.conf'), 'r') as f:
+        with open(p('.owm', 'owm.conf'), 'r') as f:
             self.assertEqual(init, f.read())
 
     def test_init_default_store_config_file_exists_update_store_conf(self):
         self._init_conf()
 
         self.cut.init(update_existing_config=True)
-        with open(p('.pow', 'pow.conf'), 'r') as f:
+        with open(p('.owm', 'owm.conf'), 'r') as f:
             conf = json.load(f)
-            self.assertEqual(conf['rdf.store_conf'], p('$POW', 'worm.db'))
+            self.assertEqual(conf['rdf.store_conf'], p('$OWM', 'worm.db'))
 
     def test_fetch_graph_no_accessor_finder(self):
         with self.assertRaises(Exception):
@@ -89,7 +89,7 @@ class POWTest(BaseTest):
             self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
 
     def test_init_fail_cleanup(self):
-        ''' If we fail on init, there shouldn't be a .pow leftover '''
+        ''' If we fail on init, there shouldn't be a .owm leftover '''
         self.cut.repository_provider = Mock()
 
         def failed_init(*args, **kwargs): raise _TestException('Oh noes!')
@@ -99,10 +99,10 @@ class POWTest(BaseTest):
             self.fail("Should have failed init")
         except _TestException:
             pass
-        self.assertFalse(exists(self.cut.powdir), msg='powdir does not exist')
+        self.assertFalse(exists(self.cut.owmdir), msg='owmdir does not exist')
 
     def test_clone_fail_cleanup(self):
-        ''' If we fail on clone, there shouldn't be a .pow leftover '''
+        ''' If we fail on clone, there shouldn't be a .owm leftover '''
         self.cut.repository_provider = Mock()
 
         def failed_clone(*args, **kwargs): raise _TestException('Oh noes!')
@@ -112,7 +112,7 @@ class POWTest(BaseTest):
             self.fail("Should have failed clone")
         except _TestException:
             pass
-        self.assertFalse(exists(self.cut.powdir), msg='powdir does not exist')
+        self.assertFalse(exists(self.cut.owmdir), msg='owmdir does not exist')
 
     def test_fetch_graph_with_accessor_success(self):
         m = Mock()
@@ -169,7 +169,7 @@ class POWTest(BaseTest):
         '''
         self._init_conf({'key': '$HERE/irrelevant'})
         conf = self.cut._conf()
-        self.assertEqual(conf['key'], p(self.cut.powdir, 'irrelevant'))
+        self.assertEqual(conf['key'], p(self.cut.owmdir, 'irrelevant'))
 
     def test_user_config_HERE_relative(self):
         '''
@@ -193,9 +193,9 @@ class POWTest(BaseTest):
         '''
         userconfdir = p(self.testdir, 'movedconf')
         os.mkdir(userconfdir)
-        userconf = p(userconfdir, 'pow.conf')
+        userconf = p(userconfdir, 'owm.conf')
         with open(userconf, 'w') as f:
-            f.write('{"key": "$HERE/irrelevant", "rdf.store_conf": "$POW/worm.db"}')
+            f.write('{"key": "$HERE/irrelevant", "rdf.store_conf": "$OWM/worm.db"}')
         self.cut.config_file = userconf
         conf = self.cut._conf()
         self.assertEqual(conf['key'], p(userconfdir, 'irrelevant'))
@@ -236,7 +236,7 @@ class POWTest(BaseTest):
         a = 'http://example.org/mdc'
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
-            with patch('PyOpenWorm.command.Context') as ctxc:
+            with patch('owmeta.command.Context') as ctxc:
                 self.cut.save('tests.command_test_module')
                 ctxc.assert_called_with(ident=a, conf=ANY)
                 ctxc().save_context.assert_called()
@@ -347,7 +347,7 @@ class POWTest(BaseTest):
         k = URIRef('http://example.org/unknown_ctx')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            with patch('PyOpenWorm.command.Context') as ctxc:
+            with patch('owmeta.command.Context') as ctxc:
 
                 data_context = Mock()
                 data_context.identifier = URIRef(a)
@@ -387,7 +387,7 @@ class POWTest(BaseTest):
         v = URIRef('http://example.org/unknown_context')
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
-            with patch('PyOpenWorm.command.Context') as ctxc:
+            with patch('owmeta.command.Context') as ctxc:
 
                 data_context = Mock()
                 data_context.identifier = URIRef(a)
@@ -435,7 +435,7 @@ class POWTest(BaseTest):
             self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
 
     def test_save_returns_context(self):
-        from PyOpenWorm.context import Context
+        from owmeta.context import Context
         a = 'http://example.org/mdc'
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
@@ -458,8 +458,8 @@ class POWTest(BaseTest):
         c = []
         self._init_conf({DATA_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im, \
-                patch('PyOpenWorm.command.Context'), \
-                patch('PyOpenWorm.context.Context'):
+                patch('owmeta.command.Context'), \
+                patch('owmeta.context.Context'):
             def f(ctx):
                 c.append(ctx.new_context(b))
 
@@ -495,7 +495,7 @@ class POWTest(BaseTest):
     def test_save_no_provider_yarom_mapped_classes(self):
         self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
         with patch('importlib.import_module') as im, \
-                patch('PyOpenWorm.mapper.Mapper.process_module'):
+                patch('owmeta.mapper.Mapper.process_module'):
             module = Mock(spec=['__yarom_mapped_classes__'])
             # must have at least one entry in mapped classes
             module.__yarom_mapped_classes__ = [MagicMock()]
@@ -522,10 +522,10 @@ class POWTest(BaseTest):
         self.assertIn((URIRef(data_context), CONTEXT_IMPORTS, imported_context_id), trips)
 
 
-class POWEvidenceGetDWEDSTest(unittest.TestCase):
+class OWMEvidenceGetDWEDSTest(unittest.TestCase):
     def setUp(self):
         self.parent = Mock(name='parent')
-        self.cut = POWEvidence(self.parent)
+        self.cut = OWMEvidence(self.parent)
 
         dweds = Mock(name='dweds', spec=DWEDS())
         # load from the given identifier is a dweds
@@ -560,10 +560,10 @@ class POWEvidenceGetDWEDSTest(unittest.TestCase):
         self.parent.message.assert_not_called()
 
 
-class POWEvidenceGetContextTest(unittest.TestCase):
+class OWMEvidenceGetContextTest(unittest.TestCase):
     def setUp(self):
         self.parent = Mock(name='parent')
-        self.cut = POWEvidence(self.parent)
+        self.cut = OWMEvidence(self.parent)
 
     def test_doc(self):
         # given
@@ -613,7 +613,7 @@ class POWEvidenceGetContextTest(unittest.TestCase):
         self.parent.message.assert_not_called()
 
 
-class POWTranslatorTest(unittest.TestCase):
+class OWMTranslatorTest(unittest.TestCase):
 
     def test_translator_list(self):
         parent = Mock()
@@ -622,15 +622,15 @@ class POWTranslatorTest(unittest.TestCase):
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
         parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
-        ps = POWTranslator(parent)
+        ps = OWMTranslator(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
 
 
-class POWTranslateTest(BaseTest):
+class OWMTranslateTest(BaseTest):
 
     def setUp(self):
-        super(POWTranslateTest, self).setUp()
+        super(OWMTranslateTest, self).setUp()
         self._init_conf({"data_context_id": "http://example.org/data"})
 
     def test_translate_unknown_translator_message(self):
@@ -762,23 +762,23 @@ class GitCommandTest(BaseTest):
            provider
         """
         self.cut.init()
-        self.assertTrue(exists(p(self.cut.powdir, '.git')))
+        self.assertTrue(exists(p(self.cut.owmdir, '.git')))
 
     def test_init_tracks_config(self):
         """ Test that the config file is tracked """
         self.cut.init()
-        p(self.cut.powdir, '.git')
+        p(self.cut.owmdir, '.git')
 
     def test_clone_creates_git_dir(self):
         self.cut.basedir = 'r1'
         self.cut.init()
 
-        pd = self.cut.powdir
+        pd = self.cut.owmdir
 
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        self.assertTrue(exists(p('r2', '.pow', '.git')))
+        self.assertTrue(exists(p('r2', '.owm', '.git')))
 
     def test_clones_graphs(self):
         self.cut.basedir = 'r1'
@@ -787,12 +787,12 @@ class GitCommandTest(BaseTest):
         self._add_to_graph()
         self.cut.commit('Commit Message')
 
-        pd = self.cut.powdir
+        pd = self.cut.owmdir
 
         clone = 'r2'
         self.cut.basedir = clone
         self.cut.clone(pd)
-        self.assertTrue(exists(p(self.cut.powdir, 'graphs', 'index')))
+        self.assertTrue(exists(p(self.cut.owmdir, 'graphs', 'index')))
 
     def test_clones_config(self):
         self.cut.basedir = 'r1'
@@ -801,7 +801,7 @@ class GitCommandTest(BaseTest):
         self._add_to_graph()
         self.cut.commit('Commit Message')
 
-        pd = self.cut.powdir
+        pd = self.cut.owmdir
 
         clone = 'r2'
         self.cut.basedir = clone
@@ -815,7 +815,7 @@ class GitCommandTest(BaseTest):
         self._add_to_graph()
         self.cut.commit('Commit Message')
 
-        pd = self.cut.powdir
+        pd = self.cut.owmdir
 
         clone = 'r2'
         self.cut.basedir = clone
@@ -827,8 +827,8 @@ class GitCommandTest(BaseTest):
 
         self._add_to_graph()
         # dirty up the index
-        repo = git.Repo(self.cut.powdir)
-        f = p(self.cut.powdir, 'something')
+        repo = git.Repo(self.cut.owmdir)
+        f = p(self.cut.owmdir, 'something')
         open(f, 'w').close()
 
         self.cut.commit('Commit Message 1')
@@ -844,8 +844,8 @@ class GitCommandTest(BaseTest):
 
         self._add_to_graph()
         # dirty up the index
-        repo = git.Repo(self.cut.powdir)
-        f = p(self.cut.powdir, 'something')
+        repo = git.Repo(self.cut.owmdir)
+        f = p(self.cut.owmdir, 'something')
         open(f, 'w').close()
 
         self.cut.commit('Commit Message 1')
@@ -921,8 +921,8 @@ class ConfigTest(unittest.TestCase):
                 f.write('{}\n')
         parent._init_config_file.side_effect = f
         parent.config_file = fname
-        parent.powdir = self.testdir
-        cut = POWConfig(parent)
+        parent.owmdir = self.testdir
+        cut = OWMConfig(parent)
         cut.set('key', 'null')
         parent._init_config_file.assert_called()
 
@@ -935,29 +935,29 @@ class ConfigTest(unittest.TestCase):
                 f.write('{}\n')
         parent._init_config_file.side_effect = f
         parent.config_file = fname
-        parent.powdir = self.testdir
-        cut = POWConfig(parent)
+        parent.owmdir = self.testdir
+        cut = OWMConfig(parent)
         cut.set('key', '1')
         self.assertEqual(cut.get('key'), 1)
 
     def test_set_new_user(self):
         parent = Mock()
-        parent.powdir = self.testdir
-        cut = POWConfig(parent)
+        parent.owmdir = self.testdir
+        cut = OWMConfig(parent)
         cut.user = True
         cut.set('key', '1')
         self.assertEqual(cut.get('key'), 1)
 
     def test_set_user_object(self):
         parent = Mock()
-        parent.powdir = self.testdir
-        cut = POWConfig(parent)
+        parent.owmdir = self.testdir
+        cut = OWMConfig(parent)
         cut.user = True
         cut.set('key', '{"smoop": "boop"}')
         self.assertEqual(cut.get('key'), {'smoop': 'boop'})
 
 
-class POWSourceTest(unittest.TestCase):
+class OWMSourceTest(unittest.TestCase):
     def test_list(self):
         parent = Mock()
         dct = dict()
@@ -967,7 +967,7 @@ class POWSourceTest(unittest.TestCase):
         # Mock the loading of DataObjects from the DataContext
         def emptygen(): yield
         parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = emptygen()
-        ps = POWSource(parent)
+        ps = OWMSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
     def test_list_with_entry(self):
@@ -979,12 +979,12 @@ class POWSourceTest(unittest.TestCase):
         # Mock the loading of DataObjects from the DataContext
         def gen(): yield Mock()
         parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = gen()
-        ps = POWSource(parent)
+        ps = OWMSource(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
 
 
-class POWDSDLoaderNoIndex(unittest.TestCase):
+class OWMDSDLoaderNoIndex(unittest.TestCase):
     def setUp(self):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
 
@@ -993,16 +993,16 @@ class POWDSDLoaderNoIndex(unittest.TestCase):
 
     def test_no_index_can_load_false(self):
         "Test index of dsds doesn't exist yet -> should indicate with an exception"
-        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut = OWMDirDataSourceDirLoader(self.testdir)
         self.assertFalse(cut.can_load(Mock()))
 
     def test_no_index_load_failed(self):
-        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut = OWMDirDataSourceDirLoader(self.testdir)
         with self.assertRaisesRegexp(LoadFailed, re.escape(self.testdir)):
             cut.load(Mock())
 
 
-class POWDSDLoaderMissingDSD(unittest.TestCase):
+class OWMDSDLoaderMissingDSD(unittest.TestCase):
     def setUp(self):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
         with open(p(self.testdir, 'index'), 'w') as f:
@@ -1019,13 +1019,13 @@ class POWDSDLoaderMissingDSD(unittest.TestCase):
         It may take some non-trivial amount of time to do the directory listing and check each entry exists, but we
         don't anticipate all that many in one repo
         '''
-        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut = OWMDirDataSourceDirLoader(self.testdir)
         m = Mock()
         m.identifier = 'dsid1'
         self.assertFalse(cut.can_load(m))
 
     def test_dir_missing_load(self):
-        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut = OWMDirDataSourceDirLoader(self.testdir)
         with self.assertRaises(LoadFailed):
             cut.load('dsdid1')
 
@@ -1034,7 +1034,7 @@ class POWDSDLoaderMissingDSD(unittest.TestCase):
         The load method doesn't take responsibility for the directory existing, in general
         '''
         os.mkdir(p(self.testdir, 'dir1'))
-        cut = POWDirDataSourceDirLoader(self.testdir)
+        cut = OWMDirDataSourceDirLoader(self.testdir)
         cut.load('dsdid1')
         os.rmdir(p(self.testdir, 'dir1'))
         cut.load('dsdid1')

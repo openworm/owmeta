@@ -13,9 +13,9 @@ except ImportError:
 from collections import namedtuple, defaultdict
 import csv
 
-import PyOpenWorm as P
-from PyOpenWorm.context import Context
-from PyOpenWorm.worm import Worm
+import owmeta as P
+from owmeta.context import Context
+from owmeta.worm import Worm
 import six
 
 #Connect to database.
@@ -29,7 +29,7 @@ Edge = namedtuple("Edge", ["pre_cell", "post_cell", "transmitter", "receptor"])
 
 
 def get_mappings():
-    """Fetch cells' neurotransmitters, neuropeptides and receptors from PyOpenWorm.
+    """Fetch cells' neurotransmitters, neuropeptides and receptors from owmeta.
 
     :return: tuple of (
         dict from cell name to set of neurotransmitter and neuropeptide names,

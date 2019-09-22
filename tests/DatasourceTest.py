@@ -8,9 +8,9 @@ except ImportError:
 
 from rdflib.term import URIRef
 
-from PyOpenWorm.datasource import Informational, DataSource, DuplicateAlsoException
-from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-from PyOpenWorm.contextDataObject import ContextDataObject
+from owmeta.datasource import Informational, DataSource, DuplicateAlsoException
+from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+from owmeta.contextDataObject import ContextDataObject
 from .DataTestTemplate import _DataTest
 
 

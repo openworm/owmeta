@@ -12,7 +12,7 @@ Interface
 Access is through a Python library which communicates with the database. This
 library serves the function of providing an object oriented view on the database
 that can be accessed through the Python scripts commonly used in the project.
-The :ref:`api <pow_module>` is described separately.
+The :ref:`api <owm_module>` is described separately.
 
 Data modelling
 --------------
@@ -59,7 +59,7 @@ describes signals transmitted between developing cells. In order to test this
 theory we would like to leverage existing photographic data indicating the
 volume of cells at the time of their division as this relates to the
 differentiation code stored by the cell. Progress on this issue is documented
-`on Github <https://github.com/openworm/PyOpenWorm/issues/7#issuecomment-45401916>`_.
+`on Github <https://github.com/openworm/owmeta/issues/7#issuecomment-45401916>`_.
 
 Aging
 ~~~~~
@@ -67,7 +67,7 @@ Concurrently with development, we would like to begin modeling the effects of
 aging on the worm. Aging typically manifests in physiological changes due to
 transcription errors or cell death. These physiological changes can be
 represented abstractly as parameters to the function of biological entities.
-See `Github <https://github.com/openworm/PyOpenWorm/issues/6>`_ for further discussion.
+See `Github <https://github.com/openworm/owmeta/issues/6>`_ for further discussion.
 
 Information assurance
 ---------------------
@@ -99,7 +99,7 @@ A technique called RDF reification allows us to annotate arbitrary facts in our
 database with additional information. This technique allows for the addition of
 structured citation data to facts in the database as well as annotations for
 tracking responsibility for uploads to the database. Further details for the
-attachment of evidence using this technique are given in the :ref:`api <pow_module>`.
+attachment of evidence using this technique are given in the :ref:`api <owm_module>`.
 
 In line with current practices for communication through the source code
 management platform, Github, we would like to track responsibility for new
@@ -125,7 +125,7 @@ with the data as well as the code.  This would require two things:
 
 - A serialization method dumps a new copy of the data out to a flat file
   enabling all users of the library to contribute their modifications to the data
-  back to the PyOpenWorm project via GitHub.
+  back to the owmeta project via GitHub.
 
 A follow on to #2 is that the serialization method would need to preserve the
 ordering of data elements and write in some plain text format so that a simple
@@ -163,7 +163,7 @@ existing queries.
 FuXi
 ~~~~~~~~~~
 `FuXi <https://github.com/RDFLib/FuXi>`_ is implemented as a semantic reasoning
-layer in PyOpenWorm. In other words, it will be used to automatically infer (and
+layer in owmeta. In other words, it will be used to automatically infer (and
 set) properties from other properties in the worm database.
 This means that redundant information (ex: explicitly stating that each object
 is of class "dataType") and subclass relationships (ex: that every object of

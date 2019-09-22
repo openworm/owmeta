@@ -7,8 +7,8 @@ import sys
 
 
 long_description = """
-PyOpenWorm
-===========
+owmeta
+======
 
 A unified, simple data access library in Python for data, facts, and models of
 *C. elegans* anatomy for the `OpenWorm project <http://www.openworm.org>`_
@@ -26,7 +26,7 @@ references.
 """
 
 
-for line in open('PyOpenWorm/__init__.py'):
+for line in open('owmeta/__init__.py'):
     if line.startswith("__version__"):
         version = line.split("=")[1].strip()[1:-1]
 
@@ -45,7 +45,7 @@ def py2_only(*args):
 
 
 setup(
-    name='PyOpenWorm',
+    name='owmeta',
     zip_safe=False,
     setup_requires=['pytest-runner'],
     tests_require=[
@@ -89,16 +89,16 @@ setup(
         ]
     },
     version=version,
-    packages=['PyOpenWorm',
-              'PyOpenWorm.data_trans'],
+    packages=['owmeta',
+              'owmeta.data_trans'],
     author='OpenWorm.org authors and contributors',
     author_email='info@openworm.org',
     description='A Python library for working with OpenWorm data and models',
     long_description=long_description,
     license='MIT',
-    url='http://PyOpenWorm.readthedocs.org/en/latest/',
-    download_url='https://github.com/openworm/PyOpenWorm/archive/master.zip',
-    entry_points={'console_scripts': ['pow = PyOpenWorm.cli:main']},
+    url='http://owmeta.readthedocs.org/en/latest/',
+    download_url='https://github.com/openworm/owmeta/archive/master.zip',
+    entry_points={'console_scripts': ['owm = owmeta.cli:main']},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',

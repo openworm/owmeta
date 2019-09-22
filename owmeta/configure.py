@@ -143,7 +143,7 @@ class Configure(object):
                         res = environ.get(match, None)
                         if res is None:
                             if match == 'BASE':
-                                res = resource_filename(Requirement.parse('PyOpenWorm'), value)
+                                res = resource_filename(Requirement.parse('owmeta'), value)
                             elif match == 'HERE':
                                 cfg_name = config_dict.get('configure.file_location')
                                 cfg_dname = cfg_name and dirname(cfg_name)

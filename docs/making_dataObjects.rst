@@ -2,24 +2,24 @@
 
 Making data objects
 ====================
-To make a new object type like :py:class:`~PyOpenWorm.neuron.Neuron` or
-:py:class:`PyOpenWorm.worm.Worm`, for the most part, you just need to make a
+To make a new object type like :py:class:`~owmeta.neuron.Neuron` or
+:py:class:`owmeta.worm.Worm`, for the most part, you just need to make a
 Python class.
 
 Say, for example, that I want to record some information about drug reactions
 in C. elegans. I make ``Drug`` and ``Experiment`` classes to describe C.
 elegans reactions::
 
-    >>> from PyOpenWorm.dataObject import (DataObject,
+    >>> from owmeta.dataObject import (DataObject,
     ...                                    DatatypeProperty,
     ...                                    ObjectProperty,
     ...                                    Alias)
-    >>> from PyOpenWorm.worm import Worm
-    >>> from PyOpenWorm.evidence import Evidence
-    >>> from PyOpenWorm.document import Document
-    >>> from PyOpenWorm.context import Context
-    >>> from PyOpenWorm.mapper import Mapper
-    >>> from PyOpenWorm import connect, ModuleRecorder
+    >>> from owmeta.worm import Worm
+    >>> from owmeta.evidence import Evidence
+    >>> from owmeta.document import Document
+    >>> from owmeta.context import Context
+    >>> from owmeta.mapper import Mapper
+    >>> from owmeta import connect, ModuleRecorder
 
     >>> class Drug(DataObject):
     ...     name = DatatypeProperty()
@@ -38,7 +38,7 @@ elegans reactions::
 
     # Do some accounting stuff to register the classes. Usually happens behind
     # the scenes. 
-    >>> m = Mapper(('PyOpenWorm.dataObject.DataObject',))
+    >>> m = Mapper(('owmeta.dataObject.DataObject',))
     >>> ModuleRecorder.add_listener(m)
     >>> m.process_classes(Drug, Experiment)
 
@@ -50,20 +50,20 @@ Aperture Labs::
     >>> e = ctx(Experiment)(key='experiment001')
     >>> w = ctx(Worm)('C. elegans')
     >>> e.subject(w)
-    PyOpenWorm.statement.Statement(...Context(.../experiments"))
+    owmeta.statement.Statement(...Context(.../experiments"))
 
     >>> e.drug(d)
-    PyOpenWorm.statement.Statement(...)
+    owmeta.statement.Statement(...)
 
     >>> e.route_of_entry('ingestion')
-    PyOpenWorm.statement.Statement(...)
+    owmeta.statement.Statement(...)
 
     >>> e.reaction('no reaction')
-    PyOpenWorm.statement.Statement(...)
+    owmeta.statement.Statement(...)
 
     >>> ev = Evidence(key='labresults', reference=Document(author="Aperture Labs"))
     >>> ev.supports(ctx)
-    PyOpenWorm.statement.Statement(...)
+    owmeta.statement.Statement(...)
 
 and save those statements::
 
@@ -79,7 +79,7 @@ either ObjectProperty or DatatypeProperty on the class::
     __main__.Drug_granularity(owner=Drug(ident=rdflib.term.URIRef(u'http://openworm.org/entities/Drug/moon%20rocks')))
 
     >>> d.granularity('ground up')
-    PyOpenWorm.statement.Statement(...Context(.../experiments"))
+    owmeta.statement.Statement(...Context(.../experiments"))
 
     >>> do = Drug()
 

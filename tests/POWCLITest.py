@@ -19,14 +19,14 @@ import transaction
 from pytest import mark, fixture
 import unittest
 
-from PyOpenWorm.data_trans.local_file_ds import LocalFileDataSource as LFDS
-from PyOpenWorm import connect
-from PyOpenWorm.datasource import DataTranslator
-from PyOpenWorm.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
-from PyOpenWorm.context_common import CONTEXT_IMPORTS
+from owmeta.data_trans.local_file_ds import LocalFileDataSource as LFDS
+from owmeta import connect
+from owmeta.datasource import DataTranslator
+from owmeta.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
+from owmeta.context_common import CONTEXT_IMPORTS
 
 
-pytestmark = mark.pow_cli_test
+pytestmark = mark.owm_cli_test
 
 
 @fixture
@@ -38,7 +38,7 @@ def self():
     # Added so pytest_cov gets to run for our subprocesses
     with open(p(res.testdir, 'sitecustomize.py'), 'w') as f:
         f.write(ptcov)
-    shutil.copytree('.pow', p(res.testdir, '.pow'), symlinks=True)
+    shutil.copytree('.owm', p(res.testdir, '.owm'), symlinks=True)
 
     yield res
 
@@ -82,17 +82,17 @@ class Data(object):
 
 def test_translator_list(self):
     ''' Test we have some translator '''
-    assertRegexpMatches(self.sh('pow translator list'), r'<[^>]+>')
+    assertRegexpMatches(self.sh('owm translator list'), r'<[^>]+>')
 
 
 def test_source_list(self):
     ''' Test we have some data source '''
-    assertRegexpMatches(self.sh('pow source list'), r'<[^>]+>')
+    assertRegexpMatches(self.sh('owm source list'), r'<[^>]+>')
 
 
 def test_source_list_dweds(self):
     ''' Test listing of DWEDS '''
-    out = self.sh('pow source list --kind :DataWithEvidenceDataSource')
+    out = self.sh('owm source list --kind :DataWithEvidenceDataSource')
     assertRegexpMatches(out, r'<[^>]+>')
 
 
@@ -100,22 +100,22 @@ def test_manual_graph_edit_no_diff(self):
     '''
     Edit a context file and do a diff -- there shouldn't be any difference because we ignore such manual updates
     '''
-    index = self.sh('cat ' + p('.pow', 'graphs', 'index'))
+    index = self.sh('cat ' + p('.owm', 'graphs', 'index'))
     fname = index.split('\n')[0].split(' ')[0]
 
-    open(p(self.testdir, '.pow', 'graphs', fname), 'w').close() # truncate a graph's serialization
+    open(p(self.testdir, '.owm', 'graphs', fname), 'w').close() # truncate a graph's serialization
 
-    assertRegexpMatches(self.sh('pow diff'), r'^$')
+    assertRegexpMatches(self.sh('owm diff'), r'^$')
 
 
 def test_contexts_list(self):
     ''' Test we have some contexts '''
-    assertRegexpMatches(self.sh('pow contexts list'), r'^http://')
+    assertRegexpMatches(self.sh('owm contexts list'), r'^http://')
 
 
 def test_list_contexts(self):
     ''' Test we have some contexts '''
-    assertRegexpMatches(self.sh('pow list_contexts'), r'^http://')
+    assertRegexpMatches(self.sh('owm list_contexts'), r'^http://')
 
 
 def test_save_diff(self):
@@ -128,14 +128,14 @@ def test_save_diff(self):
                 from test_module.monkey import Monkey
 
 
-                def pow_data(ns):
+                def owm_data(ns):
                     ns.context.add_import(Monkey.definition_context)
                     ns.context(Monkey)(bananas=55)
                 '''), file=out)
 
     with open(p(modpath, 'monkey.py'), 'w') as out:
         print(dedent('''\
-                from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+                from owmeta.dataObject import DataObject, DatatypeProperty
 
 
                 class Monkey(DataObject):
@@ -151,8 +151,8 @@ def test_save_diff(self):
 
                 __yarom_mapped_classes__ = (Monkey,)
                 '''), file=out)
-    print(self.sh('pow save test_module.command_test_save'))
-    assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
+    print(self.sh('owm save test_module.command_test_save'))
+    assertRegexpMatches(self.sh('owm diff'), r'<[^>]+>')
 
 
 def test_save_classes(self):
@@ -161,7 +161,7 @@ def test_save_classes(self):
     open(p(modpath, '__init__.py'), 'w').close()
     with open(p(modpath, 'monkey.py'), 'w') as out:
         print(dedent('''\
-                from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+                from owmeta.dataObject import DataObject, DatatypeProperty
 
 
                 class Monkey(DataObject):
@@ -177,8 +177,8 @@ def test_save_classes(self):
 
                 __yarom_mapped_classes__ = (Monkey,)
                 '''), file=out)
-    print(self.sh('pow save test_module.monkey'))
-    assertRegexpMatches(self.sh('pow diff'), r'<[^>]+>')
+    print(self.sh('owm save test_module.monkey'))
+    assertRegexpMatches(self.sh('owm diff'), r'<[^>]+>')
 
 
 def test_save_imports(self):
@@ -187,7 +187,7 @@ def test_save_imports(self):
     open(p(modpath, '__init__.py'), 'w').close()
     with open(p(modpath, 'monkey.py'), 'w') as out:
         print(dedent('''\
-                from PyOpenWorm.dataObject import DataObject, DatatypeProperty
+                from owmeta.dataObject import DataObject, DatatypeProperty
 
                 class Monkey(DataObject):
                     class_context = 'http://example.org/primate/monkey'
@@ -204,14 +204,14 @@ def test_save_imports(self):
                     class_context = 'http://example.org/ungulate/giraffe'
 
 
-                def pow_data(ns):
+                def owm_data(ns):
                     ns.context.add_import(Monkey.definition_context)
                     ns.context.add_import(Giraffe.definition_context)
 
                 __yarom_mapped_classes__ = (Monkey,)
                 '''), file=out)
-    print(self.sh('pow save test_module.monkey'))
-    with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
+    print(self.sh('owm save test_module.monkey'))
+    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
         ctx = Context(ident=conn.conf[IMPORTS_CONTEXT_KEY], conf=conn.conf)
         trips = set(ctx.stored.rdf_graph().triples((None, None, None)))
         assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
@@ -232,7 +232,7 @@ class DT1(DataTranslator):
 
 def test_translator_list(self):
     expected = URIRef('http://example.org/trans1')
-    with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
+    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
         with transaction.manager:
             # Create data sources
             ctx = Context(ident='http://example.org/context', conf=conn.conf)
@@ -250,7 +250,7 @@ def test_translator_list(self):
 
     # List translators
     assertRegexpMatches(
-        self.sh('pow translator list'),
+        self.sh('owm translator list'),
         re.compile('^' + expected.n3() + '$', flags=re.MULTILINE)
     )
 
@@ -268,7 +268,7 @@ class DT2(DataTranslator):
 
 @mark.xfail
 def test_translate_data_source_loader(self):
-    with connect(p(self.testdir, '.pow', 'pow.conf')) as conn:
+    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
         with transaction.manager:
             # Create data sources
             ctx = Context(ident='http://example.org/context', conf=conn.conf)
@@ -289,7 +289,7 @@ def test_translate_data_source_loader(self):
 
     # Do translation
     assertRegexpMatches(
-        self.sh('pow translate http://example.org/trans1 http://example.org/lfds'),
+        self.sh('owm translate http://example.org/trans1 http://example.org/lfds'),
         r'Merged_Nuclei_Stained_Worm.zip'
     )
 

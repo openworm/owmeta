@@ -13,6 +13,6 @@ else:
 #    stats.sort_stats('time','calls')
 
 # This configuration filters the output so only user-functions will show up.
-    stats.print_stats('PyOpenWorm')    
+    stats.print_stats('owmeta')
 #    stats.print_stats()
 

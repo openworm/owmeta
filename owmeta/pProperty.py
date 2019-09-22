@@ -29,7 +29,7 @@ class Property(with_metaclass(PropertyMeta, Contextualizable, DataUser)):
 
     Parameters
     ----------
-    owner : PyOpenWorm.dataObject.DataObject
+    owner : owmeta.dataObject.DataObject
         The owner of this property
     name : string
         The name of this property. Can be accessed as an attribute like::

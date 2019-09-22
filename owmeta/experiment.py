@@ -1,5 +1,5 @@
-from PyOpenWorm.dataObject import DataObject, ObjectProperty
-from PyOpenWorm.document import Document
+from owmeta.dataObject import DataObject, ObjectProperty
+from owmeta.document import Document
 
 
 class Experiment(DataObject):

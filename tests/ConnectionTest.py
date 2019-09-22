@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta.neuron import Neuron
 import rdflib as R
 
 from .DataTestTemplate import _DataTest

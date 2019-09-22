@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from PyOpenWorm.pProperty import Property
+from owmeta.pProperty import Property
 from .DataTestTemplate import _DataTest
 
 

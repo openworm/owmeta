@@ -1,7 +1,7 @@
 from .cli_common import METHOD_NAMED_ARG
 
 CLI_HINTS = {
-    'PyOpenWorm.command.POW': {
+    'owmeta.command.OWM': {
         'commit': {
             (METHOD_NAMED_ARG, 'message'): {
                 'names': ['--message', '-m'],
@@ -65,7 +65,7 @@ CLI_HINTS = {
         },
         'IGNORE': ['message', 'progress_reporter']
     },
-    'PyOpenWorm.command.POWContexts': {
+    'owmeta.command.OWMContexts': {
         'edit': {
             (METHOD_NAMED_ARG, 'context'): {
                 'names': ['context'],
@@ -77,14 +77,14 @@ CLI_HINTS = {
             }
         }
     },
-    'PyOpenWorm.command.POWSource': {
+    'owmeta.command.OWMSource': {
         'show': {
             (METHOD_NAMED_ARG, 'data_source'): {
                 'names': ['data_source'],
             },
         },
     },
-    'PyOpenWorm.command.POWSourceData': {
+    'owmeta.command.OWMSourceData': {
         'retrieve': {
             (METHOD_NAMED_ARG, 'source'): {
                 'names': ['source'],
@@ -94,21 +94,21 @@ CLI_HINTS = {
             },
         },
     },
-    'PyOpenWorm.command.POWTranslator': {
+    'owmeta.command.OWMTranslator': {
         'show': {
             (METHOD_NAMED_ARG, 'translator'): {
                 'names': ['translator'],
             },
         },
     },
-    'PyOpenWorm.command.POWEvidence': {
+    'owmeta.command.OWMEvidence': {
         'get': {
             (METHOD_NAMED_ARG, 'identifier'): {
                 'names': ['identifier'],
             },
         },
     },
-    'PyOpenWorm.command.POWConfig': {
+    'owmeta.command.OWMConfig': {
         'set': {
             (METHOD_NAMED_ARG, 'key'): {
                 'names': ['key'],

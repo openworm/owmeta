@@ -1,10 +1,10 @@
 from __future__ import print_function
-from PyOpenWorm import connect, config
-from PyOpenWorm.context import Context
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.document import Document
-from PyOpenWorm.website import Website
+from owmeta import connect, config
+from owmeta.context import Context
+from owmeta.neuron import Neuron
+from owmeta.evidence import Evidence
+from owmeta.document import Document
+from owmeta.website import Website
 
 
 conn = connect(configFile="default.conf")

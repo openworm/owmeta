@@ -1,7 +1,7 @@
-import PyOpenWorm
+import owmeta
 from time import time
-from PyOpenWorm.neuron import Neuron
-PyOpenWorm.connect(configFile='PyOpenWorm/default.conf')
+from owmeta.neuron import Neuron
+owmeta.connect(configFile='owmeta/default.conf')
 t0 = time()
 
 print("Neurons:")

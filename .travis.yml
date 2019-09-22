@@ -15,7 +15,7 @@ before_install:
 install:
 - python setup.py install
 - pip install rdflib-sqlalchemy
-- pow clone https://github.com/openworm/OpenWormData.git
+- owm clone https://github.com/openworm/OpenWormData.git
 script:
 - "./ci-test.sh"
 after_script:

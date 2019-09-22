@@ -60,7 +60,7 @@ class Worm(BiologyType):
             77
 
         :returns: An object to work with the network of the worm
-        :rtype: PyOpenWorm.Network
+        :rtype: owmeta.Network
         """
         return self.neuron_network()
 

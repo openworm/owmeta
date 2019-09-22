@@ -168,7 +168,7 @@ class Neighbor(Property):
 
            Parameters
            ----------
-           See parameters for PyOpenWorm.connection.Connection
+           See parameters for owmeta.connection.Connection
 
            Returns
            -------
@@ -284,12 +284,12 @@ class ConnectionProperty(Property):
 
            Parameters
            ----------
-           conn : PyOpenWorm.connection.Connection
+           conn : owmeta.connection.Connection
                connection associated with the owner neuron
 
            Returns
            -------
-           A PyOpenWorm.neuron.Connection
+           A owmeta.neuron.Connection
         """
         assert(isinstance(conn, self._conntype))
         self._conns.append(conn)

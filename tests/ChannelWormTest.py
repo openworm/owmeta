@@ -1,5 +1,5 @@
 import unittest
-from PyOpenWorm.channelworm import PatchClampExperiment, ChannelModel, ChannelModelType
+from owmeta.channelworm import PatchClampExperiment, ChannelModel, ChannelModelType
 
 
 class PatchClampExperimentTest(unittest.TestCase):

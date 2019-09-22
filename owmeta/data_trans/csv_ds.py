@@ -5,7 +5,7 @@ from .common_data import DS_NS
 from .local_file_ds import LocalFileDataSource
 from .http_ds import HTTPFileDataSource
 
-from PyOpenWorm.datasource import Informational, DataTranslator
+from owmeta.datasource import Informational, DataTranslator
 import csv
 
 

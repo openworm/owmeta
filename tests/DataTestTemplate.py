@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm
+import owmeta
 import unittest
 import subprocess
 import tempfile
 
-from PyOpenWorm.context import Context
-from PyOpenWorm.data import Data
+from owmeta.context import Context
+from owmeta.data import Data
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
@@ -36,7 +36,7 @@ class _DataTest(unittest.TestCase):
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        self.connection = PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
+        self.connection = owmeta.connect(conf=self.TestConfig, do_logging=False)
         self.context = Context(ident='http://example.org/test-context',
                                conf=self.TestConfig)
         typ = type(self)
@@ -50,7 +50,7 @@ class _DataTest(unittest.TestCase):
         self.context.save_context()
 
     def tearDown(self):
-        PyOpenWorm.disconnect(self.connection)
+        owmeta.disconnect(self.connection)
         self.delete_dir()
 
     @property

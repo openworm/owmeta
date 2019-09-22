@@ -43,12 +43,12 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PyOpenWorm'
+project = u'owmeta'
 copyright = u'2013-2018, OpenWorm'
 
 # For substitutions in docs
 rst_epilog = """
-.. |pow| replace:: %(project)s
+.. |owm| replace:: %(project)s
 ..
 """ % dict(project=project)
 
@@ -113,7 +113,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 html_theme = 'alabaster'
 
 apidoc_options[:] = ['members', 'no-undoc-members', 'show-inheritance']
-apidoc_main('-M -f -e -d 2 -o api ../PyOpenWorm'.split(' '))
+apidoc_main('-M -f -e -d 2 -o api ../owmeta'.split(' '))
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -191,7 +191,7 @@ html_sidebars = {
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyOpenWormdoc'
+htmlhelp_basename = 'owmetadoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -210,8 +210,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyOpenWorm.tex', u'PyOpenWorm Documentation',
-   u'PyOpenWorm', 'manual'),
+  ('index', 'owmeta.tex', u'owmeta Documentation',
+   u'owmeta', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -240,8 +240,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyopenworm', u'PyOpenWorm Documentation',
-     [u'PyOpenWorm'], 1)
+    ('index', 'pyopenworm', u'owmeta Documentation',
+     [u'owmeta'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -254,9 +254,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'PyOpenWorm', u'PyOpenWorm Documentation',
-   u'PyOpenWorm', 'PyOpenWorm', 'Unified data abstraction layer for OpenWorm',
-   'PyOpenWorm'),
+  ('index', 'owmeta', u'owmeta Documentation',
+   u'owmeta', 'owmeta', 'Unified data abstraction layer for OpenWorm',
+   'owmeta'),
 ]
 
 # Documents to append as an appendix to all manuals.

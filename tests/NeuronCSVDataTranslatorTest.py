@@ -10,12 +10,12 @@ import shutil
 from os.path import join as p
 from rdflib.term import URIRef
 
-from PyOpenWorm.data_trans.neuron_data import NeuronCSVDataTranslator, NeuronCSVDataSource
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.document import Document
-from PyOpenWorm.network import Network
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.evidence import Evidence
+from owmeta.data_trans.neuron_data import NeuronCSVDataTranslator, NeuronCSVDataSource
+from owmeta.neuron import Neuron
+from owmeta.document import Document
+from owmeta.network import Network
+from owmeta.worm import Worm
+from owmeta.evidence import Evidence
 from .DataTestTemplate import _DataTest
 
 
@@ -115,7 +115,7 @@ ADAR,Neuropeptide,PDF-1,WormAtlas,'''
             f.write(text.strip())
         self.ds.csv_file_name('mycsv.csv')
         self.ds.bibtex_files(['ignored'])
-        self.patcher = patch('PyOpenWorm.data_trans.neuron_data.parse_bibtex_into_documents')
+        self.patcher = patch('owmeta.data_trans.neuron_data.parse_bibtex_into_documents')
         mock = self.patcher.start()
 
         def m(a, ctx):

@@ -12,5 +12,5 @@ URL=${OWCS_URL:-https://owcs.pythonanywhere.com/}
 
 py.test $@ --code-speed-submit="$URL" \
     --environment="$ENV" --branch="$BRANCH" --commit="$COMMIT" \
-    --project=PyOpenWorm --password=${OWCS_KEY} --username=$OWCS_USERNAME \
+    --project=owmeta --password=${OWCS_KEY} --username=$OWCS_USERNAME \
     ./tests/ProfileTest.py

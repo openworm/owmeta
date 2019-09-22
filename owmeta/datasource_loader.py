@@ -28,7 +28,7 @@ class DataSourceDirLoader(object):
 
         Parameters
         ----------
-        data_source : PyOpenWorm.datasource.DataSource
+        data_source : owmeta.datasource.DataSource
             The data source to load files for
 
         Returns
@@ -83,7 +83,7 @@ class DataSourceDirLoader(object):
 
         Parameters
         ----------
-        data_source : PyOpenWorm.datasource.DataSource
+        data_source : owmeta.datasource.DataSource
             The data source to load files for
 
         Returns
@@ -94,12 +94,12 @@ class DataSourceDirLoader(object):
 
     def can_load(self, data_source):
         '''
-        Returns true if the `~PyOpenWorm.datasource.DataSource` can be loaded by this
+        Returns true if the `~owmeta.datasource.DataSource` can be loaded by this
         loader
 
         Parameters
         ----------
-        data_source : PyOpenWorm.datasource.DataSource
+        data_source : owmeta.datasource.DataSource
             The data source to load files for
         '''
         return False

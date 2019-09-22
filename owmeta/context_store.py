@@ -19,7 +19,7 @@ class ContextStore(Store):
         """
         Parameters
         ----------
-            context : PyOpenWorm.context.Context
+            context : owmeta.context.Context
                 context
 
         """
