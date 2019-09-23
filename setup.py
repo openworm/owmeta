@@ -100,7 +100,6 @@ setup(
         ]
     },
     version=version,
-<<<<<<< HEAD
     packages=['owmeta',
               'owmeta.data_trans',
               'owmeta.commands'],

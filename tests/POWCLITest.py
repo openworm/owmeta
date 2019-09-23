@@ -220,10 +220,10 @@ def test_save_imports(self):
 
 
 def test_bundle_load(self):
-    pow_bundle = p('tests', 'bundle.tar.gz')
-    self.sh('pow bundle load ' + pow_bundle)
+    owm_bundle = p('tests', 'bundle.tar.gz')
+    self.sh('owm bundle load ' + owm_bundle)
     assertRegexpMatches(
-        self.sh('pow bundle list'),
+        self.sh('owm bundle list'),
         r'http://example.org/test_bundle'
     )
 
@@ -232,9 +232,9 @@ def test_fetch_and_list_bundle(self):
     '''
     Retrieve the bundle from wherever and make sure we can list it
     '''
-    self.sh('pow bundle fetch http://openworm.org/data#main')
+    self.sh('owm bundle fetch http://openworm.org/data#main')
     assertRegexpMatches(
-        self.sh('pow bundle list'),
+        self.sh('owm bundle list'),
         r'http://openworm.org/data#main'
     )
 
@@ -243,9 +243,9 @@ def test_checkout_bundle(self):
     '''
     Checking out a bundle changes the set of graphs to the chosen bundle
     '''
-    self.sh('pow bundle checkout http://openworm.org/data#main')
+    self.sh('owm bundle checkout http://openworm.org/data#main')
     assertRegexpMatches(
-        self.sh('pow bundle list'),
+        self.sh('owm bundle list'),
         r'http://openworm.org/data#main'
     )
 

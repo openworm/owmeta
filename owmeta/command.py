@@ -178,14 +178,14 @@ class OWMSource(object):
         data_source : str
             The ID of the data source to find derivatives of
         '''
-        from PyOpenWorm.datasource import DataSource
+        from owmeta.datasource import DataSource
         uri = self._parent._den3(data_source)
         ctx = self._parent._data_ctx.stored
         source = ctx(DataSource)(ident=uri)
         return self._derivs(ctx, source)
 
     def _derivs(self, ctx, source):
-        from PyOpenWorm.datasource import DataSource
+        from owmeta.datasource import DataSource
         derived = ctx(DataSource).query()
         derived.source(source)
         res = dict()
