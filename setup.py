@@ -49,7 +49,8 @@ setup(
     zip_safe=False,
     setup_requires=['pytest-runner'],
     tests_require=[
-        'pytest>=3.4.0',
+        'pytest<5.0.0 ; python_version < "3.0"',
+        'pytest>=3.4.0 ; python_version >= "3.0"',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
         'rdflib-sqlalchemy',
