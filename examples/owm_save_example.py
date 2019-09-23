@@ -1,8 +1,8 @@
-from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.context import Context
+from owmeta.dataObject import DataObject
+from owmeta.context import Context
 
 
-def pow_data(namespace):
+def owm_data(namespace):
     # Make a new context. Takes care of specifying the `conf` argument and enables
     # validation for statements
     ctx = namespace.new_context("http://example.org/example_context")
@@ -10,7 +10,7 @@ def pow_data(namespace):
     ctx(DataObject)(key='a')
     ctx(DataObject)(key='b')
 
-    # Add an import of DataObject's context, but see openworm/PyOpenWorm#374 -- may be
+    # Add an import of DataObject's context, but see openworm/owmeta#374 -- may be
     # automated eventually
     ctx.add_import(DataObject.definition_context)
 

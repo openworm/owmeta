@@ -1846,7 +1846,7 @@ class OWMSaveNamespace(object):
             raise StatementValidationError(unvalidated)
 
     def save(self, *args, **kwargs):
-        # TODO: (openworm/PyOpenWorm#374) look at automatically importing contexts based
+        # TODO: (openworm/owmeta#374) look at automatically importing contexts based
         # on UnimportedContextRecords among SaveValidationFailureRecords
         self.validate()
         for c in self._created_ctxs:

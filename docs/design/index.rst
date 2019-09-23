@@ -1,7 +1,7 @@
 Design documents
 ================
 
-These comprise the core design artifacts for PyOpenWorm.
+These comprise the core design artifacts for owmeta.
 
 .. toctree::
    :maxdepth: 1

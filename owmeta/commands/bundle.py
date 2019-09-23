@@ -5,7 +5,7 @@ from ..command_util import GenericUserError
 from ..bundle import Descriptor
 
 
-class POWBundle(object):
+class OWMBundle(object):
     '''
     Bundle commands
     '''
