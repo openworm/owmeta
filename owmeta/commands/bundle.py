@@ -73,7 +73,7 @@ class OWMBundle(object):
         Parameters
         ----------
         descriptor : str
-            Descriptor For the bundle
+            Descriptor file for the bundle
         '''
         import yaml
         with open(descriptor) as inp:

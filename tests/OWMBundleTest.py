@@ -28,7 +28,7 @@ def test_load(self):
     )
 
 
-def test_create_save(self):
+def test_register(self):
     self.sh('owm bundle register http://example.org/')
 
 

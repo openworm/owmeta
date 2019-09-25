@@ -22,8 +22,10 @@ class Descriptor(object):
     '''
     def __init__(self, name):
         self.name = name
+        self.description = description
         self.patterns = set([])
         self.includes = set([])
+        self.files = None
 
     @classmethod
     def make(cls, obj):
@@ -31,8 +33,26 @@ class Descriptor(object):
         Makes a descriptor from the given object.
         '''
         res = cls(name=obj['name'])
+        res.description = obj.get('description', None)
         res.patterns = set(make_pattern(x) for x in obj['patterns'])
         res.includes = set(make_include_func(x) for x in obj['includes'])
+        res.files = FilesDescriptor.make(obj['files'])
+        return res
+
+
+class FilesDescriptor(object):
+    '''
+    Descriptor for files
+    '''
+    def __init__(self):
+        self.patterns = set([])
+        self.includes = set([])
+
+    @classmethod
+    def make(cls, obj):
+        res = cls()
+        res.patterns = set(obj['patterns'])
+        res.includes = set(obj['includes'])
         return res
 
 
