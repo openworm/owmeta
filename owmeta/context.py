@@ -84,10 +84,10 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
     A context. Analogous to an RDF context, with some special sauce
     """
 
-    def __init__(self, key=None,
+    def __init__(self, ident=None,
                  imported=(),
-                 ident=None,
                  mapper=None,
+                 key=None,
                  base_namespace=None,
                  **kwargs):
         super(Context, self).__init__(**kwargs)

@@ -45,7 +45,7 @@ elegans reactions::
 So, we have created I can then make a Drug object for moon rocks and describe an experiment by
 Aperture Labs::
 
-    >>> ctx = Context(ident='http://example.org/experiments', mapper=m)
+    >>> ctx = Context('http://example.org/experiments', mapper=m)
     >>> d = ctx(Drug)(name='moon rocks')
     >>> e = ctx(Experiment)(key='experiment001')
     >>> w = ctx(Worm)('C. elegans')

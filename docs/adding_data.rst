@@ -34,7 +34,7 @@ synaptic connections. To initialize the hierarchy you would do something like::
     >>> from owmeta.context import Context
     >>> from owmeta.worm import Worm
     >>> from owmeta.network import Network
-    >>> ctx = Context(ident='http://example.org/c-briggsae')
+    >>> ctx = Context('http://example.org/c-briggsae')
     >>> w = ctx(Worm)('C. briggsae') # The name is optional and currently defaults to 'C. elegans'
     >>> nn = ctx(Network)()          # make a neuron network
     >>> w.neuron_network(nn)         # attach to the worm the neuron network
@@ -44,7 +44,7 @@ synaptic connections. To initialize the hierarchy you would do something like::
     owmeta.statement.Statement(...)
     >>> nn.neuron(n)                 # attach to the neuron network
     owmeta.statement.Statement(...)
-    >>> ctx.save_context()           # save all of the data attached to the worm
+    >>> ctx.save()           # save all of the data attached to the worm
 
 It is possible to create objects without attaching them to anything and they
 can still be referenced by calling load on an instance of the object's class as
@@ -66,7 +66,7 @@ Future capabilities:
   from the database.
 * Statements like::
 
-    ctx = Context(ident='http://example.org/c-briggsae')
+    ctx = Context('http://example.org/c-briggsae')
     w = ctx.stored(Worm)()
     w.neuron_network.neuron.receptor('UNC-13')
     l = list(w.load()) # Get a list of worms with neurons expressing 'UNC-13'
@@ -130,7 +130,7 @@ using contexts. The code below shows how to do that::
    >>> # from bdw import Load # BigDataWarehouse API
 
    >>> # Create a Context with an identifier appropriate to this BDW data import
-   >>> ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2017-2018')
+   >>> ctx = Context('http://example.org/data/imports/BDW_Widgets_2017-2018')
 
    >>> # Create a context manager using the default behavior of reading the
    >>> # dictionary of current local variables
@@ -147,7 +147,7 @@ using contexts. The code below shows how to do that::
    >>> g = ConjunctiveGraph()
 
    >>> # Save the data
-   >>> ctx.save_context(g)
+   >>> ctx.save(g)
 
    >>> # Serialize the data in the nquads format so we can see that all of our
    >>> # statements are in the proper context
