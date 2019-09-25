@@ -38,7 +38,7 @@ class Mapper(ModuleRecordListener, Configureable):
 
         return cls._instances[args]
 
-    def __init__(self, base_class_names, base_namespace=None, imported=(), name=None, **kwargs):
+    def __init__(self, base_namespace=None, imported=(), name=None, **kwargs):
         super(Mapper, self).__init__(**kwargs)
 
         """ Maps class names to classes """
@@ -49,19 +49,6 @@ class Mapper(ModuleRecordListener, Configureable):
 
         """ Maps RDF types to properties of the related class """
         self.RDFTypeTable = dict()
-
-        if not isinstance(base_class_names, (tuple, list)):
-            raise Exception('base_class_names argument must be either a tuple'
-                            ' or list')
-        """ Names for the base classes """
-        self.base_class_names = tuple(base_class_names)
-        self.base_modules = set(n.rsplit('.', 1)[0] for n in base_class_names)
-
-        """ The base class for objects that will be mapped.
-
-        Defined once the module containing the class is loaded
-        """
-        self.base_classes = dict()
 
         if base_namespace is None:
             base_namespace = R.Namespace("http://example.com#")
@@ -174,9 +161,6 @@ class Mapper(ModuleRecordListener, Configureable):
         for cls in classes:
             # This previously used the
             full_class_name = FCN(cls)
-            if full_class_name in self.base_class_names:
-                L.debug('Setting base class %s', full_class_name)
-                self.base_classes[full_class_name] = cls
             if isinstance(cls, type) and self.add_class(cls):
                 res.append(cls)
 

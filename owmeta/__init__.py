@@ -53,8 +53,7 @@ ImportOverrider = None
 ModuleRecorder = None
 
 
-BASE_MAPPER = Mapper(base_class_names=('owmeta.dataObject.DataObject',
-    'owmeta.simpleProperty.RealSimpleProperty'))
+BASE_MAPPER = Mapper(name='base')
 '''
 Handles some of the owmeta DataObjects regardless of whether there's been any connection. Used by Contexts outside
 of a connection.
@@ -271,8 +270,7 @@ def connect(configFile=False,
 
     # Base class names is empty because we won't be adding any objects to the
     # context automatically
-    mapper = Mapper(base_class_names=('owmeta.dataObject.DataObject',
-                                      'owmeta.simpleProperty.RealSimpleProperty'))
+    mapper = Mapper()
     conf['mapper'] = mapper
     # An "empty" context, that serves as the default when no context is defined
 

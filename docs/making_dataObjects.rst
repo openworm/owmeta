@@ -38,7 +38,7 @@ elegans reactions::
 
     # Do some accounting stuff to register the classes. Usually happens behind
     # the scenes. 
-    >>> m = Mapper(('owmeta.dataObject.DataObject',))
+    >>> m = Mapper()
     >>> ModuleRecorder.add_listener(m)
     >>> m.process_classes(Drug, Experiment)
 

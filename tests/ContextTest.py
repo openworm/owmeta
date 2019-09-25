@@ -66,7 +66,7 @@ class ContextTest(_DataTest):
         class A(DataObject):
             pass
 
-        mapper = Mapper(base_class_names=(FCN(A),))
+        mapper = Mapper()
         mapper.add_class(A)
         ctx = Context(ident='http://example.com/context_1', mapper=mapper)
         ctx(A)(ident='anA')
