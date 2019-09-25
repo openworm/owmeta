@@ -128,6 +128,9 @@ def main():
             # is no `default_columns`, then all defined columns are shown. The columns can
             # be overriden by the `--columns` command line argument. If there is no
             # `header`, but `--columns` is provided, the user will get an error.
+
+            # N.B.: we use getattr rather than hasattr because we want to make sure we
+            # have the attribute AND that the columns/header isn't an empty or tuple/list
             if getattr(out, 'columns', None) and getattr(out, 'header', None):
                 if ns_handler.columns:
                     selected_columns = [i for i, e in zip(range(len(out.header)), out.header)

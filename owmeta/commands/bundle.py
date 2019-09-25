@@ -1,7 +1,8 @@
 '''
 Bundle commands
 '''
-from ..command_util import GenericUserError
+from os.path import join as p, abspath
+from ..command_util import GenericUserError, GeneratorWithData
 from ..bundle import Descriptor
 
 
@@ -75,10 +76,31 @@ class OWMBundle(object):
         descriptor : str
             Descriptor file for the bundle
         '''
-        import yaml
+        descriptor = abspath(descriptor)
         with open(descriptor) as inp:
-            descr = Descriptor.make(yaml.full_load(inp))
-        self._select_contexts(descr)
+            descr = self._parse_descriptor(inp)
+        self._register_bundle(descr, descriptor)
+
+    def _parse_descriptor(self, fh):
+        import yaml
+        return Descriptor.make(yaml.full_load(fh))
+
+    def _register_bundle(self, descr, file_name):
+        try:
+            with open(p(self._parent.owmdir, 'bundles'), 'r') as f:
+                lines = f.readlines()
+        except OSError:
+            lines = []
+
+        with open(p(self._parent.owmdir, 'bundles'), 'w') as f:
+            for line in lines:
+                if not line.strip():
+                    continue
+                name, fn = line.strip().split(' ', 1)
+                if name == descr.name:
+                    continue
+                print(line, file=f)
+            print('{descr.name} {file_name}\n'.format(**vars()), file=f)
 
     def deregister(self, bundle_name):
         '''
@@ -133,6 +155,19 @@ class OWMBundle(object):
         To list bundles within the local repo or a remote repo, use the `repo query`
         sub-command.
         '''
+        def helper():
+            with open(p(self._parent.owmdir, 'bundles'), 'r') as index_fh:
+                for line in index_fh:
+                    if not line.strip():
+                        continue
+                    name, file_name = line.strip().split(' ', 1)
+                    with open(file_name, 'r') as bundle_fh:
+                        descr = self._parse_descriptor(bundle_fh)
+                        yield (name, descr.description or "")
+        return GeneratorWithData(helper(),
+                text_format=lambda nd: "{} - {}".format(*nd),
+                columns=(lambda nd: nd[0], lambda nd: nd[1]),
+                header=("Name", "Description"))
 
     def _load(self, bundle_name):
         loader = self._get_bundle_loader(bundle_name)

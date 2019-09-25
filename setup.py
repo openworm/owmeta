@@ -79,6 +79,7 @@ setup(
         'zdaemon==4.0.0',
         'zodb==4.1.0',
         'rdflib-sqlalchemy',
+        'pyyaml',
     ] + py2_only('zodbpickle==1.0',
         'Sphinx<1.8.4',
         'backports.tempfile==1.0',

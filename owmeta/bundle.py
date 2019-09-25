@@ -22,7 +22,7 @@ class Descriptor(object):
     '''
     def __init__(self, name):
         self.name = name
-        self.description = description
+        self.description = None
         self.patterns = set([])
         self.includes = set([])
         self.files = None
