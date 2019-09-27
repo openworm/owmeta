@@ -225,7 +225,7 @@ class ImmutableConfigure(Configure):
 class Configureable(object):
 
     """ An object which can accept configuration. A base class intended to be subclassed. """
-    default = ImmutableConfigure()
+    default_config = ImmutableConfigure()
 
     def __init__(self, conf=None, **kwargs):
         super(Configureable, self).__init__(**kwargs)
@@ -234,7 +234,7 @@ class Configureable(object):
                 raise ValueError('The \'conf\' of a Configureable cannot be itself')
             self.__conf = conf
         else:
-            self.__conf = type(self).default
+            self.__conf = type(self).default_config
 
     @property
     def conf(self):

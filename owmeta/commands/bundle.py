@@ -3,9 +3,10 @@ Bundle commands
 '''
 from __future__ import print_function
 import logging
+import shutil
 from os.path import join as p, abspath, relpath
 from ..command_util import GenericUserError, GeneratorWithData
-from ..bundle import Descriptor
+from ..bundle import Descriptor, Installer
 
 
 L = logging.getLogger(__name__)
@@ -72,12 +73,11 @@ class OWMBundle(object):
             descr = self._load_descriptor(bundle_name)
         if not descr:
             raise GenericUserError('Could not find bundle with name {}'.format(bundle_name))
-        # Enumerate the contexts
-        for c in self._select_contexts(descr):
-            print(c)
-        # Serialize and hash the contexts
-        # Select the files
-        # Hash the file contents
+        bi = Installer(self._parent.basedir,
+                       p(self._parent.userdir, 'index'),
+                       p(self._parent.userdir, 'bundles'),
+                       self._parent.rdf)
+        bi.install(descr)
 
     def register(self, descriptor):
         '''
@@ -145,19 +145,6 @@ class OWMBundle(object):
             The name of the bundle to deregister
         '''
 
-    def _select_contexts(self, descr):
-        for graph in self._parent._data_ctx.stored.rdf_graph().contexts():
-            ctx = graph.identifier
-            for inc in descr.includes:
-                if inc(ctx):
-                    yield ctx
-                    break
-
-            for pat in descr.patterns:
-                if pat(ctx):
-                    yield ctx
-                    break
-
     def deploy(self, bundle_name, remotes=None):
         '''
         Deploys a bundle to a remote. The target remotes come from project and user
@@ -198,7 +185,7 @@ class OWMBundle(object):
                         with open(file_name, 'r') as bundle_fh:
                             descr = self._parse_descriptor(bundle_fh)
                             yield {'name': name, 'description': descr.description or ""}
-                    except (IOError, OSError, FileNotFoundError):
+                    except (IOError, OSError):
                         # This is at debug level since the error should be expressed well
                         # enough by the response, but we still want to show it eventually
                         L.debug("Cannot read bundle descriptor at"

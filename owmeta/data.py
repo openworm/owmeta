@@ -270,7 +270,7 @@ class Data(Configure):
         if conf is not None:
             self.copy(conf)
         else:
-            self.copy(Configureable.default)
+            self.copy(Configureable.default_config)
         self.namespace = Namespace("http://openworm.org/entities/")
         self.molecule_namespace = Namespace("http://openworm.org/entities/molecules/")
         self['rdf.namespace'] = self.namespace

@@ -2,7 +2,13 @@ from __future__ import print_function, absolute_import
 import sys
 from contextlib import contextmanager
 import os
-from os.path import exists, abspath, join as pth_join, dirname, isabs, relpath
+from os.path import (exists,
+        abspath,
+        join as pth_join,
+        dirname,
+        isabs,
+        relpath,
+        expanduser)
 
 try:
     from os import scandir
@@ -36,6 +42,7 @@ from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide
 from .capabilities import FilePathProvider
 from .datasource_loader import DataSourceDirLoader, LoadFailed
+from .graph_serialization import write_canonical_to_file, gen_ctx_fname
 
 
 L = logging.getLogger(__name__)
@@ -567,6 +574,9 @@ class OWMContexts(object):
             fname = pth_join(d, 'data')
             with transaction.manager:
                 with open(fname, mode='wb') as destination:
+                    # For canonical graphs, we would need to sort the triples first,
+                    # but it's not needed here -- the user probably doesn't care one
+                    # way or the other
                     ctx.own_stored.rdf_graph().serialize(destination, format=format)
                 call([editor, fname])
                 with open(fname, mode='rb') as source:
@@ -578,7 +588,7 @@ class OWMContexts(object):
         '''
         List the set of contexts in the graph
         '''
-        for c in self._parent._conf()['rdf.graph'].contexts():
+        for c in self._parent.rdf.contexts():
             yield c.identifier
 
     def list_changed(self):
@@ -596,6 +606,9 @@ class OWM(object):
     graph_accessor_finder = IVar(doc='Finds an RDFLib graph from the given URL')
 
     basedir = IVar('.', doc='The base directory. owmdir is resolved against this base')
+
+    userdir = IVar(expanduser(pth_join('~', '.owmeta')),
+            doc='Root directory for user-specific configuration')
 
     repository_provider = IVar(doc='The provider of the repository logic'
                                    ' (cloning, initializing, committing, checkouts)')
@@ -1068,7 +1081,7 @@ class OWM(object):
         idx_fname = pth_join(self.owmdir, 'graphs', 'index')
         triples_read = 0
         if exists(idx_fname):
-            dest = self._conf()['rdf.graph']
+            dest = self.rdf
             with open(idx_fname) as index_file:
                 cnt = 0
                 for l in index_file:
@@ -1276,7 +1289,7 @@ class OWM(object):
             ctx = Context(ident=self._den3(context), conf=self._conf())
 
         if whole_graph:
-            self._conf()['rdf.graph'].serialize(destination, format=format)
+            self.rdf.serialize(destination, format=format)
         else:
             if include_imports:
                 ctx.stored.rdf_graph().serialize(destination, format=format)
@@ -1304,7 +1317,7 @@ class OWM(object):
             yield m
 
     @property
-    def _rdf(self):
+    def rdf(self):
         return self._conf()['rdf.graph']
 
     def commit(self, message):
@@ -1336,7 +1349,7 @@ class OWM(object):
         import transaction
         from rdflib import plugin
         from rdflib.serializer import Serializer
-        g = self._conf()['rdf.graph']
+        g = self.rdf
         repo = self.repository_provider
 
         repo.base = self.owmdir
@@ -1364,7 +1377,7 @@ class OWM(object):
 
                 sfname = self._context_fnames.get(str(ident))
                 if not sfname:
-                    fname = self._gen_ctx_fname(ident, graphs_base)
+                    fname = gen_ctx_fname(ident, graphs_base)
                 else:
                     fname = sfname
 
@@ -1376,9 +1389,7 @@ class OWM(object):
                 if ctx_changed:
                     # N.B. We *overwrite* changes to the serialized graphs -- the source of truth is what's in the
                     # RDFLib graph unless we regenerate the database
-                    serializer = plugin.get('nt', Serializer)(sorted(context))
-                    with open(fname, 'wb') as gfile:
-                        serializer.serialize(gfile)
+                    write_canonical_to_file(context, fname)
                 self._context_changed_times[ident] = stat(fname).st_mtime
                 ctx_data.append((relpath(fname, graphs_base), ident))
                 files.append(fname)
@@ -1391,15 +1402,6 @@ class OWM(object):
         files.append(index_fname)
         repo.add([relpath(f, self.owmdir) for f in files] + [relpath(self.config_file, self.owmdir),
                                                              'graphs'])
-
-    def _gen_ctx_fname(self, ident, graphs_base):
-        hs = hashlib.sha256(ident.encode()).hexdigest()
-        fname = pth_join(graphs_base, hs + '.nt')
-        i = 1
-        while exists(fname):
-            fname = pth_join(graphs_base, hs + '-' + str(i) + '.nt')
-            i += 1
-        return fname
 
     def diff(self):
         """
