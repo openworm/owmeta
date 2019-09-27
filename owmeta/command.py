@@ -41,6 +41,7 @@ from .datasource_loader import DataSourceDirLoader, LoadFailed
 L = logging.getLogger(__name__)
 
 DEFAULT_SAVE_CALLABLE_NAME = 'owm_data'
+DEFAULT_OWM_DIR = '.owm'
 
 
 class OWMSourceData(object):
@@ -626,7 +627,7 @@ class OWM(object):
         self._changed_contexts = None
         self._owm_connection = None
 
-    @IVar.property('.owm')
+    @IVar.property(DEFAULT_OWM_DIR)
     def owmdir(self):
         '''
         The base directory for owmeta files. The repository provider's files also go under here
@@ -1025,7 +1026,7 @@ class OWM(object):
 
     def git(self, *args):
         '''
-        Runs git commmands in the .owm directory
+        Runs git commmands in the ".owm" directory
 
         Parameters
         ----------

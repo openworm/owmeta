@@ -20,11 +20,12 @@ class Descriptor(object):
     '''
     Descriptor for a bundle
     '''
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, ident):
+        self.id = ident
+        self.name = None
         self.description = None
-        self.patterns = set([])
-        self.includes = set([])
+        self.patterns = set()
+        self.includes = set()
         self.files = None
 
     @classmethod
@@ -32,12 +33,22 @@ class Descriptor(object):
         '''
         Makes a descriptor from the given object.
         '''
-        res = cls(name=obj['name'])
+        res = cls(ident=obj['id'])
+        res.name = obj.get('name', obj['id'])
         res.description = obj.get('description', None)
-        res.patterns = set(make_pattern(x) for x in obj['patterns'])
-        res.includes = set(make_include_func(x) for x in obj['includes'])
-        res.files = FilesDescriptor.make(obj['files'])
+        res.patterns = set(make_pattern(x) for x in obj.get('patterns', ()))
+        res.includes = set(make_include_func(x) for x in obj.get('includes', ()))
+        res.files = FilesDescriptor.make(obj.get('files', None))
         return res
+
+
+class Bundle(object):
+    def __init__(self, bundle_ident):
+        pass
+
+    @property
+    def rdf(self):
+        pass
 
 
 class FilesDescriptor(object):
@@ -45,11 +56,13 @@ class FilesDescriptor(object):
     Descriptor for files
     '''
     def __init__(self):
-        self.patterns = set([])
-        self.includes = set([])
+        self.patterns = set()
+        self.includes = set()
 
     @classmethod
     def make(cls, obj):
+        if not obj:
+            return
         res = cls()
         res.patterns = set(obj['patterns'])
         res.includes = set(obj['includes'])

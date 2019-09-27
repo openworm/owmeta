@@ -5,6 +5,7 @@ import os
 import re
 import shlex
 import shutil
+from contextlib import contextmanager
 from subprocess import check_output, CalledProcessError
 import six
 import tempfile
@@ -31,7 +32,6 @@ def module_fixture():
     # Added so pytest_cov gets to run for our subprocesses
     with open(p(res.testdir, 'sitecustomize.py'), 'w') as f:
         f.write(ptcov)
-    shutil.copytree('.owm', p(res.testdir, '.owm'), symlinks=True)
 
     try:
         yield res
@@ -39,7 +39,14 @@ def module_fixture():
         shutil.rmtree(res.testdir)
 
 
-self = fixture(module_fixture)
+def _fixture():
+    with contextmanager(module_fixture)() as data:
+        # Make a bundle
+        shutil.copytree('.owm', p(data.testdir, '.owm'), symlinks=True)
+        yield data
+
+
+self = fixture(_fixture)
 
 
 class Data(object):
@@ -47,32 +54,43 @@ class Data(object):
 
     def __str__(self):
         items = []
-        for m in dir(self):
-            if not (m.startswith('_') or m == 'sh'):
-                items.append(m + '=' + str(getattr(self, m)))
+        for m in vars(self):
+            if (m.startswith('_') or m == 'sh'):
+                continue
+            items.append(m + '=' + repr(getattr(self, m)))
         return 'Data({})'.format(', '.join(items))
 
-    def sh(self, command, **kwargs):
+    def writefile(self, name, contents):
+        with open(p(self.testdir, name), 'w') as f:
+            print(dedent(contents), file=f)
+            f.flush()
+
+    def sh(self, *command, **kwargs):
+        if not command:
+            return None
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir + os.pathsep + env['PYTHONPATH']
-        try:
-            return check_output(shlex.split(command), env=env, cwd=self.testdir, **kwargs).decode('utf-8')
-        except CalledProcessError as e:
-            if e.stdout:
-                print(dedent('''\
-                ----------stdout from "{}"----------
-                {}
-                ----------{}----------
-                '''.format(command, e.stdout.decode('UTF-8'),
-                           'end stdout'.center(14 + len(command)))))
-            if e.stderr:
-                print(dedent('''\
-                ----------stderr from "{}"----------
-                {}
-                ----------{}----------
-                '''.format(command, e.stderr.decode('UTF-8'),
-                           'end stderr'.center(14 + len(command)))))
-            raise
+        outputs = []
+        for cmd in command:
+            try:
+                outputs.append(check_output(shlex.split(cmd), env=env, cwd=self.testdir, **kwargs).decode('utf-8'))
+            except CalledProcessError as e:
+                if e.output:
+                    print(dedent('''\
+                    ----------stdout from "{}"----------
+                    {}
+                    ----------{}----------
+                    ''').format(cmd, e.output.decode('UTF-8'),
+                               'end stdout'.center(14 + len(cmd))))
+                if getattr(e, 'stderr', None):
+                    print(dedent('''\
+                    ----------stderr from "{}"----------
+                    {}
+                    ----------{}----------
+                    ''').format(cmd, e.stderr.decode('UTF-8'),
+                               'end stderr'.center(14 + len(cmd))))
+                raise
+        return outputs[0] if len(outputs) == 1 else outputs
 
     __repr__ = __str__
 
@@ -120,34 +138,32 @@ def test_save_diff(self):
     modpath = p(self.testdir, 'test_module')
     os.mkdir(modpath)
     open(p(modpath, '__init__.py'), 'w').close()
-    with open(p(modpath, 'command_test_save.py'), 'w') as out:
-        print(dedent('''\
-                from test_module.monkey import Monkey
+    self.writefile(p(modpath, 'command_test_save.py'), '''\
+        from test_module.monkey import Monkey
 
 
-                def owm_data(ns):
-                    ns.context.add_import(Monkey.definition_context)
-                    ns.context(Monkey)(bananas=55)
-                '''), file=out)
+        def owm_data(ns):
+            ns.context.add_import(Monkey.definition_context)
+            ns.context(Monkey)(bananas=55)
+        ''')
 
-    with open(p(modpath, 'monkey.py'), 'w') as out:
-        print(dedent('''\
-                from owmeta.dataObject import DataObject, DatatypeProperty
-
-
-                class Monkey(DataObject):
-                    class_context = 'http://example.org/primate/monkey'
-
-                    bananas = DatatypeProperty()
-                    def identifier_augment(self):
-                        return type(self).rdf_namespace['paul']
-
-                    def defined_augment(self):
-                        return True
+    self.writefile(p(modpath, 'monkey.py'), '''\
+        from owmeta.dataObject import DataObject, DatatypeProperty
 
 
-                __yarom_mapped_classes__ = (Monkey,)
-                '''), file=out)
+        class Monkey(DataObject):
+            class_context = 'http://example.org/primate/monkey'
+
+            bananas = DatatypeProperty()
+            def identifier_augment(self):
+                return type(self).rdf_namespace['paul']
+
+            def defined_augment(self):
+                return True
+
+
+        __yarom_mapped_classes__ = (Monkey,)
+        ''')
     print(self.sh('owm save test_module.command_test_save'))
     assertRegexpMatches(self.sh('owm diff'), r'<[^>]+>')
 
@@ -156,24 +172,23 @@ def test_save_classes(self):
     modpath = p(self.testdir, 'test_module')
     os.mkdir(modpath)
     open(p(modpath, '__init__.py'), 'w').close()
-    with open(p(modpath, 'monkey.py'), 'w') as out:
-        print(dedent('''\
-                from owmeta.dataObject import DataObject, DatatypeProperty
+    self.writefile(p(modpath, 'monkey.py'), '''\
+        from owmeta.dataObject import DataObject, DatatypeProperty
 
 
-                class Monkey(DataObject):
-                    class_context = 'http://example.org/primate/monkey'
+        class Monkey(DataObject):
+            class_context = 'http://example.org/primate/monkey'
 
-                    bananas = DatatypeProperty()
-                    def identifier_augment(self):
-                        return type(self).rdf_namespace['paul']
+            bananas = DatatypeProperty()
+            def identifier_augment(self):
+                return type(self).rdf_namespace['paul']
 
-                    def defined_augment(self):
-                        return True
+            def defined_augment(self):
+                return True
 
 
-                __yarom_mapped_classes__ = (Monkey,)
-                '''), file=out)
+        __yarom_mapped_classes__ = (Monkey,)
+        ''')
     print(self.sh('owm save test_module.monkey'))
     assertRegexpMatches(self.sh('owm diff'), r'<[^>]+>')
 
@@ -182,31 +197,30 @@ def test_save_imports(self):
     modpath = p(self.testdir, 'test_module')
     os.mkdir(modpath)
     open(p(modpath, '__init__.py'), 'w').close()
-    with open(p(modpath, 'monkey.py'), 'w') as out:
-        print(dedent('''\
-                from owmeta.dataObject import DataObject, DatatypeProperty
+    self.writefile(p(modpath, 'monkey.py'), '''\
+        from owmeta.dataObject import DataObject, DatatypeProperty
 
-                class Monkey(DataObject):
-                    class_context = 'http://example.org/primate/monkey'
+        class Monkey(DataObject):
+            class_context = 'http://example.org/primate/monkey'
 
-                    bananas = DatatypeProperty()
-                    def identifier_augment(self):
-                        return type(self).rdf_namespace['paul']
+            bananas = DatatypeProperty()
+            def identifier_augment(self):
+                return type(self).rdf_namespace['paul']
 
-                    def defined_augment(self):
-                        return True
-
-
-                class Giraffe(DataObject):
-                    class_context = 'http://example.org/ungulate/giraffe'
+            def defined_augment(self):
+                return True
 
 
-                def owm_data(ns):
-                    ns.context.add_import(Monkey.definition_context)
-                    ns.context.add_import(Giraffe.definition_context)
+        class Giraffe(DataObject):
+            class_context = 'http://example.org/ungulate/giraffe'
 
-                __yarom_mapped_classes__ = (Monkey,)
-                '''), file=out)
+
+        def owm_data(ns):
+            ns.context.add_import(Monkey.definition_context)
+            ns.context.add_import(Giraffe.definition_context)
+
+        __yarom_mapped_classes__ = (Monkey,)
+        ''')
     print(self.sh('owm save test_module.monkey'))
     with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
         ctx = Context(ident=conn.conf[IMPORTS_CONTEXT_KEY], conf=conn.conf)
@@ -217,37 +231,6 @@ def test_save_imports(self):
         assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
                 CONTEXT_IMPORTS,
                 URIRef('http://example.org/ungulate/giraffe')) in trips
-
-
-def test_bundle_load(self):
-    owm_bundle = p('tests', 'bundle.tar.gz')
-    self.sh('owm bundle load ' + owm_bundle)
-    assertRegexpMatches(
-        self.sh('owm bundle list'),
-        r'http://example.org/test_bundle'
-    )
-
-
-def test_fetch_and_list_bundle(self):
-    '''
-    Retrieve the bundle from wherever and make sure we can list it
-    '''
-    self.sh('owm bundle fetch http://openworm.org/data#main')
-    assertRegexpMatches(
-        self.sh('owm bundle list'),
-        r'http://openworm.org/data#main'
-    )
-
-
-def test_checkout_bundle(self):
-    '''
-    Checking out a bundle changes the set of graphs to the chosen bundle
-    '''
-    self.sh('owm bundle checkout http://openworm.org/data#main')
-    assertRegexpMatches(
-        self.sh('owm bundle list'),
-        r'http://openworm.org/data#main'
-    )
 
 
 class DT1(DataTranslator):

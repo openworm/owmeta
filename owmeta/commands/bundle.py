@@ -1,9 +1,14 @@
 '''
 Bundle commands
 '''
-from os.path import join as p, abspath
+from __future__ import print_function
+import logging
+from os.path import join as p, abspath, relpath
 from ..command_util import GenericUserError, GeneratorWithData
 from ..bundle import Descriptor
+
+
+L = logging.getLogger(__name__)
 
 
 class OWMBundle(object):
@@ -16,8 +21,8 @@ class OWMBundle(object):
 
     def fetch(self, bundle_name):
         '''
-        Retrieve a bundle by name, possibly from remotes, and put in the local bundle
-        repository
+        Retrieve a bundle by name from a remote and put it in the local bundle index and
+        cache
 
         Parameters
         ----------
@@ -28,7 +33,7 @@ class OWMBundle(object):
 
     def load(self, input_file_name):
         '''
-        Load a bundle from a file
+        Load a bundle from a file and register it into the project
 
         Parameters
         ----------
@@ -62,6 +67,17 @@ class OWMBundle(object):
         bundle_name : str
             Name of the bundle to install
         '''
+        descr = self._load_descriptor_by_name(bundle_name)
+        if not descr:
+            descr = self._load_descriptor(bundle_name)
+        if not descr:
+            raise GenericUserError('Could not find bundle with name {}'.format(bundle_name))
+        # Enumerate the contexts
+        for c in self._select_contexts(descr):
+            print(c)
+        # Serialize and hash the contexts
+        # Select the files
+        # Hash the file contents
 
     def register(self, descriptor):
         '''
@@ -77,9 +93,15 @@ class OWMBundle(object):
             Descriptor file for the bundle
         '''
         descriptor = abspath(descriptor)
-        with open(descriptor) as inp:
-            descr = self._parse_descriptor(inp)
+        descr = self._load_descriptor(descriptor)
         self._register_bundle(descr, descriptor)
+
+    def _load_descriptor_by_name(self, bundle_name):
+        return self._load_descriptor(self._get_bundle_fname(bundle_name))
+
+    def _load_descriptor(self, fname):
+        with open(fname, 'r') as f:
+            return self._parse_descriptor(f)
 
     def _parse_descriptor(self, fh):
         import yaml
@@ -94,13 +116,24 @@ class OWMBundle(object):
 
         with open(p(self._parent.owmdir, 'bundles'), 'w') as f:
             for line in lines:
-                if not line.strip():
+                line = line.strip()
+                if not line:
                     continue
-                name, fn = line.strip().split(' ', 1)
+                name, fn = line.split(' ', 1)
                 if name == descr.name:
                     continue
                 print(line, file=f)
             print('{descr.name} {file_name}\n'.format(**vars()), file=f)
+
+    def _get_bundle_fname(self, name):
+        with open(p(self._parent.owmdir, 'bundles'), 'r') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                idx_name, fn = line.split(' ', 1)
+                if name == idx_name:
+                    return fn
 
     def deregister(self, bundle_name):
         '''
@@ -161,13 +194,26 @@ class OWMBundle(object):
                     if not line.strip():
                         continue
                     name, file_name = line.strip().split(' ', 1)
-                    with open(file_name, 'r') as bundle_fh:
-                        descr = self._parse_descriptor(bundle_fh)
-                        yield (name, descr.description or "")
+                    try:
+                        with open(file_name, 'r') as bundle_fh:
+                            descr = self._parse_descriptor(bundle_fh)
+                            yield {'name': name, 'description': descr.description or ""}
+                    except (IOError, OSError, FileNotFoundError):
+                        # This is at debug level since the error should be expressed well
+                        # enough by the response, but we still want to show it eventually
+                        L.debug("Cannot read bundle descriptor at"
+                                " '{}'".format(file_name),
+                                exc_info=True)
+                        yield {'name': name, 'error': "ERROR: Cannot read bundle descriptor at '{}'".format(
+                            relpath(file_name)
+                            )}
         return GeneratorWithData(helper(),
-                text_format=lambda nd: "{} - {}".format(*nd),
-                columns=(lambda nd: nd[0], lambda nd: nd[1]),
-                header=("Name", "Description"))
+                text_format=lambda nd: "{name} - {description}".format(name=nd['name'],
+                    description=(nd.get('description') or nd.get('error'))),
+                columns=(lambda nd: nd['name'],
+                         lambda nd: nd.get('description'),
+                         lambda nd: nd.get('error')),
+                header=("Name", "Description", "Error"))
 
     def _load(self, bundle_name):
         loader = self._get_bundle_loader(bundle_name)
