@@ -74,7 +74,7 @@ setup(
         'transaction>=1.4.4',
         'wrapt~=1.11.1',
         'yarom~=0.12.0',
-        'zc.lockfile==1.1.0',
+        'zc.lockfile',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
