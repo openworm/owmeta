@@ -3,6 +3,7 @@ import sys
 import json
 from tqdm import tqdm
 import six
+from os import environ
 from .cli_command_wrapper import CLICommandWrapper, CLIUserError
 from .command import OWM
 from .git_repo import GitRepoProvider
@@ -88,6 +89,10 @@ def main():
     p.progress_reporter = tqdm
     p.repository_provider = GitRepoProvider()
     ns_handler = NSHandler()
+    if environ.get('OWM_CLI_PROFILE'):
+        from cProfile import Profile
+        profiler = Profile()
+        profiler.enable()
     out = None
     try:
         out = CLICommandWrapper(p).main(argument_callback=additional_args,
@@ -99,6 +104,9 @@ def main():
             # In case someone forgets to add a helpful message for their user error
             s = 'Received error: ' + FCN(type(e))
         die(s)
+    if environ.get('OWM_CLI_PROFILE'):
+        profiler.disable()
+        profiler.dump_stats(environ['OWM_CLI_PROFILE'])
     output_mode = ns_handler.output_mode
     text_field_separator = ns_handler.text_field_separator
     text_record_separator = ns_handler.text_record_separator
