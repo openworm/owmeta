@@ -73,7 +73,7 @@ setup(
         'termcolor==1.1.0',
         'transaction>=1.4.4',
         'wrapt~=1.11.1',
-        'yarom~=0.12.0',
+        'yarom~=0.12.0.dev0',
         'zc.lockfile',
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
