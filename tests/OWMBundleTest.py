@@ -1,6 +1,6 @@
 from __future__ import print_function
 from os.path import join as p
-from os import makedirs
+from os import makedirs, listdir
 from pytest import mark, fixture
 from contextlib import contextmanager
 import transaction
@@ -22,8 +22,6 @@ def module_fixture():
     with contextmanager(owm_cli_fixture)() as data:
         # Make a bundle
         data.sh('owm init')
-        with open(p(OD, 'owm.conf'), 'r') as f:
-            print(f.read())
         yield data
 
 
@@ -49,22 +47,30 @@ def test_install(self):
     description: I'm a description
     includes: ["http://example.org/test_ctx"]
     ''')
-    with connect(p(OD, 'owm.conf')) as conn:
+    with connect(p(self.testdir, OD, 'owm.conf')) as conn:
         with transaction.manager:
             graph = conn.conf['rdf.graph']
             sg = graph.get_context('http://example.org/test_ctx')
-            sg.add((URIRef('a'), URIRef('b'), Literal('c')))
+            sg.add((URIRef('http://example.org/a'),
+                    URIRef('http://example.org/b'),
+                    Literal('c')))
 
+    homedir = p(self.testdir, 'home')
+    makedirs(homedir)
     self.sh('owm bundle register abundle.yml')
-    self.sh('owm bundle install abundle')
+    print(self.sh('owm bundle install abundle',
+        env={'HOME': homedir}))
     self.writefile('use.py', '''\
     from owmeta.bundle import Bundle
     from rdflib.term import URIRef, Literal
     with Bundle('abundle') as bnd:
         # "contextualize" the Context with the bundle to access contexts within the bundle
-        print((URIRef('a'), URIRef('b'), Literal('c')) in bnd.rdf)
+        print((URIRef('http://example.org/a'),
+               URIRef('http://example.org/b'),
+               Literal('c')) in bnd.rdf, end='')
     ''')
-    assert self.sh('python use.py') == 'True'
+    assert self.sh('python use.py',
+        env={'HOME': homedir}) == 'True'
 
 
 def test_register(self):

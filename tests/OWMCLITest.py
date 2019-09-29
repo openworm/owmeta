@@ -70,6 +70,7 @@ class Data(object):
             return None
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir + os.pathsep + env['PYTHONPATH']
+        env.update(kwargs.pop('env', {}))
         outputs = []
         for cmd in command:
             try:

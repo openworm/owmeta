@@ -30,6 +30,7 @@ import json
 import logging
 import errno
 from collections import namedtuple
+from yarom.rdfUtils import BatchAddGraph
 
 try:
     from tempfile import TemporaryDirectory
@@ -844,8 +845,8 @@ class OWM(object):
             elif update_existing_config:
                 with open(self.config_file, 'r+') as f:
                     conf = json.load(f)
-                    conf['rdf.store_conf'] = pth_join('$OWM', relpath(abspath(self.store_name),
-                                                                      abspath(self.owmdir)))
+                    conf['rdf.store_conf'] = pth_join('$HERE',
+                            relpath(abspath(self.store_name), abspath(self.owmdir)))
                     f.seek(0)
                     write_config(conf, f)
 
@@ -863,8 +864,8 @@ class OWM(object):
         with open(self._default_config(), 'r') as f:
             default = json.load(f)
             with open(self.config_file, 'w') as of:
-                default['rdf.store_conf'] = pth_join('$OWM', relpath(abspath(self.store_name),
-                                                                     abspath(self.owmdir)))
+                default['rdf.store_conf'] = pth_join('$HERE',
+                        relpath(abspath(self.store_name), abspath(self.owmdir)))
                 write_config(default, of)
 
     def _init_repository(self):
@@ -927,7 +928,7 @@ class OWM(object):
 
         return self.graph_accessor_finder(url)
 
-    def _conf(self):
+    def _conf(self, *args):
         from owmeta.data import Data
         from owmeta import connect
         import six
@@ -969,6 +970,8 @@ class OWM(object):
 
             self._dat = dat
             self._dat_file = self.config_file
+        if args:
+            return dat.get(*args)
         return dat
 
     def _disconnect(self):
@@ -1094,7 +1097,7 @@ class OWM(object):
                         parser = plugin.get('nt', Parser)()
                         graph_fname = pth_join(self.owmdir, 'graphs', fname)
                         with open(graph_fname, 'rb') as f, \
-                                _BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
+                                BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
                             parser.parse(create_input_source(f), g)
 
                         progress.update(1)
@@ -1533,34 +1536,6 @@ class _OWMSaveContext(Context):
 
     def save_imports(self, *args, **kwargs):
         return self._backer.save_imports(*args, **kwargs)
-
-
-class _BatchAddGraph(object):
-    ''' Wrapper around graph that turns calls to 'add' into calls to 'addN' '''
-    def __init__(self, graph, batchsize=1000, *args, **kwargs):
-        self.graph = graph
-        self.g = (graph,)
-        self.batchsize = batchsize
-        self.reset()
-
-    def reset(self):
-        self.batch = []
-        self.count = 0
-
-    def add(self, triple):
-        if self.count > 0 and self.count % self.batchsize == 0:
-            self.graph.addN(self.batch)
-            self.batch = []
-        self.count += 1
-        self.batch.append(triple + self.g)
-
-    def __enter__(self):
-        self.reset()
-        return self
-
-    def __exit__(self, *exc):
-        if exc[0] is None:
-            self.graph.addN(self.batch)
 
 
 def write_config(ob, f):

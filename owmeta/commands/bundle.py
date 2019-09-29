@@ -5,6 +5,7 @@ from __future__ import print_function
 import logging
 import shutil
 from os.path import join as p, abspath, relpath
+from ..context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from ..command_util import GenericUserError, GeneratorWithData
 from ..bundle import Descriptor, Installer
 
@@ -73,10 +74,13 @@ class OWMBundle(object):
             descr = self._load_descriptor(bundle_name)
         if not descr:
             raise GenericUserError('Could not find bundle with name {}'.format(bundle_name))
+        imports_ctx = self._parent._conf(IMPORTS_CONTEXT_KEY, None)
+        data_ctx = self._parent._conf(DATA_CONTEXT_KEY, None)
         bi = Installer(self._parent.basedir,
-                       p(self._parent.userdir, 'index'),
                        p(self._parent.userdir, 'bundles'),
-                       self._parent.rdf)
+                       self._parent.rdf,
+                       imports_ctx=imports_ctx,
+                       data_ctx=data_ctx)
         bi.install(descr)
 
     def register(self, descriptor):

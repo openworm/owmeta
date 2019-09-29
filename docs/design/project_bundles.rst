@@ -45,14 +45,16 @@ for using bundles with conflicting Context Identifiers.
 
 Certain problems come up when dealing with contexts across different bundles.
 This rewriting allows to keep separate the contexts in one bundle from another
-and to forestall contexts with the same ID from conflicting with one another just
-because they're brought in by a transitive dependency. This is especially
-important for code.
+and to forestall contexts with the same ID from conflicting with one another
+just because they're brought in by a transitive dependency.
+
+.. This doesn't solve the problem of conflicting versions of software packages
+   referred to by the bundles. Need to make a good solution to that.
 
 An example
 ``````````
 
-Bundles α, β, and γ. With dependencies like so::
+Bundles ``α``, ``β``, and ``γ``. With dependencies like so::
 
    α -> β -> γ
 
