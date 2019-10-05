@@ -1,4 +1,5 @@
 from __future__ import print_function
+import importlib as IM
 import hashlib
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, plugin
 from rdflib.store import TripleAddedEvent, TripleRemovedEvent, Store
@@ -317,6 +318,16 @@ class Data(Configure):
             self['rdf.graph'].store.dispatcher.subscribe(TripleAddedEvent, self._context_changed_handler())
             self['rdf.graph'].store.dispatcher.subscribe(TripleRemovedEvent, self._context_changed_handler())
 
+        ccl_names = self.get('rdf.graph.context_changed_listeners', ())
+        for ccl_name in ccl_names:
+            mpart, cpart = ccl_name.rsplit('.', 1)
+            module = IM.import_module(mpart)
+            ccl = getattr(module, cpart, None)
+            if ccl:
+                self.on_context_changed(ccl(self))
+            else:
+                L.warn('Could not load context changed listener "%s"', ccl_name)
+
         self['rdf.graph']._add = self['rdf.graph'].add
         self['rdf.graph']._remove = self['rdf.graph'].remove
         self['rdf.graph'].add = self._my_graph_add
@@ -345,6 +356,10 @@ class Data(Configure):
             listeners = self._listeners.get(et, ())
             for listener in listeners:
                 listener(event)
+
+    @property
+    def event_listeners(self):
+        return self._listeners
 
     def on_context_changed(self, listener):
         ccl = self._listeners.get(ContextChangedEvent)

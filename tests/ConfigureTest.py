@@ -240,12 +240,12 @@ class ConfigureTest(unittest.TestCase):
     def test_configurable_init_empty(self):
         """Ensure Configureable gets init'd with the defalut if nothing is given"""
         i = Configureable()
-        self.assertEqual(Configureable.default, i.conf)
+        self.assertEqual(Configureable.default_config, i.conf)
 
     def test_configurable_init_False(self):
         """Ensure Configureable gets init'd with the defalut if None is given"""
         i = Configureable(conf=None)
-        self.assertEqual(Configureable.default, i.conf)
+        self.assertEqual(Configureable.default_config, i.conf)
 
     def test_dict_init(self):
         c = Configure(x=4, y=3)

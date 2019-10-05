@@ -13,10 +13,10 @@ class DataUserTest(_DataTest):
 
     def test_init_no_config(self):
         """ Should fail to initialize since it's lacking basic configuration """
-        c = Configureable.default
-        Configureable.default = False
+        c = Configureable.default_config
+        Configureable.default_config = False
         DataUser()
-        Configureable.default = c
+        Configureable.default_config = c
 
     def test_init_no_config_with_default(self):
         """ Should suceed if the default configuration is a Data object """
@@ -31,11 +31,11 @@ class DataUserTest(_DataTest):
         """ Should fail if given a non-Data configuration """
         # XXX: This test touches some machinery in
         # owmeta/__init__.py. Feel like it's a bad test
-        tmp = Configureable.default
-        Configureable.default = Configure()
+        tmp = Configureable.default_config
+        Configureable.default_config = Configure()
         with self.assertRaises(BadConf):
             DataUser()
-        Configureable.default = tmp
+        Configureable.default_config = tmp
 
     @unittest.skip("Should be tracked by version control")
     def test_add_statements_has_uploader(self):

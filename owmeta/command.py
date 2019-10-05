@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
 import sys
+from time import time
 from contextlib import contextmanager
 import os
 from os.path import (exists,
@@ -31,6 +32,7 @@ import logging
 import errno
 from collections import namedtuple
 from yarom.rdfUtils import BatchAddGraph
+from yarom.utils import FCN
 
 try:
     from tempfile import TemporaryDirectory
@@ -42,6 +44,7 @@ from .commands.bundle import OWMBundle
 from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide
 from .capabilities import FilePathProvider
+from .data import ContextChangedEvent
 from .datasource_loader import DataSourceDirLoader, LoadFailed
 from .graph_serialization import write_canonical_to_file, gen_ctx_fname
 
@@ -581,7 +584,7 @@ class OWMContexts(object):
                     ctx.own_stored.rdf_graph().serialize(destination, format=format)
                 call([editor, fname])
                 with open(fname, mode='rb') as source:
-                    g = self._parent._rdf.get_context(ctxid)
+                    g = self._parent.rdf.get_context(ctxid)
                     g.remove((None, None, None))
                     parser.parse(create_input_source(source), g)
 
@@ -633,13 +636,12 @@ class OWM(object):
     bundle = SubCommand(OWMBundle)
 
     def __init__(self):
-        from time import time
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
-        self._clock = time
         self._data_source_directories = None
         self._changed_contexts = None
         self._owm_connection = None
+        self._context_change_tracker = None
 
     @IVar.property(DEFAULT_OWM_DIR)
     def owmdir(self):
@@ -845,7 +847,7 @@ class OWM(object):
             elif update_existing_config:
                 with open(self.config_file, 'r+') as f:
                     conf = json.load(f)
-                    conf['rdf.store_conf'] = pth_join('$HERE',
+                    conf['rdf.store_conf'] = pth_join('$OWM',
                             relpath(abspath(self.store_name), abspath(self.owmdir)))
                     f.seek(0)
                     write_config(conf, f)
@@ -864,8 +866,10 @@ class OWM(object):
         with open(self._default_config(), 'r') as f:
             default = json.load(f)
             with open(self.config_file, 'w') as of:
-                default['rdf.store_conf'] = pth_join('$HERE',
+                default['rdf.store_conf'] = pth_join('$OWM',
                         relpath(abspath(self.store_name), abspath(self.owmdir)))
+
+                default['rdf.graph.context_changed_listeners'] = [FCN(ContextChangedTracker)]
                 write_config(default, of)
 
     def _init_repository(self):
@@ -953,6 +957,7 @@ class OWM(object):
             rc.update(udat.items())
             rc['configure.file_location'] = self.config_file
             dat = Data.process_config(rc, variables={'OWM': self.owmdir})
+            dat['owm.directory'] = self.owmdir
             store_conf = dat.get('rdf.store_conf', None)
             if not store_conf:
                 raise GenericUserError('rdf.store_conf is not defined in either of the OWM'
@@ -965,8 +970,6 @@ class OWM(object):
                 raise GenericUserError('rdf.store_conf must specify a path inside of ' +
                         self.owmdir + ' but instead it is ' + store_conf)
             self._owm_connection = connect(conf=dat)
-
-            dat.on_context_changed(self._context_changed_handler())
 
             self._dat = dat
             self._dat_file = self.config_file
@@ -981,35 +984,15 @@ class OWM(object):
 
     _init_store = _conf
 
-    def _context_changed_handler(self):
-        def handler(event):
-            from rdflib.term import URIRef
-            self._context_changed_times[URIRef(event.context)] = self._clock()
-        return handler
-
     @property
     def _context_changed_times(self):
-        if self._changed_contexts is None:
-            import ZODB
-            from ZODB.FileStorage import FileStorage
-            import BTrees
-            ccfile = pth_join(self.owmdir, 'changed_contexts')
-            all_changed = False
-            if not exists(ccfile):
-                all_changed = True
-            try:
-                fs = FileStorage(ccfile)
-            except IOError:
-                L.exception("Failed to create a FileStorage")
-                raise Exception("Failed to open", ccfile)
-
-            _cc_zdb = ZODB.DB(fs, cache_size=1600)
-            _cc_conn = _cc_zdb.open()
-            root = _cc_conn.root()
-            if 'ccmap' not in root:
-                root['ccmap'] = BTrees.family32.OO.BTree()
-            self._changed_contexts = root['ccmap']
-        return self._changed_contexts
+        if self._context_change_tracker is None:
+            listeners = self._conf().event_listeners[ContextChangedEvent]
+            for l in listeners:
+                if isinstance(l, ContextChangedTracker):
+                    self._context_change_tracker = l
+                    break
+        return self._context_change_tracker.context_changed_times
 
     def clone(self, url=None, update_existing_config=False, branch=None):
         """Clone a data store
@@ -1339,14 +1322,18 @@ class OWM(object):
     def _changed_contexts_set(self):
         from rdflib.term import URIRef
         changed = set()
+        cckeys = set()
         gf_index = {URIRef(y): x for x, y in self._graphs_index()}
+        gfkeys = set(gf_index.keys())
         for ctx, mtime in self._context_changed_times.items():
+            cckeys.add(ctx)
             g_fname = gf_index.get(ctx)
             g_fname = None if g_fname is None else pth_join(self.owmdir, 'graphs', g_fname)
             if not g_fname or stat(g_fname).st_mtime != mtime:
                 changed.add(ctx)
-        changed |= set(gf_index.keys()) - set(self._context_changed_times.keys())
-        return changed
+        deleted = gfkeys - cckeys
+        added = cckeys - gfkeys
+        return changed | deleted | added
 
     def _serialize_graphs(self, ignore_change_cache=False):
         import transaction
@@ -1360,7 +1347,7 @@ class OWM(object):
 
         changed = self._changed_contexts_set()
 
-        if changed and repo.is_dirty:
+        if changed or repo.is_dirty:
             repo.reset()
 
         if not exists(graphs_base):
@@ -1403,8 +1390,7 @@ class OWM(object):
                 print(*l, file=index_file, end='\n')
 
         files.append(index_fname)
-        repo.add([relpath(f, self.owmdir) for f in files] + [relpath(self.config_file, self.owmdir),
-                                                             'graphs'])
+        repo.add([relpath(f, self.owmdir) for f in files] + [relpath(self.config_file, self.owmdir)])
 
     def diff(self):
         """
@@ -1775,6 +1761,45 @@ class OWMSaveNamespace(object):
         self.context.save_imports(*args, **kwargs)
 
         return self.context.save_context(*args, **kwargs)
+
+
+class ContextChangedTracker(object):
+    '''
+    Tracks changes to an RDFLib ConjunctiveGraph
+    '''
+
+    def __init__(self, conf):
+        self.conf = conf
+        self._changed_contexts = None
+        self._clock = time
+
+    def __call__(self, event):
+        from rdflib.term import URIRef
+        self.context_changed_times[URIRef(event.context)] = self._clock()
+
+    @property
+    def context_changed_times(self):
+        if self._changed_contexts is None:
+            import ZODB
+            from ZODB.FileStorage import FileStorage
+            import BTrees
+            ccfile = pth_join(self.conf['owm.directory'], 'changed_contexts')
+            all_changed = False
+            if not exists(ccfile):
+                all_changed = True
+            try:
+                fs = FileStorage(ccfile)
+            except IOError:
+                L.exception("Failed to create a FileStorage")
+                raise Exception("Failed to open", ccfile)
+
+            _cc_zdb = ZODB.DB(fs, cache_size=1600)
+            _cc_conn = _cc_zdb.open()
+            root = _cc_conn.root()
+            if 'ccmap' not in root:
+                root['ccmap'] = BTrees.family32.OO.BTree()
+            self._changed_contexts = root['ccmap']
+        return self._changed_contexts
 
 
 class UnimportedContextRecord(namedtuple('UnimportedContextRecord', ['context', 'node_index', 'statement'])):
