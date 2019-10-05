@@ -1355,7 +1355,7 @@ class OWM(object):
 
         files = []
         ctx_data = []
-
+        deleted_contexts = dict(self._context_fnames)
         with transaction.manager:
             for context in g.contexts():
                 ident = context.identifier
@@ -1383,11 +1383,17 @@ class OWM(object):
                 self._context_changed_times[ident] = stat(fname).st_mtime
                 ctx_data.append((relpath(fname, graphs_base), ident))
                 files.append(fname)
+                deleted_contexts.pop(str(ident), None)
 
         index_fname = pth_join(graphs_base, 'index')
         with open(index_fname, 'w') as index_file:
             for l in sorted(ctx_data):
                 print(*l, file=index_file, end='\n')
+
+        if deleted_contexts:
+            repo.remove(relpath(f, self.owmdir) for f in deleted_contexts.values())
+            for f in deleted_contexts.values():
+                unlink(f)
 
         files.append(index_fname)
         repo.add([relpath(f, self.owmdir) for f in files] + [relpath(self.config_file, self.owmdir)])
