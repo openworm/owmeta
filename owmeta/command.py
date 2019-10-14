@@ -694,6 +694,7 @@ class OWM(object):
 
         # Generally, too verbose for the user
         logging.getLogger('owmeta.mapper').setLevel(logging.ERROR)
+        logging.getLogger('owmeta.module_recorder').setLevel(logging.ERROR)
 
     def save(self, module, provider=None, context=None):
         '''

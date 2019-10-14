@@ -27,7 +27,6 @@ class _DataTest(unittest.TestCase):
                 raise e
 
     def setUp(self):
-        # Set do_logging to True if you like walls of text
         self.TestConfig = Data.open(TEST_CONFIG)
         td = '__tempdir__'
         z = self.TestConfig['rdf.store_conf']
@@ -36,7 +35,7 @@ class _DataTest(unittest.TestCase):
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        self.connection = owmeta.connect(conf=self.TestConfig, do_logging=False)
+        self.connection = owmeta.connect(conf=self.TestConfig)
         self.context = Context(ident='http://example.org/test-context',
                                conf=self.TestConfig)
         typ = type(self)

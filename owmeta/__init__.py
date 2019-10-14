@@ -40,6 +40,7 @@ import os
 import logging
 
 LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
 
 BASE_SCHEMA_URL = 'http://openworm.org/schema'
 
@@ -190,7 +191,6 @@ def loadData(
                         than the data to be loaded in. This is determined by the modified time on the main
                         database file compared to the modified time on the data file.
     """
-    import logging
     if not os.path.isfile(data):
         raise Exception("No such data file: " + data)
 
@@ -219,7 +219,6 @@ class ConnectionFailError(Exception):
 
 def connect(configFile=False,
             conf=None,
-            do_logging=False,
             data=False,
             dataFormat='n3'):
     """
@@ -227,15 +226,10 @@ def connect(configFile=False,
 
     :param configFile: (Optional) The configuration file for owmeta
     :param conf: (Optional) a configuration object for the connection. Takes precedence over `configFile`
-    :param do_logging: (Optional) If true, turn on debug level logging
     :param data: (Optional) specify the file to load into the library
     :param dataFormat: (Optional) file format of `data`. Currently n3 is supported
     """
-    import logging
     from .data import Data, ZODBSourceOpenFailError, DatabaseConflict
-
-    if do_logging:
-        logging.basicConfig(level=logging.DEBUG)
 
     if conf:
         if not isinstance(conf, Data):
