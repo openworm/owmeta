@@ -4,6 +4,7 @@ Bundle commands
 from __future__ import print_function
 import logging
 import shutil
+import hashlib
 from os.path import join as p, abspath, relpath
 from ..context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from ..command_util import GenericUserError, GeneratorWithData
@@ -148,6 +149,21 @@ class OWMBundle(object):
         bundle_name : str
             The name of the bundle to deregister
         '''
+        try:
+            with open(p(self._parent.owmdir, 'bundles'), 'r') as f:
+                lines = f.readlines()
+        except OSError:
+            lines = []
+
+        with open(p(self._parent.owmdir, 'bundles'), 'w') as f:
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                name, fn = line.split(' ', 1)
+                if name == bundle_name:
+                    continue
+                print(line, file=f)
 
     def deploy(self, bundle_name, remotes=None):
         '''
@@ -208,10 +224,11 @@ class OWMBundle(object):
 
     def _load(self, bundle_name):
         loader = self._get_bundle_loader(bundle_name)
+        # TODO: Find the base directory
         if not loader:
             raise NoBundleLoader(bundle_name)
 
-        bundle = loader(bundle_name)
+        return loader(bundle_name)
 
     def _get_bundle_loader(self, bundle_name):
         pass

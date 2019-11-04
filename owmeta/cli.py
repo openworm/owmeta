@@ -13,15 +13,30 @@ from .command_util import GeneratorWithData, GenericUserError
 
 def additional_args(parser):
     'Add some additional options specific to CLI'
+    # The "Default is '<blah>'" part of help is to match the cli_command_wrapper output
     parser.add_argument('--output-mode', '-o', default='text',
             help='How to print the results of a command'
-            ' (if any). Either "json" or "text" (the default)')
+            ' (if any). Default is \'text\'',
+            choices=['json', 'text'])
     parser.add_argument('--columns',
             help='Comma-separated list of columns to display in "table" output mode')
     parser.add_argument('--text-field-separator', default='\t',
-            help='Separator to use between fields in "text" output mode')
+            help=r'Separator to use between fields in "text" output mode. Default is'
+            r" '\t' (tab character)")
     parser.add_argument('--text-record-separator', default='\n',
-            help='Separator to use between records in "text" output mode')
+            help='Separator to use between records in "text" output mode. Default is'
+            r" '\n' (newline)")
+    parser.add_argument('--progress',
+            help='Progress reporter to use. Default is \'tqdm\'',
+            choices=['tqdm', 'tqdm_notebook'])
+
+
+def parse_progress(s):
+    if s == 'tqdm':
+        return tqdm
+    elif s == 'tqdm_notebook':
+        from tqdm import tqdm_notebook
+        return tqdm_notebook
 
 
 def die(message, status=1):
@@ -33,7 +48,8 @@ NOT_SET = object()
 
 
 class NSHandler(object):
-    def __init__(self, **kwargs):
+    def __init__(self, command, **kwargs):
+        self.command = command
         self.opts = dict(kwargs)
 
     def __getitem__(self, k):
@@ -53,6 +69,9 @@ class NSHandler(object):
         self.opts['text_field_separator'] = ns.text_field_separator
         self.opts['text_record_separator'] = ns.text_record_separator
         self.opts['columns'] = ns.columns
+        prog = parse_progress(ns.progress)
+        if prog:
+            self.command.progress_reporter = prog
 
     def __str__(self):
         return 'NSHandler' + str(self.opts)
@@ -88,7 +107,7 @@ def main():
     p.message = print
     p.progress_reporter = tqdm
     p.repository_provider = GitRepoProvider()
-    ns_handler = NSHandler()
+    ns_handler = NSHandler(p)
     if environ.get('OWM_CLI_PROFILE'):
         from cProfile import Profile
         profiler = Profile()

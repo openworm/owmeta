@@ -25,7 +25,6 @@ except ImportError:
             del sd
 from os import makedirs, mkdir, listdir, rename, unlink, stat
 
-import hashlib
 import shutil
 import json
 import logging

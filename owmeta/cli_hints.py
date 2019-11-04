@@ -98,6 +98,11 @@ CLI_HINTS = {
                 'names': ['bundle_name'],
             },
         },
+        'deregister': {
+            (METHOD_NAMED_ARG, 'bundle_name'): {
+                'names': ['bundle_name'],
+            },
+        },
         'register': {
             (METHOD_NAMED_ARG, 'descriptor'): {
                 'names': ['descriptor'],

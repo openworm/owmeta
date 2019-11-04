@@ -184,6 +184,88 @@ def bundle_directory(bundles_directory, ident):
     return p(bundles_directory, urlquote(ident, safe=''))
 
 
+class Loader(object):
+    '''
+    Loads bundles
+
+    Attributes
+    ----------
+    base_directory : str
+        The path where the bundle archive should be unpacked
+    '''
+
+    def __init__(self):
+        # The base directory
+        self.base_directory = None
+
+    def can_load(self, bundle_name):
+        return False
+
+    def load(self, bundle_name):
+        raise NotImplementedError()
+
+    def __init__(self, bundle_name):
+        return self.load(bundle_name)
+
+
+class HttpBundleLoader(Loader):
+    '''
+    Loads bundles from HTTP(S) resources listed in an index file
+    '''
+
+    def __init__(self, index_url, cachedir=None, **kwargs):
+        '''
+        Parameters
+        ----------
+        index_url : str
+            URL for the index file pointing to the bundle archives
+        cachedir : str
+            Directory where the index and any downloaded bundle archive should be cached.
+            If provided, the index and bundle archive is cached in the given directory. If
+            not provided, the index will be cached in memory and the bundle will not be
+            cached.
+        '''
+        super(HttpBundleLoader, self).__init__(**kwargs)
+        self.index_url = index_url
+        self.cachedir = cachedir
+        self._index = None
+
+    def _setup_index(self):
+        import requests
+        if self._index is None:
+            response = requests.get(self.index_url)
+            self._index = response.json()
+
+    def can_load(self):
+        self._setup_index()
+        return bundle_name in self._index
+
+    def load(self, bundle_name):
+        '''
+        Loads a bundle by downloading an index file
+        '''
+        import requests
+        self._setup_index()
+        bundle_url = self._index.get(bundle_name)
+        if not bundle_url:
+            raise LoadFailed(bundle_name, self, 'Bundle is not in the index')
+        response = requests.get(bundle_url, stream=True)
+        if self.cachedir is not None:
+            bfn = urlquote(bundle_name)
+            with open(p(self.cachedir, bfn), 'w') as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    f.write(chunk)
+            with open(p(self.cachedir, bfn), 'r') as f:
+                self._unpack(f)
+        else:
+            self._unpack(response.raw)
+
+    def _unpack(self, f):
+        import tarfile
+        with tarfile.open(mode='r:xz', fileobj=f) as ba:
+            ba.extractall(self.base_directory)
+
+
 class Installer(object):
     '''
     Installs a bundle locally
@@ -435,3 +517,11 @@ def _select_contexts(descriptor, graph):
             if pat(ctx):
                 yield ctx, context
                 break
+
+
+class LoadFailed(Exception):
+    def __init__(self, bundle, loader, *args):
+        msg = args[0]
+        mmsg = 'Failed to load {} bundle with loader {}{}'.format(
+                bundle, loader, ': ' + msg if msg else '')
+        super(LoadFailed, self).__init__(mmsg, *args[1:])

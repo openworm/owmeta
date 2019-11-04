@@ -312,6 +312,8 @@ class CLICommandWrapper(object):
             the argument list to parse. optional
         argument_callback : callable
             a callback to add additional arguments to the command line. optional
+        argument_namespace_callback : callable
+            a callback to handle the parsed arguments to the command line. optional
         '''
 
         parser = self.parser()
