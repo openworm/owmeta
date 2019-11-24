@@ -53,7 +53,6 @@ setup(
         'pytest>=3.4.0 ; python_version >= "3.0"',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
-        'rdflib-sqlalchemy',
         'mock==2.0.0 ; python_version < "3.0"',
         'pytest-parallel ; python_version >= "3.0"'
     ],
@@ -78,7 +77,7 @@ setup(
         'ZConfig==3.0.4',
         'zdaemon==4.0.0',
         'zodb==4.1.0',
-        'rdflib-sqlalchemy',
+        'rdflib-sqlalchemy~=0.4.0',
         'pyyaml',
     ] + py2_only('zodbpickle==1.0',
         'Sphinx<1.8.4',
