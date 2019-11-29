@@ -634,13 +634,16 @@ class OWM(object):
 
     bundle = SubCommand(OWMBundle)
 
-    def __init__(self):
+    def __init__(self, owmdir=None):
         self.progress_reporter = default_progress_reporter
         self.message = lambda *args, **kwargs: print(*args, **kwargs)
         self._data_source_directories = None
         self._changed_contexts = None
         self._owm_connection = None
         self._context_change_tracker = None
+
+        if owmdir:
+            self.owmdir = owmdir
 
     @IVar.property(DEFAULT_OWM_DIR)
     def owmdir(self):
@@ -931,6 +934,10 @@ class OWM(object):
             raise Exception('No graph_accessor_finder has been configured')
 
         return self.graph_accessor_finder(url)
+
+    def connect(self):
+        self._init_store()
+        return self._owm_connection
 
     def _conf(self, *args):
         from owmeta.data import Data

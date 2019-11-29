@@ -18,6 +18,12 @@ from .cli_common import (INSTANCE_ATTRIBUTE,
 from .cli_hints import CLI_HINTS
 
 
+ARGUMENT_TYPES = {
+    'int': int
+}
+''' Map from parameter types to type constructors for parsing arguments '''
+
+
 class CLIUserError(Exception):
     pass
 
@@ -50,6 +56,19 @@ class CLIArgMapper(object):
         self.argparser = None
 
     def apply(self, runner):
+        '''
+        Applies the collected arguments to the runner by calling methods and traversing
+        the object attributes as required
+
+        Parameters
+        ----------
+        runner : object
+            Target of the command and source of argument and method names
+
+        See Also
+        --------
+        CLICommandWrapper : takes a runner in its ``__init__``
+        '''
         iattrs = self.get(INSTANCE_ATTRIBUTE)
         kvpairs = self.get(METHOD_KWARGS)
         kvs = list(kv.split('=') for kv in kvpairs.values())
@@ -82,9 +101,6 @@ class CLIArgMapper(object):
     def get(self, key):
         return {k[1]: self.mappings[k] for k in self.mappings if k[0] == key}
 
-    def get0(self, key):
-        return {k: self.mappings[k] for k in self.mappings if k[0] == key}
-
     def __str__(self):
         return type(self).__name__ + '(' + str(self.mappings) + ')'
 
@@ -92,7 +108,7 @@ class CLIArgMapper(object):
 class CLIStoreAction(argparse.Action):
     ''' Interacts with the CLIArgMapper '''
 
-    def __init__(self, mapper, key, index=-1, *args, **kwargs):
+    def __init__(self, mapper, key, index=-1, mapped_name=None, *args, **kwargs):
         super(CLIStoreAction, self).__init__(*args, **kwargs)
         if self.nargs == 0:
             raise ValueError('nargs for store actions must be > 0; if you '
@@ -103,7 +119,7 @@ class CLIStoreAction(argparse.Action):
 
         self.mapper = mapper
         self.key = key
-        self.name = self.dest
+        self.name = mapped_name or self.dest
         self.index = index
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -152,11 +168,31 @@ def _ensure_value(namespace, name, value):
 
 
 class CLICommandWrapper(object):
+    '''
+    Wraps an object such that it can be used in a command line interface
+    '''
 
-    def __init__(self, runner, mapper=None):
+    def __init__(self, runner, mapper=None, hints=None, program_name=None):
+        '''
+        Parameters
+        ----------
+        runner : object
+            An object that provides the methods to be invoked
+        mapper : CLIArgMapper
+            Stores the arguments and associated runners for the command. A mapper is
+            created if none is provided. optional
+        hints : dict
+            A multi-level dict describing how certain command line arguments get turned
+            into attributes and method orguments. If `hints` is not provided, the hints
+            are looked up by the runner's fully-qualified class name in CLI_HINTS. optional
+        program_name : str
+            The name of the top-level program. Uses `sys.argv[0] <sys.argv>` if not provided.
+            optional
+        '''
         self.runner = runner
         self.mapper = CLIArgMapper() if mapper is None else mapper
-        self.hints = CLI_HINTS.get(FCN(type(runner)), {})
+        self.hints = CLI_HINTS.get(FCN(type(runner)), {}) if hints is None else hints
+        self.program_name = program_name
 
     def extract_args(self, val):
         docstring = getattr(val, '__doc__', '')
@@ -199,7 +235,7 @@ class CLICommandWrapper(object):
                 cmd_summary, _, _ = self.extract_args(self.runner)
             else:
                 cmd_summary = None
-            parser = argparse.ArgumentParser(description=cmd_summary)
+            parser = argparse.ArgumentParser(prog=self.program_name, description=cmd_summary)
         self.mapper.argparser = parser
         for key, val in vars(self.runner).items():
             if not key.startswith('_') and key not in self.hints.get('IGNORE', ()):
@@ -228,6 +264,8 @@ class CLICommandWrapper(object):
                         if param[1] == 'bool':
                             action = CLIStoreTrueAction
 
+                        atype = ARGUMENT_TYPES.get(param[1])
+
                         arg = param[0]
                         desc = ' '.join(param[2])
                         if arg.startswith('**'):
@@ -235,6 +273,7 @@ class CLICommandWrapper(object):
                                                    action=CLIAppendAction,
                                                    mapper=self.mapper,
                                                    key=METHOD_KWARGS,
+                                                   type=atype,
                                                    help=desc)
                         elif arg.startswith('*'):
                             subparser.add_argument(arg[1:],
@@ -242,6 +281,7 @@ class CLICommandWrapper(object):
                                                    nargs='*',
                                                    key=METHOD_NARGS,
                                                    mapper=self.mapper,
+                                                   type=atype,
                                                    help=desc)
                         else:
                             arg_hints = self._arg_hints(sc_hints, METHOD_NAMED_ARG, arg)
@@ -252,6 +292,8 @@ class CLICommandWrapper(object):
                                                  key=METHOD_NAMED_ARG,
                                                  mapper=self.mapper,
                                                  index=pindex,
+                                                 mapped_name=arg,
+                                                 type=atype,
                                                  help=desc)
                             if arg_hints:
                                 nargs = arg_hints.get('nargs')

@@ -14,8 +14,8 @@ import transaction
 from pytest import mark, fixture
 
 from owmeta.data_trans.local_file_ds import LocalFileDataSource as LFDS
-from owmeta import connect
 from owmeta.datasource import DataTranslator
+from owmeta.command import OWM
 from owmeta.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
 from owmeta.context_common import CONTEXT_IMPORTS
 
@@ -226,7 +226,7 @@ def test_save_imports(self):
         __yarom_mapped_classes__ = (Monkey,)
         ''')
     print(self.sh('owm save test_module.monkey'))
-    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
+    with OWM(owmdir=p(self.testdir, '.owm')).connect() as conn:
         ctx = Context(ident=conn.conf[IMPORTS_CONTEXT_KEY], conf=conn.conf)
         trips = set(ctx.stored.rdf_graph().triples((None, None, None)))
         assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
@@ -247,7 +247,7 @@ class DT1(DataTranslator):
 
 def test_translator_list(self):
     expected = URIRef('http://example.org/trans1')
-    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
+    with OWM(owmdir=p(self.testdir, '.owm')).connect() as conn:
         with transaction.manager:
             # Create data sources
             ctx = Context(ident='http://example.org/context', conf=conn.conf)
@@ -283,7 +283,7 @@ class DT2(DataTranslator):
 
 @mark.xfail
 def test_translate_data_source_loader(self):
-    with connect(p(self.testdir, '.owm', 'owm.conf')) as conn:
+    with OWM(owmdir=p(self.testdir, '.owm')).connect() as conn:
         with transaction.manager:
             # Create data sources
             ctx = Context(ident='http://example.org/context', conf=conn.conf)

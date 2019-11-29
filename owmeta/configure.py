@@ -5,13 +5,15 @@ import six
 from pkg_resources import Requirement, resource_filename
 import json
 import re
-from os import environ
+from os import environ, getcwd
 from os.path import dirname, realpath
+from pathlib import Path
 
 
 class ConfigValue(object):
 
-    """ A value to be configured.  Base class intended to be subclassed, as its only method is not implemented
+    """ A value to be configured.  Base class intended to be subclassed, as its only
+    method is not implemented
     """
 
     def get(self):
@@ -142,15 +144,15 @@ class Configure(object):
                     if valid_var_name:
                         res = environ.get(match, None)
                         if res is None:
-                            if match == 'BASE':
+                            if variables and match in variables:
+                                res = variables[match]
+                            elif match == 'BASE':
                                 res = resource_filename(Requirement.parse('owmeta'), value)
                             elif match == 'HERE':
                                 cfg_name = config_dict.get('configure.file_location')
                                 cfg_dname = cfg_name and dirname(realpath(cfg_name))
                                 if cfg_dname != '/':
                                     res = cfg_dname
-                            elif variables and match in variables:
-                                res = variables[match]
                         res = None if res == '' else res
                     else:
                         raise ValueError("'%s' is an invalid env-var name\n"

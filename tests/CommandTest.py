@@ -27,6 +27,9 @@ from owmeta.datasource_loader import LoadFailed
 from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from owmeta.document import Document
 from owmeta.website import Website
+from owmeta.cli_command_wrapper import CLICommandWrapper
+from owmeta.cli_common import METHOD_NAMED_ARG
+
 from .TestUtilities import noexit, stderr, stdout
 
 
@@ -118,6 +121,7 @@ class OWMTest(BaseTest):
         m = Mock()
         self.cut.graph_accessor_finder = lambda url: m
         self.cut.fetch_graph("http://example.org/ImAGraphYesSiree")
+        # XXX: Should this just be assert_called or where are the arguments?
         m.assert_called_with()
 
     def test_add_graph_success(self):
@@ -1123,6 +1127,52 @@ class TestDSDDirExists(unittest.TestCase):
     # Don't have preferences yet
     # Test multiple loaders are ordered by preference -> should pick the highest ordered
     # Test multiple loaders are ordered by preference and most preferred fails -> should pick the next highest ordered
+
+
+class CLICommandWrapperTest(unittest.TestCase):
+
+    def test_named_arg_and_cli_arg_different(self):
+        m = []
+
+        class Spec(object):
+            def test(self, function_argument):
+                '''
+                Description
+
+                Parameters
+                ----------
+                function_argument : str
+                    description
+                '''
+                m.append(function_argument)
+
+        hints = {'test': {
+            (METHOD_NAMED_ARG, 'function_argument'): {
+                'names': ['command_line_argument']
+            }
+        }}
+        with noexit():
+            CLICommandWrapper(Spec(), hints=hints, program_name="test").main(args=['test', 'hello'])
+        self.assertEqual(m, ['hello'])
+
+    def test_convert_to_int(self):
+        m = []
+
+        class Spec(object):
+            def test(self, arg):
+                '''
+                Description
+
+                Parameters
+                ----------
+                arg : int
+                    description
+                '''
+                m.append(arg)
+
+        with noexit():
+            CLICommandWrapper(Spec(), program_name="test").main(args=['test', '--arg=5'])
+        self.assertEqual(m, [5])
 
 
 class _TestException(Exception):

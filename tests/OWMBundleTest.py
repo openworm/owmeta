@@ -5,8 +5,7 @@ from pytest import mark, fixture
 from contextlib import contextmanager
 import transaction
 
-from owmeta import connect
-from owmeta.command import DEFAULT_OWM_DIR as OD
+from owmeta.command import DEFAULT_OWM_DIR as OD, OWM
 from owmeta.context import Context
 
 from rdflib.term import URIRef, Literal
@@ -47,7 +46,7 @@ def test_install(self):
     description: I'm a description
     includes: ["http://example.org/test_ctx"]
     ''')
-    with connect(p(self.testdir, OD, 'owm.conf')) as conn:
+    with OWM(owmdir=p(self.testdir, OD)).connect() as conn:
         with transaction.manager:
             graph = conn.conf['rdf.graph']
             sg = graph.get_context('http://example.org/test_ctx')
