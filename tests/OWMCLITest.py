@@ -27,6 +27,8 @@ pytestmark = mark.owm_cli_test
 def module_fixture():
     res = Data()
     res.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
+    res.test_homedir = p(res.testdir, 'homedir')
+    os.mkdir(res.test_homedir)
     with open(p('tests', 'pytest-cov-embed.py'), 'r') as f:
         ptcov = f.read()
     # Added so pytest_cov gets to run for our subprocesses
@@ -70,6 +72,7 @@ class Data(object):
             return None
         env = dict(os.environ)
         env['PYTHONPATH'] = self.testdir + os.pathsep + env['PYTHONPATH']
+        env['HOME'] = self.test_homedir
         env.update(kwargs.pop('env', {}))
         outputs = []
         for cmd in command:
