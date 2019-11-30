@@ -5,20 +5,84 @@ from __future__ import print_function
 import logging
 import shutil
 import hashlib
-from os.path import join as p, abspath, relpath
+from os.path import join as p, abspath, relpath, isdir
+from os import mkdir, listdir, unlink
 import yaml
 from ..context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
-from ..command_util import GenericUserError, GeneratorWithData
-from ..bundle import Descriptor, Installer
+from ..command_util import GenericUserError, GeneratorWithData, SubCommand
+from ..bundle import Descriptor, Installer, HTTPBundleLoader, URLConfig, Remote
+import hashlib
 
 
 L = logging.getLogger(__name__)
+
+
+class OWMBundleRemote(object):
+    '''
+    Commands for dealing with bundle remotes
+    '''
+
+    def __init__(self, parent):
+        self._parent = parent
+        self._owm = self._parent._parent
+
+    def add(self, name, url):
+        '''
+        Add a remote
+
+        Parameters
+        ----------
+        name : str
+            Name of the remote
+        url : str
+            URL for the remote
+        '''
+        url = URLConfig(url)
+        r = Remote(name, accessor_configs=(url,))
+        remotes_dir = p(self._owm.owmdir, 'remotes')
+        if not isdir(remotes_dir):
+            try:
+                mkdir(remotes_dir)
+            except Exception:
+                L.warn('Could not crerate directory for storage of remote configurations', exc_info=True)
+                raise GenericUserError('Could not create directory for storage of remote configurations')
+
+        fname = self._remote_fname(r.name)
+        try:
+            with open(fname, 'w') as out:
+                r.write(out)
+        except Exception:
+            unlink(fname)
+            raise
+
+    def _remote_fname(self, name):
+        return p(self._owm.owmdir, 'remotes', hashlib.sha224(name.encode('UTF-8')).hexdigest() + '.remote')
+
+    def list(self):
+        ''' List remotes '''
+
+        def helper():
+            remotes_dir = p(self._owm.owmdir, 'remotes')
+            for r in listdir(remotes_dir):
+                if r.endswith('.remote'):
+                    with open(p(remotes_dir, r)) as inp:
+                        try:
+                            yield Remote.read(inp)
+                        except Exception:
+                            L.warning('Unable to read remote %s', r, exc_info=True)
+
+        return GeneratorWithData(helper(),
+                text_format=lambda r: r.name,
+                columns=(lambda r: r.name,),
+                header=("Name",))
 
 
 class OWMBundle(object):
     '''
     Bundle commands
     '''
+
+    remote = SubCommand(OWMBundleRemote)
 
     def __init__(self, parent):
         self._parent = parent
@@ -239,13 +303,13 @@ class OWMBundle(object):
 
     def _retrieve_remotes(self):
         remotes_dir = p(self._parent.owmdir, 'remotes')
-        for r in os.listdir(remotes_dir):
+        for r in listdir(remotes_dir):
             if r.endswith('.remote'):
                 with open(r) as inp:
                     try:
                         yield Remote.read(inp)
                     except Exception:
-
+                        L.warning('Unable to read remote %s', r, exc_info=True)
 
     def _get_bundle_loaders(self, bundle_name):
         for rem in self._retrieve_remotes():

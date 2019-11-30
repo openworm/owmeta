@@ -26,7 +26,7 @@ class Remote(object):
     '''
     A place where bundles come from and go to
     '''
-    def __init__(self, name):
+    def __init__(self, name, accessor_configs=()):
         '''
         Parameters
         ----------
@@ -37,8 +37,11 @@ class Remote(object):
         self.name = name
         ''' Name of the remote '''
 
-        self.accessor_configs = []
+        self.accessor_configs = list(accessor_configs)
         ''' Configs for how you access the remote. Probably just URLs '''
+
+    def add_config(self, accessor_config):
+        self.accessor_configs.append(accessor_config)
 
     def generate_loaders(self, loader_classes):
         for ac in self.accessor_configs:

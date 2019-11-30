@@ -50,7 +50,6 @@ def _property_update(wrapped, *args, **kwargs):
 
 
 class SubCommand(object):
-
     def __init__(self, cmd):
         self.cmd = cmd
         self.__doc__ = getattr(cmd, '__doc__', '')

@@ -77,6 +77,16 @@ CLI_HINTS = {
             }
         }
     },
+    'owmeta.commands.bundle.OWMBundleRemote': {
+        'add': {
+            (METHOD_NAMED_ARG, 'name'): {
+                'names': ['name'],
+            },
+            (METHOD_NAMED_ARG, 'url'): {
+                'names': ['url'],
+            },
+        },
+    },
     'owmeta.commands.bundle.OWMBundle': {
         'fetch': {
             (METHOD_NAMED_ARG, 'bundle_name'): {
