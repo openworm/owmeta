@@ -8,6 +8,7 @@ import shutil
 import errno
 from rdflib.term import URIRef
 from struct import pack
+import yaml
 from .context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .context_common import CONTEXT_IMPORTS
 from .data import Data
@@ -21,26 +22,77 @@ except ImportError:
     from urllib import quote as urlquote
 
 
-class DirectoryLoader(object):
-    '''
-    Loads a bundle into a directory.
-
-    Created from a remote to actually get the bundle
-    '''
-    def __init__(self, base_directory=None):
-        self.base_directory = base_directory
-
-    def load(self, bundle_name):
-        '''
-        Loads a bundle into the given base directory
-        '''
-        raise NotImplementedError()
-
-
 class Remote(object):
     '''
     A place where bundles come from and go to
     '''
+    def __init__(self, name):
+        '''
+        Parameters
+        ----------
+        name : str
+            The name of the remote
+        '''
+
+        self.name = name
+        ''' Name of the remote '''
+
+        self.accessor_configs = []
+        ''' Configs for how you access the remote. Probably just URLs '''
+
+    def generate_loaders(self, loader_classes):
+        for ac in self.accessor_configs:
+            for lc in loader_classes:
+                if lc.can_load_from(ac):
+                    loader = lc(ac)
+                    self._loaders.append(loader)
+                    yield loader
+
+    def write(self, out):
+        '''
+        Parameters
+        ----------
+        out : file-like object
+            Target for writing the remote
+        '''
+        yaml.dump(self, out)
+
+    @classmethod
+    def read(cls, inp):
+        res = yaml.full_load(inp)
+        assert isinstance(res, cls)
+        return res
+
+    def __eq__(self, other):
+        return (self.name == other.name and
+                self.accessor_configs == other.accessor_configs)
+
+
+class AccessorConfig(object):
+    '''
+    Configuration for accessing a remote. Loaders are added to a remote according to which
+    accessors are avaialble
+    '''
+
+    def __eq__(self, other):
+        raise NotImplementedError()
+
+
+class URLConfig(AccessorConfig):
+    '''
+    Configuration for accessing a remote with just a URL.
+    '''
+
+    def __init__(self, url):
+        self.url = url
+
+    def __eq__(self, other):
+        return self.url == other.url
+
+    def __str__(self):
+        return '{}(url={})'.format(FCN(type(self)), repr(self.url))
+
+    __repr__ = __str__
 
 
 class Descriptor(object):
@@ -50,6 +102,7 @@ class Descriptor(object):
     def __init__(self, ident):
         self.id = ident
         self.name = None
+        self.version = None
         self.description = None
         self.patterns = set()
         self.includes = set()
@@ -62,6 +115,7 @@ class Descriptor(object):
         '''
         res = cls(ident=obj['id'])
         res.name = obj.get('name', obj['id'])
+        res.version = obj.get('version', 1)
         res.description = obj.get('description', None)
         res.patterns = set(make_pattern(x) for x in obj.get('patterns', ()))
         res.includes = set(make_include_func(x) for x in obj.get('includes', ()))
@@ -70,11 +124,12 @@ class Descriptor(object):
 
     def __str__(self):
         return (FCN(type(self)) + '(ident={},'
-                'name={},description={},'
+                'name={},version={},description={},'
                 'patterns={},includes={},'
                 'files={})').format(
                         repr(self.id),
                         repr(self.name),
+                        repr(self.version),
                         repr(self.description),
                         repr(self.patterns),
                         repr(self.includes),
@@ -186,7 +241,7 @@ def bundle_directory(bundles_directory, ident):
 
 class Loader(object):
     '''
-    Loads bundles
+    Downloads bundles into the local index and caches them
 
     Attributes
     ----------
@@ -198,17 +253,24 @@ class Loader(object):
         # The base directory
         self.base_directory = None
 
+    @classmethod
+    def can_load_from(cls, accessor_config):
+        ''' Returns True if the given accessor_config is a valid config for this loader '''
+        return False
+
     def can_load(self, bundle_name):
+        ''' Returns True if the bundle named `bundle_name` is supported '''
         return False
 
     def load(self, bundle_name):
+        ''' Loads the bundle into the local index '''
         raise NotImplementedError()
 
-    def __init__(self, bundle_name):
+    def __call__(self, bundle_name):
         return self.load(bundle_name)
 
 
-class HttpBundleLoader(Loader):
+class HTTPBundleLoader(Loader):
     '''
     Loads bundles from HTTP(S) resources listed in an index file
     '''
@@ -217,7 +279,7 @@ class HttpBundleLoader(Loader):
         '''
         Parameters
         ----------
-        index_url : str
+        index_url : str or URLConfig
             URL for the index file pointing to the bundle archives
         cachedir : str
             Directory where the index and any downloaded bundle archive should be cached.
@@ -225,8 +287,13 @@ class HttpBundleLoader(Loader):
             not provided, the index will be cached in memory and the bundle will not be
             cached.
         '''
-        super(HttpBundleLoader, self).__init__(**kwargs)
-        self.index_url = index_url
+        super(HTTPBundleLoader, self).__init__(**kwargs)
+
+        if isinstance(index_url, str):
+            self.index_url = index_url
+        else:
+            self.index_url = index_url.url
+
         self.cachedir = cachedir
         self._index = None
 
@@ -236,7 +303,13 @@ class HttpBundleLoader(Loader):
             response = requests.get(self.index_url)
             self._index = response.json()
 
-    def can_load(self):
+    @classmethod
+    def can_load_from(cls, ac):
+        return (isinstance(ac, URLConfig) and
+                (ac.url.startswith('https://') or
+                    ac.url.startswith('http://')))
+
+    def can_load(self, bundle_name):
         self._setup_index()
         return bundle_name in self._index
 
@@ -264,6 +337,22 @@ class HttpBundleLoader(Loader):
         import tarfile
         with tarfile.open(mode='r:xz', fileobj=f) as ba:
             ba.extractall(self.base_directory)
+
+
+class DirectoryLoader(Loader):
+    '''
+    Loads a bundle into a directory.
+
+    Created from a remote to actually get the bundle
+    '''
+    def __init__(self, base_directory=None):
+        self.base_directory = base_directory
+
+    def load(self, bundle_name):
+        '''
+        Loads a bundle into the given base directory
+        '''
+        super(DirectoryLoader, self).load(bundle_name)
 
 
 class Installer(object):
@@ -315,16 +404,24 @@ class Installer(object):
         shutil.rmtree(p(staging_directory, 'files'))
 
     def _install(self, descriptor, staging_directory):
-        contexts = _select_contexts(descriptor, self.graph)
+        graphs_directory, files_directory = self._set_up_directories(staging_directory)
+        self._write_file_hashes(descriptor, files_directory)
+        self._write_context_data(descriptor, graphs_directory)
+        self._write_manifest(descriptor, staging_directory)
+
+    def _set_up_directories(self, staging_directory):
         graphs_directory = p(staging_directory, 'graphs')
         files_directory = p(staging_directory, 'files')
+
         try:
             makedirs(graphs_directory)
             makedirs(files_directory)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+        return graphs_directory, files_directory
 
+    def _write_file_hashes(self, descriptor, files_directory):
         with open(p(files_directory, 'hashes'), 'wb') as hash_out:
             for fname in _select_files(descriptor, self.source_directory):
                 hsh = self.file_hash()
@@ -334,6 +431,23 @@ class Installer(object):
                 hash_out.write(fname.encode('UTF-8') + b'\x00' + pack('B', hsh.digest_size) + hsh.digest() + b'\n')
                 shutil.copy2(source_fname, p(files_directory, fname))
 
+    def _write_manifest(self, descriptor, staging_directory):
+        with open(p(staging_directory, 'manifest'), 'wb') as mf:
+            if self.data_ctx:
+                mf.write(DATA_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
+                        self.data_ctx.encode('UTF-8') + b'\n')
+            if self.imports_ctx:
+                mf.write(IMPORTS_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
+                         b'http://openworm.org/data/generated_imports_ctx?bundle_id=' +
+                         quote(descriptor.id).encode('UTF-8') + b'\n')
+            mf.write(b'version\x00' + pack('Q', descriptor.version) + b'\n')
+            mf.flush()
+
+    def _write_context_data(self, descriptor, graphs_directory):
+        contexts = _select_contexts(descriptor, self.graph)
+
+        # XXX: Find out what I was planning to do with these imported contexts...adding
+        # dependencies or something?
         if self.imports_ctx:
             imports_ctxg = self.graph.get_context(self.imports_ctx)
 
@@ -347,30 +461,22 @@ class Installer(object):
                 with open(temp_fname, 'rb') as ctx_fh:
                     hash_file(hsh, ctx_fh)
                 ctxidb = ctxid.encode('UTF-8')
+                # Write hash
                 hash_out.write(ctxidb + b'\x00' + pack('B', hsh.digest_size) + hsh.digest() + b'\n')
-                hash_out.flush()
                 gbname = hsh.hexdigest() + '.nt'
+                # Write index
+                index_out.write(ctxidb + b'\x00' + gbname.encode('UTF-8') + b'\n')
+
                 ctx_file_name = p(graphs_directory, gbname)
                 rename(temp_fname, ctx_file_name)
-                index_out.write(ctxidb + b'\x00' + gbname.encode('UTF-8') + b'\n')
-                index_out.flush()
 
                 if self.imports_ctx and imports_ctxg:
-                    imported_contexts |= transitive_lookup(self.imports_ctxg,
+                    imported_contexts |= transitive_lookup(imports_ctxg,
                                                            ctxid,
                                                            CONTEXT_IMPORTS,
                                                            seen=imported_contexts)
-                # Get transitive imports and include in the new imports context
-
-        with open(p(staging_directory, 'manifest'), 'wb') as mf:
-            if self.data_ctx:
-                mf.write(DATA_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                        self.data_ctx.encode('UTF-8') + b'\n')
-            if self.imports_ctx:
-                mf.write(IMPORTS_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                         b'http://openworm.org/data/generated_imports_ctx?bundle_id=' +
-                         quote(descriptor.id).encode('UTF-8') + b'\n')
-            mf.flush()
+            hash_out.flush()
+            index_out.flush()
 
 
 def hash_file(hsh, fh, blocksize=None):
