@@ -18,9 +18,7 @@ L = logging.getLogger(__name__)
 
 
 class OWMBundleRemote(object):
-    '''
-    Commands for dealing with bundle remotes
-    '''
+    ''' Commands for dealing with bundle remotes '''
 
     def __init__(self, parent):
         self._parent = parent

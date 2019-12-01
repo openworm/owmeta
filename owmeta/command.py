@@ -248,6 +248,9 @@ class OWMSource(object):
 
 
 class OWMTranslator(object):
+    '''
+    Data source translator commands
+    '''
     def __init__(self, parent):
         self._parent = parent
 
@@ -295,6 +298,9 @@ class OWMTranslator(object):
 
 
 class OWMNamespace(object):
+    '''
+    RDF namespace commands
+    '''
     def __init__(self, parent):
         self._parent = parent
 
@@ -315,6 +321,9 @@ class _ProgressMock(object):
 
 
 class OWMConfig(object):
+    '''
+    Config file commands
+    '''
     user = IVar(value_type=bool,
                 default_value=False,
                 doc='If set, configs are only for the user; otherwise, they \
@@ -429,6 +438,9 @@ POSSIBLE_EDITORS = [
 
 
 class OWMEvidence(object):
+    '''
+    Commands for evidence
+    '''
     def __init__(self, parent):
         self._parent = parent
 
@@ -506,6 +518,9 @@ class OWMEvidence(object):
 
 
 class OWMContexts(object):
+    '''
+    Commands for working with contexts
+    '''
     def __init__(self, parent):
         self._parent = parent
 
