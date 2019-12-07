@@ -28,15 +28,13 @@ def additional_args(parser):
             r" '\n' (newline)")
     parser.add_argument('--progress',
             help='Progress reporter to use. Default is \'tqdm\'',
-            choices=['tqdm', 'tqdm_notebook'])
+            choices=['tqdm', 'none'],
+            default='tqdm')
 
 
 def parse_progress(s):
     if s == 'tqdm':
         return tqdm
-    elif s == 'tqdm_notebook':
-        from tqdm import tqdm_notebook
-        return tqdm_notebook
 
 
 def die(message, status=1):
@@ -105,7 +103,6 @@ def main():
     p = OWM()
     p.log_level = 'WARN'
     p.message = print
-    p.progress_reporter = tqdm
     p.repository_provider = GitRepoProvider()
     ns_handler = NSHandler(p)
     if environ.get('OWM_CLI_PROFILE'):
