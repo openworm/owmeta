@@ -6,6 +6,7 @@ from os import makedirs, rename, scandir
 import hashlib
 import shutil
 import errno
+import io
 from rdflib.term import URIRef
 from struct import pack
 import yaml
@@ -331,16 +332,45 @@ class Loader(object):
         ''' Returns True if the given accessor_config is a valid config for this loader '''
         return False
 
-    def can_load(self, bundle_name):
+    def can_load(self, bundle_name, bundle_version=None):
         ''' Returns True if the bundle named `bundle_name` is supported '''
         return False
 
-    def load(self, bundle_name):
-        ''' Loads the bundle into the local index '''
+    def bundle_versions(self, bundle_name):
+        '''
+        List the versions available for the bundle.
+
+        This is a required part of the `Loader` interface.
+
+        Parameter
+        ---------
+        bundle_name : str
+            ID of the bundle for which versions are requested
+
+        Returns
+        -------
+            A list of int. Each entry is a version of the bundle available via this loader
+        '''
         raise NotImplementedError()
 
-    def __call__(self, bundle_name):
-        return self.load(bundle_name)
+    def load(self, bundle_name, bundle_version=None):
+        '''
+        Load the bundle into the local index
+
+        Parameters
+        ----------
+        bundle_name : str
+            ID of the bundle to load
+        bundle_version : int
+            Version of the bundle to load. Defaults to the latest available. optional
+        '''
+        raise NotImplementedError()
+
+    def __call__(self, bundle_name, bundle_version=None):
+        '''
+        Load the bundle into the local index. Short-hand for `load`
+        '''
+        return self.load(bundle_name, bundle_version)
 
 
 class HTTPBundleLoader(Loader):
@@ -386,19 +416,59 @@ class HTTPBundleLoader(Loader):
                 (ac.url.startswith('https://') or
                     ac.url.startswith('http://')))
 
-    def can_load(self, bundle_name):
+    def can_load(self, bundle_name, bundle_version=None):
         self._setup_index()
-        return bundle_name in self._index
+        binfo = self._index.get(bundle_name)
+        if binfo:
+            if bundle_version is None:
+                return True
+            if not isinstance(binfo, dict):
+                return False
+            return bundle_version in binfo
 
-    def load(self, bundle_name):
+    def bundle_versions(self, bundle_name):
+        self._setup_index()
+        binfo = self._index.get(bundle_name)
+
+        if not binfo:
+            return []
+
+        res = []
+        for k in binfo.keys():
+            try:
+                val = int(k)
+            except ValueError:
+                L.warning("Got unexpected non-version-number key '%s' in bundle index info", k)
+            else:
+                res.append(val)
+        return res
+
+    def load(self, bundle_name, bundle_version=None):
         '''
         Loads a bundle by downloading an index file
         '''
         import requests
         self._setup_index()
-        bundle_url = self._index.get(bundle_name)
-        if not bundle_url:
+        binfo = self._index.get(bundle_name)
+        if not binfo:
             raise LoadFailed(bundle_name, self, 'Bundle is not in the index')
+        if not isinstance(binfo, dict):
+            raise LoadFailed(bundle_name, self, 'Unexpected type of bundle info in the index')
+        if bundle_version is None:
+            max_vn = 0
+            for k in binfo.keys():
+                try:
+                    val = int(k)
+                except ValueError:
+                    L.warning("Got unexpected non-version-number key '%s' in bundle index info", k)
+                else:
+                    if max_vn < val:
+                        max_vn = val
+            bundle_version = max_vn
+        bundle_url = binfo.get(str(bundle_version))
+        if bundle_url is None:
+            raise LoadFailed(bundle_name, self, 'Did not find a URL for "%s" at'
+                    ' version %s', bundle_name, bundle_version)
         response = requests.get(bundle_url, stream=True)
         if self.cachedir is not None:
             bfn = urlquote(bundle_name)
@@ -408,7 +478,10 @@ class HTTPBundleLoader(Loader):
             with open(p(self.cachedir, bfn), 'r') as f:
                 self._unpack(f)
         else:
-            self._unpack(response.raw)
+            bio = io.BytesIO()
+            bio.write(response.raw.read())
+            bio.seek(0)
+            self._unpack(bio)
 
     def _unpack(self, f):
         import tarfile

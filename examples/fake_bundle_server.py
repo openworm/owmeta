@@ -1,14 +1,12 @@
+import sys
 from os.path import join as p
 from os import mkdir, listdir, chdir
-from time import sleep
 import tarfile
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import json
-from textwrap import dedent
 
-import rdflib
 import requests
 
 from owmeta import connect
@@ -140,7 +138,10 @@ def make_server():
 
 
 if __name__ == '__main__':
+    server_address_file = sys.argv[1]
     logging.basicConfig(level=logging.INFO)
     server, shutdown = start()
     wait_for_started(server.server_address)
+    with open(server_address_file, 'w') as f:
+        print('http://{}:{}'.format(*server.server_address), file=f)
     L.info('started')

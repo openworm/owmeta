@@ -10,7 +10,12 @@ from os import mkdir, listdir, unlink
 import yaml
 from ..context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from ..command_util import GenericUserError, GeneratorWithData, SubCommand
-from ..bundle import Descriptor, Installer, HTTPBundleLoader, URLConfig, Remote
+from ..bundle import (Descriptor,
+                      Installer,
+                      HTTPBundleLoader,
+                      URLConfig,
+                      Remote,
+                      bundle_directory)
 import hashlib
 
 
@@ -91,7 +96,7 @@ class OWMBundle(object):
         ]
         ''' Priority-sorted list of bundle loader classes '''
 
-    def fetch(self, bundle_name):
+    def fetch(self, bundle_name, bundle_version=None):
         '''
         Retrieve a bundle by name from a remote and put it in the local bundle index and
         cache
@@ -100,12 +105,24 @@ class OWMBundle(object):
         ----------
         bundle_name : str
             The name of the bundle to retrieve. The name may include the version number.
+        bundle_version : int
+            The version of the bundle to retrieve. optional
         '''
-        loaders = self._get_bundle_loaders(bundle_name)
+        loaders = self._get_bundle_loaders(bundle_name, bundle_version)
 
         for loader in loaders:
             try:
-                loader(bundle_name)
+                if bundle_version is None:
+                    versions = loader.bundle_versions(bundle_name)
+                    if not versions:
+                        raise BundleNotFound(bundle_name, bundle_version)
+                    bundle_version = max(versions)
+                loader.base_directory = bundle_directory(p(self._parent.userdir, 'bundles'),
+                        bundle_name, bundle_version)
+                try:
+                    loader(bundle_name, bundle_version)
+                finally:
+                    loader.base_directory = None
                 break
             except Exception:
                 L.warn("Failed to load bundle %s with %s", bundle_name, loader, exc_info=True)
@@ -160,7 +177,7 @@ class OWMBundle(object):
                        self._parent.rdf,
                        imports_ctx=imports_ctx,
                        data_ctx=data_ctx)
-        bi.install(descr)
+        return bi.install(descr)
 
     def register(self, descriptor):
         '''
@@ -303,16 +320,16 @@ class OWMBundle(object):
         remotes_dir = p(self._parent.owmdir, 'remotes')
         for r in listdir(remotes_dir):
             if r.endswith('.remote'):
-                with open(r) as inp:
+                with open(p(remotes_dir, r)) as inp:
                     try:
                         yield Remote.read(inp)
                     except Exception:
                         L.warning('Unable to read remote %s', r, exc_info=True)
 
-    def _get_bundle_loaders(self, bundle_name):
+    def _get_bundle_loaders(self, bundle_name, bundle_version):
         for rem in self._retrieve_remotes():
             for loader in rem.generate_loaders(self._loader_classes):
-                if loader.can_load(bundle_name):
+                if loader.can_load(bundle_name, bundle_version):
                     yield loader
 
 
@@ -321,6 +338,18 @@ class NoBundleLoader(GenericUserError):
     Thrown when a loader can't be found for a loader
     '''
 
-    def __init__(self, bundle_name):
+    def __init__(self, bundle_name, bundle_version=None):
         super(NoBundleLoader, self).__init__(
-            'No loader could be found for "%s"' % bundle_name)
+            'No loader could be found for "%s"%s' % (bundle_name,
+                (' at version ' + bundle_version) if bundle_version is not None else ''))
+
+
+class BundleNotFound(GenericUserError):
+    '''
+    Thrown when a bundle cannot be found with the requested name and ID
+    '''
+
+    def __init__(self, bundle_name, bundle_version=None):
+        super(BundleNotFound, self).__init__(
+            'The requested bundle could not be loaded "%s"%s' % (bundle_name,
+                (' at version ' + bundle_version) if bundle_version is not None else ''))
