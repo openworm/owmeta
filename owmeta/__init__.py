@@ -38,6 +38,7 @@ __author__ = 'Stephen Larson'
 import sys
 import os
 import logging
+import uuid
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
@@ -146,6 +147,13 @@ class Connection(object):
     def __init__(self, conf):
         self.conf = conf
 
+        self.identifier = str(uuid.uuid4())
+        '''
+        Identifier for this connection.
+
+        Primarily, so that this Connection can be passed to contextualize for a Context
+        '''
+
     def disconnect(self):
         self.conf.closeDatabase()
         ModuleRecorder.remove_listener(self.conf['mapper'])
@@ -155,6 +163,17 @@ class Connection(object):
 
     def __exit__(self, *args):
         self.disconnect()
+
+    def __call__(self, target):
+        '''
+        Contextualize the given `Context`
+        '''
+        # XXX: May be able to loosen th
+        if target is not None and issubclass(target, Context):
+            return target.contextualize(self)
+        else:
+            raise TypeError('Connections can only contextualize owmeta.context.Context'
+                    ' or subclasses thereof. Received %s' % target)
 
     def __str__(self):
         conf = self.conf
@@ -230,6 +249,10 @@ def connect(configFile=False,
     :param dataFormat: (Optional) file format of `data`. Currently n3 is supported
     """
     from .data import Data, ZODBSourceOpenFailError, DatabaseConflict
+
+    if not isinstance(configFile, str):
+        conf = configFile
+        configFile = None
 
     if conf:
         if not isinstance(conf, Data):

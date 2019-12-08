@@ -28,9 +28,9 @@ def test_get_http_url_loaders():
     Find loaders for HTTP URLs
     '''
     out = StringIO()
-    r0 = Remote('remote', loader_classes=(HTTPBundleLoader,))
+    r0 = Remote('remote')
     r0.accessor_configs.append(URLConfig('http://example.org/bundle_remote0'))
-    for l in r0.generate_loaders():
+    for l in r0.generate_loaders(loader_classes=(HTTPBundleLoader,)):
         if isinstance(l, HTTPBundleLoader):
             return
 

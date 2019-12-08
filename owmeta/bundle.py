@@ -40,10 +40,21 @@ class Remote(object):
         self.accessor_configs = list(accessor_configs)
         ''' Configs for how you access the remote. Probably just URLs '''
 
+        self._loaders = []
+
     def add_config(self, accessor_config):
         self.accessor_configs.append(accessor_config)
 
     def generate_loaders(self, loader_classes):
+        '''
+        Generate
+
+        Parameters
+        ----------
+        loader_classes : list of Loader subclasses
+            List of
+        '''
+        self._loaders = []
         for ac in self.accessor_configs:
             for lc in loader_classes:
                 if lc.can_load_from(ac):
@@ -53,15 +64,25 @@ class Remote(object):
 
     def write(self, out):
         '''
+        Serialize the `Remote` and write to `out`
+
         Parameters
         ----------
-        out : file-like object
+        out : :term:`file object`
             Target for writing the remote
         '''
         yaml.dump(self, out)
 
     @classmethod
     def read(cls, inp):
+        '''
+        Read a serialized `Remote`
+
+        Parameters
+        ----------
+        inp : :term:`file object`
+            File-like object containing the serialized `Remote`
+        '''
         res = yaml.full_load(inp)
         assert isinstance(res, cls)
         return res
@@ -105,7 +126,7 @@ class Descriptor(object):
     def __init__(self, ident):
         self.id = ident
         self.name = None
-        self.version = None
+        self.version = 1
         self.description = None
         self.patterns = set()
         self.includes = set()
@@ -274,6 +295,7 @@ class Loader(object):
 
 
 class HTTPBundleLoader(Loader):
+    # TODO: Test this class...
     '''
     Loads bundles from HTTP(S) resources listed in an index file
     '''
@@ -294,8 +316,11 @@ class HTTPBundleLoader(Loader):
 
         if isinstance(index_url, str):
             self.index_url = index_url
-        else:
+        else isinstance(index_url, URLConfig):
             self.index_url = index_url.url
+        else:
+            raise TypeError('Expecting a string or URLConfig. Received %s' %
+                    type(index_url))
 
         self.cachedir = cachedir
         self._index = None
@@ -363,6 +388,7 @@ class Installer(object):
     Installs a bundle locally
     '''
 
+    # TODO: Make source_directory optional -- not every bundle needs files
     def __init__(self, source_directory, bundles_directory, graph,
                  imports_ctx=None, data_ctx=None, installer_id=None):
         '''
@@ -373,7 +399,7 @@ class Installer(object):
         bundles_directory : str
             Directory where the bundles files go
         installer_id : str
-            Name of this installer for purposes of mutual exclusion
+            Name of this installer for purposes of mutual exclusion. optional
         '''
         self.context_hash = hashlib.sha224
         self.file_hash = hashlib.sha224
@@ -387,6 +413,15 @@ class Installer(object):
     def install(self, descriptor):
         '''
         Given a descriptor, install a bundle
+
+        Parameters
+        ----------
+        descriptor : Descriptor
+            The descriptor for the bundle
+
+        Returns
+        -------
+            The directory where the bundle is installed
         '''
         # Create the staging directory in the base directory to reduce the chance of
         # moving across file systems
@@ -395,9 +430,11 @@ class Installer(object):
             makedirs(staging_directory)
         except OSError:
             pass
+
         with lock_file(p(staging_directory, '.lock'), unique_key=self.installer_id):
             try:
                 self._install(descriptor, staging_directory)
+                return staging_directory
             except Exception:
                 self._cleanup_failed_install(staging_directory)
                 raise

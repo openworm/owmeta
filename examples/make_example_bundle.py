@@ -1,11 +1,13 @@
 from os.path import join as p
 from os import mkdir, stat
 import tarfile
+import json
 import rdflib
 from owmeta import connect
 from owmeta.dataObject import DataObject, DatatypeProperty
 from owmeta.context import Context
 from owmeta.bundle import Bundle, Descriptor, make_include_func, Installer
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 try:
     from tempfile import TemporaryDirectory, mkdtemp
@@ -49,10 +51,31 @@ def main():
             bi = Installer(srcdir, bnddir, rdf)
             install_dir = bi.install(desc)
 
+            # TODO: create a special handler for serving up the index file with the
+            # server's URLs
+
             with open(p(srvdir, 'example_bundle.tar.xz'), 'wb') as out:
                 with tarfile.open(mode='w:xz', fileobj=out) as ba:
                     ba.add(install_dir)
-            bundle_archive = p(srvdir, 'example_bundle.tar.xz')
+            run_server(srvdir)
+
+
+def run_server(basedir):
+    HC = type('Handler', (SimpleHTTPRequestHandler,), dict(directory=basedir))
+
+    done = False
+    port = 8888
+    while not done:
+        try:
+            with HTTPServer(('127.0.0.1', port), HC) as httpd:
+                print("Serving bundles on port %d" % port)
+                httpd.serve_forever()
+        except OSError as e:
+            if e.errno != 98:
+                done = True
+            port += 1
+
+    done = True
 
 
 if __name__ == '__main__':

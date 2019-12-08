@@ -105,7 +105,6 @@ UNSET = object()
 
 
 def contextualize_metaclass(context, self):
-
     class _H(type(self)):
         def __init__(self, name, bases, dct):
             super(_H, self).__init__(name, bases, dct)
