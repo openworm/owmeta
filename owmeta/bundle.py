@@ -2,7 +2,7 @@ import re
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
 from os.path import join as p, exists, relpath, expanduser
-from os import makedirs, rename
+from os import makedirs, rename, scandir
 import hashlib
 import shutil
 import errno
@@ -161,7 +161,7 @@ class Descriptor(object):
 
 
 class Bundle(object):
-    def __init__(self, ident, bundles_directory=None, conf=None):
+    def __init__(self, ident, bundles_directory=None, version=None, conf=None):
         if not ident:
             raise Exception('ident must be non-None')
         self.ident = ident
@@ -170,16 +170,50 @@ class Bundle(object):
         self.bundles_directory = bundles_directory
         if not conf:
             conf = {'rdf.source': 'sqlite'}
+        self.version = version
         self._given_conf = conf
         self.conf = None
 
-    def _get_bundle(self):
+    def _get_bundle_directory(self):
         # - look up the bundle in the index
         # - generate a config based on the current config load the config
         # - make a database from the graphs, if necessary (similar to `owm regendb`). If
         #   delete the existing database if it doesn't match the store config
-        bdir = bundle_directory(self.bundles_directory, self.ident)
-        self._make_config(bdir)
+        version = self.version
+        if version is None:
+            bundle_root = bundle_directory(self.bundles_directory, self.ident)
+            latest_version = 0
+            try:
+                ents = scandir(bundle_root)
+            except (OSError, IOError) as e:
+                if e.errno == 2: # FileNotFound
+                    raise BundleNotFound(self.ident, 'Bundle directory does not exist')
+                raise
+
+            for ent in ents:
+                if ent.is_dir():
+                    try:
+                        vn = int(ent.name)
+                    except ValueError:
+                        # We may put things other than versioned bundle directories in
+                        # this directory later, in which case this is OK
+                        pass
+                    else:
+                        if vn > latest_version:
+                            latest_version = vn
+            version = latest_version
+        if not version:
+            raise BundleNotFound(self.ident, 'No versioned bundle directories exist')
+        res = bundle_directory(self.bundles_directory, self.ident, version)
+        if not exists(res):
+            if self.version is None:
+                raise BundleNotFound(self.ident, 'Bundle directory does not exist', version)
+            else:
+                raise BundleNotFound(self.ident, 'Bundle directory does not exist for the specified version', version)
+        return res
+
+    def _get_bundle(self):
+        self._make_config(self._get_bundle_directory())
 
     def _make_config(self, bundle_directory, progress=None, trip_prog=None):
         self.conf = Data().copy(self._given_conf)
@@ -259,8 +293,23 @@ class Bundle(object):
         return None
 
 
-def bundle_directory(bundles_directory, ident):
-    return p(bundles_directory, urlquote(ident, safe=''))
+def bundle_directory(bundles_directory, ident, version=None):
+    '''
+    Get the directory for the given bundle identifier and version
+
+    Parameters
+    ----------
+    ident : str
+        Bundle identifier
+    version : int
+        Version number. If not provided, returns the directory containing all of the
+        versions
+    '''
+    base = p(bundles_directory, urlquote(ident, safe=''))
+    if version is not None:
+        return p(base, str(version))
+    else:
+        return base
 
 
 class Loader(object):
@@ -316,7 +365,7 @@ class HTTPBundleLoader(Loader):
 
         if isinstance(index_url, str):
             self.index_url = index_url
-        else isinstance(index_url, URLConfig):
+        elif isinstance(index_url, URLConfig):
             self.index_url = index_url.url
         else:
             raise TypeError('Expecting a string or URLConfig. Received %s' %
@@ -426,7 +475,8 @@ class Installer(object):
         # Create the staging directory in the base directory to reduce the chance of
         # moving across file systems
         try:
-            staging_directory = bundle_directory(self.bundles_directory, descriptor.id)
+            staging_directory = bundle_directory(self.bundles_directory, descriptor.id,
+                    descriptor.version)
             makedirs(staging_directory)
         except OSError:
             pass
@@ -663,6 +713,14 @@ def _select_contexts(descriptor, graph):
             if pat(ctx):
                 yield ctx, context
                 break
+
+
+class BundleNotFound(Exception):
+    def __init__(self, bundle_ident, msg=None, version=None):
+        msg = 'Missing bundle "{}"{}{}'.format(bundle_ident,
+                '' if version is None else ' at version ' + str(version),
+                ': ' + str(msg) if msg is not None else '')
+        super(BundleNotFound, self).__init__(msg)
 
 
 class LoadFailed(Exception):

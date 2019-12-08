@@ -28,7 +28,7 @@ def test_bundle_install_directory(dirs):
     d = Descriptor('test')
     bi = Installer(*dirs, graph=rdflib.ConjunctiveGraph())
     bi.install(d)
-    assert isdir(p(dirs.bundles_directory, 'test'))
+    assert isdir(p(dirs.bundles_directory, 'test', '1'))
 
 
 def test_context_hash_file_exists(dirs):
@@ -40,7 +40,7 @@ def test_context_hash_file_exists(dirs):
     cg.add((URIRef('a'), URIRef('b'), URIRef('c')))
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    assert isfile(p(dirs.bundles_directory, 'test', 'graphs', 'hashes'))
+    assert isfile(p(dirs.bundles_directory, 'test', '1', 'graphs', 'hashes'))
 
 
 def test_context_index_file_exists(dirs):
@@ -52,7 +52,7 @@ def test_context_index_file_exists(dirs):
     cg.add((URIRef('a'), URIRef('b'), URIRef('c')))
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    assert isfile(p(dirs.bundles_directory, 'test', 'graphs', 'index'))
+    assert isfile(p(dirs.bundles_directory, 'test', '1', 'graphs', 'index'))
 
 
 def test_context_hash_file_contains_ctxid(dirs):
@@ -65,7 +65,7 @@ def test_context_hash_file_contains_ctxid(dirs):
         cg.add((URIRef('a'), URIRef('b'), URIRef('c')))
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    with open(p(dirs.bundles_directory, 'test', 'graphs', 'hashes'), 'rb') as f:
+    with open(p(dirs.bundles_directory, 'test', '1', 'graphs', 'hashes'), 'rb') as f:
         assert f.read().startswith(ctxid.encode('UTF-8'))
 
 
@@ -79,7 +79,7 @@ def test_context_index_file_contains_ctxid(dirs):
         cg.add((URIRef('a'), URIRef('b'), URIRef('c')))
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    with open(p(dirs.bundles_directory, 'test', 'graphs', 'index'), 'rb') as f:
+    with open(p(dirs.bundles_directory, 'test', '1', 'graphs', 'index'), 'rb') as f:
         assert f.read().startswith(ctxid.encode('UTF-8'))
 
 
@@ -100,7 +100,7 @@ def test_multiple_context_hash(dirs):
 
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    with open(p(dirs.bundles_directory, 'test', 'graphs', 'hashes'), 'rb') as f:
+    with open(p(dirs.bundles_directory, 'test', '1', 'graphs', 'hashes'), 'rb') as f:
         contents = f.read()
         assert ctxid_1.encode('UTF-8') in contents
         assert ctxid_2.encode('UTF-8') in contents
@@ -123,7 +123,7 @@ def test_no_dupe(dirs):
 
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    graph_files = [x for x in listdir(p(dirs.bundles_directory, 'test', 'graphs')) if x.endswith('.nt')]
+    graph_files = [x for x in listdir(p(dirs.bundles_directory, 'test', '1', 'graphs')) if x.endswith('.nt')]
     assert len(graph_files) == 1
 
 
@@ -135,7 +135,7 @@ def test_file_copy(dirs):
     g = rdflib.ConjunctiveGraph()
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    bfiles = p(dirs.bundles_directory, 'test', 'files')
+    bfiles = p(dirs.bundles_directory, 'test', '1', 'files')
     assert set(listdir(bfiles)) == set(['hashes', 'somefile'])
 
 
@@ -147,7 +147,7 @@ def test_file_pattern_copy(dirs):
     g = rdflib.ConjunctiveGraph()
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    bfiles = p(dirs.bundles_directory, 'test', 'files')
+    bfiles = p(dirs.bundles_directory, 'test', '1', 'files')
     assert set(listdir(bfiles)) == set(['hashes', 'somefile'])
 
 
@@ -159,7 +159,7 @@ def test_file_hash(dirs):
     g = rdflib.ConjunctiveGraph()
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    assert isfile(p(dirs.bundles_directory, 'test', 'files', 'hashes'))
+    assert isfile(p(dirs.bundles_directory, 'test', '1', 'files', 'hashes'))
 
 
 def test_file_hash_content(dirs):
@@ -170,6 +170,6 @@ def test_file_hash_content(dirs):
     g = rdflib.ConjunctiveGraph()
     bi = Installer(*dirs, graph=g)
     bi.install(d)
-    with open(p(dirs.bundles_directory, 'test', 'files', 'hashes'), 'rb') as f:
+    with open(p(dirs.bundles_directory, 'test', '1', 'files', 'hashes'), 'rb') as f:
         contents = f.read()
         assert b'somefile' in contents

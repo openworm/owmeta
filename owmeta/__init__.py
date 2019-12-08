@@ -236,7 +236,7 @@ class ConnectionFailError(Exception):
             super(ConnectionFailError, self).__init__('owmeta connection failed: {}'.format(cause))
 
 
-def connect(configFile=False,
+def connect(configFile=None,
             conf=None,
             data=False,
             dataFormat='n3'):
@@ -250,7 +250,7 @@ def connect(configFile=False,
     """
     from .data import Data, ZODBSourceOpenFailError, DatabaseConflict
 
-    if not isinstance(configFile, str):
+    if configFile is not None and not isinstance(configFile, str):
         conf = configFile
         configFile = None
 

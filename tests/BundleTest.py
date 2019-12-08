@@ -1,6 +1,12 @@
 from io import StringIO
-from owmeta.bundle import Remote, URLConfig, HTTPBundleLoader
+import tempfile
+from os.path import join as p
+from os import makedirs, chmod
+
+from owmeta.bundle import Remote, URLConfig, HTTPBundleLoader, Bundle, BundleNotFound
 from owmeta.commands.bundle import OWMBundle
+
+import pytest
 
 
 def test_write_read_remote_1():
@@ -35,3 +41,84 @@ def test_get_http_url_loaders():
             return
 
     raise AssertionError('No HTTPBundleLoader was created')
+
+
+def test_latest_bundle_fetched():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        makedirs(p(bundles_directory, 'example', '1'))
+        makedirs(p(bundles_directory, 'example', '2'))
+        expected = p(bundles_directory, 'example', '3')
+        makedirs(expected)
+        b = Bundle('example', bundles_directory=bundles_directory)
+        assert expected == b._get_bundle_directory()
+
+
+def test_specified_version_fetched():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        makedirs(p(bundles_directory, 'example', '1'))
+        expected = p(bundles_directory, 'example', '2')
+        makedirs(expected)
+        makedirs(p(bundles_directory, 'example', '3'))
+        b = Bundle('example', version=2, bundles_directory=bundles_directory)
+        assert expected == b._get_bundle_directory()
+
+
+def test_no_versioned_bundles():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        makedirs(p(bundles_directory, 'example'))
+        b = Bundle('example', bundles_directory=bundles_directory)
+        with pytest.raises(BundleNotFound, match='No versioned bundle directories'):
+            b._get_bundle_directory()
+
+
+def test_specified_bundle_does_not_exist():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        makedirs(p(bundles_directory, 'example'))
+        b = Bundle('example', bundles_directory=bundles_directory, version=2)
+        with pytest.raises(BundleNotFound, match='at version 2.*specified version'):
+            b._get_bundle_directory()
+
+
+def test_specified_bundle_directory_does_not_exist():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        makedirs(bundles_directory)
+        b = Bundle('example', bundles_directory=bundles_directory)
+        with pytest.raises(BundleNotFound, match='Bundle directory'):
+            b._get_bundle_directory()
+
+
+def test_specified_bundles_root_directory_does_not_exist():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        b = Bundle('example', bundles_directory=bundles_directory)
+        with pytest.raises(BundleNotFound, match='Bundle directory'):
+            b._get_bundle_directory()
+
+
+def test_specified_bundles_root_permission_denied():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        b = Bundle('example', bundles_directory=bundles_directory)
+        makedirs(bundles_directory)
+        chmod(bundles_directory, 0)
+        try:
+            with pytest.raises(OSError, match='[Pp]ermission denied'):
+                b._get_bundle_directory()
+        finally:
+            chmod(bundles_directory, 0o777)
+
+
+def test_ignore_non_version_number():
+    with tempfile.TemporaryDirectory(prefix=__name__ + '.') as tempdir:
+        bundles_directory = p(tempdir, 'bundles')
+        b = Bundle('example', bundles_directory=bundles_directory)
+        makedirs(p(bundles_directory, 'example', 'ignore_me'))
+        expected = p(bundles_directory, 'example', '5')
+        makedirs(expected)
+        actual = b._get_bundle_directory()
+        assert actual == expected
