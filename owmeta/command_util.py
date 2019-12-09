@@ -1,3 +1,10 @@
+'''
+Utilities for making objects that work with the `CLICommandWrapper`
+'''
+
+DEFAULT_OWM_DIR = '.owm'
+
+
 class IVar(object):
     '''
     A descriptor for instance variables amended to provide some attributes like

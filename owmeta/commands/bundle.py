@@ -15,7 +15,11 @@ from ..bundle import (Descriptor,
                       HTTPBundleLoader,
                       URLConfig,
                       Remote,
-                      bundle_directory)
+                      Fetcher,
+                      bundle_directory,
+                      retrieve_remotes,
+                      LOADER_CLASSES)
+
 import hashlib
 
 
@@ -91,11 +95,6 @@ class OWMBundle(object):
         self._parent = parent
         self._loaders = []
 
-        self._loader_classes = [
-            HTTPBundleLoader
-        ]
-        ''' Priority-sorted list of bundle loader classes '''
-
     def fetch(self, bundle_name, bundle_version=None):
         '''
         Retrieve a bundle by name from a remote and put it in the local bundle index and
@@ -108,26 +107,8 @@ class OWMBundle(object):
         bundle_version : int
             The version of the bundle to retrieve. optional
         '''
-        loaders = self._get_bundle_loaders(bundle_name, bundle_version)
-
-        for loader in loaders:
-            try:
-                if bundle_version is None:
-                    versions = loader.bundle_versions(bundle_name)
-                    if not versions:
-                        raise BundleNotFound(bundle_name, bundle_version)
-                    bundle_version = max(versions)
-                loader.base_directory = bundle_directory(p(self._parent.userdir, 'bundles'),
-                        bundle_name, bundle_version)
-                try:
-                    loader(bundle_name, bundle_version)
-                finally:
-                    loader.base_directory = None
-                break
-            except Exception:
-                L.warn("Failed to load bundle %s with %s", bundle_name, loader, exc_info=True)
-        else: # no break
-            raise NoBundleLoader(bundle_name)
+        f = Fetcher(p(self._parent.userdir, 'bundles'), self._retrieve_remotes())
+        f.fetch(bundle_name, bundle_version)
 
     def load(self, input_file_name):
         '''
@@ -317,20 +298,7 @@ class OWMBundle(object):
                 header=("Name", "Description", "Error"))
 
     def _retrieve_remotes(self):
-        remotes_dir = p(self._parent.owmdir, 'remotes')
-        for r in listdir(remotes_dir):
-            if r.endswith('.remote'):
-                with open(p(remotes_dir, r)) as inp:
-                    try:
-                        yield Remote.read(inp)
-                    except Exception:
-                        L.warning('Unable to read remote %s', r, exc_info=True)
-
-    def _get_bundle_loaders(self, bundle_name, bundle_version):
-        for rem in self._retrieve_remotes():
-            for loader in rem.generate_loaders(self._loader_classes):
-                if loader.can_load(bundle_name, bundle_version):
-                    yield loader
+        return retrieve_remotes(self._parent.owmdir)
 
 
 class NoBundleLoader(GenericUserError):

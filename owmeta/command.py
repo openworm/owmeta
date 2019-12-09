@@ -38,7 +38,8 @@ try:
 except ImportError:
     from backports.tempfile import TemporaryDirectory
 
-from .command_util import IVar, SubCommand, GeneratorWithData, GenericUserError
+from .command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
+                           DEFAULT_OWM_DIR)
 from .commands.bundle import OWMBundle
 from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide
@@ -51,7 +52,6 @@ from .graph_serialization import write_canonical_to_file, gen_ctx_fname
 L = logging.getLogger(__name__)
 
 DEFAULT_SAVE_CALLABLE_NAME = 'owm_data'
-DEFAULT_OWM_DIR = '.owm'
 
 
 class OWMSourceData(object):

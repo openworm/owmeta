@@ -2,7 +2,8 @@ import re
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
 from os.path import join as p, exists, relpath, expanduser
-from os import makedirs, rename, scandir
+from os import makedirs, rename, scandir, listdir
+import logging
 import hashlib
 import shutil
 import errno
@@ -10,6 +11,7 @@ import io
 from rdflib.term import URIRef
 from struct import pack
 import yaml
+from .command_util import DEFAULT_OWM_DIR
 from .context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .context_common import CONTEXT_IMPORTS
 from .data import Data
@@ -21,6 +23,8 @@ try:
     from urllib.parse import quote as urlquote
 except ImportError:
     from urllib import quote as urlquote
+
+L = logging.getLogger(__name__)
 
 
 class Remote(object):
@@ -46,18 +50,13 @@ class Remote(object):
     def add_config(self, accessor_config):
         self.accessor_configs.append(accessor_config)
 
-    def generate_loaders(self, loader_classes):
+    def generate_loaders(self):
         '''
         Generate
-
-        Parameters
-        ----------
-        loader_classes : list of Loader subclasses
-            List of
         '''
         self._loaders = []
         for ac in self.accessor_configs:
-            for lc in loader_classes:
+            for lc in LOADER_CLASSES:
                 if lc.can_load_from(ac):
                     loader = lc(ac)
                     self._loaders.append(loader)
@@ -175,6 +174,10 @@ class Bundle(object):
         self._given_conf = conf
         self.conf = None
 
+    @property
+    def identifier(self):
+        return self.ident
+
     def _get_bundle_directory(self):
         # - look up the bundle in the index
         # - generate a config based on the current config load the config
@@ -214,7 +217,18 @@ class Bundle(object):
         return res
 
     def _get_bundle(self):
-        self._make_config(self._get_bundle_directory())
+        try:
+            bundle_directory = self._get_bundle_directory()
+        except BundleNotFound:
+            # If there's a .owm directory, then get the remotes from there
+            if exists(DEFAULT_OWM_DIR):
+                # TODO: Make this search upwards in case the directory exists at a parent
+                f = Fetcher(self.bundles_directory, retrieve_remotes(DEFAULT_OWM_DIR))
+                bundle_directory = f(self.ident, self.version)
+            else:
+                raise
+
+        self._make_config(bundle_directory)
 
     def _make_config(self, bundle_directory, progress=None, trip_prog=None):
         self.conf = Data().copy(self._given_conf)
@@ -290,7 +304,7 @@ class Bundle(object):
 
     def __call__(self, target):
         if target and hasattr(target, 'contextualize'):
-            return target.contextualie(self)
+            return target.contextualize(self)
         return None
 
 
@@ -311,6 +325,75 @@ def bundle_directory(bundles_directory, ident, version=None):
         return p(base, str(version))
     else:
         return base
+
+
+class Fetcher(object):
+    ''' Fetches bundles '''
+
+    def __init__(self, bundles_root, remotes):
+        self.bundles_root = bundles_root
+        self.remotes = remotes
+
+    def __call__(self, *args, **kwargs):
+        return self.fetch(*args, **kwargs)
+
+    def fetch(self, bundle_name, bundle_version=None):
+        '''
+        Retrieve a bundle by name from a remote and put it in the local bundle index and
+        cache
+
+        Parameters
+        ----------
+        bundle_name : str
+            The name of the bundle to retrieve. The name may include the version number.
+        bundle_version : int
+            The version of the bundle to retrieve. optional
+        '''
+        loaders = self._get_bundle_loaders(bundle_name, bundle_version)
+
+        for loader in loaders:
+            try:
+                if bundle_version is None:
+                    versions = loader.bundle_versions(bundle_name)
+                    if not versions:
+                        raise BundleNotFound(bundle_name, 'This loader does not have any'
+                                ' versions of the bundle')
+                    bundle_version = max(versions)
+                bdir = bundle_directory(self.bundles_root, bundle_name, bundle_version)
+                loader.base_directory = bdir
+                loader(bundle_name, bundle_version)
+                return bdir
+            except Exception:
+                L.warn("Failed to load bundle %s with %s", bundle_name, loader, exc_info=True)
+        else: # no break
+            raise NoBundleLoader(bundle_name, bundle_version)
+
+    def _get_bundle_loaders(self, bundle_name, bundle_version):
+        for rem in self.remotes:
+            for loader in rem.generate_loaders():
+                if loader.can_load(bundle_name, bundle_version):
+                    yield loader
+
+
+def retrieve_remotes(owmdir):
+    '''
+    Retrieve remotes from a owmeta project directory
+
+    Parameters
+    ----------
+    owmdir : str
+        path to the project directory
+    '''
+    remotes_dir = p(owmdir, 'remotes')
+    if not exists(remotes_dir):
+        return
+    for r in listdir(remotes_dir):
+        if r.endswith('.remote'):
+            with open(p(remotes_dir, r)) as inp:
+                try:
+                    yield Remote.read(inp)
+                except Exception:
+                    L.warning('Unable to read remote %s', r, exc_info=True)
 
 
 class Loader(object):
@@ -788,6 +871,11 @@ def _select_contexts(descriptor, graph):
                 break
 
 
+LOADER_CLASSES = [
+    HTTPBundleLoader
+]
+
+
 class BundleNotFound(Exception):
     def __init__(self, bundle_ident, msg=None, version=None):
         msg = 'Missing bundle "{}"{}{}'.format(bundle_ident,
@@ -802,3 +890,19 @@ class LoadFailed(Exception):
         mmsg = 'Failed to load {} bundle with loader {}{}'.format(
                 bundle, loader, ': ' + msg if msg else '')
         super(LoadFailed, self).__init__(mmsg, *args[1:])
+
+
+class FetchFailed(Exception):
+    ''' Generic message for when a fetch fails '''
+    pass
+
+
+class NoBundleLoader(FetchFailed):
+    '''
+    Thrown when a loader can't be found for a loader
+    '''
+
+    def __init__(self, bundle_name, bundle_version=None):
+        super(NoBundleLoader, self).__init__(
+            'No loader could be found for "%s"%s' % (bundle_name,
+                (' at version ' + bundle_version) if bundle_version is not None else ''))

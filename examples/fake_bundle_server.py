@@ -23,6 +23,7 @@ L = logging.getLogger(__name__)
 
 
 class A(DataObject):
+    class_context = 'https://example.org/types'
     redness = DatatypeProperty()
     blueness = DatatypeProperty()
 
@@ -69,32 +70,46 @@ def setUp(base):
         a = ctx0(A)(ident='http://example.org/A')
         a.redness(24)
         a.blueness(24)
+        ctx0.add_import(A.class_context)
 
         ctx0.save()
 
-        desc = Descriptor('example/aBundle')
+        bm = BundleMaker(conn, base)
+        bm.make_bundle('example/aBundle', 'example_bundle', 23)
+        bm.make_bundle('example/bundle.01', 'example_bundle_01', 1)
+
+        return make_server(), bm.srvdir
+
+
+class BundleMaker(object):
+    def __init__(self, conn, base):
+        self.srvdir = p(base, 'server_directory')
+        mkdir(self.srvdir)
+
+        self.srcdir = p(base, 'install_dir')
+        mkdir(self.srcdir)
+
+        self.bnddir = p(base, 'bundles_dir')
+        mkdir(self.bnddir)
+
+        self.conn = conn
+
+    def make_bundle(self, ident, fname, version):
+        desc = Descriptor(ident)
         desc.name = 'A Bundle'
-        desc.version = 23
+        desc.version = version
         desc.description = 'An example bundle'
-        desc.includes = set([make_include_func('https://example.org/bundles#example')])
+        desc.includes = set([make_include_func('https://example.org/bundles#example'),
+                             make_include_func('https://example.org/imports'),
+                             make_include_func('https://example.org/types')])
 
-        rdf = conn.conf['rdf.graph']
-        srcdir = p(base, 'install_dir')
-        mkdir(srcdir)
-
-        bnddir = p(base, 'bundles_dir')
-        mkdir(bnddir)
-
-        srvdir = p(base, 'server_directory')
-        mkdir(srvdir)
-
-        bi = Installer(srcdir, bnddir, rdf)
+        rdf = self.conn.conf['rdf.graph']
+        bi = Installer(self.srcdir, self.bnddir, rdf)
         install_dir = bi.install(desc)
 
-        with tarfile.open(p(srvdir, 'example_bundle.tar.xz'), mode='w:xz') as ba:
+        with tarfile.open(p(self.srvdir, fname + '.tar.xz'), mode='w:xz') as ba:
             # arcname='.' removes the leading part of the path to the install directory
             ba.add(install_dir, arcname='.')
-        return make_server(), srvdir
 
 
 def make_server():
@@ -108,6 +123,9 @@ def make_server():
                 body = json.dumps({
                     'example/aBundle': {
                         23: base_uri + '/example_bundle.tar.xz'
+                    },
+                    'example/bundle.01': {
+                        1: base_uri + '/example_bundle_01.tar.xz'
                     }
                 })
                 # cannot write directly to wfile with json.dump because it only outputs
@@ -118,14 +136,6 @@ def make_server():
 
         def _get_base_uri(self):
             return 'http://{}:{}'.format(*self.server.server_address)
-
-        def do_POST(self):
-            if self.path.endswith('SHUTDOWN'):
-                self.send_response(200)
-                self.end_headers()
-                self.wfile.write(b'\n\n')
-            else:
-                super(_Handler, self).do_POST()
 
     port = 8000
     while True:
