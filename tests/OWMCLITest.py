@@ -16,7 +16,7 @@ from pytest import mark, fixture
 from owmeta.data_trans.local_file_ds import LocalFileDataSource as LFDS
 from owmeta.datasource import DataTranslator
 from owmeta.command import OWM
-from owmeta.context import Context, IMPORTS_CONTEXT_KEY, DATA_CONTEXT_KEY
+from owmeta.context import Context, IMPORTS_CONTEXT_KEY, DEFAULT_CONTEXT_KEY
 from owmeta.context_common import CONTEXT_IMPORTS
 
 from .TestUtilities import assertRegexpMatches
@@ -229,10 +229,10 @@ def test_save_imports(self):
     with OWM(owmdir=p(self.testdir, '.owm')).connect() as conn:
         ctx = Context(ident=conn.conf[IMPORTS_CONTEXT_KEY], conf=conn.conf)
         trips = set(ctx.stored.rdf_graph().triples((None, None, None)))
-        assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
+        assert (URIRef(conn.conf[DEFAULT_CONTEXT_KEY]),
                 CONTEXT_IMPORTS,
                 URIRef('http://example.org/primate/monkey')) in trips
-        assert (URIRef(conn.conf[DATA_CONTEXT_KEY]),
+        assert (URIRef(conn.conf[DEFAULT_CONTEXT_KEY]),
                 CONTEXT_IMPORTS,
                 URIRef('http://example.org/ungulate/giraffe')) in trips
 
@@ -257,7 +257,7 @@ def test_translator_list(self):
             # Create a translator
             dt = ctx(DT1)()
 
-            ctx_id = conn.conf['data_context_id']
+            ctx_id = conn.conf[DEFAULT_CONTEXT_KEY]
             main_ctx = Context(ident=ctx_id, conf=conn.conf)
             main_ctx.add_import(ctx)
             main_ctx.save_imports()
@@ -295,7 +295,7 @@ def test_translate_data_source_loader(self):
             ctx.mapper.process_class(DT2)
             dt = ctx(DT2)()
             # Create a translator
-            ctx_id = conn.conf['data_context_id']
+            ctx_id = conn.conf[DEFAULT_CONTEXT_KEY]
             DT2.definition_context.save(conn.conf['rdf.graph'])
             main_ctx = Context(ident=ctx_id, conf=conn.conf)
             main_ctx.add_import(ctx)

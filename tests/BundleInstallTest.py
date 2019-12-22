@@ -7,10 +7,7 @@ import rdflib
 import transaction
 from collections import namedtuple
 from rdflib.term import Literal, URIRef
-from owmeta.bundle import (Installer,
-                           Descriptor,
-                           make_include_func,
-                           FilesDescriptor,
+from owmeta.bundle import (Installer, Descriptor, make_include_func, FilesDescriptor,
                            MissingImports)
 from owmeta.context_common import CONTEXT_IMPORTS
 from os.path import join as p, isdir, isfile
@@ -194,6 +191,36 @@ def test_imports_are_included(dirs):
     d = Descriptor('test')
     d.includes.add(make_include_func(ctxid_1))
     d.includes.add(make_include_func(imports_ctxid))
+
+    # Add some triples so the contexts aren't empty -- we can't save an empty context
+    g = rdflib.ConjunctiveGraph()
+    cg_1 = g.get_context(ctxid_1)
+    cg_2 = g.get_context(ctxid_2)
+    cg_imp = g.get_context(imports_ctxid)
+    with transaction.manager:
+        cg_1.add((URIRef('a'), URIRef('b'), URIRef('c')))
+        cg_2.add((URIRef('d'), URIRef('e'), URIRef('f')))
+        cg_imp.add((URIRef(ctxid_1), CONTEXT_IMPORTS, URIRef(ctxid_2)))
+
+    bi = Installer(*dirs, imports_ctx=imports_ctxid, graph=g)
+    with pytest.raises(MissingImports):
+        bi.install(d)
+
+
+def test_imports_in_dependencies(dirs):
+    '''
+    If we have imports and a dependency includes the context, then we shouldn't have an
+    error
+    '''
+    imports_ctxid = 'http://example.org/imports'
+    ctxid_1 = 'http://example.org/ctx1'
+    ctxid_2 = 'http://example.org/ctx2'
+
+    # Make a descriptor that includes ctx1 and the imports, but not ctx2
+    d = Descriptor('test')
+    d.includes.add(make_include_func(ctxid_1))
+    d.includes.add(make_include_func(imports_ctxid))
+    d.dependencies.add(DependencyDescriptor('example'))
 
     # Add some triples so the contexts aren't empty -- we can't save an empty context
     g = rdflib.ConjunctiveGraph()

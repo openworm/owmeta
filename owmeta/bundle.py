@@ -1,4 +1,5 @@
 import re
+from collections import namedtuple
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
 from os.path import join as p, exists, relpath, expanduser
@@ -11,8 +12,9 @@ import io
 from rdflib.term import URIRef
 from struct import pack
 import yaml
+import six
 from .command_util import DEFAULT_OWM_DIR
-from .context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from .context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .context_common import CONTEXT_IMPORTS
 from .data import Data
 from .file_match import match_files
@@ -92,6 +94,28 @@ class Remote(object):
                 self.accessor_configs == other.accessor_configs)
 
 
+class DependencyDescriptor(object):
+    __slots__ = ('id', 'version')
+
+    def __new__(cls, id, version=None):
+        res = super(DependencyDescriptor, cls).__new__(cls)
+        res.id = id
+        res.version = version
+        return res
+
+    def __eq__(self, other):
+        return self.id == other.id and self.version == other.version
+
+    def __hash__(self):
+        return hash((self.id, self.version))
+
+    def __repr__(self):
+        return '{}({}{})'.format(
+                FCN(type(self)),
+                repr(self.id),
+                (', ' + repr(self.version)) if self.version is not None else '')
+
+
 class AccessorConfig(object):
     '''
     Configuration for accessing a remote. Loaders are added to a remote according to which
@@ -130,6 +154,7 @@ class Descriptor(object):
         self.description = None
         self.patterns = set()
         self.includes = set()
+        self.dependencies = set()
         self.files = None
 
     @classmethod
@@ -143,6 +168,16 @@ class Descriptor(object):
         res.description = obj.get('description', None)
         res.patterns = set(make_pattern(x) for x in obj.get('patterns', ()))
         res.includes = set(make_include_func(x) for x in obj.get('includes', ()))
+
+        deps = set()
+        for x in obj.get('dependencies', ()):
+            if isinstance(x, six.string_types):
+                deps.add(DependencyDescriptor(x))
+            elif isinstance(x, dict):
+                deps.add(DependencyDescriptor(**x))
+            else:
+                deps.add(DependencyDescriptor(*x))
+        res.dependencies = deps
         res.files = FilesDescriptor.make(obj.get('files', None))
         return res
 
@@ -150,14 +185,15 @@ class Descriptor(object):
         return (FCN(type(self)) + '(ident={},'
                 'name={},version={},description={},'
                 'patterns={},includes={},'
-                'files={})').format(
+                'files={},dependencies={})').format(
                         repr(self.id),
                         repr(self.name),
                         repr(self.version),
                         repr(self.description),
                         repr(self.patterns),
                         repr(self.includes),
-                        repr(self.files))
+                        repr(self.files),
+                        repr(self.dependencies))
 
 
 class Bundle(object):
@@ -236,11 +272,9 @@ class Bundle(object):
         self.conf[IMPORTS_CONTEXT_KEY] = (
                 'http://openworm.org/data/generated_imports_ctx?bundle_id=' + urlquote(self.ident))
         with open(p(bundle_directory, 'manifest')) as mf:
-            data_ctx = None
-            imports_ctx = None
             for ln in mf:
-                if ln.startswith(DATA_CONTEXT_KEY):
-                    self.conf[DATA_CONTEXT_KEY] = ln[len(DATA_CONTEXT_KEY) + 1:]
+                if ln.startswith(DEFAULT_CONTEXT_KEY):
+                    self.conf[DEFAULT_CONTEXT_KEY] = ln[len(DEFAULT_CONTEXT_KEY) + 1:]
                 if ln.startswith(IMPORTS_CONTEXT_KEY):
                     self.conf[IMPORTS_CONTEXT_KEY] = ln[len(IMPORTS_CONTEXT_KEY) + 1:]
         # Create the database file and initialize some needed data structures
@@ -595,7 +629,7 @@ class Installer(object):
 
     # TODO: Make source_directory optional -- not every bundle needs files
     def __init__(self, source_directory, bundles_directory, graph,
-                 imports_ctx=None, data_ctx=None, installer_id=None):
+                 imports_ctx=None, default_ctx=None, installer_id=None):
         '''
         Parameters
         ----------
@@ -607,9 +641,12 @@ class Installer(object):
             Name of this installer for purposes of mutual exclusion. optional
         graph : rdflib.graph.ConjunctiveGraph
             The graph from which we source contexts for this bundle
+        default_ctx : str
+            The ID of the default context -- the target of a query when not otherwise
+            specified. optional
         imports_ctx : str
             The ID of the imports context this installer should use. Imports relationships
-            are selected from this graph according to the included contexts
+            are selected from this graph according to the included contexts. optional
         '''
         self.context_hash = hashlib.sha224
         self.file_hash = hashlib.sha224
@@ -618,7 +655,7 @@ class Installer(object):
         self.graph = graph
         self.installer_id = installer_id
         self.imports_ctx = imports_ctx
-        self.data_ctx = data_ctx
+        self.default_ctx = default_ctx
 
     def install(self, descriptor):
         '''
@@ -684,9 +721,9 @@ class Installer(object):
 
     def _write_manifest(self, descriptor, staging_directory):
         with open(p(staging_directory, 'manifest'), 'wb') as mf:
-            if self.data_ctx:
-                mf.write(DATA_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                        self.data_ctx.encode('UTF-8') + b'\n')
+            if self.default_ctx:
+                mf.write(DEFAULT_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
+                        self.default_ctx.encode('UTF-8') + b'\n')
             if self.imports_ctx:
                 # If an imports context was specified, then we'll need to generate an
                 # imports context with the appropriate imports. We don't use the source
@@ -742,6 +779,9 @@ class Installer(object):
             index_out.flush()
 
     def _cover_with_dependencies(self, contexts):
+        # TODO: Check for contexts being included in dependencies
+        # XXX: Will also need to check for the contexts having a given ID being consistent
+        # with each other across dependencies
         return contexts
 
 

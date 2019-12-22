@@ -8,7 +8,7 @@ import hashlib
 from os.path import join as p, abspath, relpath, isdir
 from os import mkdir, listdir, unlink
 import yaml
-from ..context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from ..context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from ..command_util import GenericUserError, GeneratorWithData, SubCommand
 from ..bundle import (Descriptor,
                       Installer,
@@ -152,12 +152,12 @@ class OWMBundle(object):
         if not descr:
             raise GenericUserError('Could not find bundle with name {}'.format(bundle_name))
         imports_ctx = self._parent._conf(IMPORTS_CONTEXT_KEY, None)
-        data_ctx = self._parent._conf(DATA_CONTEXT_KEY, None)
+        default_ctx = self._parent._conf(DEFAULT_CONTEXT_KEY, None)
         bi = Installer(self._parent.basedir,
                        p(self._parent.userdir, 'bundles'),
                        self._parent.rdf,
                        imports_ctx=imports_ctx,
-                       data_ctx=data_ctx)
+                       default_ctx=default_ctx)
         return bi.install(descr)
 
     def register(self, descriptor):

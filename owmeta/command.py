@@ -41,7 +41,7 @@ except ImportError:
 from .command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
                            DEFAULT_OWM_DIR)
 from .commands.bundle import OWMBundle
-from .context import Context, DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from .context import Context, DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide
 from .capabilities import FilePathProvider
 from .data import ContextChangedEvent
@@ -92,7 +92,7 @@ class OWMSourceData(object):
             archive_type = 'tar'
 
         try:
-            sources = self._owm_command._data_ctx.stored(DataSource)(ident=sid).load()
+            sources = self._owm_command._default_ctx.stored(DataSource)(ident=sid).load()
             for data_source in sources:
                 dd = self._owm_command._dsd[data_source]
         except KeyError:
@@ -153,7 +153,7 @@ class OWMSource(object):
         if context is not None:
             ctx = self._make_ctx(context)
         else:
-            ctx = self._parent._data_ctx
+            ctx = self._parent._default_ctx
         if kind is None:
             kind = DataSource.rdf_type
         kind_uri = self._parent._den3(kind)
@@ -191,7 +191,7 @@ class OWMSource(object):
         '''
         from owmeta.datasource import DataSource
         uri = self._parent._den3(data_source)
-        ctx = self._parent._data_ctx.stored
+        ctx = self._parent._default_ctx.stored
         source = ctx(DataSource)(ident=uri)
         return self._derivs(ctx, source)
 
@@ -216,7 +216,7 @@ class OWMSource(object):
 
         for ds in data_source:
             uri = self._parent._den3(ds)
-            for x in self._parent._data_ctx.stored(DataSource)(ident=uri).load():
+            for x in self._parent._default_ctx.stored(DataSource)(ident=uri).load():
                 self._parent.message(x.format_str(stored=True))
 
     def list_kinds(self, full=False):
@@ -233,7 +233,7 @@ class OWMSource(object):
         from yarom.graphObject import ZeroOrMoreTQLayer
         from .rdf_query_util import zomifier
         conf = self._parent._conf()
-        ctx = self._parent._data_ctx
+        ctx = self._parent._default_ctx
         rdfto = ctx.stored(DataSource.rdf_type_object)
         sc = ctx.stored(TypeDataObject)()
         sc.attach_property(RDFSSubClassOfProperty)
@@ -270,7 +270,7 @@ class OWMTranslator(object):
         if context is not None:
             ctx = self._make_ctx(context)
         else:
-            ctx = self._parent._data_ctx
+            ctx = self._parent._default_ctx
         dt = ctx.stored(DataTranslator)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
         for x in dt.load():
@@ -291,7 +291,7 @@ class OWMTranslator(object):
         from owmeta.datasource import DataTranslator
         conf = self._parent._conf()
         uri = self._parent._den3(translator)
-        dt = self._parent._data_ctx.stored(DataTranslator)(ident=uri, conf=conf)
+        dt = self._parent._default_ctx.stored(DataTranslator)(ident=uri, conf=conf)
         for x in dt.load():
             self._parent.message(x)
             return
@@ -459,7 +459,7 @@ class OWMEvidence(object):
         from owmeta.evidence import Evidence
         from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
         from owmeta.contextDataObject import ContextDataObject
-        ctx = self._parent._data_ctx.stored
+        ctx = self._parent._default_ctx.stored
         identifier = self._parent._den3(identifier)
         rdf_type = self._parent._den3(rdf_type)
         if rdf_type:
@@ -563,8 +563,8 @@ class OWMContexts(object):
 
         from subprocess import call
         if context is None:
-            ctx = self._parent._data_ctx
-            ctxid = self._parent._conf()[DATA_CONTEXT_KEY]
+            ctx = self._parent._default_ctx
+            ctxid = self._parent._conf()[DEFAULT_CONTEXT_KEY]
         else:
             ctx = Context(ident=context, conf=self._parent._conf())
             ctxid = context
@@ -747,7 +747,7 @@ class OWM(object):
                 provider = DEFAULT_SAVE_CALLABLE_NAME
 
             if not context:
-                ctx = _OWMSaveContext(self._data_ctx, m)
+                ctx = _OWMSaveContext(self._default_ctx, m)
             else:
                 ctx = _OWMSaveContext(Context(ident=context, conf=conf), m)
             attr_chain = provider.split('.')
@@ -801,7 +801,7 @@ class OWM(object):
         '''
         from owmeta.dataObject import DataObject
         import transaction
-        dctx = self._data_ctx
+        dctx = self._default_ctx
         query = dctx.stored(DataObject)(ident=self._den3(subject))
         with transaction.manager:
             for ob in query.load():
@@ -822,9 +822,9 @@ class OWM(object):
         if context is not None:
             config = self.config
             config.user = user
-            config.set(DATA_CONTEXT_KEY, context)
+            config.set(DEFAULT_CONTEXT_KEY, context)
         else:
-            return self._conf().get(DATA_CONTEXT_KEY)
+            return self._conf().get(DEFAULT_CONTEXT_KEY)
 
     def imports_context(self, context=None, user=False):
         '''
@@ -1232,12 +1232,12 @@ class OWM(object):
 
     def _lookup_translator(self, tname):
         from owmeta.datasource import DataTranslator
-        for x in self._data_ctx.stored(DataTranslator)(ident=tname).load():
+        for x in self._default_ctx.stored(DataTranslator)(ident=tname).load():
             return x
 
     def _lookup_source(self, sname):
         from owmeta.datasource import DataSource
-        for x in self._data_ctx.stored(DataSource)(ident=self._den3(sname)).load():
+        for x in self._default_ctx.stored(DataSource)(ident=self._den3(sname)).load():
             provide(x, self._cap_provs)
             return x
 
@@ -1246,12 +1246,12 @@ class OWM(object):
         return [DataSourceDirectoryProvider(self._dsd)]
 
     @property
-    def _data_ctx(self):
+    def _default_ctx(self):
         conf = self._conf()
         try:
-            return Context(ident=conf[DATA_CONTEXT_KEY], conf=conf)
+            return Context(ident=conf[DEFAULT_CONTEXT_KEY], conf=conf)
         except KeyError:
-            raise ConfigMissingException(DATA_CONTEXT_KEY)
+            raise ConfigMissingException(DEFAULT_CONTEXT_KEY)
 
     def _make_ctx(self, ctxid):
         return Context(ident=ctxid, conf=self._conf())
@@ -1292,7 +1292,7 @@ class OWM(object):
             destination = BytesIO()
 
         if context is None:
-            ctx = self._data_ctx
+            ctx = self._default_ctx
         else:
             ctx = Context(ident=self._den3(context), conf=self._conf())
 

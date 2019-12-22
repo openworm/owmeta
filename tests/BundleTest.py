@@ -3,7 +3,8 @@ import tempfile
 from os.path import join as p
 from os import makedirs, chmod
 
-from owmeta.bundle import Remote, URLConfig, HTTPBundleLoader, Bundle, BundleNotFound
+from owmeta.bundle import (Remote, URLConfig, HTTPBundleLoader, Bundle, BundleNotFound,
+                           Descriptor, DependencyDescriptor)
 from owmeta.commands.bundle import OWMBundle
 
 import pytest
@@ -36,7 +37,7 @@ def test_get_http_url_loaders():
     out = StringIO()
     r0 = Remote('remote')
     r0.accessor_configs.append(URLConfig('http://example.org/bundle_remote0'))
-    for l in r0.generate_loaders(loader_classes=(HTTPBundleLoader,)):
+    for l in r0.generate_loaders():
         if isinstance(l, HTTPBundleLoader):
             return
 
@@ -122,3 +123,19 @@ def test_ignore_non_version_number():
         makedirs(expected)
         actual = b._get_bundle_directory()
         assert actual == expected
+
+
+def test_descriptor_dependency():
+    d = Descriptor.make({
+        'id': 'testBundle',
+        'dependencies': [
+            'dep1',
+            {'id': 'dep2', 'version': 2},
+            ('dep3', 4),
+            ('dep4',)
+        ]
+    })
+    assert DependencyDescriptor('dep1') in d.dependencies
+    assert DependencyDescriptor('dep2', 2) in d.dependencies
+    assert DependencyDescriptor('dep3', 4) in d.dependencies
+    assert DependencyDescriptor('dep4') in d.dependencies

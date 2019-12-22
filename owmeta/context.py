@@ -23,7 +23,7 @@ import six
 
 L = logging.getLogger(__name__)
 
-DATA_CONTEXT_KEY = 'data_context_id'
+DEFAULT_CONTEXT_KEY = 'default_context_id'
 IMPORTS_CONTEXT_KEY = 'imports_context_id'
 
 

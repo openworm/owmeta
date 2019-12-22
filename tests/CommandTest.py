@@ -18,7 +18,7 @@ from owmeta.git_repo import GitRepoProvider, _CloneProgress
 from owmeta.command import (OWM, UnreadableGraphException, GenericUserError, StatementValidationError,
                             OWMConfig, OWMSource, OWMTranslator, OWMEvidence,
                             DEFAULT_SAVE_CALLABLE_NAME, OWMDirDataSourceDirLoader, _DSD)
-from owmeta.context import DATA_CONTEXT_KEY, IMPORTS_CONTEXT_KEY, Context
+from owmeta.context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY, Context
 from owmeta.context_common import CONTEXT_IMPORTS
 from owmeta.bittorrent import BitTorrentDataSourceDirLoader
 from owmeta.command_util import IVar, PropertyIVar
@@ -165,7 +165,7 @@ class OWMTest(BaseTest):
         c = 'http://example.org/context'
         self._init_conf()
         self.cut.context(c)
-        self.assertEqual(self.cut.config.get(DATA_CONTEXT_KEY), c)
+        self.assertEqual(self.cut.config.get(DEFAULT_CONTEXT_KEY), c)
 
     def test_config_HERE_relative(self):
         '''
@@ -236,9 +236,9 @@ class OWMTest(BaseTest):
             self.cut.save('tests.command_test_module', context='http://example.org/context')
             getattr(im(ANY), DEFAULT_SAVE_CALLABLE_NAME).assert_called()
 
-    def test_save_data_context(self):
+    def test_save_default_context(self):
         a = 'http://example.org/mdc'
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
             with patch('owmeta.command.Context') as ctxc:
                 self.cut.save('tests.command_test_module')
@@ -251,7 +251,7 @@ class OWMTest(BaseTest):
         # expect exception
         with self.assertRaises(StatementValidationError):
             a = 'http://example.org/mdc'
-            self._init_conf({DATA_CONTEXT_KEY: a})
+            self._init_conf({DEFAULT_CONTEXT_KEY: a})
             with patch('importlib.import_module') as im:
                 def f(ns):
                     stmt = MagicMock()
@@ -265,7 +265,7 @@ class OWMTest(BaseTest):
         # doesn't fail
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ns):
                 stmt = Mock()
@@ -281,7 +281,7 @@ class OWMTest(BaseTest):
     def test_save_validates_object_context_import_before_success(self):
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ns):
                 ctx = ns.context
@@ -302,7 +302,7 @@ class OWMTest(BaseTest):
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
         k = URIRef('http://example.org/new_ctx')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ns):
                 ctx = ns.context
@@ -328,7 +328,7 @@ class OWMTest(BaseTest):
         # these features
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ns):
                 ctx = ns.context
@@ -349,17 +349,17 @@ class OWMTest(BaseTest):
         a = 'http://example.org/mdc'
         s = URIRef('http://example.org/node')
         k = URIRef('http://example.org/unknown_ctx')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             with patch('owmeta.command.Context') as ctxc:
 
-                data_context = Mock()
-                data_context.identifier = URIRef(a)
+                default_context = Mock()
+                default_context.identifier = URIRef(a)
 
                 ctxk = Mock()
                 ctxk.identifier = k
 
-                ctxc.side_effect = [data_context, ctxk]
+                ctxc.side_effect = [default_context, ctxk]
 
                 def f(ns):
                     ctx = ns.context
@@ -380,7 +380,7 @@ class OWMTest(BaseTest):
                     self.cut.save('tests', 'test')
                     self.fail('Should have errored')
                 except StatementValidationError:
-                    data_context.save_context.assert_not_called()
+                    default_context.save_context.assert_not_called()
                     ctxk.save_context.assert_not_called()
 
     def test_save_validation_fail_in_created_context_precludes_save(self):
@@ -389,17 +389,17 @@ class OWMTest(BaseTest):
         s = URIRef('http://example.org/node')
         k = URIRef('http://example.org/created_context')
         v = URIRef('http://example.org/unknown_context')
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             with patch('owmeta.command.Context') as ctxc:
 
-                data_context = Mock()
-                data_context.identifier = URIRef(a)
+                default_context = Mock()
+                default_context.identifier = URIRef(a)
 
                 ctxk = Mock()
                 ctxk.identifier = k
 
-                ctxc.side_effect = [data_context, ctxk]
+                ctxc.side_effect = [default_context, ctxk]
 
                 def f(ns):
                     ctx = ns.context
@@ -429,26 +429,26 @@ class OWMTest(BaseTest):
                     self.cut.save('tests', 'test')
                     self.fail('Should have errored')
                 except StatementValidationError:
-                    data_context.save_context.assert_not_called()
+                    default_context.save_context.assert_not_called()
                     ctxk.save_context.assert_not_called()
 
     def test_save_returns_something(self):
         a = 'http://example.org/mdc'
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
             self.assertIsNotNone(next(iter(self.cut.save('tests', 'test')), None))
 
     def test_save_returns_context(self):
         from owmeta.context import Context
         a = 'http://example.org/mdc'
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module'):
             self.assertIsInstance(next(self.cut.save('tests', 'test')), Context)
 
     def test_save_returns_created_contexts(self):
         a = 'http://example.org/mdc'
         b = 'http://example.org/smoo'
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im:
             def f(ctx):
                 ctx.new_context(b)
@@ -460,7 +460,7 @@ class OWMTest(BaseTest):
         a = 'http://example.org/mdc'
         b = 'http://example.org/smoo'
         c = []
-        self._init_conf({DATA_CONTEXT_KEY: a})
+        self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im, \
                 patch('owmeta.command.Context'), \
                 patch('owmeta.context.Context'):
@@ -472,14 +472,14 @@ class OWMTest(BaseTest):
             c[0]._backer.save_context.assert_called()
 
     def test_save_no_such_attr(self):
-        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        self._init_conf({DEFAULT_CONTEXT_KEY: 'http://example.org/mdc'})
         with patch('importlib.import_module') as im:
             with self.assertRaisesRegexp(AttributeError, r'\btest\b'):
                 im.return_value = Mock(spec=[])
                 self.cut.save('tests', 'test')
 
     def test_save_no_such_attr_yarom_mapped_classes_1(self):
-        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        self._init_conf({DEFAULT_CONTEXT_KEY: 'http://example.org/mdc'})
         with patch('importlib.import_module') as im:
             with self.assertRaisesRegexp(AttributeError, r'\btest\b'):
                 module = Mock(spec=['__yarom_mapped_classes__'])
@@ -488,7 +488,7 @@ class OWMTest(BaseTest):
                 self.cut.save('tests', 'test')
 
     def test_save_no_such_attr_yarom_mapped_classes_2(self):
-        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        self._init_conf({DEFAULT_CONTEXT_KEY: 'http://example.org/mdc'})
         with patch('importlib.import_module') as im:
             with self.assertRaisesRegexp(AttributeError, r'\b' + DEFAULT_SAVE_CALLABLE_NAME + r'\b'):
                 module = Mock(spec=['__yarom_mapped_classes__'])
@@ -497,7 +497,7 @@ class OWMTest(BaseTest):
                 self.cut.save('tests', DEFAULT_SAVE_CALLABLE_NAME)
 
     def test_save_no_provider_yarom_mapped_classes(self):
-        self._init_conf({DATA_CONTEXT_KEY: 'http://example.org/mdc'})
+        self._init_conf({DEFAULT_CONTEXT_KEY: 'http://example.org/mdc'})
         with patch('importlib.import_module') as im, \
                 patch('owmeta.mapper.Mapper.process_module'):
             module = Mock(spec=['__yarom_mapped_classes__'])
@@ -508,10 +508,10 @@ class OWMTest(BaseTest):
             # then, no exception was raised
 
     def test_save_imports(self):
-        data_context = 'http://example.org/mdc'
+        default_context = 'http://example.org/mdc'
         imports_context = 'http://example.org/imports_ctx'
         imported_context_id = URIRef('http://example.org/new_ctx')
-        self._init_conf({DATA_CONTEXT_KEY: data_context,
+        self._init_conf({DEFAULT_CONTEXT_KEY: default_context,
                          IMPORTS_CONTEXT_KEY: imports_context})
         with patch('importlib.import_module') as im:
             def f(ns):
@@ -523,7 +523,7 @@ class OWMTest(BaseTest):
             self.cut.save('tests', 'test')
         trips = set(self.cut._conf()['rdf.graph'].triples((None, None, None),
                                                           context=URIRef(imports_context)))
-        self.assertIn((URIRef(data_context), CONTEXT_IMPORTS, imported_context_id), trips)
+        self.assertIn((URIRef(default_context), CONTEXT_IMPORTS, imported_context_id), trips)
 
 
 class OWMEvidenceGetDWEDSTest(unittest.TestCase):
@@ -533,7 +533,7 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
 
         dweds = Mock(name='dweds', spec=DWEDS())
         # load from the given identifier is a dweds
-        self.parent._data_ctx.stored(ANY).query().load.return_value = [dweds]
+        self.parent._default_ctx.stored(ANY).query().load.return_value = [dweds]
         # load evidence from the evidence_context is just one evidence object
         self.ev_load = dweds.evidence_context.stored(ANY).query().load
 
@@ -568,8 +568,8 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
         There's no evidence, so we shouldn't see any output
         '''
         # given
-        self.parent._data_ctx.stored.resolve_class.return_value = None
-        self.parent._data_ctx.stored.side_effect = lambda x: x
+        self.parent._default_ctx.stored.resolve_class.return_value = None
+        self.parent._default_ctx.stored.side_effect = lambda x: x
         self.parent._den3.side_effect = lambda x: x
         # then
         with self.assertRaisesRegexp(GenericUserError, r'unresolved'):
@@ -588,7 +588,7 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
         doc = Mock(name="doc", spec=Document())
         cdo = Mock(name='cdo', spec=ContextDataObject())
         # load from the given identifier is a ContextDataObject
-        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+        self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       [evid]]
         evid.reference.return_value = doc
 
@@ -604,7 +604,7 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
         web = Mock(name="web", spec=Website())
         cdo = Mock(name='cdo', spec=ContextDataObject())
         # load from the given identifier is a ContextDataObject
-        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+        self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       [evid]]
         evid.reference.return_value = web
 
@@ -620,7 +620,7 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
         '''
         # given
         cdo = Mock(name='cdo', spec=ContextDataObject())
-        self.parent._data_ctx.stored(ANY).query().load.side_effect = [[cdo],
+        self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       []]
 
         # when
@@ -638,7 +638,7 @@ class OWMTranslatorTest(unittest.TestCase):
         dct['rdf.graph'] = Mock()
         parent._conf.return_value = dct
         # Mock the loading of DataObjects from the DataContext
-        parent._data_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
+        parent._default_ctx.stored(ANY)(conf=ANY).load.return_value = [Mock()]
         ps = OWMTranslator(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
@@ -648,7 +648,7 @@ class OWMTranslateTest(BaseTest):
 
     def setUp(self):
         super(OWMTranslateTest, self).setUp()
-        self._init_conf({"data_context_id": "http://example.org/data"})
+        self._init_conf({DEFAULT_CONTEXT_KEY: "http://example.org/data"})
 
     def test_translate_unknown_translator_message(self):
         '''
@@ -983,7 +983,7 @@ class OWMSourceTest(unittest.TestCase):
 
         # Mock the loading of DataObjects from the DataContext
         def emptygen(): yield
-        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = emptygen()
+        parent._default_ctx.stored(ANY).query(conf=ANY).load.return_value = emptygen()
         ps = OWMSource(parent)
         self.assertIsNone(next(ps.list(), None))
 
@@ -995,7 +995,7 @@ class OWMSourceTest(unittest.TestCase):
 
         # Mock the loading of DataObjects from the DataContext
         def gen(): yield Mock()
-        parent._data_ctx.stored(ANY).query(conf=ANY).load.return_value = gen()
+        parent._default_ctx.stored(ANY).query(conf=ANY).load.return_value = gen()
         ps = OWMSource(parent)
 
         self.assertIsNotNone(next(ps.list(), None))
