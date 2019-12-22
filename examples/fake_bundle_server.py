@@ -137,6 +137,14 @@ def make_server():
         def _get_base_uri(self):
             return 'http://{}:{}'.format(*self.server.server_address)
 
+        def do_POST(self):
+            if self.path.endswith('SHUTDOWN'):
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b'\n\n')
+            else:
+                super(_Handler, self).do_POST()
+
     port = 8000
     while True:
         try:

@@ -211,7 +211,7 @@ class Bundle(object):
         res = bundle_directory(self.bundles_directory, self.ident, version)
         if not exists(res):
             if self.version is None:
-                raise BundleNotFound(self.ident, 'Bundle directory does not exist', version)
+                raise BundleNotFound(self.ident, 'Bundle directory does not exist')
             else:
                 raise BundleNotFound(self.ident, 'Bundle directory does not exist for the specified version', version)
         return res
@@ -605,6 +605,11 @@ class Installer(object):
             Directory where the bundles files go
         installer_id : str
             Name of this installer for purposes of mutual exclusion. optional
+        graph : rdflib.graph.ConjunctiveGraph
+            The graph from which we source contexts for this bundle
+        imports_ctx : str
+            The ID of the imports context this installer should use. Imports relationships
+            are selected from this graph according to the included contexts
         '''
         self.context_hash = hashlib.sha224
         self.file_hash = hashlib.sha224
@@ -683,6 +688,10 @@ class Installer(object):
                 mf.write(DATA_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
                         self.data_ctx.encode('UTF-8') + b'\n')
             if self.imports_ctx:
+                # If an imports context was specified, then we'll need to generate an
+                # imports context with the appropriate imports. We don't use the source
+                # imports context ID for the bundle's imports context because the bundle
+                # imports that we actually need are a subset of the total set of imports
                 mf.write(IMPORTS_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
                          b'http://openworm.org/data/generated_imports_ctx?bundle_id=' +
                          quote(descriptor.id).encode('UTF-8') + b'\n')
@@ -694,8 +703,11 @@ class Installer(object):
 
         # XXX: Find out what I was planning to do with these imported contexts...adding
         # dependencies or something?
+        imports_ctxg = None
         if self.imports_ctx:
             imports_ctxg = self.graph.get_context(self.imports_ctx)
+
+        included_context_ids = set()
 
         with open(p(graphs_directory, 'hashes'), 'wb') as hash_out,\
                 open(p(graphs_directory, 'index'), 'wb') as index_out:
@@ -706,6 +718,7 @@ class Installer(object):
                 write_canonical_to_file(ctxgraph, temp_fname)
                 with open(temp_fname, 'rb') as ctx_fh:
                     hash_file(hsh, ctx_fh)
+                included_context_ids.add(ctxid)
                 ctxidb = ctxid.encode('UTF-8')
                 # Write hash
                 hash_out.write(ctxidb + b'\x00' + pack('B', hsh.digest_size) + hsh.digest() + b'\n')
@@ -716,13 +729,20 @@ class Installer(object):
                 ctx_file_name = p(graphs_directory, gbname)
                 rename(temp_fname, ctx_file_name)
 
-                if self.imports_ctx and imports_ctxg:
+                if imports_ctxg is not None:
                     imported_contexts |= transitive_lookup(imports_ctxg,
                                                            ctxid,
                                                            CONTEXT_IMPORTS,
                                                            seen=imported_contexts)
+            uncovered_contexts = imported_contexts - included_context_ids
+            uncovered_contexts = self._cover_with_dependencies(uncovered_contexts)
+            if uncovered_contexts:
+                raise MissingImports(uncovered_contexts)
             hash_out.flush()
             index_out.flush()
+
+    def _cover_with_dependencies(self, contexts):
+        return contexts
 
 
 def hash_file(hsh, fh, blocksize=None):
@@ -890,6 +910,16 @@ class LoadFailed(Exception):
         mmsg = 'Failed to load {} bundle with loader {}{}'.format(
                 bundle, loader, ': ' + msg if msg else '')
         super(LoadFailed, self).__init__(mmsg, *args[1:])
+
+
+class InstallFailed(Exception):
+    pass
+
+
+class MissingImports(InstallFailed):
+    def __init__(self, imports):
+        msg = 'Missing {} imports'.format(len(imports))
+        super(MissingImports, self).__init__(msg)
 
 
 class FetchFailed(Exception):

@@ -7,21 +7,26 @@ import rdflib
 import transaction
 from collections import namedtuple
 from rdflib.term import Literal, URIRef
-from owmeta.bundle import Installer, Descriptor, make_include_func, FilesDescriptor
+from owmeta.bundle import (Installer,
+                           Descriptor,
+                           make_include_func,
+                           FilesDescriptor,
+                           MissingImports)
+from owmeta.context_common import CONTEXT_IMPORTS
 from os.path import join as p, isdir, isfile
 from os import listdir
 
 import pytest
 
 
-Data = namedtuple('S', ('source_directory', 'bundles_directory'))
+Dirs = namedtuple('Dirs', ('source_directory', 'bundles_directory'))
 
 
 @pytest.fixture
 def dirs():
     with TemporaryDirectory() as source_directory,\
             TemporaryDirectory() as bundles_directory:
-        yield Data(source_directory, bundles_directory)
+        yield Dirs(source_directory, bundles_directory)
 
 
 def test_bundle_install_directory(dirs):
@@ -123,6 +128,7 @@ def test_no_dupe(dirs):
 
     bi = Installer(*dirs, graph=g)
     bi.install(d)
+
     graph_files = [x for x in listdir(p(dirs.bundles_directory, 'test', '1', 'graphs')) if x.endswith('.nt')]
     assert len(graph_files) == 1
 
@@ -173,3 +179,32 @@ def test_file_hash_content(dirs):
     with open(p(dirs.bundles_directory, 'test', '1', 'files', 'hashes'), 'rb') as f:
         contents = f.read()
         assert b'somefile' in contents
+
+
+def test_imports_are_included(dirs):
+    '''
+    If we have imports and no dependencies, then thrown an exception if we have not
+    included them in the bundle
+    '''
+    imports_ctxid = 'http://example.org/imports'
+    ctxid_1 = 'http://example.org/ctx1'
+    ctxid_2 = 'http://example.org/ctx2'
+
+    # Make a descriptor that includes ctx1 and the imports, but not ctx2
+    d = Descriptor('test')
+    d.includes.add(make_include_func(ctxid_1))
+    d.includes.add(make_include_func(imports_ctxid))
+
+    # Add some triples so the contexts aren't empty -- we can't save an empty context
+    g = rdflib.ConjunctiveGraph()
+    cg_1 = g.get_context(ctxid_1)
+    cg_2 = g.get_context(ctxid_2)
+    cg_imp = g.get_context(imports_ctxid)
+    with transaction.manager:
+        cg_1.add((URIRef('a'), URIRef('b'), URIRef('c')))
+        cg_2.add((URIRef('d'), URIRef('e'), URIRef('f')))
+        cg_imp.add((URIRef(ctxid_1), CONTEXT_IMPORTS, URIRef(ctxid_2)))
+
+    bi = Installer(*dirs, imports_ctx=imports_ctxid, graph=g)
+    with pytest.raises(MissingImports):
+        bi.install(d)
