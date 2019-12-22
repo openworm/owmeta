@@ -7,6 +7,7 @@ from owmeta.bundle import (Remote, URLConfig, HTTPBundleLoader, Bundle, BundleNo
                            Descriptor, DependencyDescriptor)
 from owmeta.commands.bundle import OWMBundle
 
+
 import pytest
 
 

@@ -8,10 +8,14 @@ import transaction
 from collections import namedtuple
 from rdflib.term import Literal, URIRef
 from owmeta.bundle import (Installer, Descriptor, make_include_func, FilesDescriptor,
-                           MissingImports)
+                           MissingImports, DependencyDescriptor)
 from owmeta.context_common import CONTEXT_IMPORTS
 from os.path import join as p, isdir, isfile
 from os import listdir
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 import pytest
 
@@ -210,7 +214,10 @@ def test_imports_are_included(dirs):
 def test_imports_in_dependencies(dirs):
     '''
     If we have imports and a dependency includes the context, then we shouldn't have an
-    error
+    error.
+
+    Versioned bundles are assumed to be immutable, so we won't re-fetch a bundle already
+    in the local index
     '''
     imports_ctxid = 'http://example.org/imports'
     ctxid_1 = 'http://example.org/ctx1'
@@ -220,7 +227,10 @@ def test_imports_in_dependencies(dirs):
     d = Descriptor('test')
     d.includes.add(make_include_func(ctxid_1))
     d.includes.add(make_include_func(imports_ctxid))
-    d.dependencies.add(DependencyDescriptor('example'))
+    d.dependencies.add(DependencyDescriptor('dep'))
+
+    dep_d = Descriptor('dep')
+    dep_d.includes.add(make_include_func(ctxid_2))
 
     # Add some triples so the contexts aren't empty -- we can't save an empty context
     g = rdflib.ConjunctiveGraph()
@@ -233,5 +243,65 @@ def test_imports_in_dependencies(dirs):
         cg_imp.add((URIRef(ctxid_1), CONTEXT_IMPORTS, URIRef(ctxid_2)))
 
     bi = Installer(*dirs, imports_ctx=imports_ctxid, graph=g)
-    with pytest.raises(MissingImports):
+    bi.install(dep_d)
+    bi.install(d)
+
+
+def test_imports_in_unfetched_dependencies(dirs):
+    '''
+    If we have imports and a dependency includes the context, then we shouldn't have an
+    error.
+
+    Versioned bundles are assumed to be immutable, so we won't re-fetch a bundle already
+    in the local index
+    '''
+    imports_ctxid = 'http://example.org/imports'
+    ctxid_1 = 'http://example.org/ctx1'
+    ctxid_2 = 'http://example.org/ctx2'
+
+    # Make a descriptor that includes ctx1 and the imports, but not ctx2
+    d = Descriptor('test')
+    d.includes.add(make_include_func(ctxid_1))
+    d.includes.add(make_include_func(imports_ctxid))
+    d.dependencies.add(DependencyDescriptor('dep'))
+
+    dep_d = Descriptor('dep')
+    dep_d.includes.add(make_include_func(ctxid_2))
+
+    # Add some triples so the contexts aren't empty -- we can't save an empty context
+    g = rdflib.ConjunctiveGraph()
+    cg_1 = g.get_context(ctxid_1)
+    cg_2 = g.get_context(ctxid_2)
+    cg_imp = g.get_context(imports_ctxid)
+    with transaction.manager:
+        cg_1.add((URIRef('a'), URIRef('b'), URIRef('c')))
+        cg_2.add((URIRef('d'), URIRef('e'), URIRef('f')))
+        cg_imp.add((URIRef(ctxid_1), CONTEXT_IMPORTS, URIRef(ctxid_2)))
+
+    class loader_class(object):
+        def __init__(self, *args):
+            self.bi = None
+
+        def can_load(self, *args):
+            return True
+
+        def can_load_from(self, *args):
+            return True
+
+        def bundle_versions(self, *args):
+            return [1]
+
+        def __call__(self, *args):
+            self.bi.install(dep_d)
+
+    loader = loader_class()
+
+    class remote_class(object):
+        def generate_loaders(self, *args):
+            yield loader
+
+    bi = Installer(*dirs, imports_ctx=imports_ctxid, graph=g, remotes=[remote_class()])
+    loader.bi = bi
+
+    with patch('owmeta.bundle.LOADER_CLASSES', (loader_class,)):
         bi.install(d)

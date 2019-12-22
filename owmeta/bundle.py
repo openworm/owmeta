@@ -39,6 +39,8 @@ class Remote(object):
         ----------
         name : str
             The name of the remote
+        accessor_configs : iterable of AccessorConfig
+            Configs for how you access the remote
         '''
 
         self.name = name
@@ -54,7 +56,7 @@ class Remote(object):
 
     def generate_loaders(self):
         '''
-        Generate
+        Generate the bundle loaders for this remote
         '''
         self._loaders = []
         for ac in self.accessor_configs:
@@ -93,6 +95,9 @@ class Remote(object):
         return (self.name == other.name and
                 self.accessor_configs == other.accessor_configs)
 
+    def __hash__(self):
+        return hash((self.name, self.accessor_configs))
+
 
 class DependencyDescriptor(object):
     __slots__ = ('id', 'version')
@@ -125,6 +130,9 @@ class AccessorConfig(object):
     def __eq__(self, other):
         raise NotImplementedError()
 
+    def __hash__(self):
+        raise NotImplementedError()
+
 
 class URLConfig(AccessorConfig):
     '''
@@ -136,6 +144,9 @@ class URLConfig(AccessorConfig):
 
     def __eq__(self, other):
         return self.url == other.url
+
+    def __hash__(self):
+        return hash(self.url)
 
     def __str__(self):
         return '{}(url={})'.format(FCN(type(self)), repr(self.url))
@@ -197,7 +208,7 @@ class Descriptor(object):
 
 
 class Bundle(object):
-    def __init__(self, ident, bundles_directory=None, version=None, conf=None):
+    def __init__(self, ident, bundles_directory=None, version=None, conf=None, remotes=()):
         if not ident:
             raise Exception('ident must be non-None')
         self.ident = ident
@@ -207,12 +218,33 @@ class Bundle(object):
         if not conf:
             conf = {'rdf.source': 'sqlite'}
         self.version = version
+        self.remotes = remotes
         self._given_conf = conf
         self.conf = None
+        self._contexts = None
 
     @property
     def identifier(self):
         return self.ident
+
+    def resolve(self):
+        try:
+            bundle_directory = self._get_bundle_directory()
+        except BundleNotFound:
+            # If there's a .owm directory, then get the remotes from there
+            if self.remotes:
+                remotes = self.remotes
+
+            if not remotes and exists(DEFAULT_OWM_DIR):
+                # TODO: Make this search upwards in case the directory exists at a parent
+                remotes = retrieve_remotes(DEFAULT_OWM_DIR)
+
+            if remotes:
+                f = Fetcher(self.bundles_directory, remotes)
+                bundle_directory = f(self.ident, self.version)
+            else:
+                raise
+        return bundle_directory
 
     def _get_bundle_directory(self):
         # - look up the bundle in the index
@@ -252,25 +284,10 @@ class Bundle(object):
                 raise BundleNotFound(self.ident, 'Bundle directory does not exist for the specified version', version)
         return res
 
-    def _get_bundle(self):
-        try:
-            bundle_directory = self._get_bundle_directory()
-        except BundleNotFound:
-            # If there's a .owm directory, then get the remotes from there
-            if exists(DEFAULT_OWM_DIR):
-                # TODO: Make this search upwards in case the directory exists at a parent
-                f = Fetcher(self.bundles_directory, retrieve_remotes(DEFAULT_OWM_DIR))
-                bundle_directory = f(self.ident, self.version)
-            else:
-                raise
-
-        self._make_config(bundle_directory)
-
     def _make_config(self, bundle_directory, progress=None, trip_prog=None):
         self.conf = Data().copy(self._given_conf)
         self.conf['rdf.store_conf'] = p(bundle_directory, 'owm.db')
-        self.conf[IMPORTS_CONTEXT_KEY] = (
-                'http://openworm.org/data/generated_imports_ctx?bundle_id=' + urlquote(self.ident))
+        self.conf[IMPORTS_CONTEXT_KEY] = fmt_bundle_ctx_id(self.ident)
         with open(p(bundle_directory, 'manifest')) as mf:
             for ln in mf:
                 if ln.startswith(DEFAULT_CONTEXT_KEY):
@@ -283,12 +300,35 @@ class Bundle(object):
             raise Exception('Cannot find the database file at ' + self.conf['rdf.store_conf'])
         self._load_all_graphs(bundle_directory, progress=progress, trip_prog=trip_prog)
 
+    @property
+    def contexts(self):
+        ''' Return contexts in a bundle '''
+        # Since bundles are meant to be immutable, we won't need to add
+        if self._contexts is not None:
+            return self._contexts
+        bundle_directory = self.resolve()
+        contexts = set()
+        graphs_directory = p(bundle_directory, 'graphs')
+        idx_fname = p(graphs_directory, 'index')
+        if not exists(idx_fname):
+            raise Exception('Cannot find an index at {}'.format(repr(idx_fname)))
+        with open(idx_fname, 'rb') as index_file:
+            for l in index_file:
+                l = l.strip()
+                if not l:
+                    continue
+                ctx, _ = l.split(b'\x00')
+                contexts.add(ctx.decode('UTF-8'))
+        self._contexts = contexts
+        return self._contexts
+
     def _load_all_graphs(self, bundle_directory, progress=None, trip_prog=None):
         # This is very similar to the owmeta.command.OWM._load_all_graphs, but is
         # different enough that it's easier to just keep them separate
         import transaction
         from rdflib import plugin
         from rdflib.parser import Parser, create_input_source
+        contexts = set()
         graphs_directory = p(bundle_directory, 'graphs')
         idx_fname = p(graphs_directory, 'index')
         if not exists(idx_fname):
@@ -312,8 +352,10 @@ class Bundle(object):
                         continue
                     ctx, fname = l.split(b'\x00')
                     graph_fname = p(graphs_directory, fname.decode('UTF-8'))
+                    ctx_str = ctx.decode('UTF-8')
+                    contexts.add(ctx_str)
                     with open(graph_fname, 'rb') as f, \
-                            BatchAddGraph(dest.get_context(ctx.decode('UTF-8')), batchsize=4000) as g:
+                            BatchAddGraph(dest.get_context(ctx_str), batchsize=4000) as g:
                         parser.parse(create_input_source(f), g)
 
                     if progress is not None and trip_prog is not None:
@@ -322,6 +364,7 @@ class Bundle(object):
                         trip_prog.update(g.count)
                 if progress is not None:
                     progress.write('Finalizing writes to database...')
+        self._contexts = contexts
         if progress is not None:
             progress.write('Loaded {:,} triples'.format(triples_read))
 
@@ -330,7 +373,7 @@ class Bundle(object):
         return self.conf['rdf.graph']
 
     def __enter__(self):
-        self._get_bundle()
+        self._make_config(self.resolve())
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -629,7 +672,7 @@ class Installer(object):
 
     # TODO: Make source_directory optional -- not every bundle needs files
     def __init__(self, source_directory, bundles_directory, graph,
-                 imports_ctx=None, default_ctx=None, installer_id=None):
+                 imports_ctx=None, default_ctx=None, installer_id=None, remotes=()):
         '''
         Parameters
         ----------
@@ -647,6 +690,8 @@ class Installer(object):
         imports_ctx : str
             The ID of the imports context this installer should use. Imports relationships
             are selected from this graph according to the included contexts. optional
+        remotes : iterable of Remote
+            Remotes to be used for retrieving dependencies when needed during installation
         '''
         self.context_hash = hashlib.sha224
         self.file_hash = hashlib.sha224
@@ -656,6 +701,7 @@ class Installer(object):
         self.installer_id = installer_id
         self.imports_ctx = imports_ctx
         self.default_ctx = default_ctx
+        self.remotes = remotes
 
     def install(self, descriptor):
         '''
@@ -730,8 +776,7 @@ class Installer(object):
                 # imports context ID for the bundle's imports context because the bundle
                 # imports that we actually need are a subset of the total set of imports
                 mf.write(IMPORTS_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                         b'http://openworm.org/data/generated_imports_ctx?bundle_id=' +
-                         quote(descriptor.id).encode('UTF-8') + b'\n')
+                         fmt_bundle_ctx_id(descriptor.id).encode('UTF-8') + b'\n')
             mf.write(b'version\x00' + pack('Q', descriptor.version) + b'\n')
             mf.flush()
 
@@ -772,17 +817,27 @@ class Installer(object):
                                                            CONTEXT_IMPORTS,
                                                            seen=imported_contexts)
             uncovered_contexts = imported_contexts - included_context_ids
-            uncovered_contexts = self._cover_with_dependencies(uncovered_contexts)
+            uncovered_contexts = self._cover_with_dependencies(uncovered_contexts, descriptor.dependencies)
             if uncovered_contexts:
                 raise MissingImports(uncovered_contexts)
             hash_out.flush()
             index_out.flush()
 
-    def _cover_with_dependencies(self, contexts):
+    def _cover_with_dependencies(self, uncovered_contexts, dependencies):
         # TODO: Check for contexts being included in dependencies
         # XXX: Will also need to check for the contexts having a given ID being consistent
         # with each other across dependencies
-        return contexts
+        for d in dependencies:
+            bnd = Bundle(d.id, self.bundles_directory, d.version, remotes=self.remotes)
+            for b in bnd.contexts:
+                uncovered_contexts.remove(URIRef(b))
+                if not uncovered_contexts:
+                    break
+        return uncovered_contexts
+
+
+def fmt_bundle_ctx_id(id):
+    return 'http://openworm.org/data/generated_imports_ctx?bundle_id=' + urlquote(id)
 
 
 def hash_file(hsh, fh, blocksize=None):
@@ -960,6 +1015,7 @@ class MissingImports(InstallFailed):
     def __init__(self, imports):
         msg = 'Missing {} imports'.format(len(imports))
         super(MissingImports, self).__init__(msg)
+        self.imports = imports
 
 
 class FetchFailed(Exception):
