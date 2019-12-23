@@ -1,5 +1,4 @@
 import re
-from collections import namedtuple
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
 from os.path import join as p, exists, relpath, expanduser
