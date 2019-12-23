@@ -7,7 +7,6 @@ import json
 import re
 from os import environ, getcwd
 from os.path import dirname, realpath
-from pathlib import Path
 
 
 class ConfigValue(object):
