@@ -5,17 +5,21 @@
 
 Project Bundles
 ===============
-A project bundle is:
+A project bundle is composed of:
 
-* an identifier,
-* an optional human-friendly name,
-* an optional description of the bundle's contents,
+* a universally unique identifier,
+* a version number,
 * a collection of contexts,
 * a distinguished "imports" context describing relationships between contexts,
   both those in the bundle, and between contexts in the bundle and in
   dependencies,
-* an optional collection of files,
-* listing of dependencies on other bundles, 
+
+plus several optional components:
+
+* a human-friendly name,
+* a description of the bundle's contents,
+* a collection of files,
+* a listing of dependencies on other bundles, 
 * a set of mappings between project-scoped identifiers and universal
   context identifiers.
 
@@ -36,23 +40,26 @@ necessarily related.
 
 Dependencies
 ------------
-A bundle can declare, by their identifiers, other bundles upon which it
-depends. In addition, a bundle can declare contexts and files within the
-dependency that should be included or excluded. More interestingly, a
-dependency specification may declare that contexts declared within the
-dependency be renamed according to a number of rewrite rules. This is to allow
-for using bundles with conflicting Context Identifiers. 
+A bundle can declare other bundles upon which it depends, by listing those
+other bundles identifiers and version numbers. In addition, a bundle can
+declare contexts and files within the dependency that should be included or
+excluded. More interestingly, a dependency specification may declare that
+contexts declared within the dependency be renamed according to a number of
+rewrite rules. This is to allow for using bundles with conflicting Context
+Identifiers. 
 
 Certain problems come up when dealing with contexts across different bundles.
 This rewriting allows to keep separate the contexts in one bundle from another
-and to forestall contexts with the same ID from conflicting with one another
-just because they're brought in by a transitive dependency.
+and to prevent contexts with the same ID from conflicting with one another just
+because they're brought in by a transitive dependency.
 
 .. This doesn't solve the problem of conflicting versions of software packages
    referred to by the bundles. Need to make a good solution to that.
 
 An example
 ``````````
+This example describes a likely naming conflict that can arise in context
+naming between bundles.
 
 Bundles ``α``, ``β``, and ``γ``. With dependencies like so::
 
@@ -76,7 +83,6 @@ distinct.
    meaning of statements within a context, which is more appropriately handled
    in the imports context.
 
-This should 
 
 Core bundles
 ------------
@@ -99,6 +105,10 @@ one and only one Human".
 * A Content-Based Identifier has an RDF Serialization Format
 * A Hash can appear in zero or more Content-Based Identifiers
 * A Hash has an Algorithm ID and a Message Digest
+
+.. XXX The content-based ID is lacks the RDF serialization in the first cut
+   because there's only one we use. Will decide on format for representing the
+   serialization format later, if we need it.
 
 Types
 -----
