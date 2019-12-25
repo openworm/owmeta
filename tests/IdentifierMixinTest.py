@@ -37,5 +37,5 @@ class IdentifierMixinTest(unittest.TestCase):
         def s(*args):
             raise KeyError()
         self.cls.rdf_namespace.__getitem__.side_effect = s
-        with self.assertRaises(KeyError, message='KeyError should flow up'):
+        with self.assertRaises(KeyError, msg='KeyError should flow up'):
             self.cls(key='blah')
