@@ -89,8 +89,8 @@ CLI_HINTS = {
     },
     'owmeta.commands.bundle.OWMBundle': {
         'fetch': {
-            (METHOD_NAMED_ARG, 'bundle_name'): {
-                'names': ['bundle_name'],
+            (METHOD_NAMED_ARG, 'bundle_id'): {
+                'names': ['bundle_id'],
             },
         },
         'load': {
@@ -104,13 +104,13 @@ CLI_HINTS = {
             },
         },
         'install': {
-            (METHOD_NAMED_ARG, 'bundle_name'): {
-                'names': ['bundle_name'],
+            (METHOD_NAMED_ARG, 'bundle'): {
+                'names': ['bundle'],
             },
         },
         'deregister': {
-            (METHOD_NAMED_ARG, 'bundle_name'): {
-                'names': ['bundle_name'],
+            (METHOD_NAMED_ARG, 'bundle_id'): {
+                'names': ['bundle_id'],
             },
         },
         'register': {
@@ -119,13 +119,13 @@ CLI_HINTS = {
             },
         },
         'deploy': {
-            (METHOD_NAMED_ARG, 'bundle_name'): {
-                'names': ['bundle_name'],
+            (METHOD_NAMED_ARG, 'bundle_id'): {
+                'names': ['bundle_id'],
             },
         },
         'checkout': {
-            (METHOD_NAMED_ARG, 'bundle_name'): {
-                'names': ['bundle_name'],
+            (METHOD_NAMED_ARG, 'bundle_id'): {
+                'names': ['bundle_id'],
             },
         },
     },

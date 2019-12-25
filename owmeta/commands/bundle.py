@@ -18,6 +18,7 @@ from ..bundle import (Descriptor,
                       Fetcher,
                       bundle_directory,
                       retrieve_remotes,
+                      NoBundleLoader as _NoBundleLoader,
                       LOADER_CLASSES)
 
 import hashlib
@@ -95,20 +96,23 @@ class OWMBundle(object):
         self._parent = parent
         self._loaders = []
 
-    def fetch(self, bundle_name, bundle_version=None):
+    def fetch(self, bundle_id, bundle_version=None):
         '''
-        Retrieve a bundle by name from a remote and put it in the local bundle index and
+        Retrieve a bundle by id from a remote and put it in the local bundle index and
         cache
 
         Parameters
         ----------
-        bundle_name : str
-            The name of the bundle to retrieve. The name may include the version number.
+        bundle_id : str
+            The id of the bundle to retrieve.
         bundle_version : int
             The version of the bundle to retrieve. optional
         '''
         f = Fetcher(p(self._parent.userdir, 'bundles'), self._retrieve_remotes())
-        f.fetch(bundle_name, bundle_version)
+        try:
+            f.fetch(bundle_id, bundle_version)
+        except _NoBundleLoader as e:
+            raise NoBundleLoader(e.bundle_id, e.bundle_version)
 
     def load(self, input_file_name):
         '''
@@ -120,7 +124,7 @@ class OWMBundle(object):
             The source file of the bundle
         '''
 
-    def save(self, bundle_name, output):
+    def save(self, bundle_id, output):
         '''
         Write a bundle to a file
 
@@ -130,27 +134,47 @@ class OWMBundle(object):
 
         Parameters
         ----------
-        bundle_name : str
+        bundle_id : str
             The bundle to save
         output : str
             The target file
         '''
 
-    def install(self, bundle_name):
+    def install(self, bundle):
         '''
         Install the bundle to the local bundle repository for use across projects on the
         same machine
 
         Parameters
         ----------
-        bundle_name : str
-            Name of the bundle to install
+        bundle : str
+            ID of the bundle to install or path to the bundle descriptor
         '''
-        descr = self._load_descriptor_by_name(bundle_name)
+        descriptor_fname = self._get_bundle_descr_fname(bundle)
+        if not descriptor_fname:
+            descriptor_fname = bundle
+        not_known_id = descriptor_fname == bundle
+        try:
+            descr = self._load_descriptor(descriptor_fname)
+        except (OSError, IOError) as e:
+            # XXX: Avoiding specialized exception types for Python 2 compat
+            if e.errno == 2:  # FileNotFound
+                raise GenericUserError('Could not find bundle descriptor with {} {}'.format(
+                    'file name' if not_known_id else 'ID',
+                    bundle
+                ))
+            if e.errno == 21:  # IsADirectoryError
+                raise GenericUserError('A bundle descriptor is a file, but we were given'
+                    ' a directory for {}'.format(bundle))
+
+            raise GenericUserError('Error recovering bundle descriptor with {} {}'.format(
+                'file name' if not_known_id else 'ID',
+                bundle
+            ))
+
         if not descr:
-            descr = self._load_descriptor(bundle_name)
-        if not descr:
-            raise GenericUserError('Could not find bundle with name {}'.format(bundle_name))
+            raise GenericUserError('Could not find bundle with id {}'.format(bundle))
+
         imports_ctx = self._parent._conf(IMPORTS_CONTEXT_KEY, None)
         default_ctx = self._parent._conf(DEFAULT_CONTEXT_KEY, None)
         bi = Installer(self._parent.basedir,
@@ -177,9 +201,6 @@ class OWMBundle(object):
         descr = self._load_descriptor(descriptor)
         self._register_bundle(descr, descriptor)
 
-    def _load_descriptor_by_name(self, bundle_name):
-        return self._load_descriptor(self._get_bundle_fname(bundle_name))
-
     def _load_descriptor(self, fname):
         with open(fname, 'r') as f:
             return self._parse_descriptor(f)
@@ -199,30 +220,30 @@ class OWMBundle(object):
                 line = line.strip()
                 if not line:
                     continue
-                name, fn = line.split(' ', 1)
-                if name == descr.name:
+                idx_id, fn = line.split(' ', 1)
+                if idx_id == descr.id:
                     continue
                 print(line, file=f)
-            print('{descr.name} {file_name}\n'.format(**vars()), file=f)
+            print('{descr.id} {file_name}\n'.format(**vars()), file=f)
 
-    def _get_bundle_fname(self, name):
+    def _get_bundle_descr_fname(self, bundle_id):
         with open(p(self._parent.owmdir, 'bundles'), 'r') as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
-                idx_name, fn = line.split(' ', 1)
-                if name == idx_name:
+                idx_id, fn = line.split(' ', 1)
+                if bundle_id == idx_id:
                     return fn
 
-    def deregister(self, bundle_name):
+    def deregister(self, bundle_id):
         '''
         Remove a bundle from the project
 
         Parameters
         ----------
-        bundle_name : str
-            The name of the bundle to deregister
+        bundle_id : str
+            The id of the bundle to deregister
         '''
         try:
             with open(p(self._parent.owmdir, 'bundles'), 'r') as f:
@@ -235,32 +256,32 @@ class OWMBundle(object):
                 line = line.strip()
                 if not line:
                     continue
-                name, fn = line.split(' ', 1)
-                if name == bundle_name:
+                idx_id, fn = line.split(' ', 1)
+                if idx_id == bundle_id:
                     continue
                 print(line, file=f)
 
-    def deploy(self, bundle_name, remotes=None):
+    def deploy(self, bundle_id, remotes=None):
         '''
         Deploys a bundle to a remote. The target remotes come from project and user
         settings or, if provided, the parameters
 
         Parameters
         ----------
-        bundle_name : str
-            Name of the bundle to deploy
+        bundle_id : str
+            ID of the bundle to deploy
         remotes : str
-            Names of the remotes to deploy to
+            Names of the remotes to deploy to. optional.
         '''
 
-    def checkout(self, bundle_name):
+    def checkout(self, bundle_id):
         '''
         Switch to the named bundle
 
         Parameters
         ----------
-        bundle_name : str
-            Name of the bundle to switch to
+        bundle_id : str
+            ID of the bundle to switch to
         '''
 
     def list(self):
@@ -275,18 +296,18 @@ class OWMBundle(object):
                 for line in index_fh:
                     if not line.strip():
                         continue
-                    name, file_name = line.strip().split(' ', 1)
+                    bundle_id, file_name = line.strip().split(' ', 1)
                     try:
                         with open(file_name, 'r') as bundle_fh:
                             descr = self._parse_descriptor(bundle_fh)
-                            yield {'name': name, 'description': descr.description or ""}
+                            yield {'name': bundle_id, 'description': descr.description or ""}
                     except (IOError, OSError):
                         # This is at debug level since the error should be expressed well
                         # enough by the response, but we still want to show it eventually
                         L.debug("Cannot read bundle descriptor at"
                                 " '{}'".format(file_name),
                                 exc_info=True)
-                        yield {'name': name, 'error': "ERROR: Cannot read bundle descriptor at '{}'".format(
+                        yield {'name': bundle_id, 'error': "ERROR: Cannot read bundle descriptor at '{}'".format(
                             relpath(file_name)
                             )}
         return GeneratorWithData(helper(),
@@ -306,9 +327,9 @@ class NoBundleLoader(GenericUserError):
     Thrown when a loader can't be found for a loader
     '''
 
-    def __init__(self, bundle_name, bundle_version=None):
+    def __init__(self, bundle_id, bundle_version=None):
         super(NoBundleLoader, self).__init__(
-            'No loader could be found for "%s"%s' % (bundle_name,
+            'No loader could be found for "%s"%s' % (bundle_id,
                 (' at version ' + bundle_version) if bundle_version is not None else ''))
 
 
@@ -317,7 +338,7 @@ class BundleNotFound(GenericUserError):
     Thrown when a bundle cannot be found with the requested name and ID
     '''
 
-    def __init__(self, bundle_name, bundle_version=None):
+    def __init__(self, bundle_id, bundle_version=None):
         super(BundleNotFound, self).__init__(
-            'The requested bundle could not be loaded "%s"%s' % (bundle_name,
+            'The requested bundle could not be loaded "%s"%s' % (bundle_id,
                 (' at version ' + bundle_version) if bundle_version is not None else ''))

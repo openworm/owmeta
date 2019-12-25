@@ -32,7 +32,7 @@ L = logging.getLogger(__name__)
 BUNDLE_MANIFEST_VERSION = 1
 '''
 Current version number of the bundle manifest. Written by `Installer` and anticipated by
-`Deployer` implementations.
+`Deployer` and `Fetcher`.
 '''
 
 
@@ -409,7 +409,12 @@ def bundle_directory(bundles_directory, ident, version=None):
 
 
 class Fetcher(object):
-    ''' Fetches bundles '''
+    '''
+    Fetches bundles from `Remotes <Remote>`
+
+    A fetcher takes a list of remotes and a bundle bundle directory tree or bundle archive and uploads it to a remote.
+    `Fetcher` is, functionally, the dual of this class. The specific
+    '''
 
     def __init__(self, bundles_root, remotes):
         self.bundles_root = bundles_root
@@ -418,41 +423,41 @@ class Fetcher(object):
     def __call__(self, *args, **kwargs):
         return self.fetch(*args, **kwargs)
 
-    def fetch(self, bundle_name, bundle_version=None):
+    def fetch(self, bundle_id, bundle_version=None):
         '''
         Retrieve a bundle by name from a remote and put it in the local bundle index and
         cache
 
         Parameters
         ----------
-        bundle_name : str
-            The name of the bundle to retrieve. The name may include the version number.
+        bundle_id : str
+            The id of the bundle to retrieve
         bundle_version : int
             The version of the bundle to retrieve. optional
         '''
-        loaders = self._get_bundle_loaders(bundle_name, bundle_version)
+        loaders = self._get_bundle_loaders(bundle_id, bundle_version)
 
         for loader in loaders:
             try:
                 if bundle_version is None:
-                    versions = loader.bundle_versions(bundle_name)
+                    versions = loader.bundle_versions(bundle_id)
                     if not versions:
-                        raise BundleNotFound(bundle_name, 'This loader does not have any'
+                        raise BundleNotFound(bundle_id, 'This loader does not have any'
                                 ' versions of the bundle')
                     bundle_version = max(versions)
-                bdir = bundle_directory(self.bundles_root, bundle_name, bundle_version)
+                bdir = bundle_directory(self.bundles_root, bundle_id, bundle_version)
                 loader.base_directory = bdir
-                loader(bundle_name, bundle_version)
+                loader(bundle_id, bundle_version)
                 return bdir
             except Exception:
-                L.warn("Failed to load bundle %s with %s", bundle_name, loader, exc_info=True)
+                L.warn("Failed to load bundle %s with %s", bundle_id, loader, exc_info=True)
         else: # no break
-            raise NoBundleLoader(bundle_name, bundle_version)
+            raise NoBundleLoader(bundle_id, bundle_version)
 
-    def _get_bundle_loaders(self, bundle_name, bundle_version):
+    def _get_bundle_loaders(self, bundle_id, bundle_version):
         for rem in self.remotes:
             for loader in rem.generate_loaders():
-                if loader.can_load(bundle_name, bundle_version):
+                if loader.can_load(bundle_id, bundle_version):
                     yield loader
 
 
@@ -460,7 +465,8 @@ class Deployer(object):
     '''
     Deploys bundles to `Remotes <Remote>`.
 
-    A deployer takes a bundle directory tree or bundle archive and uploads it to a remote
+    A deployer takes a bundle directory tree or bundle archive and uploads it to a remote.
+    `Fetcher` is, functionally, the dual of this class. The specific
     '''
 
     def deploy(self, bundle_path):
@@ -499,6 +505,9 @@ class Deployer(object):
             if not ident:
                 raise NotABundlePath(bundle_path,
                         'the bundle manifest has no bundle id')
+
+    def __call__(self, *args, **kwargs):
+        return self.deploy(*args, **kwargs)
 
 
 def retrieve_remotes(owmdir):
@@ -541,11 +550,11 @@ class Loader(object):
         ''' Returns True if the given accessor_config is a valid config for this loader '''
         return False
 
-    def can_load(self, bundle_name, bundle_version=None):
-        ''' Returns True if the bundle named `bundle_name` is supported '''
+    def can_load(self, bundle_id, bundle_version=None):
+        ''' Returns True if the bundle named `bundle_id` is supported '''
         return False
 
-    def bundle_versions(self, bundle_name):
+    def bundle_versions(self, bundle_id):
         '''
         List the versions available for the bundle.
 
@@ -553,7 +562,7 @@ class Loader(object):
 
         Parameter
         ---------
-        bundle_name : str
+        bundle_id : str
             ID of the bundle for which versions are requested
 
         Returns
@@ -562,24 +571,24 @@ class Loader(object):
         '''
         raise NotImplementedError()
 
-    def load(self, bundle_name, bundle_version=None):
+    def load(self, bundle_id, bundle_version=None):
         '''
         Load the bundle into the local index
 
         Parameters
         ----------
-        bundle_name : str
+        bundle_id : str
             ID of the bundle to load
         bundle_version : int
             Version of the bundle to load. Defaults to the latest available. optional
         '''
         raise NotImplementedError()
 
-    def __call__(self, bundle_name, bundle_version=None):
+    def __call__(self, bundle_id, bundle_version=None):
         '''
         Load the bundle into the local index. Short-hand for `load`
         '''
-        return self.load(bundle_name, bundle_version)
+        return self.load(bundle_id, bundle_version)
 
 
 class HTTPBundleLoader(Loader):
@@ -625,9 +634,9 @@ class HTTPBundleLoader(Loader):
                 (ac.url.startswith('https://') or
                     ac.url.startswith('http://')))
 
-    def can_load(self, bundle_name, bundle_version=None):
+    def can_load(self, bundle_id, bundle_version=None):
         self._setup_index()
-        binfo = self._index.get(bundle_name)
+        binfo = self._index.get(bundle_id)
         if binfo:
             if bundle_version is None:
                 return True
@@ -635,9 +644,9 @@ class HTTPBundleLoader(Loader):
                 return False
             return bundle_version in binfo
 
-    def bundle_versions(self, bundle_name):
+    def bundle_versions(self, bundle_id):
         self._setup_index()
-        binfo = self._index.get(bundle_name)
+        binfo = self._index.get(bundle_id)
 
         if not binfo:
             return []
@@ -652,17 +661,17 @@ class HTTPBundleLoader(Loader):
                 res.append(val)
         return res
 
-    def load(self, bundle_name, bundle_version=None):
+    def load(self, bundle_id, bundle_version=None):
         '''
         Loads a bundle by downloading an index file
         '''
         import requests
         self._setup_index()
-        binfo = self._index.get(bundle_name)
+        binfo = self._index.get(bundle_id)
         if not binfo:
-            raise LoadFailed(bundle_name, self, 'Bundle is not in the index')
+            raise LoadFailed(bundle_id, self, 'Bundle is not in the index')
         if not isinstance(binfo, dict):
-            raise LoadFailed(bundle_name, self, 'Unexpected type of bundle info in the index')
+            raise LoadFailed(bundle_id, self, 'Unexpected type of bundle info in the index')
         if bundle_version is None:
             max_vn = 0
             for k in binfo.keys():
@@ -676,11 +685,11 @@ class HTTPBundleLoader(Loader):
             bundle_version = max_vn
         bundle_url = binfo.get(str(bundle_version))
         if bundle_url is None:
-            raise LoadFailed(bundle_name, self, 'Did not find a URL for "%s" at'
-                    ' version %s', bundle_name, bundle_version)
+            raise LoadFailed(bundle_id, self, 'Did not find a URL for "%s" at'
+                    ' version %s', bundle_id, bundle_version)
         response = requests.get(bundle_url, stream=True)
         if self.cachedir is not None:
-            bfn = urlquote(bundle_name)
+            bfn = urlquote(bundle_id)
             with open(p(self.cachedir, bfn), 'w') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
@@ -698,6 +707,14 @@ class HTTPBundleLoader(Loader):
             ba.extractall(self.base_directory)
 
 
+class Archiver(object):
+    '''
+    Archives a bundle directory tree
+    '''
+    def __init__(self):
+        pass
+
+
 class DirectoryLoader(Loader):
     '''
     Loads a bundle into a directory.
@@ -707,11 +724,11 @@ class DirectoryLoader(Loader):
     def __init__(self, base_directory=None):
         self.base_directory = base_directory
 
-    def load(self, bundle_name):
+    def load(self, bundle_id):
         '''
         Loads a bundle into the given base directory
         '''
-        super(DirectoryLoader, self).load(bundle_name)
+        super(DirectoryLoader, self).load(bundle_id)
 
 
 class Installer(object):
@@ -1086,10 +1103,12 @@ class NoBundleLoader(FetchFailed):
     Thrown when a loader can't be found for a loader
     '''
 
-    def __init__(self, bundle_name, bundle_version=None):
+    def __init__(self, bundle_id, bundle_version=None):
         super(NoBundleLoader, self).__init__(
-            'No loader could be found for "%s"%s' % (bundle_name,
+            'No loader could be found for "%s"%s' % (bundle_id,
                 (' at version ' + bundle_version) if bundle_version is not None else ''))
+        self.bundle_id = bundle_id
+        self.bundle_version = bundle_version
 
 
 class NotABundlePath(Exception):
