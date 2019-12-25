@@ -8,7 +8,7 @@ import transaction
 from collections import namedtuple
 from rdflib.term import Literal, URIRef
 from owmeta.bundle import (Installer, Descriptor, make_include_func, FilesDescriptor,
-                           MissingImports, DependencyDescriptor)
+                           UncoveredImports, DependencyDescriptor)
 from owmeta.context_common import CONTEXT_IMPORTS
 from os.path import join as p, isdir, isfile
 from os import listdir
@@ -207,7 +207,7 @@ def test_imports_are_included(dirs):
         cg_imp.add((URIRef(ctxid_1), CONTEXT_IMPORTS, URIRef(ctxid_2)))
 
     bi = Installer(*dirs, imports_ctx=imports_ctxid, graph=g)
-    with pytest.raises(MissingImports):
+    with pytest.raises(UncoveredImports):
         bi.install(d)
 
 

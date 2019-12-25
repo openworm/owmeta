@@ -1,7 +1,7 @@
 import re
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
-from os.path import join as p, exists, relpath, expanduser
+from os.path import join as p, exists, relpath, expanduser, isdir, isfile
 from os import makedirs, rename, scandir, listdir
 import logging
 import hashlib
@@ -11,6 +11,7 @@ import io
 from rdflib.term import URIRef
 from struct import pack
 import yaml
+import json
 import six
 from .command_util import DEFAULT_OWM_DIR
 from .context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
@@ -26,6 +27,13 @@ except ImportError:
     from urllib import quote as urlquote
 
 L = logging.getLogger(__name__)
+
+
+BUNDLE_MANIFEST_VERSION = 1
+'''
+Current version number of the bundle manifest. Written by `Installer` and anticipated by
+`Deployer` implementations.
+'''
 
 
 class Remote(object):
@@ -157,15 +165,9 @@ class Descriptor(object):
     '''
     Descriptor for a bundle
     '''
-    def __init__(self, ident):
+    def __init__(self, ident, **kwargs):
         self.id = ident
-        self.name = None
-        self.version = 1
-        self.description = None
-        self.patterns = set()
-        self.includes = set()
-        self.dependencies = set()
-        self.files = None
+        self._set(kwargs)
 
     @classmethod
     def make(cls, obj):
@@ -173,11 +175,15 @@ class Descriptor(object):
         Makes a descriptor from the given object.
         '''
         res = cls(ident=obj['id'])
-        res.name = obj.get('name', obj['id'])
-        res.version = obj.get('version', 1)
-        res.description = obj.get('description', None)
-        res.patterns = set(make_pattern(x) for x in obj.get('patterns', ()))
-        res.includes = set(make_include_func(x) for x in obj.get('includes', ()))
+        res._set(obj)
+        return res
+
+    def _set(self, obj):
+        self.name = obj.get('name', self.id)
+        self.version = obj.get('version', 1)
+        self.description = obj.get('description', None)
+        self.patterns = set(make_pattern(x) for x in obj.get('patterns', ()))
+        self.includes = set(make_include_func(x) for x in obj.get('includes', ()))
 
         deps = set()
         for x in obj.get('dependencies', ()):
@@ -187,9 +193,8 @@ class Descriptor(object):
                 deps.add(DependencyDescriptor(**x))
             else:
                 deps.add(DependencyDescriptor(*x))
-        res.dependencies = deps
-        res.files = FilesDescriptor.make(obj.get('files', None))
-        return res
+        self.dependencies = deps
+        self.files = FilesDescriptor.make(obj.get('files', None))
 
     def __str__(self):
         return (FCN(type(self)) + '(ident={},'
@@ -449,6 +454,51 @@ class Fetcher(object):
             for loader in rem.generate_loaders():
                 if loader.can_load(bundle_name, bundle_version):
                     yield loader
+
+
+class Deployer(object):
+    '''
+    Deploys bundles to `Remotes <Remote>`.
+
+    A deployer takes a bundle directory tree or bundle archive and uploads it to a remote
+    '''
+
+    def deploy(self, bundle_path):
+        '''
+        Deploy a bundle
+
+        Parameters
+        ----------
+        bundle_path : str
+            Path to a bundle directory tree or archive
+        '''
+        if not exists(bundle_path):
+            raise NotABundlePath(bundle_path, 'the file does not exist')
+
+        if isdir(bundle_path):
+            try:
+                with open(p(bundle_path, 'manifest')) as mf:
+                    manifest_data = json.load(mf)
+            except (OSError, IOError) as e:
+                if e.errno == 2: # FileNotFound
+                    raise NotABundlePath(bundle_path, 'no bundle manifest found')
+                if e.errno == 21: # IsADirectoryError
+                    raise NotABundlePath(bundle_path, 'manifest is not a regular file')
+                raise
+            manifest_version = manifest_data.get('manifest_version')
+            if not manifest_version:
+                raise NotABundlePath(bundle_path,
+                        'the bundle manifest has no manifest version')
+
+            version = manifest_data.get('version')
+            if not version:
+                raise NotABundlePath(bundle_path,
+                        'the bundle manifest has no bundle version')
+
+            ident = manifest_data.get('id')
+            if not ident:
+                raise NotABundlePath(bundle_path,
+                        'the bundle manifest has no bundle id')
 
 
 def retrieve_remotes(owmdir):
@@ -765,19 +815,20 @@ class Installer(object):
                 shutil.copy2(source_fname, p(files_directory, fname))
 
     def _write_manifest(self, descriptor, staging_directory):
-        with open(p(staging_directory, 'manifest'), 'wb') as mf:
-            if self.default_ctx:
-                mf.write(DEFAULT_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                        self.default_ctx.encode('UTF-8') + b'\n')
-            if self.imports_ctx:
-                # If an imports context was specified, then we'll need to generate an
-                # imports context with the appropriate imports. We don't use the source
-                # imports context ID for the bundle's imports context because the bundle
-                # imports that we actually need are a subset of the total set of imports
-                mf.write(IMPORTS_CONTEXT_KEY.encode('UTF-8') + b'\x00' +
-                         fmt_bundle_ctx_id(descriptor.id).encode('UTF-8') + b'\n')
-            mf.write(b'version\x00' + pack('Q', descriptor.version) + b'\n')
-            mf.flush()
+        manifest_data = {}
+        if self.default_ctx:
+            manifest_data[DEFAULT_CONTEXT_KEY] = self.default_ctx
+        if self.imports_ctx:
+            # If an imports context was specified, then we'll need to generate an
+            # imports context with the appropriate imports. We don't use the source
+            # imports context ID for the bundle's imports context because the bundle
+            # imports that we actually need are a subset of the total set of imports
+            manifest_data[IMPORTS_CONTEXT_KEY] = fmt_bundle_ctx_id(descriptor.id)
+        manifest_data['id'] = descriptor.id
+        manifest_data['version'] = descriptor.version
+        manifest_data['manifest_version'] = BUNDLE_MANIFEST_VERSION
+        with open(p(staging_directory, 'manifest'), 'w') as mf:
+            json.dump(manifest_data, mf, separators=(',', ':'))
 
     def _write_context_data(self, descriptor, graphs_directory):
         contexts = _select_contexts(descriptor, self.graph)
@@ -818,7 +869,7 @@ class Installer(object):
             uncovered_contexts = imported_contexts - included_context_ids
             uncovered_contexts = self._cover_with_dependencies(uncovered_contexts, descriptor.dependencies)
             if uncovered_contexts:
-                raise MissingImports(uncovered_contexts)
+                raise UncoveredImports(uncovered_contexts)
             hash_out.flush()
             index_out.flush()
 
@@ -1007,13 +1058,21 @@ class LoadFailed(Exception):
 
 
 class InstallFailed(Exception):
-    pass
+    '''
+    Thrown when a bundle installation fails to complete.
+
+    You can assume that any intermediate bundle files have been cleaned up from the bundle
+    cache
+    '''
 
 
-class MissingImports(InstallFailed):
+class UncoveredImports(InstallFailed):
+    '''
+    Thrown when a bundle to be installed is missing
+    '''
     def __init__(self, imports):
         msg = 'Missing {} imports'.format(len(imports))
-        super(MissingImports, self).__init__(msg)
+        super(UncoveredImports, self).__init__(msg)
         self.imports = imports
 
 
@@ -1031,3 +1090,13 @@ class NoBundleLoader(FetchFailed):
         super(NoBundleLoader, self).__init__(
             'No loader could be found for "%s"%s' % (bundle_name,
                 (' at version ' + bundle_version) if bundle_version is not None else ''))
+
+
+class NotABundlePath(Exception):
+    '''
+    Thrown when a given path does not point to a bundle directory tree or bundle archive
+    '''
+    def __init__(self, path, explanation):
+        message = '"{}" is not a bundle path: {}'.format(path, explanation)
+        super(NotABundlePath, self).__init__(message)
+        self.path = path
