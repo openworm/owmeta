@@ -8,7 +8,12 @@ import rdflib
 from rdflib import ConjunctiveGraph, URIRef
 from pytest import fixture, raises
 
-from owmeta.bundle import Deployer, Descriptor, Installer, NotABundlePath
+from owmeta.bundle import (NoRemoteAvailable,
+                           Remote,
+                           Deployer,
+                           Descriptor,
+                           Installer,
+                           NotABundlePath)
 
 
 @fixture
@@ -121,9 +126,20 @@ def test_bundle_directory_manifest_has_no_bundle_id(testdir):
         cut.deploy(p(testdir, 'notabundle'))
 
 
-def test_deployer_from_installer(bundle):
+def test_deploy_directory_from_installer(bundle):
     ''' Test that we can deploy an installed bundle '''
-    Deployer().deploy(bundle.bundle_directory)
+
+    rem = Remote('remote')
+    Deployer().deploy(
+        bundle.bundle_directory,
+        remotes=(rem,)
+    )
+
+
+def test_deploy_directory_no_remotes(bundle):
+    ''' We can't deploy if we don't have any remotes '''
+    with raises(NoRemoteAvailable):
+        Deployer().deploy(bundle.bundle_directory)
 
 
 def test_deploy_directory_ignore_archive_only_remotes():

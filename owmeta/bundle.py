@@ -13,6 +13,7 @@ from struct import pack
 import yaml
 import json
 import six
+from itertools import chain
 from .command_util import DEFAULT_OWM_DIR
 from .context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .context_common import CONTEXT_IMPORTS
@@ -408,7 +409,44 @@ def bundle_directory(bundles_directory, ident, version=None):
         return base
 
 
-class Fetcher(object):
+class _RemoteHandlerMixin(object):
+    '''
+    Utility mixin for handling remotes
+
+    The mixed-in class must have a `remotes` attribute which is a list of `Remote`
+    '''
+
+    def _get_remotes(self, remotes):
+        ''''
+        Get remotes
+
+        Parameters
+        ----------
+        remotes : iterable of Remote or str
+            A subset of names of remotes to act on and additional remotes to act on
+        '''
+
+        instance_remotes = []
+        additional_remotes = []
+        if remotes:
+            configured_remotes = {r.name: r for r in self.remotes}
+            for r in remotes:
+                if isinstance(r, six.text_type):
+                    instance_remotes.append(configured_remotes.get(r))
+                elif isinstance(r, Remote):
+                    additional_remotes.append(r)
+        else:
+            instance_remotes = self.remotes
+        has_remote = False
+        for rem in chain(additional_remotes, instance_remotes):
+            has_remote = True
+            yield rem
+
+        if not has_remote:
+            raise NoRemoteAvailable()
+
+
+class Fetcher(_RemoteHandlerMixin):
     '''
     Fetches bundles from `Remotes <Remote>`
 
@@ -421,12 +459,18 @@ class Fetcher(object):
         self.remotes = remotes
 
     def __call__(self, *args, **kwargs):
+        '''
+        Calls `fetch` with the given arguments
+        '''
         return self.fetch(*args, **kwargs)
 
-    def fetch(self, bundle_id, bundle_version=None):
+    def fetch(self, bundle_id, bundle_version=None, remotes=None):
         '''
         Retrieve a bundle by name from a remote and put it in the local bundle index and
-        cache
+        cache.
+
+        The first remote that can retrieve the bundle will be tried. Each bundle will be
+        tried in succession until one downloads the bundle.
 
         Parameters
         ----------
@@ -434,8 +478,12 @@ class Fetcher(object):
             The id of the bundle to retrieve
         bundle_version : int
             The version of the bundle to retrieve. optional
+        remotes : iterable of Remote or str
+            A subset of remotes and additional remotes to fetch from. If an entry in the
+            iterable is a string, then it will be looked for amongst the remotes passed in
+            initially.
         '''
-        loaders = self._get_bundle_loaders(bundle_id, bundle_version)
+        loaders = self._get_bundle_loaders(bundle_id, bundle_version, remotes)
 
         for loader in loaders:
             try:
@@ -451,17 +499,17 @@ class Fetcher(object):
                 return bdir
             except Exception:
                 L.warn("Failed to load bundle %s with %s", bundle_id, loader, exc_info=True)
-        else: # no break
+        else:  # no break
             raise NoBundleLoader(bundle_id, bundle_version)
 
-    def _get_bundle_loaders(self, bundle_id, bundle_version):
-        for rem in self.remotes:
+    def _get_bundle_loaders(self, bundle_id, bundle_version, remotes):
+        for rem in self._get_remotes(remotes):
             for loader in rem.generate_loaders():
                 if loader.can_load(bundle_id, bundle_version):
                     yield loader
 
 
-class Deployer(object):
+class Deployer(_RemoteHandlerMixin):
     '''
     Deploys bundles to `Remotes <Remote>`.
 
@@ -469,7 +517,13 @@ class Deployer(object):
     `Fetcher` is, functionally, the dual of this class. The specific
     '''
 
-    def deploy(self, bundle_path):
+    def __init__(self, remotes=()):
+        self.remotes = remotes
+
+    def __call__(self, *args, **kwargs):
+        return self.deploy(*args, **kwargs)
+
+    def deploy(self, bundle_path, remotes=None):
         '''
         Deploy a bundle
 
@@ -477,6 +531,8 @@ class Deployer(object):
         ----------
         bundle_path : str
             Path to a bundle directory tree or archive
+        remotes : iterable of Remote or str
+            A subset of remotes to deploy to and additional remotes to deploy to
         '''
         if not exists(bundle_path):
             raise NotABundlePath(bundle_path, 'the file does not exist')
@@ -505,9 +561,12 @@ class Deployer(object):
             if not ident:
                 raise NotABundlePath(bundle_path,
                         'the bundle manifest has no bundle id')
+        self._get_bundle_uploaders(remotes)
 
-    def __call__(self, *args, **kwargs):
-        return self.deploy(*args, **kwargs)
+    def _get_bundle_uploaders(self, remotes):
+        for rem in self._get_remotes(remotes):
+            # TODO: Implement this
+            break
 
 
 def retrieve_remotes(owmdir):
@@ -1119,3 +1178,9 @@ class NotABundlePath(Exception):
         message = '"{}" is not a bundle path: {}'.format(path, explanation)
         super(NotABundlePath, self).__init__(message)
         self.path = path
+
+
+class NoRemoteAvailable(Exception):
+    '''
+    Thrown when we need a remote and we don't have one
+    '''
