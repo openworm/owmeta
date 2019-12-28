@@ -817,7 +817,8 @@ class OWM(object):
         context : str
             The context to set
         user : bool
-            If set, set the context only for the current user. Has no effect for retrieving the context
+            If set, set the context only for the current user. Has no effect for
+            retrieving the context
         '''
         if context is not None:
             config = self.config
@@ -835,7 +836,8 @@ class OWM(object):
         context : str
             The context to set
         user : bool
-            If set, set the context only for the current user. Has no effect for retrieving the context
+            If set, set the context only for the current user. Has no effect for
+            retrieving the context
         '''
         if context is not None:
             config = self.config

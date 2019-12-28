@@ -252,42 +252,11 @@ class Bundle(object):
         return bundle_directory
 
     def _get_bundle_directory(self):
-        # - look up the bundle in the index
+        # - look up the bundle in the bundle cache
         # - generate a config based on the current config load the config
         # - make a database from the graphs, if necessary (similar to `owm regendb`). If
         #   delete the existing database if it doesn't match the store config
-        version = self.version
-        if version is None:
-            bundle_root = bundle_directory(self.bundles_directory, self.ident)
-            latest_version = 0
-            try:
-                ents = scandir(bundle_root)
-            except (OSError, IOError) as e:
-                if e.errno == 2: # FileNotFound
-                    raise BundleNotFound(self.ident, 'Bundle directory does not exist')
-                raise
-
-            for ent in ents:
-                if ent.is_dir():
-                    try:
-                        vn = int(ent.name)
-                    except ValueError:
-                        # We may put things other than versioned bundle directories in
-                        # this directory later, in which case this is OK
-                        pass
-                    else:
-                        if vn > latest_version:
-                            latest_version = vn
-            version = latest_version
-        if not version:
-            raise BundleNotFound(self.ident, 'No versioned bundle directories exist')
-        res = bundle_directory(self.bundles_directory, self.ident, version)
-        if not exists(res):
-            if self.version is None:
-                raise BundleNotFound(self.ident, 'Bundle directory does not exist')
-            else:
-                raise BundleNotFound(self.ident, 'Bundle directory does not exist for the specified version', version)
-        return res
+        return find_bundle_directory(self.bundles_directory, self.ident, self.version)
 
     def _make_config(self, bundle_directory, progress=None, trip_prog=None):
         self.conf = Data().copy(self._given_conf)
@@ -390,7 +359,45 @@ class Bundle(object):
         return None
 
 
-def bundle_directory(bundles_directory, ident, version=None):
+def find_bundle_directory(bundles_directory, ident, version=None):
+    # - look up the bundle in the bundle cache
+    # - generate a config based on the current config load the config
+    # - make a database from the graphs, if necessary (similar to `owm regendb`). If
+    #   delete the existing database if it doesn't match the store config
+    if version is None:
+        bundle_root = fmt_bundle_directory(bundles_directory, ident)
+        latest_version = 0
+        try:
+            ents = scandir(bundle_root)
+        except (OSError, IOError) as e:
+            if e.errno == errno.ENOENT: # FileNotFound
+                raise BundleNotFound(ident, 'Bundle directory does not exist')
+            raise
+
+        for ent in ents:
+            if ent.is_dir():
+                try:
+                    vn = int(ent.name)
+                except ValueError:
+                    # We may put things other than versioned bundle directories in
+                    # this directory later, in which case this is OK
+                    pass
+                else:
+                    if vn > latest_version:
+                        latest_version = vn
+        version = latest_version
+    if not version:
+        raise BundleNotFound(ident, 'No versioned bundle directories exist')
+    res = fmt_bundle_directory(bundles_directory, ident, version)
+    if not exists(res):
+        if version is None:
+            raise BundleNotFound(ident, 'Bundle directory does not exist')
+        else:
+            raise BundleNotFound(ident, 'Bundle directory does not exist for the specified version', version)
+    return res
+
+
+def fmt_bundle_directory(bundles_directory, ident, version=None):
     '''
     Get the directory for the given bundle identifier and version
 
@@ -493,7 +500,7 @@ class Fetcher(_RemoteHandlerMixin):
                         raise BundleNotFound(bundle_id, 'This loader does not have any'
                                 ' versions of the bundle')
                     bundle_version = max(versions)
-                bdir = bundle_directory(self.bundles_root, bundle_id, bundle_version)
+                bdir = fmt_bundle_directory(self.bundles_root, bundle_id, bundle_version)
                 loader.base_directory = bdir
                 loader(bundle_id, bundle_version)
                 return bdir
@@ -542,9 +549,9 @@ class Deployer(_RemoteHandlerMixin):
                 with open(p(bundle_path, 'manifest')) as mf:
                     manifest_data = json.load(mf)
             except (OSError, IOError) as e:
-                if e.errno == 2: # FileNotFound
+                if e.errno == errno.ENOENT: # FileNotFound
                     raise NotABundlePath(bundle_path, 'no bundle manifest found')
-                if e.errno == 21: # IsADirectoryError
+                if e.errno == errno.EISDIR: # IsADirectoryError
                     raise NotABundlePath(bundle_path, 'manifest is not a regular file')
                 raise
             manifest_version = manifest_data.get('manifest_version')
@@ -567,6 +574,67 @@ class Deployer(_RemoteHandlerMixin):
         for rem in self._get_remotes(remotes):
             # TODO: Implement this
             break
+
+
+class Cache(object):
+    '''
+    Cache of bundles
+    '''
+
+    def __init__(self, bundles_directory):
+        '''
+        Parameters
+        ----------
+        bundles_directory : str
+            The where bundles are stored
+        '''
+        self.bundles_directory = bundles_directory
+
+    def list(self):
+        '''
+        Returns a generator of summary bundle info
+        '''
+        try:
+            bundle_directories = scandir(self.bundles_directory)
+        except (OSError, IOError) as e:
+            if e.errno == errno.ENOENT:
+                return
+            raise
+
+        for bundle_directory in bundle_directories:
+            if not bundle_directory.is_dir():
+                continue
+
+            # Ignore deletes out from under us
+            try:
+                version_directories = scandir(bundle_directory.path)
+            except (OSError, IOError) as e:
+                if e.errno == errno.ENOENT:
+                    continue
+                raise
+
+            def keyfunc(x):
+                try:
+                    return int(x.name)
+                except ValueError:
+                    return float('+inf')
+
+            for version_directory in sorted(version_directories, key=keyfunc, reverse=True):
+                if not version_directory.is_dir():
+                    continue
+                try:
+                    manifest_fname = p(version_directory.path, 'manifest')
+                    with open(manifest_fname) as mf:
+                        try:
+                            manifest_data = json.load(mf)
+                            yield manifest_data
+                        except json.decoder.JSONDecodeError:
+                            L.warn("Bundle manifest at %s is malformed",
+                                   manifest_fname,
+                                   exc_info=True)
+                except (OSError, IOError) as e:
+                    if e.errno != errno.ENOENT:
+                        raise
 
 
 def retrieve_remotes(owmdir):
@@ -844,7 +912,7 @@ class Installer(object):
         # Create the staging directory in the base directory to reduce the chance of
         # moving across file systems
         try:
-            staging_directory = bundle_directory(self.bundles_directory, descriptor.id,
+            staging_directory = fmt_bundle_directory(self.bundles_directory, descriptor.id,
                     descriptor.version)
             makedirs(staging_directory)
         except OSError:

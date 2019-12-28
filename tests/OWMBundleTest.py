@@ -31,7 +31,7 @@ def test_load(self):
     owm_bundle = p('tests', 'bundle.tar.gz')
     self.sh('owm bundle load ' + owm_bundle)
     assertRegexpMatches(
-        self.sh('owm bundle index query'),
+        self.sh('owm bundle index list'),
         r'archive_test_bundle'
     )
 
@@ -128,14 +128,96 @@ def test_reregister(self):
     )
 
 
-def test_fetch_and_query(self):
+def test_cache_list(self):
     '''
-    Retrieve the bundle from wherever and make sure we can list it
+    List bundles in the cache
     '''
-    self.sh('owm bundle fetch openworm/main')
+    bundle_dir = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    makedirs(bundle_dir)
+    with open(p(bundle_dir, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main"}')
     assertRegexpMatches(
-        self.sh('owm bundle index query'),
-        r'openworm/main'
+        self.sh('owm bundle cache list'),
+        r'test/main@1'
+    )
+
+
+def test_cache_list_empty(self):
+    '''
+    List bundles in the cache
+    '''
+    assert self.sh('owm bundle cache list') == ''
+
+
+def test_cache_list_multiple_versions(self):
+    '''
+    List bundles in the cache.
+
+    For the same bundle ID, they should be in reverse version order (newest versions
+    first)
+    '''
+    bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    bundle_dir2 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '2')
+    makedirs(bundle_dir1)
+    makedirs(bundle_dir2)
+    with open(p(bundle_dir1, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main"}')
+    with open(p(bundle_dir2, 'manifest'), 'w') as mf:
+        mf.write('{"version": 2, "id": "test/main"}')
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'test/main@2\ntest/main@1'
+    )
+
+
+def test_cache_list_different_bundles(self):
+    '''
+    List bundles in the cache
+    '''
+    bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    bundle_dir2 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fsecondary', '1')
+    makedirs(bundle_dir1)
+    makedirs(bundle_dir2)
+    with open(p(bundle_dir1, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main"}')
+    with open(p(bundle_dir2, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/secondary"}')
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'test/main@1'
+    )
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'test/secondary@1'
+    )
+
+
+def test_cache_list_description(self):
+    '''
+    Make sure the bundle description shows up
+    '''
+    bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    bundle_dir2 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fsecondary', '2')
+    makedirs(bundle_dir1)
+    makedirs(bundle_dir2)
+    with open(p(bundle_dir1, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main"}')
+    with open(p(bundle_dir2, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/secondary"}')
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'test/main@1'
+    )
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'test/secondary@1'
     )
 
 
@@ -143,10 +225,10 @@ def test_checkout(self):
     '''
     Checking out a bundle changes the set of graphs to the chosen bundle
     '''
-    self.sh('owm bundle checkout openworm/main')
+    self.sh('owm bundle checkout test/main')
     # TODO: Add an assert
 
 
 def test_deploy(self):
-    self.sh('owm bundle deploy openworm/main')
+    self.sh('owm bundle deploy test/main')
     # TODO: Add an assert

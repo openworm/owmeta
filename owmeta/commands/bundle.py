@@ -12,14 +12,12 @@ from ..context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from ..command_util import GenericUserError, GeneratorWithData, SubCommand
 from ..bundle import (Descriptor,
                       Installer,
-                      HTTPBundleLoader,
                       URLConfig,
                       Remote,
                       Fetcher,
-                      bundle_directory,
+                      Cache,
                       retrieve_remotes,
-                      NoBundleLoader as _NoBundleLoader,
-                      LOADER_CLASSES)
+                      NoBundleLoader as _NoBundleLoader)
 
 import hashlib
 
@@ -85,12 +83,42 @@ class OWMBundleRemote(object):
                 header=("Name",))
 
 
+class OWMBundleCache(object):
+    '''
+    Bundle cache commands
+    '''
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    def list(self):
+        '''
+        List bundles in the cache
+        '''
+        bundles_directory = self._parent._bundles_directory()
+        cache = Cache(bundles_directory)
+        return GeneratorWithData(cache.list(),
+                text_format=lambda nd: "{id}{name}@{version}{description}".format(
+                    id=nd['id'],
+                    name=('(%s)' % nd['name'] if nd.get('name') else ''),
+                    version=nd.get('version'),
+                    description=(' - %s' % (nd.get('description') or nd.get('error'))) if
+                    nd.get('description') or nd.get('error') else ''),
+                columns=(lambda nd: nd['id'],
+                         lambda nd: nd['version'],
+                         lambda nd: nd.get('name'),
+                         lambda nd: nd.get('description'),
+                         lambda nd: nd.get('error', '')),
+                header=("ID", "Version", "Name", "Description", "Error"))
+
+
 class OWMBundle(object):
     '''
     Bundle commands
     '''
 
     remote = SubCommand(OWMBundleRemote)
+    cache = SubCommand(OWMBundleCache)
 
     def __init__(self, parent):
         self._parent = parent
@@ -108,11 +136,14 @@ class OWMBundle(object):
         bundle_version : int
             The version of the bundle to retrieve. optional
         '''
-        f = Fetcher(p(self._parent.userdir, 'bundles'), self._retrieve_remotes())
+        f = Fetcher(self._bundles_directory(), self._retrieve_remotes())
         try:
             f.fetch(bundle_id, bundle_version)
         except _NoBundleLoader as e:
             raise NoBundleLoader(e.bundle_id, e.bundle_version)
+
+    def _bundles_directory(self):
+        return p(self._parent.userdir, 'bundles')
 
     def load(self, input_file_name):
         '''
@@ -178,7 +209,7 @@ class OWMBundle(object):
         imports_ctx = self._parent._conf(IMPORTS_CONTEXT_KEY, None)
         default_ctx = self._parent._conf(DEFAULT_CONTEXT_KEY, None)
         bi = Installer(self._parent.basedir,
-                       p(self._parent.userdir, 'bundles'),
+                       self._bundles_directory(),
                        self._parent.rdf,
                        imports_ctx=imports_ctx,
                        default_ctx=default_ctx)
