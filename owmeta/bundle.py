@@ -177,6 +177,12 @@ class URLConfig(AccessorConfig):
     __repr__ = __str__
 
 
+class HTTPSURLConfig(URLConfig):
+    def __init__(self, *args, ssl_context=None, **kwargs):
+        super(HTTPSURLConfig, self).__init__(*args, **kwargs)
+        self.ssl_context = ssl_context
+
+
 class Descriptor(object):
     '''
     Descriptor for a bundle
@@ -796,22 +802,46 @@ class Loader(object):
 
 
 class HTTPBundleUploader(Uploader):
-    def __init__(self, upload_url):
+    def __init__(self, upload_url, ssl_context=None):
+        '''
+        Parameters
+        ----------
+        upload_url : str or URLConfig
+            URL string or accessor config
+        ssl_context : ssl.SSLContext
+            SSL/TLS context to use for the connection. Overrides any context provided in
+            `upload_url`
+        '''
         super(HTTPBundleUploader, self).__init__()
+
+        self.ssl_context = None
+
         if isinstance(upload_url, str):
             self.upload_url = upload_url
+        elif isinstance(upload_url, HTTPSURLConfig):
+            self.upload_url = upload_url.url
+            self.ssl_context = upload_url.ssl_context
         elif isinstance(upload_url, URLConfig):
             self.upload_url = upload_url.url
         else:
             raise TypeError('Expecting a string or URLConfig. Received %s' %
                     type(upload_url))
 
+        if ssl_context:
+            self.ssl_context = ssl_context
+
+    @classmethod
+    def can_upload_to(self, accessor_config):
+        return (isinstance(accessor_config, URLConfig) and
+                (accessor_config.url.startswith('https://') or
+                    accessor_config.url.startswith('http://')))
+
     def upload(self, bundle_path):
+        import tarfile
         archive_path = bundle_path
 
         with tempfile.TemporaryDirectory() as tempdir:
             if isdir(bundle_path):
-                import tarfile
                 with tarfile.open(p(tempdir, 'bundle.tar.xz'), mode='w:xz') as ba:
                     archive_path = p(tempdir, 'bundle.tar.xz')
                     ba.add(bundle_path, arcname='.')
@@ -822,7 +852,13 @@ class HTTPBundleUploader(Uploader):
     def _post(self, archive):
         urlparse = six.moves.urllib.parse.urlparse
         parsed_url = urlparse(self.upload_url)
-        conn = http.client.HTTPConnection(parsed_url.netloc)
+        if parsed_url.scheme == 'http':
+            connection_ctor = http.client.HTTPConnection
+        else:
+            def connection_ctor(*args, **kwargs):
+                return http.client.HTTPSConnection(*args,
+                        context=self.ssl_context, **kwargs)
+        conn = connection_ctor(parsed_url.netloc)
         with open(archive, 'rb') as f:
             conn.request("POST", "", body=f, headers={'Content-Type':
                 BUNDLE_ARCHIVE_MIME_TYPE})
@@ -1297,6 +1333,7 @@ LOADER_CLASSES = [
 
 
 UPLOADER_CLASSES = [
+    HTTPBundleUploader
 ]
 
 
