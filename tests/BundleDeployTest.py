@@ -75,8 +75,8 @@ def test_bundle_directory_lacks_manifest(testdir):
         cut.deploy(p(testdir, 'notabundle'))
 
 
-def test_bundle_directory_manifest_not_a_file(testdir):
-    ''' A valid bundle manifest is a file '''
+def test_bundle_directory_manifest_is_a_directory(testdir):
+    ''' A valid bundle manifest is not a directory '''
 
     cut = Deployer()
     os.makedirs(p(testdir, 'notabundle', 'manifest'))
@@ -98,11 +98,17 @@ def test_bundle_directory_manifest_has_no_version(testdir):
         cut.deploy(p(testdir, 'notabundle'))
 
 
+def test_bundle_directory_manifest_has_unknown_manifest_version(testdir):
+    cut = Deployer()
+    bdir = p(testdir, 'notabundle')
+    os.makedirs(bdir)
+    with open(p(bdir, 'manifest'), 'w') as mf:
+        json.dump({'manifest_version': 2}, mf)
+    with raises(NotABundlePath):
+        cut.deploy(p(testdir, 'notabundle'))
+
+
 def test_bundle_directory_manifest_has_no_bundle_version(testdir):
-    '''
-    A valid bundle manifest has a version number, up to a specific version, all other
-    fields are optional
-    '''
     cut = Deployer()
     bdir = p(testdir, 'notabundle')
     os.makedirs(bdir)
@@ -113,10 +119,6 @@ def test_bundle_directory_manifest_has_no_bundle_version(testdir):
 
 
 def test_bundle_directory_manifest_has_no_bundle_id(testdir):
-    '''
-    A valid bundle manifest has a version number, up to a specific version, all other
-    fields are optional
-    '''
     cut = Deployer()
     bdir = p(testdir, 'notabundle')
     os.makedirs(bdir)

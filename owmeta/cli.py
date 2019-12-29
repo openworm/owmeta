@@ -17,7 +17,7 @@ def additional_args(parser):
     parser.add_argument('--output-mode', '-o', default='text',
             help='How to print the results of a command'
             ' (if any). Default is \'text\'',
-            choices=['json', 'text'])
+            choices=['json', 'text', 'table'])
     parser.add_argument('--columns',
             help='Comma-separated list of columns to display in "table" output mode')
     parser.add_argument('--text-field-separator', default='\t',

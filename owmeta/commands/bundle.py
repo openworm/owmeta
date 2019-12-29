@@ -109,6 +109,7 @@ class OWMBundleCache(object):
                          lambda nd: nd.get('name'),
                          lambda nd: nd.get('description'),
                          lambda nd: nd.get('error', '')),
+                default_columns=('ID', 'Version'),
                 header=("ID", "Version", "Name", "Description", "Error"))
 
 

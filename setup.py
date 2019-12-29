@@ -53,6 +53,7 @@ setup(
         'pytest>=3.4.0 ; python_version >= "3.0"',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
+        'requests',
         'mock==2.0.0 ; python_version < "3.0"',
         'pytest-parallel ; python_version >= "3.0"'
     ],

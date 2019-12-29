@@ -1,6 +1,5 @@
 import re
-from yarom.utils import FCN
-from yarom.rdfUtils import transitive_lookup, BatchAddGraph
+import tempfile
 from os.path import join as p, exists, relpath, expanduser, isdir, isfile
 from os import makedirs, rename, scandir, listdir
 import logging
@@ -8,12 +7,17 @@ import hashlib
 import shutil
 import errno
 import io
-from rdflib.term import URIRef
 from struct import pack
-import yaml
 import json
-import six
 from itertools import chain
+
+import six
+import yaml
+from rdflib.term import URIRef
+import http.client
+from yarom.utils import FCN
+from yarom.rdfUtils import transitive_lookup, BatchAddGraph
+
 from .command_util import DEFAULT_OWM_DIR
 from .context import DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .context_common import CONTEXT_IMPORTS
@@ -23,9 +27,9 @@ from .file_lock import lock_file
 from .graph_serialization import write_canonical_to_file, gen_ctx_fname
 
 try:
-    from urllib.parse import quote as urlquote
+    from urllib.parse import quote as urlquote, unquote as urlunquote
 except ImportError:
-    from urllib import quote as urlquote
+    from urllib import quote as urlquote, unquote as urlunquote
 
 L = logging.getLogger(__name__)
 
@@ -34,6 +38,11 @@ BUNDLE_MANIFEST_VERSION = 1
 '''
 Current version number of the bundle manifest. Written by `Installer` and anticipated by
 `Deployer` and `Fetcher`.
+'''
+
+BUNDLE_ARCHIVE_MIME_TYPE = 'application/x-gtar'
+'''
+MIME type for bundle archive files
 '''
 
 
@@ -57,8 +66,6 @@ class Remote(object):
         self.accessor_configs = list(accessor_configs)
         ''' Configs for how you access the remote. Probably just URLs '''
 
-        self._loaders = []
-
     def add_config(self, accessor_config):
         self.accessor_configs.append(accessor_config)
 
@@ -66,12 +73,20 @@ class Remote(object):
         '''
         Generate the bundle loaders for this remote
         '''
-        self._loaders = []
         for ac in self.accessor_configs:
             for lc in LOADER_CLASSES:
                 if lc.can_load_from(ac):
                     loader = lc(ac)
-                    self._loaders.append(loader)
+                    yield loader
+
+    def generate_uploaders(self):
+        '''
+        Generate the bundle uploaders for this remote
+        '''
+        for ac in self.accessor_configs:
+            for uc in UPLOADER_CLASSES:
+                if uc.can_upload_to(ac):
+                    loader = uc(ac)
                     yield loader
 
     def write(self, out):
@@ -444,6 +459,7 @@ class _RemoteHandlerMixin(object):
                     additional_remotes.append(r)
         else:
             instance_remotes = self.remotes
+        print('self.remotes', self.remotes)
         has_remote = False
         for rem in chain(additional_remotes, instance_remotes):
             has_remote = True
@@ -554,26 +570,81 @@ class Deployer(_RemoteHandlerMixin):
                 if e.errno == errno.EISDIR: # IsADirectoryError
                     raise NotABundlePath(bundle_path, 'manifest is not a regular file')
                 raise
-            manifest_version = manifest_data.get('manifest_version')
-            if not manifest_version:
-                raise NotABundlePath(bundle_path,
-                        'the bundle manifest has no manifest version')
+            self._validate_manifest(manifest_data)
+        elif isfile(bundle_path):
+            # TODO: Handle bundle archives
+            pass
 
-            version = manifest_data.get('version')
-            if not version:
-                raise NotABundlePath(bundle_path,
-                        'the bundle manifest has no bundle version')
+        for uploader in self._get_bundle_uploaders(bundle_path, remotes=remotes):
+            uploader(bundle_path)
 
-            ident = manifest_data.get('id')
-            if not ident:
-                raise NotABundlePath(bundle_path,
-                        'the bundle manifest has no bundle id')
-        self._get_bundle_uploaders(remotes)
+    def _validate_manifest(self, bundle_path, manifest_data):
+        manifest_version = manifest_data.get('manifest_version')
+        if not manifest_version:
+            raise NotABundlePath(bundle_path,
+                    'the bundle manifest has no manifest version')
 
-    def _get_bundle_uploaders(self, remotes):
+        if manifest_version > BUNDLE_MANIFEST_VERSION or manifest_version < 0:
+            raise NotABundlePath(bundle_path,
+                    'the bundle manifest has an invalid manifest version')
+
+        version = manifest_data.get('version')
+        if not version:
+            raise NotABundlePath(bundle_path,
+                    'the bundle manifest has no bundle version')
+
+        ident = manifest_data.get('id')
+        if not ident:
+            raise NotABundlePath(bundle_path,
+                    'the bundle manifest has no bundle id')
+
+    def _get_bundle_uploaders(self, bundle_directory, remotes=None):
         for rem in self._get_remotes(remotes):
-            # TODO: Implement this
-            break
+            for uploader in rem.generate_uploaders():
+                if uploader.can_upload(bundle_directory):
+                    yield loader
+
+
+class Uploader(object):
+    '''
+    Uploads bundles to remotes
+    '''
+
+    @classmethod
+    def can_upload_to(self, accessor_config):
+        '''
+        Returns True if this uploader can upload with the given accessor configuration
+
+        Parameters
+        ----------
+        accessor_config : AccessorConfig
+        '''
+        return False
+
+    def can_upload(self, bundle_path):
+        '''
+        Returns True if this uploader can upload this bundle
+
+        Parameters
+        ----------
+        bundle_path : str
+            The file path to the bundle to upload
+        '''
+        return False
+
+    def upload(self, bundle_path):
+        '''
+        Upload a bundle
+
+        Parameters
+        ----------
+        bundle_path : str
+            The file path to the bundle to upload
+        '''
+        raise NotImplementedError()
+
+    def __call__(self, *args, **kwargs):
+        return self.upload(*args, **kwargs)
 
 
 class Cache(object):
@@ -627,11 +698,17 @@ class Cache(object):
                     with open(manifest_fname) as mf:
                         try:
                             manifest_data = json.load(mf)
+                            bd_id = urlunquote(bundle_directory.name)
+                            bd_version = int(version_directory.name)
+                            if (bd_id != manifest_data.get('id') or
+                                    bd_version != manifest_data.get('version')):
+                                L.warn('Bundle manifest at %s does not match bundle'
+                                ' directory', manifest_fname)
+                                continue
                             yield manifest_data
                         except json.decoder.JSONDecodeError:
                             L.warn("Bundle manifest at %s is malformed",
-                                   manifest_fname,
-                                   exc_info=True)
+                                   manifest_fname)
                 except (OSError, IOError) as e:
                     if e.errno != errno.ENOENT:
                         raise
@@ -716,6 +793,40 @@ class Loader(object):
         Load the bundle into the local index. Short-hand for `load`
         '''
         return self.load(bundle_id, bundle_version)
+
+
+class HTTPBundleUploader(Uploader):
+    def __init__(self, upload_url):
+        super(HTTPBundleUploader, self).__init__()
+        if isinstance(upload_url, str):
+            self.upload_url = upload_url
+        elif isinstance(upload_url, URLConfig):
+            self.upload_url = upload_url.url
+        else:
+            raise TypeError('Expecting a string or URLConfig. Received %s' %
+                    type(upload_url))
+
+    def upload(self, bundle_path):
+        archive_path = bundle_path
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            if isdir(bundle_path):
+                import tarfile
+                with tarfile.open(p(tempdir, 'bundle.tar.xz'), mode='w:xz') as ba:
+                    archive_path = p(tempdir, 'bundle.tar.xz')
+                    ba.add(bundle_path, arcname='.')
+            if not tarfile.is_tarfile(archive_path):
+                raise NotABundlePath(bundle_path, 'Expected a directory or a tar file')
+            self._post(archive_path)
+
+    def _post(self, archive):
+        urlparse = six.moves.urllib.parse.urlparse
+        parsed_url = urlparse(self.upload_url)
+        conn = http.client.HTTPConnection(parsed_url.netloc)
+        with open(archive, 'rb') as f:
+            conn.request("POST", "", body=f, headers={'Content-Type':
+                BUNDLE_ARCHIVE_MIME_TYPE})
+        response = conn.getresponse()
 
 
 class HTTPBundleLoader(Loader):
@@ -1185,6 +1296,10 @@ LOADER_CLASSES = [
 ]
 
 
+UPLOADER_CLASSES = [
+]
+
+
 class BundleNotFound(Exception):
     def __init__(self, bundle_ident, msg=None, version=None):
         msg = 'Missing bundle "{}"{}{}'.format(bundle_ident,
@@ -1240,7 +1355,8 @@ class NoBundleLoader(FetchFailed):
 
 class NotABundlePath(Exception):
     '''
-    Thrown when a given path does not point to a bundle directory tree or bundle archive
+    Thrown when a given path does not point to a valid bundle directory tree or bundle
+    archive
     '''
     def __init__(self, path, explanation):
         message = '"{}" is not a bundle path: {}'.format(path, explanation)
