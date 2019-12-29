@@ -216,3 +216,7 @@ def main():
                             print(out.text_format(x), end=text_record_separator)
                         else:
                             print(x, end=text_record_separator)
+
+
+if __name__ == '__main__':
+    main()

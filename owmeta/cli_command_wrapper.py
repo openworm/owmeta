@@ -3,8 +3,8 @@ import sys
 import types
 import argparse
 import copy as _copy
-from numpydoc.docscrape import FunctionDoc
 from yarom.mapper import FCN
+from .docscrape import parse as npdoc_parse
 from .command_util import IVar, SubCommand
 
 
@@ -198,14 +198,14 @@ class CLICommandWrapper(object):
         docstring = getattr(val, '__doc__', '')
         if not docstring:
             docstring = ''
-        docstring = docstring.strip()
-        npdoc = FunctionDoc(val)
-        params = npdoc['Parameters']
+        npdoc = npdoc_parse(docstring)
+        params = npdoc.get('parameters')
         paragraphs = self._split_paras(docstring)
         if (len(paragraphs) == 1 and not params) or len(paragraphs) > 1:
             summary = paragraphs[0]
         else:
             summary = ''
+
         if params: # Assuming the Parameters section is the last 'paragraph'
             paragraphs = paragraphs[:-1]
         detail = '\n'.join(x for x in paragraphs if x)
@@ -267,7 +267,7 @@ class CLICommandWrapper(object):
                         atype = ARGUMENT_TYPES.get(param[1])
 
                         arg = param[0]
-                        desc = ' '.join(param[2])
+                        desc = param[2]
                         if arg.startswith('**'):
                             subparser.add_argument('--' + arg[2:],
                                                    action=CLIAppendAction,
