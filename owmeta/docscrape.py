@@ -17,12 +17,18 @@ regex = r'''
 (?P<parameters>(?:{parameter_regex})+))?
 '''.format(parameter_regex=parameter_regex)
 
+first_line_unindented_regex = r'^\S.*\n+(?P<initial_white_space>\s+)'
+
 RE = re.compile(regex, flags=re.VERBOSE | re.MULTILINE)
 ParamRE = re.compile(parameter_regex, flags=re.VERBOSE | re.MULTILINE)
+FLURE = re.compile(first_line_unindented_regex, flags=re.VERBOSE | re.MULTILINE)
 
 
 def parse(text):
     resp = {}
+    iws_match = FLURE.match(text)
+    if iws_match:
+        text = iws_match.group('initial_white_space') + text
     if text.startswith('\n'):
         text = text[1:]
     text = dedent(text)
