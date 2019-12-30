@@ -576,7 +576,7 @@ class Deployer(_RemoteHandlerMixin):
                 if e.errno == errno.EISDIR: # IsADirectoryError
                     raise NotABundlePath(bundle_path, 'manifest is not a regular file')
                 raise
-            self._validate_manifest(manifest_data)
+            self._validate_manifest(bundle_path, manifest_data)
         elif isfile(bundle_path):
             # TODO: Handle bundle archives
             pass
