@@ -177,10 +177,7 @@ class CLIJSONOutputModeTest(CLIOutputModeTest):
             def main(argument_namespace_callback, **kwargs):
                 from owmeta.context import Context
                 argument_namespace_callback.output_mode = 'json'
-                m = Mock(name='context_result', spec=Context())
-                m.identifier = 'ident'
-                m.base_namespace = 'base_namespace'
-                return m
+                return Context('ident', base_namespace='base_namespace')
             self.ccw().main.side_effect = main
             PCLI.main()
         val = json.loads(so.getvalue())

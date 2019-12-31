@@ -531,7 +531,8 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
         self.parent = Mock(name='parent')
         self.cut = OWMEvidence(self.parent)
 
-        dweds = Mock(name='dweds', spec=DWEDS())
+        dweds = DWEDS()
+        dweds.evidence_context = Mock()
         # load from the given identifier is a dweds
         self.parent._default_ctx.stored(ANY).query().load.return_value = [dweds]
         # load evidence from the evidence_context is just one evidence object
@@ -540,7 +541,7 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
     def test_doc(self):
         # given
         evid = Mock(name='evidence')
-        doc = Mock(name="doc", spec=Document())
+        doc = Document()
         self.ev_load.return_value = [evid]
         evid.reference.return_value = doc
 
@@ -548,6 +549,7 @@ class OWMEvidenceGetDWEDSTest(unittest.TestCase):
         self.cut.get(URIRef('http://example.org/context'))
 
         # then
+        self.ev_load.assert_called()
         self.parent.message.assert_called()
 
     def test_no_evidence(self):
@@ -585,8 +587,8 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
     def test_doc(self):
         # given
         evid = Mock(name='evidence')
-        doc = Mock(name="doc", spec=Document())
-        cdo = Mock(name='cdo', spec=ContextDataObject())
+        doc = Document()
+        cdo = ContextDataObject()
         # load from the given identifier is a ContextDataObject
         self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       [evid]]
@@ -601,8 +603,8 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
     def test_web(self):
         # given
         evid = Mock(name='evidence')
-        web = Mock(name="web", spec=Website())
-        cdo = Mock(name='cdo', spec=ContextDataObject())
+        web = Website()
+        cdo = ContextDataObject()
         # load from the given identifier is a ContextDataObject
         self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       [evid]]
@@ -619,7 +621,7 @@ class OWMEvidenceGetContextTest(unittest.TestCase):
         There's no evidence, so we shouldn't see any output
         '''
         # given
-        cdo = Mock(name='cdo', spec=ContextDataObject())
+        cdo = ContextDataObject()
         self.parent._default_ctx.stored(ANY).query().load.side_effect = [[cdo],
                                                                       []]
 
