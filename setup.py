@@ -40,22 +40,16 @@ def excludes(base):
     return res
 
 
-def py2_only(*args):
-    return [x + ' ; python_version < "3.0"' for x in args]
-
-
 setup(
     name='owmeta',
     zip_safe=False,
     setup_requires=['pytest-runner'],
     tests_require=[
-        'pytest<5.0.0 ; python_version < "3.0"',
-        'pytest>=3.4.0 ; python_version >= "3.0"',
+        'pytest>=3.4.0',
         'pytest-cov>=2.5.1',
         'discover==0.4.0',
         'requests',
-        'mock==2.0.0 ; python_version < "3.0"',
-        'pytest-parallel ; python_version >= "3.0"'
+        'pytest-parallel'
     ],
     install_requires=[
         'bibtexparser~=1.1.0',
@@ -80,11 +74,7 @@ setup(
         'zodb==4.1.0',
         'rdflib-sqlalchemy~=0.4.0',
         'pyyaml',
-    ] + py2_only('zodbpickle==1.0',
-        'Sphinx<1.8.4',
-        'backports.tempfile==1.0',
-        'scandir',
-        'docutils<0.15'),
+    ],
     extras_require={
         # SQL source support
         'mysql_source_mysql_connector': [
@@ -118,8 +108,6 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
