@@ -11,19 +11,7 @@ from os.path import (exists,
         relpath,
         expanduser)
 
-try:
-    from os import scandir
-except ImportError:
-    from scandir import scandir as _scandir
-
-    @contextmanager
-    def scandir(directory):
-        sd = _scandir(directory)
-        try:
-            yield sd
-        finally:
-            del sd
-from os import makedirs, mkdir, listdir, rename, unlink, stat
+from os import makedirs, mkdir, listdir, rename, unlink, stat, scandir
 
 import shutil
 import json
@@ -33,10 +21,7 @@ from collections import namedtuple
 from yarom.rdfUtils import BatchAddGraph
 from yarom.utils import FCN
 
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-    from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 
 from .command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
                            DEFAULT_OWM_DIR)

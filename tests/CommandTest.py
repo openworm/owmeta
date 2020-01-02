@@ -1,9 +1,6 @@
 from __future__ import print_function
 import unittest
-try:
-    from unittest.mock import MagicMock, Mock, ANY, patch
-except ImportError:
-    from mock import MagicMock, Mock, ANY, patch
+from unittest.mock import MagicMock, Mock, ANY, patch
 import re
 import tempfile
 import os

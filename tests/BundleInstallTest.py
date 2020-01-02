@@ -1,8 +1,5 @@
 from multiprocessing import Process
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-    from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 import rdflib
 import transaction
 from collections import namedtuple
@@ -12,10 +9,7 @@ from owmeta.bundle import (Installer, Descriptor, make_include_func, FilesDescri
 from owmeta.context_common import CONTEXT_IMPORTS
 from os.path import join as p, isdir, isfile
 from os import listdir
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from unittest.mock import patch
 
 import pytest
 

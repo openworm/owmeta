@@ -3,10 +3,7 @@ from multiprocessing import Process, Queue, Semaphore
 from owmeta.file_lock import lock_file
 from os import getpid, makedirs, unlink
 from os.path import join as p
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-    from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 
 import pytest
 

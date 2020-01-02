@@ -2,10 +2,7 @@ import unittest
 from owmeta.datasource_loader import DataSourceDirLoader, LoadFailed
 from os.path import realpath, relpath, join
 from os import getcwd, makedirs, unlink
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-    from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 
 
 class DataSourceDirLoaderTest(unittest.TestCase):
