@@ -153,6 +153,10 @@ class RDFContextStore(Store):
                                             self.__imports_graph)
                 self.__context_transitive_imports = imports
             else:
+                # XXX we should maybe check that the provided context actually exists in
+                # the backing graph -- at this point, it's more-or-less assumed in this
+                # case though if self.__include_imports is True, we could have an empty
+                # set of imports => we query against everything
                 self.__context_transitive_imports = set([self.__context.identifier])
 
     def triples(self, pattern, context=None):

@@ -58,12 +58,12 @@ class _link(ConfigValue):
         return self.conf[self.members[0]]
 
 
-class NO_DEFAULT(object):
+class _NO_DEFAULT(object):
     def __repr__(self):
         return 'NO_DEFAULT'
 
 
-NO_DEFAULT = NO_DEFAULT()
+NO_DEFAULT = _NO_DEFAULT()
 
 
 class Configure(object):
@@ -119,7 +119,7 @@ class Configure(object):
             self._properties[n] = link
 
     def __contains__(self, thing):
-        return (thing in self._properties)
+        return thing in self._properties
 
     def __str__(self):
         return "{\n"+(",\n".join(
