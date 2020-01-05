@@ -50,6 +50,8 @@ class LazyDeserializationStore(Store):
             else:
                 raise Exception('Base directory does not exist and `create` is not True')
 
+        self.__modification_listeners = []
+
     def close(self):
         self.__base_directory = None
 
@@ -59,6 +61,14 @@ class LazyDeserializationStore(Store):
         if ctx_store is None:
             ctx_store = self.__tentative_stores.setdefault(ctx, IOMemory())
         ctx_store.add(triple, ctx, quoted)
+        self._tpc_register()
+
+    def watch_for_modifications(self, listener):
+        self.__modification_listeners.append(listener)
+
+    def _tpc_register(self):
+        for m in self.__modification_listeners:
+            m(self)
 
     def triples(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
@@ -119,6 +129,7 @@ class LazyDeserializationStore(Store):
         tent = self.__tentative_stores.get(ctx)
         if tent:
             tent.remove(triplepat, context=ctx)
+        self._tpc_register()
 
     def collapse(self, context):
         '''
