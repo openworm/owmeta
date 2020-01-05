@@ -1045,12 +1045,11 @@ class OWM(object):
         from glob import glob
         for g in glob(self.store_name + '*'):
             self.message('unlink', g)
-            unlink(g)
+            try:
+                unlink(g)
+            except IsADirectoryError:
+                shutil.rmtree(g)
 
-        ccfile = pth_join(self.owmdir, 'changed_contexts')
-        for g in glob(ccfile + '*'):
-            self.message('unlink', g)
-            os.unlink(g)
         self._regenerate_database()
 
     def _regenerate_database(self):
