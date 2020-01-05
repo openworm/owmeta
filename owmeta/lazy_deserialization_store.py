@@ -10,15 +10,18 @@ from rdflib.store import Store
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import URIRef
 
-try:
-    from urllib.parse import quote as urlquote, unquote as urlunquote
-except ImportError:
-    from urllib import quote as urlquote, unquote as urlunquote
-
 L = logging.getLogger(__name__)
 
 STORE_PICKLE_FNAME_REGEX = re.compile(r'(?P<index>\d+)\.(?P<type>[ra])\.pickle')
 ''' Regex for the base name of a pickled store '''
+
+
+def Q(s):
+    return s.replace('%', '%25').replace('/', '%2F')
+
+
+def UQ(s):
+    return s.replace('%2F', '/').replace('%25', '%')
 
 
 class LazyDeserializationStore(Store):
@@ -52,7 +55,9 @@ class LazyDeserializationStore(Store):
 
         self.__modification_listeners = []
 
-    def close(self):
+    def close(self, commit_pending_transaction=False):
+        if commit_pending_transaction:
+            self.commit()
         self.__base_directory = None
 
     def add(self, triple, context=None, quoted=False):
@@ -82,14 +87,15 @@ class LazyDeserializationStore(Store):
             # and we don't want to keep that in memory, so we just load and query a
             # context at a time.
             for ctxdirname in listdir(self.__base_directory):
-                this_ctx = urlunquote(ctxdirname)
+                this_ctx = UQ(ctxdirname)
                 has_loaded = self.__loaded_contexts.get(this_ctx)
                 if has_loaded:
                     # We've already loaded the context, so any triples will be in the
                     # __active_store or in a tentative store.
                     continue
-                store = IOMemory()
-                if not self._merge(this_ctx, store, triplepat):
+                store = self._merge(this_ctx, self.__active_store)
+                self.__loaded_contexts[this_ctx] = True
+                if not store:
                     continue
                 for m in store.triples(triplepat):
                     # We only make tentative stores for contexts we've previously loaded
@@ -188,7 +194,7 @@ class LazyDeserializationStore(Store):
         if not isdir(prepdir):
             return
         for ctx_fname in listdir(prepdir):
-            this_ctx = urlunquote(ctx_fname)
+            this_ctx = UQ(ctx_fname)
             ctx_prepdir = p(prepdir, ctx_fname)
             for fname in listdir(ctx_prepdir):
                 md = STORE_PICKLE_FNAME_REGEX.match(fname)
@@ -233,10 +239,10 @@ class LazyDeserializationStore(Store):
                 callback(triple, ctx)
 
     def _format_context_prep_directory_name(self, ctx):
-        return p(self.__base_directory, 'prep', urlquote(ctx or '___', safe=''))
+        return p(self.__base_directory, 'prep', Q(ctx or '___'))
 
     def _format_context_directory_name(self, ctx):
-        return p(self.__base_directory, urlquote(ctx or '___', safe=''))
+        return p(self.__base_directory, Q(ctx or '___'))
 
     def _max_rev(self, ctxdir):
         try:
@@ -244,11 +250,12 @@ class LazyDeserializationStore(Store):
         except ValueError:
             return 0
 
-    def _merge(self, ctx, store, triplepat=(None, None, None)):
+    def _merge(self, ctx, store=None, triplepat=(None, None, None)):
         ctxdir = self._format_context_directory_name(ctx)
         if not isdir(ctxdir):
-            return False
-        pickles = (x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
+            return None
+        pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
+        only_one = len(pickles) == 1
         for pickle_match_data in sorted(pickles, key=lambda x: int(x.group('index'))):
             fname = pickle_match_data.group(0)
             with open(p(ctxdir, fname), 'rb') as f:
@@ -258,6 +265,10 @@ class LazyDeserializationStore(Store):
                     L.error("Error while unpickling ≪%s≫", p(ctxdir, fname))
                     raise
 
+            if only_one and store is None:
+                return revision
+            if store is None:
+                store = IOMemory()
             store_type = pickle_match_data.group('type')
             if store_type == 'a':
                 for trip, ctxs in revision.triples(triplepat):
@@ -265,4 +276,4 @@ class LazyDeserializationStore(Store):
             elif store_type == 'r':
                 for trip, ctxs in revision.triples(triplepat):
                     store.remove(trip, context=ctx)
-        return True
+        return store
