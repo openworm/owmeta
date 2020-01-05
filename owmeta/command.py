@@ -1016,9 +1016,11 @@ class OWM(object):
             self.message('Deserializing...', file=sys.stderr)
             self._regenerate_database()
             self.message('Done!', file=sys.stderr)
-        except BaseException as e:
+        except FileExistsError:
+            raise
+        except BaseException:
             self._ensure_no_owmdir()
-            raise e
+            raise
 
     def git(self, *args):
         '''
