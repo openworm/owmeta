@@ -26,20 +26,32 @@ class LazyDeserializationStore(Store):
     Uses the `IOMemory` store as an in-memory cache and writes new triples to a pickling of
     the store
     '''
-    def __init__(self, base_directory):
+
+    context_aware = True
+
+    def __init__(self, base_directory=None):
         '''
         Paramaters
         ----------
         base_directory : str
             Base directory where pickles are stored
         '''
-        super(LazyDeserializationStore, self).__init__()
+        super(LazyDeserializationStore, self).__init__(base_directory)
+
+    def open(self, base_directory, create=True):
         self.__active_store = IOMemory()
         self.__loaded_contexts = dict()
         self.__tentative_stores = dict()
         self.__removal_stores = dict()
         self.__base_directory = base_directory
-        self.__uncommitted_pickles = []
+        if not isdir(self.__base_directory):
+            if create:
+                makedirs(self.__base_directory)
+            else:
+                raise Exception('Base directory does not exist and `create` is not True')
+
+    def close(self):
+        self.__base_directory = None
 
     def add(self, triple, context=None, quoted=False):
         ctx = getattr(context, 'identifier', context)

@@ -1,19 +1,21 @@
 from __future__ import print_function
 import importlib as IM
+import datetime
+import os
+import logging
+import atexit
 import hashlib
+from datetime import datetime as DT
+
 from rdflib import URIRef, Literal, Graph, Namespace, ConjunctiveGraph, plugin
 from rdflib.store import TripleAddedEvent, TripleRemovedEvent, Store
 from rdflib.events import Event
 from rdflib.namespace import RDFS, RDF, NamespaceManager
-from datetime import datetime as DT
-import datetime
 import transaction
-import os
-import logging
-import atexit
 
 from .utils import grouper
 from .configure import Configureable, Configure, ConfigValue
+from .zope_lazy_deserialization_store import LazyDeserializationStoreDataManager
 
 __all__ = [
     "Data",
@@ -25,7 +27,8 @@ __all__ = [
     "ZODBSource",
     "SQLiteSource",
     "MySQLSource",
-    "PostgreSQLSource"]
+    "PostgreSQLSource",
+    "LazyPickleSource"]
 
 L = logging.getLogger(__name__)
 
@@ -366,7 +369,8 @@ class Data(Configure):
                         'zodb': ZODBSource,
                         'sqlite': SQLiteSource,
                         'mysql': MySQLSource,
-                        'postgresql': PostgreSQLSource}
+                        'postgresql': PostgreSQLSource,
+                        'lazy_pickle': LazyPickleSource}
         source = self.sources[self['rdf.source'].lower()](conf=self)
         self.source = source
 
@@ -474,6 +478,34 @@ class SleepyCatSource(RDFSource):
         g0.open(self.conf['rdf.store_conf'], create=True)
         self.graph = g0
         logging.debug("Opened SleepyCatSource")
+
+
+class LazyPickleSource(RDFSource):
+    def __init__(self, *args, **kwargs):
+        super(LazyPickleSource, self).__init__(*args, **kwargs)
+        self.conf['rdf.store'] = 'lazy_pickle'
+
+    def open(self):
+        self.path = self.conf['rdf.store_conf']
+        openstr = os.path.abspath(self.path)
+        try:
+            transaction.commit()
+        except Exception:
+            # catch commit exception and close db.
+            # otherwise db would stay open and follow up tests
+            # will detect the db in error state
+            L.exception('Forced to abort transaction on LazyPickle store opening', exc_info=True)
+            transaction.abort()
+        transaction.begin()
+        self.graph = ConjunctiveGraph('lazy_pickle')
+        self.graph.open(openstr, create=True)
+
+        self.data_manager = LazyDeserializationStoreDataManager(self.graph.store,
+                transaction_manager=transaction.manager)
+
+    def close(self):
+        super(LazyPickleSource, self).close()
+        self.data_manager = None
 
 
 class DefaultSource(RDFSource):

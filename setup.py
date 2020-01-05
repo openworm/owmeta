@@ -101,7 +101,12 @@ setup(
     license='MIT',
     url='https://pyopenworm.readthedocs.io/en/latest/',
     download_url='https://github.com/openworm/owmeta/archive/master.zip',
-    entry_points={'console_scripts': ['owm = owmeta.cli:main']},
+    entry_points={
+        'console_scripts': ['owm = owmeta.cli:main'],
+        'rdf.plugins.store': [
+            'lazy_pickle = owmeta.lazy_deserialization_store:LazyDeserializationStore'
+        ],
+    },
     package_data={'owmeta': ['default.conf']},
     classifiers=[
         'Intended Audience :: Science/Research',
