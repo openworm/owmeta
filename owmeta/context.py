@@ -206,9 +206,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
             graph.update(self._save_context_triples())
         else:
             ctx_graph = self.get_target_graph(graph)
-            ctx_graph.addN((s, p, o, ctx_graph)
-                           for s, p, o
-                           in self._save_context_triples())
+            ctx_graph.addN((s, p, o, ctx_graph) for s, p, o in self._save_context_triples())
 
         if autocommit and hasattr(graph, 'commit'):
             graph.commit()
@@ -314,7 +312,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                                 store=RDFContextStore(self, include_imports=False))
 
     def load_graph_from_configured_store(self):
-        return ConjunctiveGraph(identifier=self.identifier, store=RDFContextStore(self))
+        return ConjunctiveGraph(identifier=self.identifier,
+                store=RDFContextStore(self, imports_graph=self._imports_graph()))
+
+    def _imports_graph(self):
+        ctxid = self.conf.get(IMPORTS_CONTEXT_KEY, None)
+        return ctxid and self.rdf.get_context(URIRef(ctxid))
 
     def rdf_graph(self):
         if self._graph is None:
@@ -323,7 +326,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
 
     def load_mixed_graph(self):
         return ConjunctiveGraph(identifier=self.identifier,
-                                store=ContextStore(context=self, include_stored=True))
+                                store=ContextStore(context=self, include_stored=True,
+                                    imports_graph=self._imports_graph()))
 
     def load_staged_graph(self):
         return ConjunctiveGraph(identifier=self.identifier, store=ContextStore(context=self))

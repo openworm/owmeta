@@ -15,7 +15,7 @@ class ContextStoreException(Exception):
 class ContextStore(Store):
     context_aware = True
 
-    def __init__(self, context=None, include_stored=False, **kwargs):
+    def __init__(self, context=None, include_stored=False, imports_graph=None, **kwargs):
         """
         Parameters
         ----------
@@ -26,6 +26,7 @@ class ContextStore(Store):
         super(ContextStore, self).__init__(**kwargs)
         self._memory_store = None
         self._include_stored = include_stored
+        self._imports_graph = imports_graph
         if context is not None:
             self._init_store(context)
 
@@ -39,7 +40,7 @@ class ContextStore(Store):
         self.ctx = ctx
 
         if self._include_stored:
-            self._store_store = RDFContextStore(ctx)
+            self._store_store = RDFContextStore(ctx, imports_graph=self._imports_graph)
         else:
             self._store_store = None
 

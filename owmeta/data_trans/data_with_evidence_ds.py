@@ -64,9 +64,7 @@ class DataWithEvidenceDataSource(DataSource):
         return res
 
     def commit_augment(self):
-        saved_contexts = set([])
-        self.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
-        self.evidence_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
+        self.combined_context.save(inline_imports=True)
         self.combined_context.save_imports()
 
 

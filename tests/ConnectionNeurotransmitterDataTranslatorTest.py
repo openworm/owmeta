@@ -13,7 +13,7 @@ from rdflib.term import URIRef
 
 from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
 from owmeta.data_trans.connections import (NeuronConnectomeSynapseClassTranslator,
-                                               ConnectomeCSVDataSource)
+                                           ConnectomeCSVDataSource)
 from owmeta.neuron import Neuron
 from owmeta.connection import Connection
 from owmeta.context import IMPORTS_CONTEXT_KEY
@@ -23,7 +23,7 @@ from .DataTestTemplate import _DataTest
 class _Base(_DataTest):
     def setUp(self):
         super(_Base, self).setUp()
-        self.conf[IMPORTS_CONTEXT_KEY] = 'http://example.org'
+        self.conf[IMPORTS_CONTEXT_KEY] = 'http://example.org/imports_context'
         self.startdir = os.getcwd()
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
         os.chdir(self.testdir)

@@ -221,7 +221,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                                                    syntype=typ)
                     hit = False
                     for c in conn.load():
-                        docctx_anynum(Connection)(ident=c.identifier).synclass(nt)
+                        docctx(Connection)(ident=c.identifier).synclass(nt)
                         hit = True
 
                     if not hit:
