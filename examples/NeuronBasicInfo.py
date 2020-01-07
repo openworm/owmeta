@@ -17,6 +17,7 @@ from __future__ import absolute_import
 import owmeta as P
 from owmeta.worm import Worm
 from owmeta.context import Context
+import transaction
 import os
 
 
@@ -35,33 +36,34 @@ def pp_set(title, s):
 
 
 with P.connect('default.conf') as conn:
-    ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
+    with transaction.manager:
+        ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
 
-    w = ctx(Worm)()
-    net = w.neuron_network()
-    print("Retrieving names...")
-    inter = get_names(net.interneurons())
-    motor = get_names(net.motor())
-    sensory = get_names(net.sensory())
+        w = ctx(Worm)()
+        net = w.neuron_network()
+        print("Retrieving names...")
+        inter = get_names(net.interneurons())
+        motor = get_names(net.motor())
+        sensory = get_names(net.sensory())
 
-    print("Calculating combinations...")
-    sensmot = set(sensory) & set(motor)
-    sensint = set(sensory) & set(inter)
-    motint = set(motor) & set(inter)
-    sens_only = set(sensory) - set(motor) - set(inter)
-    motor_only = set(motor) - set(sensory) - set(inter)
-    inter_only = set(inter) - set(sensory) - set(motor)
-    tri = motint & set(sensory)
-    motint_no_tri = motint - tri
-    sensint_no_tri = sensint - tri
-    sensmot_no_tri = sensmot - tri
+        print("Calculating combinations...")
+        sensmot = set(sensory) & set(motor)
+        sensint = set(sensory) & set(inter)
+        motint = set(motor) & set(inter)
+        sens_only = set(sensory) - set(motor) - set(inter)
+        motor_only = set(motor) - set(sensory) - set(inter)
+        inter_only = set(inter) - set(sensory) - set(motor)
+        tri = motint & set(sensory)
+        motint_no_tri = motint - tri
+        sensint_no_tri = sensint - tri
+        sensmot_no_tri = sensmot - tri
 
-    pp_set("Sensory only neurons", sens_only)
-    pp_set("Interneurons (not mechanosensory, etc.)", inter_only)
-    pp_set("Motor only neurons", motor_only)
-    pp_set("Sensory-motor neurons", sensmot)
-    pp_set("Sensory and interneuron?", sensint)
-    pp_set("Motor and interneuron?", motint)
-    pp_set("Sensory-motor less tri-functional", sensmot_no_tri)
-    pp_set("Motor and interneuron less tri-functional", motint_no_tri)
-    pp_set("Sensory and interneuron less tri-functional", sensint_no_tri)
+        pp_set("Sensory only neurons", sens_only)
+        pp_set("Interneurons (not mechanosensory, etc.)", inter_only)
+        pp_set("Motor only neurons", motor_only)
+        pp_set("Sensory-motor neurons", sensmot)
+        pp_set("Sensory and interneuron?", sensint)
+        pp_set("Motor and interneuron?", motint)
+        pp_set("Sensory-motor less tri-functional", sensmot_no_tri)
+        pp_set("Motor and interneuron less tri-functional", motint_no_tri)
+        pp_set("Sensory and interneuron less tri-functional", sensint_no_tri)

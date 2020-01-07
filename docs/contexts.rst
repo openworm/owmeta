@@ -50,3 +50,9 @@ owmeta when a module defining a
 :py:class:`~owmeta.dataObject.DataObject`-derived class is first processed by a
 :py:class:`~owmeta.mapper.Mapper` which will happen after the module is
 imported.
+
+Query Performance
+-------------------
+With the default "lazy_pickle" storage, access on within a context is
+preferred over access between contexts. This means that if you want to query
+within a set of statements, it is helpful to put them in as single context

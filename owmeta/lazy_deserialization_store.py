@@ -42,8 +42,6 @@ class LazyDeserializationStore(Store):
         super(LazyDeserializationStore, self).__init__(base_directory)
 
     def open(self, base_directory, create=True):
-        self.__active_store = IOMemory()
-        self.__loaded_contexts = dict()
         self.__tentative_stores = dict()
         self.__removal_stores = dict()
         self.__base_directory = base_directory
@@ -52,6 +50,13 @@ class LazyDeserializationStore(Store):
                 makedirs(self.__base_directory)
             else:
                 raise Exception('Base directory does not exist and `create` is not True')
+        try:
+            active_store_fname = p(self.__base_directory, 'active_store')
+            with open(active_store_fname, 'rb') as f:
+                self.__active_store, self.__loaded_contexts = pickle.load(f)
+        except FileNotFoundError:
+            self.__active_store = IOMemory()
+            self.__loaded_contexts = dict()
 
         self.__modification_listeners = []
 
@@ -81,6 +86,7 @@ class LazyDeserializationStore(Store):
         if ctx not in self.__loaded_contexts:
             self._merge(ctx, self.__active_store)
             self.__loaded_contexts[ctx] = True
+            self._tpc_register()
 
         if ctx is None:
             # This is loading in every context available, which can be an arbitrary size
@@ -95,13 +101,14 @@ class LazyDeserializationStore(Store):
                     continue
                 store = self._merge(this_ctx, self.__active_store)
                 self.__loaded_contexts[this_ctx] = True
+                self._tpc_register()
                 if not store:
                     continue
                 for m in store.triples(triplepat):
                     # We only make tentative stores for contexts we've previously loaded
                     # (possibly on-demand), so we don't have to check for tentative
                     # removals here.
-                    yield m
+                    yield m[0], (URIRef(x) for x in m[1])
 
         for trip, ctxs in self.__active_store.triples(triplepat, context=ctx):
             removals = self.__removal_stores.get(ctx)
@@ -110,13 +117,13 @@ class LazyDeserializationStore(Store):
             else:
                 removed = False
             if not removed:
-                yield trip, ctxs
+                yield trip, (URIRef(x) for x in ctxs)
 
         tent = self.__tentative_stores.get(ctx)
         if tent:
             tent_triples = tent.triples(triplepat, context=context)
             for trip, ctxs in tent_triples:
-                yield trip, ctxs
+                yield trip, (URIRef(x) for x in ctxs)
 
     def remove(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
@@ -187,6 +194,9 @@ class LazyDeserializationStore(Store):
         self._dex(self.__removal_stores, 'r',
                 lambda triple, context: self.__active_store.remove(triple[0],
                     context=context))
+        makedirs(p(self.__base_directory, 'prep'), exist_ok=True)
+        with open(p(self.__base_directory, 'prep', 'active_store'), 'wb') as f:
+            pickle.dump((self.__active_store, self.__loaded_contexts), f)
         self.__removal_stores.clear()
 
     def tpc_commit(self):
@@ -196,6 +206,8 @@ class LazyDeserializationStore(Store):
         for ctx_fname in listdir(prepdir):
             this_ctx = UQ(ctx_fname)
             ctx_prepdir = p(prepdir, ctx_fname)
+            if not isdir(ctx_prepdir):
+                continue
             for fname in listdir(ctx_prepdir):
                 md = STORE_PICKLE_FNAME_REGEX.match(fname)
                 if not md:
@@ -205,6 +217,9 @@ class LazyDeserializationStore(Store):
                 rename(p(prepdir, ctx_prepdir, revision_fname),
                        p(ctxdir, revision_fname))
                 rmdir(ctx_prepdir)
+        rename(p(prepdir, 'active_store'),
+               p(self.__base_directory, 'active_store'))
+
         rmdir(prepdir)
 
     def tpc_abort(self):

@@ -154,6 +154,14 @@ class Connection(object):
         Primarily, so that this Connection can be passed to contextualize for a Context
         '''
 
+    @property
+    def transaction_manager(self):
+        self.__transaction_manager
+
+    @transaction_manager.setter
+    def transaction_manager(self, transaction_manager):
+        self.__transaction_manager = transaction_manager
+
     def disconnect(self):
         self.conf.closeDatabase()
         ModuleRecorder.remove_listener(self.conf['mapper'])

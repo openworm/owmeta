@@ -22,7 +22,6 @@ class LazyDeserializationStoreDataManager(object):
 
     def _rejoin(self):
         if self._needs_to_join:
-            print('joining')
             self.__transaction_manager.get().join(self)
             self._needs_to_join = False
 

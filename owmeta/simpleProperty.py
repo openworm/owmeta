@@ -200,11 +200,10 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         results = None
         owner = self.owner
         if owner.defined:
-            self._ensure_fresh_po_cache()
             results = set()
-            for pred, obj in owner.po_cache.cache:
-                if pred == self.link:
-                    results.add(obj)
+            ident = owner.identifier
+            for s, p, o in self.rdf.triples((ident, self.link, None)):
+                results.add(o)
         else:
             v = Variable("var" + str(id(self)))
             self._insert_value(v)
@@ -231,14 +230,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
         self._hdf[self.context] = None
         v.owner_properties.remove(self)
         self._v.remove(Statement(self.owner, self, v, self.context))
-
-    def _ensure_fresh_po_cache(self):
-        owner = self.owner
-        ident = owner.identifier
-        graph_index = self.conf.get('rdf.graph.change_counter', None)
-
-        if graph_index is None or owner.po_cache is None or owner.po_cache.cache_index != graph_index:
-            owner.po_cache = POCache(graph_index, frozenset(self.rdf.predicate_objects(ident)))
 
     def unset(self, v):
         self._remove_value(v)
@@ -273,19 +264,6 @@ class RealSimpleProperty(with_metaclass(ContextMappedPropertyClass,
     @property
     def statements(self):
         return self.rdf.quads((self.owner.idl, self.link, None, None))
-
-
-class POCache(tuple):
-
-    """ The predicate-object cache object """
-
-    _map = dict(cache_index=0, cache=1)
-
-    def __new__(cls, cache_index, cache):
-        return super(POCache, cls).__new__(cls, (cache_index, cache))
-
-    def __getattr__(self, n):
-        return self[POCache._map[n]]
 
 
 class _ContextualizingPropertySetMixin(object):

@@ -162,6 +162,7 @@ class RDFContextStore(Store):
 
     def triples(self, pattern, context=None):
         self.__init_contexts()
+
         for t in self.__store.triples(pattern, context):
             contexts = set(getattr(c, 'identifier', c) for c in t[1])
             if self.__context_transitive_imports:
