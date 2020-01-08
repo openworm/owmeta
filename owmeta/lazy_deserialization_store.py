@@ -44,6 +44,9 @@ class LazyDeserializationStore(Store):
     def open(self, base_directory, create=True):
         self.__tentative_stores = dict()
         self.__removal_stores = dict()
+
+        # A dictionary of contexts to collapse
+        self.__should_collaspe = dict()
         self.__base_directory = base_directory
         if not isdir(self.__base_directory):
             if create:
@@ -53,10 +56,13 @@ class LazyDeserializationStore(Store):
         try:
             active_store_fname = p(self.__base_directory, 'active_store')
             with open(active_store_fname, 'rb') as f:
-                self.__active_store, self.__loaded_contexts = pickle.load(f)
+                (self.__active_store,
+                 self.__earliest_revisions,
+                 self.__latest_revisions) = pickle.load(f)
         except FileNotFoundError:
             self.__active_store = IOMemory()
-            self.__loaded_contexts = dict()
+            self.__latest_revisions = dict()
+            self.__earliest_revisions = dict()
 
         self.__modification_listeners = []
 
@@ -76,6 +82,12 @@ class LazyDeserializationStore(Store):
     def watch_for_modifications(self, listener):
         self.__modification_listeners.append(listener)
 
+    def earliest_revision(self, ctx):
+        return self.__earliest_revisions.get(ctx)
+
+    def latest_revision(self, ctx):
+        return self.__latest_revisions.get(ctx)
+
     def _tpc_register(self):
         for m in self.__modification_listeners:
             m(self)
@@ -83,10 +95,10 @@ class LazyDeserializationStore(Store):
     def triples(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
 
-        if ctx not in self.__loaded_contexts:
-            self._merge(ctx, self.__active_store)
-            self.__loaded_contexts[ctx] = True
-            self._tpc_register()
+        earliest_rev = self.earliest_revision(ctx)
+        end_rev = None if earliest_rev is None else earliest_rev - 1
+        self._merge(ctx, self.__active_store, end_rev=end_rev)
+        self._tpc_register()
 
         if ctx is None:
             # This is loading in every context available, which can be an arbitrary size
@@ -94,13 +106,9 @@ class LazyDeserializationStore(Store):
             # context at a time.
             for ctxdirname in listdir(self.__base_directory):
                 this_ctx = UQ(ctxdirname)
-                has_loaded = self.__loaded_contexts.get(this_ctx)
-                if has_loaded:
-                    # We've already loaded the context, so any triples will be in the
-                    # __active_store or in a tentative store.
-                    continue
-                store = self._merge(this_ctx, self.__active_store)
-                self.__loaded_contexts[this_ctx] = True
+                this_earliest_rev = self.earliest_revision(this_ctx)
+                this_end_rev = None if this_earliest_rev is None else this_earliest_rev - 1
+                store = self._merge(this_ctx, self.__active_store, end_rev=this_end_rev)
                 self._tpc_register()
                 if not store:
                     continue
@@ -127,9 +135,9 @@ class LazyDeserializationStore(Store):
 
     def remove(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
-        if ctx not in self.__loaded_contexts:
-            self._merge(ctx, self.__active_store)
-            self.__loaded_contexts[ctx] = True
+        earliest_rev = self.earliest_revision(ctx)
+        end_rev = None if earliest_rev is None else earliest_rev - 1
+        self._merge(ctx, self.__active_store, end_rev=end_rev)
         active_store_matches = self.__active_store.triples(triplepat, context=ctx)
         has_triples = next(active_store_matches, None)
         if has_triples:
@@ -151,6 +159,46 @@ class LazyDeserializationStore(Store):
         Not a standard `rdflib.store.Store` method.
         '''
         ctx = getattr(context, 'identifier', context)
+        self.__should_collaspe[URIRef(ctx)] = True
+
+    def commit(self):
+        try:
+            self.tpc_prepare()
+        except BaseException:
+            self.tpc_abort()
+            raise
+        else:
+            self.tpc_commit()
+
+    def tpc_prepare(self):
+        add_revs = self._dex(self.__tentative_stores, 'a',
+                lambda triple, context: self.__active_store.add(triple[0],
+                    context=context))
+        # If a context is loaded, then we've already merged it into the active store --
+        # just need to write the store to disk
+        #
+        # If not, then, we'll need to call merge to load the missing revisions, in order
+        self.__tentative_stores.clear()
+        rem_revs = self._dex(self.__removal_stores, 'r',
+                lambda triple, context: self.__active_store.remove(triple[0],
+                    context=context))
+        for ctx, rev in add_revs.items():
+            self.__earliest_revisions.setdefault(ctx, rev)
+
+        for ctx, rev in rem_revs.items():
+            self.__earliest_revisions.setdefault(ctx, rev)
+
+        self.__latest_revisions.update(add_revs)
+        self.__latest_revisions.update(rem_revs)
+
+        makedirs(p(self.__base_directory, 'prep'), exist_ok=True)
+        with open(p(self.__base_directory, 'prep', 'active_store'), 'wb') as f:
+            pickle.dump((self.__active_store,
+                         self.__earliest_revisions,
+                         self.__latest_revisions), f)
+        self.__removal_stores.clear()
+
+    def do_collapse(self, ctx):
         store = IOMemory()
         self._merge(ctx, store)
         has_triples = next(store.triples((None, None, None), context=ctx), None)
@@ -176,28 +224,6 @@ class LazyDeserializationStore(Store):
             raise
         if has_triples:
             rename(collapsed_fname, p(ctxdir, collapsed_basename))
-
-    def commit(self):
-        try:
-            self.tpc_prepare()
-        except BaseException:
-            self.tpc_abort()
-            raise
-        else:
-            self.tpc_commit()
-
-    def tpc_prepare(self):
-        self._dex(self.__tentative_stores, 'a',
-                lambda triple, context: self.__active_store.add(triple[0],
-                    context=context))
-        self.__tentative_stores.clear()
-        self._dex(self.__removal_stores, 'r',
-                lambda triple, context: self.__active_store.remove(triple[0],
-                    context=context))
-        makedirs(p(self.__base_directory, 'prep'), exist_ok=True)
-        with open(p(self.__base_directory, 'prep', 'active_store'), 'wb') as f:
-            pickle.dump((self.__active_store, self.__loaded_contexts), f)
-        self.__removal_stores.clear()
 
     def tpc_commit(self):
         prepdir = p(self.__base_directory, 'prep')
@@ -232,6 +258,8 @@ class LazyDeserializationStore(Store):
             shutil.rmtree(prepdir)
 
     def _dex(self, stores, revision_type, callback):
+        # TODO: Return an indicator for the given revision being complete...
+        revisions = dict()
         for ctx, store in stores.items():
             store_triples = store.triples((None, None, None), context=ctx)
             has_triples = next(store_triples, None)
@@ -244,14 +272,17 @@ class LazyDeserializationStore(Store):
             max_rev = self._max_rev(ctxdir)
             revision_fname = p(prepdir, '%d.%s.pickle' % (max_rev + 1, revision_type))
             if isfile(revision_fname):
-                # We don't recerate a prepared file...asume it's already fully prepped
+                # We don't recreate a prepared file...assume it's already fully prepped
                 continue
 
             with open(revision_fname, 'wb') as f:
                 pickle.dump(store, f)
 
+            revisions[ctx] = max_rev + 1
+
             for triple in chain((has_triples,), store_triples):
                 callback(triple, ctx)
+        return revisions
 
     def _format_context_prep_directory_name(self, ctx):
         return p(self.__base_directory, 'prep', Q(ctx or '___'))
@@ -265,14 +296,21 @@ class LazyDeserializationStore(Store):
         except ValueError:
             return 0
 
-    def _merge(self, ctx, store=None, triplepat=(None, None, None)):
+    def _merge(self, ctx, store=None, triplepat=(None, None, None), start_rev=None, end_rev=None):
         ctxdir = self._format_context_directory_name(ctx)
         if not isdir(ctxdir):
+            return None
+        if end_rev is not None and end_rev <= 0:
             return None
         pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
         only_one = len(pickles) == 1
         for pickle_match_data in sorted(pickles, key=lambda x: int(x.group('index'))):
             fname = pickle_match_data.group(0)
+            revidx = int(pickle_match_data.group('index'))
+            if start_rev is not None and start_rev > revidx:
+                continue
+            if end_rev is not None and end_rev < revidx:
+                continue
             with open(p(ctxdir, fname), 'rb') as f:
                 try:
                     revision = pickle.load(f)
@@ -291,4 +329,5 @@ class LazyDeserializationStore(Store):
             elif store_type == 'r':
                 for trip, ctxs in revision.triples(triplepat):
                     store.remove(trip, context=ctx)
+        self.__earliest_revisions[ctx] = 0 if start_rev is None else start_rev
         return store

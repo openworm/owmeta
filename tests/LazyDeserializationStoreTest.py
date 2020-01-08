@@ -1,6 +1,6 @@
 import pickle
 from os import listdir, scandir, makedirs
-from os.path import join as p
+from os.path import join as p, isdir
 
 from pytest import fixture, fail, raises
 from rdflib.plugins.memory import IOMemory
@@ -19,7 +19,8 @@ def test_add_triple_make_new_pickle(tempdir):
              URIRef('http://example.org/3')),
             context=URIRef('http://example.org/ctx'))
     cut.commit()
-    assert len(list(listdir(tempdir))) == 1
+    print(listdir(tempdir))
+    assert context_dir_count(tempdir) == 1
 
 
 def test_remove_nonexistent_triple_makes_no_pickle(tempdir):
@@ -32,12 +33,12 @@ def test_remove_nonexistent_triple_makes_no_pickle(tempdir):
                 URIRef('http://example.org/3')),
                context=URIRef('http://example.org/ctx'))
     cut.commit()
-    assert len(list(listdir(tempdir))) == 0
+    assert context_dir_count(tempdir) == 0
 
 
 def test_add_remove_before_commit(tempdir):
     '''
-    A new pickle should be created when a triple is removed from a context
+    No pickle should be created when the context to pickle is empty
     '''
     cut = LazyDeserializationStore(tempdir)
     cut.add((URIRef('http://example.org/1'),
@@ -49,7 +50,7 @@ def test_add_remove_before_commit(tempdir):
                 URIRef('http://example.org/3')),
                context=URIRef('http://example.org/ctx'))
     cut.commit()
-    assert len(list(listdir(tempdir))) == 0
+    assert context_dir_count(tempdir) == 0
 
 
 def test_add_remove_triple(tempdir):
@@ -344,32 +345,13 @@ def test_ignore_extraneous_pickle(tempdir):
 
 def test_error_on_malformed_pickle(tempdir):
     setup = LazyDeserializationStore(tempdir)
-    setup.add((URIRef('http://example.org/1'),
-             URIRef('http://example.org/2'),
-             URIRef('http://example.org/3')),
-            context=URIRef('http://example.org/ctx'))
-    setup.commit()
+    # setup.add((URIRef('http://example.org/1'),
+             # URIRef('http://example.org/2'),
+             # URIRef('http://example.org/3')),
+            # context=URIRef('http://example.org/ctx'))
     dname = setup._format_context_directory_name(URIRef('http://example.org/ctx'))
-    with open(p(dname, '10.r.pickle'), 'wb') as f:
-        f.write(b'gibberish')
-    cut = LazyDeserializationStore(tempdir)
-
-    with raises(pickle.UnpicklingError):
-        for trip, ctx in cut.triples((URIRef('http://example.org/1'),
-                                      URIRef('http://example.org/2'),
-                                      URIRef('http://example.org/3'))):
-            pass
-
-
-def test_error_on_malformed_pickle(tempdir):
-    setup = LazyDeserializationStore(tempdir)
-    setup.add((URIRef('http://example.org/1'),
-             URIRef('http://example.org/2'),
-             URIRef('http://example.org/3')),
-            context=URIRef('http://example.org/ctx'))
-    setup.commit()
-    dname = setup._format_context_directory_name(URIRef('http://example.org/ctx'))
-    with open(p(dname, '10.r.pickle'), 'wb') as f:
+    makedirs(dname)
+    with open(p(dname, '1.a.pickle'), 'wb') as f:
         f.write(b'gibberish')
     cut = LazyDeserializationStore(tempdir)
 
@@ -544,3 +526,97 @@ def test_prepare_commit_commit(tempdir):
     cut.tpc_prepare()
     cut.tpc_commit()
     cut.tpc_commit()
+
+
+def test_new_context_earliest_revision_None_for_uncommitted(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    assert cut.earliest_revision(URIRef('http://example.org/ctx')) is None
+
+
+def test_new_context_latest_revision_None_for_uncommitted(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    assert cut.latest_revision(URIRef('http://example.org/ctx')) is None
+
+
+def test_new_context_latest_revision_one(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    assert cut.latest_revision(URIRef('http://example.org/ctx')) == 1
+
+
+def test_new_context_earliest_revision_one(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    assert cut.earliest_revision(URIRef('http://example.org/ctx')) == 1
+
+
+def test_two_contexts_earliest_revision_one(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/5'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    assert cut.earliest_revision(URIRef('http://example.org/ctx')) == 1
+
+
+def test_two_contexts_latest_revision_two(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/5'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    assert cut.latest_revision(URIRef('http://example.org/ctx')) == 2
+
+
+def test_collapse_one_latest_revision_two(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    cut.collapse(URIRef('http://example.org/ctx'))
+    assert cut.latest_revision(URIRef('http://example.org/ctx')) == 2
+
+
+def test_collapse_one_earliest_revision_two(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    cut.collapse(URIRef('http://example.org/ctx'))
+    assert cut.earliest_revision(URIRef('http://example.org/ctx')) == 2
+
+
+def context_dir_count(tempdir):
+    return len([x for x in listdir(tempdir) if isdir(p(tempdir, x))])
