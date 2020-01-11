@@ -77,7 +77,7 @@ class SimplePropertyTest(_DataTest):
         do = self.ctx.DataObject(ident=R.URIRef("http://example.org"))
         do1 = self.ctx.DataObject(ident=R.URIRef("http://example.org"))
 
-        print (list(self.context.contents_triples()))
+        print(list(self.context.contents_triples()))
         c = DataObject.DatatypeProperty("boots", do, multiple=True)
         c1 = DataObject.DatatypeProperty("boots", do1, multiple=True)
         do.boots('join')
@@ -127,62 +127,3 @@ class SimplePropertyTest(_DataTest):
         print(l1)
         b = list(x)
         self.assertEqual([4], b)
-
-
-class POCacheTest(_DataTest):
-
-    ctx_classes = (DataObject,)
-
-    def setUp(self):
-        super(POCacheTest, self).setUp()
-        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        DataObject.DatatypeProperty("boots", o)
-        o.boots('h')
-        self.save()
-
-    def test_cache_refresh_after_triple_add(self):
-        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        DataObject.DatatypeProperty("boots", o)
-        o.boots()
-        c1 = o.po_cache
-        self.assertIsNotNone(c1)
-        self.config['rdf.graph'].add((R.URIRef('http://example.org/a'),
-                                      R.URIRef('http://bluhbluh.com'),
-                                      R.URIRef('http://bluhah.com')))
-        o.boots()
-        self.assertIsNot(c1, o.po_cache)
-
-    def test_cache_no_refresh_for_no_change(self):
-        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        DataObject.DatatypeProperty("boots", o)
-        o.boots()
-        c1 = o.po_cache
-        self.assertIsNotNone(c1)
-        o.boots()
-        self.assertIs(c1, o.po_cache)
-
-    def test_cache_refresh_after_triple_remove(self):
-        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        DataObject.DatatypeProperty("boots", o)
-        o.boots()
-        c1 = o.po_cache
-        self.assertIsNotNone(c1)
-        # XXX: Note that it doesn't matter if the triple was
-        # actually in the graph
-        self.config['rdf.graph'].remove((R.URIRef('/not/in'),
-                                         R.URIRef('/the'),
-                                         R.URIRef('/graph')))
-        o.boots()
-        self.assertIsNot(c1, o.po_cache)
-
-    def test_cache_refresh_clear(self):
-        o = self.ctx.DataObject(ident=R.URIRef("http://example.org/a"))
-        DataObject.DatatypeProperty("boots", o)
-        o.boots()
-        c1 = o.po_cache
-        self.assertIsNotNone(c1)
-        # XXX: Note that it doesn't matter if the triple was
-        # actually in the graph
-        o.clear_po_cache()
-        o.boots()
-        self.assertIsNot(c1, o.po_cache)

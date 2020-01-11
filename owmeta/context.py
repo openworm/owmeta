@@ -192,7 +192,8 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
 
         if inline_imports:
             for ctx in self._imported_contexts:
-                ctx.save_context(graph, inline_imports, False, saved_contexts)
+                ctx.save_context(graph, inline_imports, autocommit=False,
+                        saved_contexts=saved_contexts)
 
         if hasattr(graph, 'bind') and self.mapper is not None:
             for c in self.mapper.mapped_classes():
