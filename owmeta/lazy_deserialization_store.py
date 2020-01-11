@@ -50,7 +50,7 @@ class LazyDeserializationStore(Store):
         self.__base_directory = base_directory
         if not isdir(self.__base_directory):
             if create:
-                makedirs(self.__base_directory)
+                makedirs(self.__base_directory, exist_ok=True)
             else:
                 raise Exception('Base directory does not exist and `create` is not True')
         try:
