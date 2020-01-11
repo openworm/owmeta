@@ -403,6 +403,7 @@ def test_collapse_empty(tempdir):
 
     cut = LazyDeserializationStore(tempdir)
     cut.collapse('http://example.org/ctx')
+    cut.commit()
 
     dname = cut._format_context_directory_name(URIRef('http://example.org/ctx'))
     assert len(list(listdir(dname))) == 0
@@ -427,6 +428,7 @@ def test_collapse_non_empty(tempdir):
 
     cut = LazyDeserializationStore(tempdir)
     cut.collapse('http://example.org/ctx')
+    cut.commit()
 
     dname = cut._format_context_directory_name(URIRef('http://example.org/ctx'))
     assert len(list(x for x in scandir(dname) if x.is_file())) == 1
@@ -596,17 +598,6 @@ def test_two_contexts_latest_revision_two(tempdir):
     assert cut.latest_revision(URIRef('http://example.org/ctx')) == 2
 
 
-def test_collapse_one_latest_revision_two(tempdir):
-    cut = LazyDeserializationStore(tempdir)
-    cut.add((URIRef('http://example.org/1'),
-             URIRef('http://example.org/2'),
-             URIRef('http://example.org/3')),
-            context=URIRef('http://example.org/ctx'))
-    cut.commit()
-    cut.collapse(URIRef('http://example.org/ctx'))
-    assert cut.latest_revision(URIRef('http://example.org/ctx')) == 2
-
-
 def test_collapse_one_earliest_revision_two(tempdir):
     cut = LazyDeserializationStore(tempdir)
     cut.add((URIRef('http://example.org/1'),
@@ -615,6 +606,7 @@ def test_collapse_one_earliest_revision_two(tempdir):
             context=URIRef('http://example.org/ctx'))
     cut.commit()
     cut.collapse(URIRef('http://example.org/ctx'))
+    cut.commit()
     assert cut.earliest_revision(URIRef('http://example.org/ctx')) == 2
 
 

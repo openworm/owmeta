@@ -46,7 +46,7 @@ class LazyDeserializationStore(Store):
         self.__removal_stores = dict()
 
         # A dictionary of contexts to collapse
-        self.__should_collaspe = dict()
+        self.__should_collapse = dict()
         self.__base_directory = base_directory
         if not isdir(self.__base_directory):
             if create:
@@ -108,7 +108,7 @@ class LazyDeserializationStore(Store):
                 this_ctx = UQ(ctxdirname)
                 this_earliest_rev = self.earliest_revision(this_ctx)
                 this_end_rev = None if this_earliest_rev is None else this_earliest_rev - 1
-                store = self._merge(this_ctx, self.__active_store, end_rev=this_end_rev)
+                store, _ = self._merge(this_ctx, self.__active_store, end_rev=this_end_rev)
                 self._tpc_register()
                 if not store:
                     continue
@@ -159,7 +159,7 @@ class LazyDeserializationStore(Store):
         Not a standard `rdflib.store.Store` method.
         '''
         ctx = getattr(context, 'identifier', context)
-        self.__should_collaspe[URIRef(ctx)] = True
+        self.__should_collapse[URIRef(ctx)] = True
 
     def commit(self):
         try:
@@ -182,14 +182,26 @@ class LazyDeserializationStore(Store):
         rem_revs = self._dex(self.__removal_stores, 'r',
                 lambda triple, context: self.__active_store.remove(triple[0],
                     context=context))
-        for ctx, rev in add_revs.items():
-            self.__earliest_revisions.setdefault(ctx, rev)
 
-        for ctx, rev in rem_revs.items():
+        for ctx, rev in chain(add_revs.items(), rem_revs.items()):
             self.__earliest_revisions.setdefault(ctx, rev)
 
         self.__latest_revisions.update(add_revs)
         self.__latest_revisions.update(rem_revs)
+
+        for c in self.__should_collapse:
+            if self.__should_collapse[c]:
+                earliest, rev = self.do_collapse(c)
+                if rev is None:
+                    self.__latest_revisions[c] = None
+                elif self.__latest_revisions[c] == rev - 1:
+                    self.__latest_revisions[c] = rev
+
+                if earliest is None:
+                    del self.__earliest_revisions[c]
+                elif earliest == self.__earliest_revisions[c]:
+                    self.__earliest_revisions[c] = rev
+        self.__should_collapse.clear()
 
         makedirs(p(self.__base_directory, 'prep'), exist_ok=True)
         with open(p(self.__base_directory, 'prep', 'active_store'), 'wb') as f:
@@ -200,17 +212,18 @@ class LazyDeserializationStore(Store):
 
     def do_collapse(self, ctx):
         store = IOMemory()
-        self._merge(ctx, store)
+        _, (earliest_revision, latest_revision) = self._merge(ctx, store)
         has_triples = next(store.triples((None, None, None), context=ctx), None)
         ctxdir = self._format_context_directory_name(ctx)
+        rev = None
         if has_triples:
             tempdir = p(ctxdir, 'temp')
             makedirs(tempdir, exist_ok=True)
-            max_rev = self._max_rev(ctxdir)
-            collapsed_basename = '%d.a.pickle' % max_rev
+            collapsed_basename = '%d.a.pickle' % (latest_revision + 1)
             collapsed_fname = p(tempdir, collapsed_basename)
             with open(collapsed_fname, 'wb') as f:
                 pickle.dump(store, f)
+            rev = latest_revision + 1
         pickles = (x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
 
         # Note: even if there are no triples, we still need to unlink the revisions
@@ -224,6 +237,7 @@ class LazyDeserializationStore(Store):
             raise
         if has_triples:
             rename(collapsed_fname, p(ctxdir, collapsed_basename))
+        return earliest_revision, rev
 
     def tpc_commit(self):
         prepdir = p(self.__base_directory, 'prep')
@@ -299,11 +313,13 @@ class LazyDeserializationStore(Store):
     def _merge(self, ctx, store=None, triplepat=(None, None, None), start_rev=None, end_rev=None):
         ctxdir = self._format_context_directory_name(ctx)
         if not isdir(ctxdir):
-            return None
+            return None, None
         if end_rev is not None and end_rev <= 0:
-            return None
+            return None, None
         pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
         only_one = len(pickles) == 1
+        earliest = None
+        latest = None
         for pickle_match_data in sorted(pickles, key=lambda x: int(x.group('index'))):
             fname = pickle_match_data.group(0)
             revidx = int(pickle_match_data.group('index'))
@@ -311,6 +327,9 @@ class LazyDeserializationStore(Store):
                 continue
             if end_rev is not None and end_rev < revidx:
                 continue
+            if earliest is None:
+                earliest = revidx
+            latest = revidx
             with open(p(ctxdir, fname), 'rb') as f:
                 try:
                     revision = pickle.load(f)
@@ -319,7 +338,7 @@ class LazyDeserializationStore(Store):
                     raise
 
             if only_one and store is None:
-                return revision
+                return revision, (earliest, latest)
             if store is None:
                 store = IOMemory()
             store_type = pickle_match_data.group('type')
@@ -329,5 +348,6 @@ class LazyDeserializationStore(Store):
             elif store_type == 'r':
                 for trip, ctxs in revision.triples(triplepat):
                     store.remove(trip, context=ctx)
-        self.__earliest_revisions[ctx] = 0 if start_rev is None else start_rev
-        return store
+        if store is None:
+            self.__earliest_revisions[ctx] = 0 if start_rev is None else start_rev
+        return store, (earliest, latest)
