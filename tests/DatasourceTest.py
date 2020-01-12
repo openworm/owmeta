@@ -167,8 +167,7 @@ class DataSourceTest(_DataTest):
 
 class DataWithEvidenceDataSourceTest(unittest.TestCase):
     def test_init_with_args(self):
-        m = Mock(name='evidence_context', spec=ContextDataObject())
-        m.owner_properties = []
+        m = ContextDataObject(ident=URIRef('http://example.org/my-evidence'))
         cut = DataWithEvidenceDataSource(ident=URIRef('http://example.org/dweds6'),
                                          evidence_context_property=m)
         self.assertEqual(m, cut.evidence_context_property.onedef())
