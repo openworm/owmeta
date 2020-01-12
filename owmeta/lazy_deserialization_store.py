@@ -311,10 +311,10 @@ class LazyDeserializationStore(Store):
             return 0
 
     def _merge(self, ctx, store=None, triplepat=(None, None, None), start_rev=None, end_rev=None):
+        if end_rev is not None and end_rev <= 0:
+            return None, None
         ctxdir = self._format_context_directory_name(ctx)
         if not isdir(ctxdir):
-            return None, None
-        if end_rev is not None and end_rev <= 0:
             return None, None
         pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
         only_one = len(pickles) == 1
@@ -348,6 +348,6 @@ class LazyDeserializationStore(Store):
             elif store_type == 'r':
                 for trip, ctxs in revision.triples(triplepat):
                     store.remove(trip, context=ctx)
-        if store is None:
+        if store is self.__active_store:
             self.__earliest_revisions[ctx] = 0 if start_rev is None else start_rev
         return store, (earliest, latest)
