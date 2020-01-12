@@ -225,10 +225,42 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
+class WormbaseIDSetter(CSVDataTranslator):
+    input_type = WormBaseCSVDataSource
+    output_type = DataWithEvidenceDataSource
+    translator_identifier = TRANS_NS.WormbaseIDSetter
+
+    def translate(self, data_source):
+        """ Upload muscles and the neurons that connect to them """
+        res = self.make_new_output((data_source,))
+        with open(data_source.csv_file_name.onedef()) as csvfile:
+            csvreader = csv.reader(csvfile)
+
+            # TODO: Improve this evidence by going back to the actual research
+            #       by using the wormbase REST API in addition to or instead of the CSV file
+            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
+                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
+                doc_ctx = res.data_context_for(document=doc)
+                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
+
+            with doc_ctx(Worm=Worm, Cell=Cell) as ctx:
+                w = ctx.Worm()
+
+                for num, line in enumerate(csvreader):
+                    if num < 4:  # skip rows with no data
+                        continue
+
+                    cell = ctx.query(Cell)(name=line['Cell'])
+                    cell.wormbaseID(line['WormBase ID'])
+
+        return res
+
+
 __yarom_mapped_classes__ = (WormbaseTextMatchCSVDataSource,
                             WormbaseIonChannelCSVDataSource,
                             WormbaseIonChannelCSVTranslator,
                             WormbaseTextMatchCSVTranslator,
                             WormBaseCSVDataSource,
                             MuscleWormBaseCSVTranslator,
-                            NeuronWormBaseCSVTranslator)
+                            NeuronWormBaseCSVTranslator,
+                            WormbaseIDSetter)

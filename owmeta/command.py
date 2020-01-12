@@ -280,6 +280,34 @@ class OWMTranslator(object):
             self._parent.message(x)
             return
 
+    def create(self, translator_class):
+        '''
+        Creates an instance of the given translator class and adds it to the graph
+
+        Parameters
+        ----------
+        translator_class : str
+            Fully qualified access path for the translator class in the form::
+
+                {module_name}.{class_name}
+        '''
+        import importlib as IM
+        import transaction
+
+        module_name, class_name = translator_class.rsplit('.', 1)
+        module = IM.import_module(module_name)
+        ctx = self._parent._default_ctx
+        try:
+            translator_type = getattr(module, class_name)
+        except AttributeError:
+            raise GenericUserError('Unable to find the given class name, "%s", in the'
+                                   ' module, "%s"' % (class_name, module_name))
+        with transaction.manager:
+            ctx(translator_type)()
+            ctx.add_import(translator_type.definition_context)
+            ctx.save(inline_imports=True)
+            ctx.save_imports()
+
 
 class OWMNamespace(object):
     '''
