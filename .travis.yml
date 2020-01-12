@@ -17,7 +17,7 @@ before_install:
 
 install:
 - ./ci-install.sh
-- owm clone https://github.com/openworm/OpenWormData.git --branch 461-pow-om-rename
+- owm clone https://github.com/openworm/OpenWormData.git --branch 466-lazy-pickle
 
 script:
 - ./ci-test.sh
