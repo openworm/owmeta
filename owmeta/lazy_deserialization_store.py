@@ -1,5 +1,5 @@
 import logging
-from os import makedirs, listdir, unlink, rename, rmdir
+from os import makedirs, listdir, scandir, unlink, rename, rmdir
 from os.path import join as p, exists, isdir, isfile
 import shutil
 import pickle
@@ -150,7 +150,54 @@ class LazyDeserializationStore(Store):
         tent = self.__tentative_stores.get(ctx)
         if tent:
             tent.remove(triplepat, context=ctx)
+            if len(tent) == 0:
+                del self.__tentative_stores[ctx]
         self._tpc_register()
+
+    def contexts(self, triple=None):
+        if triple in (None, (None, None, None)):
+            tents = set(self.__tentative_stores.keys())
+            for m in self._all_committed_contexts():
+                tents.discard(m)
+                ctxdir = self._format_context_directory_name(m)
+                pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p)
+                                           for p in listdir(ctxdir)) if x)
+                if len(pickles) == 1:
+                    yield m
+                    continue
+                merged, _ = self._merge(m)
+                if len(merged) > 0:
+                    yield m
+                    break
+            for t in tents:
+                tentative_store = self.__tentative_stores[t]
+                removal_store = self.__removal_stores.get(t)
+                if removal_store is None:
+                    yield t
+                    continue
+
+                for tentative_triple in tentative_store.triples((None, None, None)):
+                    for removed in removal_store.triples(tentative_triple):
+                        break  # inner loop. go on to the next triple
+                    else:  # no break
+                        yield t
+                        break  # outer loop
+        else:
+            ac = set(self._all_committed_contexts())
+            for c in self.__active_store.contexts(triple):
+                ac.remove(c)
+                yield c
+
+            for c in ac:
+                merged, _ = self._merge(c)
+                for _ in merged.triples(triple):
+                    yield c
+                    break
+
+    def _all_committed_contexts(self):
+        for dirent in scandir(self.__base_directory):
+            if dirent.name not in ('prep', 'temp') and dirent.is_dir():
+                yield URIRef(UQ(dirent.name))
 
     def collapse(self, context):
         '''

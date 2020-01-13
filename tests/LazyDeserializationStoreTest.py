@@ -345,10 +345,6 @@ def test_ignore_extraneous_pickle(tempdir):
 
 def test_error_on_malformed_pickle(tempdir):
     setup = LazyDeserializationStore(tempdir)
-    # setup.add((URIRef('http://example.org/1'),
-             # URIRef('http://example.org/2'),
-             # URIRef('http://example.org/3')),
-            # context=URIRef('http://example.org/ctx'))
     dname = setup._format_context_directory_name(URIRef('http://example.org/ctx'))
     makedirs(dname)
     with open(p(dname, '1.a.pickle'), 'wb') as f:
@@ -608,6 +604,81 @@ def test_collapse_one_earliest_revision_two(tempdir):
     cut.collapse(URIRef('http://example.org/ctx'))
     cut.commit()
     assert cut.earliest_revision(URIRef('http://example.org/ctx')) == 2
+
+
+def test_contexts_empty(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+
+    assert set(cut.contexts()) == set()
+
+
+def test_contexts_one_uncommitted(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+
+    assert set(cut.contexts()) == set([URIRef('http://example.org/ctx')])
+
+
+def test_contexts_empty_by_add_remove_uncommitted(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.remove((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+
+    assert set(cut.contexts()) == set()
+
+
+def test_contexts_add_mult_remove_uncommitted(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/4')),
+            context=URIRef('http://example.org/ctx'))
+    cut.remove((URIRef('http://example.org/1'),
+                URIRef('http://example.org/2'),
+                URIRef('http://example.org/3')),
+               context=URIRef('http://example.org/ctx'))
+
+    assert set(cut.contexts()) == set([URIRef('http://example.org/ctx')])
+
+
+def test_add_remove_empty_committed(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+    cut.remove((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+
+    assert set(cut.contexts()) == set()
+
+
+def test_committed_context(tempdir):
+    cut = LazyDeserializationStore(tempdir)
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.commit()
+
+    assert set(cut.contexts()) == set([URIRef('http://example.org/ctx')])
 
 
 def context_dir_count(tempdir):
