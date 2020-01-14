@@ -242,7 +242,14 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     def format_str(self, stored):
         try:
             sio = six.StringIO()
-            print(self.__class__.__name__, file=sio)
+            print(self.__class__.__name__, end='', file=sio)
+            if self.defined:
+                ident = self.identifier
+                if self.namespace_manager:
+                    ident = self.namespace_manager.normalizeUri(ident)
+                print(f'({ident})', file=sio)
+            else:
+                print(file=sio)
             for info in self.info_fields.values():
                 attr = getattr(self, info.name)
                 attr_vals = FormatUtil.collect_values(attr, stored)

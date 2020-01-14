@@ -31,6 +31,7 @@ from .capability import provide
 from .capabilities import FilePathProvider
 from .datasource_loader import DataSourceDirLoader, LoadFailed
 from .graph_serialization import write_canonical_to_file, gen_ctx_fname
+from .dataObject import DataObject
 
 
 L = logging.getLogger(__name__)
@@ -177,16 +178,24 @@ class OWMSource(object):
         uri = self._parent._den3(data_source)
         ctx = self._parent._default_ctx.stored
         source = ctx(DataSource)(ident=uri)
-        return self._derivs(ctx, source)
+
+        def text_format(dat):
+            source, derived = dat
+            return '{} → {}'.format(source.identifier, derived.identifier)
+
+        return GeneratorWithData(self._derivs(ctx, source),
+                                 text_format=text_format,
+                                 header=("Source", "Derived"),
+                                 columns=(lambda x: x[0], lambda x: x[1]))
 
     def _derivs(self, ctx, source):
         from owmeta.datasource import DataSource
         derived = ctx(DataSource).query()
         derived.source(source)
-        res = dict()
+        res = []
         for x in derived.load():
-            print(x)
-            res[x.identifier] = self._derivs(ctx, x)
+            res.append((source, x))
+            res += self._derivs(ctx, x)
         return res
 
     def show(self, *data_source):
@@ -1489,13 +1498,20 @@ class OWM(object):
 
     def _colorize_diff(self, lines):
         from termcolor import colored
+        import re
+        hunk_line_numbers_pattern = re.compile(r'^@@[0-9 +,-]+@@')
         for l in lines:
-            if l.startswith('+'):
-                yield colored(l, 'green')
+            l = l.strip()
+            if l.startswith('+++') or l.startswith('---'):
+                l = colored(l, attrs=['bold'])
+            elif hunk_line_numbers_pattern.match(l):
+                l = colored(l, 'cyan')
+            elif l.startswith('+'):
+                l = colored(l, 'green')
             elif l.startswith('-'):
-                yield colored(l, 'red')
-            else:
-                yield l
+                l = colored(l, 'red')
+            l += os.linesep
+            yield l
 
     def merge(self):
         """
@@ -1717,16 +1733,16 @@ class OWMDirDataSourceDirLoader(DataSourceDirLoader):
             raise
         return str(data_source.identifier) in self._index
 
-    def load(self, ident):
+    def load(self, data_source):
         try:
             self._ensure_index_loaded()
         except Exception as e:
-            raise LoadFailed(ident, self, "Failed to load the index: " + str(e))
+            raise LoadFailed(data_source, self, "Failed to load the index: " + str(e))
 
         try:
-            return self._index[ident]
+            return self._index[str(data_source.identifier)]
         except KeyError:
-            raise LoadFailed(ident, self, 'The given identifier is not in the index')
+            raise LoadFailed(data_source, self, 'The given identifier is not in the index')
 
 
 class OWMSaveNamespace(object):

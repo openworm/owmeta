@@ -168,7 +168,6 @@ class LazyDeserializationStore(Store):
                 merged, _ = self._merge(m)
                 if len(merged) > 0:
                     yield m
-                    break
             for t in tents:
                 tentative_store = self.__tentative_stores[t]
                 removal_store = self.__removal_stores.get(t)
