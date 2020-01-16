@@ -162,6 +162,10 @@ class Connection(object):
     def transaction_manager(self, transaction_manager):
         self.__transaction_manager = transaction_manager
 
+    @property
+    def mapper(self):
+        return self.conf['mapper']
+
     def disconnect(self):
         self.conf.closeDatabase()
         ModuleRecorder.remove_listener(self.conf['mapper'])
