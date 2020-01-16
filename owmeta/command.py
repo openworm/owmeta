@@ -271,7 +271,7 @@ class OWMTranslator(object):
             if full:
                 yield x.identifier
             else:
-                yield nm.normalizeUri(x.identifier)
+                yield x
 
     def show(self, translator):
         '''
@@ -304,9 +304,11 @@ class OWMTranslator(object):
         import importlib as IM
         import transaction
 
-        module_name, class_name = translator_class.rsplit('.', 1)
-        module = IM.import_module(module_name)
         ctx = self._parent._default_ctx
+        module_name, class_name = translator_class.rsplit('.', 1)
+
+        connection = self._parent.connect()
+        module = connection.mapper.load_module(module_name)
         try:
             translator_type = getattr(module, class_name)
         except AttributeError:
@@ -1672,7 +1674,7 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
 class _DSD(object):
     def __init__(self, ds_dict, base_directory, loaders):
         self._dsdict = ds_dict
-        self._base_directory = base_directory
+        self.base_directory = base_directory
         self._loaders = self._init_loaders(loaders)
 
     def __getitem__(self, data_source):
@@ -1692,7 +1694,7 @@ class _DSD(object):
     def _init_loaders(self, loaders):
         res = []
         for loader in loaders:
-            nd = pth_join(self._base_directory, loader.directory_key)
+            nd = pth_join(self.base_directory, loader.directory_key)
             if not exists(nd):
                 makedirs(nd)
             loader.base_directory = nd
@@ -1727,28 +1729,23 @@ class _DSDP(FilePathProvider):
 
 
 class OWMDirDataSourceDirLoader(DataSourceDirLoader):
-    def __init__(self, basedir=None):
-        super(OWMDirDataSourceDirLoader, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(OWMDirDataSourceDirLoader, self).__init__(*args, **kwargs)
         self._index = dict()
-        self.base_directory = basedir
 
     @property
-    def base_directory(self):
-        return self._base_directory
-
-    @base_directory.setter
-    def base_directory(self, val):
-        if val:
-            self._base_directory = val
-            self._idx_fname = pth_join(val, 'index')
+    def _idx_fname(self):
+        if self.base_directory:
+            return pth_join(self.base_directory, 'index')
+        else:
+            return None
 
     def _load_index(self):
-        with scandir(self._base_directory) as dirents:
+        with scandir(self.base_directory) as dirents:
             dentdict = {de.name: de for de in dirents}
             with open(self._idx_fname) as f:
                 for l in f:
-                    dsid, dname = l.split(' ')
-                    dname = dname.strip()
+                    dsid, dname = l.strip().split(' ')
                     if self._index_dir_entry_is_bad(dname, dentdict.get(dname)):
                         continue
 
@@ -1757,12 +1754,12 @@ class OWMDirDataSourceDirLoader(DataSourceDirLoader):
     def _index_dir_entry_is_bad(self, dname, de):
         if not de:
             msg = "There is no directory entry for {} in {}"
-            L.warn(msg.format(dname, self._base_directory), exc_info=True)
+            L.warn(msg.format(dname, self.base_directory), exc_info=True)
             return True
 
         if not de.is_dir():
             msg = "The directory entry for {} in {} is not a directory"
-            L.warn(msg.format(dname, self._base_directory))
+            L.warn(msg.format(dname, self.base_directory))
             return True
 
         return False
@@ -1791,7 +1788,8 @@ class OWMDirDataSourceDirLoader(DataSourceDirLoader):
             raise LoadFailed(data_source, self, "Failed to load the index: " + str(e))
 
         try:
-            return self._index[str(data_source.identifier)]
+            res = self._index[str(data_source.identifier)]
+            return res
         except KeyError:
             raise LoadFailed(data_source, self, 'The given identifier is not in the index')
 

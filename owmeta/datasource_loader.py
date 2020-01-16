@@ -21,7 +21,7 @@ class DataSourceDirLoader(object):
     '''
     def __init__(self, base_directory=None):
         if base_directory:
-            self.base_directory = realpath(base_directory)
+            self.base_directory = base_directory
         self.directory_key = FCN(type(self))
 
     def __call__(self, data_source):
@@ -66,7 +66,8 @@ class DataSourceDirLoader(object):
         # Make sure the loader isn't doing some nonsense with symlinks or non-portable paths
         rpath = realpath(s)
         if not rpath.startswith(self.base_directory):
-            msg = 'Loader returned a file path outside of the base directory, {}'.format(self.base_directory)
+            msg = 'Loader returned a file path, "{}",' \
+                    ' outside of the base directory, "{}"'.format(rpath, self.base_directory)
             raise LoadFailed(data_source, self, msg)
 
         if not exists(rpath):
@@ -78,6 +79,17 @@ class DataSourceDirLoader(object):
             raise LoadFailed(data_source, self, msg)
 
         return rpath
+
+    @property
+    def base_directory(self):
+        try:
+            return self.__base_directory
+        except AttributeError:
+            return None
+
+    @base_directory.setter
+    def base_directory(self, base_directory):
+        self.__base_directory = realpath(base_directory)
 
     def load(self, data_source):
         '''
