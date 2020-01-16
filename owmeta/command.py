@@ -18,6 +18,7 @@ import json
 import logging
 import errno
 from collections import namedtuple
+from textwrap import dedent
 from yarom.rdfUtils import BatchAddGraph
 from yarom.utils import FCN
 
@@ -637,6 +638,54 @@ class OWMContexts(object):
         return self._parent._changed_contexts_set()
 
 
+class OWMRegistry(object):
+    '''
+    Commands for dealing with the class registry, a mapping of RDF types to classes in
+    imperative programming languages
+    '''
+
+    def __init__(self, parent):
+        self._parent = parent
+
+    def list(self):
+        '''
+        List registered classes
+        '''
+        from .dataObject import RegistryEntry, PythonClassDescription, PythonModule
+        ctx = self._parent._default_ctx
+
+        def registry_entries():
+            for re in ctx.stored(RegistryEntry)().load():
+                ident = re.identifier
+                cd = re.class_description()
+                rdf_type = re.rdf_class()
+                if not isinstance(cd, PythonClassDescription):
+                    continue
+                module = cd.module()
+                if re.namespace_manager:
+                    ident = re.namespace_manager.normalizeUri(ident)
+                if hasattr(module, 'name'):
+                    module_name = module.name()
+                package = None
+                if hasattr(module, 'package'):
+                    package = module.package()
+                yield ident, rdf_type, cd.name(), module_name, package
+
+        def fmt_text(entry):
+            return dedent('''\
+            {0}:
+                RDF Type: {1}
+                Module Name: {3}
+                Class Name: {2}
+                Package: {4}
+''').format(*entry)
+
+        return GeneratorWithData(registry_entries(),
+                header=('ID', 'RDF Type', 'Class Name', 'Module Name', 'Package'),
+                columns=tuple,
+                text_format=fmt_text)
+
+
 class OWM(object):
     """
     High-level commands for working with owmeta data
@@ -669,6 +718,8 @@ class OWM(object):
     evidence = SubCommand(OWMEvidence)
 
     bundle = SubCommand(OWMBundle)
+
+    registry = SubCommand(OWMRegistry)
 
     def __init__(self, owmdir=None):
         self.progress_reporter = default_progress_reporter

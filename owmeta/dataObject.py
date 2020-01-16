@@ -8,7 +8,7 @@ import hashlib
 
 from importlib import import_module
 import owmeta  # noqa
-from . import BASE_SCHEMA_URL, DEF_CTX
+from . import BASE_SCHEMA_URL, DEF_CTX, __version__ as OWMETA_VERSION
 from .contextualize import (Contextualizable,
                             ContextualizableClass,
                             contextualize_helper,
@@ -328,7 +328,11 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         cd = PythonClassDescription.contextualize(self.definition_context)()
 
         mo = PythonModule.contextualize(self.definition_context)()
+        pkg = PythonPackage.contextualize(self.definition_context)()
+        pkg.name('owmeta')
+        pkg.version(OWMETA_VERSION)
         mo.name(self.__module__)
+        mo.package(pkg)
 
         cd.module(mo)
         cd.name(self.__name__)
@@ -965,22 +969,40 @@ def disconnect():
     PropertyTypes.clear()
 
 
-class Module(DataObject):
-    '''
-    Represents a module of code
-
-    Most modern programming languages organize code into importable modules of one kind or another. This is basically
-    the nearest level above a *class* in the language.
-    '''
-
-
-class ModuleAccess(DataObject):
+class ModuleAccessor(DataObject):
     '''
     Describes how to access a module.
 
     Module access is how a person or automated system brings the module to where it can be imported/included, possibly
     in a subsequent
     '''
+
+
+class Package(DataObject):
+    ''' Describes an idealized software package identifiable by a name and version number '''
+
+    name = DatatypeProperty()
+    ''' The standard name of the package '''
+
+    version = DatatypeProperty()
+    ''' The version of the package '''
+
+
+class Module(DataObject):
+    '''
+    Represents a module of code
+
+    Most modern programming languages organize code into importable modules of one kind or another. This is basically
+    the nearest level above a *class* in the language.
+
+    Modules are accessable by one or more ModuleAccess
+    '''
+
+    accessors = ObjectProperty(multiple=True, value_type=ModuleAccessor)
+    ''' Ways to get the module '''
+
+    package = ObjectProperty(value_type=Package)
+    ''' Package that provides the module '''
 
 
 class ClassDescription(DataObject):
@@ -1004,7 +1026,12 @@ class RegistryEntry(DataObject):
     ''' The description of the class '''
 
     rdf_class = DatatypeProperty()
-    ''' The RDF type for the class '''
+    '''
+    The RDF type for the class
+
+    We use rdf_type for the type of a DataObject (RegistryEntry.rdf_type in this case), so
+    we call this rdf_class to avoid the conflict
+    '''
 
     def defined_augment(self):
         return self.class_description.has_defined_value() and self.rdf_class.has_defined_value()
@@ -1014,28 +1041,32 @@ class RegistryEntry(DataObject):
                                     self.rdf_class.defined_values[0].identifier.n3())
 
 
+class PythonPackage(Package):
+    ''' A python package '''
+    key_properties = (Package.name, Package.version)
+
+
 class PythonModule(Module):
     '''
     A Python module
     '''
 
-    name = DatatypeProperty(multiple=False)
+    name = DatatypeProperty()
     ''' The full name of the module '''
 
-    def defined_augment(self):
-        return self.name.has_defined_value()
+    package = ObjectProperty(value_type=PythonPackage)
+    ''' The Python package '''
 
-    def identifier_augment(self):
-        return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
+    key_properties = (name, package)
 
 
-class PyPIPackage(ModuleAccess):
-
+class PIPInstall(ModuleAccessor):
     '''
-    Describes a package hosted on the Python Package Index (PyPI)
+    Describes a `pip install` command line
     '''
 
     name = DatatypeProperty()
+
     version = DatatypeProperty()
 
 
@@ -1051,9 +1082,7 @@ class PythonClassDescription(ClassDescription):
                                     self.module.defined_values[0].identifier.n3())
 
 
-CR_TYPES = frozenset((RegistryEntry, PythonClassDescription, PythonModule))
-
 __yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
                             RDFProperty, RDFSSubClassOfProperty, PropertyDataObject,
-                            RegistryEntry, ModuleAccess, ClassDescription, Module,
-                            PythonModule, PyPIPackage, PythonClassDescription)
+                            RegistryEntry, ModuleAccessor, ClassDescription, Module,
+                            PythonPackage, PythonModule, PIPInstall, PythonClassDescription)

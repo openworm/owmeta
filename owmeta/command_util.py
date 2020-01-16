@@ -108,7 +108,15 @@ class GeneratorWithData(object):
     def __init__(self, generator, header=None, text_format=None, default_columns=None, columns=None):
         self._gen = generator
         self.header = header
-        self.columns = columns
+        if columns is tuple:
+            if not self.header:
+                raise Exception('Must provide a header if columns is `tuple`')
+            columns = []
+            for i, _ in enumerate(self.header):
+                columns.append((lambda i: lambda x: x[i])(i))
+            self.columns = columns
+        else:
+            self.columns = columns
         self.default_columns = default_columns
         self.text_format = text_format if text_format else format
 
