@@ -9,6 +9,7 @@ from ..evidence import Evidence
 from ..muscle import Muscle
 from ..network import Network
 from ..neuron import Neuron
+from ..cell import Cell
 from ..website import Website
 from ..worm import Worm
 from ..datasource import Informational
@@ -235,16 +236,14 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
 
 @mapped
 class WormbaseIDSetter(CSVDataTranslator):
-    input_type = WormBaseCSVDataSource
+    input_type = (WormBaseCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.WormbaseIDSetter
 
-    def translate(self, data_source):
+    def translate(self, data_source, cells_source):
         """ Upload muscles and the neurons that connect to them """
         res = self.make_new_output((data_source,))
-        with open(data_source.csv_file_name.onedef()) as csvfile:
-            csvreader = csv.reader(csvfile)
-
+        with self.make_reader(data_source, skipinitialspace=True, skipheader=True, skiplines=1, dict_reader=True) as csvreader:
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
@@ -252,14 +251,12 @@ class WormbaseIDSetter(CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with doc_ctx(Worm=Worm, Cell=Cell) as ctx:
-                w = ctx.Worm()
+            for num, line in enumerate(csvreader):
+                if num < 2:  # skip rows with no data
+                    continue
 
-                for num, line in enumerate(csvreader):
-                    if num < 4:  # skip rows with no data
-                        continue
-
-                    cell = ctx.query(Cell)(name=line['Cell'])
-                    cell.wormbaseID(line['WormBase ID'])
+                cell = cells_source.data_context.stored(Cell).query(name=line['Cell'])
+                for loaded_cell in cell.load():
+                    doc_ctx(loaded_cell).wormbaseID(line['WormBase ID'])
 
         return res
