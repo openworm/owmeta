@@ -5,8 +5,10 @@ from .channelworm import ChannelModel
 from .biology import BiologyType
 from .channel_common import CHANNEL_RDF_TYPE
 from .cell_common import CELL_RDF_TYPE
+from .mapper import mapped
 
 
+@mapped
 class ExpressionPattern(BiologyType):
 
     class_context = BiologyType.class_context
@@ -37,6 +39,7 @@ class ExpressionPattern(BiologyType):
         return self.make_identifier(self.wormbaseid.defined_values[0])
 
 
+@mapped
 class Channel(BiologyType):
     """
     A biological ion channel.
@@ -91,6 +94,3 @@ class Channel(BiologyType):
 
     def identifier_augment(self):
         return self.make_identifier(self.name.defined_values[0])
-
-
-__yarom_mapped_classes__ = (Channel, ExpressionPattern)

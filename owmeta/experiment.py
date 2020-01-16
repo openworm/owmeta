@@ -1,7 +1,9 @@
-from owmeta.dataObject import DataObject, ObjectProperty
-from owmeta.document import Document
+from .dataObject import DataObject, ObjectProperty
+from .document import Document
+from .mapper import mapped
 
 
+@mapped
 class Experiment(DataObject):
     """
     Generic class for storing information about experiments
@@ -40,6 +42,3 @@ class Experiment(DataObject):
                     self._condits[c] = value
 
         return self._condits
-
-
-__yarom_mapped_classes__ = (Experiment,)

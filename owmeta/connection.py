@@ -7,6 +7,7 @@ import six
 
 from .biology import BiologyType
 from .cell import Cell
+from .mapper import mapped
 from .dataObject import DatatypeProperty, ObjectProperty
 
 __all__ = ['Connection']
@@ -22,6 +23,7 @@ class Termination:
     Muscle = 'muscle'
 
 
+@mapped
 class Connection(BiologyType):
 
     class_context = BiologyType.class_context
@@ -88,6 +90,3 @@ class Connection(BiologyType):
             return 'Connection(' + \
                    ', '.join('{}={}'.format(n[0], n[1]) for n in nom) + \
                    ')'
-
-
-__yarom_mapped_classes__ = (Connection,)

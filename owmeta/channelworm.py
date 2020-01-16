@@ -4,9 +4,11 @@ import six
 from .experiment import Experiment
 from .dataObject import DataObject, DatatypeProperty, ObjectProperty
 from .channel_common import CHANNEL_RDF_TYPE
+from .mapper import mapped
 from . import SCI_BIO_CTX
 
 
+@mapped
 class PatchClampExperiment(Experiment):
     """
     Store experimental conditions for a patch clamp experiment.
@@ -73,6 +75,7 @@ class ChannelModelType:
     homologyEstimate = "Estimation based on homology"
 
 
+@mapped
 class ChannelModel(DataObject):
     """
     A model for an ion channel.
@@ -115,6 +118,7 @@ class ChannelModel(DataObject):
                 self.modelType(ChannelModelType.patchClamp)
 
 
+@mapped
 class PatchClampChannelModel(ChannelModel):
     modeled_from = ObjectProperty(value_type=PatchClampExperiment)
 
@@ -123,12 +127,10 @@ class PatchClampChannelModel(ChannelModel):
                                                      **kwargs)
 
 
+@mapped
 class HomologyChannelModel(ChannelModel):
     homolog = ObjectProperty(value_rdf_type=CHANNEL_RDF_TYPE)
 
     def __init__(self, **kwargs):
         super(HomologyChannelModel, self).__init__(modelType='homology',
                                                    **kwargs)
-
-
-__yarom_mapped_classes__ = (ChannelModel, HomologyChannelModel, PatchClampChannelModel, PatchClampExperiment)

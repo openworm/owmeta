@@ -5,6 +5,7 @@ from ..network import Network
 from ..worm import Worm
 from ..website import Website
 from ..evidence import Evidence
+from ..mapper import mapped
 
 from rdflib.namespace import Namespace
 from .csv_ds import CSVDataSource, CSVDataTranslator
@@ -12,12 +13,14 @@ from .data_with_evidence_ds import DataWithEvidenceDataSource
 from .common_data import DS_NS, TRANS_NS
 
 
+@mapped
 class WormAtlasCellListDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['WormAtlasCellListDataSource#'])
     csv_header = ['Cell', 'Lineage Name', 'Description']
     csv_field_delimiter = '\t'
 
 
+@mapped
 class WormAtlasCellListDataTranslation(GenericTranslation):
     def __init__(self, **kwargs):
         super(WormAtlasCellListDataTranslation, self).__init__(**kwargs)
@@ -32,6 +35,7 @@ class WormAtlasCellListDataTranslation(GenericTranslation):
                                     self.neurons_source.onedef().identifier.n3())
 
 
+@mapped
 class WormAtlasCellListDataTranslator(CSVDataTranslator):
     input_type = (WormAtlasCellListDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
@@ -99,12 +103,7 @@ class WormAtlasCellListDataTranslator(CSVDataTranslator):
             # TODO: Add data for other cells here. Requires relating named
             # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
 
-            print ("uploaded lineage and descriptions")
+            print("uploaded lineage and descriptions")
         except Exception:
             traceback.print_exc()
         return res
-
-
-__yarom_mapped_classes__ = (WormAtlasCellListDataSource,
-                            WormAtlasCellListDataTranslator,
-                            WormAtlasCellListDataTranslation)

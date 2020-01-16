@@ -1043,17 +1043,21 @@ class OWMDSDLoaderMissingDSD(unittest.TestCase):
     def test_dir_missing_load(self):
         cut = OWMDirDataSourceDirLoader(self.testdir)
         with self.assertRaises(LoadFailed):
-            cut.load('dsdid1')
+            data_source = Mock()
+            data_source.identifier = 'dsdid1'
+            cut.load(data_source)
 
     def test_dir_removed_load_no_raise(self):
         '''
         The load method doesn't take responsibility for the directory existing, in general
         '''
         os.mkdir(p(self.testdir, 'dir1'))
+        data_source = Mock()
+        data_source.identifier = 'dsdid1'
         cut = OWMDirDataSourceDirLoader(self.testdir)
-        cut.load('dsdid1')
+        cut.load(data_source)
         os.rmdir(p(self.testdir, 'dir1'))
-        cut.load('dsdid1')
+        cut.load(data_source)
 
 
 class TorrentFileDSD(unittest.TestCase):

@@ -2,6 +2,7 @@ from ..context import Context
 from ..contextDataObject import ContextDataObject
 from rdflib.term import URIRef
 from rdflib.namespace import Namespace
+from ..mapper import mapped
 
 
 class VariableIdentifierMixin(object):
@@ -42,6 +43,7 @@ class VariableIdentifierContext(VariableIdentifierMixin, Context):
         return self._rdf_object.contextualize(self.context)
 
 
+@mapped
 class VariableIdentifierContextDataObject(VariableIdentifierMixin, ContextDataObject):
     '''
     A ContextDataObject that gets its identifier and its configuration from its 'maker' passed in at initialization
@@ -52,6 +54,3 @@ class VariableIdentifierContextDataObject(VariableIdentifierMixin, ContextDataOb
 
     def defined_augment(self):
         return self.maker is not None and self.maker.identifier is not None
-
-
-__yarom_mapped_classes__ = (VariableIdentifierContextDataObject,)

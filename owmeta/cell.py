@@ -3,6 +3,7 @@ from __future__ import print_function
 from string import Template
 import neuroml
 
+from .mapper import mapped
 from .channel import Channel
 from .biology import BiologyType
 from .dataObject import DatatypeProperty, ObjectProperty, This
@@ -58,6 +59,7 @@ def _dict_merge(d1, d2):
     dict(chain(d1.items(), d2.items()))
 
 
+@mapped
 class Cell(BiologyType):
 
     """
@@ -201,6 +203,3 @@ class Cell(BiologyType):
 
     def identifier_augment(self, *args, **kwargs):
         return self.make_identifier_direct(str(self.name.defined_values[0].identifier))
-
-
-__yarom_mapped_classes__ = (Cell,)

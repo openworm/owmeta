@@ -5,6 +5,7 @@ from .pProperty import Property
 from .dataObject import DatatypeProperty, Alias
 from .cell import Cell
 from .connection import Connection
+from .mapper import mapped
 
 
 class NeuronProxy(ObjectProxy):
@@ -23,6 +24,7 @@ class NeuronProxy(ObjectProxy):
         return self._self_connection
 
 
+@mapped
 class Neuron(Cell):
 
     """
@@ -298,6 +300,3 @@ class ConnectionProperty(Property):
         for c in self._conns:
             for x in c.triples(**kwargs):
                 yield x
-
-
-__yarom_mapped_classes__ = (Neuron,)

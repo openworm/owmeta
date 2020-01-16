@@ -12,12 +12,14 @@ from ..neuron import Neuron
 from ..website import Website
 from ..worm import Worm
 from ..datasource import Informational
+from ..mapper import mapped
 
 from .common_data import DS_NS, TRANS_NS
 from .csv_ds import CSVDataSource, CSVDataTranslator
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
+@mapped
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
 
@@ -30,6 +32,7 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
                               multiple=False)
 
 
+@mapped
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
 
     rdf_namespace = Namespace(DS_NS['WormbaseIonChannelCSVDataSource#'])
@@ -41,6 +44,7 @@ class WormbaseIonChannelCSVDataSource(CSVDataSource):
                   'description']
 
 
+@mapped
 class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
     input_type = WormbaseIonChannelCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -83,6 +87,7 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
         return res
 
 
+@mapped
 class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
     input_type = WormbaseTextMatchCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -136,6 +141,7 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
         return res
 
 
+@mapped
 class WormBaseCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['MuscleCSVDataSource#'])
     csv_header = ["Cell",
@@ -161,6 +167,7 @@ class WormBaseCSVDataSource(CSVDataSource):
                   "Synonyms"]
 
 
+@mapped
 class MuscleWormBaseCSVTranslator(CSVDataTranslator):
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -193,6 +200,7 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
+@mapped
 class NeuronWormBaseCSVTranslator(CSVDataTranslator):
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -225,6 +233,7 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
+@mapped
 class WormbaseIDSetter(CSVDataTranslator):
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -254,13 +263,3 @@ class WormbaseIDSetter(CSVDataTranslator):
                     cell.wormbaseID(line['WormBase ID'])
 
         return res
-
-
-__yarom_mapped_classes__ = (WormbaseTextMatchCSVDataSource,
-                            WormbaseIonChannelCSVDataSource,
-                            WormbaseIonChannelCSVTranslator,
-                            WormbaseTextMatchCSVTranslator,
-                            WormBaseCSVDataSource,
-                            MuscleWormBaseCSVTranslator,
-                            NeuronWormBaseCSVTranslator,
-                            WormbaseIDSetter)

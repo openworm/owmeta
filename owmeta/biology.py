@@ -1,8 +1,7 @@
-from owmeta.dataObject import DataObject
+from .mapper import mapped
+from .dataObject import DataObject
 
 
+@mapped
 class BiologyType(DataObject):
     class_context = 'http://openworm.org/schema/bio'
-
-
-__yarom_mapped_classes__ = (BiologyType,)

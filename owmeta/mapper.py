@@ -225,3 +225,17 @@ class _ClassOrderable(object):
         elif issubclass(scls, ocls) == issubclass(ocls, scls):
             res = scls.__name__ < ocls.__name__
         return res
+
+
+def mapped(cls):
+    '''
+    A decorator for declaring that a class is 'mapped'. This is required for Mapper to
+    find the class
+    '''
+    module = IM.import_module(cls.__module__)
+    if not hasattr(module, '__yarom_mapped_classes__'):
+        module.__yarom_mapped_classes__ = [cls]
+    else:
+        module.__yarom_mapped_classes__.append(cls)
+
+    return cls

@@ -7,6 +7,7 @@ from collections import OrderedDict, defaultdict
 from yarom.mapper import FCN
 from .context import Context
 from .dataObject import DataObject, ObjectProperty, This
+from .mapper import mapped
 import logging
 
 L = logging.getLogger(__name__)
@@ -140,6 +141,7 @@ class DataSourceType(type(DataObject)):
         return self.__info_fields
 
 
+@mapped
 class DataSource(six.with_metaclass(DataSourceType, DataObject)):
     '''
     A source for data that can get translated into owmeta objects.
@@ -276,6 +278,7 @@ class DataSource(six.with_metaclass(DataSourceType, DataObject)):
             return res
 
 
+@mapped
 class Translation(DataObject):
     """
     Representation of the method by which a DataSource was translated and
@@ -293,6 +296,7 @@ class Translation(DataObject):
         return self.make_identifier(self.translator.onedef().identifier.n3())
 
 
+@mapped
 class GenericTranslation(Translation):
     """
     A generic translation that just has sources in order
@@ -337,6 +341,7 @@ class GenericTranslation(Translation):
         return sio.getvalue()
 
 
+@mapped
 class DataObjectContextDataSource(DataSource):
     def __init__(self, context, **kwargs):
         super(DataObjectContextDataSource, self).__init__(**kwargs)
@@ -367,6 +372,7 @@ class DataTransatorType(type(DataObject)):
                                                 self.translator_identifier)
 
 
+@mapped
 class BaseDataTranslator(six.with_metaclass(DataTransatorType, DataObject)):
     """ Translates from a data source to owmeta objects """
 
@@ -438,6 +444,7 @@ class OneOrMore(object):
         return FCN(type(self)) + '(' + repr(self.source_type) + ')'
 
 
+@mapped
 class DataTranslator(BaseDataTranslator):
     """
     A specialization with the :class:`GenericTranslation` translation type that adds
@@ -453,6 +460,7 @@ class DataTranslator(BaseDataTranslator):
         return res
 
 
+@mapped
 class PersonDataTranslator(BaseDataTranslator):
     """
     A person who was responsible for carrying out the translation of a data source
@@ -463,7 +471,3 @@ class PersonDataTranslator(BaseDataTranslator):
     ''' A person responsible for carrying out the translation. '''
 
     # No translate impl is provided here since this is intended purely as a descriptive object
-
-
-__yarom_mapped_classes__ = (Translation, DataSource, DataTranslator,
-                            BaseDataTranslator, GenericTranslation, PersonDataTranslator)

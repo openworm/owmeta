@@ -6,8 +6,10 @@ from .file_ds import FileDataSource
 from .common_data import DS_NS
 from ..capability import Capable, NoProviderGiven
 from ..capabilities import FilePathCapability
+from ..mapper import mapped
 
 
+@mapped
 class LocalFileDataSource(Capable, FileDataSource):
     '''
     File paths should be relative -- in general, path names on a given machine are not portable
@@ -35,6 +37,3 @@ class LocalFileDataSource(Capable, FileDataSource):
 
     def basedir(self):
         return self._base_path_provider.file_path()
-
-
-__yarom_mapped_classes__ = (LocalFileDataSource,)

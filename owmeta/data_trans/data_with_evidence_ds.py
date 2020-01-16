@@ -2,11 +2,13 @@ from rdflib.namespace import Namespace
 from ..context import Context
 from ..contextDataObject import ContextDataObject
 from ..datasource import Informational, DataSource
+from ..mapper import mapped
 from .. import CONTEXT
 from .common_data import DS_NS
 from .context_datasource import VariableIdentifierContext
 
 
+@mapped
 class DataWithEvidenceDataSource(DataSource):
     evidence_context_property = Informational(display_name='Evidence context',
                                               property_name='evidence_context',
@@ -98,6 +100,3 @@ class _DataContext(VariableIdentifierContext):
             return self.maker.identifier + '-data'
         else:
             return None
-
-
-__yarom_mapped_classes__ = (DataWithEvidenceDataSource,)

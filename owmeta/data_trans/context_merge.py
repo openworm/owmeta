@@ -1,8 +1,10 @@
 from ..datasource import DataTranslator, OneOrMore
+from ..mapper import mapped
 from .common_data import TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
+@mapped
 class ContextMergeDataTranslator(DataTranslator):
     translator_identifier = TRANS_NS.ContextMergeDataTranslator
     input_type = OneOrMore(DataWithEvidenceDataSource)
@@ -19,6 +21,3 @@ class ContextMergeDataTranslator(DataTranslator):
             res.data_context.add_import(src.data_context)
             res.evidence_context.add_import(src.evidence_context)
         return res
-
-
-__yarom_mapped_classes__ = (ContextMergeDataTranslator,)

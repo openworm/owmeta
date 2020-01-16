@@ -4,11 +4,13 @@ from contextlib import contextmanager
 from .common_data import DS_NS
 from .local_file_ds import LocalFileDataSource
 from .http_ds import HTTPFileDataSource
+from ..mapper import mapped
 
 from owmeta.datasource import Informational, DataTranslator
 import csv
 
 
+@mapped
 class CSVDataSource(LocalFileDataSource):
     rdf_namespace = Namespace(DS_NS['CSVDataSource#'])
 
@@ -20,6 +22,7 @@ class CSVDataSource(LocalFileDataSource):
     csv_field_delimiter = Informational(display_name='CSV field delimiter')
 
 
+@mapped
 class CSVHTTPFileDataSource(HTTPFileDataSource):
     rdf_namespace = Namespace(DS_NS['CSVHTTPFileDataSource#'])
 
@@ -28,6 +31,7 @@ class CSVHTTPFileDataSource(HTTPFileDataSource):
     csv_field_delimiter = Informational(display_name='CSV field delimiter')
 
 
+@mapped
 class CSVDataTranslator(DataTranslator):
 
     def make_reader(self, source, skipheader=True, **kwargs):
@@ -50,6 +54,3 @@ class CSVDataTranslator(DataTranslator):
         return cm()
 
     reader = make_reader
-
-
-__yarom_mapped_classes__ = (CSVDataSource, CSVDataTranslator)

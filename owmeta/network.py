@@ -6,8 +6,10 @@ from .connection import Connection
 from .neuron import Neuron
 from .biology import BiologyType
 from .worm_common import WORM_RDF_TYPE
+from .mapper import mapped
 
 
+@mapped
 class Network(BiologyType):
 
     """ A network of neurons """
@@ -128,6 +130,3 @@ class Network(BiologyType):
 
     def defined_augment(self):
         return self.worm.has_defined_value()
-
-
-__yarom_mapped_classes__ = (Network,)

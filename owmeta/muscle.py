@@ -1,8 +1,10 @@
 from .cell import Cell
 from .neuron import Neuron
 from .dataObject import DatatypeProperty, ObjectProperty, Alias
+from .mapper import mapped
 
 
+@mapped
 class Muscle(Cell):
 
     """A single muscle cell.
@@ -30,6 +32,3 @@ class Muscle(Cell):
 
     receptor = Alias(receptors)
     ''' Alias to `receptors` '''
-
-
-__yarom_mapped_classes__ = (Muscle,)

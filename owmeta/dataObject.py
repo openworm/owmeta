@@ -14,6 +14,7 @@ from .contextualize import (Contextualizable,
                             contextualize_helper,
                             decontextualize_helper)
 from .context import ClassContext, ContextualizableDataUserMixin
+from .mapper import mapped
 
 from yarom.graphObject import (GraphObject,
                                ComponentTripler,
@@ -135,6 +136,7 @@ def UnionProperty(*args, **kwargs):
     return APThunk('UnionProperty', args, kwargs)
 
 
+@mapped
 class RDFSClass(GraphObject):
 
     """ The GraphObject corresponding to rdfs:Class """
@@ -444,6 +446,7 @@ class ContextFilteringList(Contextualizable, list):
         return list(super(ContextFilteringList, self).__iter__())
 
 
+@mapped
 class BaseDataObject(six.with_metaclass(ContextMappedClass,
                                         IdMixin(hashfunc=hashlib.md5),
                                         GraphObject,
@@ -882,6 +885,7 @@ class RDFTypeProperty(SP.ObjectProperty):
     lazy = False
 
 
+@mapped
 class RDFSSubClassOfProperty(SP.ObjectProperty):
     link = R.RDFS.subClassOf
     linkName = 'rdfs_subclassof_property'
@@ -891,6 +895,7 @@ class RDFSSubClassOfProperty(SP.ObjectProperty):
     lazy = False
 
 
+@mapped
 class TypeDataObject(BaseDataObject):
     class_context = URIRef(BASE_SCHEMA_URL)
 
@@ -921,6 +926,7 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
         return cls.instance
 
 
+@mapped
 class PropertyDataObject(BaseDataObject):
 
     """ A PropertyDataObject represents the property-as-object.
@@ -947,12 +953,15 @@ class RDFSLabelProperty(SP.DatatypeProperty):
     lazy = True
 
 
+@mapped
 class DataObject(BaseDataObject):
     rdfs_comment = CPThunk(RDFSCommentProperty)
     rdfs_label = CPThunk(RDFSLabelProperty)
 
 
+@mapped
 class RDFProperty(DataObjectSingleton):
+
 
     """ The DataObject corresponding to rdf:Property """
     rdf_type = R.RDF['Property']
@@ -969,6 +978,7 @@ def disconnect():
     PropertyTypes.clear()
 
 
+@mapped
 class ModuleAccessor(DataObject):
     '''
     Describes how to access a module.
@@ -978,6 +988,7 @@ class ModuleAccessor(DataObject):
     '''
 
 
+@mapped
 class Package(DataObject):
     ''' Describes an idealized software package identifiable by a name and version number '''
 
@@ -988,6 +999,7 @@ class Package(DataObject):
     ''' The version of the package '''
 
 
+@mapped
 class Module(DataObject):
     '''
     Represents a module of code
@@ -1005,6 +1017,7 @@ class Module(DataObject):
     ''' Package that provides the module '''
 
 
+@mapped
 class ClassDescription(DataObject):
     '''
     Describes a class in the programming language
@@ -1014,6 +1027,7 @@ class ClassDescription(DataObject):
     ''' The module the class belongs to '''
 
 
+@mapped
 class RegistryEntry(DataObject):
 
     '''
@@ -1041,11 +1055,13 @@ class RegistryEntry(DataObject):
                                     self.rdf_class.defined_values[0].identifier.n3())
 
 
+@mapped
 class PythonPackage(Package):
     ''' A python package '''
     key_properties = (Package.name, Package.version)
 
 
+@mapped
 class PythonModule(Module):
     '''
     A Python module
@@ -1060,6 +1076,7 @@ class PythonModule(Module):
     key_properties = (name, package)
 
 
+@mapped
 class PIPInstall(ModuleAccessor):
     '''
     Describes a `pip install` command line
@@ -1070,6 +1087,7 @@ class PIPInstall(ModuleAccessor):
     version = DatatypeProperty()
 
 
+@mapped
 class PythonClassDescription(ClassDescription):
     name = DatatypeProperty()
     ''' Local name of the class (i.e., relative to the module name) '''
@@ -1080,9 +1098,3 @@ class PythonClassDescription(ClassDescription):
     def identifier_augment(self):
         return self.make_identifier(self.name.defined_values[0].identifier.n3() +
                                     self.module.defined_values[0].identifier.n3())
-
-
-__yarom_mapped_classes__ = (BaseDataObject, DataObject, RDFSClass, TypeDataObject,
-                            RDFProperty, RDFSSubClassOfProperty, PropertyDataObject,
-                            RegistryEntry, ModuleAccessor, ClassDescription, Module,
-                            PythonPackage, PythonModule, PIPInstall, PythonClassDescription)

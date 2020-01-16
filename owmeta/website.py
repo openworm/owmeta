@@ -2,8 +2,10 @@ from rdflib.term import URIRef
 
 from .document import BaseDocument
 from .dataObject import DatatypeProperty
+from .mapper import mapped
 
 
+@mapped
 class Website(BaseDocument):
 
     """ A representation of a website """
@@ -22,6 +24,3 @@ class Website(BaseDocument):
 
     def identifier_augment(self):
         return URIRef(self.url.defined_values[0].identifier)
-
-
-__yarom_mapped_classes__ = (Website,)

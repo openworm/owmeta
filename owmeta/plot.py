@@ -1,6 +1,8 @@
 from .dataObject import DataObject, DatatypeProperty
+from .mapper import mapped
 
 
+@mapped
 class Plot(DataObject):
     """
     Object for storing plot data in owmeta.
@@ -69,6 +71,3 @@ class Plot(DataObject):
         Get the data stored for this plot.
         """
         return self._to_list(self._data_string())
-
-
-__yarom_mapped_classes__ = (Plot,)

@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 from rdflib.namespace import Namespace
 from ..datasource import Informational, DataSource
+from ..mapper import mapped
 from .common_data import DS_NS
 
 
+@mapped
 class FileDataSource(DataSource):
     rdf_namespace = Namespace(DS_NS['FileDataSource#'])
     md5 = Informational(display_name='MD5 hash')
@@ -20,6 +22,3 @@ class FileDataSource(DataSource):
         with self.file_contents() as f:
             hsh.update(f.read())
         getattr(self, algorithm).set(hsh.hexdigest())
-
-
-__yarom_mapped_classes__ = (FileDataSource,)

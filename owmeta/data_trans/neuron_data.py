@@ -11,14 +11,17 @@ from .common_data import DS_NS, TRANS_NS
 from .csv_ds import CSVDataSource, CSVDataTranslator
 
 from .data_with_evidence_ds import DataWithEvidenceDataSource
+from ..mapper import mapped
 
 
+@mapped
 class NeuronCSVDataSource(CSVDataSource):
     rdf_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
     bibtex_files = Informational(display_name='BibTeX files',
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
 
 
+@mapped
 class NeuronCSVDataTranslator(CSVDataTranslator):
     input_type = NeuronCSVDataSource
     output_type = DataWithEvidenceDataSource
@@ -73,6 +76,3 @@ class NeuronCSVDataTranslator(CSVDataTranslator):
             res.evidence_context(Evidence)(reference=d, supports=contextualized_doc_ctx.rdf_object)
             res.data_context.add_import(contextualized_doc_ctx)
         return res
-
-
-__yarom_mapped_classes__ = (NeuronCSVDataSource, NeuronCSVDataTranslator)

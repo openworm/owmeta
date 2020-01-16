@@ -14,6 +14,7 @@ from ..worm import Worm
 from ..network import Network
 from ..datasource import GenericTranslation
 from ..dataObject import DatatypeProperty, ObjectProperty
+from ..mapper import mapped
 
 from .csv_ds import CSVDataTranslator, CSVDataSource
 from .common_data import TRANS_NS
@@ -24,6 +25,7 @@ import logging
 L = logging.getLogger(__name__)
 
 
+@mapped
 class ConnectomeCSVDataSource(CSVDataSource):
     '''
     A CSV data source whose CSV file describes a neural connectome
@@ -33,6 +35,7 @@ class ConnectomeCSVDataSource(CSVDataSource):
     '''
 
 
+@mapped
 class NeuronConnectomeCSVTranslation(GenericTranslation):
 
     neurons_source = ObjectProperty(value_type=DataWithEvidenceDataSource)
@@ -41,6 +44,7 @@ class NeuronConnectomeCSVTranslation(GenericTranslation):
     key_properties = (GenericTranslation.source, muscles_source, neurons_source)
 
 
+@mapped
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
     input_type = (ConnectomeCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
@@ -163,12 +167,14 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         return res
 
 
+@mapped
 class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
     neurotransmitter_source = ObjectProperty()
 
     key_properties = (GenericTranslation.source, neurotransmitter_source)
 
 
+@mapped
 class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
     '''
     Adds synapse classes to existing connections
@@ -313,10 +319,3 @@ def changed_muscle(x):
 
 def expand_muscle(ctx, name):
     return ctx(Muscle)(name + 'L'), ctx(Muscle)(name + 'R')
-
-
-__yarom_mapped_classes__ = (ConnectomeCSVDataSource,
-                            NeuronConnectomeCSVTranslation,
-                            NeuronConnectomeCSVTranslator,
-                            NeuronConnectomeSynapseClassTranslator,
-                            NeuronConnectomeSynapseClassTranslation)

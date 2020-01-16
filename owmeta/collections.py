@@ -1,7 +1,9 @@
 from rdflib.term import URIRef
+from .mapper import mapped
 from .dataObject import DataObject, DatatypeProperty, UnionProperty, Alias
 
 
+@mapped
 class Bag(DataObject):
 
     """
@@ -45,6 +47,3 @@ class Bag(DataObject):
 
     def identifier_augment(self):
         return self.make_identifier_direct(self.group_name.onedef())
-
-
-__yarom_mapped_classes__ = (Bag,)

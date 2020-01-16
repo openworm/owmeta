@@ -4,11 +4,13 @@ from ..datasource import Informational, DataTranslator, DataSource
 from .local_file_ds import LocalFileDataSource
 from ..context import Context
 from ..contextDataObject import ContextDataObject
+from ..mapper import mapped
 from .. import CONTEXT
 from .common_data import DS_NS
 from .context_datasource import VariableIdentifierContext, VariableIdentifierContextDataObject
 
 
+@mapped
 class EvidenceDataSource(DataSource):
     context_property = Informational(display_name='Context',
                                      property_name='evidence_context',
@@ -35,12 +37,14 @@ class _EvidenceContext(VariableIdentifierContext):
         return self.maker.identifier + '-evidence'
 
 
+@mapped
 class BibTexDataSource(LocalFileDataSource):
     def __init__(self, bibtex_file_name, **kwargs):
         super(BibTexDataSource, self).__init__(**kwargs)
         self.bibtex_file_name = bibtex_file_name
 
 
+@mapped
 class BibTexDataTranslator(DataTranslator):
     input_type = BibTexDataSource
     output_type = EvidenceDataSource
@@ -48,6 +52,3 @@ class BibTexDataTranslator(DataTranslator):
     def translate(data_source):
         evidences = parse_bibtex_into_evidence(data_source.bibtex_file_name)
         return evidences.values()
-
-
-__yarom_mapped_classes__ = (BibTexDataSource, BibTexDataTranslator, EvidenceDataSource,)

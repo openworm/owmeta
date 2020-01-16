@@ -7,8 +7,10 @@ from .cell import Cell
 from .biology import BiologyType
 from .network import Network
 from .worm_common import WORM_RDF_TYPE
+from .mapper import mapped
 
 
+@mapped
 class Worm(BiologyType):
 
     """ A representation of the whole worm """
@@ -100,6 +102,3 @@ class Worm(BiologyType):
     def identifier_augment(self, *args, **kwargs):
         ''' Result is derived from the name property '''
         return self.make_identifier(self.name.defined_values[0])
-
-
-__yarom_mapped_classes__ = (Worm,)

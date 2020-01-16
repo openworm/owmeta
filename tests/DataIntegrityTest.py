@@ -166,7 +166,7 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that every cell has a Wormbase ID. """
         cells = set(self.qctx(Cell)().load())
         for cell in cells:
-            assert cell.wormbaseID()
+            assert cell.wormbaseID() is not None
 
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
