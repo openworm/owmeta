@@ -6,7 +6,7 @@ except ImportError:
     from itertools import izip_longest as zip_longest
 
 
-def format_table(dat, header=None, pref_widths=None, default_termwidth=80):
+def format_table(dat, header=None, pref_widths=None, default_termwidth=400):
     dat = list(dat)
     if not dat:
         return ''
