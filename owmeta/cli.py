@@ -180,9 +180,9 @@ def main():
                                         columns=[lambda x: x],
                                         header=out.header)
                 selected_columns = [0]
+            elif ns_handler.columns:
+                die('The given list of columns is not valid for this command')
             else:
-                if ns_handler.columns:
-                    die('The given list of columns is not valid for this command')
                 out = GeneratorWithData(out,
                                         columns=[lambda x: x],
                                         header=['Value'])
