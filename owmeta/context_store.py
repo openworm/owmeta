@@ -2,6 +2,7 @@ from itertools import chain
 from rdflib.store import Store, VALID_STORE, NO_STORE
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import Variable
+from time import time
 import rdflib
 from yarom.rdfUtils import transitive_lookup
 
@@ -147,7 +148,10 @@ class RDFContextStore(Store):
 
     def __init_contexts(self):
         if self.__store is not None and self.__context_transitive_imports is None:
-            if self.__include_imports:
+            if not self.__context or self.__context.identifier is None:
+                self.__context_transitive_imports = {getattr(x, 'identifier', x)
+                                                     for x in self.__store.contexts()}
+            elif self.__include_imports:
                 imports = transitive_lookup(self.__store,
                                             self.__context.identifier,
                                             CONTEXT_IMPORTS,
@@ -163,34 +167,40 @@ class RDFContextStore(Store):
     def triples(self, pattern, context=None):
         self.__init_contexts()
 
-        for t in self.__store.triples(pattern, context):
-            contexts = set(getattr(c, 'identifier', c) for c in t[1])
-            if self.__context_transitive_imports:
-                inter = self.__context_transitive_imports & contexts
-            else:
-                # Note that our own identifier is also included in the
-                # transitive imports, so if we don't have *any* imports then we
-                # fall back to querying across all contexts => we don't filter
-                # based on contexts. This is in line with rdflib ConjuctiveGraph
-                # semantics
-                inter = contexts
-            if inter:
+        if context:
+            qctxs = self.__context_transitive_imports & frozenset([context])
+        elif self.__context.identifier:
+            qctxs = self.__context_transitive_imports
+        else:
+            qctxs = [None]
+
+        for ctx in qctxs:
+            for t in self.__store.triples(pattern, ctx):
+                contexts = set(getattr(c, 'identifier', c) for c in t[1])
+                if self.__context:
+                    inter = self.__context_transitive_imports & contexts
+                else:
+                    inter = contexts
                 yield t[0], inter
 
     def triples_choices(self, pattern, context=None):
         self.__init_contexts()
-        for t in self.__store.triples_choices(pattern, context):
-            contexts = set(getattr(c, 'identifier', c) for c in t[1])
-            if self.__context_transitive_imports:
-                inter = self.__context_transitive_imports & contexts
-            else:
-                # Note that our own identifier is also included in the
-                # transitive imports, so if we don't have *any* imports then we
-                # fall back to querying across all contexts => we don't filter
-                # based on contexts. This is in line with rdflib ConjuctiveGraph
-                # semantics
-                inter = contexts
-            if inter:
+
+        if context:
+            qctxs = self.__context_transitive_imports & frozenset([context])
+        elif self.__context.identifier:
+            qctxs = self.__context_transitive_imports
+        else:
+            qctxs = [None]
+
+        for ctx in qctxs:
+            for t in self.__store.triples_choices(pattern, ctx):
+                contexts = set(getattr(c, 'identifier', c) for c in t[1])
+                if self.__context:
+                    inter = self.__context_transitive_imports & contexts
+                else:
+                    inter = contexts
+
                 yield t[0], inter
 
     def contexts(self, triple=None):
