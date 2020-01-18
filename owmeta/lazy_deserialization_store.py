@@ -4,8 +4,11 @@ from os.path import join as p, exists, isdir, isfile
 import shutil
 import pickle
 import re
+import traceback
 from itertools import chain
+from time import time
 
+from yarom.utils import FCN
 from rdflib.store import Store
 from rdflib.plugins.memory import IOMemory
 from rdflib.term import URIRef
@@ -60,7 +63,7 @@ class LazyDeserializationStore(Store):
                  self.__earliest_revisions,
                  self.__latest_revisions) = pickle.load(f)
         except FileNotFoundError:
-            self.__active_store = IOMemory()
+            self.__active_store = dict()
             self.__latest_revisions = dict()
             self.__earliest_revisions = dict()
 
@@ -93,11 +96,13 @@ class LazyDeserializationStore(Store):
             m(self)
 
     def triples(self, triplepat, context=None):
+        #print('querying triplepat', triplepat, context, '...')
+        #t0 = time()
         ctx = getattr(context, 'identifier', context)
 
         earliest_rev = self.earliest_revision(ctx)
         end_rev = None if earliest_rev is None else earliest_rev - 1
-        self._merge(ctx, self.__active_store, end_rev=end_rev)
+        self._merge(ctx, end_rev=end_rev)
         self._tpc_register()
 
         if ctx is None:
@@ -108,7 +113,10 @@ class LazyDeserializationStore(Store):
                 this_ctx = UQ(ctxdirname)
                 this_earliest_rev = self.earliest_revision(this_ctx)
                 this_end_rev = None if this_earliest_rev is None else this_earliest_rev - 1
-                store, _ = self._merge(this_ctx, self.__active_store, end_rev=this_end_rev)
+                active_store = self.__active_store.get(this_ctx)
+                if active_store is None:
+                    self.__active_store[this_ctx] = active_store = IOMemory()
+                store, _ = self._merge(this_ctx, active_store, end_rev=this_end_rev)
                 self._tpc_register()
                 if not store:
                     continue
@@ -118,27 +126,35 @@ class LazyDeserializationStore(Store):
                     # removals here.
                     yield m[0], (URIRef(x) for x in m[1])
 
-        for trip, ctxs in self.__active_store.triples(triplepat, context=ctx):
-            removals = self.__removal_stores.get(ctx)
-            if removals:
-                removed = next(removals.triples(trip, context=ctx), None)
-            else:
-                removed = False
-            if not removed:
-                yield trip, (URIRef(x) for x in ctxs)
+        active_store = self.__active_store.get(ctx)
+        if active_store:
+            for trip, ctxs in active_store.triples(triplepat, context=ctx):
+                removals = self.__removal_stores.get(ctx)
+                if removals:
+                    removed = next(removals.triples(trip, context=ctx), None)
+                else:
+                    removed = False
+                if not removed:
+                    yield trip, (URIRef(x) for x in ctxs)
 
         tent = self.__tentative_stores.get(ctx)
         if tent:
             tent_triples = tent.triples(triplepat, context=context)
             for trip, ctxs in tent_triples:
                 yield trip, (URIRef(x) for x in ctxs)
+        #print('queried triplepat', triplepat, context, 'took', time() - t0)
 
     def remove(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
         earliest_rev = self.earliest_revision(ctx)
         end_rev = None if earliest_rev is None else earliest_rev - 1
-        self._merge(ctx, self.__active_store, end_rev=end_rev)
-        active_store_matches = self.__active_store.triples(triplepat, context=ctx)
+        active_store = self.__active_store.get(ctx)
+        if not active_store:
+            # We don't have this store active, but it may have triples
+            # that we need to remove. merge it in
+            self.__active_store[ctx] = active_store = IOMemory()
+        self._merge(ctx, active_store, end_rev=end_rev)
+        active_store_matches = active_store.triples(triplepat, context=ctx)
         has_triples = next(active_store_matches, None)
         if has_triples:
             ctx_store = self.__removal_stores.get(ctx)
@@ -183,9 +199,11 @@ class LazyDeserializationStore(Store):
                         break  # outer loop
         else:
             ac = set(self._all_committed_contexts())
-            for c in self.__active_store.contexts(triple):
-                ac.remove(c)
-                yield c
+            for c, cstore in self.__active_store.items():
+                if cstore.triples(triple):
+                    yield c
+                    ac.remove(c)
+                    break
 
             for c in ac:
                 merged, _ = self._merge(c)
@@ -217,17 +235,24 @@ class LazyDeserializationStore(Store):
             self.tpc_commit()
 
     def tpc_prepare(self):
-        add_revs = self._dex(self.__tentative_stores, 'a',
-                lambda triple, context: self.__active_store.add(triple[0],
-                    context=context))
+        def handle_add(triple, context):
+            active_store = self.__active_store.get(context)
+            if active_store is None:
+                self.__active_store[context] = active_store = IOMemory()
+            active_store.add(triple[0], context=context)
+        add_revs = self._dex(self.__tentative_stores, 'a', handle_add)
         # If a context is loaded, then we've already merged it into the active store --
         # just need to write the store to disk
         #
         # If not, then, we'll need to call merge to load the missing revisions, in order
         self.__tentative_stores.clear()
-        rem_revs = self._dex(self.__removal_stores, 'r',
-                lambda triple, context: self.__active_store.remove(triple[0],
-                    context=context))
+
+        def handle_remove(triple, context):
+            active_store = self.__active_store.get(context)
+            if active_store is None:
+                self.__active_store[context] = active_store = IOMemory()
+            active_store.remove(triple[0], context=context)
+        rem_revs = self._dex(self.__removal_stores, 'r', handle_remove)
 
         for ctx, rev in chain(add_revs.items(), rem_revs.items()):
             self.__earliest_revisions.setdefault(ctx, rev)
@@ -311,7 +336,7 @@ class LazyDeserializationStore(Store):
     def tpc_abort(self):
         self.__tentative_stores.clear()
         self.__removal_stores.clear()
-        self.__active_store = IOMemory()
+        #self.__active_store = IOMemory()
         prepdir = p(self.__base_directory, 'prep')
 
         if isdir(prepdir):
@@ -394,6 +419,9 @@ class LazyDeserializationStore(Store):
             elif store_type == 'r':
                 for trip, ctxs in revision.triples(triplepat):
                     store.remove(trip, context=ctx)
-        if store is self.__active_store:
+        if store is self.__active_store[ctx]:
             self.__earliest_revisions[ctx] = 0 if start_rev is None else start_rev
         return store, (earliest, latest)
+
+    def __repr__(self):
+        return '{}({})'.format(FCN(type(self)), self.__base_directory)

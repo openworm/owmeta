@@ -928,7 +928,6 @@ class DataObjectSingleton(six.with_metaclass(DataObjectSingletonMeta, BaseDataOb
 
 @mapped
 class PropertyDataObject(BaseDataObject):
-
     """ A PropertyDataObject represents the property-as-object.
 
     Try not to confuse this with the Property class
@@ -961,8 +960,6 @@ class DataObject(BaseDataObject):
 
 @mapped
 class RDFProperty(DataObjectSingleton):
-
-
     """ The DataObject corresponding to rdf:Property """
     rdf_type = R.RDF['Property']
     class_context = URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns')
