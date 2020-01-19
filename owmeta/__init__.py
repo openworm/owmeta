@@ -156,7 +156,7 @@ class Connection(object):
 
     @property
     def transaction_manager(self):
-        self.__transaction_manager
+        return self.__transaction_manager
 
     @transaction_manager.setter
     def transaction_manager(self, transaction_manager):
@@ -165,6 +165,10 @@ class Connection(object):
     @property
     def mapper(self):
         return self.conf['mapper']
+
+    @property
+    def rdf(self):
+        return self.conf['rdf.graph']
 
     def disconnect(self):
         self.conf.closeDatabase()

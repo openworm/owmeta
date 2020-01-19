@@ -214,8 +214,8 @@ class ClassRegistryTest(_DataTest):
             - resolving subclasses from superclasses
         '''
         from owmeta.dataObject import (PythonModule,
-                                           PythonClassDescription,
-                                           RegistryEntry)
+                                       PythonClassDescription,
+                                       RegistryEntry)
 
         ident = R.URIRef('http://openworm.org/entities/TDO01')
         rdftype = R.RDF['type']

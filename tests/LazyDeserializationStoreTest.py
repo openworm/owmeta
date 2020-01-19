@@ -19,7 +19,6 @@ def test_add_triple_make_new_pickle(tempdir):
              URIRef('http://example.org/3')),
             context=URIRef('http://example.org/ctx'))
     cut.commit()
-    print(listdir(tempdir))
     assert context_dir_count(tempdir) == 1
 
 
@@ -679,6 +678,75 @@ def test_committed_context(tempdir):
     cut.commit()
 
     assert set(cut.contexts()) == set([URIRef('http://example.org/ctx')])
+
+
+def test_deactivate(tempdir):
+    cut = LazyDeserializationStore({
+        'base_directory': tempdir,
+        'max_active_contexts': 1
+    })
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx0'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/4'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx1'))
+
+    cut.commit()
+
+    assert len(cut.active_stores) == 1
+
+
+def test_reactivate(tempdir):
+    cut = LazyDeserializationStore({
+        'base_directory': tempdir,
+        'max_active_contexts': 1
+    })
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx0'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/4'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx1'))
+
+    cut.commit()
+
+    assert len(list(cut.triples((None, None, None), URIRef('http://example.org/ctx0')))) == 1
+
+
+def test_reactivate_all_contexts(tempdir):
+    cut = LazyDeserializationStore({
+        'base_directory': tempdir,
+        'max_active_contexts': 1
+    })
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/2'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx0'))
+    cut.add((URIRef('http://example.org/1'),
+             URIRef('http://example.org/4'),
+             URIRef('http://example.org/3')),
+            context=URIRef('http://example.org/ctx1'))
+
+    cut.commit()
+
+    assert len(list(cut.triples((None, None, None)))) == 3
 
 
 def context_dir_count(tempdir):

@@ -1055,7 +1055,7 @@ class RegistryEntry(DataObject):
 @mapped
 class PythonPackage(Package):
     ''' A python package '''
-    key_properties = (Package.name, Package.version)
+    key_properties = ('name', 'version')
 
 
 @mapped

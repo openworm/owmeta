@@ -175,7 +175,7 @@ class RDFContextStore(Store):
             qctxs = [None]
 
         for ctx in qctxs:
-            for t in self.__store.triples(pattern, ctx):
+            for t in self.__store.triples(pattern, self.__graph.get_context(ctx)):
                 contexts = set(getattr(c, 'identifier', c) for c in t[1])
                 if self.__context:
                     inter = self.__context_transitive_imports & contexts
@@ -194,7 +194,7 @@ class RDFContextStore(Store):
             qctxs = [None]
 
         for ctx in qctxs:
-            for t in self.__store.triples_choices(pattern, ctx):
+            for t in self.__store.triples_choices(pattern, self.__graph.get_context(ctx)):
                 contexts = set(getattr(c, 'identifier', c) for c in t[1])
                 if self.__context:
                     inter = self.__context_transitive_imports & contexts

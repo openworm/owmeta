@@ -373,6 +373,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         if self.mapper is None:
             return None
         c = self.mapper.RDFTypeTable.get(uri)
+
         if c is None:
             # otherwise, attempt to load into the cache by
             # reading the RDF graph.
@@ -382,6 +383,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
             re.rdf_class(uri)
             cd = self(PythonClassDescription)()
             re.class_description(cd)
+
             for cd_l in cd.load():
                 class_name = cd_l.name()
                 moddo = cd_l.module()
