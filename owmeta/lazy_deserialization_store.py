@@ -72,7 +72,9 @@ class LazyDeserializationStore(Store):
     def close(self, commit_pending_transaction=False):
         if commit_pending_transaction:
             self.commit()
-        self.__base_directory = None
+
+    def destroy(self):
+        shutil.rmtree(self.__base_directory)
 
     def add(self, triple, context=None, quoted=False):
         ctx = getattr(context, 'identifier', context)
@@ -96,8 +98,6 @@ class LazyDeserializationStore(Store):
             m(self)
 
     def triples(self, triplepat, context=None):
-        #print('querying triplepat', triplepat, context, '...')
-        #t0 = time()
         ctx = getattr(context, 'identifier', context)
 
         earliest_rev = self.earliest_revision(ctx)
@@ -142,7 +142,6 @@ class LazyDeserializationStore(Store):
             tent_triples = tent.triples(triplepat, context=context)
             for trip, ctxs in tent_triples:
                 yield trip, (URIRef(x) for x in ctxs)
-        #print('queried triplepat', triplepat, context, 'took', time() - t0)
 
     def remove(self, triplepat, context=None):
         ctx = getattr(context, 'identifier', context)
@@ -336,7 +335,9 @@ class LazyDeserializationStore(Store):
     def tpc_abort(self):
         self.__tentative_stores.clear()
         self.__removal_stores.clear()
-        #self.__active_store = IOMemory()
+        self.__active_store.clear()
+        self.__earliest_revisions.clear()
+        self.__latest_revisions.clear()
         prepdir = p(self.__base_directory, 'prep')
 
         if isdir(prepdir):
@@ -383,10 +384,10 @@ class LazyDeserializationStore(Store):
 
     def _merge(self, ctx, store=None, triplepat=(None, None, None), start_rev=None, end_rev=None):
         if end_rev is not None and end_rev <= 0:
-            return None, None
+            return store, None
         ctxdir = self._format_context_directory_name(ctx)
         if not isdir(ctxdir):
-            return None, None
+            return store, None
         pickles = list(x for x in (STORE_PICKLE_FNAME_REGEX.match(p) for p in listdir(ctxdir)) if x)
         only_one = len(pickles) == 1
         earliest = None
