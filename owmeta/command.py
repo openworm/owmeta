@@ -1163,17 +1163,17 @@ class OWM(object):
                 index_file.seek(0)
                 progress.total = cnt
                 with transaction.manager:
+                    bag = BatchAddGraph(dest, batchsize=10000)
                     for l in index_file:
                         fname, ctx = l.strip().split(' ')
                         parser = plugin.get('nt', Parser)()
                         graph_fname = pth_join(self.owmdir, 'graphs', fname)
-                        with open(graph_fname, 'rb') as f, \
-                                BatchAddGraph(dest.get_context(ctx), batchsize=4000) as g:
+                        with open(graph_fname, 'rb') as f, bag.get_context(ctx) as g:
                             parser.parse(create_input_source(f), g)
 
                         progress.update(1)
-                        triples_read += g.count
-                        trip_prog.update(g.count)
+                        trip_prog.update(bag.count - triples_read)
+                        triples_read = g.count
                     progress.write('Finalizing writes to database...')
         progress.write('Loaded {:,} triples'.format(triples_read))
 

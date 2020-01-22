@@ -167,41 +167,27 @@ class RDFContextStore(Store):
     def triples(self, pattern, context=None):
         self.__init_contexts()
 
-        if context:
-            qctxs = self.__context_transitive_imports & frozenset([context])
-        elif self.__context.identifier:
-            qctxs = self.__context_transitive_imports
-        else:
-            qctxs = [None]
-
-        for ctx in qctxs:
-            for t in self.__store.triples(pattern, self.__graph.get_context(ctx)):
-                contexts = set(getattr(c, 'identifier', c) for c in t[1])
-                if self.__context:
-                    inter = self.__context_transitive_imports & contexts
-                else:
-                    inter = contexts
-                yield t[0], inter
+        ctx = None if context is None else self.__graph.get_context(context)
+        for t in self.__store.triples(pattern, ctx):
+            contexts = set(getattr(c, 'identifier', c) for c in t[1])
+            if self.__context_transitive_imports:
+                inter = self.__context_transitive_imports & contexts
+            else:
+                inter = contexts
+            yield t[0], inter
 
     def triples_choices(self, pattern, context=None):
         self.__init_contexts()
 
-        if context:
-            qctxs = self.__context_transitive_imports & frozenset([context])
-        elif self.__context.identifier:
-            qctxs = self.__context_transitive_imports
-        else:
-            qctxs = [None]
+        ctx = None if context is None else self.__graph.get_context(context)
+        for t in self.__store.triples_choices(pattern, ctx):
+            contexts = set(getattr(c, 'identifier', c) for c in t[1])
+            if self.__context_transitive_imports:
+                inter = self.__context_transitive_imports & contexts
+            else:
+                inter = contexts
 
-        for ctx in qctxs:
-            for t in self.__store.triples_choices(pattern, self.__graph.get_context(ctx)):
-                contexts = set(getattr(c, 'identifier', c) for c in t[1])
-                if self.__context:
-                    inter = self.__context_transitive_imports & contexts
-                else:
-                    inter = contexts
-
-                yield t[0], inter
+            yield t[0], inter
 
     def contexts(self, triple=None):
         if triple is not None:

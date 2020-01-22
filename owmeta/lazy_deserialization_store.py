@@ -26,6 +26,12 @@ def UQ(s):
     return s.replace('%2F', '/').replace('%25', '%')
 
 
+def fix_context(context):
+    ctx = getattr(context, 'identifier', context)
+    if isinstance(ctx, URIRef):
+        return ctx
+
+
 POOL = Pool(16)
 
 
@@ -91,7 +97,7 @@ class LazyDeserializationStore(Store):
         shutil.rmtree(self.__base_directory)
 
     def add(self, triple, context=None, quoted=False):
-        ctx = getattr(context, 'identifier', context)
+        ctx = fix_context(context)
         ctx_store = self.__tentative_stores.get(ctx)
         if ctx_store is None:
             ctx_store = self.__tentative_stores.setdefault(ctx, IOMemory())
@@ -120,8 +126,9 @@ class LazyDeserializationStore(Store):
         active_store = self.__active_store.get(this_ctx)
         if active_store is None:
             active_store = IOMemory()
+        else:
+            self.__earliest_revisions[this_ctx] = 0
         self._tpc_register()
-        self.__earliest_revisions[this_ctx] = 0
         return (this_ctx,
                 self._format_context_directory_name(this_ctx),
                 active_store,
@@ -147,10 +154,10 @@ class LazyDeserializationStore(Store):
     def _merge_all_contexts(self):
         args = [self._merge_to_active_arguments(dirname)
                 for dirname in listdir(self.__base_directory)]
-        return [x[0] for x in POOL.imap_unordered(merge0, args, 100)]
+        return [x[0] for x in POOL.imap_unordered(merge0, args, 1000)]
 
     def triples(self, triplepat, context=None):
-        ctx = getattr(context, 'identifier', context)
+        ctx = fix_context(context)
 
         earliest_rev = self.earliest_revision(ctx)
         end_rev = None if earliest_rev is None else earliest_rev - 1
@@ -196,7 +203,7 @@ class LazyDeserializationStore(Store):
                 yield trip, (URIRef(x) for x in ctxs)
 
     def remove(self, triplepat, context=None):
-        ctx = getattr(context, 'identifier', context)
+        ctx = fix_context(context)
         earliest_rev = self.earliest_revision(ctx)
         end_rev = None if earliest_rev is None else earliest_rev - 1
         active_store = self.__active_store.get(ctx)
@@ -276,7 +283,7 @@ class LazyDeserializationStore(Store):
 
         Not a standard `rdflib.store.Store` method.
         '''
-        ctx = getattr(context, 'identifier', context)
+        ctx = fix_context(context)
         self.__should_collapse[URIRef(ctx)] = True
 
     def commit(self):
