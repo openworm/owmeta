@@ -38,7 +38,8 @@ def format_table(dat, header=None, pref_widths=None, default_termwidth=400):
 
         pref_widths = list(pref_widths)
     else:
-        pref_widths = (1,) * ncols
+        max_col_width = max(widths)
+        pref_widths = list(x / max_col_width for x in widths)
 
     try:
         termwidth, _ = shutil.get_terminal_size((default_termwidth, 0))
@@ -49,8 +50,8 @@ def format_table(dat, header=None, pref_widths=None, default_termwidth=400):
     new_widths = list(widths)
     idx = 0
     while sum(new_widths) + ncols - 1 >= termwidth:
-        new_widths[prefsorted_widths[idx][1]] -= 1
-        idx = (idx + 1) % ncols
+        selection = max(prefsorted_widths, key=lambda x: new_widths[x[1]] * x[0])
+        new_widths[selection[1]] -= 1
 
     widths = new_widths
 

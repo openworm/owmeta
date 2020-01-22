@@ -660,7 +660,7 @@ class OWMRegistry(object):
             for re in ctx.stored(RegistryEntry)().load():
                 ident = re.identifier
                 cd = re.class_description()
-                rdf_type = re.rdf_class()
+                rdf_type = re.namespace_manager.normalizeUri(re.rdf_class())
                 if not isinstance(cd, PythonClassDescription):
                     continue
                 module = cd.module()
@@ -679,8 +679,7 @@ class OWMRegistry(object):
                 RDF Type: {1}
                 Module Name: {3}
                 Class Name: {2}
-                Package: {4}
-''').format(*entry)
+                Package: {4}\n''').format(*entry)
 
         return GeneratorWithData(registry_entries(),
                 header=('ID', 'RDF Type', 'Class Name', 'Module Name', 'Package'),
