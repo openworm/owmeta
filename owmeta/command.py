@@ -27,6 +27,7 @@ from tempfile import TemporaryDirectory
 from .command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
                            DEFAULT_OWM_DIR)
 from .commands.bundle import OWMBundle
+from .commands.biology import CellCmd
 from .context import Context, DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
 from .capability import provide
 from .capabilities import FilePathProvider
@@ -588,7 +589,7 @@ class OWMContexts(object):
         from subprocess import call
         if context is None:
             ctx = self._parent._default_ctx
-            ctxid = self._parent._conf()[DEFAULT_CONTEXT_KEY]
+            ctxid = self._parent._conf(DEFAULT_CONTEXT_KEY)
         else:
             ctx = Context(ident=context, conf=self._parent._conf())
             ctxid = context
@@ -721,6 +722,8 @@ class OWM(object):
     bundle = SubCommand(OWMBundle)
 
     registry = SubCommand(OWMRegistry)
+
+    cell = SubCommand(CellCmd)
 
     def __init__(self, owmdir=None):
         self.progress_reporter = default_progress_reporter
@@ -1390,7 +1393,7 @@ class OWM(object):
 
     @property
     def rdf(self):
-        return self._conf()['rdf.graph']
+        return self._conf('rdf.graph')
 
     def commit(self, message):
         '''

@@ -185,4 +185,11 @@ CLI_HINTS = {
             },
         },
     },
+    'owmeta.commands.biology.CellCmd': {
+        'show': {
+            (METHOD_NAMED_ARG, 'cell_name_or_id'): {
+                'names': ['cell_name_or_id'],
+            },
+        },
+    },
 }

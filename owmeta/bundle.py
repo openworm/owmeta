@@ -242,7 +242,7 @@ class Bundle(object):
             bundles_directory = expanduser(p('~', '.owmeta', 'bundles'))
         self.bundles_directory = bundles_directory
         if not conf:
-            conf = {'rdf.source': 'lazy_pickle'}
+            conf = {'rdf.source': 'zodb'}
         self.version = version
         self.remotes = remotes
         self._given_conf = conf

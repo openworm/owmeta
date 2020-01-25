@@ -243,7 +243,8 @@ class WormbaseIDSetter(CSVDataTranslator):
     def translate(self, data_source, cells_source):
         """ Upload muscles and the neurons that connect to them """
         res = self.make_new_output((data_source,))
-        with self.make_reader(data_source, skipinitialspace=True, skipheader=True, skiplines=1, dict_reader=True) as csvreader:
+        with self.make_reader(data_source, skipinitialspace=True, skipheader=True,
+                skiplines=1, dict_reader=True) as csvreader:
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
@@ -252,10 +253,11 @@ class WormbaseIDSetter(CSVDataTranslator):
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
             for num, line in enumerate(csvreader):
-                if num < 2:  # skip rows with no data
+                if num < 1:  # skip rows with no data
                     continue
 
-                cell = cells_source.data_context.stored(Cell).query(name=line['Cell'])
+                cell_name = normalize_cell_name(line['Cell'])
+                cell = cells_source.data_context.stored(Cell).query(name=cell_name)
                 for loaded_cell in cell.load():
                     doc_ctx(loaded_cell).wormbaseID(line['WormBase ID'])
 
