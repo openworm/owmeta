@@ -174,7 +174,8 @@ class RDFContextStore(Store):
                 inter = self.__context_transitive_imports & contexts
             else:
                 inter = contexts
-            yield t[0], inter
+            if inter:
+                yield t[0], inter
 
     def triples_choices(self, pattern, context=None):
         self.__init_contexts()
@@ -187,7 +188,8 @@ class RDFContextStore(Store):
             else:
                 inter = contexts
 
-            yield t[0], inter
+            if inter:
+                yield t[0], inter
 
     def contexts(self, triple=None):
         if triple is not None:

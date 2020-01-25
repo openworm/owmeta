@@ -115,7 +115,7 @@ def evidence_for(qctx, ctx, evctx=None):
     evctx : Context
         if the Evidence.supports statements should be looked for somewhere other
         than `ctx`, that can be specified in evctx. optional
-"""
+    """
     if not evctx:
         evctx = ctx
     ctxs = query_context(ctx.rdf_graph(), qctx)

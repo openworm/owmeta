@@ -13,6 +13,7 @@ from owmeta.evidence import evidence_for
 from owmeta import connect, disconnect
 from .DataTestTemplate import _DataTest
 
+
 class EvidenceForTest(_DataTest):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
@@ -89,7 +90,8 @@ class EvidenceForTest(_DataTest):
         evctx = Context(ident='http://example.org/somerandomcontext', conf=self.conf).stored
 
         # Actually do the query
-        ev_iterable = evidence_for(qctx, ctx, evctx)
+        ev_iterable = iter(evidence_for(qctx, ctx, evctx))
 
         # Verify that there is at least one evidence object returned
-        self.assertEqual(len(ev_iterable), 0)
+        ev = next(ev_iterable, None)
+        self.assertEqual(ev, None)
