@@ -106,7 +106,7 @@ class PropertyIVar(IVar):
 
 class GeneratorWithData(object):
     def __init__(self, generator, header=None, text_format=None, default_columns=None, columns=None):
-        self._gen = generator
+        self._gen = iter(generator)
         self.header = header
         if columns is tuple:
             if not self.header:

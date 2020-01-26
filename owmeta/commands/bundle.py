@@ -16,7 +16,9 @@ from ..bundle import (Descriptor,
                       Remote,
                       Fetcher,
                       Cache,
+                      Unarchiver,
                       retrieve_remotes,
+                      fmt_bundle_directory,
                       NoBundleLoader as _NoBundleLoader)
 
 import hashlib
@@ -155,6 +157,7 @@ class OWMBundle(object):
         input_file_name : str
             The source file of the bundle
         '''
+        Unarchiver(bundles_directory=self._bundles_directory()).unpack(input_file_name)
 
     def save(self, bundle_id, output):
         '''

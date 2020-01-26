@@ -41,7 +41,7 @@ def wait_for_started(server_addr):
 def start():
     tempdir = TemporaryDirectory('example_bundle_dir')
     server, srvdir = setUp(tempdir.name)
-    L.info("starting server")
+    L.info("starting server %s serving from %s", server, srvdir)
 
     def pfunc():
         chdir(srvdir)

@@ -137,3 +137,10 @@ def assertRegexpMatches(text, pattern):
         pattern = re.compile(pattern)
     if not pattern.search(text):
         raise AssertionError('Could not find {} in:\n{}'.format(pattern, text))
+
+
+def assertNotRegexpMatches(text, pattern):
+    if isinstance(pattern, string_types):
+        pattern = re.compile(pattern)
+    if pattern.search(text):
+        raise AssertionError('Unexpectedly found {} in:\n{}'.format(pattern, text))

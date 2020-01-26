@@ -1,4 +1,5 @@
 from __future__ import print_function
+import subprocess
 from os.path import join as p
 from os import makedirs, listdir
 from pytest import mark, fixture
@@ -10,7 +11,7 @@ from owmeta.context import Context
 
 from rdflib.term import URIRef, Literal
 
-from .TestUtilities import assertRegexpMatches
+from .TestUtilities import assertRegexpMatches, assertNotRegexpMatches
 from .OWMCLITest import module_fixture as owm_cli_fixture
 
 
@@ -28,10 +29,10 @@ self = fixture(module_fixture)
 
 
 def test_load(self):
-    owm_bundle = p('tests', 'bundle.tar.gz')
+    owm_bundle = p('tests', 'bundle.tar.xz')
     self.sh('owm bundle load ' + owm_bundle)
     assertRegexpMatches(
-        self.sh('owm bundle index list'),
+        self.sh('owm bundle cache list'),
         r'archive_test_bundle'
     )
 
@@ -197,9 +198,9 @@ def test_cache_list_different_bundles(self):
     )
 
 
-def test_cache_list_description(self):
+def test_cache_list_version_check(self):
     '''
-    Make sure the bundle description shows up
+    bundle cache list filters out bundles with the wrong version
     '''
     bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
                    'test%2Fmain', '1')
@@ -215,9 +216,42 @@ def test_cache_list_description(self):
         self.sh('owm bundle cache list'),
         r'test/main@1'
     )
-    assertRegexpMatches(
+    assertNotRegexpMatches(
         self.sh('owm bundle cache list'),
         r'test/secondary@1'
+    )
+
+
+def test_cache_list_version_check_warning(self):
+    '''
+    bundle cache list filters out bundles with the wrong version
+    '''
+    bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    bundle_dir2 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fsecondary', '2')
+    makedirs(bundle_dir1)
+    makedirs(bundle_dir2)
+    with open(p(bundle_dir1, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main"}')
+    with open(p(bundle_dir2, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/secondary"}')
+    output = self.sh('owm bundle cache list', stderr=subprocess.STDOUT)
+    assertRegexpMatches(output, r'manifest.*match')
+
+
+def test_cache_list_description(self):
+    '''
+    Make sure the bundle description shows up
+    '''
+    bundle_dir1 = p(self.test_homedir, '.owmeta', 'bundles',
+                   'test%2Fmain', '1')
+    makedirs(bundle_dir1)
+    with open(p(bundle_dir1, 'manifest'), 'w') as mf:
+        mf.write('{"version": 1, "id": "test/main", "description": "Waka waka"}')
+    assertRegexpMatches(
+        self.sh('owm bundle cache list'),
+        r'Waka waka'
     )
 
 

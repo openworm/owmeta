@@ -2,6 +2,7 @@ import re
 import tempfile
 from os.path import join as p, exists, relpath, expanduser, isdir, isfile
 from os import makedirs, rename, scandir, listdir
+from contextlib import contextmanager
 import logging
 import hashlib
 import shutil
@@ -378,6 +379,10 @@ class Bundle(object):
         if target and hasattr(target, 'contextualize'):
             return target.contextualize(self)
         return None
+
+
+class ManifestValidator(object):
+    pass
 
 
 def find_bundle_directory(bundles_directory, ident, version=None):
@@ -968,17 +973,101 @@ class HTTPBundleLoader(Loader):
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
             with open(p(self.cachedir, bfn), 'r') as f:
-                self._unpack(f)
+                Unarchiver().unpack(f, self.base_directory)
         else:
+            # XXX Does this work?
             bio = io.BytesIO()
             bio.write(response.raw.read())
             bio.seek(0)
-            self._unpack(bio)
+            Unarchiver().unpack(bio, self.base_directory)
 
-    def _unpack(self, f):
+
+class Unarchiver(object):
+    '''
+    Unpacks an archive file (e.g., a `tar.gz`) of a bundle
+    '''
+    def __init__(self, bundles_directory=None, cachedir=None):
+        self.bundles_directory = bundles_directory
+        self.cachedir = cachedir
+
+    def unpack(self, input_file, target_directory=None):
+        '''
+        Unpack the archive file
+
+        If `target_directory` is provided, and `bundles_directory` is provided at
+        initialization, then if the bundle manifest doesn't match the expected archive
+        path, then an exception is raised.
+
+        Paramaters
+        ----------
+        input_file : str or :term:`file object`
+            The archive file
+        target_directory : str
+            The path where the archive should be unpacked. optional
+        '''
+        # - If we were given a target directory, just unpack there...no complications
+        #
+        # - If we weren't given a target directory, then we have to extract the manifest,
+        # read the version and name, then create the target directory
+        if not self.bundles_directory and not target_directory:
+            # TODO: Devise a better exception here
+            raise Exception('Neither a bundles_directory nor a target_directory was'
+                    ' provided. Cannot determine where to extract archive to.')
+
+        with self._to_tarfile(input_file) as ba:
+            expected_target_directory = self._process_manifest(input_file, ba)
+
+            if (target_directory and expected_target_directory and
+                    expected_target_directory != target_directory):
+                # TODO: Devise a more appropriate exception here
+                raise Exception('Target directory does not match expectation.',
+                        expected_target_directory, target_directory)
+            elif not target_directory:
+                target_directory = expected_target_directory
+
+            if not target_directory:
+                # TODO: Devise a more appropriate exception here
+                raise Exception('Could not determine a target directory')
+            ba.extractall(target_directory)
+
+    def _process_manifest(self, input_file, ba):
+        with ba.extractfile('manifest') as manifest:
+            if isinstance(input_file, str):
+                file_name = input_file
+            elif hasattr(input_file, 'name'):
+                file_name = input_file.name
+            else:
+                file_name = repr(input_file)
+
+            if manifest is None:
+                raise NotABundlePath(file_name, 'archive has no manifest')
+            manifest_data = json.load(manifest)
+            # TODO Validate the manifest
+            bundle_id = manifest_data['id']
+            bundle_version = manifest_data['version']
+            if self.bundles_directory:
+                return fmt_bundle_directory(self.bundles_directory, bundle_id, bundle_version)
+
+    def __call__(self, *args, **kwargs):
+        '''
+        Unpack the archive file
+        '''
+        return self.unpack(*args, **kwargs)
+
+    @contextmanager
+    def _to_tarfile(self, input_file):
+        if isinstance(input_file, str):
+            with open(input_file, 'rb') as f:
+                yield self._to_tarfile0(f)
+        else:
+            with hasattr(input_file, 'read'):
+                yield self._to_tarfile0(input_file)
+
+    @contextmanager
+    def _to_tarfile0(self, f):
         import tarfile
         with tarfile.open(mode='r:xz', fileobj=f) as ba:
-            ba.extractall(self.base_directory)
+            yield ba
 
 
 class Archiver(object):
