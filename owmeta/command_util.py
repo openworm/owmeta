@@ -92,7 +92,7 @@ class PropertyIVar(IVar):
 
         When the getter is first called, and when a setter is also defined, the setter will be called with the default
         value before the getter is called for the first time. _Even if the default_value is not set explicitly, the
-        setter will still be called with 'None'._
+        setter will still be called with 'None'.
         '''
         if target is None:
             return self

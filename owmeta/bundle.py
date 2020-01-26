@@ -11,6 +11,7 @@ import io
 from struct import pack
 import json
 from itertools import chain
+import tarfile
 
 import six
 import yaml
@@ -842,7 +843,6 @@ class HTTPBundleUploader(Uploader):
                     accessor_config.url.startswith('http://')))
 
     def upload(self, bundle_path):
-        import tarfile
         archive_path = bundle_path
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -986,9 +986,8 @@ class Unarchiver(object):
     '''
     Unpacks an archive file (e.g., a `tar.gz`) of a bundle
     '''
-    def __init__(self, bundles_directory=None, cachedir=None):
+    def __init__(self, bundles_directory=None):
         self.bundles_directory = bundles_directory
-        self.cachedir = cachedir
 
     def unpack(self, input_file, target_directory=None):
         '''
@@ -1004,6 +1003,16 @@ class Unarchiver(object):
             The archive file
         target_directory : str
             The path where the archive should be unpacked. optional
+
+        Raises
+        ------
+        NotABundlePath
+            Thrown in one of these conditions:
+            - If the `input_file` is not an expected format (lzma-zipped TAR file)
+            - If the `input_file` does not have a "manifest" file
+            - If the `input_file` manifest file is invalid or is not a regular file (see
+              `ManifestValidator` for further details)
+            - If the `input_file` is a file path and the corresponding file is not found
         '''
         # - If we were given a target directory, just unpack there...no complications
         #
@@ -1012,8 +1021,28 @@ class Unarchiver(object):
         if not self.bundles_directory and not target_directory:
             # TODO: Devise a better exception here
             raise Exception('Neither a bundles_directory nor a target_directory was'
-                    ' provided. Cannot determine where to extract archive to.')
+                    ' provided. Cannot determine where to extract %s archive to.' %
+                    input_file)
+        try:
+            self._unpack(input_file, target_directory)
+        except tarfile.ReadError:
+            raise NotABundlePath(self._bundle_file_name(input_file),
+                'Unable to read archive file')
 
+    def _bundle_file_name(self, input_file):
+        '''
+        Try to extract the bundle file name from `input_file`
+        '''
+        if isinstance(input_file, str):
+            file_name = input_file
+        elif hasattr(input_file, 'name'):
+            file_name = input_file.name
+        else:
+            file_name = 'bundle archive file'
+
+        return file_name
+
+    def _unpack(self, input_file, target_directory):
         with self._to_tarfile(input_file) as ba:
             expected_target_directory = self._process_manifest(input_file, ba)
 
@@ -1028,19 +1057,20 @@ class Unarchiver(object):
             if not target_directory:
                 # TODO: Devise a more appropriate exception here
                 raise Exception('Could not determine a target directory')
+            L.debug('extracting %s to %s', input_file, target_directory)
             ba.extractall(target_directory)
 
     def _process_manifest(self, input_file, ba):
-        with ba.extractfile('manifest') as manifest:
-            if isinstance(input_file, str):
-                file_name = input_file
-            elif hasattr(input_file, 'name'):
-                file_name = input_file.name
-            else:
-                file_name = repr(input_file)
+        try:
+            ef = ba.extractfile('manifest')
+        except KeyError:
+            file_name = self._bundle_file_name(input_file)
+            raise NotABundlePath(file_name, 'archive has no manifest')
 
+        with ef as manifest:
             if manifest is None:
-                raise NotABundlePath(file_name, 'archive has no manifest')
+                file_name = self._bundle_file_name(input_file)
+                raise NotABundlePath(file_name, 'archive manifest is not a regular file')
             manifest_data = json.load(manifest)
             # TODO Validate the manifest
             bundle_id = manifest_data['id']
@@ -1057,15 +1087,21 @@ class Unarchiver(object):
     @contextmanager
     def _to_tarfile(self, input_file):
         if isinstance(input_file, str):
-            with open(input_file, 'rb') as f:
-                yield self._to_tarfile0(f)
+            try:
+                archive_file = open(input_file, 'rb')
+            except FileNotFoundError:
+                file_name = self._bundle_file_name(input_file)
+                raise NotABundlePath(input_file, 'file not found')
+
+            with archive_file as f, self._to_tarfile0(f) as ba:
+                yield ba
         else:
-            with hasattr(input_file, 'read'):
-                yield self._to_tarfile0(input_file)
+            if hasattr(input_file, 'read'):
+                with self._to_tarfile0(input_file) as ba:
+                    yield ba
 
     @contextmanager
     def _to_tarfile0(self, f):
-        import tarfile
         with tarfile.open(mode='r:xz', fileobj=f) as ba:
             yield ba
 
@@ -1076,22 +1112,6 @@ class Archiver(object):
     '''
     def __init__(self):
         pass
-
-
-class DirectoryLoader(Loader):
-    '''
-    Loads a bundle into a directory.
-
-    Created from a remote to actually get the bundle
-    '''
-    def __init__(self, base_directory=None):
-        self.base_directory = base_directory
-
-    def load(self, bundle_id):
-        '''
-        Loads a bundle into the given base directory
-        '''
-        super(DirectoryLoader, self).load(bundle_id)
 
 
 class Installer(object):
