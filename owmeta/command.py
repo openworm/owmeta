@@ -268,11 +268,14 @@ class OWMTranslator(object):
             ctx = self._parent._default_ctx
         dt = ctx.stored(DataTranslator)(conf=conf)
         nm = conf['rdf.graph'].namespace_manager
-        for x in dt.load():
+
+        def id_fmt(trans):
             if full:
-                yield x.identifier
+                return str(trans.identifier)
             else:
-                yield x
+                return nm.normalizeUri(trans.identifier)
+
+        return GeneratorWithData(dt.load(), header=('ID',), columns=(id_fmt,))
 
     def show(self, translator):
         '''
@@ -1674,10 +1677,10 @@ class SaveValidationFailureRecord(namedtuple('SaveValidationFailureRecord', ['us
 
 
 class _DSD(object):
-    def __init__(self, ds_dict, base_directory, loaders):
+    def __init__(self, ds_dict, base_directory, loader_classes):
         self._dsdict = ds_dict
         self.base_directory = base_directory
-        self._loaders = self._init_loaders(loaders)
+        self._loader_classes = self._init_loaders(loader_classes)
 
     def __getitem__(self, data_source):
         dsid = str(data_source.identifier)
@@ -1693,20 +1696,20 @@ class _DSD(object):
     def put(self, data_source_ident, directory):
         self._dsdict[str(data_source_ident)] = directory
 
-    def _init_loaders(self, loaders):
+    def _init_loaders(self, loader_classes):
         res = []
-        for loader in loaders:
-            nd = pth_join(self.base_directory, loader.directory_key)
+        for loader_class in loader_classes:
+            nd = pth_join(self.base_directory, loader_class.directory_key)
             if not exists(nd):
                 makedirs(nd)
-            loader.base_directory = nd
-            res.append(loader)
+            loader_class.base_directory = nd
+            res.append(loader_class)
         return res
 
     def _load_data_source(self, data_source):
-        for loader in self._loaders:
-            if loader.can_load(data_source):
-                return loader(data_source)
+        for loader_class in self._loader_classes:
+            if loader_class.can_load(data_source):
+                return loader_class(data_source)
 
 
 class DataSourceDirectoryProvider(FilePathProvider):

@@ -265,8 +265,8 @@ def test_translator_list(self):
 
     # List translators
     assertRegexpMatches(
-        self.sh('owm translator list'),
-        re.compile('^' + expected.n3() + '$', flags=re.MULTILINE)
+        self.sh('owm -o table translator list'),
+        re.compile(expected.n3(), flags=re.MULTILINE)
     )
 
 
