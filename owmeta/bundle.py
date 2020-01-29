@@ -1,6 +1,6 @@
 import re
 import tempfile
-from os.path import join as p, exists, relpath, expanduser, isdir, isfile
+from os.path import join as p, exists, relpath, realpath, abspath, expanduser, isdir, isfile
 from os import makedirs, rename, scandir, listdir
 from contextlib import contextmanager
 import logging
@@ -382,8 +382,46 @@ class Bundle(object):
         return None
 
 
-class ManifestValidator(object):
-    pass
+def validate_manifest(bundle_path, manifest_data):
+    '''
+    Validate manifest data in a `dict`
+
+    Parameters
+    ----------
+    bundle_path : str
+        The path to the bundle directory or archive. Used in the exception message if the
+        manifest data is invalid
+    manifest_data : dict
+        The data from a manifest file
+
+    Raises
+    ------
+    NotABundlePath
+        Thrown in one of these conditions:
+        - `manifest_data` lacks a `manifest_version`
+        - `manifest_data` has a `manifest_version` > BUNDLE_MANIFEST_VERSION
+        - `manifest_data` has a `manifest_version` <= 0
+        - `manifest_data` lacks a `version`
+        - `manifest_data` lacks an `id`
+    '''
+    manifest_version = manifest_data.get('manifest_version')
+    if not manifest_version:
+        raise NotABundlePath(bundle_path,
+                'the bundle manifest has no manifest version')
+
+    if manifest_version > BUNDLE_MANIFEST_VERSION or manifest_version <= 0:
+        raise NotABundlePath(bundle_path,
+                'the bundle manifest has an invalid manifest version')
+
+    version = manifest_data.get('version')
+    if not version:
+        raise NotABundlePath(bundle_path,
+                'the bundle manifest has no bundle version')
+
+    ident = manifest_data.get('id')
+    if not ident:
+        raise NotABundlePath(bundle_path,
+                'the bundle manifest has no bundle id')
 
 
 def find_bundle_directory(bundles_directory, ident, version=None):
@@ -582,33 +620,13 @@ class Deployer(_RemoteHandlerMixin):
                 if e.errno == errno.EISDIR: # IsADirectoryError
                     raise NotABundlePath(bundle_path, 'manifest is not a regular file')
                 raise
-            self._validate_manifest(bundle_path, manifest_data)
+            validate_manifest(bundle_path, manifest_data)
         elif isfile(bundle_path):
             # TODO: Handle bundle archives
             pass
 
         for uploader in self._get_bundle_uploaders(bundle_path, remotes=remotes):
             uploader(bundle_path)
-
-    def _validate_manifest(self, bundle_path, manifest_data):
-        manifest_version = manifest_data.get('manifest_version')
-        if not manifest_version:
-            raise NotABundlePath(bundle_path,
-                    'the bundle manifest has no manifest version')
-
-        if manifest_version > BUNDLE_MANIFEST_VERSION or manifest_version < 0:
-            raise NotABundlePath(bundle_path,
-                    'the bundle manifest has an invalid manifest version')
-
-        version = manifest_data.get('version')
-        if not version:
-            raise NotABundlePath(bundle_path,
-                    'the bundle manifest has no bundle version')
-
-        ident = manifest_data.get('id')
-        if not ident:
-            raise NotABundlePath(bundle_path,
-                    'the bundle manifest has no bundle id')
 
     def _get_bundle_uploaders(self, bundle_directory, remotes=None):
         for rem in self._get_remotes(remotes):
@@ -1011,7 +1029,7 @@ class Unarchiver(object):
             - If the `input_file` is not an expected format (lzma-zipped TAR file)
             - If the `input_file` does not have a "manifest" file
             - If the `input_file` manifest file is invalid or is not a regular file (see
-              `ManifestValidator` for further details)
+              `validate_manifest` for further details)
             - If the `input_file` is a file path and the corresponding file is not found
         '''
         # - If we were given a target directory, just unpack there...no complications
@@ -1020,7 +1038,7 @@ class Unarchiver(object):
         # read the version and name, then create the target directory
         if not self.bundles_directory and not target_directory:
             # TODO: Devise a better exception here
-            raise Exception('Neither a bundles_directory nor a target_directory was'
+            raise UnarchiveFailed('Neither a bundles_directory nor a target_directory was'
                     ' provided. Cannot determine where to extract %s archive to.' %
                     input_file)
         try:
@@ -1048,17 +1066,28 @@ class Unarchiver(object):
 
             if (target_directory and expected_target_directory and
                     expected_target_directory != target_directory):
-                # TODO: Devise a more appropriate exception here
-                raise Exception('Target directory does not match expectation.',
-                        expected_target_directory, target_directory)
+                raise TargetDirectoryMismatch(target_directory, expected_target_directory)
             elif not target_directory:
                 target_directory = expected_target_directory
 
-            if not target_directory:
-                # TODO: Devise a more appropriate exception here
-                raise Exception('Could not determine a target directory')
             L.debug('extracting %s to %s', input_file, target_directory)
-            ba.extractall(target_directory)
+            target_directory_empty = True
+            try:
+                for _ in scandir(target_directory):
+                    target_directory_empty = False
+                    break
+            except FileNotFoundError:
+                pass
+            if not target_directory_empty:
+                raise UnarchiveFailed('Target directory, "%s", is not empty' %
+                        target_directory)
+            try:
+                ArchiveExtractor(target_directory, ba).extract()
+            except _BadArchiveFilePath:
+                shutil.rmtree(target_directory)
+                file_name = self._bundle_file_name(input_file)
+                raise NotABundlePath(file_name, 'Archive contains files that point'
+                    ' outside of the target directory')
 
     def _process_manifest(self, input_file, ba):
         try:
@@ -1068,11 +1097,11 @@ class Unarchiver(object):
             raise NotABundlePath(file_name, 'archive has no manifest')
 
         with ef as manifest:
+            file_name = self._bundle_file_name(input_file)
             if manifest is None:
-                file_name = self._bundle_file_name(input_file)
                 raise NotABundlePath(file_name, 'archive manifest is not a regular file')
             manifest_data = json.load(manifest)
-            # TODO Validate the manifest
+            validate_manifest(file_name, manifest_data)
             bundle_id = manifest_data['id']
             bundle_version = manifest_data['version']
             if self.bundles_directory:
@@ -1104,6 +1133,55 @@ class Unarchiver(object):
     def _to_tarfile0(self, f):
         with tarfile.open(mode='r:xz', fileobj=f) as ba:
             yield ba
+
+
+class ArchiveExtractor(object):
+    def __init__(self, targetdir, tarfile):
+        self._targetdir = targetdir
+        self._tarfile = tarfile
+
+    def extract(self):
+        self._tarfile.extractall(self._targetdir, members=self._safemembers())
+
+    def _realpath(self, path):
+        return realpath(abspath(path))
+
+    def _badpath(self, path, base=None):
+        # joinpath will ignore base if path is absolute
+        if base is None:
+            base = self._targetdir
+        return not self._realpath(p(self._targetdir, path)).startswith(base)
+
+    def _badlink(self, info):
+        # Links are interpreted relative to the directory containing the link
+        tip = self._realpath(p(self._targetdir, dirname(info.name)))
+        return self._badpath(info.linkname, base=tip)
+
+    def _safemembers(self):
+        for finfo in self._tarfile.members:
+            if self._badpath(finfo.name):
+                raise _BadArchiveFilePath(finfo.name, 'Path is outside of base path "%s"' % self._targetdir)
+            elif finfo.issym() and self._badlink(finfo):
+                raise _BadArchiveFilePath(finfo.name,
+                        'Hard link points to "%s", outside of base path "%s"' % (finfo.linkname, self._targetdir))
+            elif finfo.islnk() and self._badlink(finfo):
+                raise _BadArchiveFilePath(finfo.name,
+                        'Symlink points to "%s", outside of "%s"' % (finfo.linkname,
+                            self._targetdir))
+            else:
+                yield finfo
+
+
+class _BadArchiveFilePath(Exception):
+    '''
+    Thrown when an archive file path points outside of a given base directory
+    '''
+    def __init__(self, archive_file_path, error):
+        super(_BadArchiveFilePath, self).__init__(
+                'Disallowed archive file %s: %s' %
+                (archive_file_path, error))
+        self.archive_file_path = archive_file_path
+        self.error = error
 
 
 class Archiver(object):
@@ -1514,3 +1592,22 @@ class NoRemoteAvailable(Exception):
     '''
     Thrown when we need a remote and we don't have one
     '''
+
+
+class UnarchiveFailed(Exception):
+    '''
+    Thrown when an `Unarchiver` fails for some reason not covered by other
+    '''
+
+
+class TargetDirectoryMismatch(UnarchiveFailed):
+    '''
+    Thrown when the target path doesn't agree with the bundle manifest
+    '''
+    def __init__(self, target_directory, expected_target_directory):
+        super(TargetDirectoryMismatch, self).__init__(
+                'Target directory "%s" does not match expected directory "%s" for the'
+                ' bundle manifest.'
+                % (target_directory, expected_target_directory))
+        self.target_directory = target_directory
+        self.expected_target_directory = expected_target_directory
