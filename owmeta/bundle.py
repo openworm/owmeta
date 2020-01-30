@@ -12,11 +12,11 @@ from struct import pack
 import json
 from itertools import chain
 import tarfile
+import http.client
 
 import six
-import yaml
 from rdflib.term import URIRef
-import http.client
+import yaml
 from yarom.utils import FCN
 from yarom.rdfUtils import transitive_lookup, BatchAddGraph
 
@@ -29,9 +29,10 @@ from .file_lock import lock_file
 from .graph_serialization import write_canonical_to_file, gen_ctx_fname
 
 try:
-    from urllib.parse import quote as urlquote, unquote as urlunquote
+    from urllib.parse import quote as urlquote, unquote as urlunquote, urlparse
 except ImportError:
     from urllib import quote as urlquote, unquote as urlunquote
+    from urlparse import urlparse
 
 L = logging.getLogger(__name__)
 
@@ -66,14 +67,22 @@ class Remote(object):
         ''' Name of the remote '''
 
         self.accessor_configs = list(accessor_configs)
-        ''' Configs for how you access the remote. Probably just URLs '''
+        '''
+        Configs for how you access the remote.
+
+        One might configure mirrors or replicas for a given bundle repository as multiple
+        accessor configs
+        '''
 
     def add_config(self, accessor_config):
         self.accessor_configs.append(accessor_config)
 
     def generate_loaders(self):
         '''
-        Generate the bundle loaders for this remote
+        Generate the bundle loaders for this remote.
+
+        Loaders are generated from `accessor_configs` and `LOADER_CLASSES` according with
+        which type of `Loader` can load a type of accessor
         '''
         for ac in self.accessor_configs:
             for lc in LOADER_CLASSES:
@@ -509,7 +518,6 @@ class _RemoteHandlerMixin(object):
                     additional_remotes.append(r)
         else:
             instance_remotes = self.remotes
-        print('self.remotes', self.remotes)
         has_remote = False
         for rem in chain(additional_remotes, instance_remotes):
             has_remote = True
@@ -571,7 +579,7 @@ class Fetcher(_RemoteHandlerMixin):
                 loader(bundle_id, bundle_version)
                 return bdir
             except Exception:
-                L.warn("Failed to load bundle %s with %s", bundle_id, loader, exc_info=True)
+                L.warning("Failed to load bundle %s with %s", bundle_id, loader, exc_info=True)
         else:  # no break
             raise NoBundleLoader(bundle_id, bundle_version)
 
@@ -732,12 +740,12 @@ class Cache(object):
                             bd_version = int(version_directory.name)
                             if (bd_id != manifest_data.get('id') or
                                     bd_version != manifest_data.get('version')):
-                                L.warn('Bundle manifest at %s does not match bundle'
+                                L.warning('Bundle manifest at %s does not match bundle'
                                 ' directory', manifest_fname)
                                 continue
                             yield manifest_data
                         except json.decoder.JSONDecodeError:
-                            L.warn("Bundle manifest at %s is malformed",
+                            L.warning("Bundle manifest at %s is malformed",
                                    manifest_fname)
                 except (OSError, IOError) as e:
                     if e.errno != errno.ENOENT:
@@ -785,7 +793,14 @@ class Loader(object):
         return False
 
     def can_load(self, bundle_id, bundle_version=None):
-        ''' Returns True if the bundle named `bundle_id` is supported '''
+        '''
+        Returns True if the bundle named `bundle_id` is available.
+
+        This method is for loaders to determine that they probably can or cannot load the
+        bundle, such as by checking repository metadata. Other loaders that return `True`
+        from `can_load` should be tried if a given loader fails, but a warning should be
+        recorded for the loader that failed.
+        '''
         return False
 
     def bundle_versions(self, bundle_id):
@@ -932,14 +947,46 @@ class HTTPBundleLoader(Loader):
                     ac.url.startswith('http://')))
 
     def can_load(self, bundle_id, bundle_version=None):
+        '''
+        Check the index for an entry for the bundle.
+
+        - If a version is given and the index has an entry for the bundle at that version
+          and that entry gives a URL for the bundle, then we return `True`.
+
+        - If no version is given and the index has an entry for the bundle at any version
+          and that entry gives a URL for the bundle, then we return `True`.
+
+        - Otherwise, we return `False`
+        '''
         self._setup_index()
         binfo = self._index.get(bundle_id)
         if binfo:
             if bundle_version is None:
-                return True
+                for binfo_version, binfo_url in binfo.items():
+                    try:
+                        int(binfo_version)
+                        print('versions ok', binfo_version)
+                    except ValueError:
+                        L.warning("Got unexpected non-version-number key '%s' in bundle index info", binfo_version)
+                        continue
+                    if self._bundle_url_is_ok(binfo_url):
+                        return True
+                return False
             if not isinstance(binfo, dict):
                 return False
-            return bundle_version in binfo
+
+            binfo_url = binfo.get(str(bundle_version))
+            return self._bundle_url_is_ok(binfo_url)
+
+    def _bundle_url_is_ok(self, bundle_url):
+        try:
+            parsed_url = urlparse(bundle_url)
+        except Exception:
+            L.warning("Failed while parsing bundle URL", bundle_url)
+            return False
+        if parsed_url.scheme in ('http', 'https') and parsed_url.netloc:
+            return True
+        return False
 
     def bundle_versions(self, bundle_id):
         self._setup_index()
