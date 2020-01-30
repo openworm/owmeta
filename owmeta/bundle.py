@@ -965,7 +965,6 @@ class HTTPBundleLoader(Loader):
                 for binfo_version, binfo_url in binfo.items():
                     try:
                         int(binfo_version)
-                        print('versions ok', binfo_version)
                     except ValueError:
                         L.warning("Got unexpected non-version-number key '%s' in bundle index info", binfo_version)
                         continue
