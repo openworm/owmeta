@@ -1,5 +1,8 @@
-from unittest.mock import patch
-from owmeta.bundle import HTTPBundleLoader, URLConfig
+import pytest
+from unittest.mock import patch, Mock
+import re
+
+from owmeta.bundle import HTTPBundleLoader, URLConfig, LoadFailed
 
 
 def test_can_load_from_http():
@@ -93,3 +96,66 @@ def test_bundle_versions_skips_non_int():
             '2': 'http://some_host'
         }}
         assert set(cut.bundle_versions('test_bundle')) == set([1, 2])
+
+
+def test_load_fail_no_info():
+    cut = HTTPBundleLoader('index_url')
+    with patch('requests.get') as get:
+        get().json.return_value = {}
+        with pytest.raises(LoadFailed, match='not in.*index'):
+            cut.load('test_bundle')
+
+
+def test_load_fail_wrong_type_of_info():
+    cut = HTTPBundleLoader('index_url')
+    with patch('requests.get') as get:
+        get().json.return_value = {'test_bundle': ["wut"]}
+        with pytest.raises(LoadFailed, match='type.*bundle info'):
+            cut.load('test_bundle')
+
+
+def test_load_fail_no_valid_release_number():
+    cut = HTTPBundleLoader('index_url')
+    with patch('requests.get') as get:
+        get().json.return_value = {'test_bundle': {'smack': 'down'}}
+        with pytest.raises(LoadFailed,
+                match=re.compile('no releases found', re.I)):
+            cut.load('test_bundle')
+
+
+def test_load_fail_no_valid_bundle_url():
+    cut = HTTPBundleLoader('index_url')
+    with patch('requests.get') as get:
+        get().json.return_value = {'test_bundle': {'1': 'down'}}
+        with pytest.raises(LoadFailed,
+                match=re.compile('valid url', re.I)):
+            cut.load('test_bundle')
+
+
+def test_load_fail_no_valid_bundle_url():
+    cut = HTTPBundleLoader('index_url')
+    with patch('requests.get') as get:
+        get().json.return_value = {'test_bundle': {'1': 'down'}}
+        with pytest.raises(LoadFailed,
+                match=re.compile('valid url', re.I)):
+            cut.load('test_bundle')
+
+
+def test_load_no_cachedir():
+    from io import BytesIO
+    cut = HTTPBundleLoader('index_url')
+    cut.base_directory = 'bdir'
+    with patch('requests.get') as get, patch('owmeta.bundle.Unarchiver') as Unarchiver:
+        raw_response = Mock(name='raw_response')
+        get().json.return_value = {'test_bundle': {'1': 'http://some_host'}}
+        get().raw.read.return_value = b'bytes bytes bytes'
+        cut.load('test_bundle')
+        Unarchiver().unpack.assert_called_with(MatchingBytesIO(BytesIO(b'bytes bytes bytes')), 'bdir')
+
+
+class MatchingBytesIO(object):
+    def __init__(self, bio):
+        self.bio = bio
+
+    def __eq__(self, other):
+        return self.bio.getvalue() == other.getvalue()

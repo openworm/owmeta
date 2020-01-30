@@ -934,6 +934,9 @@ class HTTPBundleLoader(Loader):
         self.cachedir = cachedir
         self._index = None
 
+    def __repr__(self):
+        return '{}({})'.format(FCN(type(self)), repr(self.index_url))
+
     def _setup_index(self):
         import requests
         if self._index is None:
@@ -1025,11 +1028,13 @@ class HTTPBundleLoader(Loader):
                 else:
                     if max_vn < val:
                         max_vn = val
+            if not max_vn:
+                raise LoadFailed(bundle_id, self, 'No releases found')
             bundle_version = max_vn
         bundle_url = binfo.get(str(bundle_version))
-        if bundle_url is None:
-            raise LoadFailed(bundle_id, self, 'Did not find a URL for "%s" at'
-                    ' version %s', bundle_id, bundle_version)
+        if not self._bundle_url_is_ok(bundle_url):
+            raise LoadFailed(bundle_id, self, 'Did not find a valid URL for "%s" at'
+                    ' version %s' % (bundle_id, bundle_version))
         response = requests.get(bundle_url, stream=True)
         if self.cachedir is not None:
             bfn = urlquote(bundle_id)
