@@ -201,7 +201,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                     try:
                         graph.bind(c.__name__, c.rdf_namespace)
                     except Exception as e:
-                        L.warn('Failed to bind RDF namespace for %s to %s', c.__name__,
+                        L.warning('Failed to bind RDF namespace for %s to %s', c.__name__,
                                c.rdf_namespace, exc_info=True)
         if isinstance(graph, set):
             graph.update(self._save_context_triples())
@@ -397,7 +397,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
                         if matching_classes:
                             c = matching_classes[0]
                         if len(matching_classes) > 1:
-                            L.warn('More than one class has the same name in'
+                            L.warning('More than one class has the same name in'
                             ' __yarom_mapped_classes__ for {}, so we are picking the'
                             ' first one as the resolved class among {}'.format(mod, ymc))
                 break

@@ -239,7 +239,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
                             docctx_anynum(Connection)(ident=c.identifier).synclass(nt)
                             hit = True
                         if not hit:
-                            L.warn("Didn't find any connections matching: {}".format(conn))
+                            L.warning("Didn't find any connections matching: {}".format(conn))
                         else:
                             break
         return res

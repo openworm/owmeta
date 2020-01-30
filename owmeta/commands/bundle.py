@@ -52,7 +52,7 @@ class OWMBundleRemote(object):
             try:
                 mkdir(remotes_dir)
             except Exception:
-                L.warn('Could not crerate directory for storage of remote configurations', exc_info=True)
+                L.warning('Could not crerate directory for storage of remote configurations', exc_info=True)
                 raise GenericUserError('Could not create directory for storage of remote configurations')
 
         fname = self._remote_fname(r.name)

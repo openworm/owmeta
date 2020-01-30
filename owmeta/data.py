@@ -324,7 +324,7 @@ class Data(Configure):
         try:
             nm.bind("", self['rdf.namespace'])
         except Exception:
-            L.warn("Failed to bind default RDF namespace %s", self['rdf.namespace'], exc_info=True)
+            L.warning("Failed to bind default RDF namespace %s", self['rdf.namespace'], exc_info=True)
 
     def openDatabase(self):
         self.init()

@@ -1759,12 +1759,12 @@ class OWMDirDataSourceDirLoader(DataSourceDirLoader):
     def _index_dir_entry_is_bad(self, dname, de):
         if not de:
             msg = "There is no directory entry for {} in {}"
-            L.warn(msg.format(dname, self.base_directory), exc_info=True)
+            L.warning(msg.format(dname, self.base_directory), exc_info=True)
             return True
 
         if not de.is_dir():
             msg = "The directory entry for {} in {} is not a directory"
-            L.warn(msg.format(dname, self.base_directory))
+            L.warning(msg.format(dname, self.base_directory))
             return True
 
         return False
