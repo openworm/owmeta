@@ -675,7 +675,14 @@ class OWMRegistry(object):
                 package = None
                 if hasattr(module, 'package'):
                     package = module.package()
-                yield ident, rdf_type, cd.name(), module_name, package
+                    package_name = None
+                    package_version = None
+                    if package:
+                        package_name = package.name()
+                        package_version = package.version()
+
+                yield (ident, rdf_type, cd.name(), module_name, package, package_name,
+                       package_version)
 
         def fmt_text(entry):
             return dedent('''\
@@ -686,8 +693,10 @@ class OWMRegistry(object):
                 Package: {4}\n''').format(*entry)
 
         return GeneratorWithData(registry_entries(),
-                header=('ID', 'RDF Type', 'Class Name', 'Module Name', 'Package'),
+                header=('ID', 'RDF Type', 'Class Name', 'Module Name', 'Package',
+                        'Package Name', 'Package Version'),
                 columns=tuple,
+                default_columns=('ID', 'RDF Type', 'Class Name', 'Module Name', 'Package'),
                 text_format=fmt_text)
 
 
