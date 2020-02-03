@@ -78,7 +78,7 @@ def install_module_import_wrapper():
 install_module_import_wrapper()
 ModuleRecorder.add_listener(BASE_MAPPER)
 from .configure import Configureable
-from .context import Context
+from .context import Context, ClassContext
 import yarom
 
 __all__ = [
@@ -92,26 +92,26 @@ __all__ = [
 
 DEF_CTX = Context()
 
-RDF_CONTEXT = Context(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
+RDF_CONTEXT = ClassContext(ident='http://www.w3.org/1999/02/22-rdf-syntax-ns',
                       base_namespace='http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 
-RDFS_CONTEXT = Context(ident='http://www.w3.org/2000/01/rdf-schema',
+RDFS_CONTEXT = ClassContext(ident='http://www.w3.org/2000/01/rdf-schema',
                        imported=(RDF_CONTEXT,),
                        base_namespace='http://www.w3.org/2000/01/rdf-schema#')
 
-BASE_CONTEXT = Context(imported=(RDFS_CONTEXT,),
+BASE_CONTEXT = ClassContext(imported=(RDFS_CONTEXT,),
                        ident=BASE_SCHEMA_URL,
                        base_namespace=BASE_SCHEMA_URL + '#')
 
-SCI_CTX = Context(imported=(BASE_CONTEXT,),
+SCI_CTX = ClassContext(imported=(BASE_CONTEXT,),
                   ident=BASE_SCHEMA_URL + '/sci',
                   base_namespace=BASE_SCHEMA_URL + '/sci#')
 
-SCI_BIO_CTX = Context(imported=(SCI_CTX,),
+SCI_BIO_CTX = ClassContext(imported=(SCI_CTX,),
                       ident=BASE_SCHEMA_URL + '/sci/bio',
                       base_namespace=BASE_SCHEMA_URL + '/sci/bio#')
 
-CONTEXT = Context(imported=(SCI_BIO_CTX,),
+CONTEXT = ClassContext(imported=(SCI_BIO_CTX,),
                   ident=BASE_SCHEMA_URL + '/bio',
                   base_namespace=BASE_SCHEMA_URL + '/bio#')
 
@@ -147,6 +147,8 @@ class Connection(object):
     def __init__(self, conf):
         self.conf = conf
 
+        self._context = Context(conf=self.conf)
+
         self.identifier = str(uuid.uuid4())
         '''
         Identifier for this connection.
@@ -180,13 +182,15 @@ class Connection(object):
     def __exit__(self, *args):
         self.disconnect()
 
+    def _context(self):
+        return Context(conf=self.conf)
+
     def __call__(self, target):
         '''
         Contextualize the given `Context`
         '''
-        # XXX: May be able to loosen th
         if target is not None and issubclass(target, Context):
-            return target.contextualize(self)
+            return target.contextualize(self._context)
         else:
             raise TypeError('Connections can only contextualize owmeta.context.Context'
                     ' or subclasses thereof. Received %s' % target)

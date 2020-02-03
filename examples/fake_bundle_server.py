@@ -1,6 +1,6 @@
 import sys
 from os.path import join as p
-from os import mkdir, listdir, chdir
+from os import mkdir, listdir, chdir, walk
 import tarfile
 import logging
 from multiprocessing import Process
@@ -9,10 +9,10 @@ import json
 
 import requests
 
-from owmeta import connect
+from owmeta import connect, BASE_SCHEMA_URL, BASE_CONTEXT
 from owmeta.dataObject import DataObject, DatatypeProperty
-from owmeta.context import Context
-from owmeta.bundle import Bundle, Descriptor, make_include_func, Installer
+from owmeta.context import Context, ClassContext, IMPORTS_CONTEXT_KEY
+from owmeta.bundle import Bundle, Descriptor, make_include_func, Installer, UncoveredImports
 
 try:
     from tempfile import TemporaryDirectory
@@ -20,6 +20,8 @@ except ImportError:
     from backports.tempfile import TemporaryDirectory
 
 L = logging.getLogger(__name__)
+
+ClassContext('https://example.org/types', imported=(BASE_CONTEXT,))
 
 
 class A(DataObject):
@@ -64,17 +66,19 @@ def start():
 
 def setUp(base):
     with connect({'rdf.source': 'sqlite',
-                  'rdf.store_conf': p(base, 'bundle.db')}) as conn:
+                  'rdf.store_conf': p(base, 'bundle.db'),
+                  IMPORTS_CONTEXT_KEY: 'https://example.org/imports'}) as conn:
         ctx0 = conn(Context)('https://example.org/bundles#example')
 
         a = ctx0(A)(ident='http://example.org/A')
         a.redness(24)
         a.blueness(24)
-        ctx0.add_import(A.class_context)
+        ctx0.add_import(A.definition_context)
 
-        ctx0.save()
-
-        bm = BundleMaker(conn, base)
+        ctx0.save(inline_imports=True)
+        ctx0.save_imports()
+        contexts = ctx0.stored.transitive_imports()
+        bm = BundleMaker(conn, base, contexts)
         bm.make_bundle('example/aBundle', 'example_bundle', 23)
         bm.make_bundle('example/bundle.01', 'example_bundle_01', 1)
 
@@ -82,7 +86,7 @@ def setUp(base):
 
 
 class BundleMaker(object):
-    def __init__(self, conn, base):
+    def __init__(self, conn, base, contexts):
         self.srvdir = p(base, 'server_directory')
         mkdir(self.srvdir)
 
@@ -91,6 +95,7 @@ class BundleMaker(object):
 
         self.bnddir = p(base, 'bundles_dir')
         mkdir(self.bnddir)
+        self.contexts = contexts
 
         self.conn = conn
 
@@ -99,13 +104,17 @@ class BundleMaker(object):
         desc.name = 'A Bundle'
         desc.version = version
         desc.description = 'An example bundle'
-        desc.includes = set([make_include_func('https://example.org/bundles#example'),
-                             make_include_func('https://example.org/imports'),
-                             make_include_func('https://example.org/types')])
-
+        desc.includes = (set([make_include_func('https://example.org/bundles#example'),
+                              make_include_func('https://example.org/imports'),
+                              make_include_func('https://example.org/types'),
+                              make_include_func('http://www.w3.org/2000/01/rdf-schema'),
+                              make_include_func('http://www.w3.org/1999/02/22-rdf-syntax-ns'),
+                              make_include_func(BASE_SCHEMA_URL)]) |
+                         set(make_include_func(x) for x in self.contexts))
         rdf = self.conn.conf['rdf.graph']
-        bi = Installer(self.srcdir, self.bnddir, rdf)
+        bi = Installer(self.srcdir, self.bnddir, rdf, imports_ctx='https://example.org/imports')
         install_dir = bi.install(desc)
+        L.info('installed files in bundle %s at %s', ident, install_dir)
 
         with tarfile.open(p(self.srvdir, fname + '.tar.xz'), mode='w:xz') as ba:
             # arcname='.' removes the leading part of the path to the install directory

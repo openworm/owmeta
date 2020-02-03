@@ -13,7 +13,8 @@ from .contextualize import (Contextualizable,
                             ContextualizableClass,
                             contextualize_helper,
                             decontextualize_helper)
-from .context import ClassContext, ContextualizableDataUserMixin
+from .context import ContextualizableDataUserMixin
+from .contextMappedClassUtil import find_class_context, find_base_namespace
 from .mapper import mapped
 
 from yarom.graphObject import (GraphObject,
@@ -162,7 +163,7 @@ TypeDataObject = None
 class ContextMappedClass(MappedClass, ContextualizableClass):
     def __init__(self, name, bases, dct):
         super(ContextMappedClass, self).__init__(name, bases, dct)
-        ctx = ContextMappedClass._find_class_context(dct, bases)
+        ctx = find_class_context(dct, bases)
 
         if ctx is not None:
             self.__context = ctx
@@ -170,7 +171,7 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
             self.__context = None
 
         if not hasattr(self, 'base_namespace') or self.base_namespace is None:
-            self.base_namespace = ContextMappedClass._find_base_namespace(dct, bases)
+            self.base_namespace = find_base_namespace(dct, bases)
 
         self._property_classes = dict()
         for b in bases:
@@ -220,35 +221,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
 
         self.__query_form = None
 
-    @classmethod
-    def _find_class_context(cls, dct, bases):
-        ctx_or_ctx_uri = dct.get('class_context', None)
-        if ctx_or_ctx_uri is None:
-            for b in bases:
-                pctx = getattr(b, 'definition_context', None)
-                if pctx is not None:
-                    ctx = pctx
-                    break
-        else:
-            if not isinstance(ctx_or_ctx_uri, URIRef) \
-               and isinstance(ctx_or_ctx_uri, (str, six.text_type)):
-                ctx_or_ctx_uri = URIRef(ctx_or_ctx_uri)
-            if isinstance(ctx_or_ctx_uri, (str, six.text_type)):
-                ctx = ClassContext(ctx_or_ctx_uri)
-            else:
-                ctx = ctx_or_ctx_uri
-        return ctx
-
-    @classmethod
-    def _find_base_namespace(cls, dct, bases):
-        base_ns = dct.get('base_namespace', None)
-        if base_ns is None:
-            for b in bases:
-                if hasattr(b, 'base_namespace') and b.base_namespace is not None:
-                    base_ns = b.base_namespace
-                    break
-        return base_ns
-
     def contextualize_class_augment(self, context):
         '''
         For MappedClass, rdf_type and rdf_namespace have special behavior where they can
@@ -296,7 +268,6 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         return self.__query_form
 
     def _init_rdf_type_object(self):
-
         if not hasattr(self, 'rdf_type_object') or \
                 self.rdf_type_object is not None and self.rdf_type_object.identifier != self.rdf_type:
             if self.definition_context is None:
@@ -330,11 +301,19 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
         cd = PythonClassDescription.contextualize(self.definition_context)()
 
         mo = PythonModule.contextualize(self.definition_context)()
-        pkg = PythonPackage.contextualize(self.definition_context)()
-        pkg.name('owmeta')
-        pkg.version(OWMETA_VERSION)
         mo.name(self.__module__)
-        mo.package(pkg)
+
+        my_module = import_module(self.__module__)
+        distro = getattr(my_module, '__distribution__', None)
+        if isinstance(distro, dict):
+            dist_name = distro.get('name')
+            dist_version = distro.get('version')
+            if dist_name and dist_version:
+                pkg = PythonPackage.contextualize(self.definition_context)(
+                    name=dist_name,
+                    version=dist_version
+                )
+                mo.package(pkg)
 
         cd.module(mo)
         cd.name(self.__name__)
@@ -887,6 +866,7 @@ class RDFTypeProperty(SP.ObjectProperty):
 
 @mapped
 class RDFSSubClassOfProperty(SP.ObjectProperty):
+    class_context = 'http://www.w3.org/2000/01/rdf-schema'
     link = R.RDFS.subClassOf
     linkName = 'rdfs_subclassof_property'
     value_type = RDFSClass
@@ -933,10 +913,12 @@ class PropertyDataObject(BaseDataObject):
     Try not to confuse this with the Property class
     """
     rdf_type = R.RDF['Property']
-    class_context = URIRef(BASE_SCHEMA_URL)
+    class_context = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
 
+@mapped
 class RDFSCommentProperty(SP.DatatypeProperty):
+    class_context = 'http://www.w3.org/2000/01/rdf-schema'
     link = R.RDFS['comment']
     linkName = 'rdfs_comment'
     owner_type = BaseDataObject
@@ -944,7 +926,9 @@ class RDFSCommentProperty(SP.DatatypeProperty):
     lazy = True
 
 
+@mapped
 class RDFSLabelProperty(SP.DatatypeProperty):
+    class_context = 'http://www.w3.org/2000/01/rdf-schema'
     link = R.RDFS['label']
     linkName = 'rdfs_label'
     owner_type = BaseDataObject
@@ -1095,3 +1079,6 @@ class PythonClassDescription(ClassDescription):
     def identifier_augment(self):
         return self.make_identifier(self.name.defined_values[0].identifier.n3() +
                                     self.module.defined_values[0].identifier.n3())
+
+
+__distribution__ = dict(name='owmeta', version=OWMETA_VERSION)

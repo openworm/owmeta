@@ -153,6 +153,12 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
         for x in self._imported_contexts:
             yield x
 
+    def transitive_imports(self):
+        for x in self._imported_contexts:
+            yield x
+            for y in x.transitive_imports():
+                yield y
+
     def save_imports(self, context=None, *args, **kwargs):
         if not context:
             ctx_key = self.conf[IMPORTS_CONTEXT_KEY]
@@ -266,6 +272,7 @@ class Context(six.with_metaclass(ContextMeta, ImportContextualizer,
 
     def __bool__(self):
         return True
+
     __nonzero__ = __bool__
 
     def __len__(self):
@@ -418,10 +425,16 @@ ClassContexts = dict()
 
 class ClassContextMeta(ContextMeta):
 
-    def __call__(self, ident):
+    def __call__(self, ident, base_namespace=None, imported=()):
         res = ClassContexts.get(ident)
         if not res:
-            res = super(ClassContextMeta, self).__call__(ident=ident)
+            res = super(ClassContextMeta, self).__call__(ident=ident,
+                    base_namespace=base_namespace, imported=imported)
+            ClassContexts[URIRef(ident)] = res
+        else:
+            if base_namespace or imported:
+                raise Exception('Arguments can only be provided to a ClassContext on'
+                                ' first creation')
         return res
 
 

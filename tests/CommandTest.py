@@ -459,8 +459,7 @@ class OWMTest(BaseTest):
         c = []
         self._init_conf({DEFAULT_CONTEXT_KEY: a})
         with patch('importlib.import_module') as im, \
-                patch('owmeta.command.Context'), \
-                patch('owmeta.context.Context'):
+                patch('owmeta.command.Context'):
             def f(ctx):
                 c.append(ctx.new_context(b))
 

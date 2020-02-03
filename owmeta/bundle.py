@@ -269,6 +269,7 @@ class Bundle(object):
             bundle_directory = self._get_bundle_directory()
         except BundleNotFound:
             # If there's a .owm directory, then get the remotes from there
+            remotes = None
             if self.remotes:
                 remotes = self.remotes
 
@@ -1142,7 +1143,7 @@ class Unarchiver(object):
 
     def _process_manifest(self, input_file, ba):
         try:
-            ef = ba.extractfile('manifest')
+            ef = ba.extractfile('./manifest')
         except KeyError:
             file_name = self._bundle_file_name(input_file)
             raise NotABundlePath(file_name, 'archive has no manifest')
@@ -1493,7 +1494,7 @@ class URIIncludeFunc(object):
         return hash(self.include)
 
     def __call__(self, uri):
-        return uri == self.include
+        return URIRef(uri.strip()) == self.include
 
     def __str__(self):
         return '{}({})'.format(FCN(type(self)), repr(self.include))
@@ -1623,7 +1624,7 @@ class NoBundleLoader(FetchFailed):
     def __init__(self, bundle_id, bundle_version=None):
         super(NoBundleLoader, self).__init__(
             'No loader could be found for "%s"%s' % (bundle_id,
-                (' at version ' + bundle_version) if bundle_version is not None else ''))
+                (' at version ' + str(bundle_version)) if bundle_version is not None else ''))
         self.bundle_id = bundle_id
         self.bundle_version = bundle_version
 

@@ -365,7 +365,7 @@ class NoBundleLoader(GenericUserError):
     def __init__(self, bundle_id, bundle_version=None):
         super(NoBundleLoader, self).__init__(
             'No loader could be found for "%s"%s' % (bundle_id,
-                (' at version ' + bundle_version) if bundle_version is not None else ''))
+                (' at version ' + str(bundle_version)) if bundle_version is not None else ''))
 
 
 class BundleNotFound(GenericUserError):

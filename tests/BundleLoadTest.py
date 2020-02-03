@@ -179,7 +179,7 @@ def test_clear_target_directory_on_invalid_file_path(tempdir):
 def _write_archive(tempdir, manifest_contents, *files):
     manifest_contents = json.dumps(manifest_contents).encode('UTF-8')
     with tarfile.open(p(tempdir, 'file_name'), 'w:xz') as f:
-        tinfo = tarfile.TarInfo('manifest')
+        tinfo = tarfile.TarInfo('./manifest')
         tinfo.size = len(manifest_contents)
         f.addfile(tinfo, fileobj=BytesIO(manifest_contents))
         for additional_file in files:
