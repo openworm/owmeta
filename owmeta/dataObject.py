@@ -217,6 +217,45 @@ class ContextMappedClass(MappedClass, ContextualizableClass):
                             " to be a property")
             self.key_properties = tuple(new_key_properties)
 
+        key_property = dct.get('key_property')
+
+        def _process_key_property(kp):
+            if kp is not None:
+                if isinstance(kp, PThunk):
+                    for k, p in self._property_classes.items():
+                        if p is kp.result:
+                            new_key_property = {'name': k, 'type': 'hashed'}
+                            break
+                    else:  # no break
+                        raise Exception(("The provided 'key_properties' entry, {},"
+                                " does not appear to be a property").format(kp))
+                elif isinstance(kp, PropertyProperty):
+                    for k, p in self._property_classes.items():
+                        if p is kp._cls:
+                            new_key_property = {'name': k, 'type': 'hashed'}
+                            break
+                    else:
+                        raise Exception(("The provided 'key_properties' entry, {},"
+                                " does not appear to be a property for this class").format(
+                                    kp))
+                elif isinstance(kp, six.string_types):
+                    new_key_property = {'name': kp, 'type': 'hashed'}
+                elif isinstance(kp, dict):
+                    prop = kp.get('property')
+                    if prop:
+                        prockp = _process_key_property(prop)
+                        prockp.update(kp)
+                        new_key_property = prockp
+                    else:
+                        new_key_property = kp
+                else:
+                    raise Exception("The provided 'key_properties' entry does not appear"
+                            " to be a property")
+            print('new_key_property')
+            return new_key_property
+
+        self.key_property = _process_key_property(key_property)
+
         self.init_rdf_type_object()
 
         self.__query_form = None
@@ -465,6 +504,8 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
 
     key_properties = None
 
+    key_property = None
+
     query_mode = False
 
     def __new__(cls, *args, **kwargs):
@@ -549,12 +590,26 @@ class BaseDataObject(six.with_metaclass(ContextMappedClass,
                 if not attr.has_defined_value():
                     return False
             return True
+        elif self.key_property is not None:
+            attr = getattr(self, self.key_property.get('name'), None)
+            if attr is None:
+                raise Exception('Key property "{}" is not available on object'.format(
+                    self.key_property))
+            if not attr.has_defined_value():
+                return False
         else:
             return super(BaseDataObject, self).defined_augment()
 
     def identifier_augment(self):
         if self.key_properties is not None:
             return self.make_identifier_from_properties(self.key_properties)
+        elif self.key_property is not None:
+            prop = getattr(self, self.key_property.get('name'))
+            val = prop.defined_values[0]
+            if self.key_property.get('type') == 'direct':
+                return self.make_identifier_direct(val)
+            else:
+                return self.make_identifier(val)
         else:
             return super(BaseDataObject, self).identifier_augment()
 
