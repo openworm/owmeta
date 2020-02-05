@@ -1,5 +1,5 @@
-from .dataObject import DataObject, DatatypeProperty
-from .mapper import mapped
+from owmeta_core.dataObject import DataObject, DatatypeProperty
+from owmeta_core.mapper import mapped
 
 
 @mapped

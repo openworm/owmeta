@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from .dataObject import ObjectProperty, Alias
+from owmeta_core.dataObject import ObjectProperty, Alias
 from .connection import Connection
 from .neuron import Neuron
 from .biology import BiologyType
 from .worm_common import WORM_RDF_TYPE
-from .mapper import mapped
+from owmeta_core.mapper import mapped
 
 
 @mapped

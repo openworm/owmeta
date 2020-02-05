@@ -1,4 +1,4 @@
-from .cli_common import METHOD_NAMED_ARG
+from owmeta_core.cli_common import METHOD_NAMED_ARG
 
 CLI_HINTS = {
     'owmeta.command.OWM': {

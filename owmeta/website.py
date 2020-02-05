@@ -1,8 +1,8 @@
 from rdflib.term import URIRef
 
 from .document import BaseDocument
-from .dataObject import DatatypeProperty
-from .mapper import mapped
+from owmeta_core.dataObject import DatatypeProperty
+from owmeta_core.mapper import mapped
 
 
 @mapped

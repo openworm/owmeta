@@ -62,8 +62,8 @@ class SphinxTest(unittest.TestCase):
 
     def test_adding_data(self):
         # Setup a class imported by docs for demonstration purposes
-        from owmeta.dataObject import DataObject, DatatypeProperty
-        from owmeta.context import Context
+        from owmeta_core.dataObject import DataObject, DatatypeProperty
+        from owmeta_core.context import Context
         Load = lambda *args, **kwargs: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
 
         class Widget(DataObject):

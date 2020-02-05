@@ -1,9 +1,9 @@
 import logging
 
-from .dataObject import DataObject, ObjectProperty
-from .contextDataObject import ContextDataObject
-from .context import Context
-from .mapper import mapped
+from owmeta_core.dataObject import DataObject, ObjectProperty
+from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.context import Context
+from owmeta_core.mapper import mapped
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class Evidence(DataObject):
 
        >>> from owmeta.connection import Connection
        >>> from owmeta.evidence import Evidence
-       >>> from owmeta.context import Context
+       >>> from owmeta_core.context import Context
 
     Declare contexts::
 

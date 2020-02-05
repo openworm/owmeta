@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-import owmeta
 from owmeta.worm import Worm
 from owmeta.network import Network
 from owmeta.neuron import Neuron

@@ -1,5 +1,5 @@
-from .mapper import mapped
-from .dataObject import DataObject
+from owmeta_core.mapper import mapped
+from owmeta_core.dataObject import DataObject
 
 
 @mapped

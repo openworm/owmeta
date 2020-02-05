@@ -3,10 +3,10 @@ from __future__ import print_function
 from string import Template
 import neuroml
 
-from .mapper import mapped
+from owmeta_core.mapper import mapped
 from .channel import Channel
 from .biology import BiologyType
-from .dataObject import DatatypeProperty, ObjectProperty, This
+from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, This
 from .cell_common import CELL_RDF_TYPE
 
 __all__ = ["Cell"]

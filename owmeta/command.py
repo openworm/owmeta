@@ -24,16 +24,16 @@ from yarom.utils import FCN
 
 from tempfile import TemporaryDirectory
 
-from .command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
+from owmeta_core.command_util import (IVar, SubCommand, GeneratorWithData, GenericUserError,
                            DEFAULT_OWM_DIR)
 from .commands.bundle import OWMBundle
 from .commands.biology import CellCmd
-from .context import Context, DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
-from .capability import provide
-from .capabilities import FilePathProvider
-from .datasource_loader import DataSourceDirLoader, LoadFailed
-from .graph_serialization import write_canonical_to_file, gen_ctx_fname
-from .dataObject import DataObject
+from owmeta_core.context import Context, DEFAULT_CONTEXT_KEY, IMPORTS_CONTEXT_KEY
+from owmeta_core.capability import provide
+from owmeta_core.capabilities import FilePathProvider
+from owmeta_core.datasource_loader import DataSourceDirLoader, LoadFailed
+from owmeta_core.graph_serialization import write_canonical_to_file, gen_ctx_fname
+from owmeta_core.dataObject import DataObject
 
 
 L = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class OWMSourceData(object):
         archive_type : str
             The type of the archive to create.
         '''
-        from owmeta.datasource import DataSource
+        from owmeta_core.datasource import DataSource
         sid = self._owm_command._den3(source)
         if not archive_type:
             for ext in EXT_TO_ARCHIVE_FMT:
@@ -135,7 +135,7 @@ class OWMSource(object):
         full : bool
             Whether to (attempt to) shorten the source URIs by using the namespace manager
         """
-        from .datasource import DataSource
+        from owmeta_core.datasource import DataSource
         conf = self._parent._conf()
         if context is not None:
             ctx = self._make_ctx(context)
@@ -176,7 +176,7 @@ class OWMSource(object):
         data_source : str
             The ID of the data source to find derivatives of
         '''
-        from owmeta.datasource import DataSource
+        from owmeta_core.datasource import DataSource
         uri = self._parent._den3(data_source)
         ctx = self._parent._default_ctx.stored
         source = ctx(DataSource)(ident=uri)
@@ -191,7 +191,7 @@ class OWMSource(object):
                                  columns=(lambda x: x[0], lambda x: x[1]))
 
     def _derivs(self, ctx, source):
-        from owmeta.datasource import DataSource
+        from owmeta_core.datasource import DataSource
         derived = ctx(DataSource).query()
         derived.source(source)
         res = []
@@ -207,7 +207,7 @@ class OWMSource(object):
         *data_source : str
             The ID of the data source to show
         '''
-        from owmeta.datasource import DataSource
+        from owmeta_core.datasource import DataSource
 
         for ds in data_source:
             uri = self._parent._den3(ds)
@@ -223,10 +223,10 @@ class OWMSource(object):
         full : bool
             Whether to (attempt to) shorten the source URIs by using the namespace manager
         """
-        from .datasource import DataSource
-        from .dataObject import TypeDataObject, RDFSSubClassOfProperty
+        from owmeta_core.datasource import DataSource
+        from owmeta_core.dataObject import TypeDataObject, RDFSSubClassOfProperty
         from yarom.graphObject import ZeroOrMoreTQLayer
-        from .rdf_query_util import zomifier
+        from owmeta_core.rdf_query_util import zomifier
         conf = self._parent._conf()
         ctx = self._parent._default_ctx
         rdfto = ctx.stored(DataSource.rdf_type_object)
@@ -260,7 +260,7 @@ class OWMTranslator(object):
         full : bool
             Whether to (attempt to) shorten the source URIs by using the namespace manager
         '''
-        from owmeta.datasource import DataTranslator
+        from owmeta_core.datasource import DataTranslator
         conf = self._parent._conf()
         if context is not None:
             ctx = self._make_ctx(context)
@@ -286,7 +286,7 @@ class OWMTranslator(object):
         translator : str
             The translator to show
         '''
-        from owmeta.datasource import DataTranslator
+        from owmeta_core.datasource import DataTranslator
         conf = self._parent._conf()
         uri = self._parent._den3(translator)
         dt = self._parent._default_ctx.stored(DataTranslator)(ident=uri, conf=conf)
@@ -486,7 +486,7 @@ class OWMEvidence(object):
         '''
         from owmeta.evidence import Evidence
         from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-        from owmeta.contextDataObject import ContextDataObject
+        from owmeta_core.contextDataObject import ContextDataObject
         ctx = self._parent._default_ctx.stored
         identifier = self._parent._den3(identifier)
         rdf_type = self._parent._den3(rdf_type)
@@ -496,7 +496,7 @@ class OWMEvidence(object):
                 raise GenericUserError("Could not find Python class corresponding to " +
                         str(rdf_type))
         else:
-            from owmeta.dataObject import DataObject
+            from owmeta_core.dataObject import DataObject
             base_type = ctx(DataObject)
 
         q = base_type.query(ident=identifier)
@@ -657,7 +657,7 @@ class OWMRegistry(object):
         '''
         List registered classes
         '''
-        from .dataObject import RegistryEntry, PythonClassDescription, PythonModule
+        from owmeta_core.dataObject import RegistryEntry, PythonClassDescription, PythonModule
         ctx = self._parent._default_ctx
 
         def registry_entries():
@@ -887,7 +887,7 @@ class OWM(object):
         object : str
             The other object you want to say something about
         '''
-        from owmeta.dataObject import DataObject
+        from owmeta_core.dataObject import DataObject
         import transaction
         dctx = self._default_ctx
         query = dctx.stored(DataObject)(ident=self._den3(subject))
@@ -1044,7 +1044,7 @@ class OWM(object):
         return self._owm_connection
 
     def _conf(self, *args):
-        from owmeta.data import Data
+        from owmeta_core.data import Data
         from owmeta import connect
         import six
         dat = getattr(self, '_dat', None)
@@ -1310,12 +1310,12 @@ class OWM(object):
                     shutil.copy2(src, dst)
 
     def _lookup_translator(self, tname):
-        from owmeta.datasource import DataTranslator
+        from owmeta_core.datasource import DataTranslator
         for x in self._default_ctx.stored(DataTranslator)(ident=tname).load():
             return x
 
     def _lookup_source(self, sname):
-        from owmeta.datasource import DataSource
+        from owmeta_core.datasource import DataSource
         for x in self._default_ctx.stored(DataSource)(ident=self._den3(sname)).load():
             provide(x, self._cap_provs)
             return x

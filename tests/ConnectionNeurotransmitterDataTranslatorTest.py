@@ -16,7 +16,7 @@ from owmeta.data_trans.connections import (NeuronConnectomeSynapseClassTranslato
                                            ConnectomeCSVDataSource)
 from owmeta.neuron import Neuron
 from owmeta.connection import Connection
-from owmeta.context import IMPORTS_CONTEXT_KEY
+from owmeta_core.context import IMPORTS_CONTEXT_KEY
 from .DataTestTemplate import _DataTest
 
 

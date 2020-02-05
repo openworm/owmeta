@@ -6,7 +6,7 @@ from .DataTestTemplate import _DataTest
 from owmeta.neuron import Neuron
 from owmeta.cell import Cell
 from owmeta.connection import Connection
-from owmeta.context import Context
+from owmeta_core.context import Context
 
 
 class NeuronTest(_DataTest):

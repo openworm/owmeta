@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-from owmeta import config
-from owmeta.data import DataUser
+from owmeta_core import config
+from owmeta_core.data import DataUser
 from .DataTestTemplate import _DataTest
 
 from owmeta.channel import Channel

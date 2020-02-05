@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from .dataObject import DatatypeProperty, ObjectProperty, Alias
+from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, Alias
 from .muscle import Muscle
 from .cell import Cell
 from .biology import BiologyType
 from .network import Network
 from .worm_common import WORM_RDF_TYPE
-from .mapper import mapped
+from owmeta_core.mapper import mapped
 
 
 @mapped

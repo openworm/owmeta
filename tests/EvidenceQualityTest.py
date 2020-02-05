@@ -2,11 +2,11 @@
 from __future__ import absolute_import
 
 from .DataTestTemplate import _DataTest
-import owmeta
+import owmeta_core
 from owmeta.evidence import Evidence
 from owmeta.document import Document
 from owmeta.website import Website
-from owmeta.context import Context
+from owmeta_core.context import Context
 from six.moves.urllib.parse import urlparse
 import pytest
 
@@ -26,13 +26,13 @@ class EvidenceQualityTests(_DataTest):
     '''
 
     def setUp(self):
-        self.conn = owmeta.connect(configFile='tests/data_integrity_test.conf')
+        self.conn = owmeta_core.connect(configFile='tests/data_integrity_test.conf')
         self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
     def tearDown(self):
-        owmeta.disconnect(self.conn)
+        owmeta_core.disconnect(self.conn)
 
     def test_has_valid_resource(self):
         """Checks if the object has either a valid DOI or URL"""

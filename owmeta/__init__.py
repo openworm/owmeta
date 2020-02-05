@@ -47,9 +47,9 @@ BASE_SCHEMA_URL = 'http://openworm.org/schema'
 
 # The c extensions are incompatible with our code...
 os.environ['WRAPT_DISABLE_EXTENSIONS'] = '1'
-from .import_override import Overrider
-from .module_recorder import ModuleRecorder as MR
-from .mapper import Mapper
+from owmeta_core.import_override import Overrider
+from owmeta_core.module_recorder import ModuleRecorder as MR
+from owmeta_core.mapper import Mapper
 
 ImportOverrider = None
 ModuleRecorder = None
@@ -77,8 +77,8 @@ def install_module_import_wrapper():
 
 install_module_import_wrapper()
 ModuleRecorder.add_listener(BASE_MAPPER)
-from .configure import Configureable
-from .context import Context, ClassContext
+from owmeta_core.configure import Configureable
+from owmeta_core.context import Context, ClassContext
 import yarom
 
 __all__ = [
@@ -204,7 +204,7 @@ class Connection(object):
 
 def loadConfig(f):
     """ Load configuration for the module. """
-    from .data import Data
+    from owmeta_core.data import Data
     return Data.open(f)
 
 
@@ -268,7 +268,7 @@ def connect(configFile=None,
     :param data: (Optional) specify the file to load into the library
     :param dataFormat: (Optional) file format of `data`. Currently n3 is supported
     """
-    from .data import Data, ZODBSourceOpenFailError, DatabaseConflict
+    from owmeta_core.data import Data, ZODBSourceOpenFailError, DatabaseConflict
 
     if configFile is not None and not isinstance(configFile, str):
         conf = configFile

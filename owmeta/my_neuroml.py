@@ -1,6 +1,6 @@
 from owmeta.neuron import Neuron
 
-from owmeta.data import DataUser
+from owmeta_core.data import DataUser
 import neuroml as N
 
 

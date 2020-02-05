@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 from owmeta.experiment import Experiment
 from owmeta.document import Document
-from owmeta.data import DataUser
+from owmeta_core.data import DataUser
 
 
 class ExperimentTest(_DataTest):

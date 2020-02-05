@@ -4,9 +4,9 @@ from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
 from yarom.graphObject import IdentifierMissingException
-from .context import Context
-from .dataObject import DataObject, DatatypeProperty, Alias
-from .mapper import mapped
+from owmeta_core.context import Context
+from owmeta_core.dataObject import DataObject, DatatypeProperty, Alias
+from owmeta_core.mapper import mapped
 
 from owmeta import bibtex as BIB
 

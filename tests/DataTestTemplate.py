@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import owmeta
+import owmeta_core
 import unittest
 import subprocess
 import tempfile
 
-from owmeta.context import Context
-from owmeta.data import Data
+from owmeta_core.context import Context
+from owmeta_core.data import Data
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
@@ -35,7 +35,7 @@ class _DataTest(unittest.TestCase):
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        self.connection = owmeta.connect(conf=self.TestConfig)
+        self.connection = owmeta_core.connect(conf=self.TestConfig)
         self.context = Context(ident='http://example.org/test-context',
                                conf=self.TestConfig)
         typ = type(self)
@@ -49,7 +49,7 @@ class _DataTest(unittest.TestCase):
         self.context.save_context()
 
     def tearDown(self):
-        owmeta.disconnect(self.connection)
+        owmeta_core.disconnect(self.connection)
         self.delete_dir()
 
     @property

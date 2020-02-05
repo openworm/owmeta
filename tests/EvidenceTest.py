@@ -3,8 +3,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
 from owmeta.evidence import Evidence
-from owmeta.dataObject import DataObject
-from owmeta.configure import Configureable
+from owmeta_core.dataObject import DataObject
+from owmeta_core.configure import Configureable
 
 try:
     from unittest.mock import patch

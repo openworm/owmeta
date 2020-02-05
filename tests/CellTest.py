@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from owmeta.data import DataUser
+from owmeta_core.data import DataUser
 from .DataTestTemplate import _DataTest
 
 from owmeta.cell import Cell

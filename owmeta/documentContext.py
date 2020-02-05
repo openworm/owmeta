@@ -1,6 +1,6 @@
 import six
-from owmeta.contextualize import contextualize_metaclass, contextualized_new
-from owmeta.context import Context, ContextMeta
+from owmeta_core.contextualize import contextualize_metaclass, contextualized_new
+from owmeta_core.context import Context, ContextMeta
 
 
 class DocumentContextMeta(ContextMeta):

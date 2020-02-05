@@ -1,11 +1,11 @@
 from __future__ import print_function
 
 from wrapt import ObjectProxy
-from .pProperty import Property
-from .dataObject import DatatypeProperty, Alias
+from owmeta_core.pProperty import Property
+from owmeta_core.dataObject import DatatypeProperty, Alias
 from .cell import Cell
 from .connection import Connection
-from .mapper import mapped
+from owmeta_core.mapper import mapped
 
 
 class NeuronProxy(ObjectProxy):

@@ -2,9 +2,9 @@ from yarom.utils import slice_dict
 
 import six
 from .experiment import Experiment
-from .dataObject import DataObject, DatatypeProperty, ObjectProperty
+from owmeta_core.dataObject import DataObject, DatatypeProperty, ObjectProperty
 from .channel_common import CHANNEL_RDF_TYPE
-from .mapper import mapped
+from owmeta_core.mapper import mapped
 from . import SCI_BIO_CTX
 
 

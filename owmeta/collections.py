@@ -1,6 +1,6 @@
 from rdflib.term import URIRef
-from .mapper import mapped
-from .dataObject import DataObject, DatatypeProperty, UnionProperty, Alias
+from owmeta_core.mapper import mapped
+from owmeta_core.dataObject import DataObject, DatatypeProperty, UnionProperty, Alias
 
 
 @mapped

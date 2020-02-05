@@ -78,7 +78,3 @@ class ExampleRunnerTest(unittest.TestCase):
 
     def test_extrasyn(self):
         self.execfile("extrasynaptic_edges.py")
-
-    def test_owm_save(self):
-        self.exec_("owm save examples.owm_save_example",
-                  cwd=self.testdir)

@@ -7,8 +7,8 @@ import six
 
 from .biology import BiologyType
 from .cell import Cell
-from .mapper import mapped
-from .dataObject import DatatypeProperty, ObjectProperty
+from owmeta_core.mapper import mapped
+from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
 
 __all__ = ['Connection']
 

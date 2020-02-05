@@ -5,8 +5,8 @@ import unittest
 import itertools
 
 from .TestUtilities import xfail_without_db
-import owmeta
-from owmeta.context import Context
+import owmeta_core
+from owmeta_core.context import Context
 from owmeta.neuron import Neuron
 from owmeta.worm import Worm
 from owmeta.evidence import Evidence
@@ -18,13 +18,13 @@ class EvidenceCoverageTest(unittest.TestCase):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
         xfail_without_db()
-        self.conn = owmeta.connect(configFile='tests/data_integrity_test.conf')
+        self.conn = owmeta_core.connect(configFile='tests/data_integrity_test.conf')
         self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
     def tearDown(self):
-        owmeta.disconnect(self.conn)
+        owmeta_core.disconnect(self.conn)
 
     def test_verify_neurons_have_evidence(self):
         """

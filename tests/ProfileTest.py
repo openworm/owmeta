@@ -4,7 +4,7 @@ Not actually tests, but benchmarks.
 from __future__ import print_function
 from owmeta.neuron import Neuron
 from owmeta.connection import Connection
-from owmeta import connect, disconnect
+from owmeta_core import connect, disconnect
 
 from .TestUtilities import xfail_without_db
 
