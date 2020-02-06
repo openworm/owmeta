@@ -172,13 +172,13 @@ class DataIntegrityTest(unittest.TestCase):
         """ This test verifies that every neuron has a Wormbase ID. """
         net = self.qctx(Worm)().get_neuron_network()
         for neuron_object in net.neurons():
-            self.assertNotEqual(neuron_object.wormbaseID(), '')
+            assert neuron_object.wormbaseID() is not None
 
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
         muscles = self.qctx(Worm)().muscles()
         for muscle_object in muscles:
-            self.assertNotEqual(muscle_object.wormbaseID(), '')
+            assert muscle_object.wormbaseID() is not None
 
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
