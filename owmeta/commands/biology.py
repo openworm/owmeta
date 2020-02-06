@@ -1,6 +1,6 @@
 import six
 
-from ..command_util import GeneratorWithData
+from owmeta_core.command_util import GeneratorWithData
 from ..cell import Cell
 
 

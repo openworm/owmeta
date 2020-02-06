@@ -52,6 +52,7 @@ setup(
         'pytest-parallel'
     ],
     install_requires=[
+        'owmeta-core',
         'bibtexparser~=1.1.0',
         'BTrees>=4.0.8',
         'gitpython>=2.1.1',
@@ -102,10 +103,11 @@ setup(
     url='https://pyopenworm.readthedocs.io/en/latest/',
     download_url='https://github.com/openworm/owmeta/archive/master.zip',
     entry_points={
-        'console_scripts': ['owm = owmeta.cli:main'],
-        'rdf.plugins.store': [
-            'lazy_pickle = owmeta.lazy_deserialization_store:LazyDeserializationStore'
+        'owmeta_core.commands': [
+            'evidence = owmeta.command:OWMEvidence',
+            'cell = owmeta.commands.biology:CellCmd',
         ],
+        'owmeta_core.cli_hints': 'hints = owmeta.cli_hints:CLI_HINTS',
     },
     package_data={'owmeta': ['default.conf']},
     classifiers=[
