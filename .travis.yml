@@ -15,7 +15,7 @@ install:
 - git clone https://github.com/openworm/owmeta-core.git  # XXX: Temoporary - remove once owmeta-core is released
 - pip install owmeta-core  # XXX: Temoporary - remove once owmeta-core is released
 - pip install .
-- owm clone https://github.com/openworm/OpenWormData.git --branch 466-lazy-pickle
+- owm clone https://github.com/openworm/OpenWormData.git --branch 'openworm/owmeta#462-owmeta-core-split'
 
 script:
 - ./ci-test.sh
