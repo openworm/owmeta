@@ -1,18 +1,28 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import owmeta as P
 
-P.connect('default.conf')
+from owmeta_core.mapper import mapped
+from owmeta_core.dataObject import ObjectProperty
+from owmeta_core.pProperty import Property
+from owmeta_core.context import Context
+from owmeta_core import connect
 
-class NC_neighbor(P.Property):
+from owmeta.neuron import Neuron
+from owmeta.network import Network
+from owmeta.worm import Worm
+from owmeta.evidence import Evidence
+from owmeta.document import Document
+
+
+class NC_neighbor(Property):
     def __init__(self, *args, **kwargs):
-        P.Property.__init__(self, '_nb', *args, **kwargs)
+        super(NC_neighbor, self).__init__('_nb', *args, **kwargs)
         self.real_neighbor = self.owner.neighbor
 
         # Re-assigning neighbor Property
         self.owner.neighbor = self
 
-    def get(self,**kwargs):
+    def get(self, **kwargs):
         # get the members of the class
         for x in self.owner.neighbor():
             yield x
@@ -31,9 +41,9 @@ class NC_neighbor(P.Property):
                     side = n[n.find(ob_name)+len(ob_name):]
 
                     name_here = this_name + side
-                    this_neuron = P.Neuron(name_here)
+                    this_neuron = Neuron(name_here)
                     self.owner.member(this_neuron)
-                    this_neuron.neighbor(x,**kwargs)
+                    this_neuron.neighbor(x, **kwargs)
                 except ValueError:
                     # XXX: could default to all-to-all semantics
                     print('Do not recoginze the membership of this neuron/neuron class', ob)
@@ -41,19 +51,21 @@ class NC_neighbor(P.Property):
             for x in self.owner.member:
                 x.neighbor(ob)
 
-    def triples(self,*args,**kwargs):
+    def triples(self, *args, **kwargs):
         """ Stub. All of the actual relationships are encoded in Neuron.neighbor and NeuronClass.member """
         return []
 
+
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
-class NeuronClass(P.Neuron):
+@mapped
+class NeuronClass(Neuron):
+    member = ObjectProperty(value_type=Neuron, multiple=True)
+
     def __init__(self, name=False, **kwargs):
-        P.Neuron.__init__(self,**kwargs)
-        NeuronClass.ObjectProperty('member', owner=self, value_type=P.Neuron, multiple=True)
+        super(NeuronClass, self).__init__(**kwargs)
         NC_neighbor(owner=self)
         if name:
             self.name(name)
-NeuronClass.register()
 
 # A neuron class should be a way for saying what all neurons of a class have in common
 # (The notation below is a bit of a mish-mash. basically it's owmeta without
@@ -90,59 +102,65 @@ NeuronClass.register()
 # Setting up the data
 #
 
-ev = P.Evidence(title="A Hub-and-Spoke Circuit Drives Pheromone Attraction and Social Behavior in C. elegans",
-        uri="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/",
-        year=2009)
-w = P.Worm("C. elegans")
-net = P.Network()
-w.neuron_network(net)
-
-ev.asserts(w)
-def setup(name,type):
-    n = NeuronClass(name)
+def setup(ctx, name, type):
+    n = ctx(NeuronClass)(name)
     n.type(type)
-    n.member(P.Neuron(name+"R"))
-    n.member(P.Neuron(name+"L"))
+    n.member(ctx(Neuron)(name+"R"))
+    n.member(ctx(Neuron)(name+"L"))
     net.neuron(n)
     return n
 
-rmg = setup("RMG",'interneuron')
-rmh = setup("RMH",'motor')
-ask = setup("ASK",'sensory')
-ash = setup("ASH",'sensory')
-adl = setup("ADL",'sensory')
-urx = setup("URX",'sensory')
-awb = setup("AWB",'sensory')
-il2 = setup("IL2",'sensory')
 
-# describing the connections
-d = [(ask, 'gj', rmg),
-     (rmh, 'gj', rmg),
-     (urx, 'gj', rmg),
-     (urx, 'sn', rmg),
-     (awb, 'gj', rmg),
-     (il2, 'gj', rmg),
-     (adl, 'gj', rmg),
-     (ash, 'sn', rmg),
-     (ash, 'gj', rmg),
-     (rmg, 'sn', ash)]
+with connect('default.conf') as conn:
+    ctx = conn(Context)('http://example.org/data')
+    evctx = conn(Context)('http://example.org/evidence')
 
-for p,x,o in d:
-    if x == 'gj':
-        x='GapJunction'
-    else:
-        x='Send'
-    p.neighbor(o, syntype=x)
-ev.save()
+    w = ctx(Worm)("C. elegans")
+    net = ctx(Network)()
+    w.neuron_network(net)
 
-nc = NeuronClass()
-nc.type('sensory')
+    doc = evctx(Document)(title="A Hub-and-Spoke Circuit Drives Pheromone Attraction and Social Behavior in C. elegans",
+                          uri="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/",
+                          year=2009)
+    ev = evctx(Evidence)(reference=doc)
+    ev.supports(ctx.rdf_object)
 
-print('Sensory neuron classes in the circuit and their neurons')
-# XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
-for x in nc.load():
-    print(x.name(), "has:")
-    for y in x.member():
-        print(" ", y.name(), "of type", ",".join(y.type()))
+    rmg = setup(ctx, "RMG", 'interneuron')
+    rmh = setup(ctx, "RMH", 'motor')
+    ask = setup(ctx, "ASK", 'sensory')
+    ash = setup(ctx, "ASH", 'sensory')
+    adl = setup(ctx, "ADL", 'sensory')
+    urx = setup(ctx, "URX",  'sensory')
+    awb = setup(ctx, "AWB", 'sensory')
+    il2 = setup(ctx, "IL2", 'sensory')
 
-P.disconnect()
+    # describing the connections
+    d = [(ask, 'gj', rmg),
+         (rmh, 'gj', rmg),
+         (urx, 'gj', rmg),
+         (urx, 'sn', rmg),
+         (awb, 'gj', rmg),
+         (il2, 'gj', rmg),
+         (adl, 'gj', rmg),
+         (ash, 'sn', rmg),
+         (ash, 'gj', rmg),
+         (rmg, 'sn', ash)]
+
+    for p, x, o in d:
+        if x == 'gj':
+            x = 'GapJunction'
+        else:
+            x = 'Send'
+        p.neighbor(o, syntype=x)
+    ctx.save()
+    evctx.save()
+
+    nc = NeuronClass()
+    nc.type('sensory')
+
+    print('Sensory neuron classes in the circuit and their neurons')
+    # XXX: Add an evidence query like ev.asserts(nc.member(P.Neuron("ADLL")))
+    for x in nc.load():
+        print(x.name(), "has:")
+        for y in x.member():
+            print(" ", y.name(), "of type", ",".join(y.type()))

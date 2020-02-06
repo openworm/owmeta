@@ -86,7 +86,7 @@ owm clone https://github.com/openworm/OpenWormData.git
 
 Then, in Python, from the same directory:
 ```python
->>> import owmeta as P
+>>> import owmeta_core as P
 >>> conn = P.connect('readme.conf')
 
 ```
@@ -106,7 +106,7 @@ Then you can try out a few things:
 
 ```python
 # Make the context
->>> from owmeta.context import Context
+>>> from owmeta_core.context import Context
 >>> ctx = Context(ident='http://openworm.org/data', conf=conn.conf)
 
 # Grabs the representation of the neuronal network
@@ -182,11 +182,11 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-owmeta.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta.context.Context(ident="http://example.org/data/context"))
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
 
 
 >>> e.supports(dctx.rdf_object)
-owmeta.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta.context.Context(ident="http://example.org/evidence/context"))
+owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
 
 >>> dctx.save_context()
 >>> evctx.save_context()
@@ -214,7 +214,7 @@ object of that type and calling `load()`::
 ...     w = cctx.Worm()
 ...     net = cctx.Network()
 ...     w.neuron_network(net)
-owmeta.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://openworm.org/entities/Network/ad33294553d7aae0c3c3f4ab331a295a1')), context=owmeta.context.QueryContext(ident="http://openworm.org/data"))
+owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://openworm.org/entities/Network/ad33294553d7aae0c3c3f4ab331a295a1')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
 ...     neur = cctx.Neuron()
 ...     neur.count()
@@ -226,7 +226,7 @@ See what neurons express a given neuropeptide::
 ```python
 >>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
-owmeta.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=owmeta.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('INS-26')), context=owmeta.context.QueryContext(ident="http://openworm.org/data"))
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=owmeta.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal('INS-26')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
 >>> sorted(x.name() for x in n.load())
 ['ASEL', 'ASER', 'ASIL', 'ASIR']

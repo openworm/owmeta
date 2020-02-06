@@ -1,5 +1,5 @@
-from owmeta.dataObject import DataObject
-from owmeta.context import Context
+from owmeta_core.dataObject import DataObject
+from owmeta_core.context import Context
 
 
 def owm_data(namespace):

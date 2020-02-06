@@ -7,12 +7,14 @@ evidence for an object means.
 
 from __future__ import absolute_import
 from __future__ import print_function
-import owmeta as P
+
+import owmeta_core as P
+from owmeta_core.data import Data
+from owmeta_core.context import Context
+
 from owmeta.evidence import Evidence
 from owmeta.neuron import Neuron
 from owmeta.document import Document
-from owmeta.data import Data
-from owmeta.context import Context
 
 # Create dummy database configuration.
 d = Data()

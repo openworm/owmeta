@@ -5,10 +5,11 @@ database.
 
 from __future__ import absolute_import
 from __future__ import print_function
-import owmeta as P
+import owmeta_core as P
+from owmeta_core.context import Context
+
 from owmeta.connection import Connection
 from owmeta.neuron import Neuron
-from owmeta.context import Context
 
 
 def pp_connection(conn):

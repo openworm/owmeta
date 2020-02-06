@@ -1,6 +1,8 @@
 from __future__ import print_function
-from owmeta import connect, config
-from owmeta.context import Context
+
+from owmeta_core import connect, config
+from owmeta_core.context import Context
+
 from owmeta.neuron import Neuron
 from owmeta.evidence import Evidence
 from owmeta.document import Document

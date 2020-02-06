@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from __future__ import absolute_import
-from .DataTestTemplate import _DataTest
-from owmeta.evidence import Evidence
+
 from owmeta_core.dataObject import DataObject
 from owmeta_core.configure import Configureable
+
+from owmeta.evidence import Evidence
+
+from .DataTestTemplate import _DataTest
 
 try:
     from unittest.mock import patch
@@ -16,7 +19,7 @@ class EvidenceTest(_DataTest):
     ctx_classes = (Evidence,)
 
     def setUp(self):
-        self.patcher = patch('owmeta.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher = patch('owmeta_core.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
         self.patcher.start()
         super(EvidenceTest, self).setUp()
 

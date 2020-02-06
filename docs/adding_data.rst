@@ -17,7 +17,7 @@ into your database, then you can load objects from it::
     >>> from owmeta.neuron import Neuron
     >>> n = Neuron.query()
     >>> n.receptor('UNC-13')
-    owmeta.statement.Statement(...obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal(u'UNC-13')), context=None)
+    owmeta_core.statement.Statement(...obj=yarom.propertyValue.PropertyValue(rdflib.term.Literal(u'UNC-13')), context=None)
     >>> for x in n.load():
     ...     do_something_with_unc13_neuron(n)  # doctest.SKIP
 
@@ -31,19 +31,19 @@ property, ``neuron_network``, which points to the
 :class:`~owmeta.network.Network` which should contain all neural cells and
 synaptic connections. To initialize the hierarchy you would do something like::
 
-    >>> from owmeta.context import Context
+    >>> from owmeta_core.context import Context
     >>> from owmeta.worm import Worm
     >>> from owmeta.network import Network
     >>> ctx = Context('http://example.org/c-briggsae')
     >>> w = ctx(Worm)('C. briggsae') # The name is optional and currently defaults to 'C. elegans'
     >>> nn = ctx(Network)()          # make a neuron network
     >>> w.neuron_network(nn)         # attach to the worm the neuron network
-    owmeta.statement.Statement(...)
+    owmeta_core.statement.Statement(...)
     >>> n = ctx(Neuron)('NeuronX')   # make a neuron
     >>> n.receptor('UNC-13')         # state that the neuron has a UNC-13 type receptor
-    owmeta.statement.Statement(...)
+    owmeta_core.statement.Statement(...)
     >>> nn.neuron(n)                 # attach to the neuron network
-    owmeta.statement.Statement(...)
+    owmeta_core.statement.Statement(...)
     >>> ctx.save()           # save all of the data attached to the worm
 
 It is possible to create objects without attaching them to anything and they
@@ -125,7 +125,7 @@ distinct times or which come from different, possibly conflicting, sources is
 using contexts. The code below shows how to do that::
 
    >>> from rdflib import ConjunctiveGraph
-   >>> from owmeta.context import Context
+   >>> from owmeta_core.context import Context
    >>> # from mymod import Widget  # my own OWM widget model
    >>> # from bdw import Load # BigDataWarehouse API
 

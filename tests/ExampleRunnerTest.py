@@ -72,7 +72,6 @@ class ExampleRunnerTest(unittest.TestCase):
     def test_bgp(self):
         self.execfile("test_bgp.py")
 
-    @unittest.skip("See #102")
     def test_rmgr(self):
         self.execfile("rmgr.py")
 

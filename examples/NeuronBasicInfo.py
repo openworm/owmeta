@@ -14,11 +14,13 @@ declared the variable `adal`.
 
 from __future__ import print_function
 from __future__ import absolute_import
-import owmeta as P
-from owmeta.worm import Worm
-from owmeta.context import Context
+
 import transaction
 import os
+from owmeta_core import connect
+from owmeta_core.context import Context
+
+from owmeta.worm import Worm
 
 
 def get_names(it):
@@ -35,9 +37,9 @@ def pp_set(title, s):
     print()
 
 
-with P.connect('default.conf') as conn:
+with connect('default.conf') as conn:
     with transaction.manager:
-        ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
+        ctx = conn(Context)(ident="http://openworm.org/data").stored
 
         w = ctx(Worm)()
         net = w.neuron_network()

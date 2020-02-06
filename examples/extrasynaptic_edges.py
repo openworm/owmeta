@@ -13,8 +13,8 @@ except ImportError:
 from collections import namedtuple, defaultdict
 import csv
 
-import owmeta as P
-from owmeta.context import Context
+from owmeta_core import connect
+from owmeta_core.context import Context
 from owmeta.worm import Worm
 import six
 
@@ -98,8 +98,8 @@ def fetch_ma_mapping():
     return mapping
 
 
-with P.connect('default.conf') as conn:
-    ctx = Context(ident="http://openworm.org/data", conf=conn.conf).stored
+with connect('default.conf') as conn:
+    ctx = conn(Context)(ident="http://openworm.org/data").stored
     #Get the worm object.
     worm = ctx(Worm)()
     #Extract the network object from the worm object.

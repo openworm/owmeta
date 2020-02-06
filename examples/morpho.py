@@ -4,11 +4,12 @@ How to load morphologies of certain cells from the database.
 #this is an expected failure right now, as morphology is not implemented
 from __future__ import absolute_import
 from __future__ import print_function
-import owmeta as P
-from owmeta.context import Context
-from owmeta.worm import Worm
 
 from six import StringIO
+import owmeta_core as P
+from owmeta_core.context import Context
+
+from owmeta.worm import Worm
 
 #Connect to database.
 with P.connect('default.conf') as conn:
