@@ -3,12 +3,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import six
-
+from owmeta_core.mapper import mapped
+from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
 
 from .biology import BiologyType
 from .cell import Cell
-from owmeta_core.mapper import mapped
-from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
 
 __all__ = ['Connection']
 

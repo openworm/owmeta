@@ -1,26 +1,26 @@
 import re
 import traceback
 import csv
+import logging
+
+from owmeta_core.context import Context
+from owmeta_core.datasource import GenericTranslation
+from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
+from owmeta_core.mapper import mapped
+from owmeta_core.data_trans.csv_ds import CSVDataTranslator, CSVDataSource
 
 from ..utils import normalize_cell_name
 from ..connection import Connection
 from ..cell import Cell
-from ..context import Context
 from ..document import Document
 from ..evidence import Evidence
 from ..neuron import Neuron
 from ..muscle import Muscle
 from ..worm import Worm
 from ..network import Network
-from ..datasource import GenericTranslation
-from ..dataObject import DatatypeProperty, ObjectProperty
-from ..mapper import mapped
 
-from .csv_ds import CSVDataTranslator, CSVDataSource
 from .common_data import TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
-
-import logging
 
 L = logging.getLogger(__name__)
 

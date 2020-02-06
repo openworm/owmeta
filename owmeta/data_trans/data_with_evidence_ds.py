@@ -1,11 +1,11 @@
 from rdflib.namespace import Namespace
-from ..context import Context
-from ..contextDataObject import ContextDataObject
-from ..datasource import Informational, DataSource
-from ..mapper import mapped
+from owmeta_core.context import Context
+from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.datasource import Informational, DataSource
+from owmeta_core.mapper import mapped
+from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
 from .. import CONTEXT
 from .common_data import DS_NS
-from .context_datasource import VariableIdentifierContext
 
 
 @mapped

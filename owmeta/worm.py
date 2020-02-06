@@ -2,12 +2,13 @@
 from __future__ import print_function
 
 from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, Alias
+from owmeta_core.mapper import mapped
+
 from .muscle import Muscle
 from .cell import Cell
 from .biology import BiologyType
 from .network import Network
 from .worm_common import WORM_RDF_TYPE
-from owmeta_core.mapper import mapped
 
 
 @mapped

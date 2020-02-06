@@ -12,11 +12,11 @@ from ..neuron import Neuron
 from ..cell import Cell
 from ..website import Website
 from ..worm import Worm
-from ..datasource import Informational
-from ..mapper import mapped
+from owmeta_core.datasource import Informational
+from owmeta_core.mapper import mapped
 
-from .common_data import DS_NS, TRANS_NS
-from .csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.data_trans.common_data import DS_NS, TRANS_NS
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 

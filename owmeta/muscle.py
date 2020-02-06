@@ -1,7 +1,8 @@
-from .cell import Cell
-from .neuron import Neuron
 from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, Alias
 from owmeta_core.mapper import mapped
+
+from .cell import Cell
+from .neuron import Neuron
 
 
 @mapped

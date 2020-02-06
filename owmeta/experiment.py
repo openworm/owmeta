@@ -1,6 +1,7 @@
 from owmeta_core.dataObject import DataObject, ObjectProperty
-from .document import Document
 from owmeta_core.mapper import mapped
+
+from .document import Document
 
 
 @mapped

@@ -3,8 +3,9 @@ from __future__ import print_function, absolute_import
 import logging
 
 from owmeta_core.command_util import GenericUserError
-from .commands.biology import CellCmd
 from owmeta_core.dataObject import DataObject
+
+from .commands.biology import CellCmd
 
 
 L = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
-from ..datasource import DataTranslator, OneOrMore
-from ..mapper import mapped
+from owmeta_core.datasource import DataTranslator, OneOrMore
+from owmeta_core.mapper import mapped
 from .common_data import TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 

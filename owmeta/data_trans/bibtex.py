@@ -1,13 +1,15 @@
 from rdflib.namespace import Namespace
-from ..bibtex import parse_bibtex_into_evidence
-from ..datasource import Informational, DataTranslator, DataSource
-from .local_file_ds import LocalFileDataSource
-from ..context import Context
-from ..contextDataObject import ContextDataObject
-from ..mapper import mapped
+from owmeta_core.datasource import Informational, DataTranslator, DataSource
+from owmeta_core.data_trans.local_file_ds import LocalFileDataSource
+from owmeta_core.data_trans.context_datasource import (VariableIdentifierContext,
+                                                       VariableIdentifierContextDataObject)
+from owmeta_core.context import Context
+from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.mapper import mapped
+
 from .. import CONTEXT
+from ..bibtex import parse_bibtex_into_evidence
 from .common_data import DS_NS
-from .context_datasource import VariableIdentifierContext, VariableIdentifierContextDataObject
 
 
 @mapped

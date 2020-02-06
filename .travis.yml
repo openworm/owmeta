@@ -16,6 +16,8 @@ before_install:
 - pip install pytest>=3.4.0
 
 install:
+- git clone https://github.com/openworm/owmeta-core.git  # XXX: Temoporary - remove once owmeta-core is released
+- pip install owmeta-core  # XXX: Temoporary - remove once owmeta-core is released
 - ./ci-install.sh
 - owm clone https://github.com/openworm/OpenWormData.git --branch 466-lazy-pickle
 

@@ -1,7 +1,7 @@
-from owmeta.neuron import Neuron
-
-from owmeta_core.data import DataUser
 import neuroml as N
+from owmeta_core.data import DataUser
+
+from .neuron import Neuron
 
 
 class NeuroML(DataUser):

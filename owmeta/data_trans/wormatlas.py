@@ -1,14 +1,14 @@
 import traceback
 
-from ..datasource import GenericTranslation
+from owmeta_core.datasource import GenericTranslation
 from ..network import Network
 from ..worm import Worm
 from ..website import Website
 from ..evidence import Evidence
-from ..mapper import mapped
+from owmeta_core.mapper import mapped
 
 from rdflib.namespace import Namespace
-from .csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 from .common_data import DS_NS, TRANS_NS
 

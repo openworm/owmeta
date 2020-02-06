@@ -6,12 +6,12 @@ from ..worm import Worm
 from ..document import Document
 from ..evidence import Evidence
 from ..bibtex import parse_bibtex_into_documents
-from ..datasource import Informational
+from owmeta_core.datasource import Informational
 from .common_data import DS_NS, TRANS_NS
-from .csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 
 from .data_with_evidence_ds import DataWithEvidenceDataSource
-from ..mapper import mapped
+from owmeta_core.mapper import mapped
 
 
 @mapped
