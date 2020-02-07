@@ -3,7 +3,7 @@ from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
-from yarom.graphObject import IdentifierMissingException
+from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
 from owmeta_core.dataObject import DataObject, DatatypeProperty, Alias
 from owmeta_core.mapper import mapped

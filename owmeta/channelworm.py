@@ -1,11 +1,12 @@
-from yarom.utils import slice_dict
-
 import six
 from .experiment import Experiment
+
 from owmeta_core.dataObject import DataObject, DatatypeProperty, ObjectProperty
-from .channel_common import CHANNEL_RDF_TYPE
 from owmeta_core.mapper import mapped
+from owmeta_core.utils import slice_dict
+
 from . import SCI_BIO_CTX
+from .channel_common import CHANNEL_RDF_TYPE
 
 
 @mapped

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
-from yarom.graphObject import IdentifierMissingException
 from .DataTestTemplate import _DataTest
+from owmeta_core.graph_object import IdentifierMissingException
 from owmeta.document import (Document,
                              _doi_uri_to_doi,
                              WormbaseRetrievalException)
