@@ -10,7 +10,7 @@ Say, for example, that I want to record some information about drug reactions
 in C. elegans. I make ``Drug`` and ``Experiment`` classes to describe C.
 elegans reactions::
 
-    >>> from owmeta_core.dataObject import (DataObject,
+    >>> from owmeta_core.dataobject import (DataObject,
     ...                                     DatatypeProperty,
     ...                                     ObjectProperty,
     ...                                     Alias)

@@ -15,7 +15,7 @@ or, to exclude such tests:
 
 This directory contains the unit and integration tests for owmeta.
 
-* ConfigureTest.py - Tests for the Configure class, which provides
+* ConfigureTest.py - Tests for the Configuration class, which provides
   functionality to modules to allow outside objects to parameterize their
   behavior
 * DataIntegrityTest.py - Integration tests that read from the database and

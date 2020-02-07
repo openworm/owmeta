@@ -1,7 +1,7 @@
 import six
 from .experiment import Experiment
 
-from owmeta_core.dataObject import DataObject, DatatypeProperty, ObjectProperty
+from owmeta_core.dataobject import DataObject, DatatypeProperty, ObjectProperty
 from owmeta_core.mapper import mapped
 from owmeta_core.utils import slice_dict
 

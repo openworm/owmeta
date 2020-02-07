@@ -33,7 +33,7 @@ n = ctx(Neuron)(name='AVAL')
 d = evctx(Document)(key='Anonymous2011', doi='125.41.3/ploscompbiol', pmid='12345678')
 e = evctx(Evidence)(key='Anonymous2011', reference=d)
 
-# Evidence object asserts something about the enclosed dataObject.
+# Evidence object asserts something about the enclosed dataobject.
 # Here we add a receptor to the Neuron we made earlier, and "assert it".
 # As the discussion (see top) reads, this might be asserting the existence of
 # receptor UNC-8 on neuron AVAL.

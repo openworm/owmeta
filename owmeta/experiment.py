@@ -1,4 +1,4 @@
-from owmeta_core.dataObject import DataObject, ObjectProperty
+from owmeta_core.dataobject import DataObject, ObjectProperty
 from owmeta_core.mapper import mapped
 
 from .document import Document

@@ -2,8 +2,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
-from owmeta_core.dataObject import DataObject
-from owmeta_core.configure import Configureable
+from owmeta_core.dataobject import DataObject
+from owmeta_core.configure import Configurable
 
 from owmeta.evidence import Evidence
 

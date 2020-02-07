@@ -46,7 +46,7 @@ LOGGER.addHandler(logging.NullHandler())
 BASE_SCHEMA_URL = 'http://openworm.org/schema'
 
 from owmeta_core import BASE_CONTEXT
-from owmeta_core.configure import Configureable
+from owmeta_core.configure import Configurable
 from owmeta_core.context import Context, ClassContext
 
 __all__ = ["get_data"]

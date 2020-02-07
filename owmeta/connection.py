@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import six
 from owmeta_core.mapper import mapped
-from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
+from owmeta_core.dataobject import DatatypeProperty, ObjectProperty
 
 from .biology import BiologyType
 from .cell import Cell

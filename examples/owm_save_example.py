@@ -1,4 +1,4 @@
-from owmeta_core.dataObject import DataObject
+from owmeta_core.dataobject import DataObject
 from owmeta_core.context import Context
 
 

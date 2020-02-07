@@ -1,7 +1,7 @@
 import logging
 
-from owmeta_core.dataObject import DataObject, ObjectProperty
-from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.dataobject import DataObject, ObjectProperty
+from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.context import Context
 from owmeta_core.mapper import mapped
 

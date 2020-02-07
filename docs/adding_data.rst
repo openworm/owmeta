@@ -17,7 +17,7 @@ into your database, then you can load objects from it::
     >>> from owmeta.neuron import Neuron
     >>> n = Neuron.query()
     >>> n.receptor('UNC-13')
-    owmeta_core.statement.Statement(...obj=owmeta_core.simpleProperty.ContextualizedPropertyValue(rdflib.term.Literal(u'UNC-13')), context=None)
+    owmeta_core.statement.Statement(...obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal(u'UNC-13')), context=None)
     >>> for x in n.load():
     ...     do_something_with_unc13_neuron(n)  # doctest.SKIP
 

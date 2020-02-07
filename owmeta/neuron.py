@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from wrapt import ObjectProxy
 from owmeta_core.pProperty import Property
-from owmeta_core.dataObject import DatatypeProperty, Alias
+from owmeta_core.dataobject import DatatypeProperty, Alias
 from owmeta_core.mapper import mapped
 
 from .cell import Cell

@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import Mock, ANY
 from rdflib.term import URIRef
 from owmeta_core.command import GenericUserError
-from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.context_dataobject import ContextDataObject
 
 from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource as DWEDS
 from owmeta.command import OWMEvidence

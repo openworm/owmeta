@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import unittest
 
-from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.context_dataobject import ContextDataObject
 from rdflib.term import URIRef
 
 from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource

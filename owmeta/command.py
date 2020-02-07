@@ -3,7 +3,7 @@ from __future__ import print_function, absolute_import
 import logging
 
 from owmeta_core.command_util import GenericUserError
-from owmeta_core.dataObject import DataObject
+from owmeta_core.dataobject import DataObject
 
 from .commands.biology import CellCmd
 
@@ -32,7 +32,7 @@ class OWMEvidence(object):
         '''
         from owmeta.evidence import Evidence
         from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-        from owmeta_core.contextDataObject import ContextDataObject
+        from owmeta_core.context_dataobject import ContextDataObject
         ctx = self._parent._default_ctx.stored
         identifier = self._parent._den3(identifier)
         rdf_type = self._parent._den3(rdf_type)

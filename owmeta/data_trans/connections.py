@@ -5,7 +5,7 @@ import logging
 
 from owmeta_core.context import Context
 from owmeta_core.datasource import GenericTranslation
-from owmeta_core.dataObject import DatatypeProperty, ObjectProperty
+from owmeta_core.dataobject import DatatypeProperty, ObjectProperty
 from owmeta_core.mapper import mapped
 from owmeta_core.data_trans.csv_ds import CSVDataTranslator, CSVDataSource
 

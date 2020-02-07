@@ -4,7 +4,7 @@ from owmeta_core.data_trans.local_file_ds import LocalFileDataSource
 from owmeta_core.data_trans.context_datasource import (VariableIdentifierContext,
                                                        VariableIdentifierContextDataObject)
 from owmeta_core.context import Context
-from owmeta_core.contextDataObject import ContextDataObject
+from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.mapper import mapped
 
 from .. import CONTEXT

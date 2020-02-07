@@ -182,7 +182,7 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=owmeta_core.simpleProperty.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
 
 
 >>> e.supports(dctx.rdf_object)
@@ -226,7 +226,7 @@ See what neurons express a given neuropeptide::
 ```python
 >>> n = ctx.stored(Neuron)()
 >>> n.neuropeptide("INS-26")
-owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=owmeta.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=owmeta_core.simpleProperty.ContextualizedPropertyValue(rdflib.term.Literal('INS-26')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=owmeta.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('INS-26')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
 >>> sorted(x.name() for x in n.load())
 ['ASEL', 'ASER', 'ASIL', 'ASIR']

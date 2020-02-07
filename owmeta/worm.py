@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, Alias
+from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
 from owmeta_core.mapper import mapped
 
 from .muscle import Muscle

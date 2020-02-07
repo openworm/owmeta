@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from owmeta_core.mapper import mapped
-from owmeta_core.dataObject import ObjectProperty
+from owmeta_core.dataobject import ObjectProperty
 from owmeta_core.pProperty import Property
 from owmeta_core.context import Context
 from owmeta_core import connect

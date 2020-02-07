@@ -1,6 +1,6 @@
 import rdflib as R
 
-from owmeta_core.dataObject import DatatypeProperty, ObjectProperty, Alias
+from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
 from .channelworm import ChannelModel
 from .biology import BiologyType
 from .channel_common import CHANNEL_RDF_TYPE

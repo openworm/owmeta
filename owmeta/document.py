@@ -5,7 +5,7 @@ import re
 import logging
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
-from owmeta_core.dataObject import DataObject, DatatypeProperty, Alias
+from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias
 from owmeta_core.mapper import mapped
 
 from owmeta import bibtex as BIB
