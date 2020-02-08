@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from wrapt import ObjectProxy
-from owmeta_core.pProperty import Property
+from owmeta_core.custom_dataobject_property import CustomProperty
 from owmeta_core.dataobject import DatatypeProperty, Alias
 from owmeta_core.mapper import mapped
 
@@ -66,10 +66,10 @@ class Neuron(Cell):
 
     Attributes
     ----------
-    neighbor : Property
+    neighbor : CustomProperty
         Get neurons connected to this neuron if called with no arguments, or
         with arguments, state that neuronName is a neighbor of this Neuron
-    connection : Property
+    connection : CustomProperty
         Get a set of Connection objects describing chemical synapses or gap
         junctions between this neuron and others
 
@@ -95,10 +95,12 @@ class Neuron(Cell):
     receptors = Alias(receptor)
     ''' Alias to py:attr:`receptor` '''
 
-    def __init__(self, name=False, **kwargs):
+    def __init__(self, name=None, **kwargs):
         super(Neuron, self).__init__(name=name, **kwargs)
+
         # Get neurons connected to this neuron
         Neighbor(owner=self)
+
         # Get connections from this neuron
         ConnectionProperty(owner=self)
 
@@ -143,14 +145,8 @@ class Neuron(Cell):
             if 'GapJunction' in item[2]['synapse']:
                 yield item[0]
 
-    def _as_neuroml(self):
-        """Return this neuron as a NeuroML representation
 
-           :rtype: libNeuroML.Neuron
-        """
-
-
-class Neighbor(Property):
+class Neighbor(CustomProperty):
     multiple = True
 
     def __init__(self, **kwargs):
@@ -210,7 +206,7 @@ class Neighbor(Property):
                 yield x
 
 
-class ConnectionProperty(Property):
+class ConnectionProperty(CustomProperty):
 
     """A representation of the connection between neurons. Either a gap junction
     or a chemical synapse
