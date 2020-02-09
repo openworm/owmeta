@@ -43,10 +43,6 @@ class ExpressionPattern(BiologyType):
 class Channel(BiologyType):
     """
     A biological ion channel.
-
-    Attributes
-    ----------
-    Models : Property
     """
 
     class_context = BiologyType.class_context
@@ -70,8 +66,7 @@ class Channel(BiologyType):
     gene_WB_ID = DatatypeProperty()
     ''' Wormbase ID of the encoding gene '''
 
-    expression_pattern = ObjectProperty(multiple=True,
-                                        value_type=ExpressionPattern)
+    expression_pattern = ObjectProperty(multiple=True, value_type=ExpressionPattern)
     ''' A pattern of expression of this cell within an organism '''
 
     neuroml_file = DatatypeProperty()
@@ -85,6 +80,9 @@ class Channel(BiologyType):
 
     model = ObjectProperty(value_type=ChannelModel)
     ''' Get experimental models of this ion channel '''
+
+    models = Alias(model)
+    ''' Alias to :py:attr:`model` '''
 
     def __init__(self, name=None, **kwargs):
         super(Channel, self).__init__(name=name, **kwargs)

@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from owmeta_core.mapper import mapped
 from owmeta_core.dataobject import ObjectProperty
-from owmeta_core.pProperty import Property
+from owmeta_core.custom_dataobject_property import CustomProperty
 from owmeta_core.context import Context
 from owmeta_core import connect
 
@@ -14,7 +14,7 @@ from owmeta.evidence import Evidence
 from owmeta.document import Document
 
 
-class NC_neighbor(Property):
+class NC_neighbor(CustomProperty):
     def __init__(self, *args, **kwargs):
         super(NC_neighbor, self).__init__('_nb', *args, **kwargs)
         self.real_neighbor = self.owner.neighbor
