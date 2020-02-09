@@ -254,8 +254,9 @@ data repository within the OpenWorm suite of tools.
 
 ```python
 # Get data for a subtype of voltage-gated potassium channels
->> kv1 = ctx(IonChannel)('Kv1')
->> mods = list(kv1.models.get())
+>>> from owmeta.channel import Channel
+>>> kv1 = ctx(Channel)(subfamily='Kv1.1')
+>>> kv1.models()
 
 ```
 
