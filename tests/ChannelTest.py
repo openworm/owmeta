@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-from owmeta_core import config
 from owmeta_core.data import DataUser
 from .DataTestTemplate import _DataTest
 

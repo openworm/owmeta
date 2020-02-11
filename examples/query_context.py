@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from owmeta_core import connect, config
+from owmeta_core import connect
 from owmeta_core.context import Context
 
 from owmeta.neuron import Neuron
