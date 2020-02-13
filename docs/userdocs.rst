@@ -6,13 +6,7 @@ For Users
    :maxdepth: 2
 
    data_sources
-   process
+   data_requirements
    adding_data
-   making_dataObjects
-   sharing
-   contexts
-   command
    versioning
    python_release_compatibility
-   bittorrent
-
