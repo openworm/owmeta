@@ -43,7 +43,7 @@ import uuid
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
 
-BASE_SCHEMA_URL = 'http://openworm.org/schema'
+BASE_SCHEMA_URL = 'http://openworm.org/schema/sci'
 
 from owmeta_core import BASE_CONTEXT
 from owmeta_core.configure import Configurable
@@ -53,13 +53,9 @@ __all__ = ["get_data"]
 
 DEF_CTX = Context()
 
-SCI_CTX = ClassContext(imported=(BASE_CONTEXT,),
-                  ident=BASE_SCHEMA_URL + '/sci',
-                  base_namespace=BASE_SCHEMA_URL + '/sci#')
-
-SCI_BIO_CTX = ClassContext(imported=(SCI_CTX,),
-                      ident=BASE_SCHEMA_URL + '/sci/bio',
-                      base_namespace=BASE_SCHEMA_URL + '/sci/bio#')
+SCI_BIO_CTX = ClassContext(imported=(BASE_CONTEXT,),
+                      ident=BASE_SCHEMA_URL,
+                      base_namespace=BASE_SCHEMA_URL + '#')
 
 CONTEXT = ClassContext(imported=(SCI_BIO_CTX,),
                   ident=BASE_SCHEMA_URL + '/bio',
