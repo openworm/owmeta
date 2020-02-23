@@ -14,7 +14,7 @@ before_install:
 - pip uninstall pytest --yes
 - pip install pytest>=3.4.0
 install:
-- python setup.py install
+- pip install .
 - pow clone https://github.com/openworm/OpenWormData.git
 script:
 - "./ci-test.sh"
