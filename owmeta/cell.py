@@ -10,7 +10,6 @@ from .cell_common import CELL_RDF_TYPE
 
 @mapped
 class Cell(BiologyType):
-
     """
     A biological cell.
 

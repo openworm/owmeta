@@ -1,20 +1,25 @@
 import traceback
 
+from rdflib.namespace import Namespace
+
 from owmeta_core.datasource import GenericTranslation
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.mapper import mapped
+
+from .. import CONTEXT
 from ..network import Network
 from ..worm import Worm
 from ..website import Website
 from ..evidence import Evidence
-from owmeta_core.mapper import mapped
 
-from rdflib.namespace import Namespace
-from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 from .common_data import DS_NS, TRANS_NS
 
 
 @mapped
 class WormAtlasCellListDataSource(CSVDataSource):
+    class_context = CONTEXT
+
     rdf_namespace = Namespace(DS_NS['WormAtlasCellListDataSource#'])
     csv_header = ['Cell', 'Lineage Name', 'Description']
     csv_field_delimiter = '\t'
@@ -22,6 +27,8 @@ class WormAtlasCellListDataSource(CSVDataSource):
 
 @mapped
 class WormAtlasCellListDataTranslation(GenericTranslation):
+    class_context = CONTEXT
+
     def __init__(self, **kwargs):
         super(WormAtlasCellListDataTranslation, self).__init__(**kwargs)
         self.neurons_source = WormAtlasCellListDataTranslation.ObjectProperty()
@@ -37,6 +44,8 @@ class WormAtlasCellListDataTranslation(GenericTranslation):
 
 @mapped
 class WormAtlasCellListDataTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = (WormAtlasCellListDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
     translation_type = WormAtlasCellListDataTranslation

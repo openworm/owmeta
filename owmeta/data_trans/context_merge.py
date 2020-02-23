@@ -1,11 +1,16 @@
 from owmeta_core.datasource import DataTranslator, OneOrMore
 from owmeta_core.mapper import mapped
+
+from .. import SCI_CTX
+
 from .common_data import TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
 @mapped
 class ContextMergeDataTranslator(DataTranslator):
+    class_context = SCI_CTX
+
     translator_identifier = TRANS_NS.ContextMergeDataTranslator
     input_type = OneOrMore(DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource

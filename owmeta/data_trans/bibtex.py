@@ -7,13 +7,16 @@ from owmeta_core.context import Context
 from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.mapper import mapped
 
-from .. import CONTEXT
+from .. import CONTEXT, SCI_CTX
 from ..bibtex import parse_bibtex_into_evidence
+
 from .common_data import DS_NS
 
 
 @mapped
 class EvidenceDataSource(DataSource):
+    class_context = SCI_CTX
+
     context_property = Informational(display_name='Context',
                                      property_name='evidence_context',
                                      property_type='ObjectProperty',

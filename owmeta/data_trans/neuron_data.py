@@ -1,21 +1,25 @@
 from rdflib.namespace import Namespace
 
+from owmeta_core.datasource import Informational
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.mapper import mapped
+
+from .. import CONTEXT
 from ..neuron import Neuron
 from ..network import Network
 from ..worm import Worm
 from ..document import Document
 from ..evidence import Evidence
 from ..bibtex import parse_bibtex_into_documents
-from owmeta_core.datasource import Informational
-from .common_data import DS_NS, TRANS_NS
-from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 
+from .common_data import DS_NS, TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
-from owmeta_core.mapper import mapped
 
 
 @mapped
 class NeuronCSVDataSource(CSVDataSource):
+    class_context = CONTEXT
+
     rdf_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
     bibtex_files = Informational(display_name='BibTeX files',
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
@@ -23,6 +27,8 @@ class NeuronCSVDataSource(CSVDataSource):
 
 @mapped
 class NeuronCSVDataTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = NeuronCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronCSVDataTranslator

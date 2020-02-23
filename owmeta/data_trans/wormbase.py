@@ -3,6 +3,7 @@ import csv
 import re
 import traceback
 
+from .. import CONTEXT
 from ..utils import normalize_cell_name
 from ..channel import Channel, ExpressionPattern
 from ..evidence import Evidence
@@ -12,16 +13,19 @@ from ..neuron import Neuron
 from ..cell import Cell
 from ..website import Website
 from ..worm import Worm
-from owmeta_core.datasource import Informational
-from owmeta_core.mapper import mapped
 
+from owmeta_core.datasource import Informational
 from owmeta_core.data_trans.common_data import DS_NS, TRANS_NS
 from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
+from owmeta_core.mapper import mapped
+
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
 @mapped
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
+    class_context = CONTEXT
+
     rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
 
     initial_cell_column = Informational('Initial Cell Column',
@@ -35,6 +39,7 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
 
 @mapped
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
+    class_context = CONTEXT
 
     rdf_namespace = Namespace(DS_NS['WormbaseIonChannelCSVDataSource#'])
 
@@ -47,6 +52,8 @@ class WormbaseIonChannelCSVDataSource(CSVDataSource):
 
 @mapped
 class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = WormbaseIonChannelCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.WormbaseIonChannelCSVTranslator
@@ -90,6 +97,8 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
 
 @mapped
 class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = WormbaseTextMatchCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.WormbaseTextMatchCSVTranslator
@@ -144,6 +153,8 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
 
 @mapped
 class WormBaseCSVDataSource(CSVDataSource):
+    class_context = CONTEXT
+
     rdf_namespace = Namespace(DS_NS['MuscleCSVDataSource#'])
     csv_header = ["Cell",
                   "Lineage Name",
@@ -170,6 +181,8 @@ class WormBaseCSVDataSource(CSVDataSource):
 
 @mapped
 class MuscleWormBaseCSVTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.MuscleWormBaseCSVTranslator
@@ -203,6 +216,8 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
 
 @mapped
 class NeuronWormBaseCSVTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronWormBaseCSVTranslator
@@ -236,6 +251,8 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
 
 @mapped
 class WormbaseIDSetter(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = (WormBaseCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.WormbaseIDSetter

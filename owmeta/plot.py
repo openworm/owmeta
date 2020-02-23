@@ -1,6 +1,8 @@
 from owmeta_core.dataobject import DataObject, DatatypeProperty
 from owmeta_core.mapper import mapped
 
+from . import SCI_CTX
+
 
 @mapped
 class Plot(DataObject):
@@ -18,6 +20,8 @@ class Plot(DataObject):
         >>> pl.get_data()
         # [[1, 2], [3, 4]]
     """
+
+    class_context = SCI_CTX
 
     _data_string = DatatypeProperty()
 

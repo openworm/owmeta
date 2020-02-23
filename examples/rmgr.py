@@ -59,6 +59,8 @@ class NC_neighbor(CustomProperty):
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
 @mapped
 class NeuronClass(Neuron):
+    class_context = 'http://example.org/rmgr_example'
+
     member = ObjectProperty(value_type=Neuron, multiple=True)
 
     def __init__(self, name=False, **kwargs):

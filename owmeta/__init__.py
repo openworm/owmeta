@@ -53,11 +53,11 @@ __all__ = ["get_data"]
 
 DEF_CTX = Context()
 
-SCI_BIO_CTX = ClassContext(imported=(BASE_CONTEXT,),
+SCI_CTX = ClassContext(imported=(BASE_CONTEXT,),
                       ident=BASE_SCHEMA_URL,
                       base_namespace=BASE_SCHEMA_URL + '#')
 
-CONTEXT = ClassContext(imported=(SCI_BIO_CTX,),
+CONTEXT = ClassContext(imported=(SCI_CTX,),
                   ident=BASE_SCHEMA_URL + '/bio',
                   base_namespace=BASE_SCHEMA_URL + '/bio#')
 

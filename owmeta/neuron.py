@@ -27,7 +27,6 @@ class NeuronProxy(ObjectProxy):
 
 @mapped
 class Neuron(Cell):
-
     """
     A neuron.
 

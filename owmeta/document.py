@@ -3,12 +3,14 @@ from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
+
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
 from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias
 from owmeta_core.mapper import mapped
 
-from owmeta import bibtex as BIB
+from . import SCI_CTX
+from . import bibtex as BIB
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,7 @@ class PubmedRetrievalException(Exception):
 # scientific or logical justification for any of the statements made within it.
 @mapped
 class BaseDocument(DataObject):
+    class_context = SCI_CTX
 
     def make_context_identifier(self):
         return self.make_identifier(self.identifier)
@@ -44,7 +47,6 @@ class BaseDocument(DataObject):
 
 @mapped
 class Document(BaseDocument):
-
     """
     A representation of some document.
 
@@ -55,8 +57,9 @@ class Document(BaseDocument):
         doi: a Digitial Object id or url (e.g., s00454-010-9273-0)
         uri: a URI specific to the document, preferably usable for accessing
              the document
-
     """
+
+    class_context = SCI_CTX
 
     author = DatatypeProperty(multiple=True)
     ''' An author of the document '''

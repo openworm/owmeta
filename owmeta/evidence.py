@@ -5,6 +5,8 @@ from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.context import Context
 from owmeta_core.mapper import mapped
 
+from . import SCI_CTX
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,7 +24,6 @@ class ContextToDataObjectMixin(object):
 
 @mapped
 class Evidence(DataObject):
-
     """
     A representation which provides evidence, for a group of statements.
 
@@ -67,7 +68,7 @@ class Evidence(DataObject):
 
     """
 
-    class_context = 'http://openworm.org/schema/sci'
+    class_context = SCI_CTX
 
     supports = ObjectProperty(value_type=ContextDataObject,
                               mixins=(ContextToDataObjectMixin,))

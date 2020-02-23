@@ -67,6 +67,7 @@ class SphinxTest(unittest.TestCase):
         Load = lambda *args, **kwargs: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
 
         class Widget(DataObject):
+            class_context = 'http://example.org/test_adding_data'
             hardiness = DatatypeProperty()
             fullness = DatatypeProperty()
             part_number = DatatypeProperty()
@@ -85,6 +86,3 @@ class SphinxTest(unittest.TestCase):
         ctx(Widget)(part_number=20)
 
         self.execute('adding_data', extraglobs={'Load': Load, 'Widget': Widget, 'ctx18': ctx})
-
-    def test_making_dataObjects(self):
-        self.execute('making_dataObjects')

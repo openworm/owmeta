@@ -1,15 +1,26 @@
 from rdflib.namespace import Namespace
+
 from owmeta_core.context import Context
 from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.datasource import Informational, DataSource
 from owmeta_core.mapper import mapped
 from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
-from .. import CONTEXT
+
+from .. import CONTEXT, SCI_CTX
+
 from .common_data import DS_NS
 
 
 @mapped
 class DataWithEvidenceDataSource(DataSource):
+    '''
+    A data source that has an "evidence context" containing statements which support those
+    in its "data context". The data source also has a combined context which  imports both
+    the data and evidence contexts.
+    '''
+
+    class_context = SCI_CTX
+
     evidence_context_property = Informational(display_name='Evidence context',
                                               property_name='evidence_context',
                                               property_type='ObjectProperty',

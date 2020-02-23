@@ -9,6 +9,7 @@ from owmeta_core.dataobject import DatatypeProperty, ObjectProperty
 from owmeta_core.mapper import mapped
 from owmeta_core.data_trans.csv_ds import CSVDataTranslator, CSVDataSource
 
+from .. import CONTEXT
 from ..utils import normalize_cell_name
 from ..connection import Connection
 from ..cell import Cell
@@ -33,10 +34,12 @@ class ConnectomeCSVDataSource(CSVDataSource):
     Basically, this is just a marker type to indicate what's described in the CSV --
     there's no consistent schema
     '''
+    class_context = CONTEXT
 
 
 @mapped
 class NeuronConnectomeCSVTranslation(GenericTranslation):
+    class_context = CONTEXT
 
     neurons_source = ObjectProperty(value_type=DataWithEvidenceDataSource)
     muscles_source = ObjectProperty(value_type=DataWithEvidenceDataSource)
@@ -46,6 +49,8 @@ class NeuronConnectomeCSVTranslation(GenericTranslation):
 
 @mapped
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
+    class_context = CONTEXT
+
     input_type = (ConnectomeCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
     translator_identifier = TRANS_NS.NeuronConnectomeCSVTranslator
@@ -169,6 +174,8 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
 
 @mapped
 class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
+    class_context = CONTEXT
+
     neurotransmitter_source = ObjectProperty()
 
     key_properties = (GenericTranslation.source, neurotransmitter_source)
@@ -179,6 +186,7 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
     '''
     Adds synapse classes to existing connections
     '''
+    class_context = CONTEXT
 
     translator_identifier = TRANS_NS.NeuronConnectomeSynapseClassTranslator
     translation_type = NeuronConnectomeSynapseClassTranslation

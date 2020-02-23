@@ -1,6 +1,7 @@
 from owmeta_core.dataobject import DataObject, ObjectProperty
 from owmeta_core.mapper import mapped
 
+from . import SCI_CTX
 from .document import Document
 
 
@@ -19,7 +20,7 @@ class Experiment(DataObject):
     DatatypeProperty or ObjectProperty for the experiment as well.
     """
 
-    class_context = 'http://openworm.org/schema/sci'
+    class_context = SCI_CTX
 
     reference = ObjectProperty(value_type=Document, multiple=True)
     ''' Supporting article for this experiment. '''

@@ -13,7 +13,6 @@ from .worm_common import WORM_RDF_TYPE
 
 @mapped
 class Worm(BiologyType):
-
     """ A representation of the whole worm """
 
     class_context = BiologyType.class_context

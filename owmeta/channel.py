@@ -46,6 +46,7 @@ class Channel(BiologyType):
     """
 
     class_context = BiologyType.class_context
+
     rdf_type = CHANNEL_RDF_TYPE
 
     subfamily = DatatypeProperty()
