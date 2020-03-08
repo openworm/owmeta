@@ -5,7 +5,7 @@ from owmeta_core.dataobject import DataObject, DatatypeProperty, ObjectProperty
 from owmeta_core.mapper import mapped
 from owmeta_core.utils import slice_dict
 
-from . import SCI_CTX
+from . import CONTEXT
 from .channel_common import CHANNEL_RDF_TYPE
 
 
@@ -15,7 +15,7 @@ class PatchClampExperiment(Experiment):
     Store experimental conditions for a patch clamp experiment.
     """
 
-    class_context = SCI_CTX
+    class_context = CONTEXT
 
     Ca_concentration = DatatypeProperty()
     '''Calcium concentration'''
@@ -93,7 +93,7 @@ class ChannelModel(DataObject):
         >>> ev.asserts(cm)
         >>> ev.save()
     """
-    class_context = SCI_CTX
+    class_context = CONTEXT
 
     modelType = DatatypeProperty()
     ''' The type of model employed to describe a channel '''
@@ -121,7 +121,7 @@ class ChannelModel(DataObject):
 
 @mapped
 class PatchClampChannelModel(ChannelModel):
-    class_context = SCI_CTX
+    class_context = CONTEXT
 
     modeled_from = ObjectProperty(value_type=PatchClampExperiment)
 
@@ -132,7 +132,7 @@ class PatchClampChannelModel(ChannelModel):
 
 @mapped
 class HomologyChannelModel(ChannelModel):
-    class_context = SCI_CTX
+    class_context = CONTEXT
 
     homolog = ObjectProperty(value_rdf_type=CHANNEL_RDF_TYPE)
 

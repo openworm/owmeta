@@ -1,10 +1,11 @@
 import rdflib as R
 
-from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
-from .channelworm import ChannelModel
 from .biology import BiologyType
-from .channel_common import CHANNEL_RDF_TYPE
 from .cell_common import CELL_RDF_TYPE
+from .channel_common import CHANNEL_RDF_TYPE
+from .channelworm import ChannelModel
+
+from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
 from owmeta_core.mapper import mapped
 
 
