@@ -182,6 +182,27 @@ class Neighbor(CustomProperty):
             for r in conn.post_cell.get():
                 yield r
 
+    def get_terms(self, **kwargs):
+        """Get a list of neighboring neurons.
+
+           Parameters
+           ----------
+           See parameters for owmeta.connection.Connection
+
+           Returns
+           -------
+           list of Neuron
+        """
+        if len(self._conns) > 0:
+            for c in self._conns:
+                if c.context == self.context:
+                    for post in c.post_cell.get_terms():
+                        yield post
+        else:
+            conn = self._conntype.contextualize(self.context)(pre_cell=self.owner, **kwargs)
+            for r in conn.post_cell.get_terms():
+                yield r
+
     def count(self, **kwargs):
         conntype = self._conntype.contextualize(self.context)
         return conntype(pre_cell=self.owner, **kwargs).count()
@@ -236,6 +257,43 @@ class ConnectionProperty(CustomProperty):
            -------
            list of Connection
         """
+        c = self._gather_query_conns(pre_post_or_either, **kwargs)
+
+        for x in c:
+            for r in x.load():
+                yield r
+
+        for x in self._conns:
+            if x.defined and x.context == self.context:
+                yield x
+
+    def get_terms(self, pre_post_or_either='pre', **kwargs):
+        """
+        Get a list of connection identifiers associated with the owning neuron.
+
+        Parameters
+        ----------
+        pre_post_or_either: str
+            What kind of connection to look for.
+            'pre': Owner is the source of the connection
+            'post': Owner is the destination of the connection
+            'either': Owner is either the source or destination of the connection
+
+        Returns
+        -------
+        list of Connection
+        """
+        c = self._gather_query_conns(pre_post_or_either, **kwargs)
+
+        for x in c:
+            for r in x.load_terms():
+                yield r
+
+        for x in self._conns:
+            if x.defined and x.context == self.context:
+                yield x.identifier
+
+    def _gather_query_conns(self, pre_post_or_either, **kwargs):
         c = []
         ct = self._conntype.contextualize(self.context)
         if pre_post_or_either == 'pre':
@@ -245,14 +303,7 @@ class ConnectionProperty(CustomProperty):
         elif pre_post_or_either == 'either':
             c.append(ct(pre_cell=self.owner, **kwargs))
             c.append(ct(post_cell=self.owner, **kwargs))
-
-        for x in c:
-            for r in x.load():
-                yield r
-
-        for x in self._conns:
-            if x.defined and x.context == self.context:
-                yield x
+        return c
 
     def contextualize(self, context):
         res = type(self)(owner=self.owner)

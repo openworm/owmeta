@@ -52,10 +52,11 @@ class NeuronTest(_DataTest):
     def test_neighbor(self):
         n = self.neur('AVAL')
         n.neighbor(self.neur('PVCL'), syntype='send')
-        neighbors = list(n.neighbor())
-        self.assertIn(self.neur('PVCL'), neighbors)
+        neighbors = list(n.neighbor.get_terms())
+        self.assertIn(self.neur('PVCL').identifier, neighbors)
         self.save()
-        self.assertIn(self.neur('PVCL'), list(self.neur('AVAL').neighbor()))
+        self.assertIn(self.neur('PVCL').identifier,
+                      self.neur('AVAL').neighbor.get_terms())
 
     def test_neighbor_count(self):
         n = self.neur('AVAL')
@@ -81,6 +82,13 @@ class NeuronTest(_DataTest):
         n.connection(self.ctx.Connection(n, self.neur('PVCL'), syntype='send'))
         self.save()
         self.assertEqual(1, self.neur('AVAL').connection.count())
+
+    def test_connection_get_terms(self):
+        n = self.neur('AVAL')
+        conn = self.ctx.Connection(n, self.neur('PVCL'), syntype='send')
+        n.connection(conn)
+        self.save()
+        self.assertIn(conn.identifier, self.neur('AVAL').connection.get_terms())
 
     def test_connection_count_staged(self):
         n = self.neur('AVAL')

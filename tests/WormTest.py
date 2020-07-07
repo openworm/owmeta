@@ -23,8 +23,10 @@ class WormTest(_DataTest):
         w.muscle(self.ctx.Muscle(name='MDL08'))
         w.muscle(self.ctx.Muscle(name='MDL15'))
         self.save()
-        self.assertIn(self.ctx.Muscle(name='MDL08'), list(self.ctx.Worm().muscles()))
-        self.assertIn(self.ctx.Muscle(name='MDL15'), list(self.ctx.Worm().muscles()))
+        self.assertIn(self.ctx.Muscle(name='MDL08').identifier,
+                      self.ctx.Worm().muscle.get_terms())
+        self.assertIn(self.ctx.Muscle(name='MDL15').identifier,
+                      self.ctx.Worm().muscle.get_terms())
 
     def test_get_semantic_net(self):
         g0 = self.ctx.Worm().get_semantic_net()

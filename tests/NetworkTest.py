@@ -51,4 +51,4 @@ class NetworkTest(_DataTest):
         self.net.neuron(n1)
         self.save()
         n = self.context.stored(Network)()
-        self.assertIn(n1, n.interneurons())
+        self.assertIn(n1.identifier, [x.identifier for x in n.interneurons()])

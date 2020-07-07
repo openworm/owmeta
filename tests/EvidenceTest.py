@@ -45,8 +45,8 @@ class EvidenceTest(_DataTest):
         self.save()
         e0 = self.ctx.Evidence()
         e0.supports(r)
-        s = list(e0.load())
-        self.assertIn(e, s)
+        s = list(e0.load_terms())
+        self.assertIn(e.identifier, s)
 
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields
@@ -71,9 +71,9 @@ class EvidenceTest(_DataTest):
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
             if x.idl == e1.idl:
-                self.assertEqual(lbr, br)
+                self.assertEqual(lbr.identifier, br.identifier)
             elif x.idl == e.idl:
-                self.assertEqual(lar, ar)
+                self.assertEqual(lar.identifier, ar.identifier)
             else:
                 self.fail("Unknown object returned from load")
 

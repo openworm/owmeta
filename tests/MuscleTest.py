@@ -19,7 +19,7 @@ class MuscleTest(_DataTest):
         m.innervatedBy(n)
         self.save()
         v = self.ctx.Muscle(name='MDL08')
-        self.assertIn(n, list(v.innervatedBy()))
+        self.assertIn(n.identifier, v.innervatedBy.get_terms())
 
     def test_muscle_neurons(self):
         """ Should be the same as innervatedBy """
@@ -29,4 +29,4 @@ class MuscleTest(_DataTest):
         self.save()
 
         m = self.ctx.Muscle(name='MDL08')
-        self.assertIn(self.ctx.Neuron('tnnetenba'), list(m.neurons()))
+        self.assertIn(self.ctx.Neuron('tnnetenba').identifier, m.neurons.get_terms())
