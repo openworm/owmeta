@@ -1,0 +1,12 @@
+---
+id: openworm/owmeta-schema
+name: owmeta schema bundle
+version: 1 
+description: Bundle for OpenWorm schema for scientific data
+includes: 
+    - http://openworm.org/schema/bio
+    - http://openworm.org/schema/sci
+    - http://openworm.org/schema/sci/bio
+dependencies:
+    - id: openworm/owmeta-core
+      version: 1
