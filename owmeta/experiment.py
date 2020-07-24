@@ -1,11 +1,9 @@
 from owmeta_core.dataobject import DataObject, ObjectProperty
-from owmeta_core.mapper import mapped
 
 from . import SCI_CTX
 from .document import Document
 
 
-@mapped
 class Experiment(DataObject):
     """
     Generic class for storing information about experiments

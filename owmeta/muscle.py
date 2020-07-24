@@ -1,11 +1,9 @@
 from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
-from owmeta_core.mapper import mapped
 
 from .cell import Cell
 from .neuron import Neuron
 
 
-@mapped
 class Muscle(Cell):
 
     """A single muscle cell.

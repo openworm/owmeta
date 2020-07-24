@@ -142,7 +142,7 @@ using contexts. The code below shows how to do that::
    ...             hardiness=record.hrds)
    Widget(ident=rdflib.term.URIRef(...))
 
-   
+
    >>> # Create an RDFLib graph as the target for the data
    >>> g = ConjunctiveGraph()
 
@@ -152,8 +152,8 @@ using contexts. The code below shows how to do that::
    >>> # Serialize the data in the nquads format so we can see that all of our
    >>> # statements are in the proper context
    >>> print(g.serialize(format='nquads').decode('UTF-8'))
-   <http://openworm.org/entities/Widget/12> <http...> <http://example.org/data/imports/BDW_Widgets_2017-2018> .
-   <http://openworm.org/entities/Widget/12> <...
+   <http://example.org/BDW/entities/Widget#12> <http...> <http://example.org/data/imports/BDW_Widgets_2017-2018> .
+   <http://example.org/BDW/entities/Widget#12> <...
 
 If you've worked with lots of data before, this kind of pattern should be
 familiar. You can see how, with later imports, you would follow the naming

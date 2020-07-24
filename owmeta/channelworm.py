@@ -2,14 +2,11 @@ import six
 from .experiment import Experiment
 
 from owmeta_core.dataobject import DataObject, DatatypeProperty, ObjectProperty
-from owmeta_core.mapper import mapped
-from owmeta_core.utils import slice_dict
 
 from . import CONTEXT
 from .channel_common import CHANNEL_RDF_TYPE
 
 
-@mapped
 class PatchClampExperiment(Experiment):
     """
     Store experimental conditions for a patch clamp experiment.
@@ -76,7 +73,6 @@ class ChannelModelType:
     homologyEstimate = "Estimation based on homology"
 
 
-@mapped
 class ChannelModel(DataObject):
     """
     A model for an ion channel.
@@ -119,7 +115,6 @@ class ChannelModel(DataObject):
                 self.modelType(ChannelModelType.patchClamp)
 
 
-@mapped
 class PatchClampChannelModel(ChannelModel):
     class_context = CONTEXT
 
@@ -130,7 +125,6 @@ class PatchClampChannelModel(ChannelModel):
                                                      **kwargs)
 
 
-@mapped
 class HomologyChannelModel(ChannelModel):
     class_context = CONTEXT
 

@@ -17,12 +17,10 @@ from ..worm import Worm
 from owmeta_core.datasource import Informational
 from owmeta_core.data_trans.common_data import DS_NS, TRANS_NS
 from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
-from owmeta_core.mapper import mapped
 
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
-@mapped
 class WormbaseTextMatchCSVDataSource(CSVDataSource):
     class_context = CONTEXT
 
@@ -37,7 +35,6 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
                               multiple=False)
 
 
-@mapped
 class WormbaseIonChannelCSVDataSource(CSVDataSource):
     class_context = CONTEXT
 
@@ -50,7 +47,6 @@ class WormbaseIonChannelCSVDataSource(CSVDataSource):
                   'description']
 
 
-@mapped
 class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
     class_context = CONTEXT
 
@@ -95,7 +91,6 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
         return res
 
 
-@mapped
 class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
     class_context = CONTEXT
 
@@ -151,7 +146,6 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
         return res
 
 
-@mapped
 class WormBaseCSVDataSource(CSVDataSource):
     class_context = CONTEXT
 
@@ -179,7 +173,6 @@ class WormBaseCSVDataSource(CSVDataSource):
                   "Synonyms"]
 
 
-@mapped
 class MuscleWormBaseCSVTranslator(CSVDataTranslator):
     class_context = CONTEXT
 
@@ -214,7 +207,6 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
-@mapped
 class NeuronWormBaseCSVTranslator(CSVDataTranslator):
     class_context = CONTEXT
 
@@ -249,7 +241,6 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
-@mapped
 class WormbaseIDSetter(CSVDataTranslator):
     class_context = CONTEXT
 

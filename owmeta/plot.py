@@ -1,10 +1,8 @@
 from owmeta_core.dataobject import DataObject, DatatypeProperty
-from owmeta_core.mapper import mapped
 
 from . import SCI_CTX
 
 
-@mapped
 class Plot(DataObject):
     """
     Object for storing plot data in owmeta.

@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import six
-from owmeta_core.mapper import mapped
 from owmeta_core.dataobject import DatatypeProperty, ObjectProperty
 
 from .biology import BiologyType
@@ -22,7 +21,6 @@ class Termination:
     Muscle = 'muscle'
 
 
-@mapped
 class Connection(BiologyType):
 
     class_context = BiologyType.class_context

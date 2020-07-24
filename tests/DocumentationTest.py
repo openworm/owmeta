@@ -10,10 +10,6 @@ import tempfile
 import shutil
 import pytest
 from collections import namedtuple
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    from mock import MagicMock
 from .doctest_plugin import ALLOW_UNICODE, UnicodeOutputChecker
 from .TestUtilities import xfail_without_db
 
@@ -68,18 +64,14 @@ class SphinxTest(unittest.TestCase):
 
         class Widget(DataObject):
             class_context = 'http://example.org/test_adding_data'
+            rdf_type = 'http://example.org/BDW/schema/Widget'
+            rdf_namespace = 'http://example.org/BDW/entities/Widget#'
             hardiness = DatatypeProperty()
             fullness = DatatypeProperty()
             part_number = DatatypeProperty()
-
-            def identifier_augment(self):
-                return self.make_identifier_direct(str(self.part_number.onedef()))
-
-            def defined_augment(self):
-                return self.part_number.has_defined_value()
+            key_property = {'name': 'part_number', 'type': 'direct'}
 
         ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2018-2019')
-        ctx.mapper.process_class(Widget)
 
         ctx(Widget)(part_number=15)
         ctx(Widget)(part_number=17)

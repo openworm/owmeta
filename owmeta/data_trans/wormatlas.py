@@ -4,7 +4,6 @@ from rdflib.namespace import Namespace
 
 from owmeta_core.datasource import GenericTranslation
 from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
-from owmeta_core.mapper import mapped
 
 from .. import CONTEXT
 from ..network import Network
@@ -16,7 +15,6 @@ from .data_with_evidence_ds import DataWithEvidenceDataSource
 from .common_data import DS_NS, TRANS_NS
 
 
-@mapped
 class WormAtlasCellListDataSource(CSVDataSource):
     class_context = CONTEXT
 
@@ -25,7 +23,6 @@ class WormAtlasCellListDataSource(CSVDataSource):
     csv_field_delimiter = '\t'
 
 
-@mapped
 class WormAtlasCellListDataTranslation(GenericTranslation):
     class_context = CONTEXT
 
@@ -42,7 +39,6 @@ class WormAtlasCellListDataTranslation(GenericTranslation):
                                     self.neurons_source.onedef().identifier.n3())
 
 
-@mapped
 class WormAtlasCellListDataTranslator(CSVDataTranslator):
     class_context = CONTEXT
 

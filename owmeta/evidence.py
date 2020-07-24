@@ -3,7 +3,6 @@ import logging
 from owmeta_core.dataobject import DataObject, ObjectProperty
 from owmeta_core.context_dataobject import ContextDataObject
 from owmeta_core.context import Context
-from owmeta_core.mapper import mapped
 
 from . import SCI_CTX
 
@@ -22,7 +21,6 @@ class ContextToDataObjectMixin(object):
         return super(ContextToDataObjectMixin, self).set(v)
 
 
-@mapped
 class Evidence(DataObject):
     """
     A representation which provides evidence, for a group of statements.

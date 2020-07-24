@@ -1,13 +1,11 @@
 from rdflib.term import URIRef
 
 from owmeta_core.dataobject import DatatypeProperty
-from owmeta_core.mapper import mapped
 
 from . import SCI_CTX
 from .document import BaseDocument
 
 
-@mapped
 class Website(BaseDocument):
     """ A representation of a website """
 

@@ -5,8 +5,7 @@ import logging
 
 from owmeta_core.context import Context
 from owmeta_core.datasource import GenericTranslation
-from owmeta_core.dataobject import DatatypeProperty, ObjectProperty
-from owmeta_core.mapper import mapped
+from owmeta_core.dataobject import ObjectProperty
 from owmeta_core.data_trans.csv_ds import CSVDataTranslator, CSVDataSource
 
 from .. import CONTEXT
@@ -26,7 +25,6 @@ from .data_with_evidence_ds import DataWithEvidenceDataSource
 L = logging.getLogger(__name__)
 
 
-@mapped
 class ConnectomeCSVDataSource(CSVDataSource):
     '''
     A CSV data source whose CSV file describes a neural connectome
@@ -37,7 +35,6 @@ class ConnectomeCSVDataSource(CSVDataSource):
     class_context = CONTEXT
 
 
-@mapped
 class NeuronConnectomeCSVTranslation(GenericTranslation):
     class_context = CONTEXT
 
@@ -47,7 +44,6 @@ class NeuronConnectomeCSVTranslation(GenericTranslation):
     key_properties = (GenericTranslation.source, muscles_source, neurons_source)
 
 
-@mapped
 class NeuronConnectomeCSVTranslator(CSVDataTranslator):
     class_context = CONTEXT
 
@@ -172,7 +168,6 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
         return res
 
 
-@mapped
 class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
     class_context = CONTEXT
 
@@ -181,7 +176,6 @@ class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
     key_properties = (GenericTranslation.source, neurotransmitter_source)
 
 
-@mapped
 class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
     '''
     Adds synapse classes to existing connections

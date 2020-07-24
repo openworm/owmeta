@@ -6,10 +6,8 @@ from .channel_common import CHANNEL_RDF_TYPE
 from .channelworm import ChannelModel
 
 from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, Alias
-from owmeta_core.mapper import mapped
 
 
-@mapped
 class ExpressionPattern(BiologyType):
 
     class_context = BiologyType.class_context
@@ -40,7 +38,6 @@ class ExpressionPattern(BiologyType):
         return self.make_identifier(self.wormbaseid.defined_values[0])
 
 
-@mapped
 class Channel(BiologyType):
     """
     A biological ion channel.

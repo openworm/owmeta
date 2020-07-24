@@ -3,7 +3,6 @@ from __future__ import print_function
 from wrapt import ObjectProxy
 from owmeta_core.custom_dataobject_property import CustomProperty
 from owmeta_core.dataobject import DatatypeProperty, Alias
-from owmeta_core.mapper import mapped
 
 from .cell import Cell
 from .connection import Connection
@@ -25,7 +24,6 @@ class NeuronProxy(ObjectProxy):
         return self._self_connection
 
 
-@mapped
 class Neuron(Cell):
     """
     A neuron.

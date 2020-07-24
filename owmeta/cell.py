@@ -1,14 +1,12 @@
 from __future__ import print_function
 
 from owmeta_core.dataobject import DatatypeProperty, ObjectProperty, This
-from owmeta_core.mapper import mapped
 
 from .channel import Channel
 from .biology import BiologyType
 from .cell_common import CELL_RDF_TYPE
 
 
-@mapped
 class Cell(BiologyType):
     """
     A biological cell.
