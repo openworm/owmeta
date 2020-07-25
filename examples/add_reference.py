@@ -21,7 +21,8 @@ d = Data()
 
 # Connect to database with dummy configuration
 conn = P.connect(conf=d)
-
+conn.mapper.add_class(Evidence)
+conn.mapper.add_class(Document)
 ctx = Context(ident='http://example.org/data', conf=conn.conf)
 evctx = Context(ident='http://example.org/meta', conf=conn.conf)
 

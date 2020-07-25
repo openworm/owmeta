@@ -16,8 +16,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import transaction
-import os
 from owmeta_core import connect
+from owmeta_core.command import OWM
 from owmeta_core.context import Context
 
 from owmeta.worm import Worm
@@ -37,11 +37,11 @@ def pp_set(title, s):
     print()
 
 
-with connect('default.conf') as conn:
+with OWM('../.owm').connect() as conn:
     with transaction.manager:
         ctx = conn(Context)(ident="http://openworm.org/data").stored
 
-        w = ctx(Worm)()
+        w = ctx(Worm).query()
         net = w.neuron_network()
         print("Retrieving names...")
         inter = get_names(net.interneurons())

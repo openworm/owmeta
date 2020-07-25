@@ -20,9 +20,8 @@ class _Base(_DataTest):
         self.conf[IMPORTS_CONTEXT_KEY] = 'http://example.org/imports_context'
         self.startdir = os.getcwd()
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        #os.chdir(self.testdir)
-        self.mapper.declare_python_class_registry_entry(Connection)
-        self.mapper.save_class_registry()
+        self.mapper.add_class(Connection)
+        self.mapper.save()
         self.conn_ds = self.context(DataWithEvidenceDataSource)(key='test_dweds')
         self.nt_ds = self.context(ConnectomeCSVDataSource)()
         self.nt_ds.basedir = lambda: self.testdir
@@ -30,7 +29,6 @@ class _Base(_DataTest):
 
     def tearDown(self):
         super(_Base, self).tearDown()
-        #os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
 
 

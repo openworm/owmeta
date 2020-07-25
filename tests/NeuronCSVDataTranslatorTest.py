@@ -113,6 +113,8 @@ header,row,completely,ignored,x
 ADAR,Neuropeptide,PDF-1,WormAtlas,'''
         with open(fname, 'w') as f:
             f.write(text.strip())
+        self.mapper.add_class(Evidence)
+        self.mapper.add_class(Document)
         self.ds.csv_file_name('mycsv.csv')
         self.ds.bibtex_files(['ignored'])
         self.patcher = patch('owmeta.data_trans.neuron_data.parse_bibtex_into_documents')

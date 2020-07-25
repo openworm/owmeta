@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from owmeta_core.mapper import mapped
+from owmeta_core.command import OWM
 from owmeta_core.dataobject import ObjectProperty
 from owmeta_core.custom_dataobject_property import CustomProperty
 from owmeta_core.context import Context
-from owmeta_core import connect
 
 from owmeta.neuron import Neuron
 from owmeta.network import Network
@@ -32,9 +31,8 @@ class NC_neighbor(CustomProperty):
         if isinstance(ob, NeuronClass):
             ob_name = ob.name()
             this_name = self.owner.name()
-            for x in ob.member():
+            for x in ob.member.defined_values:
                 # Get the name for the neighbor
-                # XXX:
 
                 try:
                     n = x.name()
@@ -57,7 +55,6 @@ class NC_neighbor(CustomProperty):
 
 
 # Circuit from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2760495/
-@mapped
 class NeuronClass(Neuron):
     class_context = 'http://example.org/rmgr_example'
 
@@ -104,16 +101,19 @@ class NeuronClass(Neuron):
 # Setting up the data
 #
 
-def setup(ctx, name, type):
+def setup(sctx, ctx, name, type):
     n = ctx(NeuronClass)(name)
     n.type(type)
-    n.member(ctx(Neuron)(name+"R"))
-    n.member(ctx(Neuron)(name+"L"))
-    net.neuron(n)
+    r = sctx(Neuron).query(name+"R")
+    for rs in r.load():
+        n.member(rs)
+    l = sctx(Neuron).query(name+"L")
+    for ls in l.load():
+        n.member(ls)
     return n
 
 
-with connect('default.conf') as conn:
+with OWM('../.owm').connect() as conn:
     ctx = conn(Context)('http://example.org/data')
     evctx = conn(Context)('http://example.org/evidence')
 
@@ -127,14 +127,15 @@ with connect('default.conf') as conn:
     ev = evctx(Evidence)(reference=doc)
     ev.supports(ctx.rdf_object)
 
-    rmg = setup(ctx, "RMG", 'interneuron')
-    rmh = setup(ctx, "RMH", 'motor')
-    ask = setup(ctx, "ASK", 'sensory')
-    ash = setup(ctx, "ASH", 'sensory')
-    adl = setup(ctx, "ADL", 'sensory')
-    urx = setup(ctx, "URX",  'sensory')
-    awb = setup(ctx, "AWB", 'sensory')
-    il2 = setup(ctx, "IL2", 'sensory')
+    sctx = conn(Context)().stored
+    rmg = setup(sctx, ctx, "RMG", 'interneuron')
+    rmh = setup(sctx, ctx, "RMH", 'motor')
+    ask = setup(sctx, ctx, "ASK", 'sensory')
+    ash = setup(sctx, ctx, "ASH", 'sensory')
+    adl = setup(sctx, ctx, "ADL", 'sensory')
+    urx = setup(sctx, ctx, "URX",  'sensory')
+    awb = setup(sctx, ctx, "AWB", 'sensory')
+    il2 = setup(sctx, ctx, "IL2", 'sensory')
 
     # describing the connections
     d = [(ask, 'gj', rmg),
@@ -154,10 +155,12 @@ with connect('default.conf') as conn:
         else:
             x = 'Send'
         p.neighbor(o, syntype=x)
+    ctx.add_import(Context('http://openworm.org/data'))
     ctx.save()
+    ctx.save_imports()
     evctx.save()
-
-    nc = NeuronClass()
+    ctx.mapper.add_class(NeuronClass)
+    nc = ctx.stored(NeuronClass)()
     nc.type('sensory')
 
     print('Sensory neuron classes in the circuit and their neurons')
@@ -165,4 +168,4 @@ with connect('default.conf') as conn:
     for x in nc.load():
         print(x.name(), "has:")
         for y in x.member():
-            print(" ", y.name(), "of type", ",".join(y.type()))
+            print(" ", y.name(), "of type", ", ".join(y.type()))

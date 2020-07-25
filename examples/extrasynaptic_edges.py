@@ -13,6 +13,7 @@ except ImportError:
 from collections import namedtuple, defaultdict
 import csv
 
+from owmeta_core.command import OWM
 from owmeta_core import connect
 from owmeta_core.context import Context
 from owmeta.worm import Worm
@@ -98,10 +99,10 @@ def fetch_ma_mapping():
     return mapping
 
 
-with connect('default.conf') as conn:
+with OWM('../.owm').connect() as conn:
     ctx = conn(Context)(ident="http://openworm.org/data").stored
     #Get the worm object.
-    worm = ctx(Worm)()
+    worm = ctx(Worm).query()
     #Extract the network object from the worm object.
     net = worm.neuron_network()
 
