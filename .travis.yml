@@ -9,7 +9,7 @@ before_install:
 - pip install --upgrade pip
 - pip install coveralls
 - pip uninstall pytest --yes
-- pip install pytest>=3.4.0
+- pip install -r test-requirements.txt
 
 install:
 - git clone https://github.com/openworm/owmeta-core.git  # XXX: Temoporary - remove once owmeta-core is released

@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 pt () {
-    python setup.py test --addopts "$* --cov=owmeta"
+    sh -c "pytest --cov=owmeta $*"
 }
 
 
