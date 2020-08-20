@@ -37,13 +37,14 @@ class _DataTest(unittest.TestCase):
         self.delete_dir()
         self.connection = owmeta_core.connect(conf=self.TestConfig)
         self.mapper = self.connection.mapper
-        self.context = Context(ident='http://example.org/test-context',
-                               conf=self.TestConfig)
+        self.process_class = self.connection.mapper.process_class
+        self.context = self.connection(Context)(ident='http://example.org/test-context',
+                                                conf=self.TestConfig)
         typ = type(self)
         if hasattr(typ, 'ctx_classes'):
-            if isinstance(dict, typ.ctx_classes):
-                self.mapper.process_classes(typ.ctx_classes.values)
+            if isinstance(typ.ctx_classes, dict):
                 self.ctx = self.context(typ.ctx_classes)
+                self.mapper.process_classes(typ.ctx_classes.values)
             else:
                 self.mapper.process_classes(*typ.ctx_classes)
                 self.ctx = self.context({x.__name__: x for x in typ.ctx_classes})

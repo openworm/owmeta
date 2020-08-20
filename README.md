@@ -76,46 +76,39 @@ See INSTALL.md
 Quickstart
 -----------
 
-To get started, you'll need to connect to a database. The OpenWorm database is
-currently hosted at `https://github.com/openworm/OpenWormData.git`. You can
-read it in by executing the following command line after installation:
+To get started, you'll need to connect to a database. The OpenWorm owmeta
+"project" is currently hosted at `https://github.com/openworm/OpenWormData.git`.
+This project holds a working-copy of the database. You can retrieve it by
+executing the following command line after owmeta installation:
 
 ```bash
 owm clone https://github.com/openworm/OpenWormData.git
 ```
 
-Then, in Python, from the same directory:
+This command should create a directory `.owm` in your current working
+directory. Then, in Python, from the same working directory:
 ```python
->>> import owmeta_core as P
->>> conn = P.connect('readme.conf')
+>>> from owmeta_core.command import OWM
+>>> conn = OWM().connect()
 
 ```
 
-where `readme.conf` contains:
-
-```json
-{
-    "rdf.source" : "ZODB",
-    "rdf.store_conf" : "$HERE/.owm/worm.db"
-}
-```
-
-`$HERE` is resolved by owmeta to the location of the config file.
+This creates a connection to the project stored under the `.owm` directory.
 
 Then you can try out a few things:
 
 ```python
 # Make the context
 >>> from owmeta_core.context import Context
->>> ctx = Context(ident='http://openworm.org/data', conf=conn.conf)
+>>> ctx = conn(Context)(ident='http://openworm.org/data')
 
 # Grabs the representation of the neuronal network
 >>> from owmeta.worm import Worm
->>> net = ctx.stored(Worm)().neuron_network()
+>>> net = ctx.stored(Worm).query().neuron_network()
 
 # Grab a specific neuron
 >>> from owmeta.neuron import Neuron
->>> aval = ctx.stored(Neuron)(name='AVAL')
+>>> aval = ctx.stored(Neuron).query(name='AVAL')
 
 >>> aval.type.one()
 'interneuron'
@@ -159,7 +152,7 @@ Returns the list of all neurons::
 Returns a set of all muscles::
 
 ```python
->>> muscles = ctx.stored(Worm)().muscles()
+>>> muscles = ctx.stored(Worm).query().muscles()
 >>> len(muscles)
 158
 
@@ -174,20 +167,18 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> from owmeta.evidence import Evidence
 
 # Make a context for evidence (i.e., statements about other groups of statements)
->>> evctx = Context(ident='http://example.org/evidence/context', conf=conn.conf)
+>>> evctx = conn(Context)(ident='http://example.org/evidence/context')
 
 # Make a context for defining domain knowledge
->>> dctx = Context(ident='http://example.org/data/context', conf=conn.conf)
+>>> dctx = conn(Context)(ident='http://example.org/data/context')
 >>> doc = evctx(Document)(key="Sulston83", author='Sulston et al.', date='1983')
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://openworm.org/entities/Neuron/AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
-
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Neuron#AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Neuron#AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
 
 >>> e.supports(dctx.rdf_object)
-owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://openworm.org/entities/Evidence/Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
-
+owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Evidence#Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Evidence#Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
 >>> dctx.save_context()
 >>> evctx.save_context()
 
@@ -214,7 +205,7 @@ object of that type and calling `load()`::
 ...     w = cctx.Worm()
 ...     net = cctx.Network()
 ...     w.neuron_network(net)
-owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://openworm.org/entities/Worm/a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://openworm.org/entities/Network/ad33294553d7aae0c3c3f4ab331a295a1')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
+owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Worm#a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Worm#a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Network#ab5686f2882d8d7eebb449213ed3bb3b0')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
 ...     neur = cctx.Neuron()
 ...     neur.count()
@@ -272,7 +263,7 @@ model was derived from.
 
 Finally, when you're done accessing the database, be sure to disconnect from it::
 ```python
->>> P.disconnect(conn)
+>>> conn.disconnect()
 
 ```
 

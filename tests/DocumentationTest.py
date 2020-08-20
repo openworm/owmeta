@@ -73,6 +73,7 @@ class SphinxTest(unittest.TestCase):
 
         ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2018-2019')
 
+        ctx.mapper.process_class(Widget)
         ctx(Widget)(part_number=15)
         ctx(Widget)(part_number=17)
         ctx(Widget)(part_number=20)

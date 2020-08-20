@@ -131,6 +131,7 @@ using contexts. The code below shows how to do that::
 
    >>> # Create a Context with an identifier appropriate to this BDW data import
    >>> ctx = Context('http://example.org/data/imports/BDW_Widgets_2017-2018')
+   >>> ctx.mapper.process_class(Widget)
 
    >>> # Create a context manager using the default behavior of reading the
    >>> # dictionary of current local variables

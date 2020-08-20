@@ -99,7 +99,7 @@ class Evidence(DataObject):
 
 def evidence_for(qctx, ctx, evctx=None):
     """
-     Returns an iterable of Evidence
+    Returns an iterable of Evidence
 
     Parameters
     ----------

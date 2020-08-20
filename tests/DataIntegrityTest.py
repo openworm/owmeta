@@ -2,12 +2,14 @@ from __future__ import print_function
 from __future__ import absolute_import
 import unittest
 import csv
-import owmeta_core
+
+from owmeta_core.context import Context
+from owmeta_core.command import OWM
+
 from owmeta.worm import Worm
 from owmeta.cell import Cell
 from owmeta.neuron import Neuron
 from owmeta.connection import Connection
-from owmeta_core.context import Context
 
 import rdflib as R
 import pytest
@@ -34,14 +36,14 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        self.conn = owmeta_core.connect(configFile='tests/data_integrity_test.conf')
+        self.conn = OWM('.owm').connect(read_only=True)
         self.conf = self.conn.conf
         self.g = self.conf["rdf.graph"]
-        self.context = Context(ident="http://openworm.org/data", conf=self.conf)
+        self.context = self.conn(Context)(ident="http://openworm.org/data")
         self.qctx = self.context.stored
 
     def tearDown(self):
-        owmeta_core.disconnect(self.conn)
+        self.conn.disconnect()
 
     def test_correct_neuron_number(self):
         """
@@ -50,7 +52,7 @@ class DataIntegrityTest(unittest.TestCase):
         # FIXME: Test execution is not properly isolated -- it fails if
         #        test_compare_to_xls fails. Other conditions may cause
         #        it to pass
-        net = self.qctx(Worm)().get_neuron_network()
+        net = self.qctx(Worm).query().get_neuron_network()
         self.assertEqual(302, net.neuron.count())
 
     def test_correct_muscle_number(self):
@@ -62,7 +64,7 @@ class DataIntegrityTest(unittest.TestCase):
             https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1
 
         """
-        self.assertEqual(158, self.qctx(Worm)().muscle.count())
+        self.assertEqual(158, self.qctx(Worm).query().muscle.count())
 
     def test_INS_26_neuropeptide_neuron_list(self):
         """
@@ -80,7 +82,7 @@ class DataIntegrityTest(unittest.TestCase):
         has been incorporated, by checking that one of the novel receptor
         expression patterns is in the worm.
         """
-        va9 = self.qctx(Neuron)('VA9')
+        va9 = self.qctx(Neuron).query('VA9')
         self.assertIn('LGC-53', va9.receptors())
 
     def test_unique_neuron_node(self):
@@ -96,12 +98,12 @@ class DataIntegrityTest(unittest.TestCase):
             # Create a SPARQL query per neuron that looks for all RDF nodes
             # that have text matching the name of the neuron
             qres = self.g.query(
-                """
+                f"""
                 SELECT distinct ?n WHERE
                 {{
-                    ?n <http://openworm.org/entities/Cell/name> {name}
+                    ?n <{Cell.name.link}> {R.Literal(n).n3()}
                 }} LIMIT 5
-                """.format(name=R.Literal(n).n3()))
+                """)
             results[n] = (len(qres), [x[0] for x in qres])
 
         # If there is not only one result back, then there is more than one RDF
@@ -127,11 +129,11 @@ class DataIntegrityTest(unittest.TestCase):
         """
         results = set()
         for n in self.neurons:
-            s = '''SELECT ?v WHERE {{
-                       ?k <http://openworm.org/entities/Cell/name> {name} .
-                       ?k <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://openworm.org/entities/Neuron> .
-                       ?k <http://openworm.org/entities/Neuron/type> ?v .
-                    }}'''.format(name=R.Literal(n).n3())
+            s = f'''SELECT ?v WHERE {{
+                       ?k <{Cell.name.link}> {R.Literal(n).n3()} .
+                       ?k <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <{Neuron.rdf_type}> .
+                       ?k <{Neuron.type.link}> ?v .
+                    }}'''
             qres = self.g.query(s)
             for x in qres:
                 v = x[0]
@@ -145,12 +147,12 @@ class DataIntegrityTest(unittest.TestCase):
     def test_neuron_GJ_degree(self):
         """ Get the number of gap junctions from a representation """
         # was 81 -- now retunring 44 -- are we sure this is correct?
-        self.assertEqual(self.qctx(Neuron)(name='AVAL').GJ_degree(), 44)
+        self.assertEqual(self.qctx(Neuron).query(name='AVAL').GJ_degree(), 44)
 
     def test_neuron_Syn_degree(self):
         """ Get the number of chemical synapses from a representation """
         # was 187 -- now returning 105 -- are we sure this is correct?
-        self.assertEqual(self.qctx(Neuron)(name='AVAL').Syn_degree(), 105)
+        self.assertEqual(self.qctx(Neuron).query(name='AVAL').Syn_degree(), 105)
 
     @unittest.skip("have not yet defined asserts")
     def test_what_nodes_get_type_info(self):
@@ -170,32 +172,32 @@ class DataIntegrityTest(unittest.TestCase):
 
     def test_all_neurons_have_wormbaseID(self):
         """ This test verifies that every neuron has a Wormbase ID. """
-        net = self.qctx(Worm)().get_neuron_network()
+        net = self.qctx(Worm).query().get_neuron_network()
         for neuron_object in net.neurons():
             assert neuron_object.wormbaseID() is not None
 
     def test_all_muscles_have_wormbaseID(self):
         """ This test verifies that every muscle has a Wormbase ID. """
-        muscles = self.qctx(Worm)().muscles()
+        muscles = self.qctx(Worm).query().muscles()
         for muscle_object in muscles:
             assert muscle_object.wormbaseID() is not None
 
     def test_all_neurons_are_cells(self):
         """ This test verifies that all Neuron objects are also Cell objects. """
-        net = self.qctx(Worm)().get_neuron_network()
+        net = self.qctx(Worm).query().get_neuron_network()
 
         for neuron_object in net.neurons():
             self.assertIsInstance(neuron_object, Cell)
 
     def test_all_muscles_are_cells(self):
         """ This test verifies that all Muscle objects are also Cell objects. """
-        muscles = self.qctx(Worm)().muscles()
+        muscles = self.qctx(Worm).query().muscles()
         for muscle_object in muscles:
             self.assertIsInstance(muscle_object, Cell)
 
     def test_correct_connections_number(self):
         """ This test verifies that there are exactly 7319 connections. """
-        net = self.qctx(Worm)().get_neuron_network()
+        net = self.qctx(Worm).query().get_neuron_network()
         # XXX: The synapses contain some cells that aren't neurons
         self.assertEqual(7319, net.synapses.count())
 
@@ -206,7 +208,7 @@ class DataIntegrityTest(unittest.TestCase):
         """
         synapse = self.qctx(Connection)()
         synapse.termination('neuron')
-        self.qctx(Worm)().get_neuron_network().synapse(synapse)
+        self.qctx(Worm).query().get_neuron_network().synapse(synapse)
 
         self.assertEqual(5805, synapse.count())
 
@@ -217,7 +219,7 @@ class DataIntegrityTest(unittest.TestCase):
         """
         synapse = self.qctx(Connection)()
         synapse.termination('muscle')
-        self.qctx(Worm)().get_neuron_network().synapse(synapse)
+        self.qctx(Worm).query().get_neuron_network().synapse(synapse)
 
         self.assertEqual(1111, synapse.count())
 
@@ -229,7 +231,7 @@ class DataIntegrityTest(unittest.TestCase):
         synapse = self.qctx(Connection)()
         pre = self.qctx(Neuron)()
         synapse.pre_cell(pre)
-        self.qctx(Worm)().get_neuron_network().synapse(synapse)
+        self.qctx(Worm).query().get_neuron_network().synapse(synapse)
 
         self.assertEqual(300, pre.count())
 
@@ -246,7 +248,7 @@ class DataIntegrityTest(unittest.TestCase):
         neuron = self.qctx(Neuron)()
         synapse = self.qctx(Connection)()
         synapse.pre_cell(neuron)
-        self.qctx(Worm)().get_neuron_network().synapse(synapse)
+        self.qctx(Worm).query().get_neuron_network().synapse(synapse)
         connected_neurons = set()
         unconnected_neurons = {'CANL', 'CANR'}
         for name in neuron.name.get():

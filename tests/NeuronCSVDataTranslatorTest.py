@@ -39,6 +39,9 @@ class NeuronCSVDataTranslatorTest(_Base):
 
     def setUp(self):
         super(NeuronCSVDataTranslatorTest, self).setUp()
+        self.process_class(Worm)
+        self.process_class(Neuron)
+        self.process_class(Network)
         fname = p(self.testdir, 'mycsv.csv')
         text = '''
 header,row,completely,ignored,x

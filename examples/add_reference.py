@@ -23,8 +23,8 @@ d = Data()
 conn = P.connect(conf=d)
 conn.mapper.add_class(Evidence)
 conn.mapper.add_class(Document)
-ctx = Context(ident='http://example.org/data', conf=conn.conf)
-evctx = Context(ident='http://example.org/meta', conf=conn.conf)
+ctx = conn(Context)(ident='http://example.org/data')
+evctx = conn(Context)(ident='http://example.org/meta')
 
 # Create a new Neuron object to work with
 n = ctx(Neuron)(name='AVAL')
