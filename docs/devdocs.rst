@@ -8,4 +8,3 @@ For Developers
    test
    docs
    coding_standards
-   query
