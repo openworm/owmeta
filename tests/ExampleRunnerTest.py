@@ -74,3 +74,6 @@ class ExampleRunnerTest(unittest.TestCase):
 
     def test_extrasyn(self):
         self.execfile("extrasynaptic_edges.py")
+
+    def test_list_conns(self):
+        self.execfile("list_conns.py")
