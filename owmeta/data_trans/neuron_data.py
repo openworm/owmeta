@@ -11,14 +11,16 @@ from ..document import Document
 from ..evidence import Evidence
 from ..bibtex import parse_bibtex_into_documents
 
-from .common_data import DS_NS, TRANS_NS
+from .common_data import DS_NS, DS_DATA_NS, TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
 class NeuronCSVDataSource(CSVDataSource):
     class_context = CONTEXT
 
-    rdf_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
+    schema_namespace = Namespace(DS_NS['NeuronCSVDataSource#'])
+    rdf_namespace = Namespace(DS_DATA_NS['NeuronCSVDataSource#'])
+
     bibtex_files = Informational(display_name='BibTeX files',
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
 
