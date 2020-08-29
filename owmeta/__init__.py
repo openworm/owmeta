@@ -38,18 +38,20 @@ __author__ = 'Stephen Larson'
 import sys
 import os
 import logging
-import uuid
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
 
-BASE_SCHEMA_URL = 'http://openworm.org/schema/sci'
+BASE_SCHEMA_URL = 'http://schema.openworm.org/2020/07/sci'
+BASE_BIO_SCHEMA_URL = 'http://schema.openworm.org/2020/07/sci/bio'
+BASE_DATA_URL = 'http://data.openworm.org/sci'
+BASE_BIO_DATA_URL = 'http://data.openworm.org/sci/bio'
 
 from owmeta_core import BASE_CONTEXT
 from owmeta_core.configure import Configurable
 from owmeta_core.context import Context, ClassContext
 
-__all__ = ["get_data"]
+__all__ = ["get_data", "Configurable"]
 
 DEF_CTX = Context()
 
@@ -58,8 +60,8 @@ SCI_CTX = ClassContext(imported=(BASE_CONTEXT,),
                       base_namespace=BASE_SCHEMA_URL + '#')
 
 CONTEXT = ClassContext(imported=(SCI_CTX,),
-                  ident=BASE_SCHEMA_URL + '/bio',
-                  base_namespace=BASE_SCHEMA_URL + '/bio#')
+                  ident=BASE_BIO_SCHEMA_URL,
+                  base_namespace=BASE_BIO_SCHEMA_URL + '#')
 
 
 def get_data(path):

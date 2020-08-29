@@ -4,9 +4,9 @@ name: owmeta schema bundle
 version: 1 
 description: Bundle for OpenWorm schema for scientific data
 includes: 
-    - http://openworm.org/schema/bio
-    - http://openworm.org/schema/sci
-    - http://openworm.org/schema/sci/bio
+    - http://schema.openworm.org/2020/07/bio
+    - http://schema.openworm.org/2020/07/sci
+    - http://schema.openworm.org/2020/07/sci/bio
 dependencies:
     - id: openworm/owmeta-core
       version: 1
