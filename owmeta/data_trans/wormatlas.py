@@ -2,6 +2,7 @@ import traceback
 
 from rdflib.namespace import Namespace
 
+from owmeta_core.dataobject import ObjectProperty
 from owmeta_core.datasource import GenericTranslation
 from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 
@@ -25,10 +26,7 @@ class WormAtlasCellListDataSource(CSVDataSource):
 
 class WormAtlasCellListDataTranslation(GenericTranslation):
     class_context = CONTEXT
-
-    def __init__(self, **kwargs):
-        super(WormAtlasCellListDataTranslation, self).__init__(**kwargs)
-        self.neurons_source = WormAtlasCellListDataTranslation.ObjectProperty()
+    neurons_source = ObjectProperty()
 
     def defined_augment(self):
         return super(WormAtlasCellListDataTranslation, self).defined_augment() and \
