@@ -223,8 +223,8 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
             for row in reader:
                 pre, post, typ, number, nt = row
                 with data_source.data_context.stored(Connection, Neuron) as srcctx:
-                    conn = srcctx.Connection.query(pre_cell=srcctx.Neuron(pre),
-                                                   post_cell=srcctx.Neuron(post),
+                    conn = srcctx.Connection.query(pre_cell=srcctx.Neuron.query(pre),
+                                                   post_cell=srcctx.Neuron.query(post),
                                                    number=int(number),
                                                    syntype=typ)
                     hit = False
