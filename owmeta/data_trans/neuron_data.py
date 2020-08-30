@@ -11,7 +11,7 @@ from ..document import Document
 from ..evidence import Evidence
 from ..bibtex import parse_bibtex_into_documents
 
-from .common_data import DSMixin, TRANS_NS
+from .common_data import DSMixin, DTMixin
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
@@ -22,12 +22,11 @@ class NeuronCSVDataSource(DSMixin, CSVDataSource):
                                  description='List of BibTeX files that are referenced in the csv file by entry ID')
 
 
-class NeuronCSVDataTranslator(CSVDataTranslator):
+class NeuronCSVDataTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = NeuronCSVDataSource
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.NeuronCSVDataTranslator
 
     def __init__(self, *args, **kwargs):
         super(NeuronCSVDataTranslator, self).__init__(*args, **kwargs)

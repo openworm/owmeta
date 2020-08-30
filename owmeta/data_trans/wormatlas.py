@@ -13,7 +13,7 @@ from ..website import Website
 from ..evidence import Evidence
 
 from .data_with_evidence_ds import DataWithEvidenceDataSource
-from .common_data import TRANS_NS, DSMixin
+from .common_data import DTMixin, DSMixin
 
 
 class WormAtlasCellListDataSource(DSMixin, CSVDataSource):
@@ -36,13 +36,12 @@ class WormAtlasCellListDataTranslation(GenericTranslation):
                                     self.neurons_source.onedef().identifier.n3())
 
 
-class WormAtlasCellListDataTranslator(CSVDataTranslator):
+class WormAtlasCellListDataTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = (WormAtlasCellListDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
     translation_type = WormAtlasCellListDataTranslation
-    translator_identifier = TRANS_NS.WormAtlasCellListDataTranslator
 
     def make_translation(self, sources):
         res = super(WormAtlasCellListDataTranslator, self).make_translation()

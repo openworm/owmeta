@@ -6,10 +6,10 @@ from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
 
 from .. import CONTEXT, SCI_CTX
 
-from .common_data import DS_NS
+from .common_data import DSMixin
 
 
-class DataWithEvidenceDataSource(DataSource):
+class DataWithEvidenceDataSource(DSMixin, DataSource):
     '''
     A data source that has an "evidence context" containing statements which support those
     in its "data context". The data source also has a combined context which  imports both
@@ -37,8 +37,6 @@ class DataWithEvidenceDataSource(DataSource):
                                               property_type='ObjectProperty',
                                               multiple=False,
                                               description='Context importing both the data and evidence contexts')
-
-    rdf_namespace = Namespace(DS_NS['DataWithEvidenceDataSource#'])
 
     def __init__(self, *args, **kwargs):
         super(DataWithEvidenceDataSource, self).__init__(*args, **kwargs)

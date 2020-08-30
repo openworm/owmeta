@@ -19,7 +19,7 @@ from ..muscle import Muscle
 from ..worm import Worm
 from ..network import Network
 
-from .common_data import DSMixin, TRANS_NS
+from .common_data import DSMixin, DTMixin
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 L = logging.getLogger(__name__)
@@ -44,12 +44,11 @@ class NeuronConnectomeCSVTranslation(GenericTranslation):
     key_properties = (GenericTranslation.source, muscles_source, neurons_source)
 
 
-class NeuronConnectomeCSVTranslator(CSVDataTranslator):
+class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = (ConnectomeCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.NeuronConnectomeCSVTranslator
     translation_type = NeuronConnectomeCSVTranslation
 
     def make_translation(self, sources):
@@ -109,7 +108,7 @@ class NeuronConnectomeCSVTranslator(CSVDataTranslator):
             doc.author('Nguyen, K.')
             doc.author('Hall, D.')
             e = res.evidence_context(Evidence)(key="emmons2015", reference=doc)
-            docctx = res.evidence_context(Context)(ident=self.translator_identifier + '/emmons2015-context')
+            docctx = res.evidence_context(Context)(ident=self.identifier + '/emmons2015-context')
             e.supports(docctx.rdf_object)
             with docctx(Neuron, Muscle, Cell, Connection) as ctx:
                 res.data_context.add_import(ctx.context)
@@ -176,13 +175,12 @@ class NeuronConnectomeSynapseClassTranslation(GenericTranslation):
     key_properties = (GenericTranslation.source, neurotransmitter_source)
 
 
-class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
+class NeuronConnectomeSynapseClassTranslator(DTMixin, CSVDataTranslator):
     '''
     Adds synapse classes to existing connections
     '''
     class_context = CONTEXT
 
-    translator_identifier = TRANS_NS.NeuronConnectomeSynapseClassTranslator
     translation_type = NeuronConnectomeSynapseClassTranslation
 
     input_type = (DataWithEvidenceDataSource, ConnectomeCSVDataSource)
@@ -206,13 +204,13 @@ class NeuronConnectomeSynapseClassTranslator(CSVDataTranslator):
         # We don't use doc.as_context for the statements' context because the document
         # itself doesn't actually make the statements below, although it does *support*
         # them by describing the process by which they are derived
-        docctx = res.evidence_context(Context)(ident=self.translator_identifier + '#shterionov2011-context')
+        docctx = res.evidence_context(Context)(ident=self.identifier + '#shterionov2011-context')
 
         # There are many entries in the Shterionov data where the number of synapses
         # doesn't match that in, say, the Emmons (2015) data. We distinguish these so it's
         # easy to look back at the differences later, but the different number of synapses
         # isn't recorded here.
-        docctx_anynum = res.evidence_context(Context)(ident=self.translator_identifier
+        docctx_anynum = res.evidence_context(Context)(ident=self.identifier
                                                       + '#shterionov2011-context-any-number')
         e.supports(docctx.rdf_object)
         res.data_context.add_import(docctx)

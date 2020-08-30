@@ -17,7 +17,7 @@ from ..cell import Cell
 from ..website import Website
 from ..worm import Worm
 
-from .common_data import DSMixin, TRANS_NS
+from .common_data import DSMixin, DTMixin
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
@@ -43,12 +43,11 @@ class WormbaseIonChannelCSVDataSource(DSMixin, CSVDataSource):
                   'description']
 
 
-class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
+class WormbaseIonChannelCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = WormbaseIonChannelCSVDataSource
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.WormbaseIonChannelCSVTranslator
 
     def translate(self, data_source):
         res = self.make_new_output((data_source,))
@@ -87,12 +86,11 @@ class WormbaseIonChannelCSVTranslator(CSVDataTranslator):
         return res
 
 
-class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
+class WormbaseTextMatchCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = WormbaseTextMatchCSVDataSource
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.WormbaseTextMatchCSVTranslator
 
     def translate(self, data_source):
         initcol = data_source.initial_cell_column()
@@ -168,12 +166,11 @@ class WormBaseCSVDataSource(DSMixin, CSVDataSource):
                   "Synonyms"]
 
 
-class MuscleWormBaseCSVTranslator(CSVDataTranslator):
+class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.MuscleWormBaseCSVTranslator
 
     def translate(self, data_source):
         """ Upload muscles and the neurons that connect to them """
@@ -202,12 +199,11 @@ class MuscleWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
-class NeuronWormBaseCSVTranslator(CSVDataTranslator):
+class NeuronWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.NeuronWormBaseCSVTranslator
 
     def translate(self, data_source):
         res = self.make_new_output((data_source,))
@@ -236,12 +232,11 @@ class NeuronWormBaseCSVTranslator(CSVDataTranslator):
         return res
 
 
-class WormbaseIDSetter(CSVDataTranslator):
+class WormbaseIDSetter(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = (WormBaseCSVDataSource, DataWithEvidenceDataSource)
     output_type = DataWithEvidenceDataSource
-    translator_identifier = TRANS_NS.WormbaseIDSetter
 
     def translate(self, data_source, cells_source):
         """ Upload muscles and the neurons that connect to them """
