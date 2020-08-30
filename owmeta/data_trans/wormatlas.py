@@ -13,13 +13,12 @@ from ..website import Website
 from ..evidence import Evidence
 
 from .data_with_evidence_ds import DataWithEvidenceDataSource
-from .common_data import DS_NS, TRANS_NS
+from .common_data import TRANS_NS, DSMixin
 
 
-class WormAtlasCellListDataSource(CSVDataSource):
+class WormAtlasCellListDataSource(DSMixin, CSVDataSource):
     class_context = CONTEXT
 
-    rdf_namespace = Namespace(DS_NS['WormAtlasCellListDataSource#'])
     csv_header = ['Cell', 'Lineage Name', 'Description']
     csv_field_delimiter = '\t'
 

@@ -1,7 +1,10 @@
 from rdflib.namespace import Namespace
 import csv
+from owmeta_core.datasource import Informational
+from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
 import re
 import traceback
+
 
 from .. import CONTEXT
 from ..utils import normalize_cell_name
@@ -14,17 +17,12 @@ from ..cell import Cell
 from ..website import Website
 from ..worm import Worm
 
-from owmeta_core.datasource import Informational
-from owmeta_core.data_trans.common_data import DS_NS, TRANS_NS
-from owmeta_core.data_trans.csv_ds import CSVDataSource, CSVDataTranslator
-
+from .common_data import DSMixin, TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 
-class WormbaseTextMatchCSVDataSource(CSVDataSource):
+class WormbaseTextMatchCSVDataSource(DSMixin, CSVDataSource):
     class_context = CONTEXT
-
-    rdf_namespace = Namespace(DS_NS['WormbaseTextMatchCSVDataSource#'])
 
     initial_cell_column = Informational('Initial Cell Column',
                                         description='The index of the first column with a cell name',
@@ -35,10 +33,8 @@ class WormbaseTextMatchCSVDataSource(CSVDataSource):
                               multiple=False)
 
 
-class WormbaseIonChannelCSVDataSource(CSVDataSource):
+class WormbaseIonChannelCSVDataSource(DSMixin, CSVDataSource):
     class_context = CONTEXT
-
-    rdf_namespace = Namespace(DS_NS['WormbaseIonChannelCSVDataSource#'])
 
     csv_header = ['channel_name',
                   'gene_name',
@@ -146,10 +142,9 @@ class WormbaseTextMatchCSVTranslator(CSVDataTranslator):
         return res
 
 
-class WormBaseCSVDataSource(CSVDataSource):
+class WormBaseCSVDataSource(DSMixin, CSVDataSource):
     class_context = CONTEXT
 
-    rdf_namespace = Namespace(DS_NS['MuscleCSVDataSource#'])
     csv_header = ["Cell",
                   "Lineage Name",
                   "Description",

@@ -6,18 +6,16 @@ from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
 from .. import CONTEXT, SCI_CTX
 from ..bibtex import parse_bibtex_into_evidence
 
-from .common_data import DS_NS
+from .common_data import DSMixin, TRANS_NS
 
 
-class EvidenceDataSource(DataSource):
+class EvidenceDataSource(DSMixin, DataSource):
     class_context = SCI_CTX
 
     context_property = Informational(display_name='Context',
                                      property_name='evidence_context',
                                      property_type='ObjectProperty',
                                      description='The context')
-
-    rdf_namespace = Namespace(DS_NS['EvidenceDataSource#'])
 
     def __init__(self, *args, **kwargs):
         super(EvidenceDataSource, self).__init__(*args, **kwargs)
@@ -37,15 +35,21 @@ class _EvidenceContext(VariableIdentifierContext):
         return self.maker.identifier + '-evidence'
 
 
-class BibTexDataSource(LocalFileDataSource):
+class BibTexDataSource(DSMixin, LocalFileDataSource):
+    class_context = SCI_CTX
+
     def __init__(self, bibtex_file_name, **kwargs):
         super(BibTexDataSource, self).__init__(**kwargs)
         self.bibtex_file_name = bibtex_file_name
 
 
 class BibTexDataTranslator(DataTranslator):
+    class_context = SCI_CTX
+
     input_type = BibTexDataSource
     output_type = EvidenceDataSource
+
+    translator_identifier = TRANS_NS.BibTexDataTranslator
 
     def translate(data_source):
         evidences = parse_bibtex_into_evidence(data_source.bibtex_file_name)

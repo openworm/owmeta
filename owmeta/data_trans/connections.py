@@ -19,13 +19,13 @@ from ..muscle import Muscle
 from ..worm import Worm
 from ..network import Network
 
-from .common_data import TRANS_NS
+from .common_data import DSMixin, TRANS_NS
 from .data_with_evidence_ds import DataWithEvidenceDataSource
 
 L = logging.getLogger(__name__)
 
 
-class ConnectomeCSVDataSource(CSVDataSource):
+class ConnectomeCSVDataSource(DSMixin, CSVDataSource):
     '''
     A CSV data source whose CSV file describes a neural connectome
 
