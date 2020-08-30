@@ -80,8 +80,19 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
         return res
 
     def commit_augment(self):
-        self.combined_context.save(inline_imports=True)
-        self.combined_context.save_imports()
+        for ctx in self.__ad_hoc:
+            ctx.save()
+
+        self.evidence_context.save()
+        self.data_context.save()
+        self.combined_context.save()
+
+        for ctx in self.__ad_hoc:
+            ctx.save_imports(transitive=False)
+
+        self.evidence_context.save_imports(transitive=False)
+        self.data_context.save_imports(transitive=False)
+        self.combined_context.save_imports(transitive=False)
 
 
 class _CombinedContext(VariableIdentifierContext):

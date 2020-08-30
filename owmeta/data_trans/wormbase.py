@@ -175,9 +175,7 @@ class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
     def translate(self, data_source):
         """ Upload muscles and the neurons that connect to them """
         res = self.make_new_output((data_source,))
-        with open(data_source.csv_file_name.onedef()) as csvfile:
-            csvreader = csv.reader(csvfile)
-
+        with self.make_reader(data_source) as csvreader:
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:

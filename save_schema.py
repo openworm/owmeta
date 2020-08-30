@@ -1,4 +1,5 @@
 from owmeta_core.command import OWM
+from owmeta.data_trans.wormbase import MuscleWormBaseCSVTranslator, WormBaseCSVDataSource
 
 
 owm = OWM()
@@ -28,4 +29,9 @@ for module in ('owmeta.neuron',
                'owmeta.translators',
                ):
     owm.save(module)
-#owm.translate()
+
+# We don't have to use the URIs for sources here since we're recreating the
+
+owm.translate(MuscleWormBaseCSVTranslator(),
+              data_sources=(WormBaseCSVDataSource(key='wormbase_celegans_cells'),),
+              output_key='muscles')
