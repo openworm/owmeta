@@ -1,5 +1,7 @@
 from owmeta_core.command import OWM
-from owmeta.data_trans.wormbase import MuscleWormBaseCSVTranslator, WormBaseCSVDataSource
+from owmeta.data_trans.wormbase import (MuscleWormBaseCSVTranslator, WormBaseCSVDataSource,
+                                        WormbaseIonChannelCSVDataSource, WormbaseIonChannelCSVTranslator)
+from owmeta.data_trans.neuron_data import NeuronCSVDataSource, NeuronCSVDataTranslator
 
 
 owm = OWM()
@@ -31,7 +33,26 @@ for module in ('owmeta.neuron',
     owm.save(module)
 
 # We don't have to use the URIs for sources here since we're recreating the
+ctx = owm.default_context.stored
+muscles = owm.translate(MuscleWormBaseCSVTranslator(),
+        data_sources=(WormBaseCSVDataSource(key='wormbase_celegans_cells'),),
+        output_key='muscles')
+ctx(muscles).description(
+        "Contains descriptions of C. elegans muscles and is the"
+        " principle such list for OpenWorm")
 
-owm.translate(MuscleWormBaseCSVTranslator(),
-              data_sources=(WormBaseCSVDataSource(key='wormbase_celegans_cells'),),
-              output_key='muscles')
+neurons = owm.translate(NeuronCSVDataTranslator(),
+        data_sources=(NeuronCSVDataSource(key='neurons'),),
+        output_key='neurons')
+ctx(neurons).description(
+        "Contains descriptions of C. elegans neurons and is the"
+        " principle such list for OpenWorm")
+
+ion_channels = owm.translate(
+        WormbaseIonChannelCSVTranslator(),
+        data_sources=(WormbaseIonChannelCSVDataSource(key='ion_channels'),),
+        output_key='ion_channels')
+ctx(ion_channels).description(
+        "Contains Channels and ExpressionPatterns")
+
+ctx.save()
