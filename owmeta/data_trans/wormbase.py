@@ -57,8 +57,7 @@ class WormbaseIonChannelCSVTranslator(DTMixin, CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with self.make_reader(data_source):
-                csvreader = csv.reader(csvfile, skipinitialspace=True)
+            with self.make_reader(data_source) as csvreader:
                 with doc_ctx(Channel=Channel,
                              ExpressionPattern=ExpressionPattern) as ctx:
                     for line in csvreader:
