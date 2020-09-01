@@ -57,8 +57,7 @@ class WormbaseIonChannelCSVTranslator(DTMixin, CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with open(data_source.csv_file_name.onedef(), 'r') as csvfile:
-                next(csvfile, None)
+            with self.make_reader(data_source):
                 csvreader = csv.reader(csvfile, skipinitialspace=True)
                 with doc_ctx(Channel=Channel,
                              ExpressionPattern=ExpressionPattern) as ctx:
@@ -175,7 +174,7 @@ class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
     def translate(self, data_source):
         """ Upload muscles and the neurons that connect to them """
         res = self.make_new_output((data_source,))
-        with self.make_reader(data_source) as csvreader:
+        with self.make_reader(data_source, skipheader=False, skiplines=3) as csvreader:
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
@@ -187,9 +186,6 @@ class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
                 w = ctx.Worm()
 
                 for num, line in enumerate(csvreader):
-                    if num < 4:  # skip rows with no data
-                        continue
-
                     if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
                         muscle_name = normalize_cell_name(line[0]).upper()
                         m = ctx.Muscle(name=muscle_name)
