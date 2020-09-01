@@ -29,7 +29,11 @@ def owm_data(ns):
             "1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit")
     ctx(WormbaseIonChannelCSVDataSource)(
             key='ion_channels',
-            csv_file_name="ion_channel.csv")
+            csv_file_name="ion_channel.csv",
+            description="C. elegans ion channel data from WormBase. Contains"
+            " WormBase IDs (WBIDs) for genes that code the ion channels and for"
+            " the expression of those genes in C. elegans (e.g.,"
+            " \"Chronogram479\", \"Expr6468\")")
     ctx(WormbaseTextMatchCSVDataSource)(
             key='muscle_ion_channels',
             csv_file_name="Ion channels - Ion Channel To Body Muscle.tsv",
