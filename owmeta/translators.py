@@ -7,11 +7,13 @@ from .data_trans.wormbase import (WormbaseTextMatchCSVTranslator,
                                   NeuronWormBaseCSVTranslator,
                                   WormbaseIDSetter,
                                   WormbaseIonChannelCSVTranslator)
+from .data_trans.context_merge import ContextMergeDataTranslator
 
 
 def owm_data(ns):
     ctx = ns.context
     ctx.add_import(NeuronCSVDataTranslator.definition_context)
+    ctx.add_import(ContextMergeDataTranslator.definition_context)
     ctx(MuscleWormBaseCSVTranslator)()
     ctx(NeuronConnectomeCSVTranslator)()
     ctx(NeuronConnectomeSynapseClassTranslator)()
@@ -21,3 +23,4 @@ def owm_data(ns):
     ctx(WormbaseIDSetter)()
     ctx(WormbaseIonChannelCSVTranslator)()
     ctx(WormbaseTextMatchCSVTranslator)()
+    ctx(ContextMergeDataTranslator)()
