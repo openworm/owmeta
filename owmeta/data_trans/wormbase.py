@@ -51,36 +51,33 @@ class WormbaseIonChannelCSVTranslator(DTMixin, CSVDataTranslator):
 
     def translate(self, data_source):
         res = self.make_new_output((data_source,))
-        try:
-            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
-                doc_ctx = res.data_context_for(document=doc)
-                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
+        with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
+            doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
+            doc_ctx = res.data_context_for(document=doc)
+            ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with self.make_reader(data_source) as csvreader:
-                with doc_ctx(Channel=Channel,
-                             ExpressionPattern=ExpressionPattern) as ctx:
-                    for line in csvreader:
-                        channel_name = normalize_cell_name(line[0]).upper()
-                        gene_name = line[1].upper()
-                        gene_WB_ID = line[2].upper()
-                        expression_pattern = line[3]
-                        description = line[4]
-                        c = ctx.Channel(name=str(channel_name))
-                        c.gene_name(gene_name)
-                        c.gene_WB_ID(gene_WB_ID)
-                        c.description(description)
-                        patterns = expression_pattern.split(r' | ')
-                        regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
+        with self.make_reader(data_source) as csvreader:
+            with doc_ctx(Channel=Channel,
+                         ExpressionPattern=ExpressionPattern) as ctx:
+                for line in csvreader:
+                    channel_name = normalize_cell_name(line[0]).upper()
+                    gene_name = line[1].upper()
+                    gene_WB_ID = line[2].upper()
+                    expression_pattern = line[3]
+                    description = line[4]
+                    c = ctx.Channel(name=str(channel_name))
+                    c.gene_name(gene_name)
+                    c.gene_WB_ID(gene_WB_ID)
+                    c.description(description)
+                    patterns = expression_pattern.split(r' | ')
+                    regex = re.compile(r' *\[([^\]]+)\] *(.*) *')
 
-                        matches = [regex.match(pat) for pat in patterns]
-                        patterns = [ctx.ExpressionPattern(wormbaseid=m.group(1),
-                                                          description=m.group(2))
-                                    for m in matches if m is not None]
-                        for pat in patterns:
-                            c.expression_pattern(pat)
-        except Exception:
-            traceback.print_exc()
+                    matches = [regex.match(pat) for pat in patterns]
+                    patterns = [ctx.ExpressionPattern(wormbaseid=m.group(1),
+                                                      description=m.group(2))
+                                for m in matches if m is not None]
+                    for pat in patterns:
+                        c.expression_pattern(pat)
         return res
 
 
@@ -97,26 +94,23 @@ class WormbaseTextMatchCSVTranslator(DTMixin, CSVDataTranslator):
         ctype = self.context.resolve_class(ctype)
 
         res = self.make_new_output((data_source,))
-        try:
-            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
-                doc_ctx = res.data_context_for(document=doc)
-                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
+        with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
+            doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
+            doc_ctx = res.data_context_for(document=doc)
+            ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with open(data_source.csv_file_name.one(), 'r') as f:
-                reader = csv.reader(f, delimiter='\t')
-                header = self.skip_to_header(reader)
-                with doc_ctx(Channel=Channel, CType=ctype) as ctx:
-                    for row in reader:
-                        cells = self.extract_cell_names(header,
-                                                        initcol,
-                                                        row)
-                        ch = ctx.Channel(name=str(row[0]))
-                        for cell in cells:
-                            m = ctx.CType(name=str(cell))
-                            ch.appearsIn(m)
-        except Exception:
-            traceback.print_exc()
+        with open(data_source.full_path(), 'r') as f:
+            reader = csv.reader(f, delimiter='\t')
+            header = self.skip_to_header(reader)
+            with doc_ctx(Channel=Channel, CType=ctype) as ctx:
+                for row in reader:
+                    cells = self.extract_cell_names(header,
+                                                    initcol,
+                                                    row)
+                    ch = ctx.Channel(name=str(row[0]))
+                    for cell in cells:
+                        m = ctx.CType(name=str(cell))
+                        ch.appearsIn(m)
         return res
 
     def skip_to_header(self, reader):
@@ -212,13 +206,8 @@ class NeuronWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
             n = ctx.Network()
             n.worm(w)
 
-            with open(data_source.csv_file_name.one()) as csvfile:
-                csvreader = csv.reader(csvfile)
-
+            with self.make_reader(data_source, skipheader=False, skiplines=3) as csvreader:
                 for num, line in enumerate(csvreader):
-                    if num < 4:  # skip rows with no data
-                        continue
-
                     if line[5] == '1':  # neurons marked in this column
                         neuron_name = normalize_cell_name(line[0]).upper()
                         n.neuron(ctx.Neuron(name=neuron_name))
