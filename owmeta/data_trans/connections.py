@@ -112,7 +112,7 @@ class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
             e.supports(docctx.rdf_object)
             with docctx(Neuron, Muscle, Cell, Connection) as ctx:
                 res.data_context.add_import(ctx.context)
-                with open(data_source.csv_file_name.onedef()) as csvfile:
+                with open(data_source.full_path()) as csvfile:
                     edge_reader = csv.reader(csvfile)
                     next(edge_reader)  # skip header row
                     for row in edge_reader:
