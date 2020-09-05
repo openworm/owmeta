@@ -5,7 +5,7 @@ from . import BASE_BIO_DATA_URL, BASE_BIO_SCHEMA_URL
 
 
 class BiologyType(DataObject):
-    class_context = 'http://openworm.org/schema/bio'
+    class_context = BASE_BIO_SCHEMA_URL
 
     base_namespace = R.Namespace(BASE_BIO_SCHEMA_URL + '/')
     base_data_namespace = R.Namespace(BASE_BIO_DATA_URL + '/')
