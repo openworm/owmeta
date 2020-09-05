@@ -222,11 +222,9 @@ class WormbaseIDSetter(DTMixin, CSVDataTranslator):
 
     def translate(self, data_source, cells_source):
         """ Upload muscles and the neurons that connect to them """
-        res = self.make_new_output((data_source,))
+        res = self.make_new_output((data_source, cells_source))
         with self.make_reader(data_source, skipinitialspace=True, skipheader=True,
                 skiplines=1, dict_reader=True) as csvreader:
-            # TODO: Improve this evidence by going back to the actual research
-            #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
                 doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
                 doc_ctx = res.data_context_for(document=doc)
