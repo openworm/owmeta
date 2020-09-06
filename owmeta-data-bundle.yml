@@ -1,7 +1,7 @@
 ---
 id: openworm/owmeta-data
 name: owmeta data bundle
-version: 1 
+version: 2 
 description: Bundle for OpenWorm data
 patterns:
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression/context_for?*
@@ -39,22 +39,33 @@ includes:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscle_ion_channels-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscle_ion_channels/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles-data:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels-data:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels/context_for?document=http://data.openworm.org/Website#wormbase
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons-data
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons-evidence
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass-data:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass/context_for?document=http://data.openworm.org/Document#aca617d62c5bb5cb3f6bf96092c179512
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass/context_for?document=http://data.openworm.org/Document#aca617d62c5bb5cb3f6bf96092c179512&number_matches=False
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids-data:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons-data:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons/context_for?document=http://data.openworm.org/Website#wormbase
+
 dependencies:
     - id: openworm/owmeta-schema
-      version: 1
+      version: 2
       #excludes:
           #- http://www.w3.org/1999/02/22-rdf-syntax-ns
       #merges:
