@@ -68,7 +68,8 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
         return ctx
 
     def context_for(self, ident=None, **kwargs):
-        key = "&".join(k + "=" + kwargs[k].identifier for k in sorted(kwargs.keys()))
+        key = "&".join(k + "=" + getattr(kwargs[k], 'identifier', str(kwargs[k]))
+                       for k in sorted(kwargs.keys()))
         res = self.__ad_hoc_contexts.get(key)
         if res is None:
             if ident:

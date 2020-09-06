@@ -73,97 +73,94 @@ class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
 
         res = self.make_new_output(sources=(data_source, neurons_source, muscles_source))
 
-        try:
-            # XXX: should there be a different src for muscles?
-            w_q = muscles_source.data_context.stored(Worm)()
-            n_q = neurons_source.data_context.stored(Network)()
-            i_n = next(n_q.load(), n_q)
-            i_w = next(w_q.load(), w_q)
-            # XXX: If the context we query for is the same ID as the default
-            # context, then we should query the merge of all graphs (using the
-            # contract of the ConjunctiveGraph with 'default_is_union==True').
-            # Otherwise, we should query only for what's in that graph.
-            #
-            neuron_objs = list(set(i_n.neurons()))
-            muscle_objs = list(i_w.muscles())
-            # get lists of neuron and muscles names
-            neurons = [neuron.name() for neuron in neuron_objs]
-            muscles = [muscle.name() for muscle in muscle_objs]
-            o_w = res.data_context(Worm)()
-            o_n = res.data_context(Network)(worm=o_w)
-            # Evidence object to assert each connection
-            ctxd_Document = res.evidence_context(Document)
-            doc = ctxd_Document(key="emmons2015",
-                                title='Whole-animal C. elegans connectomes',
-                                year=2015,
-                                uri='http://abstracts.genetics-gsa.org/cgi-bin/'
-                                'celegans15s/wsrch15.pl?author=emmons&sort=ptimes&'
-                                'sbutton=Detail&absno=155110844&sid=668862',
-                                rdfs_comment="Data related by personal communication")
-            doc.author('Emmons, S.')
-            doc.author('Cook, S.')
-            doc.author('Jarrell, T.')
-            doc.author('Wang, Y.')
-            doc.author('Yakolev, M.')
-            doc.author('Nguyen, K.')
-            doc.author('Hall, D.')
-            e = res.evidence_context(Evidence)(key="emmons2015", reference=doc)
-            docctx = res.evidence_context(Context)(ident=self.identifier + '/emmons2015-context')
-            e.supports(docctx.rdf_object)
-            with docctx(Neuron, Muscle, Cell, Connection) as ctx:
-                res.data_context.add_import(ctx.context)
-                with open(data_source.full_path()) as csvfile:
-                    edge_reader = csv.reader(csvfile)
-                    next(edge_reader)  # skip header row
-                    for row in edge_reader:
-                        source, target, weight, syn_type = map(str.strip, row)
+        # XXX: should there be a different src for muscles?
+        w_q = muscles_source.data_context.stored(Worm)()
+        n_q = neurons_source.data_context.stored(Network)()
+        i_n = next(n_q.load(), n_q)
+        i_w = next(w_q.load(), w_q)
+        # XXX: If the context we query for is the same ID as the default
+        # context, then we should query the merge of all graphs (using the
+        # contract of the ConjunctiveGraph with 'default_is_union==True').
+        # Otherwise, we should query only for what's in that graph.
+        #
+        neuron_objs = list(set(i_n.neurons()))
+        muscle_objs = list(i_w.muscles())
+        # get lists of neuron and muscles names
+        neurons = set(neuron.name() for neuron in neuron_objs)
+        muscles = set(muscle.name() for muscle in muscle_objs)
+        o_w = res.data_context(Worm)()
+        o_n = res.data_context(Network)(worm=o_w)
+        # Evidence object to assert each connection
+        ctxd_Document = res.evidence_context(Document)
+        doc = ctxd_Document(key="emmons2015",
+                            title='Whole-animal C. elegans connectomes',
+                            year=2015,
+                            uri='http://abstracts.genetics-gsa.org/cgi-bin/'
+                            'celegans15s/wsrch15.pl?author=emmons&sort=ptimes&'
+                            'sbutton=Detail&absno=155110844&sid=668862',
+                            rdfs_comment="Data related by personal communication")
+        doc.author('Emmons, S.')
+        doc.author('Cook, S.')
+        doc.author('Jarrell, T.')
+        doc.author('Wang, Y.')
+        doc.author('Yakolev, M.')
+        doc.author('Nguyen, K.')
+        doc.author('Hall, D.')
+        docctx = res.data_context_for(document=doc)
+        res.evidence_context(Evidence)(key="emmons2015",
+                reference=doc,
+                supports=docctx.rdf_object)
+        with docctx(Neuron, Muscle, Cell, Connection) as ctx:
+            res.data_context.add_import(ctx.context)
+            with open(data_source.full_path()) as csvfile:
+                edge_reader = csv.reader(csvfile)
+                next(edge_reader)  # skip header row
+                for row in edge_reader:
+                    source, target, weight, syn_type = map(str.strip, row)
 
-                        # set synapse type to something the Connection object
-                        # expects, and normalize the source and target names
-                        if syn_type == 'electrical':
-                            syn_type = 'gapJunction'
-                        elif syn_type == 'chemical':
-                            syn_type = 'send'
+                    # set synapse type to something the Connection object
+                    # expects, and normalize the source and target names
+                    if syn_type == 'electrical':
+                        syn_type = 'gapJunction'
+                    elif syn_type == 'chemical':
+                        syn_type = 'send'
 
-                        source = normalize_cell_name(source).upper()
-                        target = normalize_cell_name(target).upper()
+                    source = normalize_cell_name(source).upper()
+                    target = normalize_cell_name(target).upper()
 
-                        weight = int(weight)
+                    weight = int(weight)
 
-                        # remove BMW from Body Wall Muscle cells
-                        if 'BWM' in source:
-                            source = normalize_muscle(source)
-                        if 'BWM' in target:
-                            target = normalize_muscle(target)
+                    # remove BMW from Body Wall Muscle cells
+                    if 'BWM' in source:
+                        source = normalize_muscle(source)
+                    if 'BWM' in target:
+                        target = normalize_muscle(target)
 
-                        # change certain muscle names to names in wormbase
-                        if source in changed_muscles:
-                            source = changed_muscle(source)
-                        if target in changed_muscles:
-                            target = changed_muscle(target)
+                    # change certain muscle names to names in wormbase
+                    if source in changed_muscles:
+                        source = changed_muscle(source)
+                    if target in changed_muscles:
+                        target = changed_muscle(target)
 
-                        sources = convert_to_cell(ctx, source, muscles, neurons)
-                        targets = convert_to_cell(ctx, target, muscles, neurons)
+                    sources = convert_to_cell(ctx, source, muscles, neurons)
+                    targets = convert_to_cell(ctx, target, muscles, neurons)
 
-                        for s in sources:
-                            for t in targets:
-                                conn = add_synapse(ctx, s, t, weight, syn_type)
-                                o_n.synapse(conn)
-                                kind = conn.termination.onedef()
-                                if kind == 'muscle':
-                                    muscle_connections += 1
-                                elif kind == 'neuron':
-                                    neuron_connections += 1
-                                else:
-                                    other_connections += 1
+                    for s in sources:
+                        for t in targets:
+                            conn = add_synapse(ctx, s, t, weight, syn_type)
+                            o_n.synapse(conn)
+                            kind = conn.termination.onedef()
+                            if kind == 'muscle':
+                                muscle_connections += 1
+                            elif kind == 'neuron':
+                                neuron_connections += 1
+                            else:
+                                other_connections += 1
 
-            print('Total neuron to neuron connections added = %i' % neuron_connections)
-            print('Total neuron to muscle connections added = %i' % muscle_connections)
-            print('Total other connections added = %i' % other_connections)
-            print('uploaded connections')
-
-        except Exception:
-            traceback.print_exc()
+        print('Total neuron to neuron connections added = %i' % neuron_connections)
+        print('Total neuron to muscle connections added = %i' % muscle_connections)
+        print('Total other connections added = %i' % other_connections)
+        print('uploaded connections')
         return res
 
 
@@ -204,23 +201,23 @@ class NeuronConnectomeSynapseClassTranslator(DTMixin, CSVDataTranslator):
         # We don't use doc.as_context for the statements' context because the document
         # itself doesn't actually make the statements below, although it does *support*
         # them by describing the process by which they are derived
-        docctx = res.evidence_context(Context)(ident=self.identifier + '#shterionov2011-context')
+        docctx = res.data_context_for(document=doc)
 
         # There are many entries in the Shterionov data where the number of synapses
         # doesn't match that in, say, the Emmons (2015) data. We distinguish these so it's
         # easy to look back at the differences later, but the different number of synapses
         # isn't recorded here.
-        docctx_anynum = res.evidence_context(Context)(ident=self.identifier
-                                                      + '#shterionov2011-context-any-number')
+        docctx_anynum = res.data_context_for(document=doc, number_matches=False)
+
         e.supports(docctx.rdf_object)
         res.data_context.add_import(docctx)
         res.data_context.add_import(docctx_anynum)
-        with self.make_reader(neurotransmitter_source,
-                              skipheader=False,
-                              delimiter=';') as reader:
-            for row in reader:
-                pre, post, typ, number, nt = row
-                with data_source.data_context.stored(Connection, Neuron) as srcctx:
+        with data_source.data_context.stored(Connection, Neuron) as srcctx:
+            with self.make_reader(neurotransmitter_source,
+                                  skipheader=False,
+                                  delimiter=';') as reader:
+                for row in reader:
+                    pre, post, typ, number, nt = row
                     conn = srcctx.Connection.query(pre_cell=srcctx.Neuron.query(pre),
                                                    post_cell=srcctx.Neuron.query(post),
                                                    number=int(number),
@@ -238,10 +235,9 @@ class NeuronConnectomeSynapseClassTranslator(DTMixin, CSVDataTranslator):
                         for c in conn.load():
                             docctx_anynum(Connection)(ident=c.identifier).synclass(nt)
                             hit = True
+
                         if not hit:
                             L.warning("Didn't find any connections matching: {}".format(conn))
-                        else:
-                            break
         return res
 
 
