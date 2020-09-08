@@ -14,13 +14,14 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from owmeta_core import connect, __version__
+from owmeta_core.command import OWM
 from owmeta_core.context import Context
 
 from owmeta.worm import Worm
 from owmeta.neuron import Neuron
 
 print("Connecting to the database using owmeta v%s..." % __version__)
-with connect('default.conf') as conn:
+with OWM('../.owm').connect() as conn:
     ctx = conn(Context)(ident="http://openworm.org/data").stored
 
     #Get the worm object.
