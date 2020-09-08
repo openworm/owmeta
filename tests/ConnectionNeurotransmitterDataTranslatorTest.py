@@ -23,7 +23,7 @@ class _Base(_DataTest):
         self.mapper.add_class(Connection)
         self.mapper.save()
         self.conn_ds = self.context(DataWithEvidenceDataSource)(key='test_dweds')
-        self.nt_ds = self.context(ConnectomeCSVDataSource)()
+        self.nt_ds = self.context(ConnectomeCSVDataSource)(key='nt_ds')
         self.nt_ds.basedir = lambda: self.testdir
         self.cut = self.context(NeuronConnectomeSynapseClassTranslator)()
 
@@ -40,10 +40,11 @@ class InexactNumberMatchTest(_Base):
         text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
             f.write(text)
-        self.nt_ds.csv_file_name('mycsv.csv')
+        self.nt_ds.file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
                                               syntype='send')
+        self.nt_ds.commit()
         self.conn_ds.commit()
 
     def test_connection_exists(self):
@@ -67,7 +68,7 @@ class ExactNumberMatchTest(_Base):
         text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
             f.write(text)
-        self.nt_ds.csv_file_name('mycsv.csv')
+        self.nt_ds.file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
                                               syntype='send',

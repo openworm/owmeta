@@ -48,7 +48,7 @@ header,row,completely,ignored,x
 ADAR,Neuropeptide,PDF-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/ADAmainframe.htm'''
         with open(fname, 'w') as f:
             f.write(text.strip())
-        self.ds.csv_file_name('mycsv.csv')
+        self.ds.file_name('mycsv.csv')
 
     def test_creates_neuron(self):
         res = self.cut(self.ds, output_identifier=URIRef('http://example.org/smashing'))
@@ -96,7 +96,7 @@ ADAR,Neuropeptide,PDF-1,WormAtlas,'''
         with open(fname, 'w') as f:
             f.write(text.strip())
 
-        self.ds.csv_file_name('mycsv.csv')
+        self.ds.file_name('mycsv.csv')
 
     def test_no_evidence(self):
         res = self.cut(self.ds, output_identifier=URIRef('http://example.org/wonderful'))
@@ -118,7 +118,7 @@ ADAR,Neuropeptide,PDF-1,WormAtlas,'''
             f.write(text.strip())
         self.mapper.add_class(Evidence)
         self.mapper.add_class(Document)
-        self.ds.csv_file_name('mycsv.csv')
+        self.ds.file_name('mycsv.csv')
         self.ds.bibtex_files(['ignored'])
         self.patcher = patch('owmeta.data_trans.neuron_data.parse_bibtex_into_documents')
         mock = self.patcher.start()
