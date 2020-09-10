@@ -63,8 +63,11 @@ class DOIURITest(unittest.TestCase):
 @pytest.mark.inttest
 class DocumentElaborationTest(_DataTest):
     '''
-    Tests for Document 'elaboration', the process of looking up documents from external resources by using their
-    identifiers and setting those values on the object
+    Tests for Document 'elaboration', the process of looking up documents from external
+    resources by using their identifiers and setting those values on the object
+
+    Use a Pubmed API key when running all of them at once to avoid hitting the public
+    request rate limit
     '''
     ctx_classes = (Document,)
 
