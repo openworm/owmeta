@@ -175,10 +175,9 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
 >>> avdl.lineageName("AB alaaapalr")
-owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Neuron#AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Neuron#AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
-
+owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Neuron#AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Neuron#AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
 >>> e.supports(dctx.rdf_object)
-owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Evidence#Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Evidence#Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
+owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://data.openworm.org/Evidence#Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://data.openworm.org/Evidence#Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
 >>> dctx.save_context()
 >>> evctx.save_context()
 
@@ -205,7 +204,7 @@ object of that type and calling `load()`::
 ...     w = cctx.Worm()
 ...     net = cctx.Network()
 ...     w.neuron_network(net)
-owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Worm#a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Worm#a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://schema.openworm.org/2020/07/Network#ab5686f2882d8d7eebb449213ed3bb3b0')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
+owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Worm#a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Worm#a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Network#a5859bb1e51537f60e506c283401fcd84')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
 ...     neur = cctx.Neuron()
 ...     neur.count()
