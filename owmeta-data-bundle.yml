@@ -12,12 +12,6 @@ includes:
         empty: true
     - http://openworm.org/data-evidence:
         empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells_source:
-        empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells_source-data:
-        empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells_source-evidence:
-        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression-data
@@ -39,29 +33,27 @@ includes:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscle_ion_channels-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscle_ion_channels/context_for?document=http://data.openworm.org/Website#wormbase
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles-data:
-        empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles-evidence
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#muscles/context_for?document=http://data.openworm.org/Website#wormbase
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels-data:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neuron_ion_channels/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons-data
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons-evidence
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass:
+        empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass-data:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass/context_for?document=http://data.openworm.org/Document#aca617d62c5bb5cb3f6bf96092c179512
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#synclass/context_for?document=http://data.openworm.org/Document#aca617d62c5bb5cb3f6bf96092c179512&number_matches=False
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids-data:
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells:
         empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids-evidence
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_ids/context_for?document=http://data.openworm.org/Website#wormbase
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons-data:
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells-data:
         empty: true
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons-evidence
-    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_neurons/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells-evidence
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells/context_for?document=http://data.openworm.org/Website#wormbase
 
 dependencies:
     - id: openworm/owmeta-schema
