@@ -29,3 +29,7 @@ def save_schema():
                    'owmeta.translators',
                    ):
         owm.save(module)
+
+
+if __name__ == '__main__':
+    save_schema()
