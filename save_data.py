@@ -2,10 +2,12 @@ import argparse
 import types
 
 from owmeta_core.command import OWM
-from owmeta.data_trans.wormbase import (MuscleWormBaseCSVTranslator, WormBaseCSVDataSource,
-                                        WormbaseIonChannelCSVDataSource, WormbaseIonChannelCSVTranslator,
-                                        NeuronWormBaseCSVTranslator, WormbaseTextMatchCSVTranslator,
-                                        WormbaseTextMatchCSVDataSource, WormbaseIDSetter)
+from owmeta.data_trans.wormbase import (WormBaseCSVDataSource,
+                                        WormbaseIonChannelCSVDataSource,
+                                        WormbaseIonChannelCSVTranslator,
+                                        CellWormBaseCSVTranslator,
+                                        WormbaseTextMatchCSVTranslator,
+                                        WormbaseTextMatchCSVDataSource)
 from owmeta.data_trans.neuron_data import NeuronCSVDataSource, NeuronCSVDataTranslator
 from owmeta.data_trans.connections import (NeuronConnectomeCSVTranslator,
                                            ConnectomeCSVDataSource,
@@ -68,14 +70,14 @@ class DSMethods(metaclass=OrderedClass):
         self.ctx(ion_channels).description(
                 "Contains Channels and ExpressionPatterns")
 
-    def wormbase_neurons(self):
-        wb_neurons = self.owm.translate(
-                NeuronWormBaseCSVTranslator(),
+    def wormbase_cells(self):
+        wb_cells = self.owm.translate(
+                CellWormBaseCSVTranslator(),
                 data_sources=[WormBaseCSVDataSource(key='wormbase_celegans_cells')],
-                output_key='wormbase_neurons')
-        self.ctx(wb_neurons).description(
-                'Contains neurons and links to C. elegans. Partially redundant to the Worm Atlas'
-                ' data source')
+                output_key='wormbase_cells')
+        self.ctx(wb_cells).description(
+                'Contains muscles, neurons, and other cells. Neuron data is partially'
+                ' redundant to the Worm Atlas data source')
 
     def bently_expression(self):
         bently_expression = self.owm.translate(
@@ -106,7 +108,7 @@ class DSMethods(metaclass=OrderedClass):
                 NeuronConnectomeCSVTranslator(),
                 data_sources=[ConnectomeCSVDataSource(key='emmons')],
                 named_data_sources=dict(
-                    muscles_source=DWEDS(key='muscles'),
+                    muscles_source=DWEDS(key='wormbase_cells'),
                     neurons_source=DWEDS(key='neurons')),
                 output_key='connectome')
         self.ctx(emmons_connectome).description(
@@ -123,39 +125,18 @@ class DSMethods(metaclass=OrderedClass):
                 'Adds inferred relationships between connections and neurotransmitters that'
                 ' mediates communication')
 
-    def cells_source(self):
-        cells_source = self.owm.translate(
-                ContextMergeDataTranslator(),
-                data_sources=[
-                    DWEDS(key='muscles'),
-                    DWEDS(key='neurons')],
-                output_key='cells_source')
-        self.ctx(cells_source).description(
-                'Combination of C. elegans muscles and neurons')
-
-    def wormbase_ids(self):
-        wormbase_ids = self.owm.translate(
-                WormbaseIDSetter(),
-                data_sources=[
-                    WormBaseCSVDataSource(key='wormbase_celegans_cells'),
-                    DWEDS(key='cells_source')],
-                output_key='wormbase_ids')
-        self.ctx(wormbase_ids).description(
-                'Adds identifiers from Wormbase.org for cells')
-
     def openworm_data(self):
         combined_data_source = self.owm.translate(
                 ContextMergeDataTranslator(),
                 data_sources=[
-                    DWEDS(key='cells_source'),
+                    DWEDS(key='neurons'),
+                    DWEDS(key='wormbase_cells'),
                     DWEDS(key='ion_channels'),
-                    DWEDS(key='wormbase_neurons'),
                     DWEDS(key='bently_expression'),
                     DWEDS(key='muscle_ion_channels'),
                     DWEDS(key='neuron_ion_channels'),
                     DWEDS(key='connectome'),
-                    DWEDS(key='synclass'),
-                    DWEDS(key='wormbase_ids')],
+                    DWEDS(key='synclass')],
                 output_identifier='http://openworm.org/data')
 
     def methods(self):

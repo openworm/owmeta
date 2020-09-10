@@ -8,6 +8,9 @@ from .data_trans.connections import ConnectomeCSVDataSource
 
 
 def owm_data(ns):
+    '''
+    Sources based on objects external to owmeta (e.g., files, websites)
+    '''
     ctx = ns.context
     ctx.add_import(ConnectomeCSVDataSource.definition_context)
 

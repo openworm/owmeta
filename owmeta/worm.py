@@ -27,7 +27,7 @@ class Worm(BiologyType):
     ''' A type of muscle which is in the worm '''
 
     cell = ObjectProperty(value_type=Cell)
-    ''' A cell in the worm '''
+    ''' A type of cell in the worm '''
 
     neuron_network = ObjectProperty(value_type=Network, inverse_of=(Network, 'worm'))
     ''' The neuron network of the worm '''

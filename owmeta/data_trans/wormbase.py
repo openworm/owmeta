@@ -158,16 +158,18 @@ class WormBaseCSVDataSource(DSMixin, CSVDataSource):
                   "Synonyms"]
 
 
-class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
+class CellWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
     class_context = CONTEXT
 
     input_type = WormBaseCSVDataSource
     output_type = DataWithEvidenceDataSource
 
     def translate(self, data_source):
-        """ Upload muscles and the neurons that connect to them """
+        """ Translate wormbase CSV dump into Cells, Neurons, and Muscles """
         res = self.make_new_output((data_source,))
-        with self.make_reader(data_source, skipheader=False, skiplines=3) as csvreader:
+        with self.make_reader(data_source, skipheader=False, skiplines=3,
+                dict_reader=True,
+                fieldnames=data_source.csv_header.one()) as csvreader:
             # TODO: Improve this evidence by going back to the actual research
             #       by using the wormbase REST API in addition to or instead of the CSV file
             with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
@@ -175,68 +177,29 @@ class MuscleWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with doc_ctx(Worm=Worm, Muscle=Muscle) as ctx:
+            with doc_ctx(Worm=Worm, Muscle=Muscle, Network=Network, Neuron=Neuron, Cell=Cell) as ctx:
                 w = ctx.Worm()
+                n = ctx.Network()
+                n.worm(w)
 
-                for num, line in enumerate(csvreader):
-                    if line[7] or line[8] or line[9] == '1':  # muscle's marked in these columns
-                        muscle_name = normalize_cell_name(line[0]).upper()
-                        m = ctx.Muscle(name=muscle_name)
-                        w.muscle(m)
-        return res
+                for line in csvreader:
+                    cell = None
+                    if (line['Body wall muscles'] or
+                            line['Pharynx muscles'] or
+                            line['Other muscles']):  # muscle's marked in these columns
+                        cell = ctx.Muscle()
+                        w.muscle(cell)
+                    elif line['Neurons (no male-specific cells)']:  # neurons marked in this column
+                        cell = ctx.Neuron()
+                        cell.wormbaseID(line['WormBase ID'])
+                        n.neuron(cell)
+                    elif (line['Other adult-only cells in the hermaphrodite'] or
+                            line['Other adult-only hermaphrodite-specific cells (not present in males)']):
+                        cell = ctx.Cell()
 
-
-class NeuronWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
-    class_context = CONTEXT
-
-    input_type = WormBaseCSVDataSource
-    output_type = DataWithEvidenceDataSource
-
-    def translate(self, data_source):
-        res = self.make_new_output((data_source,))
-        # TODO: Improve this evidence by going back to the actual research
-        #       by using the wormbase REST API in addition to or instead of the CSV file
-        with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-            doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
-            doc_ctx = res.data_context_for(document=doc)
-            ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
-
-        with doc_ctx(Worm=Worm, Network=Network, Neuron=Neuron) as ctx:
-            w = ctx.Worm()
-            n = ctx.Network()
-            n.worm(w)
-
-            with self.make_reader(data_source, skipheader=False, skiplines=3) as csvreader:
-                for num, line in enumerate(csvreader):
-                    if line[5] == '1':  # neurons marked in this column
-                        neuron_name = normalize_cell_name(line[0]).upper()
-                        n.neuron(ctx.Neuron(name=neuron_name))
-        return res
-
-
-class WormbaseIDSetter(DTMixin, CSVDataTranslator):
-    class_context = CONTEXT
-
-    input_type = (WormBaseCSVDataSource, DataWithEvidenceDataSource)
-    output_type = DataWithEvidenceDataSource
-
-    def translate(self, data_source, cells_source):
-        """ Upload muscles and the neurons that connect to them """
-        res = self.make_new_output((data_source, cells_source))
-        with self.make_reader(data_source, skipinitialspace=True, skipheader=True,
-                skiplines=1, dict_reader=True) as csvreader:
-            with res.evidence_context(Evidence=Evidence, Website=Website) as ctx:
-                doc = ctx.Website(key="wormbase", url="http://Wormbase.org", title="WormBase")
-                doc_ctx = res.data_context_for(document=doc)
-                ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
-
-            for num, line in enumerate(csvreader):
-                if num < 1:  # skip rows with no data
-                    continue
-
-                cell_name = normalize_cell_name(line['Cell'])
-                cell = cells_source.data_context.stored(Cell).query(name=cell_name)
-                for loaded_cell in cell.load():
-                    doc_ctx(loaded_cell).wormbaseID(line['WormBase ID'])
-
+                    if cell:
+                        cell.wormbaseID(line['WormBase ID'])
+                        cell.name(normalize_cell_name(line['Cell']).upper())
+                        cell.description(line['Description'])
+                        w.cell(cell)
         return res
