@@ -25,7 +25,7 @@ cleanup_coverage () {
 
 trap cleanup_coverage EXIT
 
-if [ $DATA_BUNDLE_TESTS ] ; then
+if [ $BUNDLE_TESTS ] ; then
     pt --verbose -m data_bundle
     add_coverage
 else
