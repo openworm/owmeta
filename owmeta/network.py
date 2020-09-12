@@ -45,14 +45,15 @@ class Network(BiologyType):
             # Grabs the representation of the neuronal network
             >>> net = Worm().get_neuron_network()
 
-            #NOTE: This is a VERY slow operation right now
             >>> len(set(net.neuron_names()))
             302
             >>> set(net.neuron_names())
             set(['VB4', 'PDEL', 'HSNL', 'SIBDR', ... 'RIAL', 'MCR', 'LUAL'])
 
         """
-        return set(x.name() for x in self.neuron())
+        neuron_expr = self.neuron.expr
+        neuron_expr.name()
+        return set(x.toPython() for x in neuron_expr.name)
 
     def aneuron(self, name):
         """
