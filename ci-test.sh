@@ -25,8 +25,13 @@ cleanup_coverage () {
 
 trap cleanup_coverage EXIT
 
-pt --verbose -m "'not inttest'"
-add_coverage
-pt --verbose -m inttest
-add_coverage
+if [ $DATA_BUNDLE_TESTS ] ; then
+    pt --verbose -m data_bundle
+    add_coverage
+else
+    pt --verbose -m "'not inttest'"
+    add_coverage
+    pt --verbose -m "'inttest and not data_bundle'"
+    add_coverage
+fi
 coverage combine $(list_coverage)

@@ -23,12 +23,10 @@ with Bundle('openworm/owmeta-data') as bnd:
     syn.number()
     connlist = syn.to_objects()
 
-term_type = Neuron.rdf_type
-
 conns = []
 for conn in connlist:
     if (Neuron.rdf_type in conn.pre_cell.rdf_type and
-            term_type in conn.post_cell.rdf_type):
+            Neuron.rdf_type in conn.post_cell.rdf_type):
         num = conn.number
         syntype = conn.syntype or ''
         synclass = conn.synclass or ''

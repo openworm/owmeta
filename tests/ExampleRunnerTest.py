@@ -8,6 +8,8 @@ import tempfile
 from six import string_types
 from os.path import join as p
 
+import pytest
+
 from .TestUtilities import xfail_without_db
 
 
@@ -75,5 +77,6 @@ class ExampleRunnerTest(unittest.TestCase):
     def test_extrasyn(self):
         self.execfile("extrasynaptic_edges.py")
 
+    @pytest.mark.data_bundle
     def test_list_conns(self):
         self.execfile("list_conns.py")

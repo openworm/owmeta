@@ -16,6 +16,7 @@ import pytest
 
 
 @pytest.mark.inttest
+@pytest.mark.data_bundle
 class DataIntegrityTest(unittest.TestCase):
 
     """ Integration tests that read from the database and ensure that basic
