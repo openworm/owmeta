@@ -5,6 +5,7 @@ import csv
 
 from owmeta_core.context import Context
 from owmeta_core.command import OWM
+from owmeta_core.bundle import Bundle
 
 from owmeta.worm import Worm
 from owmeta.cell import Cell
@@ -37,7 +38,9 @@ class DataIntegrityTest(unittest.TestCase):
                 cls.neurons.append(row[0])
 
     def setUp(self):
-        self.conn = OWM('.owm').connect(read_only=True)
+        self.bnd = Bundle('openworm/owmeta-data')
+        self.bnd.initdb()
+        self.conn = self.bnd.connection
         self.conf = self.conn.conf
         self.g = self.conf["rdf.graph"]
         self.context = self.conn(Context)(ident="http://openworm.org/data")
