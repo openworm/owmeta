@@ -20,10 +20,7 @@ before_install:
 install:
 - pip install .
 - owm clone https://github.com/openworm/OpenWormData.git --branch 'openworm/owmeta#462-owmeta-core-split'
-- | if [ $DATA_BUNDLE_TESTS ] ; then 
-      owm bundle register ./owmeta-data-bundle.yml
-      owm bundle install openworm/owmeta-data
-    fi
+- if [ $DATA_BUNDLE_TESTS ] ; then owm bundle register ./owmeta-data-bundle.yml ; owm bundle install openworm/owmeta-data ; fi
 
 script:
 - ./ci-test.sh
