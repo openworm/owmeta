@@ -15,7 +15,7 @@ pipeline](http://docs.openworm.org/en/latest/projects) for the
 
 Overview
 --------
-<img align="left" width="128" alt="pyopenworm_logo" src="pyopenworm-logo.min.svg"/>
+<img align="left" width="128" alt="owmeta_logo" src="owmeta-logo.min.svg"/>
 
 The data and models required to simulate *C. elegans* are highly heterogeneous.
 Consequently, from a software perspective, a variety of underlying
