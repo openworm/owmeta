@@ -13,6 +13,7 @@ import pytest
 from .TestUtilities import xfail_without_db
 
 
+@pytest.mark.inttest
 class ExampleRunnerTest(unittest.TestCase):
 
     """ Runs the examples to make sure we didn't break the API for them. """
