@@ -1,10 +1,11 @@
 import six
 from .experiment import Experiment
 
-from owmeta_core.dataobject import DataObject, DatatypeProperty, ObjectProperty
+from owmeta_core.dataobject import DataObject, DatatypeProperty, ObjectProperty, CPThunk
 
 from . import CONTEXT
 from .channel_common import CHANNEL_RDF_TYPE
+from .neuroml import NeuroMLProperty
 
 
 class PatchClampExperiment(Experiment):
@@ -103,6 +104,8 @@ class ChannelModel(DataObject):
 
     conductance = DatatypeProperty()
     ''' The conductance of this ion channel. This is the initial value, and should be entered as a Quantity object. '''
+
+    neuroML = CPThunk(NeuroMLProperty)
 
     def __init__(self, modelType=None, *args, **kwargs):
         super(ChannelModel, self).__init__(*args, **kwargs)

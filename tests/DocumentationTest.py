@@ -9,6 +9,7 @@ from os.path import join as p
 import tempfile
 import shutil
 from collections import namedtuple
+import importlib as IM
 
 import pytest
 
@@ -83,13 +84,16 @@ class SphinxTest(unittest.TestCase):
         self.execute('adding_data', extraglobs={'Load': Load, 'Widget': Widget, 'ctx18': ctx})
 
 
-def test_channelworm():
-    from owmeta_core import bundle
-    from owmeta.evidence import Evidence
-    from owmeta.document import Document
-    import owmeta.channelworm
-
-    [failure_count, return_count] = doctest.testmod(owmeta.channelworm,
-            optionflags=ALLOW_UNICODE | doctest.ELLIPSIS,
-            extraglobs=dict(Document=Evidence))
+def doctest_mod(module_name):
+    mod = IM.import_module(module_name)
+    [failure_count, return_count] = doctest.testmod(mod,
+            optionflags=ALLOW_UNICODE | doctest.ELLIPSIS)
     assert failure_count == 0
+
+
+def test_channelworm():
+    doctest_mod('owmeta.channelworm')
+
+
+def test_neuroml():
+    doctest_mod('owmeta.neuroml')
