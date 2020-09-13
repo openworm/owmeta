@@ -81,13 +81,14 @@ class ChannelModel(DataObject):
 
     Example usage::
 
+        >>> from owmeta_core.quantity import Quantity
+
         # Create a ChannelModel
-        >>> cm = P.ChannelModel()
-        # Create Evidence object
-        >>> ev = P.Evidence(author='White et al.', date='1986')
-        # Assert
-        >>> ev.asserts(cm)
-        >>> ev.save()
+        >>> cm = PatchClampChannelModel(key='ca_boyle',
+        ...     gating='voltage',
+        ...     ion='Ca',
+        ...     conductance=Quantity.parse('10pS'))
+
     """
     class_context = CONTEXT
 

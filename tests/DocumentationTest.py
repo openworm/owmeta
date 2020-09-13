@@ -8,8 +8,10 @@ import os
 from os.path import join as p
 import tempfile
 import shutil
-import pytest
 from collections import namedtuple
+
+import pytest
+
 from .doctest_plugin import ALLOW_UNICODE, UnicodeOutputChecker
 from .TestUtilities import xfail_without_db
 
@@ -79,3 +81,15 @@ class SphinxTest(unittest.TestCase):
         ctx(Widget)(part_number=20)
 
         self.execute('adding_data', extraglobs={'Load': Load, 'Widget': Widget, 'ctx18': ctx})
+
+
+def test_channelworm():
+    from owmeta_core import bundle
+    from owmeta.evidence import Evidence
+    from owmeta.document import Document
+    import owmeta.channelworm
+
+    [failure_count, return_count] = doctest.testmod(owmeta.channelworm,
+            optionflags=ALLOW_UNICODE | doctest.ELLIPSIS,
+            extraglobs=dict(Document=Evidence))
+    assert failure_count == 0
