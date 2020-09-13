@@ -32,7 +32,7 @@ class Worm(BiologyType):
     neuron_network = ObjectProperty(value_type=Network, inverse_of=(Network, 'worm'))
     ''' The neuron network of the worm '''
 
-    def __init__(self, scientific_name=False, **kwargs):
+    def __init__(self, scientific_name=None, **kwargs):
         super(Worm, self).__init__(**kwargs)
 
         if scientific_name:
