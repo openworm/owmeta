@@ -41,15 +41,15 @@ sense of neurons, networks, muscles, ion channels, etc. and so should our code.
 Relationship to ChannelWorm2
 -----------------------------
 [ChannelWorm2](https://github.com/openworm/ChannelWorm2) is the sub-project of
-OpenWorm which houses ion channel models.  In the future, we expect ChannelWorm2
-to be a "consumer" of owmeta.  An owmeta database will house physical
-models, the digitized plots they are derived from (there is a Plot type in
-owmeta), and provide code to put those models into enumerated formats along
-with auxillary files or comments.  However, because these projects were not
-developed sequentially, there is currently some overlap in functionality, and
-owmeta itself houses a fairly substantial amount of physiological
-information about *C. elegans.* Ultimately, the pure core of owmeta, which
-is meant to be a data framework for storing metadata and provenance (i.e.
+OpenWorm which houses ion channel models. In the future, we expect
+ChannelWorm2 to be a "consumer" of owmeta. An owmeta database will house
+physical models, the digitized plots they are derived from (there is a Plot
+type in owmeta), and provide code to put those models into enumerated formats
+along with auxiliary files or comments. However, because these projects were
+not developed sequentially, there is currently some overlap in functionality,
+and owmeta itself houses a fairly substantial amount of physiological
+information about *C. elegans.* Ultimately, the pure core of owmeta, which is
+meant to be a data framework for storing metadata and provenance (i.e.
 parameters and trajectories associated with simulations), will be separated out
 into standalone functionality.
 
@@ -102,7 +102,7 @@ Then you can try out a few things:
 >>> from owmeta_core.context import Context
 >>> ctx = conn(Context)(ident='http://openworm.org/data')
 
-# Grabs the representation of the neuronal network
+# Grab the representation of the neuronal network
 >>> from owmeta.worm import Worm
 >>> net = ctx.stored(Worm).query().neuron_network()
 
@@ -110,10 +110,11 @@ Then you can try out a few things:
 >>> from owmeta.neuron import Neuron
 >>> aval = ctx.stored(Neuron).query(name='AVAL')
 
+# Get the neuron's type
 >>> aval.type.one()
 'interneuron'
 
-#show how many connections go out of AVAL
+# Count how many connections come from AVAL
 >>> aval.connection.count('pre')
 86
 
@@ -122,26 +123,25 @@ Then you can try out a few things:
 More examples
 -------------
 
-Returns information about individual neurons::
+Return information about individual neurons:
 
 ```python
 >>> aval.name()
 'AVAL'
 
-#list all known receptors
+# List all known receptors
 >>> sorted(aval.receptors())
 ['GGR-3', 'GLR-1', ... 'NPR-4', 'UNC-8']
 
-#show how many chemical synapses go in and out of AVAL
+# Show how many chemical synapses go in and out of AVAL
 >>> aval.connection.count('either', syntype='send')
 105
 
 ```
 
-Returns the list of all neurons::
+Return the list of all neurons:
 
 ```python
-#NOTE: This is a VERY slow operation right now
 >>> len(set(net.neuron_names()))
 302
 >>> sorted(net.neuron_names())
@@ -149,7 +149,7 @@ Returns the list of all neurons::
 
 ```
 
-Returns a set of all muscles::
+Return a set of all muscles:
 
 ```python
 >>> muscles = ctx.stored(Worm).query().muscles()
@@ -159,7 +159,7 @@ Returns a set of all muscles::
 ```
 Because the ultimate aim of OpenWorm is to be a platform for biological
 research, the physiological data in owmeta should be uncontroversial and
-well supported by evidence.  Using the Evidence type, it is possible to link
+well supported by evidence. Using the Evidence type, it is possible to link
 data and models to corresponding articles from peer-reviewed literature:
 
 ```python
@@ -195,26 +195,27 @@ True
 
 ```
 
-For most types (i.e., subclasses of `P.DataObject`) that do not have required
-initialization arguments, you can load all members of that type by making an
-object of that type and calling `load()`::
+Query for neurons in *C. elegans*:
 ```python
 >>> from owmeta.network import Network
+
+# The default Worm() is for C. elegans
 >>> with ctx.stored(Worm, Neuron, Network) as cctx:
 ...     w = cctx.Worm()
 ...     net = cctx.Network()
 ...     w.neuron_network(net)
 owmeta_core.statement.Statement(subj=Worm(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Worm#a8020ed8519038a6bbc98f1792c46c97b')), prop=owmeta.worm.Worm_neuron_network(owner=Worm(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Worm#a8020ed8519038a6bbc98f1792c46c97b'))), obj=Network(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Network#a5859bb1e51537f60e506c283401fcd84')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
-...     neur = cctx.Neuron()
+...     neur = cctx.Neuron.query()
+...     net.neuron(neur)
 ...     neur.count()
 302
 
 ```
 
-See what neurons express a given neuropeptide::
+See what neurons express a given neuropeptide:
 ```python
->>> n = ctx.stored(Neuron)()
+>>> n = ctx.stored(Neuron).query()
 >>> n.neuropeptide("INS-26")
 owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_...')), prop=owmeta.neuron.Neuron_neuropeptide(owner=Neuron(ident=rdflib.term.Variable('aNeuron_...'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('INS-26')), context=owmeta_core.context.QueryContext(ident="http://openworm.org/data"))
 
@@ -223,22 +224,22 @@ owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.Variable('aNeuron_
 
 ```
 
-Get direct access to the RDFLib graph::
+Get direct access to the RDFLib graph:
 ```python
->>> conn.conf['rdf.graph'].query("SELECT ?y WHERE { ?x rdf:type ?y }")
+>>> conn.rdf.query("SELECT ?y WHERE { ?x rdf:type ?y }")
 <rdflib.plugins.sparql.processor.SPARQLResult object at ...>
 
 ```
 
 Modeling data
---------------
+-------------
 
 As described above, ultimately, ion channel models will be part of the
-ChannelWorm2 repository.  And as the project evolves, other models, such as for
-reproduction and development, may be housed in their own repositories.  But for
-the time being, the owmeta repository contains specific models as well.
-These models will eventually be transferred to an appropriate and independent
-data repository within the OpenWorm suite of tools.
+ChannelWorm2 repository. As the project evolves, other models, such as for
+reproduction and development, may be housed in their own repositories. But for
+the time being, the owmeta repository contains specific models as well. These
+models will eventually be transferred to an appropriate and independent data
+repository within the OpenWorm suite of tools.
 
 
 
@@ -260,7 +261,7 @@ model was derived from.
 
 ```
 
-Finally, when you're done accessing the database, be sure to disconnect from it::
+Finally, when you're done accessing the database, be sure to disconnect from it:
 ```python
 >>> conn.disconnect()
 
