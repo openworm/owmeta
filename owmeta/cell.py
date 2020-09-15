@@ -33,6 +33,7 @@ class Cell(BiologyType):
             >>> v = Quantity("600","(um)^3")
             >>> c = Cell(lineageName="AB plapaaaap")
             >>> c.divisionVolume(v)
+            owmeta_core.statement.Statement(...)
     '''
 
     name = DatatypeProperty()
@@ -48,10 +49,12 @@ class Cell(BiologyType):
 
     lineageName = DatatypeProperty()
     ''' The lineageName of the cell
+
         Example::
 
             >>> c = Cell(name="ADAL")
             >>> c.lineageName() # Returns ["AB plapaaaapp"]
+            owmeta_core.statement.Statement(...)
     '''
 
     synonym = DatatypeProperty(multiple=True)
@@ -74,6 +77,7 @@ class Cell(BiologyType):
 
             >>> c = Cell(name="ADAL")
             >>> c.blast() # Returns "AB"
+            owmeta_core.statement.Statement(...)
 
         Note that this isn't a Property. It returns the blast extracted from
         the ''first'' lineageName saved.
