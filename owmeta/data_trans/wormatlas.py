@@ -51,60 +51,57 @@ class WormAtlasCellListDataTranslator(DTMixin, CSVDataTranslator):
 
     def translate(self, data_source, neurons_source):
         res = self.make_new_output(sources=(data_source, neurons_source))
-        try:
-            net_q = neurons_source.data_context.query(Network)()
-            net = next(net_q.load(), net_q)
+        net_q = neurons_source.data_context.stored(Network).query()
+        net = next(net_q.load(), net_q)
 
-            # TODO: Improve this evidence marker
-            doc = res.evidence_context(Website)(url="http://www.wormatlas.org/celllist.htm")
-            ev = res.evidence_context(Evidence)(reference=doc)
-            doc_ctx = res.data_context_for(document=doc)
-            ev.supports(doc_ctx.rdf_object)
-            w = doc_ctx(Worm)()
+        # TODO: Improve this evidence marker
+        doc = res.evidence_context(Website)(url="http://www.wormatlas.org/celllist.htm")
+        ev = res.evidence_context(Evidence)(reference=doc)
+        doc_ctx = res.data_context_for(document=doc)
+        ev.supports(doc_ctx.rdf_object)
+        w = doc_ctx(Worm)()
 
-            with self.make_reader(data_source, skipinitialspace=True, skipheader=True) as csvreader:
-                cell_name_counters = dict()
-                data = dict()
-                for j in csvreader:
-                    name = j[0]
-                    lineageName = j[1]
-                    desc = j[2]
+        with self.make_reader(data_source, skipinitialspace=True, skipheader=True) as csvreader:
+            cell_name_counters = dict()
+            data = dict()
+            for j in csvreader:
+                name = j[0]
+                lineageName = j[1]
+                desc = j[2]
 
-                    # XXX: These renaming choices are arbitrary; may be inappropriate
-                    if name == "DB1/3":
-                        name = "DB1"
-                    elif name == "DB3/1":
-                        name = "DB3"
-                    elif name == "AVFL/R":
-                        if lineageName[0] == "W":
-                            name = "AVFL"
-                        elif lineageName[0] == "P":
-                            name = "AVFR"
+                # XXX: These renaming choices are arbitrary; may be inappropriate
+                if name == "DB1/3":
+                    name = "DB1"
+                elif name == "DB3/1":
+                    name = "DB3"
+                elif name == "AVFL/R":
+                    if lineageName[0] == "W":
+                        name = "AVFL"
+                    elif lineageName[0] == "P":
+                        name = "AVFR"
 
-                    if name in cell_name_counters:
-                        basename = name
-                        while name in cell_name_counters:
-                            cell_name_counters[basename] += 1
-                            name = basename + "(" + str(cell_name_counters[basename]) + ")"
-                    else:
-                        cell_name_counters[name] = 0
+                if name in cell_name_counters:
+                    basename = name
+                    while name in cell_name_counters:
+                        cell_name_counters[basename] += 1
+                        name = basename + "(" + str(cell_name_counters[basename]) + ")"
+                else:
+                    cell_name_counters[name] = 0
 
-                    data[name] = {"lineageName": lineageName, "desc": desc}
+                data[name] = {"lineageName": lineageName, "desc": desc}
 
-            for n in net.neurons():
-                # Get the name of the neuron in its original context
-                name = n.name.one()
-                cell_data = data[str(name)]
-                # Make statements in the result context
-                nn = doc_ctx(n)
-                nn.lineageName(cell_data['lineageName'])
-                nn.description(cell_data['desc'])
-                w.cell(nn)
+        for n in net.neurons():
+            # Get the name of the neuron in its original context
+            name = n.name.one()
+            cell_data = data[str(name)]
+            # Make statements in the result context
+            nn = doc_ctx(n)
+            nn.lineageName(cell_data['lineageName'])
+            nn.description(cell_data['desc'])
+            w.cell(nn)
 
-            # TODO: Add data for other cells here. Requires relating named
-            # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
+        # TODO: Add data for other cells here. Requires relating named
+        # muscle cells to their counterparts in the cell list (e.g. mu_bod(#))
 
-            print("uploaded lineage and descriptions")
-        except Exception:
-            traceback.print_exc()
+        print("uploaded lineage and descriptions")
         return res

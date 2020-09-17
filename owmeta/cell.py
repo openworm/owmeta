@@ -19,6 +19,12 @@ class Cell(BiologyType):
         The name of the cell
     lineageName : str
         The lineageName of the cell
+
+    Examples
+    --------
+    >>> from owmeta_core.quantity import Quantity
+    >>> c = Cell(lineageName="AB plapaaaap",
+    ...     divisionVolume=Quantity("600","(um)^3"))
     """
 
     class_context = BiologyType.class_context
@@ -26,18 +32,11 @@ class Cell(BiologyType):
     rdf_type = CELL_RDF_TYPE
 
     divisionVolume = DatatypeProperty()
-    ''' The volume of the cell at division
-
-        Example::
-
-            >>> v = Quantity("600","(um)^3")
-            >>> c = Cell(lineageName="AB plapaaaap")
-            >>> c.divisionVolume(v)
-            owmeta_core.statement.Statement(...)
-    '''
+    ''' The volume of the cell at division '''
 
     name = DatatypeProperty()
     ''' The 'adult' name of the cell typically used by biologists when discussing C. elegans '''
+
     wormbaseID = DatatypeProperty()
 
     description = DatatypeProperty()
@@ -48,18 +47,13 @@ class Cell(BiologyType):
                              inverse_of=(Channel, 'appearsIn'))
 
     lineageName = DatatypeProperty()
-    ''' The lineageName of the cell
-
-        Example::
-
-            >>> c = Cell(name="ADAL")
-            >>> c.lineageName() # Returns ["AB plapaaaapp"]
-            owmeta_core.statement.Statement(...)
-    '''
+    ''' The lineageName of the cell '''
 
     synonym = DatatypeProperty(multiple=True)
+
     daughterOf = ObjectProperty(value_type=This,
                                 inverse_of=(This, 'parentOf'))
+
     parentOf = ObjectProperty(value_type=This, multiple=True)
 
     key_property = {'property': name, 'type': 'direct'}
@@ -75,12 +69,12 @@ class Cell(BiologyType):
 
         Example::
 
-            >>> c = Cell(name="ADAL")
-            >>> c.blast() # Returns "AB"
-            owmeta_core.statement.Statement(...)
+            >>> c = Cell(name="ADAL", lineageName='AB ')
+            >>> c.blast()
+            'AB'
 
-        Note that this isn't a Property. It returns the blast extracted from
-        the ''first'' lineageName saved.
+        Note that this isn't a `~dataobject_property.Property`. It returns the blast cell
+        part of a `lineageName` value.
         """
         import re
         try:

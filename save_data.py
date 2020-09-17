@@ -2,6 +2,8 @@ import argparse
 import types
 
 from owmeta_core.command import OWM
+from owmeta.data_trans.wormatlas import (WormAtlasCellListDataTranslator,
+                                         WormAtlasCellListDataSource)
 from owmeta.data_trans.wormbase import (WormBaseCSVDataSource,
                                         WormbaseIonChannelCSVDataSource,
                                         WormbaseIonChannelCSVTranslator,
@@ -61,6 +63,16 @@ class DSMethods(metaclass=OrderedClass):
         self.ctx(neurons).description(
                 "Contains descriptions of C. elegans neurons and is the"
                 " principle such list for OpenWorm")
+
+    def wormatlas_cells(self):
+        cells = self.owm.translate(
+                WormAtlasCellListDataTranslator(),
+                data_sources=[
+                    WormAtlasCellListDataSource(key='cells'),
+                    DWEDS(key='neurons')],
+                output_key='cells')
+        self.ctx(cells).description(
+                "Lineage names and descriptions of C. elegans cells from Worm Atlas")
 
     def ion_channels(self):
         ion_channels = self.owm.translate(
@@ -136,7 +148,9 @@ class DSMethods(metaclass=OrderedClass):
                     DWEDS(key='muscle_ion_channels'),
                     DWEDS(key='neuron_ion_channels'),
                     DWEDS(key='connectome'),
-                    DWEDS(key='synclass')],
+                    DWEDS(key='synclass'),
+                    DWEDS(key='cells'),
+                    ],
                 output_identifier='http://openworm.org/data')
 
     def methods(self):

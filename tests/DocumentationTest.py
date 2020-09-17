@@ -97,3 +97,7 @@ def test_channelworm():
 
 def test_neuroml():
     doctest_mod('owmeta.neuroml')
+
+
+def test_cell():
+    doctest_mod('owmeta.cell')
