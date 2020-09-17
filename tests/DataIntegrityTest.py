@@ -258,3 +258,13 @@ class DataIntegrityTest(unittest.TestCase):
         for name in neuron.name.get():
             connected_neurons.add(name)
         self.assertTrue(connected_neurons.isdisjoint(unconnected_neurons))
+
+    def test_neuron_lineage_names(self):
+        """
+        Neurons should have lineage names in the bundle
+        """
+        neuron = self.qctx(Neuron)()
+        self.qctx(Worm).query().get_neuron_network().neuron(neuron)
+
+        for n in neuron.load():
+            assert set(n.lineageName.get())

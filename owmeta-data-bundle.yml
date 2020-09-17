@@ -1,11 +1,12 @@
 ---
 id: openworm/owmeta-data
 name: owmeta data bundle
-version: 2 
+version: 3 
 description: Bundle for OpenWorm data
 patterns:
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression/context_for?*
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons/context_for?*
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells/context_for?*
 includes: 
     - http://openworm.org/data
     - http://openworm.org/data-data:
@@ -54,6 +55,11 @@ includes:
         empty: true
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells-evidence
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#wormbase_cells/context_for?document=http://data.openworm.org/Website#wormbase
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells:
+        empty: true
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells-data:
+        empty: true
+    - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells-evidence
 
 dependencies:
     - id: openworm/owmeta-schema
