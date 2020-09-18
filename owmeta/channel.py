@@ -68,9 +68,6 @@ class Channel(BiologyType):
     expression_pattern = ObjectProperty(multiple=True, value_type=ExpressionPattern)
     ''' A pattern of expression of this cell within an organism '''
 
-    neuroml_file = DatatypeProperty()
-    ''' A NeuroML describing a model of this ion channel '''
-
     proteins = DatatypeProperty(multiple=True)
     ''' Proteins associated with this channel '''
 
