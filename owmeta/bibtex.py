@@ -41,11 +41,37 @@ def make_default_bibtex_parser():
 
 
 def loads(bibtex_string):
+    '''
+    Load BibTeX records from a string
+
+    Parameters
+    ----------
+    bibtex_string : str
+        Text of one or more BibTex records
+
+    Returns
+    -------
+    bibtexparser.bibdatabase.BibDatabase
+        Records represented in the string
+    '''
     parser = make_default_bibtex_parser()
     return bibtexparser.loads(bibtex_string, parser=parser)
 
 
 def load(bibtex_file):
+    '''
+    Load BibTeX records from a file
+
+    Parameters
+    ----------
+    bibtex_file : :term:`file object`
+        File containing one or more BibTex records
+
+    Returns
+    -------
+    bibtexparser.bibdatabase.BibDatabase
+        Records represented in the string
+    '''
     parser = make_default_bibtex_parser()
     return bibtexparser.load(bibtex_file, parser=parser)
 
