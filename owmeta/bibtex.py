@@ -77,11 +77,37 @@ def load(bibtex_file):
 
 
 def load_from_file_named(file_name):
+    '''
+    Loads from a file with the given name
+
+    Parameters
+    ----------
+    file_name : str
+        Name of the bibtex file to open
+
+    Returns
+    -------
+    bibtexparser.bibdatabase.BibDatabase
+        Records from the named file
+    '''
     with open(file_name) as bibtex_file:
         return load(bibtex_file)
 
 
 def parse_bibtex_into_documents(file_name, context=None):
+    '''
+    Parses BibTeX records into a dictionary of `Document` instances
+
+    Parameters
+    ----------
+    bibtex_file : :term:`file object`
+        File containing one or more BibTeX records
+
+    Returns
+    -------
+    dict
+        `Document` instances from the records in the file
+    '''
     res = dict()
     bib_database = load_from_file_named(file_name)
     for entry in bib_database.entries:
