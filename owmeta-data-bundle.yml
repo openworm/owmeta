@@ -1,7 +1,7 @@
 ---
 id: openworm/owmeta-data
 name: owmeta data bundle
-version: 3 
+version: 4
 description: Bundle for OpenWorm data
 patterns:
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression/context_for?*
