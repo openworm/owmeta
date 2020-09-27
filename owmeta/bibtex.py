@@ -6,7 +6,7 @@ from .bibtex_customizations import customizations
 
 
 def bibtex_to_document(bibtex_entry, context=None):
-    """ Takes a single BibTeX entry and translates it into a Document object """
+    """ Takes a single BibTeX entry and translates it into a `.Document` object """
     from owmeta.document import Document
 
     res = Document.contextualize(context)()
@@ -96,7 +96,7 @@ def load_from_file_named(file_name):
 
 def parse_bibtex_into_documents(file_name, context=None):
     '''
-    Parses BibTeX records into a dictionary of `Document` instances
+    Parses BibTeX records into a dictionary of `.Document` instances
 
     Parameters
     ----------
@@ -106,7 +106,7 @@ def parse_bibtex_into_documents(file_name, context=None):
     Returns
     -------
     dict
-        `Document` instances from the records in the file
+        `.Document` instances from the records in the file
     '''
     res = dict()
     bib_database = load_from_file_named(file_name)
