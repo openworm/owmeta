@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+import unittest
 from .DataTestTemplate import _DataTest
-from PyOpenWorm.document import Document
+from owmeta_core.graph_object import IdentifierMissingException
+from owmeta.document import (Document,
+                             _doi_uri_to_doi,
+                             WormbaseRetrievalException)
 import pytest
 
 
@@ -24,12 +28,46 @@ class DocumentTest(_DataTest):
         """
         self.assertIn(u'Jean César', self.ctx.Document(bibtex=bibtex).author())
 
+    def test_doi_param_sets_id(self):
+        doc = Document(doi='blah')
+        self.assertIsNotNone(doc.identifier)
+
+    def test_doi_uri_param_sets_id(self):
+        doc1 = Document(doi='http://doi.org/blah')
+        doc2 = Document(doi='blah')
+        self.assertEquals(doc2.identifier, doc1.identifier)
+
+    def test_non_doi_uri_to_doi(self):
+        doc = Document(doi='http://example.org/blah')
+        self.assertIsNotNone(doc.identifier)
+
+
+class DOIURITest(unittest.TestCase):
+    def test_match(self):
+        doi = _doi_uri_to_doi('http://doi.org/blah')
+        self.assertEqual('blah', doi)
+
+    def test_nomatch(self):
+        doi = _doi_uri_to_doi('http://example.org/blah')
+        self.assertIsNone(doi)
+
+    def test_not_a_uri(self):
+        doi = _doi_uri_to_doi('10.1098/rstb.1952.0012')
+        self.assertIsNone(doi)
+
+    def test_not_doi(self):
+        doi = _doi_uri_to_doi('blahblah')
+        self.assertIsNone(doi)
+
 
 @pytest.mark.inttest
 class DocumentElaborationTest(_DataTest):
     '''
-    Tests for Document 'elaboration', the process of looking up documents from external resources by using their
-    identifiers and setting those values on the object
+    Tests for Document 'elaboration', the process of looking up documents from external
+    resources by using their identifiers and setting those values on the object
+
+    Use a Pubmed API key when running all of them at once to avoid hitting the public
+    request rate limit
     '''
     ctx_classes = (Document,)
 
@@ -90,9 +128,13 @@ class DocumentElaborationTest(_DataTest):
         self.assertIn(u'Frederic MY', list(doc.author()))
 
     def test_wormbase_year(self):
-        """ Just make sure we can extract something without crashing """
         for i in range(600, 610):
             wbid = 'WBPaper00044' + str(i)
             doc = self.ctx.Document(wormbase=wbid)
             doc.update_from_wormbase()
             doc.year()
+
+    def test_no_wormbase_id(self):
+        doc = self.ctx.Document()
+        with self.assertRaises(WormbaseRetrievalException):
+            doc.update_from_wormbase()

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from __future__ import absolute_import
+
+from owmeta_core.dataobject import DataObject
+from owmeta_core.configure import Configurable
+
+from owmeta.evidence import Evidence
+
 from .DataTestTemplate import _DataTest
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.dataObject import DataObject
-from PyOpenWorm.configure import Configureable
 
 try:
     from unittest.mock import patch
@@ -16,7 +19,7 @@ class EvidenceTest(_DataTest):
     ctx_classes = (Evidence,)
 
     def setUp(self):
-        self.patcher = patch('PyOpenWorm.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
+        self.patcher = patch('owmeta_core.data', 'ALLOW_UNCONNECTED_DATA_USERS', True)
         self.patcher.start()
         super(EvidenceTest, self).setUp()
 
@@ -42,8 +45,8 @@ class EvidenceTest(_DataTest):
         self.save()
         e0 = self.ctx.Evidence()
         e0.supports(r)
-        s = list(e0.load())
-        self.assertIn(e, s)
+        s = list(e0.load_terms())
+        self.assertIn(e.identifier, s)
 
     def test_asserts_query_multiple(self):
         """ Show that setting the evidence with distinct objects yields
@@ -68,9 +71,9 @@ class EvidenceTest(_DataTest):
             # Testing that either a has a result tom@cn.com and y has nothing or
             # y has a result 1999 and a has nothing
             if x.idl == e1.idl:
-                self.assertEqual(lbr, br)
+                self.assertEqual(lbr.identifier, br.identifier)
             elif x.idl == e.idl:
-                self.assertEqual(lar, ar)
+                self.assertEqual(lar.identifier, ar.identifier)
             else:
                 self.fail("Unknown object returned from load")
 
@@ -79,7 +82,7 @@ class Issue211EvidenceTest(_DataTest):
     """
     Can we assert the same fact with two distinct pieces of Evidence?
 
-    issue: openworm/PyOpenWorm#211
+    issue: openworm/owmeta#211
 
     """
 

@@ -10,12 +10,12 @@ import shutil
 from os.path import join as p
 from rdflib.term import URIRef
 
-from PyOpenWorm.data_trans.neuron_data import NeuronCSVDataTranslator, NeuronCSVDataSource
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.document import Document
-from PyOpenWorm.network import Network
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.evidence import Evidence
+from owmeta.data_trans.neuron_data import NeuronCSVDataTranslator, NeuronCSVDataSource
+from owmeta.neuron import Neuron
+from owmeta.document import Document
+from owmeta.network import Network
+from owmeta.worm import Worm
+from owmeta.evidence import Evidence
 from .DataTestTemplate import _DataTest
 
 
@@ -39,13 +39,16 @@ class NeuronCSVDataTranslatorTest(_Base):
 
     def setUp(self):
         super(NeuronCSVDataTranslatorTest, self).setUp()
+        self.process_class(Worm)
+        self.process_class(Neuron)
+        self.process_class(Network)
         fname = p(self.testdir, 'mycsv.csv')
         text = '''
 header,row,completely,ignored,x
 ADAR,Neuropeptide,PDF-1,WormAtlas,http://wormatlas.org/neurons/Individual%20Neurons/ADAmainframe.htm'''
         with open(fname, 'w') as f:
             f.write(text.strip())
-        self.ds.csv_file_name('mycsv.csv')
+        self.ds.file_name('mycsv.csv')
 
     def test_creates_neuron(self):
         res = self.cut(self.ds, output_identifier=URIRef('http://example.org/smashing'))
@@ -93,7 +96,7 @@ ADAR,Neuropeptide,PDF-1,WormAtlas,'''
         with open(fname, 'w') as f:
             f.write(text.strip())
 
-        self.ds.csv_file_name('mycsv.csv')
+        self.ds.file_name('mycsv.csv')
 
     def test_no_evidence(self):
         res = self.cut(self.ds, output_identifier=URIRef('http://example.org/wonderful'))
@@ -113,9 +116,11 @@ header,row,completely,ignored,x
 ADAR,Neuropeptide,PDF-1,WormAtlas,'''
         with open(fname, 'w') as f:
             f.write(text.strip())
-        self.ds.csv_file_name('mycsv.csv')
+        self.mapper.add_class(Evidence)
+        self.mapper.add_class(Document)
+        self.ds.file_name('mycsv.csv')
         self.ds.bibtex_files(['ignored'])
-        self.patcher = patch('PyOpenWorm.data_trans.neuron_data.parse_bibtex_into_documents')
+        self.patcher = patch('owmeta.data_trans.neuron_data.parse_bibtex_into_documents')
         mock = self.patcher.start()
 
         def m(a, ctx):

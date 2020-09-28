@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import print_function
-import unittest
-import itertools
 
-from .TestUtilities import xfail_without_db
-import PyOpenWorm
-from PyOpenWorm.context import Context
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.evidence import evidence_for
-from PyOpenWorm import connect, disconnect
+from owmeta_core.context import Context
+from owmeta.neuron import Neuron
+from owmeta.evidence import Evidence
+from owmeta.evidence import evidence_for
 from .DataTestTemplate import _DataTest
+
 
 class EvidenceForTest(_DataTest):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
         # Make the statements and evidence we will query for in the test
         super(EvidenceForTest, self).setUp()
+        self.process_class(Evidence)
         c1 = Context(ident='http://example.org/statements', conf=self.conf)
         c1(Neuron)('AVAL').innexin('UNC-7')
         evc = Context(ident='http://example.org/metadata', conf=self.conf)
@@ -37,7 +34,7 @@ class EvidenceForTest(_DataTest):
         # Make the context we query statements from. This could be a 'staged'
         # context, but in this case we use what we've written to the IOMemory
         # store provided by _DataTest in self.conf['rdf.graph']
-        ctx = Context(conf=self.conf).stored
+        ctx = self.connection(Context)().stored
 
         # Actually do the query
         ev_iterable = evidence_for(qctx, ctx)
@@ -53,7 +50,7 @@ class EvidenceForTest(_DataTest):
         # Make the context we query statements from. This could be a 'staged'
         # context, but in this case we use what we've written to the IOMemory
         # store provided by _DataTest in self.conf['rdf.graph']
-        ctx = Context(conf=self.conf).stored
+        ctx = self.connection(Context)().stored
 
         # Actually do the query
         ev_iterable = evidence_for(qctx, ctx)
@@ -68,9 +65,9 @@ class EvidenceForTest(_DataTest):
         # Make the context we query statements from. This could be a 'staged'
         # context, but in this case we use what we've written to the IOMemory
         # store provided by _DataTest in self.conf['rdf.graph']
-        ctx = Context(ident='http://example.org/statements', conf=self.conf).stored
+        ctx = self.connection(Context)(ident='http://example.org/statements').stored
         # Make the context that we query Evidence from
-        evctx = Context(ident='http://example.org/metadata', conf=self.conf).stored
+        evctx = self.connection(Context)(ident='http://example.org/metadata').stored
 
         # Actually do the query
         ev_iterable = evidence_for(qctx, ctx, evctx)
@@ -85,11 +82,12 @@ class EvidenceForTest(_DataTest):
         # Make the context we query statements from. This could be a 'staged'
         # context, but in this case we use what we've written to the IOMemory
         # store provided by _DataTest in self.conf['rdf.graph']
-        ctx = Context(ident='http://example.org/statements', conf=self.conf).stored
-        evctx = Context(ident='http://example.org/somerandomcontext', conf=self.conf).stored
+        ctx = self.connection(Context)(ident='http://example.org/statements').stored
+        evctx = self.connection(Context)(ident='http://example.org/somerandomcontext').stored
 
         # Actually do the query
-        ev_iterable = evidence_for(qctx, ctx, evctx)
+        ev_iterable = iter(evidence_for(qctx, ctx, evctx))
 
         # Verify that there is at least one evidence object returned
-        self.assertEqual(len(ev_iterable), 0)
+        ev = next(ev_iterable, None)
+        self.assertEqual(ev, None)

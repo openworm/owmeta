@@ -1,10 +1,9 @@
 from __future__ import absolute_import
-from PyOpenWorm import config
-from PyOpenWorm.data import DataUser
+from owmeta_core.data import DataUser
 from .DataTestTemplate import _DataTest
 
-from PyOpenWorm.channel import Channel
-from PyOpenWorm.cell import Cell
+from owmeta.channel import Channel
+from owmeta.cell import Cell
 
 
 class ChannelTest(_DataTest):
@@ -35,7 +34,8 @@ class ChannelTest(_DataTest):
         self.save()
 
         cell = self.ctx.Cell(name='cell')
-        self.assertEqual(set(cell.channel()), set([c1, c2]))
+        self.assertEqual(set(cell.channel.get_terms()),
+                         set([c1.identifier, c2.identifier]))
 
     def test_set_channel_get_appearsIn(self):
         c1 = self.ctx.Channel(name='K+')
@@ -46,7 +46,8 @@ class ChannelTest(_DataTest):
         self.save()
 
         chan = self.ctx.Channel(name='K+')
-        self.assertEqual(set([cell]), set(chan.appearsIn()))
+        self.assertEqual(set([cell.identifier]),
+                         set(chan.appearsIn.get_terms()))
 
     def test_set_appearsIn_get_channel(self):
         c1 = self.ctx.Channel(name='K+')
@@ -59,7 +60,8 @@ class ChannelTest(_DataTest):
         self.save()
 
         cell = self.ctx.Cell(name='cell')
-        self.assertEqual(set([c1, c2]), set(cell.channel()))
+        self.assertEqual(set([c1.identifier, c2.identifier]),
+                         set(cell.channel.get_terms()))
 
     def test_set_appearsIn_channel_property_in_graph(self):
         chan = self.ctx.Channel(name='K+')

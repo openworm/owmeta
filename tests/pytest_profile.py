@@ -84,7 +84,7 @@ def pytest_runtest_call(item):
 
     # Item's excinfo will indicate any exceptions thrown
     if item.enabled and outcome.excinfo is None:
-        # item.listnames() returns list of form: ['PyOpenWorm', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
+        # item.listnames() returns list of form: ['owmeta', 'tests/CellTest.py', 'CellTest', 'test_blast_space']
         fp = FunctionProfile(cprofile=item.profiler, function_name=item.listnames()[-1])
         function_profile_list.append(fp)
 
@@ -241,7 +241,7 @@ class FunctionProfile(object):
         self.primitive_calls = json_dict["primitive_calls"]
         self.total_time = json_dict["total_time"]
 
-    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", executable="Python", project="PyOpenWorm"):
+    def to_codespeed_dict(self, commit="0", branch="dev", environment="Dual Core", executable="Python", project="owmeta"):
         """
         :param commit: Codespeed current commit argument.
         :param branch: Codespeed current branch argument.

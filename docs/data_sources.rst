@@ -1,30 +1,30 @@
 .. _data_sources:
 
-|pow| Data Sources
+|owm| Data Sources
 ==================
 
-The sources of data for PyOpenWorm are stored in the `OpenWormData
-repository <https://github.com/openworm/PyOpenWorm>`_. A few
-:py:class:`DataTranslators <~PyOpenWorm.datasource.DataTranslator>` translate
-these data into common PyOpenWorm data sources. You can list these by running::
+The sources of data for owmeta are stored in the `OpenWormData
+repository <https://github.com/openworm/OpenWormData>`_. A few
+:py:class:`DataTranslators <~owmeta.datasource.DataTranslator>` translate
+these data into common owmeta data sources. You can list these by running::
 
-    pow source list
+    owm source list
 
 and you can show some of the properties of a data source by running::
 
-    pow source show $SOURCE_IDENTIFIER
+    owm source show $SOURCE_IDENTIFIER
 
 For instance, you can run the following to see the top-level data source, try::
 
-    pow source show http://openworm.org/data
+    owm source show http://openworm.org/data
 
 This will print out summary descriptions of the sources that contribute to the
 main data source.
 
 
-A Note on |pow| Data
+A Note on |owm| Data
 --------------------
-Below, each major element of the worm's anatomy that |pow| stores data
+Below, each major element of the worm's anatomy that |owm| stores data
 on is considered individually. The data being used is tagged by source
 in a superscript, and the decisions made during the curation process
 (if any) are described.
@@ -43,27 +43,27 @@ Neurons
 
 .. _gs1: https://docs.google.com/spreadsheets/d/1NDx9LRF_B2phR5w4HlEtxJzxx1ZIPT2gA0ZmNmozjos/edit#gid=1
 .. _gs2: https://docs.google.com/spreadsheets/d/1Jc9pOJAce8DdcgkTgkUXafhsBQdrer2Y47zrHsxlqWg/edit
-.. _m3: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L145
-.. _m4: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L287
-.. _m5: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68
-.. _m7: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L262
-.. _m8: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L274
-.. _m9: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L280
-.. _m10: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L268
-.. _csv1: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv
-.. _csv2: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormBase.csv
-.. _tsv1: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv
+.. _m3: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L145
+.. _m4: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L287
+.. _m5: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L68
+.. _m7: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L262
+.. _m8: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L274
+.. _m9: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L280
+.. _m10: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L268
+.. _csv1: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/Modified%20celegans%20db%20dump.csv
+.. _csv2: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormBase.csv
+.. _tsv1: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/C.%20elegans%20Cell%20List%20-%20WormAtlas.tsv
 
 Gene expression data below, additional to that extracted from WormAtlas
 concerning receptors, neuropeptides, neurotransmitters and innexins are parsed
 by `this method
-<https://github.com/openworm/PyOpenWorm/blob/4eb25df267ce385053f746ceb66e74d9c616403f/OpenWormData/scripts/insert_worm.py#L217>`_:
+<https://github.com/openworm/owmeta/blob/4eb25df267ce385053f746ceb66e74d9c616403f/OpenWormData/scripts/insert_worm.py#L217>`_:
 
 - Monoamine secretors and receptors, neuropeptide secretors and receptors [4]_:
   Dynamic version on `this google spreadsheet
   <https://docs.google.com/spreadsheets/d/1kCxOOKu1wAREa9VbBiWVVHh-GEC3kJk0A3YVEipPKcc/edit#gid=0>`_.
   Staged in `this csv file
-  <https://github.com/openworm/PyOpenWorm/blob/27647748981fe0fe135b8aa39191c0e32579c923/OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv>`_.
+  <https://github.com/openworm/owmeta/blob/27647748981fe0fe135b8aa39191c0e32579c923/OpenWormData/aux_data/expression_data/Bentley_et_al_2016_expression.csv>`_.
 
 Muscle cells
 ------------
@@ -81,9 +81,9 @@ Muscle cells
   communicated by S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by
   `this method <m12_>`_.
 
-.. _csv3: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv
-.. _m11: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L44
-.. _m12: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L432
+.. _csv3: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/aux_data/herm_full_edgelist.csv
+.. _m11: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L44
+.. _m12: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L432
 
 Connectome
 ----------
@@ -95,7 +95,7 @@ Connectome
   S. Cook.  Staged in `this csv file <csv3_>`_.  Parsed by `this method
   <m13_>`_.
 
-.. _m13: https://github.com/openworm/PyOpenWorm/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L423
+.. _m13: https://github.com/openworm/owmeta/blob/945f7172f0dff1d022ce0574f3c630ee53297386/OpenWormData/scripts/insert_worm.py#L423
 
 Curation note
 ^^^^^^^^^^^^^

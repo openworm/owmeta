@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm as P
+import owmeta as P
 import datetime
 from yarom.quantity import Quantity
-from PyOpenWorm.channel import Channel
-from PyOpenWorm.channelworm import PatchClampChannelModel, PatchClampExperiment
-from PyOpenWorm.context import Context
-from PyOpenWorm.evidence import Evidence
-from PyOpenWorm.experiment import Experiment
+from owmeta.channel import Channel
+from owmeta.channelworm import PatchClampChannelModel, PatchClampExperiment
+from owmeta.context import Context
+from owmeta.evidence import Evidence
+from owmeta.experiment import Experiment
 
 #Connect to existing database.
 P.connect('default.conf')

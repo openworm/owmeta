@@ -1,18 +1,18 @@
 .. _test:
 
-Testing in PyOpenWorm
+Testing in owmeta
 =====================
 
 Preparing for tests
 -------------------
 
-PyOpenWorm should be installed like::
+Within the owmeta project directory, owmeta can be installed for development and testing like this::
 
-    python setup.py develop
+    pip install --editable .
 
-The default database should be populated like::
+The project database should be populated like::
 
-    pow clone https://github.com/openworm/OpenWormData.git
+    owm clone https://github.com/openworm/OpenWormData.git
 
 Running tests
 -------------
@@ -35,5 +35,5 @@ tests, tests can also be tagged using pytest marks like::
         ...
 
 Currently, marks are used to distinguish between unit-level tests and others
-which have the ``inttest`` mark
-
+which have the ``inttest`` mark. All marks are listed in pytest.ini under
+'markers'.

@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 from .DataTestTemplate import _DataTest
-from PyOpenWorm.experiment import Experiment
-from PyOpenWorm.document import Document
-from PyOpenWorm.data import DataUser
+from owmeta.experiment import Experiment
+from owmeta.document import Document
+from owmeta_core.data import DataUser
 
 
 class ExperimentTest(_DataTest):

@@ -1,9 +1,8 @@
 from __future__ import absolute_import
-import PyOpenWorm
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.network import Network
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
+from owmeta.worm import Worm
+from owmeta.network import Network
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
 
 from .DataTestTemplate import _DataTest
 
@@ -52,4 +51,4 @@ class NetworkTest(_DataTest):
         self.net.neuron(n1)
         self.save()
         n = self.context.stored(Network)()
-        self.assertIn(n1, n.interneurons())
+        self.assertIn(n1.identifier, [x.identifier for x in n.interneurons()])

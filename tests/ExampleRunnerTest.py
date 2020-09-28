@@ -3,12 +3,17 @@ import unittest
 import os
 import subprocess as SP
 import shutil
+import shlex
 import tempfile
+from six import string_types
 from os.path import join as p
+
+import pytest
 
 from .TestUtilities import xfail_without_db
 
 
+@pytest.mark.inttest
 class ExampleRunnerTest(unittest.TestCase):
 
     """ Runs the examples to make sure we didn't break the API for them. """
@@ -19,7 +24,7 @@ class ExampleRunnerTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('.owm', p(self.testdir, '.owm'), symlinks=True)
         shutil.copytree('examples', p(self.testdir, 'examples'), symlinks=True)
         self.startdir = os.getcwd()
         os.chdir(p(self.testdir, 'examples'))
@@ -33,11 +38,17 @@ class ExampleRunnerTest(unittest.TestCase):
         shutil.rmtree(self.testdir)
 
     def execfile(self, example_file_name):
+        self.exec_(["python", example_file_name])
+
+    def exec_(self, command, **kwargs):
+        if isinstance(command, string_types):
+            command = shlex.split(command)
         fname = tempfile.mkstemp()[1]
         with open(fname, 'w+') as out:
-            stat = SP.call(["python", example_file_name],
+            stat = SP.call(command,
                            stdout=out,
-                           stderr=out)
+                           stderr=out,
+                           **kwargs)
             out.seek(0)
             self.assertEqual(0, stat,
                 "Example failed with status {}. Its output:\n{}".format(
@@ -52,9 +63,6 @@ class ExampleRunnerTest(unittest.TestCase):
         # XXX: No `synclass' is given, so all neurons are called `excitatory'
         self.execfile("NetworkInfo.py")
 
-    def test_run_morpho(self):
-        self.execfile("morpho.py")
-
     def test_gap_junctions(self):
         self.execfile("gap_junctions.py")
 
@@ -64,9 +72,12 @@ class ExampleRunnerTest(unittest.TestCase):
     def test_bgp(self):
         self.execfile("test_bgp.py")
 
-    @unittest.skip("See #102")
     def test_rmgr(self):
         self.execfile("rmgr.py")
 
     def test_extrasyn(self):
         self.execfile("extrasynaptic_edges.py")
+
+    @pytest.mark.data_bundle
+    def test_list_conns(self):
+        self.execfile("list_conns.py")

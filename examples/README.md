@@ -1,8 +1,8 @@
-Some of these examples employ dummy database configurations just to demonstrate how to use the PyOpenWorm API.
+Some of these examples employ dummy database configurations just to demonstrate how to use the owmeta API.
 
 To run others (those that connect with `default.conf`) you need to have a database set up.
 
-To set up a database, you can run `PyOpenWorm.loadData` in the project root directory (there is also an example of creating the database in PyOpenWorm's main README).
+To set up a database, you can run `owmeta.loadData` in the project root directory (there is also an example of creating the database in owmeta's main README).
 
 *Note:* These examples assume that you are running them in the directory they're stored in.
 
@@ -53,7 +53,7 @@ Finally, we save our mock db and the Evidence/Neuron it contains.
 
 #####5. `NetworkInfo.py`
 
-This script is an example of generating simple but useful output by querying with PyOpenWorm.
+This script is an example of generating simple but useful output by querying with owmeta.
 Similar to an earlier example, we get the Worm object, then the Network object from it.
 
 We then make a list of neuron names we are interested in, and iterate through each of the corresponding Neuron objects.

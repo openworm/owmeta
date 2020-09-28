@@ -8,12 +8,11 @@ import os
 from os.path import join as p
 import tempfile
 import shutil
-import pytest
 from collections import namedtuple
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    from mock import MagicMock
+import importlib as IM
+
+import pytest
+
 from .doctest_plugin import ALLOW_UNICODE, UnicodeOutputChecker
 from .TestUtilities import xfail_without_db
 
@@ -28,7 +27,7 @@ class READMETest(unittest.TestCase):
         xfail_without_db()
         self.startdir = os.getcwd()
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        shutil.copytree('.pow', p(self.testdir, '.pow'), symlinks=True)
+        shutil.copytree('.owm', p(self.testdir, '.owm'), symlinks=True)
         shutil.copyfile('README.md', p(self.testdir, 'README.md'))
         shutil.copyfile('readme.conf', p(self.testdir, 'readme.conf'))
         os.chdir(self.testdir)
@@ -62,29 +61,43 @@ class SphinxTest(unittest.TestCase):
 
     def test_adding_data(self):
         # Setup a class imported by docs for demonstration purposes
-        from PyOpenWorm.dataObject import DataObject, DatatypeProperty
-        from PyOpenWorm.context import Context
+        from owmeta_core.dataobject import DataObject, DatatypeProperty
+        from owmeta_core.context import Context
         Load = lambda *args, **kwargs: [namedtuple('Record', ('pnum', 'flns', 'hrds'))(12, 1.0, 100)]
 
         class Widget(DataObject):
+            class_context = 'http://example.org/test_adding_data'
+            rdf_type = 'http://example.org/BDW/schema/Widget'
+            rdf_namespace = 'http://example.org/BDW/entities/Widget#'
             hardiness = DatatypeProperty()
             fullness = DatatypeProperty()
             part_number = DatatypeProperty()
-
-            def identifier_augment(self):
-                return self.make_identifier_direct(str(self.part_number.onedef()))
-
-            def defined_augment(self):
-                return self.part_number.has_defined_value()
+            key_property = {'name': 'part_number', 'type': 'direct'}
 
         ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2018-2019')
-        ctx.mapper.process_class(Widget)
 
+        ctx.mapper.process_class(Widget)
         ctx(Widget)(part_number=15)
         ctx(Widget)(part_number=17)
         ctx(Widget)(part_number=20)
 
         self.execute('adding_data', extraglobs={'Load': Load, 'Widget': Widget, 'ctx18': ctx})
 
-    def test_making_dataObjects(self):
-        self.execute('making_dataObjects')
+
+def doctest_mod(module_name):
+    mod = IM.import_module(module_name)
+    [failure_count, return_count] = doctest.testmod(mod,
+            optionflags=ALLOW_UNICODE | doctest.ELLIPSIS)
+    assert failure_count == 0
+
+
+def test_channelworm():
+    doctest_mod('owmeta.channelworm')
+
+
+def test_neuroml():
+    doctest_mod('owmeta.neuroml')
+
+
+def test_cell():
+    doctest_mod('owmeta.cell')

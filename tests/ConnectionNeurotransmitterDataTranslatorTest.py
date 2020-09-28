@@ -1,40 +1,34 @@
 from __future__ import absolute_import
 from __future__ import print_function
-from textwrap import dedent
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 import os
 import tempfile
 import shutil
 from os.path import join as p
-from rdflib.term import URIRef
 
-from PyOpenWorm.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
-from PyOpenWorm.data_trans.connections import (NeuronConnectomeSynapseClassTranslator,
-                                               ConnectomeCSVDataSource)
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.connection import Connection
-from PyOpenWorm.context import IMPORTS_CONTEXT_KEY
+from owmeta.data_trans.data_with_evidence_ds import DataWithEvidenceDataSource
+from owmeta.data_trans.connections import (NeuronConnectomeSynapseClassTranslator,
+                                           ConnectomeCSVDataSource)
+from owmeta.neuron import Neuron
+from owmeta.connection import Connection
+from owmeta_core.context import IMPORTS_CONTEXT_KEY
 from .DataTestTemplate import _DataTest
 
 
 class _Base(_DataTest):
     def setUp(self):
         super(_Base, self).setUp()
-        self.conf[IMPORTS_CONTEXT_KEY] = 'http://example.org'
+        self.conf[IMPORTS_CONTEXT_KEY] = 'http://example.org/imports_context'
         self.startdir = os.getcwd()
         self.testdir = tempfile.mkdtemp(prefix=__name__ + '.')
-        os.chdir(self.testdir)
+        self.mapper.add_class(Connection)
+        self.mapper.save()
         self.conn_ds = self.context(DataWithEvidenceDataSource)(key='test_dweds')
-        self.nt_ds = self.context(ConnectomeCSVDataSource)()
+        self.nt_ds = self.context(ConnectomeCSVDataSource)(key='nt_ds')
         self.nt_ds.basedir = lambda: self.testdir
         self.cut = self.context(NeuronConnectomeSynapseClassTranslator)()
 
     def tearDown(self):
         super(_Base, self).tearDown()
-        os.chdir(self.startdir)
         shutil.rmtree(self.testdir)
 
 
@@ -46,10 +40,11 @@ class InexactNumberMatchTest(_Base):
         text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
             f.write(text)
-        self.nt_ds.csv_file_name('mycsv.csv')
+        self.nt_ds.file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
                                               syntype='send')
+        self.nt_ds.commit()
         self.conn_ds.commit()
 
     def test_connection_exists(self):
@@ -73,7 +68,7 @@ class ExactNumberMatchTest(_Base):
         text = 'PreCell;PostCell;send;3;neurotransmitter'
         with open(fname, 'w') as f:
             f.write(text)
-        self.nt_ds.csv_file_name('mycsv.csv')
+        self.nt_ds.file_name('mycsv.csv')
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
                                               syntype='send',

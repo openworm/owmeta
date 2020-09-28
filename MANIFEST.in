@@ -1,1 +1,1 @@
-include PyOpenWorm/default.conf
+include owmeta/default.conf

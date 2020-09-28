@@ -5,11 +5,11 @@ import unittest
 import itertools
 
 from .TestUtilities import xfail_without_db
-import PyOpenWorm
-from PyOpenWorm.context import Context
-from PyOpenWorm.neuron import Neuron
-from PyOpenWorm.worm import Worm
-from PyOpenWorm.evidence import Evidence
+import owmeta_core
+from owmeta_core.context import Context
+from owmeta.neuron import Neuron
+from owmeta.worm import Worm
+from owmeta.evidence import Evidence
 
 
 # XXX: This could probably just be one test at this point -- iterate over all contexts and check for an
@@ -18,17 +18,17 @@ class EvidenceCoverageTest(unittest.TestCase):
     ''' Tests for statements having an associated Evidence object '''
     def setUp(self):
         xfail_without_db()
-        self.conn = PyOpenWorm.connect(configFile='tests/data_integrity_test.conf')
+        self.conn = owmeta_core.connect(configFile='tests/data_integrity_test.conf')
         self.g = self.conn.conf["rdf.graph"]
         self.context = Context()
         self.qctx = self.context.stored
 
     def tearDown(self):
-        PyOpenWorm.disconnect(self.conn)
+        owmeta_core.disconnect(self.conn)
 
     def test_verify_neurons_have_evidence(self):
         """
-        For each neuron in PyOpenWorm, verify
+        For each neuron in owmeta, verify
         that there is supporting evidence
         """
 
@@ -49,7 +49,7 @@ class EvidenceCoverageTest(unittest.TestCase):
         self.assertTrue(0 not in evcheck, "There appears to be no evidence: " + str(evcheck))
 
     def test_verify_muslces_have_evidence(self):
-        """ For each muscle in PyOpenWorm, verify
+        """ For each muscle in owmeta, verify
         that there is supporting evidence"""
         muscles = list(self.qctx(Worm)().muscles())
         evcheck = []
@@ -67,7 +67,7 @@ class EvidenceCoverageTest(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_verify_connections_have_evidence(self):
-        """ For each connection in PyOpenWorm, verify that there is
+        """ For each connection in owmeta, verify that there is
         supporting evidence. """
         net = Worm().get_neuron_network()
         connections = list(net.synapses())
@@ -80,7 +80,7 @@ class EvidenceCoverageTest(unittest.TestCase):
 
     @unittest.skip('There is no information at present about channels')
     def test_verify_channels_have_evidence(self):
-        """ For each channel in PyOpenWorm, verify that there is
+        """ For each channel in owmeta, verify that there is
         supporting evidence. """
         pass
 

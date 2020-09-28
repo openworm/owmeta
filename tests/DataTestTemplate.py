@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import PyOpenWorm
+import owmeta_core
 import unittest
 import subprocess
 import tempfile
 
-from PyOpenWorm.context import Context
-from PyOpenWorm.data import Data
+from owmeta_core.context import Context
+from owmeta_core.data import Data
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
@@ -27,7 +27,6 @@ class _DataTest(unittest.TestCase):
                 raise e
 
     def setUp(self):
-        # Set do_logging to True if you like walls of text
         self.TestConfig = Data.open(TEST_CONFIG)
         td = '__tempdir__'
         z = self.TestConfig['rdf.store_conf']
@@ -36,21 +35,25 @@ class _DataTest(unittest.TestCase):
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
         self.delete_dir()
-        self.connection = PyOpenWorm.connect(conf=self.TestConfig, do_logging=False)
-        self.context = Context(ident='http://example.org/test-context',
-                               conf=self.TestConfig)
+        self.connection = owmeta_core.connect(conf=self.TestConfig)
+        self.mapper = self.connection.mapper
+        self.process_class = self.connection.mapper.process_class
+        self.context = self.connection(Context)(ident='http://example.org/test-context',
+                                                conf=self.TestConfig)
         typ = type(self)
         if hasattr(typ, 'ctx_classes'):
-            if isinstance(dict, typ.ctx_classes):
+            if isinstance(typ.ctx_classes, dict):
                 self.ctx = self.context(typ.ctx_classes)
+                self.mapper.process_classes(typ.ctx_classes.values)
             else:
+                self.mapper.process_classes(*typ.ctx_classes)
                 self.ctx = self.context({x.__name__: x for x in typ.ctx_classes})
 
     def save(self):
         self.context.save_context()
 
     def tearDown(self):
-        PyOpenWorm.disconnect(self.connection)
+        owmeta_core.disconnect(self.connection)
         self.delete_dir()
 
     @property

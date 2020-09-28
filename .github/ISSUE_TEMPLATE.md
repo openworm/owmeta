@@ -9,7 +9,7 @@ If this issue is intended to be a *bug report*, please fill out the following:
 
 ---
 
-If this issue is a question about the usage, behavior, or design of PyOpenWorm,
+If this issue is a question about the usage, behavior, or design of owmeta,
 please attach the 'question' label. For questions about behavior, you are most
 likely to get a good answer quickly if you provide a [short, self-contained
 example](http://www.sscce.org/) demonstrating the behavior.

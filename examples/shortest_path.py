@@ -11,9 +11,9 @@ import six
 sys.path.insert(0,'..')
 
 import apsp
-import PyOpenWorm as P
+import owmeta as P
 import numpy as np
-# Start PyOpenWorm
+# Start owmeta
 P.connect('default.conf')
 try:
     # make the matrix
@@ -61,5 +61,5 @@ try:
     np.save("celegans_apsp.npy", mat)
 
 finally:
-    # Be sure to disconnect from PyOpenWorm to prevent resource leaks!
+    # Be sure to disconnect from owmeta to prevent resource leaks!
     P.disconnect()
