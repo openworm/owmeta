@@ -15,7 +15,7 @@ from ..cell import Cell
 from ..document import Document
 from ..evidence import Evidence
 from ..neuron import Neuron
-from ..muscle import Muscle
+from ..muscle import Muscle, BodyWallMuscle
 from ..worm import Worm
 from ..network import Network
 
@@ -110,7 +110,7 @@ class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
         res.evidence_context(Evidence)(key="emmons2015",
                 reference=doc,
                 supports=docctx.rdf_object)
-        with docctx(Neuron, Muscle, Cell, Connection) as ctx:
+        with docctx(Neuron, Muscle, BodyWallMuscle, Cell, Connection) as ctx:
             res.data_context.add_import(ctx.context)
             with open(data_source.full_path()) as csvfile:
                 edge_reader = csv.reader(csvfile)
@@ -125,16 +125,13 @@ class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
                     elif syn_type == 'chemical':
                         syn_type = 'send'
 
+                    source_is_bwm = 'BWM' in source.upper()
+                    target_is_bwm = 'BWM' in target.upper()
+
                     source = normalize_cell_name(source).upper()
                     target = normalize_cell_name(target).upper()
 
                     weight = int(weight)
-
-                    # remove BMW from Body Wall Muscle cells
-                    if 'BWM' in source:
-                        source = normalize_muscle(source)
-                    if 'BWM' in target:
-                        target = normalize_muscle(target)
 
                     # change certain muscle names to names in wormbase
                     if source in changed_muscles:
@@ -142,8 +139,8 @@ class NeuronConnectomeCSVTranslator(DTMixin, CSVDataTranslator):
                     if target in changed_muscles:
                         target = changed_muscle(target)
 
-                    sources = convert_to_cell(ctx, source, muscles, neurons)
-                    targets = convert_to_cell(ctx, target, muscles, neurons)
+                    sources = convert_to_cell(ctx, source, muscles, neurons, source_is_bwm)
+                    targets = convert_to_cell(ctx, target, muscles, neurons, target_is_bwm)
 
                     for s in sources:
                         for t in targets:
@@ -241,16 +238,21 @@ class NeuronConnectomeSynapseClassTranslator(DTMixin, CSVDataTranslator):
         return res
 
 
-def convert_to_cell(ctx, name, muscles, neurons):
+def convert_to_cell(ctx, name, muscles, neurons, is_bwm):
     ret = []
     res = None
     res2 = None
     if name in neurons:
         res = ctx.Neuron(name)
-    elif name in muscles:
-        res = ctx.Muscle(name)
     elif name in TO_EXPAND_MUSCLES:
+        # All of the muscle cell types we need to expand are pharyngeal, so no need to
+        # pass through is_bwm
         res, res2 = expand_muscle(ctx, name)
+    elif name in muscles:
+        if is_bwm:
+            res = ctx.BodyWallMuscle(name)
+        else:
+            res = ctx.Muscle(name)
     elif name in OTHER_CELLS:
         res = ctx.Cell(name)
 
@@ -266,26 +268,13 @@ def add_synapse(ctx, source, target, weight, syn_type):
     c = ctx.Connection(pre_cell=source, post_cell=target,
                        number=weight, syntype=syn_type)
 
-    if isinstance(source, ctx.Neuron) and isinstance(target, ctx.Neuron):
+    if isinstance(source, Neuron) and isinstance(target, Neuron):
         c.termination('neuron')
-    elif isinstance(source, ctx.Neuron) and isinstance(target, ctx.Muscle) or \
-            isinstance(source, ctx.Muscle) and isinstance(target, ctx.Neuron):
+    elif isinstance(source, Neuron) and isinstance(target, Muscle) or \
+            isinstance(source, Muscle) and isinstance(target, Neuron):
         c.termination('muscle')
 
     return c
-
-
-# to normalize certian body wall muscle cell names
-SEARCH_STRING_MUSCLE = re.compile(r'\w+[BWM]+\w+')
-REPLACE_STRING_MUSCLE = re.compile(r'[BWM]+')
-
-
-def normalize_muscle(name):
-    # normalize names of Body Wall Muscles
-    # if there is 'BWM' in the name, remove it
-    if re.match(SEARCH_STRING_MUSCLE, name):
-        name = REPLACE_STRING_MUSCLE.sub('', name)
-    return name
 
 
 MUSCLES = {

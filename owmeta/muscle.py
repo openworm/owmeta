@@ -5,8 +5,8 @@ from .neuron import Neuron
 
 
 class Muscle(Cell):
-
-    """A single muscle cell.
+    """
+    A single muscle cell.
 
     See what neurons innervate a muscle:
 
@@ -31,3 +31,11 @@ class Muscle(Cell):
 
     receptor = Alias(receptors)
     ''' Alias to `receptors` '''
+
+
+class BodyWallMuscle(Muscle):
+    '''
+    A somatic muscle cell that lies close under the skin and basal lamina of C. elegans
+    and allows the worm to move
+    '''
+    class_context = Cell.class_context
