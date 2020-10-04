@@ -1,13 +1,13 @@
 ---
 id: openworm/owmeta-data
 name: owmeta data bundle
-version: 4
+version: 6
 description: Bundle for OpenWorm data
 patterns:
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#bently_expression/context_for?*
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#neurons/context_for?*
     - http://data.openworm.org/sci/data_sources/DataWithEvidenceDataSource#cells/context_for?*
-includes: 
+includes:
     - http://openworm.org/data
     - http://openworm.org/data-data:
         empty: true
@@ -63,7 +63,7 @@ includes:
 
 dependencies:
     - id: openworm/owmeta-schema
-      version: 2
+      version: 3
       #excludes:
           #- http://www.w3.org/1999/02/22-rdf-syntax-ns
       #merges:

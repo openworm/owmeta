@@ -48,14 +48,6 @@ class DSMethods(metaclass=OrderedClass):
         self.owm = OWM()
         self.ctx = self.owm.default_context.stored
 
-    def muscles(self):
-        muscles = self.owm.translate(MuscleWormBaseCSVTranslator(),
-                data_sources=[WormBaseCSVDataSource(key='wormbase_celegans_cells')],
-                output_key='muscles')
-        self.ctx(muscles).description(
-                "Contains descriptions of C. elegans muscles and is the"
-                " principle such list for OpenWorm")
-
     def neurons(self):
         neurons = self.owm.translate(NeuronCSVDataTranslator(),
                 data_sources=[NeuronCSVDataSource(key='neurons')],

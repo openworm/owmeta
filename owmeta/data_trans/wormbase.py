@@ -10,7 +10,7 @@ from .. import CONTEXT
 from ..utils import normalize_cell_name
 from ..channel import Channel, ExpressionPattern
 from ..evidence import Evidence
-from ..muscle import Muscle
+from ..muscle import Muscle, BodyWallMuscle
 from ..network import Network
 from ..neuron import Neuron
 from ..cell import Cell
@@ -177,19 +177,25 @@ class CellWormBaseCSVTranslator(DTMixin, CSVDataTranslator):
                 doc_ctx = res.data_context_for(document=doc)
                 ctx.Evidence(reference=doc, supports=doc_ctx.rdf_object)
 
-            with doc_ctx(Worm=Worm, Muscle=Muscle, Network=Network, Neuron=Neuron, Cell=Cell) as ctx:
+            with doc_ctx(Worm=Worm,
+                         BodyWallMuscle=BodyWallMuscle,
+                         Muscle=Muscle,
+                         Network=Network,
+                         Neuron=Neuron,
+                         Cell=Cell) as ctx:
                 w = ctx.Worm()
                 n = ctx.Network()
                 n.worm(w)
 
                 for line in csvreader:
                     cell = None
-                    if (line['Body wall muscles'] or
-                            line['Pharynx muscles'] or
-                            line['Other muscles']):  # muscle's marked in these columns
+                    if line['Body wall muscles']:
+                        cell = ctx.BodyWallMuscle()
+                        w.muscle(cell)
+                    elif line['Pharynx muscles'] or line['Other muscles']:
                         cell = ctx.Muscle()
                         w.muscle(cell)
-                    elif line['Neurons (no male-specific cells)']:  # neurons marked in this column
+                    elif line['Neurons (no male-specific cells)']:
                         cell = ctx.Neuron()
                         cell.wormbaseID(line['WormBase ID'])
                         n.neuron(cell)
