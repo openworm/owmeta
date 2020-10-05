@@ -58,7 +58,7 @@ setup(
     description='A Python library for working with OpenWorm data and models',
     long_description=long_description,
     license='MIT',
-    url='https://pyopenworm.readthedocs.io/en/latest/',
+    url='https://owmeta.readthedocs.io/en/latest/',
     download_url='https://github.com/openworm/owmeta/archive/master.zip',
     entry_points={
         'owmeta_core.commands': [
