@@ -13,7 +13,7 @@ An introduction to owmeta can be found in the README on our
 """
 
 from __future__ import print_function
-__version__ = '0.12.2.dev0'
+__version__ = '0.12.3.dev0'
 __author__ = 'OpenWorm.org authors and contributors'
 
 import logging
