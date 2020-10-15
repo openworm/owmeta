@@ -22,8 +22,7 @@ use owmeta without it, there is an OpenWorm database which is managed with
 This will create a directory `.owm` in your current working directory,
 underneath which, the database and related files are stored. See documentation
 for the command on ReadTheDocs.io
-[here](https://pyopenworm.readthedocs.io/en/dev/command.html) or look at
-docs/command.rst. 
+[here](https://owmeta-core.readthedocs.io/en/stable/command.html). 
 
 Running tests
 -------------

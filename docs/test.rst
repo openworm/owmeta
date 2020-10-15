@@ -18,11 +18,11 @@ Running tests
 -------------
 Tests should be run via setup.py like::
 
-    python setup.py test
+    pytest
 
 you can pass options to ``pytest`` like so::
 
-    python setup.py test --addopts '-k DataIntegrityTest'
+    pytest -k ChannelTest
 
 Writing tests
 -------------
@@ -37,3 +37,10 @@ tests, tests can also be tagged using pytest marks like::
 Currently, marks are used to distinguish between unit-level tests and others
 which have the ``inttest`` mark. All marks are listed in pytest.ini under
 'markers'.
+
+Data Bundle Tests
+-----------------
+The tests in DataIntegrityTest.py require that the openworm/owmeta-data bundle
+is installed. Normally, these will run in the CI environment. If you are doing
+work that affects what goes in the bundle, you can install new versions of the
+bundle and run the tests with ``pytest -m data_bundle``.
