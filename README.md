@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/openworm/owmeta.png?branch=dev)](https://travis-ci.org/openworm/owmeta/builds)
-[![Docs](https://readthedocs.org/projects/pyopenworm/badge/?version=latest)](https://pyopenworm.readthedocs.io/en/latest)
+[![Docs](https://readthedocs.org/projects/owmeta/badge/?version=latest)](https://owmeta.readthedocs.io/en/latest)
 [![Coverage Status](https://coveralls.io/repos/github/openworm/owmeta/badge.svg?branch=dev)](https://coveralls.io/github/openworm/owmeta?branch=dev)
 
 owmeta
@@ -274,7 +274,7 @@ More examples can be found
 Documentation
 -------------
 
-Further documentation [is available online](http://pyopenworm.readthedocs.org).
+Further documentation [is available online](http://owmeta.readthedocs.io).
 
 Contributing
 ------------
