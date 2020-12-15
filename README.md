@@ -82,7 +82,7 @@ This project holds a working-copy of the database. You can retrieve it by
 executing the following command line after owmeta installation:
 
 ```bash
-owm clone https://github.com/openworm/OpenWormData.git
+owm clone https://github.com/openworm/OpenWormData.git --branch owmeta
 ```
 
 This command should create a directory `.owm` in your current working
