@@ -43,7 +43,7 @@ setup(
         'pytest-parallel'
     ],
     install_requires=[
-        'owmeta-core',
+        'owmeta-core>=0.14.0.dev0',
         'bibtexparser~=1.1.0',
         'libneuroml',
         'rdflib>=4.1.2',
