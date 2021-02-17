@@ -1,8 +1,7 @@
-from rdflib.namespace import Namespace
-
 from owmeta_core.context import Context
 from owmeta_core.datasource import Informational, DataSource
-from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
+from owmeta_core.data_trans.context_datasource import (VariableIdentifierContext,
+        VariableIdentifierContextDataObject)
 
 from .. import CONTEXT, SCI_CTX
 
@@ -22,6 +21,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                               property_name='evidence_context',
                                               property_type='ObjectProperty',
                                               multiple=False,
+                                              value_type=VariableIdentifierContextDataObject,
                                               description='The context in which evidence'
                                                           ' for the "Data context" is defined')
 
@@ -29,6 +29,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                           property_name='data_context',
                                           property_type='ObjectProperty',
                                           multiple=False,
+                                          value_type=VariableIdentifierContextDataObject,
                                           description='The context in which primary data'
                                                       ' for this data source is defined')
 
@@ -36,6 +37,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                               property_name='combined_context',
                                               property_type='ObjectProperty',
                                               multiple=False,
+                                              value_type=VariableIdentifierContextDataObject,
                                               description='Context importing both the data and evidence contexts')
 
     def __init__(self, *args, **kwargs):
