@@ -3,3 +3,4 @@ pytest-cov>=2.5.1
 discover==0.4.0
 requests
 pytest-parallel
+owmeta-pytest-plugin
