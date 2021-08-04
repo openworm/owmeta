@@ -6,7 +6,8 @@ import logging
 
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
-from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias
+from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias, BaseDataObject
+import owmeta_core.dataobject_property as DP
 
 from . import SCI_CTX
 from . import bibtex as BIB
@@ -281,6 +282,18 @@ class Document(BaseDocument):
         else:
             raise PubmedRetrievalException('More than one Pubmed ID is attached to this document.'
                                            ' Please try with just one Pubmed ID')
+
+
+class SourcedFrom(DP.ObjectProperty):
+    '''
+    Indicates which document provided the source for an object
+    '''
+    class_context = SCI_CTX
+    link_name = "sourced_from"
+    value_type = BaseDocument
+    owner_type = BaseDataObject
+    multiple = False
+    lazy = True
 
 
 def _wormbase_uri_to_wbid(uri):
