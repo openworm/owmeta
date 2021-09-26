@@ -49,13 +49,11 @@ class InexactNumberMatchTest(_Base):
 
     def test_connection_exists(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(len(list(conn.load())), 1)
 
     def test_adds_nt(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(list(conn.load())[0].synclass(), 'neurotransmitter')
 
@@ -77,12 +75,10 @@ class ExactNumberMatchTest(_Base):
 
     def test_connection_exists(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(len(list(conn.load())), 1)
 
     def test_adds_nt(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(list(conn.load())[0].synclass(), 'neurotransmitter')
