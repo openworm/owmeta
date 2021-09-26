@@ -1,4 +1,3 @@
-from rdflib.namespace import Namespace
 from owmeta_core.datasource import Informational, DataTranslator, DataSource
 from owmeta_core.data_trans.local_file_ds import LocalFileDataSource
 from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
@@ -23,7 +22,8 @@ class EvidenceDataSource(DSMixin, DataSource):
                                                                     imported=(CONTEXT,))
         self.context_property(self.evidence_context.rdf_object)
 
-    def commit_augment(self):
+    def after_transform(self):
+        super(EvidenceDataSource, self).after_transform()
         saved_contexts = set([])
         self.data_context.save_context(inline_imports=True, saved_contexts=saved_contexts)
         self.context.save_context(inline_imports=True, saved_contexts=saved_contexts)

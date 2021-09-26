@@ -82,7 +82,8 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
             res = self.__ad_hoc_contexts[key]
         return res
 
-    def commit_augment(self):
+    def after_transform(self):
+        super(DataWithEvidenceDataSource, self).after_transform()
         for ctx in self.__ad_hoc_contexts.values():
             ctx.save()
 
