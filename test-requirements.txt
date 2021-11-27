@@ -4,3 +4,4 @@ discover==0.4.0
 requests
 pytest-parallel
 owmeta-pytest-plugin
+http-server-pytest-fixtures
