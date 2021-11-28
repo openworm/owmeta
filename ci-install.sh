@@ -1,3 +1,5 @@
+#!/bin/sh -ex
+
 pip install -e .
 pip install coveralls
 pip install -r test-requirements.txt

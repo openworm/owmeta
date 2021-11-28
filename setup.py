@@ -2,8 +2,6 @@
 #
 
 from setuptools import setup
-import os
-import sys
 
 
 long_description = """
@@ -34,14 +32,6 @@ for line in open('owmeta/__init__.py'):
 setup(
     name='owmeta',
     zip_safe=False,
-    setup_requires=['pytest-runner'],
-    tests_require=[
-        'pytest>=3.4.0',
-        'pytest-cov>=2.5.1',
-        'discover==0.4.0',
-        'requests',
-        'pytest-parallel'
-    ],
     install_requires=[
         'owmeta-core>=0.14.0.dev0',
         'bibtexparser~=1.1.0',
