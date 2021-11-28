@@ -3,7 +3,7 @@ name: Dev Test/Deploy
 on:
   push: {}
   pull_request:
-    branches: develop
+    branches: dev
 
 jobs:
   test:

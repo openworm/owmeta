@@ -9,5 +9,5 @@ jobs:
   test:
     uses: openworm/owmeta/.github/workflows/test.yml@github-workflows
     with:
-      ref: refs/heads/develop
+      ref: refs/heads/dev
 
