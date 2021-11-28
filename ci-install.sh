@@ -10,7 +10,7 @@ if [ $BUNDLE_TESTS ] ; then
     owm bundle install openworm/owmeta-schema
     owm bundle install openworm/owmeta-data
 fi
-if [ "$PYTHON_VERSION" == "3.6" ] ; then
+if [ "$PYTHON_VERSION" = "3.6" ] ; then
     # pyparsing 3.0 no longer allows setting the .name attribute for
     # TokenConverter, but the fix for that only goes in RDFLib 6 which
     # does not support Python 3.6. See
