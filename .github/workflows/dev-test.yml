@@ -1,0 +1,23 @@
+name: Dev Test/Deploy
+
+on:
+  push: {}
+  pull_request:
+    branches: develop
+
+jobs:
+  test:
+    uses: openworm/owmeta/.github/workflows/test.yml@github-workflows
+    with:
+      coveralls: ${{github.event_name != 'schedule'}}
+      ref: ${{ github.ref }}
+    secrets:
+      github_token: ${{secrets.GITHUB_TOKEN}}
+
+  coveralls:
+    if: github.event_name == 'push'
+    needs: test
+    uses: openworm/owmeta/.github/workflows/coveralls-upload.yml@github-workflows
+    secrets:
+      github_token: ${{secrets.GITHUB_TOKEN}}
+
