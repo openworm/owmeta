@@ -1,0 +1,43 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      coveralls:
+        description: Whether or not to send coverage to coveralls
+        default: false
+        required: false
+        type: boolean
+      ref:
+        description: Which github ref to test
+        required: true
+        type: string
+    secrets:
+      github_token:
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9, '3.10']
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ inputs.ref }}
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: ./ci-install.sh
+    - name: Test
+      run: ./ci-test.sh
+    - name: Coveralls
+      if: inputs.coveralls
+      run: coveralls --service=github
+      env:
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+        COVERALLS_PARALLEL: true
