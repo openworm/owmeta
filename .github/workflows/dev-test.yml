@@ -13,6 +13,7 @@ jobs:
       ref: ${{ github.ref }}
     secrets:
       github_token: ${{secrets.GITHUB_TOKEN}}
+      pubmed_api_key: ${{secrets.PUBMED_API_KEY}}
 
   coveralls:
     if: github.event_name == 'push'

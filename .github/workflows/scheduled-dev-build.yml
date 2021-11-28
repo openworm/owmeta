@@ -10,4 +10,5 @@ jobs:
     uses: openworm/owmeta/.github/workflows/test.yml@github-workflows
     with:
       ref: refs/heads/dev
-
+    secrets:
+      pubmed_api_key: ${{secrets.PUBMED_API_KEY}}
