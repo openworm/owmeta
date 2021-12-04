@@ -37,7 +37,8 @@ setup(
         'bibtexparser~=1.1.0',
         'libneuroml',
         'rdflib>=4.1.2',
-        'six~=1.10'
+        'six~=1.10',
+        'requests',
     ],
     version=version,
     packages=['owmeta',

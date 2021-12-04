@@ -1,5 +1,4 @@
 from six.moves.urllib.parse import urlparse, urlencode
-from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
@@ -10,6 +9,8 @@ from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias
 
 from . import SCI_CTX
 from . import bibtex as BIB
+from .requests_stream import RequestsResponseStream
+
 
 logger = logging.getLogger(__name__)
 
@@ -239,22 +240,24 @@ class Document(BaseDocument):
                 if 'year' in r:
                     self.year(r['year'])
 
-    def update_from_pubmed(self):
+    def update_from_pubmed(self, requests_session=None):
         def pmRequest(pmid):
             import xml.etree.ElementTree as ET  # Python 2.5 and up
-            url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + str(pmid)
+
+            url = ('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?'
+                    f'db=pubmed&id={pmid}')
             key = self.get('pubmed.api_key', None)
             if key:
-                url += '&api_key=' + key
+                url += f'&api_key={key}'
             else:
                 logger.warning("PubMed API key not defined. API calls will be limited.")
-            s = _url_request(url)
+            s = _url_request(url, requests_session=requests_session)
             if hasattr(s, 'charset'):
                 parser = ET.XMLParser(encoding=s.charset)
             else:
                 parser = None
 
-            return ET.parse(s, parser)
+            return ET.parse(RequestsResponseStream(s), parser)
 
         pmid = self.pmid.defined_values
         if len(pmid) == 1:
@@ -307,35 +310,41 @@ class EmptyRes(object):
         return bytes()
 
 
-def _url_request(url, headers={}):
+def _url_request(url, headers={}, requests_session=None, **kwargs):
+    import requests
+    from requests.adapters import HTTPAdapter
+    from requests.packages.urllib3.util.retry import Retry
+
+    sess = requests.Session()
+    retries = Retry()
+    adapter = HTTPAdapter(max_retries=retries)
+    sess.mount('http://', adapter)
+    sess.mount('https://', adapter)
+
+    if 'headers' not in kwargs:
+        kwargs['headers'] = headers
+
+    if 'timeout' not in kwargs:
+        kwargs['timeout'] = 1
+
     try:
-        r = Request(url, headers=headers)
-        s = urlopen(r, timeout=1)
-        info = dict(s.info())
-        content_type = {k.lower(): info[k] for k in info}['content-type']
+        resp = sess.get(url, **kwargs)
+        content_type = resp.headers['content-type']
         md = re.search("charset *= *([^ ]+)", content_type)
         if md:
-            s.charset = md.group(1)
+            resp.charset = md.group(1)
 
-        return s
-    except HTTPError:
-        logger.error("Error in request for {}".format(url), exc_info=True)
-        return EmptyRes()
-    except URLError:
-        logger.error("Error in request for {}".format(url), exc_info=True)
+        return resp
+    except Exception:
+        logger.error("Error in request for %s", url, exc_info=True)
         return EmptyRes()
 
 
 def _json_request(url):
-    import json
     headers = {'Accept': 'application/json'}
     try:
-        data = _url_request(url, headers).read().decode('UTF-8')
-        if hasattr(data, 'charset'):
-            return json.loads(data, encoding=data.charset)
-        else:
-            return json.loads(data)
+        return _url_request(url, headers).json()
     except BaseException:
-        logger.warning("Couldn't retrieve JSON data from " + url,
+        logger.warning("Couldn't retrieve JSON data from %s", url,
                        exc_info=True)
         return {}
