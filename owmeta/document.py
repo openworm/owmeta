@@ -1,6 +1,7 @@
 from six.moves.urllib.parse import urlparse, urlencode
 import re
 import logging
+from contextlib import closing
 
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
@@ -11,7 +12,6 @@ from requests.packages.urllib3.util.retry import Retry
 
 from . import SCI_CTX
 from . import bibtex as BIB
-from .requests_stream import RequestsResponseStream
 
 
 logger = logging.getLogger(__name__)
@@ -248,12 +248,15 @@ class Document(BaseDocument):
                 if 'year' in r:
                     self.year(r['year'])
 
-    def update_from_pubmed(self, **kwargs):
+    def update_from_pubmed(self, read_size=2**16, **kwargs):
         '''
         Update the document attributes from NCBI Entrez API using the pubmed attribute
 
         Parameters
         ----------
+        chunk_size : int
+            The number of bytes to pass to `requests.Response.iter_content`. This *may*
+            reduce runtime memory requirements for the request.
         **kwargs
             Passed on as arguments to `requests.Session.get`
         '''
@@ -272,13 +275,18 @@ class Document(BaseDocument):
             if 'do_retries' not in kwargs:
                 kwargs['do_retries'] = True
 
+            kwargs['stream'] = True
+
             s = _url_request(url, **kwargs)
             if hasattr(s, 'charset'):
                 parser = ET.XMLParser(encoding=s.charset)
             else:
-                parser = None
+                parser = ET.XMLParser(encoding='UTF-8')
 
-            return ET.parse(RequestsResponseStream(s), parser)
+            with s:
+                for chunk in s.iter_content(read_size):
+                    parser.feed(chunk)
+                return parser.close()
 
         pmid = self.pmid.defined_values
         if len(pmid) == 1:
