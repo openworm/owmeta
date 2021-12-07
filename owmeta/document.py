@@ -1,7 +1,6 @@
 from six.moves.urllib.parse import urlparse, urlencode
 import re
 import logging
-from contextlib import closing
 
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
@@ -334,11 +333,6 @@ def _doi_uri_to_doi(uri):
     return doi
 
 
-class EmptyRes(object):
-    def read(self):
-        return bytes()
-
-
 def _url_request(url, requests_session=None, do_retries=False, **kwargs):
 
     if requests_session is None:
@@ -365,7 +359,7 @@ def _url_request(url, requests_session=None, do_retries=False, **kwargs):
         return resp
     except Exception:
         logger.error("Error in request for %s", url, exc_info=True)
-        return EmptyRes()
+        raise
 
 
 def _json_request(url, **kwargs):
