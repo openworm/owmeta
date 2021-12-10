@@ -267,9 +267,10 @@ Finally, when you're done accessing the database, be sure to disconnect from it:
 
 ```
 
-More examples can be found
-[here](http://owm-doc.readthedocs.org/en/latest/making_dataObjects.html) and
-[here](https://github.com/openworm/owmeta/tree/master/examples).
+More examples can be found [in the owmeta-core
+documentation](https://owmeta-core.readthedocs.io/en/latest/making_dataObjects.html)
+and [in the ./examples directory of the owmeta Git
+repository](https://github.com/openworm/owmeta/tree/master/examples).
 
 Documentation
 -------------
