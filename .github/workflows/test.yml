@@ -13,6 +13,8 @@ on:
         required: true
         type: string
     secrets:
+      github_token:
+        required: false
       pubmed_api_key:
         required: true
 
