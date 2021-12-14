@@ -1,0 +1,14 @@
+name: Build develop
+
+on:
+  schedule:
+    # minute 39 of every hour
+    - cron:  '39 * * * *'
+
+jobs:
+  test:
+    uses: openworm/owmeta/.github/workflows/test.yml@github-workflows
+    with:
+      ref: refs/heads/dev
+    secrets:
+      pubmed_api_key: ${{secrets.PUBMED_API_KEY}}

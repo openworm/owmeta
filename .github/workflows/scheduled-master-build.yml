@@ -1,0 +1,13 @@
+name: Build master
+
+on:
+  schedule:
+    - cron:  '13 2 * * *'
+
+jobs:
+  test:
+    uses: openworm/owmeta/.github/workflows/test.yml@github-workflows
+    with:
+      ref: refs/heads/master
+    secrets:
+      pubmed_api_key: ${{secrets.PUBMED_API_KEY}}
