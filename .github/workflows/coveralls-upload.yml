@@ -3,7 +3,7 @@ name: Coveralls Upload
 on:
   workflow_call:
     secrets:
-      github_token:
+      my_github_token:
         required: false
 
 jobs:
@@ -17,4 +17,4 @@ jobs:
         pip3 install --upgrade coveralls
         coveralls --service=github --finish
       env:
-        GITHUB_TOKEN: ${{ secrets.github_token }}
+        GITHUB_TOKEN: ${{ secrets.my_github_token }}
