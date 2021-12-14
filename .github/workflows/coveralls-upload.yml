@@ -1,10 +1,7 @@
 name: Coveralls Upload
 
 on:
-  workflow_call:
-    secrets:
-      github_token:
-        required: false
+  workflow_call: {}
 
 jobs:
   coveralls:
