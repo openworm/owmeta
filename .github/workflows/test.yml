@@ -9,7 +9,7 @@ on:
         required: false
         type: boolean
       ref:
-        description: Which github ref to test
+        description: Which Git ref to test
         required: true
         type: string
     secrets:
