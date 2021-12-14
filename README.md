@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/openworm/owmeta.png?branch=dev)](https://travis-ci.org/openworm/owmeta/builds)
+[![Build Status](https://github.com/openworm/owmeta/actions/workflows/dev-test.yml/badge.svg)](https://github.com/openworm/owmeta/actions/workflows/dev-test.yml)
 [![Docs](https://readthedocs.org/projects/owmeta/badge/?version=latest)](https://owmeta.readthedocs.io/en/latest)
 [![Coverage Status](https://coveralls.io/repos/github/openworm/owmeta/badge.svg?branch=dev)](https://coveralls.io/github/openworm/owmeta?branch=dev)
 
