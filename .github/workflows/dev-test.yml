@@ -12,7 +12,7 @@ jobs:
       coveralls: ${{github.event_name != 'schedule'}}
       ref: ${{ github.ref }}
     secrets:
-      github_token: ${{secrets.GITHUB_TOKEN}}
+      my_github_token: ${{secrets.GITHUB_TOKEN}}
       pubmed_api_key: ${{secrets.PUBMED_API_KEY}}
 
   coveralls:
@@ -20,5 +20,5 @@ jobs:
     needs: test
     uses: openworm/owmeta/.github/workflows/coveralls-upload.yml@github-workflows
     secrets:
-      github_token: ${{secrets.GITHUB_TOKEN}}
+      my_github_token: ${{secrets.GITHUB_TOKEN}}
 
