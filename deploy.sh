@@ -1,10 +1,8 @@
 #!/bin/bash -xe
 HEAD_REV=$(git rev-parse HEAD)
-ORIGIN_DEV_REV=$(git ls-remote origin refs/heads/develop | grep -E -o '^[^[:space:]]+')
-if [ "$HEAD_REV" != "$ORIGIN_DEV_REV" ] ; then
-    echo "Not deploying since we aren't on the 'develop' branch" >&2
+git ls-remote origin refs/heads/dev | grep -q -E -o "^$HEAD_REV" || \
+    echo "Not deploying since we aren't on the 'dev' branch" >&2 && \
     exit 0
-fi
 
 git log --format=%s -n 1 "$HEAD_REV" | grep -E -q '(^MINOR:)|(\[skip-deploy\])' && exit 0
 
