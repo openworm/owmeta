@@ -364,10 +364,13 @@ def _url_request(url, requests_session=None, do_retries=False, **kwargs):
 
     try:
         resp = sess.get(url, **kwargs)
-        content_type = resp.headers['content-type']
-        md = re.search("charset *= *([^ ]+)", content_type)
-        if md:
-            resp.charset = md.group(1)
+        if resp.status_code != 200:
+            raise Exception(f'Service returned status code {resp.status_code}')
+        content_type = resp.headers.get('content-type')
+        if content_type:
+            md = re.search("charset *= *([^ ]+)", content_type)
+            if md:
+                resp.charset = md.group(1)
 
         return resp
     except Exception:

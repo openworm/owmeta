@@ -30,7 +30,7 @@ if [ $BUNDLE_TESTS ] ; then
 else
     pt --verbose -m "'not inttest'"
     add_coverage
-    pt --verbose -m "'inttest and not data_bundle'" -k 'not wormbase'
+    pt --verbose -m "'inttest and not data_bundle'" -k "'not wormbase'"
     add_coverage
 fi
 coverage combine $(list_coverage)
