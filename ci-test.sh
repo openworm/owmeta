@@ -4,7 +4,6 @@ pt () {
     sh -c "pytest --cov=owmeta $*"
 }
 
-
 COVERAGES=""
 
 add_coverage () {
@@ -31,7 +30,7 @@ if [ $BUNDLE_TESTS ] ; then
 else
     pt --verbose -m "'not inttest'"
     add_coverage
-    pt --verbose -m "'inttest and not data_bundle'"
+    pt --verbose -m "'inttest and not data_bundle'" -k 'not wormbase'
     add_coverage
 fi
 coverage combine $(list_coverage)
