@@ -14,6 +14,14 @@ jobs:
     secrets:
       my_github_token: ${{secrets.GITHUB_TOKEN}}
       pubmed_api_key: ${{secrets.PUBMED_API_KEY}}
+  dev-deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    uses: openworm/owmeta-core/.github/workflows/deploy.yml@github-workflows
+    needs: test
+    with:
+      ref: refs/heads/dev
+    secrets:
+      twine_token: ${{secrets.TWINE_PASSWORD}}
 
   coveralls:
     if: github.event_name == 'push'
