@@ -11,8 +11,10 @@ from .common_data import DSMixin
 class DataWithEvidenceDataSource(DSMixin, DataSource):
     '''
     A data source that has an "evidence context" containing statements which support those
-    in its "data context". The data source also has a combined context which  imports both
-    the data and evidence contexts.
+    in its "data context". The data source also has a combined context which imports both
+    the data and evidence contexts. The data and evidence contexts have identifiers based
+    on the data source's identifier and the combined context has the same identifier as
+    the data source.
     '''
 
     class_context = SCI_CTX
