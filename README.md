@@ -178,8 +178,9 @@ data and models to corresponding articles from peer-reviewed literature:
 owmeta_core.statement.Statement(subj=Neuron(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Neuron#AVDL')), prop=owmeta.cell.Cell_lineageName(owner=Neuron(ident=rdflib.term.URIRef('http://data.openworm.org/sci/bio/Neuron#AVDL'))), obj=owmeta_core.dataobject_property.ContextualizedPropertyValue(rdflib.term.Literal('AB alaaapalr')), context=owmeta_core.context.Context(ident="http://example.org/data/context"))
 >>> e.supports(dctx.rdf_object)
 owmeta_core.statement.Statement(subj=Evidence(ident=rdflib.term.URIRef('http://data.openworm.org/Evidence#Sulston83')), prop=owmeta.evidence.Evidence_supports(owner=Evidence(ident=rdflib.term.URIRef('http://data.openworm.org/Evidence#Sulston83'))), obj=ContextDataObject(ident=rdflib.term.URIRef('http://example.org/data/context')), context=owmeta_core.context.Context(ident="http://example.org/evidence/context"))
->>> dctx.save_context()
->>> evctx.save_context()
+>>> with conn.transaction_manager:
+...     dctx.save_context()
+...     evctx.save_context()
 
 ```
 
