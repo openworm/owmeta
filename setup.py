@@ -36,7 +36,7 @@ setup(
         'owmeta-core>=0.14.0.dev0',
         'bibtexparser~=1.1.0',
         'libneuroml',
-        'rdflib>=4.1.2',
+        'rdflib>=4.1.2,<6.0.0',
         'six~=1.10',
         'requests',
     ],
