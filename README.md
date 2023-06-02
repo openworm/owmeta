@@ -170,7 +170,7 @@ data and models to corresponding articles from peer-reviewed literature:
 >>> evctx = conn(Context)(ident='http://example.org/evidence/context')
 
 # Make a context for defining domain knowledge
->>> dctx = conn(Context)(ident='http://example.org/data/context')
+>>> dctx = evctx(Context)(ident='http://example.org/data/context')
 >>> doc = evctx(Document)(key="Sulston83", author='Sulston et al.', date='1983')
 >>> e = evctx(Evidence)(key="Sulston83", reference=doc)
 >>> avdl = dctx(Neuron)(name="AVDL")
