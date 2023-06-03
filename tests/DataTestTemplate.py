@@ -7,6 +7,7 @@ import tempfile
 
 from owmeta_core.context import Context
 from owmeta_core.data import Data
+from owmeta_core.mapper import CLASS_REGISTRY_CONTEXT_KEY
 from .GraphDBInit import delete_zodb_data_store, TEST_CONFIG
 
 
@@ -34,6 +35,7 @@ class _DataTest(unittest.TestCase):
             x = z[len(td):]
             h = tempfile.mkdtemp()
             self.TestConfig['rdf.store_conf'] = h + x
+        self.TestConfig[CLASS_REGISTRY_CONTEXT_KEY] = 'http://example.org/class_registry'
         self.delete_dir()
         self.connection = owmeta_core.connect(conf=self.TestConfig)
         self.mapper = self.connection.mapper

@@ -1,8 +1,7 @@
-from rdflib.namespace import Namespace
-
 from owmeta_core.context import Context
 from owmeta_core.datasource import Informational, DataSource
-from owmeta_core.data_trans.context_datasource import VariableIdentifierContext
+from owmeta_core.data_trans.context_datasource import (VariableIdentifierContext,
+        VariableIdentifierContextDataObject)
 
 from .. import CONTEXT, SCI_CTX
 
@@ -12,8 +11,10 @@ from .common_data import DSMixin
 class DataWithEvidenceDataSource(DSMixin, DataSource):
     '''
     A data source that has an "evidence context" containing statements which support those
-    in its "data context". The data source also has a combined context which  imports both
-    the data and evidence contexts.
+    in its "data context". The data source also has a combined context which imports both
+    the data and evidence contexts. The data and evidence contexts have identifiers based
+    on the data source's identifier and the combined context has the same identifier as
+    the data source.
     '''
 
     class_context = SCI_CTX
@@ -22,6 +23,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                               property_name='evidence_context',
                                               property_type='ObjectProperty',
                                               multiple=False,
+                                              value_type=VariableIdentifierContextDataObject,
                                               description='The context in which evidence'
                                                           ' for the "Data context" is defined')
 
@@ -29,6 +31,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                           property_name='data_context',
                                           property_type='ObjectProperty',
                                           multiple=False,
+                                          value_type=VariableIdentifierContextDataObject,
                                           description='The context in which primary data'
                                                       ' for this data source is defined')
 
@@ -36,6 +39,7 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
                                               property_name='combined_context',
                                               property_type='ObjectProperty',
                                               multiple=False,
+                                              value_type=VariableIdentifierContextDataObject,
                                               description='Context importing both the data and evidence contexts')
 
     def __init__(self, *args, **kwargs):
@@ -80,7 +84,8 @@ class DataWithEvidenceDataSource(DSMixin, DataSource):
             res = self.__ad_hoc_contexts[key]
         return res
 
-    def commit_augment(self):
+    def after_transform(self):
+        super(DataWithEvidenceDataSource, self).after_transform()
         for ctx in self.__ad_hoc_contexts.values():
             ctx.save()
 

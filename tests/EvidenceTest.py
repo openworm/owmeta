@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 from owmeta_core.dataobject import DataObject
 from owmeta_core.configure import Configurable
+from owmeta_core.context import Context
 
 from owmeta.evidence import Evidence
 
@@ -14,6 +15,7 @@ try:
 except ImportError:
     from mock import patch
 
+import rdflib
 
 class EvidenceTest(_DataTest):
     ctx_classes = (Evidence,)
@@ -32,7 +34,8 @@ class EvidenceTest(_DataTest):
         Asserting something should allow us to get it back.
         """
         e = self.ctx.Evidence(key='WBPaper00044600')
-        r = DataObject(key="context_data_object")
+        ctx = self.context(Context)(rdflib.URIRef('https://example.org/context'))
+        r = ctx.rdf_object
         e.supports(r)
         s = list(e.supports.get())
         self.assertIn(r, s)

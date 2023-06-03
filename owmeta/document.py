@@ -1,15 +1,18 @@
 from six.moves.urllib.parse import urlparse, urlencode
-from six.moves.urllib.request import Request, urlopen
-from six.moves.urllib.error import HTTPError, URLError
 import re
 import logging
 
 from owmeta_core.graph_object import IdentifierMissingException
 from owmeta_core.context import Context
-from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias
+import owmeta_core.dataobject_property as DP
+from owmeta_core.dataobject import DataObject, DatatypeProperty, Alias, BaseDataObject
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from . import SCI_CTX
 from . import bibtex as BIB
+
 
 logger = logging.getLogger(__name__)
 
@@ -159,11 +162,17 @@ class Document(BaseDocument):
                 return self.make_identifier(s)
         raise IdentifierMissingException(self)
 
-    # TODO: Provide a way to override modification of already set values.
-    def update_from_wormbase(self, replace_existing=False):
-        """ Queries wormbase for additional data to fill in the Document.
+    def update_from_wormbase(self, replace_existing=False, **kwargs):
+        """ Queries WormBase.org for additional data to fill in the `Document`.
 
         If replace_existing is set to `True`, then existing values will be cleared.
+
+        Parameters
+        ----------
+        replace_existing : bool
+            Whether to replace values that are already set for a given property
+        **kwargs
+            Passed on as arguments to `requests.Session.get`
         """
 
         # XXX: wormbase's REST API is pretty sparse in terms of data provided.
@@ -176,8 +185,8 @@ class Document(BaseDocument):
             # get the author
             try:
                 root = self.conf.get('wormbase_api_root_url', 'http://rest.wormbase.org')
-                url = root + '/rest/widget/paper/' + str(wbid) + '/overview?content-type=application%2Fjson'
-                j = _json_request(url)
+                url = f'{root}/rest/widget/paper/{wbid}/overview?content-type=application%2Fjson'
+                j = _json_request(url, **kwargs)
                 if 'fields' in j:
                     f = j['fields']
                     if 'authors' in f:
@@ -239,22 +248,45 @@ class Document(BaseDocument):
                 if 'year' in r:
                     self.year(r['year'])
 
-    def update_from_pubmed(self):
+    def update_from_pubmed(self, read_size=2**16, **kwargs):
+        '''
+        Update the document attributes from NCBI Entrez API using the pubmed attribute
+
+        Parameters
+        ----------
+        chunk_size : int
+            The number of bytes to pass to `requests.Response.iter_content`. This *may*
+            reduce runtime memory requirements for the request.
+        **kwargs
+            Passed on as arguments to `requests.Session.get`
+        '''
+
         def pmRequest(pmid):
             import xml.etree.ElementTree as ET  # Python 2.5 and up
-            url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + str(pmid)
+
+            url = ('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?'
+                    f'db=pubmed&id={pmid}')
             key = self.get('pubmed.api_key', None)
             if key:
-                url += '&api_key=' + key
+                url += f'&api_key={key}'
             else:
                 logger.warning("PubMed API key not defined. API calls will be limited.")
-            s = _url_request(url)
+
+            if 'do_retries' not in kwargs:
+                kwargs['do_retries'] = True
+
+            kwargs['stream'] = True
+
+            s = _url_request(url, **kwargs)
             if hasattr(s, 'charset'):
                 parser = ET.XMLParser(encoding=s.charset)
             else:
-                parser = None
+                parser = ET.XMLParser(encoding='UTF-8')
 
-            return ET.parse(s, parser)
+            with s:
+                for chunk in s.iter_content(read_size):
+                    parser.feed(chunk)
+                return parser.close()
 
         pmid = self.pmid.defined_values
         if len(pmid) == 1:
@@ -283,6 +315,18 @@ class Document(BaseDocument):
                                            ' Please try with just one Pubmed ID')
 
 
+class SourcedFrom(DP.ObjectProperty):
+    '''
+    Indicates which document provided the source for an object
+    '''
+    class_context = SCI_CTX
+    link_name = "sourced_from"
+    value_type = BaseDocument
+    owner_type = BaseDataObject
+    multiple = False
+    lazy = True
+
+
 def _wormbase_uri_to_wbid(uri):
     return str(urlparse(uri).path.split("/")[2])
 
@@ -302,40 +346,48 @@ def _doi_uri_to_doi(uri):
     return doi
 
 
-class EmptyRes(object):
-    def read(self):
-        return bytes()
+def _url_request(url, requests_session=None, do_retries=False, **kwargs):
 
+    if requests_session is None:
+        sess = requests.Session()
+    else:
+        sess = requests_session
 
-def _url_request(url, headers={}):
+    if do_retries:
+        retries = Retry()
+        adapter = HTTPAdapter(max_retries=retries)
+        sess.mount('http://', adapter)
+        sess.mount('https://', adapter)
+
+    if 'timeout' not in kwargs:
+        kwargs['timeout'] = 1
+
     try:
-        r = Request(url, headers=headers)
-        s = urlopen(r, timeout=1)
-        info = dict(s.info())
-        content_type = {k.lower(): info[k] for k in info}['content-type']
-        md = re.search("charset *= *([^ ]+)", content_type)
-        if md:
-            s.charset = md.group(1)
+        resp = sess.get(url, **kwargs)
+        if resp.status_code != 200:
+            raise Exception(f'Service returned status code {resp.status_code}')
+        content_type = resp.headers.get('content-type')
+        if content_type:
+            md = re.search("charset *= *([^ ]+)", content_type)
+            if md:
+                resp.charset = md.group(1)
 
-        return s
-    except HTTPError:
-        logger.error("Error in request for {}".format(url), exc_info=True)
-        return EmptyRes()
-    except URLError:
-        logger.error("Error in request for {}".format(url), exc_info=True)
-        return EmptyRes()
+        return resp
+    except Exception:
+        logger.error("Error in request for %s", url, exc_info=True)
+        raise
 
 
-def _json_request(url):
-    import json
-    headers = {'Accept': 'application/json'}
+def _json_request(url, **kwargs):
+    if 'headers' in kwargs:
+        headers = kwargs['headers']
+    else:
+        headers = {}
+        kwargs['headers'] = headers
+    headers['Accept'] = 'application/json'
     try:
-        data = _url_request(url, headers).read().decode('UTF-8')
-        if hasattr(data, 'charset'):
-            return json.loads(data, encoding=data.charset)
-        else:
-            return json.loads(data)
+        return _url_request(url, **kwargs).json()
     except BaseException:
-        logger.warning("Couldn't retrieve JSON data from " + url,
+        logger.warning("Couldn't retrieve JSON data from %s", url,
                        exc_info=True)
         return {}

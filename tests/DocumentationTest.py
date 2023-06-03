@@ -72,7 +72,8 @@ class SphinxTest(unittest.TestCase):
             hardiness = DatatypeProperty()
             fullness = DatatypeProperty()
             part_number = DatatypeProperty()
-            key_property = {'name': 'part_number', 'type': 'direct'}
+            key_property = 'part_number'
+            direct_key = True
 
         ctx = Context(ident='http://example.org/data/imports/BDW_Widgets_2018-2019')
 

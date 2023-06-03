@@ -44,18 +44,15 @@ class InexactNumberMatchTest(_Base):
         self.conn_ds.data_context(Connection)(pre_cell=Neuron('PreCell'),
                                               post_cell=Neuron('PostCell'),
                                               syntype='send')
-        self.nt_ds.commit()
-        self.conn_ds.commit()
+        self.conn_ds.data_context.save()
 
     def test_connection_exists(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(len(list(conn.load())), 1)
 
     def test_adds_nt(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(list(conn.load())[0].synclass(), 'neurotransmitter')
 
@@ -73,16 +70,14 @@ class ExactNumberMatchTest(_Base):
                                               post_cell=Neuron('PostCell'),
                                               syntype='send',
                                               number=3)
-        self.conn_ds.commit()
+        self.conn_ds.data_context.save()
 
     def test_connection_exists(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(len(list(conn.load())), 1)
 
     def test_adds_nt(self):
         res = self.cut(self.conn_ds, self.nt_ds)
-        res.commit()
         conn = res.data_context.stored(Connection).query()
         self.assertEqual(list(conn.load())[0].synclass(), 'neurotransmitter')

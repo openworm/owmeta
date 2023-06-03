@@ -37,6 +37,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode',
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'rdflib': ('https://rdflib.readthedocs.io/en/stable/', None),
                        'owmeta-core': ('https://owmeta-core.readthedocs.io/en/stable/', None),
+                       'requests': ('https://requests.readthedocs.io/en/stable/', None),
                        'bibtexparser': ('https://bibtexparser.readthedocs.io/en/master/', None)}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -4,7 +4,6 @@ pt () {
     sh -c "pytest --cov=owmeta $*"
 }
 
-
 COVERAGES=""
 
 add_coverage () {

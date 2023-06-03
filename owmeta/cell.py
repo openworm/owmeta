@@ -56,7 +56,9 @@ class Cell(BiologyType):
 
     parentOf = ObjectProperty(value_type=This, multiple=True)
 
-    key_property = {'property': name, 'type': 'direct'}
+    key_property = 'name'
+
+    direct_key = True
 
     def __init__(self, name=None, lineageName=None, **kwargs):
         # NOTE: We name the `name` and `lineageName` as positional parameters for

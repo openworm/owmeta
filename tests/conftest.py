@@ -8,6 +8,7 @@ import shutil
 import tempfile
 
 import requests
+from owmeta_pytest_plugin import bundle_fixture_helper
 from pytest import fixture
 
 
@@ -119,3 +120,7 @@ def wait_for_started(server_data, max_tries=10):
             done = True
         except Exception:
             L.info("Unable to connect to the bundle server. Trying again.", exc_info=True)
+
+
+data_bundle = fixture(bundle_fixture_helper('openworm/owmeta-data'))
+owmeta_schema_bundle = fixture(bundle_fixture_helper('openworm/owmeta-schema'))
