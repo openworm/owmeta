@@ -2,7 +2,7 @@
 [![Docs](https://readthedocs.org/projects/owmeta/badge/?version=latest)](https://owmeta.readthedocs.io/en/latest)
 [![Coverage Status](https://coveralls.io/repos/github/openworm/owmeta/badge.svg?branch=dev)](https://coveralls.io/github/openworm/owmeta?branch=dev)
 
-owmeta
+owmeta 
 ======
 <img width="1207" alt="pyow_in_overview" src="openworm-overview.png">
 
