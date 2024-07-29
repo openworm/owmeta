@@ -113,7 +113,7 @@ def setup(sctx, ctx, name, type):
     return n
 
 
-with OWM('../.owm').connect() as conn:
+with OWM('../.owm').connect().transaction() as conn:
     ctx = conn(Context)('http://example.org/data')
     evctx = conn(Context)('http://example.org/evidence')
 

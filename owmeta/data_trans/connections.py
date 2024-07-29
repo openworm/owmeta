@@ -1,9 +1,6 @@
-import re
-import traceback
 import csv
 import logging
 
-from owmeta_core.context import Context
 from owmeta_core.datasource import GenericTranslation
 from owmeta_core.dataobject import ObjectProperty
 from owmeta_core.data_trans.csv_ds import CSVDataTranslator, CSVDataSource

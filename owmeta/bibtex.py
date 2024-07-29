@@ -1,4 +1,3 @@
-import re
 import bibtexparser
 
 from .evidence import Evidence
@@ -15,7 +14,7 @@ def bibtex_to_document(bibtex_entry, context=None):
 
 
 def update_document_with_bibtex(document, bibtex_entry):
-    document.set_key(bibtex_entry['ID'])
+    document.key = bibtex_entry['ID']
     for ath in bibtex_entry.get('author', tuple()):
         document.author(ath)
 

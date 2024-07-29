@@ -19,7 +19,7 @@ before_install:
 
 install:
 - pip install .
-- owm clone https://github.com/openworm/OpenWormData.git
+- owm clone https://github.com/openworm/OpenWormData.git --branch owmeta
 - |
   if [ $BUNDLE_TESTS ] ; then
     owm bundle register ./owmeta-schema-bundle.yml
